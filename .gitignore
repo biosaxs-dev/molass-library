@@ -1,6 +1,7 @@
 # Ignore build artifacts
 build/
-molass.egg-info/
+dist/
+*.egg-info/
 
 # Ignore the evironment file which defines PYTHONPATH for local execution
 .env
