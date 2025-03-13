@@ -1,0 +1,25 @@
+.. molass documentation master file, created by
+   sphinx-quickstart on Fri Mar 14 07:21:52 2025.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Molass Library Reference
+========================
+
+Add your content using ``reStructuredText`` syntax. See the
+`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
+documentation for details.
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   modules
+
+The Egyptian Sphinx
+-------------------
+
+.. image:: _static/molamola.png
+   :alt: Molamola
+   :align: left
