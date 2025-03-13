@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "molass"
+version = "0.0.1"
+dependencies = [
+]
+requires-python = ">=3.9"
+authors = [
+  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"},
+]
+maintainers = [
+  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"}
+]
+description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
+readme = "README.md"
+license = {text = "GPLv3"}
+# license-files = ["LICEN[CS]E.*"]
+keywords = ["SEC-SAXS"]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Repository = "https://github.com/freesemt/molass-library"
