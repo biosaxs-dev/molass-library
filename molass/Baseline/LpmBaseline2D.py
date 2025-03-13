@@ -6,7 +6,7 @@
 import numpy as np
 from molass.PackageUtils.NumbaUtils import get_ready_for_numba
 get_ready_for_numba()
-from Baseline.ScatteringBaseline import ScatteringBaseline
+from molass_legacy.Baseline.ScatteringBaseline import ScatteringBaseline
 
 def individual_axes_impl(self, data, axes, method, method_kwargs):
     """Implementation of the LPM baseline fitting for 2D data"""

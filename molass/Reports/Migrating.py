@@ -4,7 +4,7 @@
     extracted from Lib.Reports.ReportUtils.py
 """
 import numpy as np
-from AutorgKek.Quality import compute_atsas_fit_consistency
+from molass_legacy.AutorgKek.Quality import compute_atsas_fit_consistency
 
 COLNAMES = [
     'folder',

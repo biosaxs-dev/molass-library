@@ -10,6 +10,8 @@ from molass.DataObjects.Curve import Curve
 PICKAT = 0.02   # default value for pickat
 
 class XrData(SsMatrixData):
+    """
+    XrData class for XR matrix data. """
     def __init__(self, iv, jv, M, E):
         super().__init__(iv, jv, M, E)
         self.qv = iv

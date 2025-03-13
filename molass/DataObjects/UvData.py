@@ -10,6 +10,8 @@ PICKVALUES = [280, 400]
 PICKAT = PICKVALUES[0]
 
 class UvData(SsMatrixData):
+    """
+    UvData class for UV matrix data. """
     def __init__(self, iv, jv, M, E):
         super().__init__(iv, jv, M, E)
         self.wv = iv

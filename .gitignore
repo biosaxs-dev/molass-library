@@ -8,3 +8,8 @@ dist/
 
 # Ignore Python cache files
 __pycache__/
+
+# Ignore the Sphinx build directory
+docs/_build/
+
+docs/molass*.rst
