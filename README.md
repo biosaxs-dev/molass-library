@@ -14,4 +14,4 @@ For the theoretical explanation, read [Molass Library Theory](https://freesemt.g
 
 To get started, follow [Molass Library Tutorial](https://freesemt.github.io/molass-tutorial/).
 
-For detailed description of each fucntion, check out [Molass Library Reference](https://freesemt.github.io/molass-reference/).
+For detailed description of each fucntion, check out [Molass Library Reference](https://freesemt.github.io/molass-library/).
