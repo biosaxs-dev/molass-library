@@ -10,8 +10,8 @@ To install this package, you can use pip as follows.
 pip install -U molass
 ```
 
-For the theoretical explanation, read [Molass Library Theory](https://freesemt.github.io/molass-theory/).
+For details, see also:
 
-To get started, follow [Molass Library Tutorial](https://freesemt.github.io/molass-tutorial/).
-
-For detailed description of each fucntion, see [Molass Library Reference](https://freesemt.github.io/molass-library/).
+- **Molass Library Theory:** https://freesemt.github.io/molass-theory
+- **Molass Library Tutorial:** https://freesemt.github.io/molass-tutorial
+- **Molass Library Reference:** https://freesemt.github.io/molass-library
