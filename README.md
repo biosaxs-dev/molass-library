@@ -1,4 +1,4 @@
-<div align="center" valign=center>
+<div align="center" valign="center">
 <h1><img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="100">& ; & ; Molass Library</h1>
 </div>
 
