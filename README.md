@@ -1,6 +1,6 @@
-<h1 align="center" valign="center">
-<img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="100">Molass Library
-</h1><br>
+<div align="center" valign="center">
+<img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="100"><h1>Molass Library</h1>
+</div><br>
 
 <font color="orange">WARNING: This package is currently in preparation to be available in April, 2025.</font>
 
