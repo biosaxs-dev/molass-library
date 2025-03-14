@@ -1,10 +1,7 @@
 <div align="center">
-<table>
-<tr>
-<td><img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="100"></td>
-<td><h1>Molass Library</h1></td>
-</tr>
-</table>
+<pre>
+<img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="100">   <h1>Molass Library</h1>
+</pre>
 </div><br>
 
 <font color="orange">WARNING: This package is currently in preparation to be available in April, 2025.</font>
