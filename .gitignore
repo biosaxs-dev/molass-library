@@ -13,3 +13,5 @@ __pycache__/
 docs/_build/
 
 docs/molass*.rst
+
+docs-jb/_build/
