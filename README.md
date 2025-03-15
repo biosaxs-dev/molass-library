@@ -15,5 +15,6 @@ For details, see also:
 - **Theory:** https://freesemt.github.io/molass-theory
 - **Tutorial:** https://freesemt.github.io/molass-tutorial
 - **Reference:** https://freesemt.github.io/molass-library
+- **Legacy Repository:** https://github.com/freesemt/molass-legacy
 
 <br>
