@@ -15,8 +15,8 @@ pip install -U molass
 
 For details, see also:
 
-- **Molass Library Theory:** https://freesemt.github.io/molass-theory
-- **Molass Library Tutorial:** https://freesemt.github.io/molass-tutorial
-- **Molass Library Reference:** https://freesemt.github.io/molass-library
+- **Theory:** https://freesemt.github.io/molass-theory
+- **Tutorial:** https://freesemt.github.io/molass-tutorial
+- **Reference:** https://freesemt.github.io/molass-library
 
 <br>
