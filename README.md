@@ -8,6 +8,11 @@ To install this package, use pip as follows.
 
 ```
 pip install -U molass
+pip install -U molass_legacy
+```
+
+```{note}
+The molass package currently depends on molass_legacy. This dependency is planned to be removed.
 ```
 
 For details, see also:
