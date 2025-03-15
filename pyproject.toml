@@ -7,6 +7,9 @@ name = "molass"
 version = "0.0.2"
 
 dependencies = [
+  "numpy",
+  "scipy",
+  "matplotlib",
 ]
 
 requires-python = ">=3.9"
@@ -21,7 +24,7 @@ maintainers = [
 
 description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
 readme = "README.md"
-license = {file = "gpl-3.0.txt"}
+license = {file = "LICENSE.txt"}
 
 keywords = ["SEC-SAXS"]
 classifiers = [
