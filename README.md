@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://freesemt.github.io/molass-library/_static/molamola.png" width="70">&emsp;Molass Library</h1>
+<h1 align="center"><img src="https://freesemt.github.io/molass-library/_static/molass-title.png" width="70"></h1>
 
 <font color="orange">WARNING: This package is currently in preparation to be available in April, 2025.</font>
 
