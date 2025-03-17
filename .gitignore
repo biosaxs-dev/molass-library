@@ -12,6 +12,4 @@ __pycache__/
 # Ignore the Sphinx build directory
 docs/_build/
 
-docs/molass*.rst
-
-docs-jb/_build/
+docs/molass.*.rst
