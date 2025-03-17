@@ -12,4 +12,4 @@ Molass Library is a rewrite of `MOLASS <https://www.jstage.jst.go.jp/article/bio
    :maxdepth: 4
    :caption: Contents:
 
-   molass
+   modules
