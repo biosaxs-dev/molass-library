@@ -1,7 +1,7 @@
 molass package
 ==============
 
-Subpackages
+Submodules
 -----------
 
 .. toctree::
