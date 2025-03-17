@@ -17,7 +17,7 @@ pip install -U molass_legacy
 
 For details, see also:
 
-- **Theory:** https://freesemt.github.io/molass-theory
+- **Essense:** https://freesemt.github.io/molass-essense
 - **Tutorial:** https://freesemt.github.io/molass-tutorial
 - **Reference:** https://freesemt.github.io/molass-library
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy
