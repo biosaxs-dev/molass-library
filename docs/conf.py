@@ -30,3 +30,4 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinxawesome_theme'
 html_static_path = ['_static']
+html_favicon = "_static/molamola.png"
