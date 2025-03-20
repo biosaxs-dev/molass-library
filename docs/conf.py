@@ -19,6 +19,8 @@ extensions = [
 ]
 
 autoclass_content = 'both'
+# napoleon_google_docstring = True
+# napoleon_numpy_docstring = True
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -26,6 +28,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
 html_theme_options = {
     "repository_url": "https://github.com/freesemt/molass-library",
     "use_repository_button": True,
