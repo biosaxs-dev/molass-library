@@ -20,7 +20,7 @@ def compute_rgcurve_info(xrdata):
     return rginfo_list
 
 def compute_rgcurve_info_atsas(xrdata):
-    from ATSAS.AutorgRunner import AutorgRunner
+    from molass_legacy.ATSAS.AutorgRunner import AutorgRunner
     from molass_legacy._MOLASS.SerialSettings import set_setting
 
     cwd = os.getcwd()
