@@ -298,7 +298,7 @@ def draw_wedges(ax, center, radius, rad_pairs, colors):
         wedge = Wedge(center, radius, scale*r1, scale*r2, color=c)
         ax.add_patch(wedge)
 
-def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True, fig_check=False, debug=False):
+def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True, return_init=False, fig_check=False, debug=False):
     # import molass_legacy.KekLib.DebugPlot as plt
     from matplotlib.widgets import Button
 
@@ -330,6 +330,9 @@ def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True,
     markersizes = np.array([8, 4, 2])
     pcolors = ["green", "blue", "red"]
     ptype_indeces = np.array(list(np.arange(len(psizes)))*200)
+    large_indeces = np.where(ptype_indeces == 0)[0]
+    middle_indeces = np.where(ptype_indeces == 1)[0]
+    small_indeces = np.where(ptype_indeces == 2)[0]
     np.random.shuffle(ptype_indeces)
     num_particles = len(ptype_indeces)
     grain_references = -np.ones(num_particles, dtype=int)
@@ -361,7 +364,11 @@ def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True,
         ax1 = fig.add_subplot(gs[0,0])
         ax2 = fig.add_subplot(gs[0,1])
         ax3 = fig.add_subplot(gs[0,2:4])
-        fig.suptitle("Size Exclusion Chromatography Illustrative 2D Animation", fontsize=16, y=0.99)
+        suptitle_fmt = "Size Exclusion Chromatography Illustrative 2D Animation: %3d"
+        suptitle_text = fig.suptitle(suptitle_fmt % 0, fontsize=16, y=0.99)
+        ax1.set_title("Column Image")
+        ax2.set_title("Histogram by Y-Axis") 
+        ax3.set_title("Histogram by Retension Time (Frames)")
     main_fig = fig
 
     if fig_check:
@@ -378,16 +385,17 @@ def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True,
         
     fig.canvas.mpl_connect('button_press_event', on_click)
 
-    button_ax = fig.add_axes([0.85, 0.05, 0.1, 0.03])
-    def draw_slice_states(event):
-        from Stochastic.ColumnSliceStates import draw_slice_states_impl
-        print("draw_slice_states")
-        if event.inaxes != button_ax:
-            return
-        draw_slice_states_impl(fig, ax2, grains, pxv, pyv, inmobile_states)
+    if False:
+        button_ax = fig.add_axes([0.85, 0.05, 0.1, 0.03])
+        def draw_slice_states(event):
+            from Stochastic.ColumnSliceStates import draw_slice_states_impl
+            print("draw_slice_states")
+            if event.inaxes != button_ax:
+                return
+            draw_slice_states_impl(fig, ax2, grains, pxv, pyv, inmobile_states)
 
-    debug_btn = Button(button_ax, 'Draw Slice States', hovercolor='0.975')
-    debug_btn.on_clicked(draw_slice_states)
+        debug_btn = Button(button_ax, 'Draw Slice States', hovercolor='0.975')
+        debug_btn.on_clicked(draw_slice_states)
 
     def plot_column_structure(ax):
         ax.set_axis_off()
@@ -601,12 +609,67 @@ def get_animation(figsize=None, use_tqdm=True, num_frames=None, close_plot=True,
             print("(3) inmobile_states=", ''.join(map(lambda b: '%d' % b, inmobile_states)))
         return pxv, pyv
 
+
+    y_axis_bins = np.linspace(ymin, ymax, 100)
+    x_axis_bins = np.arange(num_frames)
+    # horizontal_bins = 50
+    horizontal_bar_containers = []
+    vertical_bar_containers = []
+
+    x_hist_large = np.zeros(len(x_axis_bins))
+    x_hist_middle = np.zeros(len(x_axis_bins))
+    x_hist_small = np.zeros(len(x_axis_bins))
+    x_hist_list = [x_hist_large, x_hist_middle, x_hist_small]
+    delta_y = y_axis_bins[1] - y_axis_bins[0]
+
+    def compute_histogram_data(i, add_containers=False):
+        pyv_large = pyv[large_indeces]
+        pyv_middle = pyv[middle_indeces]
+        pyv_small = pyv[small_indeces]
+
+        y_hist_large = np.histogram(pyv_large, bins=y_axis_bins)[0]
+        y_hist_middle = np.histogram(pyv_middle, bins=y_axis_bins)[0]
+        y_hist_small = np.histogram(pyv_small, bins=y_axis_bins)[0]
+        y_hist_list = [y_hist_large, y_hist_middle, y_hist_small]
+        x_hist_large[i] = np.where(np.logical_and(pyv_large > -delta_y, pyv_large < +delta_y))[0].shape[0]
+        x_hist_middle[i] = np.where(np.logical_and(pyv_middle > -delta_y, pyv_middle < +delta_y))[0].shape[0]
+        x_hist_small[i] = np.where(np.logical_and(pyv_small > -delta_y, pyv_small < +delta_y))[0].shape[0]
+        
+        if add_containers:
+            for hist, color in zip(y_hist_list, pcolors):
+                _, _, bar_container = ax2.hist(hist, y_axis_bins, lw=1,
+                                        ec="yellow", fc=color, alpha=0.5, orientation='horizontal')
+                horizontal_bar_containers.append(bar_container)
+            for hist, color in zip(x_hist_list, pcolors):
+                _, _, bar_container = ax3.hist(hist, x_axis_bins, lw=1,
+                                        ec="yellow", fc=color, alpha=0.5)
+                vertical_bar_containers.append(bar_container)
+        else:
+            for hist, container in zip(y_hist_list, horizontal_bar_containers):
+                for count, rect in zip(hist, container.patches):
+                    rect.set_width(count)
+            for hist, container in zip(x_hist_list, vertical_bar_containers):
+                for count, rect in zip(hist, container.patches):
+                    rect.set_height(count)
+
+    # ax2.invert_yaxis()
+    compute_histogram_data(0, add_containers=True)
+    bar_patches = []
+    for container in horizontal_bar_containers + vertical_bar_containers:
+        bar_patches += container.patches
+    ax3.set_ylim(0, 20)
+
+    if return_init:
+        return
+
     def animate(i):
         if not pause:
-            compute_next_positions()
+            pxv, pyv = compute_next_positions()
+            compute_histogram_data(i)
+            suptitle_text.set_text(suptitle_fmt % i)
         for k, p in enumerate(particles):
             p.set_data(pxv[k:k+1], pyv[k:k+1])
-        return particles
+        return particles + bar_patches
 
     def init():
         nonlocal pxv, pyv, rv
