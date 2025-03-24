@@ -36,6 +36,8 @@ As the name suggests, SEC-SAXS experiment consists of the two parts:
 
 each of which has its own theoretical characteristics. Therefore, the analysis requires a balanced combination of those, which is the target of `Molass Library`.
 
+![Logo of Molass Library created by K. Yatabe](docs/_static/molass_256.png)
+
 # Statement of need
 
 Analysis of SEC-SAXS experiment data involves several steps such as:
@@ -50,8 +52,6 @@ Analysis of SEC-SAXS experiment data involves several steps such as:
 9. Original Structure (Electron Density) Estimation
 
 among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary and consists of a couple of dozens of command interface programs for each responsible step. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include closed ATSAS. In such state of software availability for SEC-SAXS experiments, `Molass Library` can make larger part of tools more open and flexible powered by the Python ecosystem.
-
-![Logo of Molass Library created by K. Yatabe](docs/_static/molass_256.png)
 
 # Notable package dependence
 
