@@ -27,7 +27,7 @@ bibliography: paper.bib
 
 # Summary
 
-`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks, thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
+`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
 As the name suggests, SEC-SAXS experiment consists of the two parts:
 
@@ -53,25 +53,22 @@ among which `Molass Library` currently supports only steps 3-8. For the first tw
 
 ![Logo of Molass Library created by K. Yatabe](docs/_static/molass_256.png)
 
-# Notable Package Dependence
+# Notable package dependence
 
 NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007] are necessity. Moreover, it is notable that `Molass Library` reduced significant volume of codes by the use of following packages.
 
-* pybaselines [@pybaselines] for Baseline Correcction
-* ruptures [@TRUONG2020107299] for Change Point Dedection
+* `pybaselines` [@pybaselines] for Baseline Correcction
+* `ruptures` [@TRUONG2020107299] for Change Point Dedection
 
-Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for the practical recognition.
+Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
 
-# 
+# Theoretical focus
+
+"Low Rank Factorization", the most important feature of `Molass Library`, is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is easy. Otherwise it is challenging so that ... 
 
 $$ M = P \cdot C  $$
 
 $$ P = M \cdot C^{+}  $$
-
-# Citations
-
-
-# Figures
 
 
 # Acknowledgements
