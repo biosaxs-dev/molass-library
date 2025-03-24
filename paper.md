@@ -66,7 +66,7 @@ As for reduced dependence, large part of GUI implementation, which was previouly
 
 # Theoretical focus
 
-"Low Rank Factorization", the most important feature of `Molass Library`, is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is easy. Otherwise it becomes challenging as the problem gets the unfortunate nature of unerdeterminedness, the handling of which is beyond the scope of this paper.
+"Low Rank Factorization", the most important feature of `Molass Library`, is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is easy. Otherwise it becomes challenging as the problem gets the unfortunate nature of unerdeterminedness, the handling of which is beyond the scope of this paper and should be worked using the future version of this library.
 
 Here, we decribe the essense of the easy part to give a basic idea of what this main feature is all about.
 
