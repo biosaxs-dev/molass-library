@@ -62,6 +62,8 @@ NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007] are nec
 
 Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
 
+Large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is not longer needed because it has been replaced by the scripting in Jupyter notebooks [@Kluyver:2016aa].
+
 # Theoretical focus
 
 "Low Rank Factorization", the most important feature of `Molass Library`, is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is easy. Otherwise it is challenging so that ... 
