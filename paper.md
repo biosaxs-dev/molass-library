@@ -30,22 +30,24 @@ bibliography: paper.bib
 `Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter Notebooks, thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
 As the name suggests, SEC-SAXS experiment consists of the two parts:
+
 * SEC - Size Exclusion Chromatograpy
 * SAXS - Small Angle X-Ray Scattering
+
 each of which has its own theoretical aspects. Therefore, the analysis requires a balanced combination of those.
 
 # Statement of need
 
 Analysis of SEC-SAXS experiment data involves several steps such as:
 
- 1 Circular Average
- 2 Background Subtraction
- 3 Trimming
- 4 Baseline Correcction
- 5 Low Rank Factorization
- 6 Rg Estimation (Guinier Plot)
- 8 ... (Kratky Plot)
- 9 Original Structure (Electron Density) Estimation
+1. Circular Average
+2. Background Subtraction
+3. Trimming
+4. Baseline Correcction
+5. Low Rank Factorization
+6. Rg Estimation (Guinier Plot)
+8. ... (Kratky Plot)
+9. Original Structure (Electron Density) Estimation
 
 among which `Molass Library` currently only supports 3-8. For all these steps, there already exist several software tools with various coverage. The most comprehensive and used tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary and consists of a couple of dozens of commands for each responsible step. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include closed ATSAS.
 
@@ -53,7 +55,7 @@ among which `Molass Library` currently only supports 3-8. For all these steps, t
 
 # Mathematics
 
-$$  $$
+$$ M = P \cdot C  $$
 
 # Citations
 
