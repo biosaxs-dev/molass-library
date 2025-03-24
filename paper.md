@@ -27,7 +27,7 @@ bibliography: paper.bib
 
 # Summary
 
-`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter Notebooks, thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
+`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks, thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
 As the name suggests, SEC-SAXS experiment consists of the two parts:
 
@@ -49,11 +49,20 @@ Analysis of SEC-SAXS experiment data involves several steps such as:
 8. ... (Kratky Plot)
 9. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and used tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary and consists of a couple of dozens of commands for each responsible step. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include closed ATSAS.
+among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary and consists of a couple of dozens of command interface programs for each responsible step. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include closed ATSAS. In such state of software availability for SEC-SAXS experiments, `Molass Library` can make larger part of tools more open and flexible powered by the Python ecosystem.
 
 ![Logo of Molass Library created by K. Yatabe](docs/_static/molass_256.png)
 
-# Mathematics
+# Notable Package Dependence
+
+NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007] are necessity. Moreover, it is notable that `Molass Library` reduced significant volume of codes by the use of following packages.
+
+* pybaselines [@pybaselines] for Baseline Correcction
+* ruptures [@TRUONG2020107299] for Change Point Dedection
+
+Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for the practical recognition.
+
+# 
 
 $$ M = P \cdot C  $$
 
