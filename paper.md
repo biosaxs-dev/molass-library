@@ -5,13 +5,12 @@ tags:
   - SEC-SAXS
   - Bio-SAXS
 authors:
-  - name: Matastuyo Takahashi
+  - name: Masatsuyo Takahashi
     orcid: 0009-0007-1466-5563
-    equal-contrib: true
+    corresponding: false    
     affiliation: 1
   - name: Nobutaka Shimizu
     orcid: 0000-0002-3636-1663
-    equal-contrib: true
     corresponding: true
     affiliation: "2,1"
 affiliations:
