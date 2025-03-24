@@ -35,6 +35,8 @@ bibliography: paper.bib
 
 `Molass` was designed ...
 
+![Logo of Molass Library](docs/_static/molamola.png)
+
 # Mathematics
 
 
