@@ -29,14 +29,14 @@ bibliography: paper.bib
 
 `Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
-As the name suggests, SEC-SAXS experiment consists of the two parts:
+Literally, SEC-SAXS experiment consists of the two parts:
 
 * SEC - Size Exclusion Chromatograpy
 * SAXS - Small Angle X-Ray Scattering
 
-each of which has its own theoretical characteristics. Therefore, the analysis requires a balanced combination of those, which is the target of `Molass Library`.
+each of which is based on its own theoretical discipline, indicating the fact that the analysis requires a balanced combination of those, which is the target of `Molass Library`.
 
-![Logo of Molass Library created by K. Yatabe](docs/_static/molass_256.png)
+![Logo of Molass Library designed by K. Yatabe](docs/_static/molass_256.png)
 
 # Statement of need
 
