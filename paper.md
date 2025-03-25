@@ -80,15 +80,15 @@ where the matrices are
 
 [^1]: While it is also called Low Rank Approximation, we prefer the word "Factorization" because our purpose is decomposition to find out what components are there.
 
-Using the above relation, the solution can be calcualted as follows:
+Using the above relation, the solution can be calcualted [@Penrose_1956] as follows:
 
 $$ P = M \cdot C^{+} $$
 
 where
 
-* $C^{+}$ : Moore-Penrose inverse [@Penrose_1956].
+* $C^{+}$ : Moore-Penrose inverse.
 
-Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
+Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
 
 For real noisy data, ... 
 
