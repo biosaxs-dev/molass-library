@@ -48,10 +48,10 @@ Analysis of SEC-SAXS experiment data involves several steps. To list a simplest 
 4. Baseline Correcction
 5. Low Rank Factorization
 6. Rg Estimation (Guinier Plot)
-8. ... (Kratky Plot)
-9. Original Structure (Electron Density) Estimation
+7. ... (Kratky Plot)
+8. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers by making larger part of the tools more open and flexible together with the Python ecosystem.
+among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand and use their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
 
 # Notable package dependence
 
@@ -66,17 +66,17 @@ For less dependence, large part of GUI implementation, which was previouly done 
 
 # Theoretical focus
 
-Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by the logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, when the peaks overlap widely, it becomes challenging due to underdeterminedness from noise, the handling of which is beyond the scope of this paper and should be worked using the future versions of this library.
+Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness from noise, the handling of which is beyond the scope of this paper and possibly might be worked using the future versions of this library.
 
-Here, we decribe the essense of easier part to give a basic idea of what it is all about. To discuss the decomposition, it is convinient to express the data using matrices. Ideally, then, the decomposition should be expressed as follows:
+Here, we decribe the essense of easier part to give a basic idea of what it is all about. To discuss the decomposition, it is convinient to use matrices for the data. Ideally, then, the decomposition should be expressed as follows:
 
 $$ M = P \cdot C \qquad (1) $$
 
-where the matrices are
+where the symbols are
 
-* $M$ : measured data,
-* $P$ : columns of component scattering curves,
-* $C$ : rows of component elution curves.
+* $M$ : matrix of measured data,
+* $P$ : matrix made of columns of component scattering curves,
+* $C$ : matrix made of rows of component elution curves.
 
 [^1]: Where it is often called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
 
