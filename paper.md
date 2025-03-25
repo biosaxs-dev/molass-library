@@ -66,7 +66,7 @@ For less dependence, large part of GUI implementation, which was previouly done 
 
 # Theoretical focus
 
-Among the above mentioned steps, Low Rank Factorization[^1] is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise it becomes challenging due to unerdeterminedness from noisy data, the handling of which is beyond the scope of this paper and should be worked using the future versions of this library.
+Among the above mentioned steps, Low Rank Factorization[^1] is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise it becomes challenging due to underdeterminedness from noisy data, the handling of which is beyond the scope of this paper and should be worked using the future versions of this library.
 
 Here, we decribe the essense of easier part to give a basic idea of what it is all about. To handle the decomposition, it is convinient to express the data using matrices. Then, ideally, the decomposition should be expressed as follows:
 
@@ -88,7 +88,7 @@ where
 
 * $C^{+}$ : Moore-Penrose inverse.
 
-Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principal where the component particles elute in the decsending order of particle size, namely the larger comes earlier, and the resulted curves are  relatively easy to model.
+Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
 
 For real noisy data, ... 
 
@@ -98,9 +98,13 @@ We can denose using SVD as follows ...
 
 # Elution curve models - modeling approach
 
+To cope with the problem of underdeterminedness, we believe it is essential to utilize appropriate models such as:
+
 * EGH [@LAN20011]
 * SDM [@Felinger1999]
 * EDM [@Ur2021]
+
+depending on the state of data, which are included in `Molass Library`.
 
 # Acknowledgements
 
