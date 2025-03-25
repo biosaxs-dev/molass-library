@@ -92,7 +92,7 @@ Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to 
 
 For real noisy data, ... $(1)$ should be interpreted as:
 
-$$ argmin \| M - P \cdot C \| \qquad (3) $$
+$$ \min_{P} \| M - P \cdot C \| \qquad (3) $$
 
 We can denose using SVD as follows ...
 
