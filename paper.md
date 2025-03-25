@@ -70,7 +70,7 @@ Among the above mentioned steps, Low Rank Factorization[^1] is the most distinct
 
 Here, we decribe the essense of easier part to give a basic idea of what it is all about. To handle the decomposition, it is convinient to express the data using matrices. Then, ideally, the decomposition should be expressed as follows:
 
-$$ M = P \cdot C \label{eq:1} $$
+$$ M = P \cdot C \quad (1) $$
 
 where the matrices are
 
@@ -82,7 +82,7 @@ where the matrices are
 
 Using the above relation, the solution can be calcualted [@Penrose_1956] as follows:
 
-$$ P = M \cdot C^{+} \label{eg:2} $$
+$$ P = M \cdot C^{+} \quad (2) $$
 
 where
 
@@ -90,9 +90,9 @@ where
 
 Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
 
-For real noisy data, ... $\ref{eq:1}$ should be interpreted as:
+For real noisy data, ... $ (1) $ should be interpreted as:
 
-$$ argmin \| M - P \cdot C \| \label{eg:3} $$
+$$ argmin \| M - P \cdot C \| \quad (3) $$
 
 We can denose using SVD as follows ...
 
