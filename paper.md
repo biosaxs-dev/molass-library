@@ -40,7 +40,7 @@ each of which is based on its own theoretical discipline, indicating the fact th
 
 # Statement of need
 
-Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for example:
+Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for discussion:
 
 1. Circular Average
 2. Background Subtraction
@@ -51,7 +51,7 @@ Analysis of SEC-SAXS experiment data involves several steps. To list a simplest 
 7. ... (Kratky Plot)
 8. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand and use their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
+among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand and utilize their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
 
 # Notable package dependence
 
@@ -66,7 +66,7 @@ For less dependence, large part of GUI implementation, which was previouly done 
 
 # Theoretical focus
 
-Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness from noise, the handling of which is beyond the scope of this paper and possibly might be worked using the future versions of this library.
+Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is directly related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness from noise, the handling of which is beyond the scope of this paper and possibly might be worked using the future versions of this library.
 
 Here, we decribe the essense of easier part to give a basic idea of what it is all about. To discuss the decomposition, it is convinient to use matrices for the data. Ideally, then, the decomposition should be expressed as follows:
 
