@@ -80,7 +80,9 @@ where the matrices are
 
 [^1]: While it is also called Low Rank Approximation, we prefer the word "Factorization" because our purpose is decomposition to find out what components are there.
 
-Using the above relation, the solution can be calcualted [@Penrose_1956] as follows:
+Using the above relation, the solution can be calcualted [@Penrose_1956], in a sense noted in the footnote[^2], as follows:
+
+[^2]: $P$ is determined as $ \min_{P} \| M - P \cdot C \| $.
 
 $$ P = M \cdot C^{+} \qquad (2) $$
 
@@ -90,9 +92,9 @@ where
 
 Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
 
-For real noisy data, ... $(1)$ should be interpreted as:
+For real noisy data, the equation $(1)$ should be interpreted as:
 
-$$ \min_{P} \| M - P \cdot C \| \qquad (3) $$
+$$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
 We can denose using SVD as follows ...
 
