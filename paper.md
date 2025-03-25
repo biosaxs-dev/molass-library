@@ -94,13 +94,26 @@ Note that, mathematically, $P$ and $C$ are equally eligible but physically not. 
 
 For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions as in [@Hammouda:ce5078] do not seem applicable at least to protein samples.
 
-# How to denoise
+# Denoising $M$
 
 For real noisy data, the equation $(1)$ should be interpreted as:
 
 $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
-We can denose using SVD as follows ...
+As commonly known, we can denose $M$ by ignoring the insignificant tail[^3] of the following expansion made from SVD - Singular Value Decomposition.
+
+$$ M = \sum_{i=1}{n} \sigma_i u_i v_i^* $$
+
+where
+
+* $n \leq max(n_rows, n_cols)$ : the rank of $M$,
+* $\sigma_i$ : ith singular value,
+* $u_i$ : ith row vector of the unitary matrix often denoted by $U$,
+* $v_i^*$ : traspose of ith row vector of the unitary matrix often denoted by $V$.
+
+Using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
+
+[^3]: terms where $n \geq i \geq r$ assuming the target rank is r.
 
 # Elution curve models - modeling approach
 
