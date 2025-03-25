@@ -113,15 +113,15 @@ where
 
 Using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
 
-[^3]: terms where $n \geq i \geq r$ assuming the target rank is r.
+[^3]: terms where $n \geq i \geq r$ assuming the target rank is r, which is the number of components in a simple assumption.
 
 # Elution curve models - modeling approach
 
 While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the underdeterminedness, we believe it is essential to utilize appropriate models as included in `Molass Library`, namely:
 
-* `EGH` [@LAN20011],
-* `SDM` [@Felinger1999],
-* `EDM` [@Ur2021],
+* `EGH` : Exponential Gaussian Hybrid [@LAN20011],
+* `SDM` : Stochastic Dispersive Model [@Felinger1999],
+* `EDM` : Equilibrium Dispersive Model [@Ur2021],
 
 depending on the state of data. Strength and weakness of these models are well distinguished in `Molass Library` online documentation.
 
