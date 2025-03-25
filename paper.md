@@ -55,14 +55,14 @@ among which `Molass Library` currently supports only steps 3-8. For the first tw
 
 # Notable package dependence
 
-Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes by the use of following packages.
+Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes by using the following packages.
 
 * `pybaselines` [@pybaselines] for Baseline Correcction
 * `ruptures` [@TRUONG2020107299] for Change Point Dedection
 
-Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
+Likewise, the basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
 
-For less dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is no longer needed because it has been replaced by the scripting in Jupyter notebooks [@Kluyver:2016aa].
+For less dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is no longer needed because it has been replaced by the scripting in Jupyter notebooks.
 
 # Theoretical focus
 
