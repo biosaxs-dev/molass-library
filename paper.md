@@ -86,11 +86,21 @@ $$ P = M \cdot C^{+} $$
 
 where
 
-* $C^{+}$ : Moore^-Penrose inverse.
+* $C^{+}$ : Moore-Penrose inverse.
 
-Note that we get $P$ from $M$ and $C$, because it is easier to estimate $C$ than $P$. The reason of this argument is as follows.
+Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principal where the component particles elute in the decsending order of particle size, namely the larger comes earlier, and the resulted curves are  relatively easy to model.
 
-...
+For real noisy data, ... 
+
+$$ argmin \| M - P \cdot C \|  $$
+
+We can denose using SVD as follows ...
+
+# Elution curve models - modeling approach
+
+* EGH [@LAN20011]
+* SDM [@Felinger1999]
+* EDM [@Ur2021]
 
 # Acknowledgements
 
