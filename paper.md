@@ -100,13 +100,13 @@ We can denose using SVD as follows ...
 
 # Elution curve models - modeling approach
 
-While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the problem of underdeterminedness, we believe it is essential to utilize appropriate models such as:
+While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the problem of underdeterminedness, we believe it is essential to utilize appropriate models as included in `Molass Library`, such as:
 
 * `EGH` [@LAN20011]
 * `SDM` [@Felinger1999]
 * `EDM` [@Ur2021]
 
-depending on the state of data, which are included in `Molass Library`.
+depending on the state of data.
 
 # Acknowledgements
 
