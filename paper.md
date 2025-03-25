@@ -51,7 +51,7 @@ Analysis of SEC-SAXS experiment data involves several steps. To list a simplest 
 8. ... (Kratky Plot)
 9. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include ATSAS suite. In such a state of software availability for SEC-SAXS experiments, `Molass Library` can make larger part of the tools more open and flexible powered by the Python ecosystem.
+among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include ATSAS suite. In such a state of software availability for SEC-SAXS experiments, `Molass Library` can help researchers by making larger part of the tools more open and flexible powered by the Python ecosystem.
 
 # Notable package dependence
 
@@ -86,7 +86,7 @@ $$ P = M \cdot C^{+} $$
 
 where
 
-* $C^{+}$ : Moore-Penrose inverse.
+* $C^{+}$ : Moore-Penrose inverse [@Penrose_1956].
 
 Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ than $P$. The reason of this argument comes from the SEC principle where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model.
 
