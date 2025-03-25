@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 `Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
-Literally, SEC-SAXS experiment consists of the two parts:
+Literally, SEC-SAXS experiment consists of the two independent parts:
 
 * SEC - Size Exclusion Chromatograpy
 * SAXS - Small Angle X-Ray Scattering
@@ -40,7 +40,7 @@ each of which is based on its own theoretical discipline, indicating the fact th
 
 # Statement of need
 
-Analysis of SEC-SAXS experiment data involves several steps such as:
+Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for example:
 
 1. Circular Average
 2. Background Subtraction
@@ -51,29 +51,46 @@ Analysis of SEC-SAXS experiment data involves several steps such as:
 8. ... (Kratky Plot)
 9. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary and consists of a couple of dozens of command interface programs for each responsible step. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include closed ATSAS. In such state of software availability for SEC-SAXS experiments, `Molass Library` can make larger part of tools more open and flexible powered by the Python ecosystem.
+among which `Molass Library` currently supports only steps 3-8. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for such executable programs, some of which are open and others of which include ATSAS suite. In such a state of software availability for SEC-SAXS experiments, `Molass Library` can make larger part of the tools more open and flexible powered by the Python ecosystem.
 
 # Notable package dependence
 
-NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007] are necessity. Notably, `Molass Library` replaced significant volume of codes by the use of following packages.
+Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes by the use of following packages.
 
 * `pybaselines` [@pybaselines] for Baseline Correcction
 * `ruptures` [@TRUONG2020107299] for Change Point Dedection
 
 Likewise, basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
 
-As for reduced dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is not longer needed because it has been replaced by the scripting in Jupyter notebooks [@Kluyver:2016aa].
+For less dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is no longer needed because it has been replaced by the scripting in Jupyter notebooks [@Kluyver:2016aa].
 
 # Theoretical focus
 
-"Low Rank Factorization", the most important feature of `Molass Library`, is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is easy. Otherwise it becomes challenging as the problem gets the unfortunate nature of unerdeterminedness, the handling of which is beyond the scope of this paper and should be worked using the future version of this library.
+Among the above mentioned steps, Low Rank Factorization[^1] is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise it becomes challenging due to unerdeterminedness from noisy data, the handling of which is beyond the scope of this paper and should be worked using the future versions of this library.
 
-Here, we decribe the essense of the easy part to give a basic idea of what this main feature is all about.
+Here, we decribe the essense of easier part to give a basic idea of what it is all about. To handle the decomposition, it is convinient to express the data using matrices. Then, ideally, the decomposition should be expressed as follows:
 
-$$ M = P \cdot C  $$
+$$ M = P \cdot C $$
 
-$$ P = M \cdot C^{+}  $$
+where the matrices are
 
+* $M$ : measured data
+* $P$ : columns of component scattering curves
+* $C$ : rows of component elution curves.
+
+[^1]: While it is also called Low Rank Approximation, we prefer the word "Factorization" because our purpose is decomposition to find out what components are there.
+
+Using the above relation, the solution can be calcualted as follows:
+
+$$ P = M \cdot C^{+} $$
+
+where
+
+* $C^{+}$ : Moore^-Penrose inverse.
+
+Note that we get $P$ from $M$ and $C$, because it is easier to estimate $C$ than $P$. The reason of this argument is as follows.
+
+...
 
 # Acknowledgements
 
