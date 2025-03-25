@@ -90,7 +90,7 @@ where
 
 * $C^{+}$ : Moore-Penrose inverse. [@Penrose_1956]
 
-Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason of this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves which are relatively easy to model as mentioned later.
+Note that we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason of this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
 For scattering curves on the other hand, we only have classical models for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions. From our experience, models just smoothly linking those extreme regions as in [@Hammouda:ce5078] do not seem applicable at least to protein samples. 
 
