@@ -100,16 +100,16 @@ For real noisy data, the equation $(1)$ should be interpreted as:
 
 $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
-As commonly known, we can denose $M$ by ignoring the insignificant tail[^3] of the following expansion made from SVD - Singular Value Decomposition.
+As commonly known, we can denoise $M$ by ignoring the insignificant tail[^3] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
 
-$$ M = \sum_{i=1}{n} \sigma_i u_i v_i^* $$
+$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* $$
 
 where
 
-* $n \leq max(n_rows, n_cols)$ : the rank of $M$,
+* $n \leq \max(rows, columns)$ : the rank of $M$,
 * $\sigma_i$ : ith singular value,
-* $u_i$ : ith row vector of the unitary matrix often denoted by $U$,
-* $v_i^*$ : traspose of ith row vector of the unitary matrix often denoted by $V$.
+* $u_i$ : ith row vector of the unitary matrix usually denoted by $U$,
+* $v_i^*$ : traspose of ith row vector of the unitary matrix usually denoted by $V$.
 
 Using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
 
