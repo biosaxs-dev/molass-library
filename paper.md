@@ -68,7 +68,7 @@ For less dependence, large part of GUI implementation, which was previouly done 
 
 Among the above mentioned steps, Low Rank Factorization[^1] is the most distinctive feature of `Molass Library`. It is related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise it becomes challenging due to underdeterminedness from noisy data, the handling of which is beyond the scope of this paper and should be worked using the future versions of this library.
 
-Here, we decribe the essense of easier part to give a basic idea of what it is all about. To handle the decomposition, it is convinient to express the data using matrices. Then, ideally, the decomposition should be expressed as follows:
+Here, we decribe the essense of easier part to give a basic idea of what it is all about. To discuss the decomposition, it is convinient to express the data using matrices. Then, ideally, the decomposition should be expressed as follows:
 
 $$ M = P \cdot C \qquad (1) $$
 
@@ -78,7 +78,7 @@ where the matrices are
 * $P$ : columns of component scattering curves
 * $C$ : rows of component elution curves.
 
-[^1]: While it is also called Low Rank Approximation, we prefer the word "Factorization" because our purpose is decomposition to find out what components are there.
+[^1]: Where it is often called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
 
 Using the above relation, the solution can be calcualted [@Penrose_1956], in a sense noted in the footnote[^2], as follows:
 
@@ -100,7 +100,7 @@ We can denose using SVD as follows ...
 
 # Elution curve models - modeling approach
 
-While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the problem of underdeterminedness, we believe it is essential to utilize appropriate models as included in `Molass Library`, such as:
+While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the  underdeterminedness, we believe it is essential to utilize appropriate models as included in `Molass Library`, namely:
 
 * `EGH` [@LAN20011]
 * `SDM` [@Felinger1999]
