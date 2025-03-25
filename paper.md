@@ -92,7 +92,7 @@ where
 
 Note that, mathematically, $P$ and $C$ are equally eligible but physically not. Therefore, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
-For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions as in [@Hammouda:ce5078] do not seem applicable at least to protein samples. 
+For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions as in [@Hammouda:ce5078] do not seem applicable at least to protein samples.
 
 # How to denoise
 
