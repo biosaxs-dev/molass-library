@@ -78,7 +78,7 @@ where the symbols are
 * $P$ : matrix made of columns of component scattering curves,
 * $C$ : matrix made of rows of component elution curves.
 
-[^1]: Where it is often called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
+[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
 
 Using the above relation, the solution can be calcualted, in a sense noted in the footnote[^2], as follows:
 
