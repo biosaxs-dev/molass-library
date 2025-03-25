@@ -82,7 +82,7 @@ where the matrices are
 
 Using the above relation, the solution can be calcualted [@Penrose_1956], in a sense noted in the footnote[^2], as follows:
 
-[^2]: $P$ is determined as the best possible solution which minimizes $ \| M - P \cdot C \| $.
+[^2]: $P$ is determined as the best possible solution which minimizes $\| M - P \cdot C \|$.
 
 $$ P = M \cdot C^{+} \qquad (2) $$
 
