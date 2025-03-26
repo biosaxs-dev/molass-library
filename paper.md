@@ -47,8 +47,8 @@ Analysis of SEC-SAXS experiment data involves several steps. To list a simplest 
 3. Trimming
 4. Baseline Correcction
 5. Low Rank Factorization
-6. Rg Estimation (Guinier Plot)
-7. Shape Inspection (Kratky Plot)
+6. Rg Estimation (Guinier Plot[@Guinier_1939])
+7. Shape Inspection (Kratky Plot[@Kratky_1963])
 8. Original Structure (Electron Density) Estimation
 
 among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand, improve, and utilize their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
@@ -98,7 +98,7 @@ where
 
 Note that in formula $(1)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
-For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one [@Hammouda:ce5078] used in the above figure, do not seem applicable at least to protein samples.
+For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation[@Guinier_1939] for small angle regions and Porod's law[@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one [@Hammouda:ce5078] used in the above figure, do not seem applicable at least to protein samples.
 
 # Denoising $M$
 
