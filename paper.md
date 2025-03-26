@@ -96,7 +96,7 @@ For scattering curves on the other hand, to the best of our knowledge, we have c
 
 # Denoising $M$
 
-For real noisy data, the equation $(1)$ should be interpreted as:
+For noisy data from real experiments, the equation $(1)$ should be interpreted as:
 
 $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
@@ -106,12 +106,12 @@ $$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* $$
 
 where
 
-* $n \leq \max(rows, columns)$ : the rank of $M$,
+* $n \leq \min(rows, columns)$ : the rank of $M$,
 * $\sigma_i$ : ith singular value,
 * $u_i$ : ith row vector of the unitary matrix usually denoted by $U$,
 * $v_i^*$ : traspose of ith row vector of the unitary matrix usually denoted by $V$.
 
-Using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
+Reducing $\| M - P \cdot C \|$ by using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
 
 [^3]: terms where $n \geq i \geq r$ assuming the target rank is r, which is the number of components in a simple assumption.
 
