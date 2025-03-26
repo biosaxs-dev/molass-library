@@ -51,7 +51,7 @@ Analysis of SEC-SAXS experiment data involves several steps. To list a simplest 
 7. ... (Kratky Plot)
 8. Original Structure (Electron Density) Estimation
 
-among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last step. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand, improve, and utilize their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
+among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a SAXS-oriented suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand, improve, and utilize their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
 
 # Notable package dependence
 
@@ -98,7 +98,7 @@ where
 
 Note that in formula $(1)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
-For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions as in [@Hammouda:ce5078] do not seem applicable at least to protein samples.
+For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@refId0] for small angle regions and Porod's law for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one [@Hammouda:ce5078] used in the above figure, do not seem applicable at least to protein samples.
 
 # Denoising $M$
 
@@ -106,7 +106,7 @@ For noisy data from real experiments, the equation $(1)$ should be interpreted a
 
 $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
-As commonly known, we can denoise $M$ by ignoring the insignificant tail[^3] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
+As commonly known, we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
 
 $$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* $$
 
@@ -119,7 +119,7 @@ where
 
 Reducing $\| M - P \cdot C \|$ by using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
 
-[^3]: terms where $n \geq i \geq r$ assuming the target rank is r, which is supposed to be the number of components in cases of simple assumption. Otherwize, e.g, if any significant interparticle effects are suspected, this number should be duly incremented. `Molass Library` can deal with this issue by adding extra quadratic rows to $C$ when the concentration dependence can be assumed linear.
+[^4]: terms where $n \geq i \geq r$ assuming the target rank is r, which is supposed to be the number of components in cases of simple assumption. Otherwize, e.g, if any significant interparticle effects are suspected, this number should be duly incremented. `Molass Library` can deal with this issue by adding extra quadratic rows to $C$ when the concentration dependence can be assumed linear.
 
 # Elution curve models - modeling approach
 
