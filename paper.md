@@ -123,7 +123,7 @@ Reducing $\| M - P \cdot C \|$ by using the denoised $M$ in place of the origina
 
 # Elution curve models - modeling approach
 
-While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the underdeterminedness, we believe it is essential to utilize appropriate models as included in `Molass Library`, namely:
+While some model-free approaches like `REGALS` [@Meisburger:mf5050] have been reported, to cope with the underdeterminedness, we believe it is essential to reduce the degree of freedom by the contraints from appropriate models as included in `Molass Library`, namely:
 
 * `EGH` : Exponential Gaussian Hybrid [@LAN20011],
 * `SDM` : Stochastic Dispersive Model [@Felinger1999],
