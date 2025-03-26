@@ -86,7 +86,7 @@ See the following figure to get intuition of this decomposition.
 
 ![Decomposition ](docs/_static/simulated_data.png)
 
-Using the above relation, the solution can be calculated, in the sense in footnote[^3], as follows:
+Using the above relation, the solution can be calculated, in the sense of footnote[^3], as follows:
 
 [^3]: $P$ is determined as the best possible solution which minimizes $\| M - P \cdot C \|$.
 
