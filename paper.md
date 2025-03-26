@@ -66,7 +66,7 @@ For less dependence, large part of GUI implementation, which was previouly done 
 
 # Theoretical focus
 
-Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is directly related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness from noise, the handling of which is beyond the scope of this paper and possibly might be studied using the future versions of this library.
+Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is directly related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness[^2] from noise, the handling of which is beyond the scope of this paper and possibly might be studied using the future versions of this library.
 
 Here, we decribe the essense of easier part to give a basic idea of what it is all about. For discussion, it is convinient to use matrices. Ideally, then, the decomposition should be expressed as follows:
 
@@ -78,15 +78,17 @@ where the symbols are
 * $P$ : matrix made of columns of component scattering curves,
 * $C$ : matrix made of rows of component elution curves.
 
+[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
+
+[^2]: By "underdeterminedness", we mean here the situation where many decomposition candidates are found and we have no definite information to reduce them to a fewer number which can be studied effectively.
+
 See the following figure to get intuition of this decomposition.
 
 ![Decomposition ](docs/_static/simulated_data.png)
 
-[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
+Using the above relation, the solution can be calculated, in a sense noted in the footnote[^3], as follows:
 
-Using the above relation, the solution can be calculated, in a sense noted in the footnote[^2], as follows:
-
-[^2]: $P$ is determined as the best possible solution which minimizes $\| M - P \cdot C \|$.
+[^3]: $P$ is determined as the best possible solution which minimizes $\| M - P \cdot C \|$.
 
 $$ P = M \cdot C^{+} \qquad (2) $$
 
