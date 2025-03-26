@@ -117,7 +117,7 @@ where
 
 Reducing $\| M - P \cdot C \|$ by using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
 
-[^3]: terms where $n \geq i \geq r$ assuming the target rank is r, which is supposed to be the number of components in cases of simple assumption. Otherwize, e.g, if any significant interparticle effects are suspected, this number should be duly incremented. `Molass Library` can deal with this issue when its concentration dependence can be assumed linear.
+[^3]: terms where $n \geq i \geq r$ assuming the target rank is r, which is supposed to be the number of components in cases of simple assumption. Otherwize, e.g, if any significant interparticle effects are suspected, this number should be duly incremented. `Molass Library` can deal with this issue by adding extra quadratic rows to $C$ when the concentration dependence can be assumed linear.
 
 # Elution curve models - modeling approach
 
