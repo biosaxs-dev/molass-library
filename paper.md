@@ -84,7 +84,7 @@ where the symbols are
 
 See the following figure to get intuition of this decomposition.
 
-![Decomposition ](docs/_static/simulated_data.png)
+![Illustratin of Decomposition using Simulated Data](docs/_static/simulated_data.png)
 
 Using the above relation, the solution can be calculated, in the sense of footnote[^3], as follows:
 
@@ -94,7 +94,7 @@ $$ P = M \cdot C^{+} \qquad (2) $$
 
 where
 
-* $C^{+}$ : Moore-Penrose inverse. [@Penrose_1956]
+* $C^{+}$ : Moore-Penrose inverse. [@Penrose_1955; @Penrose_1956]
 
 Note that in formula $(1)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
