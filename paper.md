@@ -70,7 +70,7 @@ Among the above mentioned steps, Low Rank Factorization[^1] using elution curve 
 
 Here, we decribe the essense of easier part to give a basic idea of what it is all about. For discussion, it is convenient to use matrices. Ideally, then, the decomposition should be expressed as follows:
 
-$$ M = P \cdot C \qquad (1) $$
+$$ M = P \cdot C \qquad \qquad (1) $$
 
 where the symbols are
 
@@ -78,7 +78,7 @@ where the symbols are
 * $P$ : matrix made of columns of component scattering curves,
 * $C$ : matrix made of rows of component elution curves.
 
-[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in experiments.
+[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better to the decomposition in analysis.
 
 [^2]: By "underdeterminedness", we mean here the situation where many decomposition candidates are found and we have no definite information to reduce them to a fewer number which can be studied effectively.
 
@@ -90,25 +90,25 @@ Using the above relation, the solution can be calculated, in the sense of footno
 
 [^3]: $P$ is determined as the best possible solution which minimizes $\| M - P \cdot C \|$.
 
-$$ P = M \cdot C^{+} \qquad (2) $$
+$$ P = M \cdot C^{+} \qquad \qquad (2) $$
 
 where
 
 * $C^{+}$ : Moore-Penrose inverse. [@Penrose_1955; @Penrose_1956]
 
-Note that in formula $(1)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
+Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this comes from the SEC principle [@Striegel_2009] where the component particles elute in the decsending order of particle size, namely the larger comes earlier, resulting in curves with distant peaks, each of which is relatively easy to model as mentioned later.
 
-For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@Guinier_1939] for small angle regions and Porod's law [@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one [@Hammouda:ce5078] used in the above figure, do not seem applicable at least to protein samples.
+For scattering curves on the other hand, to the best of our knowledge, we have classical models only for extreme regions, namely, Guinier Approximation [@Guinier_1939] for small angle regions and Porod's law [@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one used in the above figure [@Hammouda:ce5078], do not seem applicable at least to protein samples.
 
 # Denoising $M$
 
 For noisy data from real experiments, the equation $(1)$ should be interpreted as:
 
-$$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
+$$ \min_{P,C} \| M - P \cdot C \| \qquad \qquad (3) $$
 
 As commonly known [@Schanze_2018], we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
 
-$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* \qquad (4) $$
+$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* \qquad \qquad (4) $$
 
 where
 
