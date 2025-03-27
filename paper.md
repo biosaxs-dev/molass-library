@@ -131,7 +131,7 @@ To contrast our approach, there have been reported some model-free approaches li
 
 depending on the state of data. Strength and weakness of these models are well distinguished in `Molass Library` online documentation.
 
-[^5]: The meaning of "contraints" is abstract here. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
+[^5]: The meaning of "contraints" is left abstract here for brevity. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
 
 # Acknowledgements
 
