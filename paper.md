@@ -100,7 +100,7 @@ Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathemati
 
 For elution curves in $C$, the SEC principle [@Striegel_2009] applies, where the component particles elute in the descending order of particle size, namely the larger comes earlier, resulting in curves with (hopefully) distant peaks, each of which is relatively easy to model as mentioned later.
 
-For scattering curves in $P$ on the other hand, to the best of our knowledge, we only have classical models for extreme regions, namely, Guinier Approximation [@Guinier_1939] for small angle regions and Porod's law [@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one used in the above figure [@Hammouda:ce5078], do not seem applicable at least to protein samples.
+For scattering curves in $P$ on the other hand, to the best of our knowledge, we only have classical models for extreme regions, namely, Guinier Approximation [@Guinier_1939] for small angle regions and Porod's law [@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one used in the above figure [@Hammouda:ce5078], do not seem applicable at least to real protein samples.
 
 # Denoising $M$
 
