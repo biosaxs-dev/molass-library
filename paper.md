@@ -78,7 +78,7 @@ where the symbols are
 * $P$ : matrix made of columns of component scattering curves,
 * $C$ : matrix made of rows of component elution curves.
 
-[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word in mathematics matches better psychologically to the decomposition in analysis.
+[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word matches better, in psychological orientation, to decomposition.
 
 [^2]: By "underdeterminedness", we mean here the situation where many decomposition candidates are found and we have no definite information to reduce them to a fewer number which can be studied effectively.
 
