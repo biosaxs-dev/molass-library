@@ -108,7 +108,7 @@ $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
 As commonly known, we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
 
-$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* $$
+$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* \qquad (4) $$
 
 where
 
