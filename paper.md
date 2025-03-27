@@ -40,7 +40,7 @@ each of which is based on its own theoretical discipline, indicating the fact th
 
 # Statement of need
 
-Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for discussion:
+Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for discussion here:
 
 1. Circular Average
 2. Background Subtraction
