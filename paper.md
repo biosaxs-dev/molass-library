@@ -106,7 +106,7 @@ For noisy data from real experiments, the equation $(1)$ should be interpreted a
 
 $$ \min_{P,C} \| M - P \cdot C \| \qquad (3) $$
 
-As commonly known, we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
+As commonly known [@Schanze_2017], we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear structure expected in the data.
 
 $$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* \qquad (4) $$
 
