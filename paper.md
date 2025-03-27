@@ -136,9 +136,9 @@ depending on the state of data. Strength and weakness of these models are well d
 
 [^5]: The meaning of "contraints" is left abstract here for brevity. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
 
-# Elutin curve sources
+# Elution curve sources
 
-in preparation to include some brief decsription about UV, X-ray, mapping, ...
+in preparation to include some brief decsription on UV, X-ray, mapping, ...
 
 # Acknowledgements
 
