@@ -60,7 +60,7 @@ Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen
 * `pybaselines` [@pybaselines] for Baseline Correcction
 * `ruptures` [@TRUONG2020107299] for Change Point Dedection
 
-Likewise, the basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate cutomization is still required for practical recognition.
+Likewise, the basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate adjustment is still required for practical recognition.
 
 For less dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is no longer needed because it has been replaced by the scripting in Jupyter notebooks.
 
