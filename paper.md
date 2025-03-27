@@ -55,7 +55,7 @@ among which `Molass Library` currently supports only steps 3-7. For the first tw
 
 # Notable package dependence
 
-Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes by using the following packages.
+Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes with the following packages.
 
 * `pybaselines` [@pybaselines] for Baseline Correcction
 * `ruptures` [@TRUONG2020107299] for Change Point Dedection
