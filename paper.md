@@ -96,33 +96,9 @@ where
 
 * $C^{+}$ : Moore-Penrose inverse. [@Penrose_1955; @Penrose_1956]
 
-Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$. The reason for this is as follows.
+Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$.[^4]
 
-For elution curves in $C$, the SEC principle [@Striegel_2009] applies, where the component particles elute in the descending order of particle size, namely the larger comes earlier, resulting in curves with (hopefully) distant peaks, each of which is relatively easy to model as mentioned later.
-
-For scattering curves in $P$ on the other hand, to the best of our knowledge, we only have classical models for extreme regions, namely, Guinier Approximation [@Guinier_1939] for small angle regions and Porod's law [@Porod_1951] for larger angle regions, and none for intermediate regions. From our experience, models just smoothly linking those extreme regions, as the one used in the above figure [@Hammouda:ce5078], do not seem applicable at least to real protein samples.
-
-# Denoising $M$
-
-For noisy data from real experiments, the equation $(1)$ should be interpreted as:
-
-$$ \min_{P,C} \| M - P \cdot C \| \qquad \qquad (3) $$
-
-meaning $M \approx P \cdot C$.
-As commonly known [@Schanze_2018], we can denoise $M$ by ignoring the insignificant tail[^4] of the following expansion made from SVD - Singular Value Decomposition - based on the linear nature expected in the data.
-
-$$ M = \sum_{i=1}^{n} \sigma_i u_i v_i^* \qquad \qquad (4) $$
-
-where
-
-* $n \leq \min(rows, columns)$ : the rank of $M$,
-* $\sigma_i$ : ith singular value,
-* $u_i$ : ith row vector of the unitary matrix usually denoted by $U$,
-* $v_i^*$ : traspose of ith row vector of the unitary matrix usually denoted by $V$.
-
-Reducing $\| M - P \cdot C \|$ by using the denoised $M$ in place of the original, we can expect a better estimation as performed in the library. 
-
-[^4]: terms where $n \geq i \geq r$ assuming the target rank is r, which is supposed to be the number of components in cases of simple assumption. Otherwize, e.g, if any significant interparticle effects are suspected, this number should be duly incremented. `Molass Library` can deal with this issue by adding extra quadratic rows to $C$ when the concentration dependence can be assumed linear.
+[^4]: The reason of this is described the document named `Molass Essense`.
 
 # Elution curve models - modeling approach
 
@@ -135,10 +111,6 @@ To contrast our approach, there have been reported some model-free approaches li
 depending on the state of data. Strength and weakness of these models are well distinguished in `Molass Library` online documentation.
 
 [^5]: The meaning of "contraints" is left abstract here for brevity. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
-
-# Concentration data sources
-
-in preparation to include some brief decsription on UV, X-ray, mapping, ...
 
 # Acknowledgements
 
