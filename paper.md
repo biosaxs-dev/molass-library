@@ -98,7 +98,7 @@ where
 
 Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$.[^4]
 
-[^4]: For this reason, see the chapter of document named [Molass Essense](https://freesemt.github.io/molass-essense/chapters/04/lowrank.html).
+[^4]: For this reason, see the corresponding chapter of document [Molass Essense](https://freesemt.github.io/molass-essense/chapters/04/lowrank.html).
 
 # Elution curve models - modeling approach
 
