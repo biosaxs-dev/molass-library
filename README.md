@@ -22,4 +22,8 @@ For details, see also:
 - **Reference:** https://freesemt.github.io/molass-library
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy
 
+For maintenance, see also:
+
+- **Handbook:** https://freesemt.github.io/molass-develop
+
 <br>
