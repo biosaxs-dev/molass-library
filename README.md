@@ -17,13 +17,13 @@ pip install -U molass_legacy
 
 For details, see also:
 
-- **Essence:** https://freesemt.github.io/molass-essence
-- **Tutorial:** https://freesemt.github.io/molass-tutorial
-- **Reference:** https://freesemt.github.io/molass-library
-- **Legacy Repository:** https://github.com/freesemt/molass-legacy
+- **Essence:** https://freesemt.github.io/molass-essence for theory,
+- **Tutorial:** https://freesemt.github.io/molass-tutorial for how to use,
+- **Reference:** https://freesemt.github.io/molass-library for function reference,
+- **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
 
-For maintenance, see also:
+See also:
 
-- **Handbook:** https://freesemt.github.io/molass-develop
+- **Handbook:** https://freesemt.github.io/molass-develop for maintenace.
 
 <br>
