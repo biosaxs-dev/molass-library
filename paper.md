@@ -14,7 +14,7 @@ authors:
     corresponding: true
     affiliation: "3,1,2"
 affiliations:
-  - name: Structural Biology Research Center, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK), Tsukuba, Ibaraki 305-0801, Japan 
+  - name: Structural Biology Research Center, Institute of Materials Structure Science
     index: 1
   - name: Institute of Materials Structure Science
     index: 2
