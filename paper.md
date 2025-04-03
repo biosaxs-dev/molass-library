@@ -8,18 +8,20 @@ authors:
   - name: Masatsuyo Takahashi
     orcid: 0009-0007-1466-5563
     corresponding: false    
-    affiliation: 1
+    affiliation: "1,2"
   - name: Nobutaka Shimizu
     orcid: 0000-0002-3636-1663
     corresponding: true
-    affiliation: "2,1"
+    affiliation: "3,1,2"
 affiliations:
- - name: Institute of Materials Structure Science
-   index: 1
-   ror: 0327y7e25
- - name: Institute of Physical and Chemical Research
-   index: 2
-   ror: 01sjwvz98
+  - name: Structural Biology Research Center, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK), Tsukuba, Ibaraki 305-0801, Japan 
+    index: 1
+  - name: Institute of Materials Structure Science
+    index: 2
+    ror: 0327y7e25
+  - name: Institute of Physical and Chemical Research
+    index: 3
+    ror: 01sjwvz98
 date: 24 March 2025
 bibliography: paper.bib
 
