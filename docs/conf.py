@@ -1,3 +1,10 @@
+# Add the root directory to the system path
+# This is necessary to import the package correctly in the Sphinx documentation.
+import sys
+import os
+root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, root_dir)
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -7,8 +14,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Molass Library'
-copyright = '2025, The Molass Community'
-author = 'The Molass Community'
+copyright = '2025, Molass Community'
+author = 'Molass Community'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
