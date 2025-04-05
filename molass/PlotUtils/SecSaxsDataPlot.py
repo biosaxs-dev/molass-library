@@ -35,7 +35,7 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
             ax1.set_xlabel("wavelength", **labelkwarg)
             ax1.set_ylabel("frames", **labelkwarg)
             ax1.set_zlabel("absorbance", **labelkwarg)
-            simple_plot_3d(ax1, uv.M, x=uv.iv, y=uv.jv)
+            simple_plot_3d(ax1, uv.M, x=uv.iv, y=uv.jv, **kwargs)
             for axis in [ax1.xaxis, ax1.yaxis, ax1.zaxis]:
                 axis.set_tick_params(**tickkwarg)
 
@@ -46,7 +46,7 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
             ax2.set_xlabel("Q", **labelkwarg)
             ax2.set_ylabel("frames", **labelkwarg)
             ax2.set_zlabel("scattering", **labelkwarg)
-            simple_plot_3d(ax2, xr.M, x=xr.iv, y=xr.jv)
+            simple_plot_3d(ax2, xr.M, x=xr.iv, y=xr.jv, **kwargs)
             for axis in [ax2.xaxis, ax2.yaxis, ax2.zaxis]:
                 axis.set_tick_params(**tickkwarg)
 

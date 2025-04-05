@@ -111,15 +111,30 @@ class SecSaxsData:
         self.beamlineinfo = beamlineinfo
 
     def plot_3d(self, **kwargs):
-        """ssd.plot_3d()
+        """ssd.plot_3d(view_init=None)
 
             Plots a pair of 3D figures of UV and XR data.
 
             Parameters
             ----------
-            None
+            view_init   : dict, optional
+                A dictionary which specifies the view_init parameters.
+                The default is dict(elev=30, azim=-60) as of matplotlib 3.10.
+
+            view_arrows : bool, optional
+                If it is True, the 2D view arrows are drawn on the 3D plot.
+                One of the arrows shows the elutional view, while the other
+                shows the spectral view. The default is False.
+
+            Rturns
+            -------
+            result : PlotResult
+                A PlotResult object which contains the following attributes.
+
+                fig: Figure
+                axes: Axes
         """
-        debug = kwargs.get('debug', False)
+        debug = kwargs.pop('debug', False)
         if debug:
             import molass.PlotUtils.SecSaxsDataPlot
             reload(molass.PlotUtils.SecSaxsDataPlot)
