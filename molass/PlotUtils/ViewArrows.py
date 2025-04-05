@@ -1,7 +1,6 @@
 """
     PlotUtils.ViewArrows.py
 """
-import numpy as np
 
 def plot_view_arrows(ax, use_quiver=False, debug=False):
     """
@@ -41,10 +40,12 @@ def plot_view_arrows(ax, use_quiver=False, debug=False):
     yz_head_vector = get_direction(0, 0.5, 0)
 
     if use_quiver:
+        # Use quiver for 3D arrows
+        # Note: currently not available possibly due to a bug.
         xz_arrow_length = 0.3*(xmax - xmin)
         yz_arrow_length = 0.3*(ymax - ymin)
         ax.quiver(*xz_view_point, *xz_head_vector, color='orange', length=xz_arrow_length, arrow_length_ratio=0.2, normalize=True)
-        ax.quiver(*yz_view_point, *yz_head_vector, color='orange', length=yz_arrow_length, arrow_length_ratio=0.002, normalize=True)
+        ax.quiver(*yz_view_point, *yz_head_vector, color='orange', length=yz_arrow_length, arrow_length_ratio=0.2, normalize=True)
     else:
         add_arrow3D()
         arrowstyle="-|>"
