@@ -54,4 +54,4 @@ def plot_view_arrows(ax, use_quiver=False, debug=False):
         ax.arrow3D(*yz_view_point, *yz_head_vector, **arrow_spec)
 
     ax.text(*xz_view_point, "Elutional View", color='orange', va='top', ha='center', fontsize=14)
-    ax.text(*yz_view_point, "Spactral View", color='orange', va='top', ha='center', fontsize=14)
+    ax.text(*yz_view_point, "Spectral View", color='orange', va='top', ha='center', fontsize=14)
