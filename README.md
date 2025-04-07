@@ -3,7 +3,7 @@
 > [!WARNING]
 > The initial version of this package is currently in preparation to be available in May, 2025.
 
-Molass Library is a rewrite of [MOLASS](https://www.jstage.jst.go.jp/article/biophysico/20/1/20_e200001/_article), an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html).
+Molass Library is a rewrite of [MOLASS](https://www.jstage.jst.go.jp/article/biophysico/20/1/20_e200001/_article), an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html), Japan.
 
 To install this package, use pip as follows.
 
