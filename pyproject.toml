@@ -12,6 +12,7 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines",
+  "molass_legacy",
 ]
 
 requires-python = ">=3.9"

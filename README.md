@@ -9,7 +9,6 @@ To install this package, use pip as follows.
 
 ```
 pip install -U molass
-pip install -U molass_legacy
 ```
 
 > [!NOTE]

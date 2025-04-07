@@ -1,5 +1,5 @@
 """
-    Stochastic.ColumnElements.py
+    SEC.ColumnElements.py
 
     Copyright (c) 2024-2025, Molass Community
 """
@@ -139,9 +139,9 @@ class Particle:
 
         def get_next_position():
             from importlib import reload
-            import molass.Stochastic.StationaryMove as sm
+            import molass.SEC.StationaryMove as sm
             reload(sm)
-            from molass.Stochastic.StationaryMove import get_next_position_impl
+            from molass.SEC.StationaryMove import get_next_position_impl
             debug_info = (fig, ax) if debug else None
             nx, ny, state = get_next_position_impl(self, grain, last_px, last_py, px, py, debug_info=debug_info)
             if debug:
