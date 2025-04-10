@@ -1,7 +1,7 @@
 # 
 import os
 
-def get_version():
+def get_version(toml_only=False):
     """
     Retrieve the version of the package from pyproject.toml or importlib.metadata.
     """
@@ -13,5 +13,6 @@ def get_version():
         return pyproject_data['project']['version']
     else:
         # Otherwise, use importlib.metadata to get it from the installed package
+        assert toml_only is False, "toml_only is not expected in this context"
         import importlib.metadata
         return importlib.metadata.version(__package__)

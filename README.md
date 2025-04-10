@@ -23,6 +23,6 @@ For details, see also:
 
 See also:
 
-- **Handbook:** https://freesemt.github.io/molass-develop for maintenace.
+- **Handbook:** https://freesemt.github.io/molass-develop for maintenance.
 
 <br>

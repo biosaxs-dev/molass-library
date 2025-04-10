@@ -1,16 +1,12 @@
 """
-    Test.TestFlowChange.py
-
-    cf. https://realpython.com/python-unittest/
+    test FlowChange
 """
-import sys
 import os
-testdir = os.path.dirname(__file__)
-libhome = os.path.dirname(os.path.dirname(testdir))
-sys.path.insert(0, libhome)
-
-import unittest
-from molass.Test.TestSettings import get_datafolder
+from molass import get_version
+get_version(toml_only=True)     # to ensure that the current repository is used
+from molass.Local import get_local_settings
+local_settings = get_local_settings()
+DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
 
 TEST_TARGETS = [
     (r"20160227\backsub",           (None, None)),  # 0
@@ -67,20 +63,12 @@ TEST_TARGETS = [
     (r"sample_data",                (135, None)),   # 36
 ]
 
-class TestFlowChange(unittest.TestCase):
-    def __init__(self, methodName='runTest'):  
-        super().__init__(methodName)
-        self.root_folder = get_datafolder()
-
-    def test_flowchange_exclude_slice(self):
-        from molass.DataUtils.UvLoader import get_uvcurves
-        from molass.FlowChange.FlowChange import flowchange_exclude_slice
-        for k, (folder, result) in enumerate(TEST_TARGETS):
-            path = os.path.join(self.root_folder, folder)
-            print([k], "path=", path)
-            c1, c2= get_uvcurves(path)
-            i, j = flowchange_exclude_slice(c1.x, c1.y, c2.y)[0]
-            self.assertEqual((k, (i,j)), (k, result))   # using k in order to identify the case when it fails
-
-if __name__ == '__main__':
-    unittest.main()
+def test_010_flowchange_exclude_slice():
+    from molass.DataUtils.UvLoader import get_uvcurves
+    from molass.FlowChange.FlowChange import flowchange_exclude_slice
+    for k, (folder, result) in enumerate(TEST_TARGETS):
+        path = os.path.join(DATA_ROOT_FOLDER, folder)
+        print([k], "path=", path)
+        c1, c2= get_uvcurves(path)
+        i, j = flowchange_exclude_slice(c1.x, c1.y, c2.y)[0]
+        assert (k, (i,j)) == (k, result)    # using k in order to identify the case when it fails
