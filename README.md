@@ -1,4 +1,4 @@
-<h1 align="center"><a href="https://freesemt.github.io/molass-library"><img src="docs/_static/molass-title.png" width="300"></a></h1>
+<h1 align="center"><a href="https://nshimizu0721.github.io/molass-library"><img src="docs/_static/molass-title.png" width="300"></a></h1>
 
 > [!WARNING]
 > The initial version of this package is currently in preparation to be available in July, 2025.
@@ -16,13 +16,13 @@ pip install -U molass
 
 For details, see also:
 
-- **Essence:** https://freesemt.github.io/molass-essence for theory,
-- **Tutorial:** https://freesemt.github.io/molass-tutorial for how to use,
-- **Reference:** https://freesemt.github.io/molass-library for function reference,
+- **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
+- **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
+- **Reference:** https://nshimizu0721.github.io/molass-library for function reference,
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
 
 See also:
 
-- **Handbook:** https://freesemt.github.io/molass-develop for maintenance.
+- **Handbook:** https://nshimizu0721.github.io/molass-develop for maintenance.
 
 <br>
