@@ -37,7 +37,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme_options = {
-    "repository_url": "https://github.com/freesemt/molass-library",
+    "repository_url": "https://github.com/nshimizu0721/molass-library",
     "use_repository_button": True,
 }
 
