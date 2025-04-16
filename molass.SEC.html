@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>molass.Stochastic.ColumnSimulation module &#8212; Molass Library  documentation</title>
+    <title>molass.SEC package &#8212; Molass Library  documentation</title>
   
   
   
@@ -40,12 +40,10 @@
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'molass.Stochastic.ColumnSimulation';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'molass.SEC';</script>
     <link rel="icon" href="_static/molamola.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="molass.Stochastic.ColumnSliceStates module" href="molass.Stochastic.ColumnSliceStates.html" />
-    <link rel="prev" title="molass.Stochastic.ColumnElements module" href="molass.Stochastic.ColumnElements.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -155,7 +153,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="current nav bd-sidenav">
+        <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Baseline.html">molass.Baseline package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">molass.Baseline.Baseline2D module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">molass.Baseline.BaselineUtils module</a></li>
@@ -267,6 +265,8 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">molass.PlotUtils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">molass.PlotUtils.Annotation3D module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">molass.PlotUtils.Arrow3D module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">molass.PlotUtils.LowRankInfoPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">molass.PlotUtils.MatrixPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">molass.PlotUtils.PlotResult module</a></li>
@@ -275,6 +275,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html">molass.PlotUtils.TrimmingPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.V1GuinierPlot.html">molass.PlotUtils.V1GuinierPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.V1KratkyPlot.html">molass.PlotUtils.V1KratkyPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.ViewArrows.html">molass.PlotUtils.ViewArrows module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Progress.html">molass.Progress package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -293,14 +294,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Stats.html">molass.Stats package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Stats.EghMoment.html">molass.Stats.EghMoment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Stats.Moment.html">molass.Stats.Moment module</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Stochastic.html">molass.Stochastic package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnElements.html">molass.Stochastic.ColumnElements module</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">molass.Stochastic.ColumnSimulation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnSliceStates.html">molass.Stochastic.ColumnSliceStates module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnStructure.html">molass.Stochastic.ColumnStructure module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.StationaryMove.html">molass.Stochastic.StationaryMove module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SurveyUtils.html">molass.SurveyUtils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -357,7 +350,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/freesemt/molass-library" target="_blank"
+<a href="https://github.com/nshimizu0721/molass-library" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -383,7 +376,7 @@
       
       
       
-      <li><a href="_sources/molass.Stochastic.ColumnSimulation.rst" target="_blank"
+      <li><a href="_sources/molass.SEC.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -467,7 +460,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>molass.Stochastic.ColumnSimulation module</h1>
+    <h1>molass.SEC package</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -477,7 +470,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stochastic.ColumnSimulation.get_animation"><code class="docutils literal notranslate"><span class="pre">get_animation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-molass.SEC">Module contents</a></li>
 </ul>
             </nav>
         </div>
@@ -489,15 +483,66 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-molass.Stochastic.ColumnSimulation">
-<span id="molass-stochastic-columnsimulation-module"></span><h1>molass.Stochastic.ColumnSimulation module<a class="headerlink" href="#module-molass.Stochastic.ColumnSimulation" title="Link to this heading">#</a></h1>
-<p>Stochastic.ColumnSimulation.py</p>
-<p>Copyright (c) 2024-2025, Molass Community</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="molass.Stochastic.ColumnSimulation.get_animation">
-<span class="sig-prename descclassname"><span class="pre">molass.Stochastic.ColumnSimulation.</span></span><span class="sig-name descname"><span class="pre">get_animation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_tqdm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stochastic.ColumnSimulation.get_animation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+  <section id="molass-sec-package">
+<h1>molass.SEC package<a class="headerlink" href="#molass-sec-package" title="Link to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="molass.SEC.ColumnElements.html">molass.SEC.ColumnElements module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain"><code class="docutils literal notranslate"><span class="pre">NewGrain</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">NewGrain.compute_poreentries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain.draw"><code class="docutils literal notranslate"><span class="pre">NewGrain.draw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle"><code class="docutils literal notranslate"><span class="pre">Particle</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.draw"><code class="docutils literal notranslate"><span class="pre">Particle.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.enters_stationary"><code class="docutils literal notranslate"><span class="pre">Particle.enters_stationary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.stationary_move"><code class="docutils literal notranslate"><span class="pre">Particle.stationary_move()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain"><code class="docutils literal notranslate"><span class="pre">SolidGrain</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_bounce_vector"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_bounce_vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_inpore_nextpos"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_inpore_nextpos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_poreentries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.draw"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.draw_entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw_entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_entry_including"><code class="docutils literal notranslate"><span class="pre">SolidGrain.get_entry_including()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_point_from_angle"><code class="docutils literal notranslate"><span class="pre">SolidGrain.get_point_from_angle()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.draw_wedges"><code class="docutils literal notranslate"><span class="pre">draw_wedges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.grain_particle_test"><code class="docutils literal notranslate"><span class="pre">grain_particle_test()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.new_grain_unit_test"><code class="docutils literal notranslate"><span class="pre">new_grain_unit_test()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">molass.SEC.ColumnSimulation module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html#molass.SEC.ColumnSimulation.get_animation"><code class="docutils literal notranslate"><span class="pre">get_animation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html">molass.SEC.ColumnSliceStates module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html#molass.SEC.ColumnSliceStates.draw_slice_states_impl"><code class="docutils literal notranslate"><span class="pre">draw_slice_states_impl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.SEC.ColumnStructure.html">molass.SEC.ColumnStructure module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnStructure.html#molass.SEC.ColumnStructure.plot_column_structure"><code class="docutils literal notranslate"><span class="pre">plot_column_structure()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.SEC.StationaryMove.html">molass.SEC.StationaryMove module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_boundary_walls"><code class="docutils literal notranslate"><span class="pre">compute_boundary_walls()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_reflected_point"><code class="docutils literal notranslate"><span class="pre">compute_reflected_point()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.find_nearest_wall"><code class="docutils literal notranslate"><span class="pre">find_nearest_wall()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl"><code class="docutils literal notranslate"><span class="pre">get_next_position_impl()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.mirrorImage"><code class="docutils literal notranslate"><span class="pre">mirrorImage()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-molass.SEC">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-molass.SEC" title="Link to this heading">#</a></h2>
+<p>SEC.__init__.py</p>
+</section>
 </section>
 
 
@@ -511,24 +556,6 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="molass.Stochastic.ColumnElements.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">molass.Stochastic.ColumnElements module</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="molass.Stochastic.ColumnSliceStates.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">molass.Stochastic.ColumnSliceStates module</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -545,7 +572,8 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stochastic.ColumnSimulation.get_animation"><code class="docutils literal notranslate"><span class="pre">get_animation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-molass.SEC">Module contents</a></li>
 </ul>
   </nav></div>
 

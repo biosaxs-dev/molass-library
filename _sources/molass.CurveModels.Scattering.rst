@@ -5,7 +5,7 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 4
 
    molass.CurveModels.Scattering.FormFactors
 

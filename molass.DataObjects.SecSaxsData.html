@@ -267,6 +267,8 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">molass.PlotUtils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">molass.PlotUtils.Annotation3D module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">molass.PlotUtils.Arrow3D module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">molass.PlotUtils.LowRankInfoPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">molass.PlotUtils.MatrixPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">molass.PlotUtils.PlotResult module</a></li>
@@ -275,6 +277,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html">molass.PlotUtils.TrimmingPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.V1GuinierPlot.html">molass.PlotUtils.V1GuinierPlot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.V1KratkyPlot.html">molass.PlotUtils.V1KratkyPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.ViewArrows.html">molass.PlotUtils.ViewArrows module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Progress.html">molass.Progress package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -293,14 +296,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Stats.html">molass.Stats package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Stats.EghMoment.html">molass.Stats.EghMoment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Stats.Moment.html">molass.Stats.Moment module</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Stochastic.html">molass.Stochastic package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnElements.html">molass.Stochastic.ColumnElements module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnSimulation.html">molass.Stochastic.ColumnSimulation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnSliceStates.html">molass.Stochastic.ColumnSliceStates module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.ColumnStructure.html">molass.Stochastic.ColumnStructure module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Stochastic.StationaryMove.html">molass.Stochastic.StationaryMove module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SurveyUtils.html">molass.SurveyUtils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -357,7 +352,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/freesemt/molass-library" target="_blank"
+<a href="https://github.com/nshimizu0721/molass-library" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -634,11 +629,23 @@ unusable UV data regions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d">
-<span class="sig-name descname"><span class="pre">plot_3d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d" title="Link to this definition">#</a></dt>
 <dd><p>Plots a pair of 3D figures of UV and XR data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>view_init</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary which specifies the view_init parameters.
+The default is dict(elev=30, azim=-60) as of matplotlib 3.10.</p></li>
+<li><p><strong>view_arrows</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D view arrows are drawn on the 3D plot.
+One of the arrows shows the elutional view, while the other
+shows the spectral view. The default is False.</p></li>
+<li><p><strong>Rturns</strong></p></li>
+<li><p><strong>-------</strong></p></li>
+<li><p><strong>result</strong> (<a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult"><em>PlotResult</em></a>) – <p>A PlotResult object which contains the following attributes.</p>
+<p>fig: Figure
+axes: Axes</p>
+</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
