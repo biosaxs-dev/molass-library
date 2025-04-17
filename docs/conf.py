@@ -32,6 +32,15 @@ autoclass_content = 'both'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# Customize autodoc behavior
+autodoc_default_options = {
+    'member-order': 'bysource',  # Order members as they appear in the source code
+    'undoc-members': False,      # Include undocumented members
+    'show-inheritance': False,   # Show inheritance diagrams
+}
+
+# Avoid using "package" in titles
+add_module_names = False  # Removes the "molass." prefix from module names in titles
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -45,3 +54,4 @@ html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_logo = "_static/molamola.png"
 html_favicon = "_static/molamola.png"
+

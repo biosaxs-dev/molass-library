@@ -5,19 +5,31 @@ def get_version(toml_only=False):
     """
     Retrieve the version of the package from pyproject.toml or importlib.metadata.
 
+    This function prioritizes reading the version from pyproject.toml to ensure
+    that the local repository version is used during development or testing.
+    If pyproject.toml is not found, it falls back to using importlib.metadata
+    to retrieve the version of the installed package.
+
     Parameters:
     ------------
     toml_only: bool, optional
-        If True, only read the version from pyproject.toml and ensure
-        that you are using the local repository. Default is False.
-        This is crucial when you are testing in environments you can also
-        use the installed package version.
-        In fact, while you are testing, it is almost always the case that
-        you are updating the local repository (not yet installed version),
-        and you will be confused unless you are certain which version you are using.
+        If True, the function strictly reads the version from pyproject.toml.
+        This is crucial to avoid confusion about the version being used,
+        which can lead to significant time loss during testing.
+        (confusion about the local repository versus the installed).
 
-        If False, read the version from pyproject.toml if it exists,
-        otherwise use importlib.metadata.
+        If False, the function attempts to read the version from pyproject.toml
+        first. If pyproject.toml does not exist, it falls back to using
+        importlib.metadata to retrieve the version of the installed package.
+
+    Raises:
+    -------
+    AssertionError:
+        If toml_only is True but pyproject.toml is not found. This ensures
+        that the function behaves predictably in cases where the local
+        repository is not available.
+
+    This docstring was improved in collaboration with GitHub Copilot.
     """
 
     pyproject_toml = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'pyproject.toml')
