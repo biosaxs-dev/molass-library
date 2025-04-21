@@ -12,7 +12,7 @@ dist/
 # Ignore the Sphinx build directory
 docs/_build/
 
-docs/source/
+docs/source/**
 
 # Ignore pytest related files
 .pytest_cache/

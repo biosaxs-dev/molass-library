@@ -1,6 +1,9 @@
+"""
+docs/edit.py
+"""
 import os
 
-docs_dir = "."  # Path to your docs directory
+docs_dir = "./source"
 
 for root, _, files in os.walk(docs_dir):
     for file in files:
@@ -12,8 +15,10 @@ for root, _, files in os.walk(docs_dir):
             # Update the title line
             updated_content = []
             for line in content:
-                if line.strip().startswith("molass."):
-                    line = line.replace("molass.", "")
+                if line.startswith("molass."):
+                    line = line.replace("molass.", "").replace(" package", "").replace(" module", "")
+                elif line.startswith("Subpackages"):
+                    line = line.replace("Subpackages", "Submodules")
                 updated_content.append(line)
 
             # Write the updated content back to the file
