@@ -8,42 +8,42 @@ Molass Library Reference
 
 Molass Library is a rewrite of `MOLASS <https://www.jstage.jst.go.jp/article/biophysico/20/1/20_e200001/_article>`_, an analytical tool for SEC-SAXS experiment data currently hosted at `Photon Factory <https://pfwww.kek.jp/saxs/MOLASS.html>`_.
 
-Submodules
------------
-
-.. toctree::
-   :maxdepth: 5
-
-   Baseline
-   Bridge
-   CurveModels
-   CurveModels.Scattering
-   CurveModels.Scattering.FormFactors
-   DataObjects
-   DataUtils
-   DENSS
-   Except
-   FlowChange
-   Guinier
-   InterParticle
-   Legacy
-   Local
-   LowRank
-   Mapping
-   PackageUtils
-   Peaks
-   PlotUtils
-   Progress
-   Reports
-   Stats
-   Stochastic
-   SurveyUtils
-   Trimming
-
-Module contents
----------------
+Module Functions
+----------------
 
 .. automodule:: molass
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 5
+
+   source/molass.Baseline
+   source/molass.Bridge
+   source/molass.CurveModels
+   source/molass.CurveModels.Scattering
+   source/molass.CurveModels.Scattering.FormFactors
+   source/molass.DataObjects
+   source/molass.DataUtils
+   source/molass.DENSS
+   source/molass.Except
+   source/molass.FlowChange
+   source/molass.Guinier
+   source/molass.InterParticle
+   source/molass.Legacy
+   source/molass.Local
+   source/molass.LowRank
+   source/molass.Mapping
+   source/molass.PackageUtils
+   source/molass.Peaks
+   source/molass.PlotUtils
+   source/molass.Progress
+   source/molass.Reports
+   source/molass.Stats
+   source/molass.Stochastic
+   source/molass.SurveyUtils
+   source/molass.Trimming
