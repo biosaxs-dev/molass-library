@@ -19,8 +19,9 @@ def get_version(toml_only=False):
         (confusion about the local repository versus the installed).
 
         If False, the function attempts to read the version from pyproject.toml
-        first. If pyproject.toml does not exist, it falls back to using
-        importlib.metadata to retrieve the version of the installed package.
+        first. If pyproject.toml does not exist, which means you are using the
+        installed package, it falls back to using importlib.metadata to retrieve
+        this version.
 
     Raises:
     -------
