@@ -1,5 +1,10 @@
 """
-docs/edit.py
+This script edits all .rst files in the docs directory to update the title lines.
+
+See also: `"Modify *.rst files" <LINK1_>`__.
+
+.. _LINK1: https://nshimizu0721.github.io/molass-develop/chapters/07/documentation.html#modify-rst-files
+
 """
 import os
 
@@ -24,3 +29,6 @@ for root, _, files in os.walk(docs_dir):
             # Write the updated content back to the file
             with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(updated_content)
+
+print("All .rst files have been updated.")
+# This script will walk through all the .rst files in the docs directory and update the title lines as specified.

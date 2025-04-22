@@ -23,6 +23,7 @@ author = 'Molass Community'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autosectionlabel",
 ]
 
 autoclass_content = 'both'
