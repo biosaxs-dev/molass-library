@@ -308,6 +308,9 @@
 </ul>
 </details></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst</a></li>
+</ul>
 
     </div>
 </nav></div>
@@ -501,8 +504,9 @@ This is crucial to avoid confusion about the version being used,
 which can lead to significant time loss during testing.
 (confusion about the local repository versus the installed).</p>
 <p>If False, the function attempts to read the version from pyproject.toml
-first. If pyproject.toml does not exist, it falls back to using
-importlib.metadata to retrieve the version of the installed package.</p>
+first. If pyproject.toml does not exist, which means you are using the
+installed package, it falls back to using importlib.metadata to retrieve
+this version.</p>
 </dd>
 </dl>
 </section>

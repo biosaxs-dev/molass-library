@@ -47,3 +47,11 @@ Submodules
    source/molass.Stochastic
    source/molass.SurveyUtils
    source/molass.Trimming
+
+Tool Functions
+----------------
+
+.. toctree::
+   :maxdepth: 5
+
+   source/EditRst
