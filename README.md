@@ -21,7 +21,7 @@ For details, see also:
 - **Reference:** https://nshimizu0721.github.io/molass-library for function reference,
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
 
-See also:
+To join the community, see also:
 
 - **Handbook:** https://nshimizu0721.github.io/molass-develop for maintenance.
 
