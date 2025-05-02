@@ -1,4 +1,4 @@
-Mapping.MappingInfo
+molass.Mapping.MappingInfo module
 =================================
 
 .. automodule:: molass.Mapping.MappingInfo

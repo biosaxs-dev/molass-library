@@ -1,4 +1,4 @@
-CurveModels.Scattering
+molass.CurveModels.Scattering package
 =====================================
 
 .. automodule:: molass.CurveModels.Scattering

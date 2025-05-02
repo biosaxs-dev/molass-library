@@ -1,4 +1,4 @@
-PlotUtils.ViewArrows
+molass.PlotUtils.ViewArrows module
 ==================================
 
 .. automodule:: molass.PlotUtils.ViewArrows

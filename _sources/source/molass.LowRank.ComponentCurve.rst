@@ -1,4 +1,4 @@
-LowRank.ComponentCurve
+molass.LowRank.ComponentCurve module
 ====================================
 
 .. automodule:: molass.LowRank.ComponentCurve

@@ -1,4 +1,4 @@
-Bridge.V2Result
+molass.Bridge.V2Result module
 =============================
 
 .. automodule:: molass.Bridge.V2Result

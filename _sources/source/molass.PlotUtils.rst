@@ -1,4 +1,4 @@
-PlotUtils
+molass.PlotUtils package
 ========================
 
 .. automodule:: molass.PlotUtils

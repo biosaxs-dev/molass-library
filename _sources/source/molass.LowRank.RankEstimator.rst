@@ -1,4 +1,4 @@
-LowRank.RankEstimator
+molass.LowRank.RankEstimator module
 ===================================
 
 .. automodule:: molass.LowRank.RankEstimator

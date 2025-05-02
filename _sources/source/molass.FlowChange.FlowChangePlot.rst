@@ -1,4 +1,4 @@
-FlowChange.FlowChangePlot
+molass.FlowChange.FlowChangePlot module
 =======================================
 
 .. automodule:: molass.FlowChange.FlowChangePlot

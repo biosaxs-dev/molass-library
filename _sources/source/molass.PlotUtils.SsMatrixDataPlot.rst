@@ -1,4 +1,4 @@
-PlotUtils.SsMatrixDataPlot
+molass.PlotUtils.SsMatrixDataPlot module
 ========================================
 
 .. automodule:: molass.PlotUtils.SsMatrixDataPlot

@@ -1,4 +1,4 @@
-SEC
+molass.SEC package
 ==================
 
 .. automodule:: molass.SEC

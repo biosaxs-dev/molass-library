@@ -1,4 +1,4 @@
-Batch.V1Legacy
+molass.Batch.V1Legacy module
 ============================
 
 .. automodule:: molass.Batch.V1Legacy

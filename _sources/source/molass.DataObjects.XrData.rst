@@ -1,4 +1,4 @@
-DataObjects.XrData
+molass.DataObjects.XrData module
 ================================
 
 .. automodule:: molass.DataObjects.XrData

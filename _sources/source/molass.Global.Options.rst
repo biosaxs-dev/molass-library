@@ -1,4 +1,4 @@
-Global.Options
+molass.Global.Options module
 ============================
 
 .. automodule:: molass.Global.Options

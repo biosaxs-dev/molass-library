@@ -1,4 +1,4 @@
-Trimming
+molass.Trimming package
 =======================
 
 .. automodule:: molass.Trimming

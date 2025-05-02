@@ -1,4 +1,4 @@
-Trimming.UsableQrange
+molass.Trimming.UsableQrange module
 ===================================
 
 .. automodule:: molass.Trimming.UsableQrange

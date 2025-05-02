@@ -1,4 +1,4 @@
-DataUtils.ForwardCompat
+molass.DataUtils.ForwardCompat module
 =====================================
 
 .. automodule:: molass.DataUtils.ForwardCompat

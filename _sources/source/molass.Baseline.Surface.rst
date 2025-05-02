@@ -1,4 +1,4 @@
-Baseline.Surface
+molass.Baseline.Surface module
 ==============================
 
 .. automodule:: molass.Baseline.Surface

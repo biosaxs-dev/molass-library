@@ -1,4 +1,4 @@
-LowRank.PairedRange
+molass.LowRank.PairedRange module
 =================================
 
 .. automodule:: molass.LowRank.PairedRange

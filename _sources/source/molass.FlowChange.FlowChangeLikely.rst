@@ -1,4 +1,4 @@
-FlowChange.FlowChangeLikely
+molass.FlowChange.FlowChangeLikely module
 =========================================
 
 .. automodule:: molass.FlowChange.FlowChangeLikely

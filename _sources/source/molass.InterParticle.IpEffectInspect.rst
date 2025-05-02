@@ -1,4 +1,4 @@
-InterParticle.IpEffectInspect
+molass.InterParticle.IpEffectInspect module
 ===========================================
 
 .. automodule:: molass.InterParticle.IpEffectInspect

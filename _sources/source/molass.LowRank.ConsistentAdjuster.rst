@@ -1,4 +1,4 @@
-LowRank.ConsistentAdjuster
+molass.LowRank.ConsistentAdjuster module
 ========================================
 
 .. automodule:: molass.LowRank.ConsistentAdjuster

@@ -1,4 +1,4 @@
-Reports.V1Report
+molass.Reports.V1Report module
 ==============================
 
 .. automodule:: molass.Reports.V1Report

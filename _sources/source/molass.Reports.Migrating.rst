@@ -1,4 +1,4 @@
-Reports.Migrating
+molass.Reports.Migrating module
 ===============================
 
 .. automodule:: molass.Reports.Migrating

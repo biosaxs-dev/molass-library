@@ -1,4 +1,4 @@
-Peaks
+molass.Peaks package
 ====================
 
 .. automodule:: molass.Peaks

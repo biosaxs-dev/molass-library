@@ -1,4 +1,4 @@
-InterParticle
+molass.InterParticle package
 ============================
 
 .. automodule:: molass.InterParticle

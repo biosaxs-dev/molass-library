@@ -1,4 +1,4 @@
-Reports
+molass.Reports package
 ======================
 
 .. automodule:: molass.Reports

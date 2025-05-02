@@ -1,4 +1,4 @@
-Reports.ReportUtils
+molass.Reports.ReportUtils module
 =================================
 
 .. automodule:: molass.Reports.ReportUtils

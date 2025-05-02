@@ -1,4 +1,4 @@
-LowRank.Component
+molass.LowRank.Component module
 ===============================
 
 .. automodule:: molass.LowRank.Component

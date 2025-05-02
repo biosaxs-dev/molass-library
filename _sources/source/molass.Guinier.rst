@@ -1,4 +1,4 @@
-Guinier
+molass.Guinier package
 ======================
 
 .. automodule:: molass.Guinier

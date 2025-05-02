@@ -1,4 +1,4 @@
-DataUtils.FolderWalker
+molass.DataUtils.FolderWalker module
 ====================================
 
 .. automodule:: molass.DataUtils.FolderWalker

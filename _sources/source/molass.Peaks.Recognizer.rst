@@ -1,4 +1,4 @@
-Peaks.Recognizer
+molass.Peaks.Recognizer module
 ==============================
 
 .. automodule:: molass.Peaks.Recognizer

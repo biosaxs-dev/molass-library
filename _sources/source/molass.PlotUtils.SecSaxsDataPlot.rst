@@ -1,4 +1,4 @@
-PlotUtils.SecSaxsDataPlot
+molass.PlotUtils.SecSaxsDataPlot module
 =======================================
 
 .. automodule:: molass.PlotUtils.SecSaxsDataPlot

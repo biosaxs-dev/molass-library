@@ -1,4 +1,4 @@
-SEC.ColumnStructure
+molass.SEC.ColumnStructure module
 =================================
 
 .. automodule:: molass.SEC.ColumnStructure

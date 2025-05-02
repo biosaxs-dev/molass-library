@@ -1,4 +1,4 @@
-DataObjects.SsMatrixData
+molass.DataObjects.SsMatrixData module
 ======================================
 
 .. automodule:: molass.DataObjects.SsMatrixData

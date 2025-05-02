@@ -1,4 +1,4 @@
-LowRank.LowRankInfo
+molass.LowRank.LowRankInfo module
 =================================
 
 .. automodule:: molass.LowRank.LowRankInfo

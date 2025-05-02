@@ -1,4 +1,4 @@
-Peaks.PeakSimilarity
+molass.Peaks.PeakSimilarity module
 ==================================
 
 .. automodule:: molass.Peaks.PeakSimilarity

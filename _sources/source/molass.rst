@@ -6,7 +6,7 @@ molass package
    :undoc-members:
    :show-inheritance:
 
-Submodules
+Subpackages
 -----------
 
 .. toctree::

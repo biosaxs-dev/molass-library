@@ -1,4 +1,4 @@
-SurveyUtils
+molass.SurveyUtils package
 ==========================
 
 .. automodule:: molass.SurveyUtils

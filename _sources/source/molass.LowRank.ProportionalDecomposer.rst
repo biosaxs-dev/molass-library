@@ -1,4 +1,4 @@
-LowRank.ProportionalDecomposer
+molass.LowRank.ProportionalDecomposer module
 ============================================
 
 .. automodule:: molass.LowRank.ProportionalDecomposer

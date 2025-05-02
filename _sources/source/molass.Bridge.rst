@@ -1,4 +1,4 @@
-Bridge
+molass.Bridge package
 =====================
 
 .. automodule:: molass.Bridge

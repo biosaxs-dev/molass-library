@@ -1,4 +1,4 @@
-LowRank.CoupledAdjuster
+molass.LowRank.CoupledAdjuster module
 =====================================
 
 .. automodule:: molass.LowRank.CoupledAdjuster

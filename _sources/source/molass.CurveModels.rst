@@ -1,4 +1,4 @@
-CurveModels
+molass.CurveModels package
 ==========================
 
 .. automodule:: molass.CurveModels
@@ -6,7 +6,7 @@ CurveModels
    :undoc-members:
    :show-inheritance:
 
-Submodules
+Subpackages
 -----------
 
 .. toctree::

@@ -1,4 +1,4 @@
-Mapping.RatioCurve
+molass.Mapping.RatioCurve module
 ================================
 
 .. automodule:: molass.Mapping.RatioCurve

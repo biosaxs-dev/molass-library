@@ -1,4 +1,4 @@
-LowRank.ErrorPropagate
+molass.LowRank.ErrorPropagate module
 ====================================
 
 .. automodule:: molass.LowRank.ErrorPropagate

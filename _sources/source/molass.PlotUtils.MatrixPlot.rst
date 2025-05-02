@@ -1,4 +1,4 @@
-PlotUtils.MatrixPlot
+molass.PlotUtils.MatrixPlot module
 ==================================
 
 .. automodule:: molass.PlotUtils.MatrixPlot

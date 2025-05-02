@@ -1,4 +1,4 @@
-LowRank
+molass.LowRank package
 ======================
 
 .. automodule:: molass.LowRank

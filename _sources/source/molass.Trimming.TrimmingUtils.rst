@@ -1,4 +1,4 @@
-Trimming.TrimmingUtils
+molass.Trimming.TrimmingUtils module
 ====================================
 
 .. automodule:: molass.Trimming.TrimmingUtils

@@ -1,4 +1,4 @@
-DataUtils.Concentration
+molass.DataUtils.Concentration module
 =====================================
 
 .. automodule:: molass.DataUtils.Concentration

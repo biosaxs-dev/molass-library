@@ -1,4 +1,4 @@
-DataUtils
+molass.DataUtils package
 ========================
 
 .. automodule:: molass.DataUtils

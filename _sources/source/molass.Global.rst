@@ -1,4 +1,4 @@
-Global
+molass.Global package
 =====================
 
 .. automodule:: molass.Global

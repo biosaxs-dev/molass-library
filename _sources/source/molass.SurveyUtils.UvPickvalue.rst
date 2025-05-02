@@ -1,4 +1,4 @@
-SurveyUtils.UvPickvalue
+molass.SurveyUtils.UvPickvalue module
 =====================================
 
 .. automodule:: molass.SurveyUtils.UvPickvalue

@@ -1,4 +1,4 @@
-Stats.EghMoment
+molass.Stats.EghMoment module
 =============================
 
 .. automodule:: molass.Stats.EghMoment

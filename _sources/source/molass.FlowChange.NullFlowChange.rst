@@ -1,4 +1,4 @@
-FlowChange.NullFlowChange
+molass.FlowChange.NullFlowChange module
 =======================================
 
 .. automodule:: molass.FlowChange.NullFlowChange

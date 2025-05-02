@@ -1,4 +1,4 @@
-InterParticle.ConcDepend
+molass.InterParticle.ConcDepend module
 ======================================
 
 .. automodule:: molass.InterParticle.ConcDepend
