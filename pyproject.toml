@@ -19,11 +19,11 @@ dependencies = [
 requires-python = ">=3.9"
 
 authors = [
-  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"},
+  {name = "Molass Community"},
 ]
 
 maintainers = [
-  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"}
+  {name = "Molass Community"}
 ]
 
 description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
