@@ -1,4 +1,4 @@
-molass.Except.ExceptionTypes module
+Except.ExceptionTypes
 ===================================
 
 .. automodule:: molass.Except.ExceptionTypes

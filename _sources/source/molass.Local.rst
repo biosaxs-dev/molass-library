@@ -1,4 +1,4 @@
-molass.Local package
+Local
 ====================
 
 .. automodule:: molass.Local

@@ -1,4 +1,4 @@
-molass.DataUtils.UvFileTrimming module
+DataUtils.UvFileTrimming
 ======================================
 
 .. automodule:: molass.DataUtils.UvFileTrimming

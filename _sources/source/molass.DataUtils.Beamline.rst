@@ -1,4 +1,4 @@
-molass.DataUtils.Beamline module
+DataUtils.Beamline
 ================================
 
 .. automodule:: molass.DataUtils.Beamline

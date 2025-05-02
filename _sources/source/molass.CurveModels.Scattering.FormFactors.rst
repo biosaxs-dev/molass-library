@@ -1,4 +1,4 @@
-molass.CurveModels.Scattering.FormFactors module
+CurveModels.Scattering.FormFactors
 ================================================
 
 .. automodule:: molass.CurveModels.Scattering.FormFactors

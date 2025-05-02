@@ -1,4 +1,4 @@
-molass.Reports.V1GuinierReport module
+Reports.V1GuinierReport
 =====================================
 
 .. automodule:: molass.Reports.V1GuinierReport

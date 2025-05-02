@@ -1,4 +1,4 @@
-molass.DataUtils.ZipFolder module
+DataUtils.ZipFolder
 =================================
 
 .. automodule:: molass.DataUtils.ZipFolder

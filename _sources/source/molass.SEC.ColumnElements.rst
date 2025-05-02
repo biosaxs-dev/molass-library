@@ -1,4 +1,4 @@
-molass.SEC.ColumnElements module
+SEC.ColumnElements
 ================================
 
 .. automodule:: molass.SEC.ColumnElements

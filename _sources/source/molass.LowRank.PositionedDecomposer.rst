@@ -1,4 +1,4 @@
-molass.LowRank.PositionedDecomposer module
+LowRank.PositionedDecomposer
 ==========================================
 
 .. automodule:: molass.LowRank.PositionedDecomposer

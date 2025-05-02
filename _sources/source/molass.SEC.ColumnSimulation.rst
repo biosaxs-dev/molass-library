@@ -1,4 +1,4 @@
-molass.SEC.ColumnSimulation module
+SEC.ColumnSimulation
 ==================================
 
 .. automodule:: molass.SEC.ColumnSimulation

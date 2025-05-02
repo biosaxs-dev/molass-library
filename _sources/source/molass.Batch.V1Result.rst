@@ -1,4 +1,4 @@
-molass.Batch.V1Result module
+Batch.V1Result
 ============================
 
 .. automodule:: molass.Batch.V1Result

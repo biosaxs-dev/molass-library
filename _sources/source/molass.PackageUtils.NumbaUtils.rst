@@ -1,4 +1,4 @@
-molass.PackageUtils.NumbaUtils module
+PackageUtils.NumbaUtils
 =====================================
 
 .. automodule:: molass.PackageUtils.NumbaUtils

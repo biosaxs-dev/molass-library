@@ -1,4 +1,4 @@
-molass.Baseline.LpmBaseline2D module
+Baseline.LpmBaseline2D
 ====================================
 
 .. automodule:: molass.Baseline.LpmBaseline2D

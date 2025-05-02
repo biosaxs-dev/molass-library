@@ -1,4 +1,4 @@
-molass.PlotUtils.V1KratkyPlot module
+PlotUtils.V1KratkyPlot
 ====================================
 
 .. automodule:: molass.PlotUtils.V1KratkyPlot

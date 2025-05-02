@@ -1,4 +1,4 @@
-molass.Trimming.TrimmingInfo module
+Trimming.TrimmingInfo
 ===================================
 
 .. automodule:: molass.Trimming.TrimmingInfo

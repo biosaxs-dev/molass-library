@@ -1,4 +1,4 @@
-molass.PlotUtils.TrimmingPlot module
+PlotUtils.TrimmingPlot
 ====================================
 
 .. automodule:: molass.PlotUtils.TrimmingPlot

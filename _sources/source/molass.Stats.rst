@@ -1,4 +1,4 @@
-molass.Stats package
+Stats
 ====================
 
 .. automodule:: molass.Stats

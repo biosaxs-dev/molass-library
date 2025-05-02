@@ -1,4 +1,4 @@
-molass.PackageUtils package
+PackageUtils
 ===========================
 
 .. automodule:: molass.PackageUtils

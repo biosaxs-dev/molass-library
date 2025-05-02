@@ -1,4 +1,4 @@
-molass.Guinier.RgCurveUtils module
+Guinier.RgCurveUtils
 ==================================
 
 .. automodule:: molass.Guinier.RgCurveUtils

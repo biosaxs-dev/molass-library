@@ -1,4 +1,4 @@
-molass.Mapping.PeakMatcher module
+Mapping.PeakMatcher
 =================================
 
 .. automodule:: molass.Mapping.PeakMatcher

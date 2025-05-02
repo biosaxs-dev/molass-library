@@ -1,4 +1,4 @@
-molass.Batch package
+Batch
 ====================
 
 .. automodule:: molass.Batch

@@ -1,4 +1,4 @@
-molass.Geometric package
+Geometric
 ========================
 
 .. automodule:: molass.Geometric

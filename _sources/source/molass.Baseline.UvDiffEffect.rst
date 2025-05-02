@@ -1,4 +1,4 @@
-molass.Baseline.UvDiffEffect module
+Baseline.UvDiffEffect
 ===================================
 
 .. automodule:: molass.Baseline.UvDiffEffect

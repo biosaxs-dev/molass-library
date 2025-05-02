@@ -1,4 +1,4 @@
-molass.DENSS package
+DENSS
 ====================
 
 .. automodule:: molass.DENSS

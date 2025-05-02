@@ -1,4 +1,4 @@
-molass.Reports.ReportInfo module
+Reports.ReportInfo
 ================================
 
 .. automodule:: molass.Reports.ReportInfo

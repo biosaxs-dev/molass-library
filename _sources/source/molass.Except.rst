@@ -1,4 +1,4 @@
-molass.Except package
+Except
 =====================
 
 .. automodule:: molass.Except

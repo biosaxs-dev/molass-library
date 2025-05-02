@@ -1,4 +1,4 @@
-molass.Legacy.BackCompatUtils module
+Legacy.BackCompatUtils
 ====================================
 
 .. automodule:: molass.Legacy.BackCompatUtils

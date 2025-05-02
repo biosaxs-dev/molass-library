@@ -1,4 +1,4 @@
-molass.Legacy package
+Legacy
 =====================
 
 .. automodule:: molass.Legacy

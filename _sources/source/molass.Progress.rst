@@ -1,4 +1,4 @@
-molass.Progress package
+Progress
 =======================
 
 .. automodule:: molass.Progress

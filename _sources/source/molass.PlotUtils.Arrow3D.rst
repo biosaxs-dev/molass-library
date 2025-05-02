@@ -1,4 +1,4 @@
-molass.PlotUtils.Arrow3D module
+PlotUtils.Arrow3D
 ===============================
 
 .. automodule:: molass.PlotUtils.Arrow3D

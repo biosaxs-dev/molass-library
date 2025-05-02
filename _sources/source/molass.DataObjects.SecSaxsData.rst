@@ -1,4 +1,4 @@
-molass.DataObjects.SecSaxsData module
+DataObjects.SecSaxsData
 =====================================
 
 .. automodule:: molass.DataObjects.SecSaxsData

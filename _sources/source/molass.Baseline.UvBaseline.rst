@@ -1,4 +1,4 @@
-molass.Baseline.UvBaseline module
+Baseline.UvBaseline
 =================================
 
 .. automodule:: molass.Baseline.UvBaseline

@@ -1,4 +1,4 @@
-molass.SEC.ColumnSliceStates module
+SEC.ColumnSliceStates
 ===================================
 
 .. automodule:: molass.SEC.ColumnSliceStates

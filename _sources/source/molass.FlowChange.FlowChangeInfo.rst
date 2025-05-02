@@ -1,4 +1,4 @@
-molass.FlowChange.FlowChangeInfo module
+FlowChange.FlowChangeInfo
 =======================================
 
 .. automodule:: molass.FlowChange.FlowChangeInfo

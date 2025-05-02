@@ -1,4 +1,4 @@
-molass.DENSS.DenssUtils module
+DENSS.DenssUtils
 ==============================
 
 .. automodule:: molass.DENSS.DenssUtils

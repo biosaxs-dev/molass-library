@@ -1,4 +1,4 @@
-molass.SEC.StationaryMove module
+SEC.StationaryMove
 ================================
 
 .. automodule:: molass.SEC.StationaryMove

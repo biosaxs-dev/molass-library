@@ -1,4 +1,4 @@
-molass.Reports.Controller module
+Reports.Controller
 ================================
 
 .. automodule:: molass.Reports.Controller

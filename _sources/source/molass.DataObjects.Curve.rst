@@ -1,4 +1,4 @@
-molass.DataObjects.Curve module
+DataObjects.Curve
 ===============================
 
 .. automodule:: molass.DataObjects.Curve

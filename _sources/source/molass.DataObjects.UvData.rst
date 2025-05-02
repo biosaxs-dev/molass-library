@@ -1,4 +1,4 @@
-molass.DataObjects.UvData module
+DataObjects.UvData
 ================================
 
 .. automodule:: molass.DataObjects.UvData

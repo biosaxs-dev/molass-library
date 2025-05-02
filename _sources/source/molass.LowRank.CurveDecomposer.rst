@@ -1,4 +1,4 @@
-molass.LowRank.CurveDecomposer module
+LowRank.CurveDecomposer
 =====================================
 
 .. automodule:: molass.LowRank.CurveDecomposer

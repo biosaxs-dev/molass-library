@@ -1,4 +1,4 @@
-molass.Stats.Moment module
+Stats.Moment
 ==========================
 
 .. automodule:: molass.Stats.Moment

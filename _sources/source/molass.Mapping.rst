@@ -1,4 +1,4 @@
-molass.Mapping package
+Mapping
 ======================
 
 .. automodule:: molass.Mapping

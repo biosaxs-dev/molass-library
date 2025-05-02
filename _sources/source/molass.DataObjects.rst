@@ -1,4 +1,4 @@
-molass.DataObjects package
+DataObjects
 ==========================
 
 .. automodule:: molass.DataObjects

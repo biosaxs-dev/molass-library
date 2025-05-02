@@ -1,4 +1,4 @@
-molass.Trimming.UsableWrange module
+Trimming.UsableWrange
 ===================================
 
 .. automodule:: molass.Trimming.UsableWrange

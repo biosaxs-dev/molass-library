@@ -1,4 +1,4 @@
-molass.Progress.ProgessUtils module
+Progress.ProgessUtils
 ===================================
 
 .. automodule:: molass.Progress.ProgessUtils

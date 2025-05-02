@@ -1,4 +1,4 @@
-molass.PlotUtils.PlotResult module
+PlotUtils.PlotResult
 ==================================
 
 .. automodule:: molass.PlotUtils.PlotResult

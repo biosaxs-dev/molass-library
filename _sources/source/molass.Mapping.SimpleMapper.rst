@@ -1,4 +1,4 @@
-molass.Mapping.SimpleMapper module
+Mapping.SimpleMapper
 ==================================
 
 .. automodule:: molass.Mapping.SimpleMapper

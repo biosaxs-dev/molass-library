@@ -1,4 +1,4 @@
-molass.Baseline.Baseline2D module
+Baseline.Baseline2D
 =================================
 
 .. automodule:: molass.Baseline.Baseline2D

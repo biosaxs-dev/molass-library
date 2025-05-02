@@ -1,4 +1,4 @@
-molass.Geometric.Peaklike module
+Geometric.Peaklike
 ================================
 
 .. automodule:: molass.Geometric.Peaklike

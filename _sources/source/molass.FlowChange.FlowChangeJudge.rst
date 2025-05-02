@@ -1,4 +1,4 @@
-molass.FlowChange.FlowChangeJudge module
+FlowChange.FlowChangeJudge
 ========================================
 
 .. automodule:: molass.FlowChange.FlowChangeJudge

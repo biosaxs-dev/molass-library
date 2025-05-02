@@ -1,4 +1,4 @@
-molass.PlotUtils.LowRankInfoPlot module
+PlotUtils.LowRankInfoPlot
 =======================================
 
 .. automodule:: molass.PlotUtils.LowRankInfoPlot

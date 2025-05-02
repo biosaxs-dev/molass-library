@@ -1,4 +1,4 @@
-molass.PlotUtils.Annotation3D module
+PlotUtils.Annotation3D
 ====================================
 
 .. automodule:: molass.PlotUtils.Annotation3D

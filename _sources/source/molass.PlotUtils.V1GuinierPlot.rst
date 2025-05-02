@@ -1,4 +1,4 @@
-molass.PlotUtils.V1GuinierPlot module
+PlotUtils.V1GuinierPlot
 =====================================
 
 .. automodule:: molass.PlotUtils.V1GuinierPlot

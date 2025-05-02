@@ -1,4 +1,4 @@
-molass.DataUtils.AnomalyHandlers module
+DataUtils.AnomalyHandlers
 =======================================
 
 .. automodule:: molass.DataUtils.AnomalyHandlers

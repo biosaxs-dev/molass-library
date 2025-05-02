@@ -1,4 +1,4 @@
-molass.Geometric.LinesegmentUtils module
+Geometric.LinesegmentUtils
 ========================================
 
 .. automodule:: molass.Geometric.LinesegmentUtils

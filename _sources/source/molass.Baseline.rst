@@ -1,4 +1,4 @@
-molass.Baseline package
+Baseline
 =======================
 
 .. automodule:: molass.Baseline

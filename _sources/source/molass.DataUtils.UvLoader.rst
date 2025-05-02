@@ -1,4 +1,4 @@
-molass.DataUtils.UvLoader module
+DataUtils.UvLoader
 ================================
 
 .. automodule:: molass.DataUtils.UvLoader

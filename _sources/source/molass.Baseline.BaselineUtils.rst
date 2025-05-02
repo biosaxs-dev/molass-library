@@ -1,4 +1,4 @@
-molass.Baseline.BaselineUtils module
+Baseline.BaselineUtils
 ====================================
 
 .. automodule:: molass.Baseline.BaselineUtils
