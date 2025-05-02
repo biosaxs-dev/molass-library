@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 # Summary
 
-`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html). It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
+`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html), Japan. It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
 
 Literally, a SEC-SAXS experiment consists of the two independent parts:
 
@@ -110,7 +110,7 @@ To contrast our approach, there have been reported some model-free approaches li
 * `SDM` : Stochastic Dispersive Model [@Felinger1999],
 * `EDM` : Equilibrium Dispersive Model [@Ur2021],
 
-depending on the state of data. Strength and weakness of these models are well distinguished in `Molass Library` online documentation.
+depending on the state of data. Strengths and weaknesses of these models are well distinguished in `Molass Library` online documentation.
 
 [^5]: The meaning of "contraints" is left abstract here for brevity. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
 
