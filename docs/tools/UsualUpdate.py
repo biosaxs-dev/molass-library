@@ -1,8 +1,6 @@
 """
 This script is used to simplify the process of updating in usual cases
 after the initial setup of the documentation.
-It is designed to be run in the docs directory of the project.
-
 It is assumed to be run from the docs directory as follows.
 
 .. code-block:: bat

@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosectionlabel",
+    'sphinx_copybutton',
 ]
 
 autoclass_content = 'both'
