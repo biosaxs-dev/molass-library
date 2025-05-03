@@ -66,3 +66,4 @@ Tool Functions
    :maxdepth: 5
 
    source/EditRst
+   source/UsualUpdate

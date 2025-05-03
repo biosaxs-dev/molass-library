@@ -3,7 +3,9 @@
 import sys
 import os
 root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-sys.path.insert(0, root_dir)
+sys.path.insert(0, root_dir)    # required to import molass
+tools_dir = os.path.join(root_dir, "docs", "tools")
+sys.path.insert(0, tools_dir)   # required to import tools/*.py
 
 # Configuration file for the Sphinx documentation builder.
 #
