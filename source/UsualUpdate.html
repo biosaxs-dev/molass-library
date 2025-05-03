@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>FlowChange.FlowChangeParams &#8212; Molass Library  documentation</title>
+    <title>UsualUpdate module &#8212; Molass Library  documentation</title>
   
   
   
@@ -40,12 +40,11 @@
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.FlowChange.FlowChangeParams';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/UsualUpdate';</script>
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="FlowChange.FlowChangePlot" href="molass.FlowChange.FlowChangePlot.html" />
-    <link rel="prev" title="FlowChange.FlowChangeLikely" href="molass.FlowChange.FlowChangeLikely.html" />
+    <link rel="prev" title="EditRst module" href="EditRst.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -155,7 +154,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="current nav bd-sidenav">
+        <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Baseline.html">Baseline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
@@ -211,12 +210,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.FlowChange.html">FlowChange</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.FlowChange.html">FlowChange</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChange.html">FlowChange.FlowChange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangeInfo.html">FlowChange.FlowChangeInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangeJudge.html">FlowChange.FlowChangeJudge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangeLikely.html">FlowChange.FlowChangeLikely</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">FlowChange.FlowChangeParams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangeParams.html">FlowChange.FlowChangeParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangePlot.html">FlowChange.FlowChangePlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.NullFlowChange.html">FlowChange.NullFlowChange</a></li>
 </ul>
@@ -310,9 +309,9 @@
 </ul>
 </details></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="UsualUpdate.html">UsualUpdate module</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">UsualUpdate module</a></li>
 </ul>
 
     </div>
@@ -382,7 +381,7 @@
       
       
       
-      <li><a href="../_sources/source/molass.FlowChange.FlowChangeParams.rst" target="_blank"
+      <li><a href="../_sources/source/UsualUpdate.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -453,7 +452,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -464,11 +465,19 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>FlowChange.FlowChangeParams</h1>
+    <h1>UsualUpdate module</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#UsualUpdate.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -478,8 +487,29 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="flowchange-flowchangeparams">
-<h1>FlowChange.FlowChangeParams<a class="headerlink" href="#flowchange-flowchangeparams" title="Link to this heading">#</a></h1>
+  <section id="module-UsualUpdate">
+<span id="usualupdate-module"></span><h1>UsualUpdate module<a class="headerlink" href="#module-UsualUpdate" title="Link to this heading">#</a></h1>
+<p>This script is used to simplify the process of updating in usual cases
+after the initial setup of the documentation.
+It is designed to be run in the docs directory of the project.</p>
+<p>It is assumed to be run from the docs directory as follows.</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>python tools/UsualUpdate.py
+</pre></div>
+</div>
+<p>This script performs the following tasks:</p>
+<ol class="arabic simple">
+<li><p>Checks if the current directory is the docs directory.</p></li>
+<li><p>Checks if the source directory exists or is empty.</p></li>
+<li><p>Generates the initial documentation.</p></li>
+<li><p>Makes HTML documentation.</p></li>
+<li><p>Deploys the documentation to GitHub Pages.</p></li>
+</ol>
+<dl class="py function">
+<dt class="sig sig-object py" id="UsualUpdate.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UsualUpdate.main" title="Link to this definition">#</a></dt>
+<dd><p>Main function to update the documentation.</p>
+</dd></dl>
+
 </section>
 
 
@@ -494,22 +524,13 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="molass.FlowChange.FlowChangeLikely.html"
+       href="EditRst.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">FlowChange.FlowChangeLikely</p>
+        <p class="prev-next-title">EditRst module</p>
       </div>
-    </a>
-    <a class="right-next"
-       href="molass.FlowChange.FlowChangePlot.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">FlowChange.FlowChangePlot</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -517,6 +538,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#UsualUpdate.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
