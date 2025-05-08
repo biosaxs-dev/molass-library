@@ -29,64 +29,64 @@ bibliography: paper.bib
 
 # Summary
 
-`Molass Library` is a rewrite of MOLASS [@Yonezawa:2023] which is an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html), Japan. It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby attaining greater flexibility compared to the predecessor thanks to the Python ecosystem diversity.
+Molass Library is a rewrite of MOLASS [@Yonezawa:2023], an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html), Japan. It is designed for scripting in Jupyter notebooks [@Kluyver:2016aa], thereby achieving greater flexibility than its predecessor, thanks to the diversity of the Python ecosystem.
 
-Literally, a SEC-SAXS experiment consists of the two independent parts:
+An SEC-SAXS experiment consists of two independent parts:
 
-* SEC - Size Exclusion Chromatograpy
+* SEC - Size Exclusion Chromatography
 * SAXS - Small Angle X-Ray Scattering
 
-each of which is based on its own theoretical discipline, indicating the fact that the analysis requires a balanced combination of those, which is the target of `Molass Library`.
+Each is based on its own theoretical discipline, and analysis requires a balanced combination of both, which is the aim of the Molass Library.
 
 ![Logo of Molass Library designed by K. Yatabe](docs/_static/molass_256.png)
 
 # Statement of need
 
-Analysis of SEC-SAXS experiment data involves several steps. To list a simplest course for discussion here:
+Analysis of SEC-SAXS experiment data involves several steps. For clarity, a typical workflow includes:
 
-1. Circular Average
+1. Circular Averaging
 2. Background Subtraction
 3. Trimming
-4. Baseline Correcction
+4. Baseline Correction
 5. Low Rank Factorization
-6. Rg Estimation - Guinier Plot [@Guinier_1939]
-7. Shape Inspection - Kratky Plot [@Kratky_1963]
+6. Rg Estimation – Guinier Plot [@Guinier_1939]
+7. Shape Inspection – Kratky Plot [@Kratky_1963]
 8. Electron Density Estimation
 
-among which `Molass Library` currently supports only steps 3-7. For the first two steps, `SAngler` [@Shimizu:2016] can be used, while `DENSS` [@Grant:2018] is available for the last. For all those steps, there already exist alternative software tools with various coverage. The most comprehensive and popular tool is `ATSAS` [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a standard SAXS suite of command line interface programs for each responsible step, coupled with GUI programs for them. Other tools include `BioXTAS RAW` [@Hopkins:jl5075], which is an open-source GUI application for running such executable modular programs, some of which are open-source and others of which include the ATSAS suite. In such a semi-closed state of tools for SEC-SAXS experiments, `Molass Library` is expected to help researchers better understand, improve, and utilize their tools by making larger part of the tools more open and flexible together with the Python ecosystem.
+Among these, the Molass Library currently supports steps 3–7. For the first two steps, SAngler [@Shimizu:2016] can be used, while DENSS [@Grant:2018] is available for the last. Alternative software tools already exist with varying coverage of these steps. The most comprehensive and popular tool is ATSAS [@Manalastas-Cantos:ge5081], which is proprietary (closed-source) and consists of a standard SAXS suite of command-line interface programs for each step, coupled with GUI programs. Other tools include BioXTAS RAW [@Hopkins:jl5075], an open-source GUI application for running such modular programs, some of which are open-source and others of which include the ATSAS suite. In this semi-closed ecosystem of SEC-SAXS tools, the Molass Library is expected to help researchers better understand, improve, and utilize their tools by making a larger part of the workflow more open and flexible, in conjunction with the Python ecosystem.
 
-# Notable package dependence
+# Notable package dependencies
 
-Setting aside the fundamental necessity of NumPy [@Harris2020], SciPy [@Virtanen2020] and Matplotlib [@Hunter:2007], `Molass Library` replaced significant volume of custom codes with the following packages.
+In addition to the fundamental dependencies on NumPy [@Harris2020], SciPy [@Virtanen2020], and Matplotlib [@Hunter:2007], the Molass Library has replaced a significant volume of custom code with the following packages:
 
-* `pybaselines` [@pybaselines] for Baseline Correcction
-* `ruptures` [@TRUONG2020107299] for Change Point Dedection
+* pybaselines [@pybaselines] for baseline correction
+* ruptures [@TRUONG2020107299] for change point detection
 
-Likewise, the basic part of peak recognition was replaced by `scipy.signal.find_peaks` although elaborate adjustment is still required for practical recognition.
+Similarly, the core functionality for peak recognition has been replaced by `scipy.signal.find_peaks`, although further adjustments are still required for practical application.
 
-For less dependence, large part of GUI implementation, which was previouly done using Tkinter [@lundh1999introduction], is no longer needed because it has been replaced by the scripting in Jupyter notebooks.
+To reduce dependencies, much of the GUI implementation previously done using Tkinter [@lundh1999introduction] is no longer needed, as it has been replaced by scripting in Jupyter notebooks.
 
 # Theoretical focus
 
-Among the above mentioned steps, Low Rank Factorization[^1] using elution curve models is the most distinctive feature of `Molass Library`. It is directly related to the decomposition of species contained in the sample, which is first attained physically by the Size Exclusion Chromatograpy, followed by logical estimation and optimization of the software. When the chromatographic peaks are sufficiently separated, the decomposition is relatively simple. Otherwise, i.e., when the peaks overlap widely, it becomes challenging due to underdeterminedness[^2] from noise, the handling of which is beyond the scope of this paper and possibly might be studied using the future versions of this library.
+Among the steps listed above, low rank factorization[^1] using elution curve models is the most distinctive feature of the Molass Library. This process is directly related to the decomposition of species in the sample, which is first achieved physically by size exclusion chromatography and then refined through logical estimation and optimization in the software. When the chromatographic peaks are well separated, decomposition is relatively straightforward. However, significant peak overlap makes decomposition challenging due to underdeterminedness[^2] and noise. Addressing these challenges is beyond the scope of this paper and may be explored in future versions of the library.
 
-Here, we decribe the essense of easier part to give a basic idea of what it is all about. For discussion, it is convenient to use matrices. Ideally, then, the decomposition should be expressed as follows:
+Here, we describe the essence of the simpler case to illustrate the basic approach. For clarity, we use matrix notation in the following discussion. Ideally, the decomposition can be expressed as follows:
 
 $$ M = P \cdot C \qquad \qquad (1) $$
 
-where the symbols are
+where:
 
-* $M$ : matrix of measured data,
-* $P$ : matrix made of columns of component scattering curves,
-* $C$ : matrix made of rows of component elution curves.
+* $M$: matrix of measured data,
+* $P$: matrix whose columns are component scattering curves,
+* $C$: matrix whose rows are component elution curves.
 
-[^1]: Where it is often also called Low Rank Approximation, we prefer the word "Factorization" because, in this context, the latter word matches better, in psychological orientation, to decomposition.
+[^1]: While this is often called Low Rank Approximation, we prefer the term "Factorization" because, in this context, it better matches the psychological orientation toward decomposition.
 
-[^2]: By "underdeterminedness", we mean here the situation where many decomposition candidates are found and we have no definite information to reduce them to a fewer number which can be studied effectively.
+[^2]: By "underdeterminedness," we mean the situation where many decomposition candidates are found and we have no definite information to reduce them to a smaller number that can be studied effectively.
 
-See the following figure to get intuition of this decomposition.
+See the following figure for intuition about this decomposition.
 
-![Illustratin of Decomposition using Simulated Data](docs/_static/simulated_data.png)
+![Illustration of Decomposition using Simulated Data](docs/_static/simulated_data.png)
 
 Using the above relation, the solution can be calculated, in the sense of footnote[^3], as follows:
 
@@ -96,23 +96,23 @@ $$ P = M \cdot C^{+} \qquad \qquad (2) $$
 
 where
 
-* $C^{+}$ : Moore-Penrose inverse. [@Penrose_1955; @Penrose_1956]
+* $C^{+}$: Moore-Penrose inverse [@Penrose_1955; @Penrose_1956]
 
-Note that in formula $(1)$ and $(2)$, $P$ and $C$ are equally eligible mathematically, but physically not. In fact, we get $P$ from $M$ and $C$, because $M$ is given and it is easier to estimate $C$ rather than $P$.[^4]
+Note that in equations (1) and (2), $P$ and $C$ are mathematically equivalent, but not physically identical. In practice, we obtain $P$ from $M$ and $C$, since $M$ is given and it is easier to estimate $C$ than $P$.[^4]
 
-[^4]: For this reason, see the corresponding chapter of online document [Molass Essence](https://freesemt.github.io/molass-essence/chapters/04/lowrank.html).
+[^4]: For more details, see the corresponding chapter of the online document [Molass Essence](https://freesemt.github.io/molass-essence/chapters/04/lowrank.html).
 
-# Elution curve models - modeling approach
+# Elution curve models – modeling approach
 
-To contrast our approach, there have been reported some model-free approaches like `REGALS` [@Meisburger:mf5050]. However, to cope with the underdeterminedness, we believe it is essential to reduce the degree of freedom by the contraints[^5] from appropriate models as included in `Molass Library`, namely:
+In contrast to our approach, some model-free methods such as REGALS [@Meisburger:mf5050] have been reported. However, to address underdeterminedness, we believe it is essential to reduce the degrees of freedom by applying constraints[^5] from appropriate models, as included in the Molass Library, namely:
 
-* `EGH` : Exponential Gaussian Hybrid [@LAN20011],
-* `SDM` : Stochastic Dispersive Model [@Felinger1999],
-* `EDM` : Equilibrium Dispersive Model [@Ur2021],
+* EGH: Exponential Gaussian Hybrid [@LAN20011]
+* SDM: Stochastic Dispersive Model [@Felinger1999]
+* EDM: Equilibrium Dispersive Model [@Ur2021]
 
-depending on the state of data. Strengths and weaknesses of these models are well distinguished in `Molass Library` online documentation.
+depending on the characteristics of the data. The strengths and weaknesses of these models are described in detail in the Molass Library's online documentation.
 
-[^5]: The meaning of "contraints" is left abstract here for brevity. It should be made precise in the context of model application not only from the models themselves but also by additional cutomization adjusted to reality, which will be disscussed elsewhere.
+[^5]: The meaning of "constraints" is left abstract here for brevity. It should be made precise in the context of model application, not only from the models themselves but also by additional customization adjusted to reality, which will be discussed elsewhere.
 
 # Acknowledgements
 
