@@ -1,11 +1,12 @@
 name: Draft PDF
 on:
-    push:
-      paths:
-        - paper.md
-        - paper.bib
-        - .github/workflows/draft-pdf.yml
-        
+  push:
+    paths:
+      - paper.md
+      - paper.bib
+      - .github/workflows/draft-pdf.yml
+  workflow_dispatch:
+
 jobs:
   paper:
     runs-on: ubuntu-latest
