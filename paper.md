@@ -8,18 +8,18 @@ authors:
   - name: Masatsuyo Takahashi
     orcid: 0009-0007-1466-5563
     corresponding: false    
-    affiliation: "1,2"
+    affiliation: "1"
   - name: Nobutaka Shimizu
     orcid: 0000-0002-3636-1663
     corresponding: true
-    affiliation: "3,1,2"
+    affiliation: "1,2"
 affiliations:
-  - name: Structural Biology Research Center, Institute of Materials Structure Science
+  - name: Structural Biology Research Center, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK)
     index: 1
-  - name: Institute of Materials Structure Science
+  - name: Photon Factory, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK)
     index: 2
     ror: 0327y7e25
-  - name: Institute of Physical and Chemical Research
+  - name: Life Science Research Infrastructure Group, RIKEN SPring-8 Center
     index: 3
     ror: 01sjwvz98
 date: 24 March 2025
@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 # Summary
 
-The **Molass Library** is a modern, open-source Python package for the analysis of SEC-SAXS (Size Exclusion Chromatography coupled with Small Angle X-ray Scattering) experimental data. It is a comprehensive rewrite of the original MOLASS tool [@Yonezawa:2023], currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html), Japan. By leveraging the Python ecosystem and supporting scripting in Jupyter notebooks [@Kluyver:2016aa], Molass Library offers greater flexibility, reproducibility, and extensibility compared to its predecessor.
+The **Molass Library** is a modern, open-source Python package for the analysis of SEC-SAXS (Size Exclusion Chromatography coupled with Small Angle X-ray Scattering) experimental data. It is a comprehensive rewrite of the original MOLASS tool [@Yonezawa:2023], currently hosted at [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html), Japan. By leveraging the Python ecosystem and supporting scripting in Jupyter notebooks [@Kluyver:2016aa], Molass Library offers greater flexibility, reproducibility, and extensibility compared to its predecessor.
 
 A typical SEC-SAXS experiment involves two distinct yet interdependent processes:
 
