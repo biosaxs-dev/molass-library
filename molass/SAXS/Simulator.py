@@ -5,7 +5,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from learnsaxs import draw_voxles_as_dots, draw_detector_image
-from .DetectorInfo import get_detector_info
 from .DenssLike import get_detector_info_from_density
 
 class SaxsInfo:
@@ -80,13 +79,7 @@ class ElectronDensitySpace:
         if q is None:
             q = np.linspace(0.005, 0.5, 100)
  
-        if use_denss:
-            ft_image = None
-            info = get_detector_info_from_density(q, space)
-        else:
-            F = np.fft.fftn(space)
-            ft_image = np.abs(F)
-            info = get_detector_info(q, F)
+        info, ft_image = get_detector_info_from_density(q, space, use_denss=use_denss)
 
         info.y /= info.y.max()
         return SaxsInfo(space, ft_image, info)
