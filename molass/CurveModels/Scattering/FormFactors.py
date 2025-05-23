@@ -2,6 +2,7 @@
 This module contains functions, which is used to calculate the form factors
 """
 import numpy as np
+import scipy.integrate as integrate
 
 def homogeneous_sphere(q, R):
     """
@@ -21,5 +22,100 @@ def homogeneous_sphere(q, R):
         The form factor of the homogeneous sphere.
     """
     # Calculate the form factor using the formula for a homogeneous sphere
-    F = (3 * (np.sin(q * R) - q * R * np.cos(q * R))) / (q * R)**3
+    qR = q * R
+    F = (3 * (np.sin(qR) - qR * np.cos(qR))) / qR**3
+    return F
+
+def sphere_volume(R):
+    """
+    Calculate the volume of a sphere.
+
+    Parameters
+    ----------
+    R : float
+        The radius of the sphere.
+
+    Returns
+    -------
+    V : float
+        The volume of the sphere.
+    """
+    # Calculate the volume using the formula for a sphere
+    V = (4/3) * np.pi * R**3
+    return V
+
+def spherical_shell(q, R, r):
+    """
+    Calculate the form factor of a spherical shell.
+
+    Parameters
+    ----------
+    q : float or array-like
+        The scattering vector magnitude.
+    R : float
+        The outer radius of the shell.
+    r : float
+        The inner radius of the shell.
+
+    Returns
+    -------
+    F : float or array-like
+        The form factor of the spherical shell.
+    """
+    # Calculate the form factor using the formula for a spherical shell
+    v1 = sphere_volume(R)
+    v2 = sphere_volume(r)
+    F = (v1*homogeneous_sphere(q, R) - v2*homogeneous_sphere(q, r)) / (v1 - v2)
+    return F
+
+def ellipsoid_of_revolution(q, R, epsilon):
+    """
+    Calculate the form factor of an ellipsoid of revolution.
+
+    Parameters
+    ----------
+    q : float or array-like
+        The scattering vector magnitude.
+    R : float
+        The semi-major axis of the ellipsoid.
+    epsilon : float
+        The aspect ratio of the ellipsoid.
+
+    Returns
+    -------
+    F : float or array-like
+        The form factor of the ellipsoid of revolution.
+    """
+    # Calculate the form factor using the formula for an ellipsoid of revolution
+    def r(R, epsilon, alpha):
+        return R * np.sqrt(np.sin(alpha)**2 + (epsilon**2) * np.cos(alpha)**2)
+
+    F = integrate.quad(lambda a: homogeneous_sphere(q, r(R, epsilon, a)), 0, np.pi/2)[0]
+    return F
+
+def tri_axial_ellipsoid(q, a, b, c):
+    """
+    Calculate the form factor of a tri-axial ellipsoid.
+
+    Parameters
+    ----------
+    q : float or array-like
+        The scattering vector magnitude.
+    a : float
+        The semi-major axis of the ellipsoid.
+    b : float
+        The semi-minor axis of the ellipsoid in the x-y plane.
+    c : float
+        The semi-minor axis of the ellipsoid in the z direction.
+
+    Returns
+    -------
+    F : float or array-like
+        The form factor of the tri-axial ellipsoid.
+    """
+    # Calculate the form factor using the formula for a tri-axial ellipsoid
+    def r(a, b, c, x, y):
+        return np.sqrt((a * np.sin(x) * np.cos(y))**2 + (b * np.sin(x) * np.sin(y))**2 + (c * np.cos(x))**2)
+
+    F = integrate.quad(lambda a: homogeneous_sphere(q, r(a, b, c, a)), 0, np.pi/2)[0]
     return F
