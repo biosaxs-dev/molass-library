@@ -13,6 +13,8 @@ dependencies = [
   "tqdm",
   "pybaselines",
   "molass_legacy",
+  "statsmodels",
+  "scikit-learn",
   "toml",
 ]
 

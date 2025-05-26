@@ -33,5 +33,6 @@ def get_local_settings(filename='local_settings.py', debug=False):
     if not found:
         raise FileNotFoundError('The local_settings.py file was not found.')
 
-    exec(open(local_settings_file).read())
-    return locals()['LocalSettings']
+    locals_ = {}
+    exec(open(local_settings_file).read(), locals=locals_)  # it seems that locals option is required for Python 3.13+.
+    return locals_['LocalSettings']
