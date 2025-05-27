@@ -1,6 +1,8 @@
 """
     test SSD
 """
+import sys
+sys.path.insert(0, r'D:\Github\molass-library')  # Add the parent directory to the path
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings
@@ -20,10 +22,10 @@ def test_01_constructor(ssd_instance):
     assert hasattr(ssd_instance, 'xr'), "SSD object should have 'xr' attribute"
     assert hasattr(ssd_instance, 'uv'), "SSD object should have 'uv' attribute"
 
-def test_02_plot_3d(ssd_instance):
-    plot_result = ssd_instance.plot_3d()
-    assert plot_result is not None, "Plot result should not be None"
-    plot_result = ssd_instance.plot_3d(uv_only=True)
-    assert plot_result is not None, "Plot result should not be None"
-    plot_result = ssd_instance.plot_3d(xr_only=True)
-    assert plot_result is not None, "Plot result should not be None"
+def test_02_exec_denss(ssd_instance):
+    from molass.SAXS.DenssLike import exec_denss
+    exec_denss(ssd_instance)
+
+if __name__ == "__main__":
+    path = '::'.join([__file__, 'test_02_exec_denss'])
+    pytest.main([path, '-v', '--tb=short'])

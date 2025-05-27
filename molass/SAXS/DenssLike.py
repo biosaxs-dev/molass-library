@@ -12,6 +12,18 @@ class DetectorInfo:
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
+def exec_denss(ssd):
+    from denss.core import reconstruct_abinitio_from_scattering_profile
+    trimmed_ssd = ssd.trimmed_copy()
+    corrected_ssd = trimmed_ssd.corrected_copy()
+    data = corrected_ssd.get_denss_data()
+    q = data.q
+    I = data.I
+    sigq = data.sigq
+    dmax = 100
+    print("q, I, sigq:", len(q), len(I), len(sigq))
+    qdata, Idata, sigqdata, qbinsc, Imean, chi, rg, supportV, rho, side, fit, final_chi2 = reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, ne=10000, extrapolate=True)
+
 def get_detector_info_from_density(q, rho, dmax=100, use_denss=False):
     F = np.fft.fftn(rho)
     info = get_detector_info(q, F)

@@ -143,3 +143,22 @@ class XrData(SsMatrixData):
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
 
+    def get_denss_data(self, **kwargs):
+        """xr.get_denss_data()
+        
+        Returns a SAXS data object from the XR matrix data.
+        
+        Parameters
+        ----------
+        None
+        """
+        from molass.DataObjects.Curve import create_jcurve
+        from molass.DataObjects.DenssData import DenssData
+
+        q = self.qv
+        icurve = self.get_icurve()
+        peaks = icurve.get_peaks()
+        j = peaks[0]
+        I = self.get_jcurve(j).y
+        sigq = create_jcurve(q, self.E, j).y
+        return DenssData(q, I, sigq)
