@@ -15,7 +15,7 @@ def ssd_instance():
     print("Fixture executed")
     return SSD(TUTORIAL_DATA)
 
-def test_01_cunstructor(ssd_instance):
+def test_01_constructor(ssd_instance):
     assert ssd_instance is not None, "SSD object should not be None"
     assert hasattr(ssd_instance, 'xr'), "SSD object should have 'xr' attribute"
     assert hasattr(ssd_instance, 'uv'), "SSD object should have 'uv' attribute"
