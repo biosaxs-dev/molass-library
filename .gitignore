@@ -7,9 +7,15 @@ dist/
 .env
 
 # Ignore Python cache files
-__pycache__/
+**/__pycache__/**
 
 # Ignore the Sphinx build directory
 docs/_build/
+docs/source/**
 
-docs/molass.*.rst
+# Ignore pytest related files
+.pytest_cache/
+.coverage
+htmlcov
+
+log/

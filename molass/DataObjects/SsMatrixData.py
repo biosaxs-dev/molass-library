@@ -56,7 +56,7 @@ class SsMatrixData:
         return self.moment
 
     def get_baseline2d(self, **kwargs):
-        from molass_legacy.Baseline import Baseline2D
+        from molass.Baseline import Baseline2D
         method = kwargs.get('method', 'molass_lpm')
         if method == 'molass_lpm':
             moment = self.get_moment()
