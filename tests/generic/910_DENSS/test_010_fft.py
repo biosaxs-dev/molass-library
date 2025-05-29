@@ -27,5 +27,7 @@ def test_02_exec_denss(ssd_instance):
     exec_denss(ssd_instance)
 
 if __name__ == "__main__":
-    path = '::'.join([__file__, 'test_02_exec_denss'])
-    pytest.main([path, '-v', '--tb=short'])
+    # path = '::'.join([__file__, 'test_02_exec_denss'])
+    # pytest.main([path, '-v', '--tb=short'])
+    ssd = SSD(TUTORIAL_DATA)
+    test_02_exec_denss(ssd)

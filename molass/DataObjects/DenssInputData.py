@@ -1,17 +1,17 @@
 """
-DataObjects.DenssData.py
+DataObjects.DenssInputData.py
 
 """
 
-class DenssData:
+class DenssInputData:
     """
     Class to handle Denss input data.
     """
 
     def __init__(self, q, I, sigq):
         """
-        Initialize the DenssData object.
-        
+        Initialize the DenssInputData object.
+
         Parameters
         ----------
         q : array-like

@@ -4,6 +4,8 @@
 import os
 import tempfile
 
+IS_READY_FOR_NUMBA = False
+
 def get_ready_for_numba():
     """
     Prepare the environment for Numba.
@@ -12,6 +14,10 @@ def get_ready_for_numba():
     using numba, e.g., pybaselines, has been installed with the admin privilege.
     (as of numba 0.61.0)
     """
+    global IS_READY_FOR_NUMBA
+    if IS_READY_FOR_NUMBA:
+        return
+    
     numba_cache = os.path.join(tempfile.gettempdir(), "numba_cache")
     os.environ['NUMBA_CACHE_DIR'] = numba_cache
 
@@ -19,3 +25,4 @@ def get_ready_for_numba():
         import shutil
         shutil.rmtree(numba_cache)
     os.makedirs(numba_cache)
+    IS_READY_FOR_NUMBA = True

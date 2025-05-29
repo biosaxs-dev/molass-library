@@ -3,6 +3,8 @@ DenssLike.py
 """
 
 import numpy as np
+from molass.PackageUtils.NumbaUtils import get_ready_for_numba
+get_ready_for_numba()
 from denss.core import reconstruct_abinitio_from_scattering_profile
 from .DetectorInfo import get_detector_info
 
@@ -16,7 +18,7 @@ def exec_denss(ssd):
     from denss.core import reconstruct_abinitio_from_scattering_profile
     trimmed_ssd = ssd.trimmed_copy()
     corrected_ssd = trimmed_ssd.corrected_copy()
-    data = corrected_ssd.get_denss_data()
+    data = corrected_ssd.xr.get_data_for_denss()
     q = data.q
     I = data.I
     sigq = data.sigq

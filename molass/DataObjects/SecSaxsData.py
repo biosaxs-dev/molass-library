@@ -392,19 +392,3 @@ class SecSaxsData:
             reload(molass.InterParticle.IpEffectInspect)
         from molass.InterParticle.IpEffectInspect import inspect_ip_effect_impl
         return inspect_ip_effect_impl(self, debug=debug)
-
-    def get_denss_data(self, **kwargs):
-        """ssd.get_denss_data()
-
-        Returns a SAXSData object which contains the XR data.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        SAXSData
-            A SAXSData object which contains the XR data.
-        """
-        return self.xr.get_denss_data(**kwargs)
