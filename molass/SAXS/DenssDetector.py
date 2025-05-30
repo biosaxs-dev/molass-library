@@ -13,7 +13,7 @@ def get_denss_detector(q, rho, DENSS_GPU=False, debug=True):
     # return DenssDetector(q=q, y=curve_y, spline=interp)
     # Initialize variables
 
-    dmax = 37
+    dmax = 41
     voxel = 5           # voxel size in Angstroms
     oversampling=3.     # oversampling factor
 

@@ -24,7 +24,7 @@ def homogeneous_sphere(q, R):
     # Calculate the form factor using the formula for a homogeneous sphere
     qR = q * R
     F = (3 * (np.sin(qR) - qR * np.cos(qR))) / qR**3
-    return F
+    return F**2
 
 def sphere_volume(R):
     """
