@@ -1,8 +1,9 @@
 """
-    test SSD
+    test DenssTools
 """
 import sys
-sys.path.insert(0, r'D:\Github\molass-library')  # Add the parent directory to the path
+sys.path.insert(0, r'D:\Github\molass-library')
+sys.path.insert(0, r'D:\Github\molass-legacy')
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings
@@ -23,8 +24,11 @@ def test_01_constructor(ssd_instance):
     assert hasattr(ssd_instance, 'uv'), "SSD object should have 'uv' attribute"
 
 def test_02_exec_denss(ssd_instance):
-    from molass.SAXS.DenssLike import exec_denss
-    exec_denss(ssd_instance)
+    from molass.SAXS.DenssTools import exec_denss
+    trimmed_ssd = ssd_instance.trimmed_copy()
+    corrected_ssd = trimmed_ssd.corrected_copy()
+    data = corrected_ssd.xr.get_data_for_denss()
+    exec_denss(data)
 
 if __name__ == "__main__":
     # path = '::'.join([__file__, 'test_02_exec_denss'])

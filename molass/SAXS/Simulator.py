@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from learnsaxs import draw_voxles_as_dots, draw_detector_image
-from .DenssLike import get_detector_info_from_density
+from .DenssTools import get_detector_info_from_density
 
 class SaxsInfo:
     """

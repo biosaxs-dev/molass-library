@@ -143,8 +143,8 @@ class XrData(SsMatrixData):
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
 
-    def get_data_for_denss(self, **kwargs):
-        """xr.get_data_for_denss()
+    def get_data_for_denss(self, j=None):
+        """xr.get_data_for_denss(j=None)
         
         Returns data for Denss input.
         This method extracts the q, I, and sigq values from the XR data.
@@ -152,16 +152,22 @@ class XrData(SsMatrixData):
         
         Parameters
         ----------
-        None
+        j : int, optional
+            The index of the j-curve to use. If None, the first peak is used.
+
+        Returns
+        -------
+        DenssInputData
         """
         from molass.DataObjects.Curve import create_jcurve
         from molass.DataObjects.DenssInputData import DenssInputData
         from molass_legacy.DENSS.DenssUtils import fit_data_impl
 
         q = self.qv
-        icurve = self.get_icurve()
-        peaks = icurve.get_peaks()
-        j = peaks[0]
+        if j is None:
+            icurve = self.get_icurve()
+            peaks = icurve.get_peaks()
+            j = peaks[0]
         I = self.get_jcurve(j).y
         sigq = create_jcurve(q, self.E, j).y
         sasrec, work_info = fit_data_impl(q, I, sigq, "None", use_memory_data=True)
