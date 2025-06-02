@@ -135,3 +135,29 @@ class LowRankInfo:
         for i, c in enumerate(self.get_components()):
             props[i] = c.compute_xr_area()
         return props/np.sum(props)
+
+    def get_data_for_denss(self, k=0):
+        """xr.get_data_for_denss(k=0)
+        
+        Returns data for Denss input.
+        This method extracts the q, I, and sigq values from the XR data.
+        It uses the first peak in the i-curve to determine the j-curve.
+        
+        Parameters
+        ----------
+        k : int, optional
+            The index of the k-curve to use. If None, the first peak is used.
+
+        Returns
+        -------
+        DenssInputData
+        """
+        from molass.DataObjects.DenssInputData import DenssInputData
+        from molass_legacy.DENSS.DenssUtils import fit_data_impl
+
+        q = self.qv
+        xrP = self.xr_matrices[2]
+        I = xrP[:, k]  # Use the k-th component from the propagated error matrix
+        sigq = self.xrPe[:, k]  # Use the propagated error for the k-th component
+        sasrec, work_info = fit_data_impl(q, I, sigq, "None", use_memory_data=True)
+        return DenssInputData(sasrec.qc, sasrec.Ic, sasrec.Icerr)
