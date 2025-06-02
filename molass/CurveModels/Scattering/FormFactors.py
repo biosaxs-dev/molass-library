@@ -24,7 +24,7 @@ def homogeneous_sphere(q, R):
     # Calculate the form factor using the formula for a homogeneous sphere
     qR = q * R
     F = (3 * (np.sin(qR) - qR * np.cos(qR))) / qR**3
-    return F**2
+    return F
 
 def sphere_volume(R):
     """
@@ -114,8 +114,9 @@ def tri_axial_ellipsoid(q, a, b, c):
         The form factor of the tri-axial ellipsoid.
     """
     # Calculate the form factor using the formula for a tri-axial ellipsoid
-    def r(a, b, c, x, y):
-        return np.sqrt((a * np.sin(x) * np.cos(y))**2 + (b * np.sin(x) * np.sin(y))**2 + (c * np.cos(x))**2)
+    def r(a, b, c, alpha, beta):
+        return np.sqrt(((a**2 * np.sin(beta)**2 + b**2 * np.cos(beta)**2) * np.sin(alpha)**2 + (c * np.cos(alpha))**2))
 
-    F = integrate.quad(lambda a: homogeneous_sphere(q, r(a, b, c, a)), 0, np.pi/2)[0]
+    F = integrate.nquad(lambda alpha, beta: homogeneous_sphere(q, r(a, b, c, alpha, beta))*np.sin(alpha), [[0, np.pi/2], [0, np.pi/2]])[0]
+
     return F

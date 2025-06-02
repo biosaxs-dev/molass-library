@@ -40,6 +40,6 @@ def get_detector_info_from_density(q, rho, dmax=100, use_denss=False):
         ft_image = None
         return DetectorInfo(q=qdata, y=Idata), ft_image
     else:
-        info = get_detector_info(q, F)        
+        info = get_detector_info(q, F, dmax=dmax)
         ft_image = np.abs(F)
         return info, ft_image

@@ -8,9 +8,8 @@ class DetectorInfo:
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
-def get_detector_info(q, F):
+def get_detector_info(q, F, dmax=100):
     shape = F.shape
-    dmax = 100.0*0.35
     voxel = 5
     oversampling = 3
 
