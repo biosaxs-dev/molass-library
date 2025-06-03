@@ -4,6 +4,22 @@ This module contains functions, which is used to calculate the form factors
 import numpy as np
 import scipy.integrate as integrate
 
+# from https://github.com/scipy/scipy/issues/12209
+def nquad_vec(f, limits):
+    n_vars = len(limits)
+    z = np.zeros(n_vars-1)
+
+    def integrand(var, i):
+        if i > 0:
+            z[i-1] = var
+        if i == n_vars - 1:
+            return integrate.quad_vec(lambda x: f(*z, x), *limits[i])[0]
+        else:
+            res = integrate.quad_vec(lambda x: integrand(x, i+1), *limits[i])
+            return res if i == 0 else res[0]
+
+    return integrand(None, 0)
+
 def homogeneous_sphere(q, R):
     """
     Calculate the form factor of a homogeneous sphere.
@@ -117,6 +133,5 @@ def tri_axial_ellipsoid(q, a, b, c):
     def r(a, b, c, alpha, beta):
         return np.sqrt(((a**2 * np.sin(beta)**2 + b**2 * np.cos(beta)**2) * np.sin(alpha)**2 + (c * np.cos(alpha))**2))
 
-    F = integrate.nquad(lambda alpha, beta: homogeneous_sphere(q, r(a, b, c, alpha, beta))*np.sin(alpha), [[0, np.pi/2], [0, np.pi/2]])[0]
-
+    F = 2/np.pi * nquad_vec(lambda alpha, beta: homogeneous_sphere(q, r(a, b, c, alpha, beta))*np.sin(alpha), [[0, np.pi/2], [0, np.pi/2]])[0]
     return F

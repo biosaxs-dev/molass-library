@@ -29,7 +29,9 @@ def exec_denss(jcurve_data, data_name="data_name"):
     print("qc, ac, ec:", len(qc), len(ac), len(ec))
     run_denss_impl(qc, ac, ec, dmax, data_name, use_gpu=False)
 
-def get_detector_info_from_density(q, rho, dmax=100, use_denss=False):
+def get_detector_info_from_density(q, rho, dmax=100, use_denss=False, debug=False):
+    if debug:
+        print("dmax=", dmax)
     F = np.fft.fftn(rho)
     if use_denss:
         # Use denss to reconstruct the scattering profile
