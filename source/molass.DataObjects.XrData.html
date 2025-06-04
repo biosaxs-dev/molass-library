@@ -314,8 +314,7 @@
 </details></li>
 </ul>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="UsualUpdate.html">UsualUpdate module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst</a></li>
 </ul>
 
     </div>
@@ -487,6 +486,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ibaseline"><code class="docutils literal notranslate"><span class="pre">XrData.get_ibaseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve_atsas"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve_atsas()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_data_for_denss"><code class="docutils literal notranslate"><span class="pre">XrData.get_data_for_denss()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -600,6 +600,22 @@ unusable XR data regions.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_data_for_denss">
+<span class="sig-name descname"><span class="pre">get_data_for_denss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_data_for_denss" title="Link to this definition">#</a></dt>
+<dd><p>Returns data for Denss input.
+This method extracts the q, I, and sigq values from the XR data.
+It uses the first peak in the i-curve to determine the j-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>j</strong> (<em>int</em><em>, </em><em>optional</em>) – The index of the j-curve to use. If None, the first peak is used.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.DenssInputData.html#molass.DataObjects.DenssInputData.DenssInputData" title="molass.DataObjects.DenssInputData.DenssInputData">DenssInputData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -657,6 +673,7 @@ unusable XR data regions.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ibaseline"><code class="docutils literal notranslate"><span class="pre">XrData.get_ibaseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve_atsas"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve_atsas()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_data_for_denss"><code class="docutils literal notranslate"><span class="pre">XrData.get_data_for_denss()</span></code></a></li>
 </ul>
 </li>
 </ul>

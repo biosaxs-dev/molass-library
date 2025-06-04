@@ -314,8 +314,7 @@
 </details></li>
 </ul>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="UsualUpdate.html">UsualUpdate module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EditRst.html">EditRst</a></li>
 </ul>
 
     </div>
@@ -479,7 +478,12 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.nquad_vec"><code class="docutils literal notranslate"><span class="pre">nquad_vec()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.homogeneous_sphere"><code class="docutils literal notranslate"><span class="pre">homogeneous_sphere()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.sphere_volume"><code class="docutils literal notranslate"><span class="pre">sphere_volume()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.spherical_shell"><code class="docutils literal notranslate"><span class="pre">spherical_shell()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.ellipsoid_of_revolution"><code class="docutils literal notranslate"><span class="pre">ellipsoid_of_revolution()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.tri_axial_ellipsoid"><code class="docutils literal notranslate"><span class="pre">tri_axial_ellipsoid()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -495,6 +499,11 @@ document.write(`
 <span id="curvemodels-scattering-formfactors"></span><h1>CurveModels.Scattering.FormFactors<a class="headerlink" href="#module-molass.CurveModels.Scattering.FormFactors" title="Link to this heading">#</a></h1>
 <p>This module contains functions, which is used to calculate the form factors</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.nquad_vec">
+<span class="sig-name descname"><span class="pre">nquad_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.nquad_vec" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.homogeneous_sphere">
 <span class="sig-name descname"><span class="pre">homogeneous_sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.homogeneous_sphere" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the form factor of a homogeneous sphere.
@@ -508,6 +517,87 @@ document.write(`
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>F</strong> – The form factor of the homogeneous sphere.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.sphere_volume">
+<span class="sig-name descname"><span class="pre">sphere_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.sphere_volume" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the volume of a sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>R</strong> (<em>float</em>) – The radius of the sphere.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>V</strong> – The volume of the sphere.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.spherical_shell">
+<span class="sig-name descname"><span class="pre">spherical_shell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.spherical_shell" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor of a spherical shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The outer radius of the shell.</p></li>
+<li><p><strong>r</strong> (<em>float</em>) – The inner radius of the shell.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>F</strong> – The form factor of the spherical shell.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.ellipsoid_of_revolution">
+<span class="sig-name descname"><span class="pre">ellipsoid_of_revolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.ellipsoid_of_revolution" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor of an ellipsoid of revolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – The aspect ratio of the ellipsoid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>F</strong> – The form factor of the ellipsoid of revolution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.CurveModels.Scattering.FormFactors.tri_axial_ellipsoid">
+<span class="sig-name descname"><span class="pre">tri_axial_ellipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.CurveModels.Scattering.FormFactors.tri_axial_ellipsoid" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor of a tri-axial ellipsoid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the x-y plane.</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the z direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>F</strong> – The form factor of the tri-axial ellipsoid.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float or array-like</p>
@@ -562,7 +652,12 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.nquad_vec"><code class="docutils literal notranslate"><span class="pre">nquad_vec()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.homogeneous_sphere"><code class="docutils literal notranslate"><span class="pre">homogeneous_sphere()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.sphere_volume"><code class="docutils literal notranslate"><span class="pre">sphere_volume()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.spherical_shell"><code class="docutils literal notranslate"><span class="pre">spherical_shell()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.ellipsoid_of_revolution"><code class="docutils literal notranslate"><span class="pre">ellipsoid_of_revolution()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.CurveModels.Scattering.FormFactors.tri_axial_ellipsoid"><code class="docutils literal notranslate"><span class="pre">tri_axial_ellipsoid()</span></code></a></li>
 </ul>
   </nav></div>
 
