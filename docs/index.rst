@@ -8,12 +8,13 @@ Molass Library Reference
 
 Molass Library is a rewrite of `MOLASS <https://www.jstage.jst.go.jp/article/biophysico/20/1/20_e200001/_article>`_, an analytical tool for SEC-SAXS experiment data currently hosted at `Photon Factory <https://pfwww.kek.jp/saxs/MOLASS.html>`_, Japan.
 
+This document describes each function of the library.
+
 For details, see also:
 
 - **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
 - **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
-- **Reference:** https://nshimizu0721.github.io/molass-library for function reference,
-- **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
+- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for the GUI application version.
 
 To join the community, see also:
 
