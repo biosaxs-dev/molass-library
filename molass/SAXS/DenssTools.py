@@ -2,6 +2,7 @@
 DenssTools.py
 """
 
+import os
 import numpy as np
 from molass.PackageUtils.NumbaUtils import get_ready_for_numba
 get_ready_for_numba()
@@ -14,20 +15,52 @@ class DetectorInfo:
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
-def exec_denss(jcurve_data, data_name="data_name"):
+def run_denss(jcurve_array, output_folder=None, file_prefix="denss_result", debug=False):
+    """run_denss(jcurve_array, output_folder=None, file_prefix="denss_result")
+    Runs the DENSS algorithm on the provided j-curve data.
+
+    Parameters
+    ----------
+    jcurve_array : np.ndarray
+        A 2D array where each row contains q, I, and sigq values.
+        The first column is q, the second is I, and the third is sigq.
+
+    output_folder : str, optional
+        The folder where the output files will be saved. If None, no files will be saved.
+
+    file_prefix : str, optional
+        A prefix for the output files. Default is "denss_result".
+        A name for the data, used in the output. Default is "denss_result".
+
+    Returns
+    -------
+    None
+    """
     # from denss.core import reconstruct_abinitio_from_scattering_profile
     from molass_legacy.DENSS.DenssUtils import fit_data_impl, run_denss_impl
-    q = jcurve_data.q
-    I = jcurve_data.I
-    sigq = jcurve_data.sigq
+    q = jcurve_array[:,0]
+    I = jcurve_array[:,1]
+    sigq = jcurve_array[:,2]
     sasrec, work_info = fit_data_impl(q, I, sigq, gui=True, use_memory_data=True)
     dmax = round(sasrec.D, 2)
-    print("q, I, sigq:", len(q), len(I), len(sigq))
+    if debug:
+        print("dmax:", dmax)
+        print("q, I, sigq:", len(q), len(I), len(sigq))
     qc = sasrec.qc
     ac = sasrec.Ic
     ec = sasrec.Icerr
-    print("qc, ac, ec:", len(qc), len(ac), len(ec))
-    run_denss_impl(qc, ac, ec, dmax, data_name, use_gpu=False)
+    if debug:
+        print("qc, ac, ec:", len(qc), len(ac), len(ec))
+    
+    cwd = None
+    if output_folder is not None:
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+        cwd = os.getcwd()
+        os.chdir(output_folder)
+    run_denss_impl(qc, ac, ec, dmax, file_prefix, use_gpu=False)
+    if cwd is not None:
+        os.chdir(cwd)
 
 def get_detector_info_from_density(q, rho, dmax=100, use_denss=False, debug=False):
     if debug:

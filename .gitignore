@@ -18,4 +18,5 @@ docs/source/**
 .coverage
 htmlcov
 
-log/
+# Ignore the run_denss results
+**/temp/**

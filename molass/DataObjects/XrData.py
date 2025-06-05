@@ -3,6 +3,7 @@
 
     Copyright (c) 2025, SAXS Team, KEK-PF
 """
+import numpy as np
 from importlib import reload
 from molass.DataObjects.SsMatrixData import SsMatrixData
 from molass.DataObjects.Curve import Curve
@@ -63,7 +64,6 @@ class XrData(SsMatrixData):
         """
         debug = kwargs.get('debug', False)
         if debug:
-            from importlib import reload
             import molass.Trimming.UsableQrange
             reload(molass.Trimming.UsableQrange)
         from molass.Trimming.UsableQrange import get_usable_qrange_impl
@@ -87,7 +87,6 @@ class XrData(SsMatrixData):
         """
         debug = kwargs.get('debug', False)
         if debug:
-            from importlib import reload
             import molass.Baseline.BaselineUtils
             reload(molass.Baseline.BaselineUtils)
         from molass.Baseline.BaselineUtils import get_xr_baseline_func
@@ -107,6 +106,7 @@ class XrData(SsMatrixData):
         None
         """
         if debug:
+            
             import molass.Guinier.RgCurveUtils
             reload(molass.Guinier.RgCurveUtils)
         from molass.Guinier.RgCurveUtils import compute_rgcurve_info
@@ -116,7 +116,6 @@ class XrData(SsMatrixData):
         else:
             if debug:
                 import molass.Guinier.RgCurve
-                reload(molass.Guinier.RgCurve)
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo)
 
@@ -143,32 +142,36 @@ class XrData(SsMatrixData):
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
 
-    def get_data_for_denss(self, j=None):
-        """xr.get_data_for_denss(j=None)
-        
-        Returns data for Denss input.
+    def get_jcurve_array(self, j=None, peak=None):
+        """xr.get_jcurve_array(j=None, peak=None)
+
+        Returns the j-curve array.
         This method extracts the q, I, and sigq values from the XR data.
         It uses the first peak in the i-curve to determine the j-curve.
         
         Parameters
         ----------
         j : int, optional
-            The index of the j-curve to use. If None, the first peak is used.
+            The index of the j-curve to use. If None, the peak argument is used.
+
+        peak : int, optional
+            This argument is used only if j is None.
+            The index of the peak in the i-curve to use. If None, the first peak is used.            
 
         Returns
         -------
-        DenssInputData
+        jcurve_array : np.ndarray
         """
         from molass.DataObjects.Curve import create_jcurve
-        from molass.DataObjects.DenssInputData import DenssInputData
-        from molass_legacy.DENSS.DenssUtils import fit_data_impl
 
         q = self.qv
         if j is None:
             icurve = self.get_icurve()
             peaks = icurve.get_peaks()
-            j = peaks[0]
+            if peak is None:
+                peak = 0
+            j = peaks[peak]
+                
         I = self.get_jcurve(j).y
         sigq = create_jcurve(q, self.E, j).y
-        sasrec, work_info = fit_data_impl(q, I, sigq, "None", use_memory_data=True)
-        return DenssInputData(sasrec.qc, sasrec.Ic, sasrec.Icerr)
+        return np.array([q, I, sigq]).T

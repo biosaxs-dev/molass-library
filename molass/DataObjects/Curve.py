@@ -63,7 +63,7 @@ class Curve:
         return get_peak_positions(self, debug=debug)
 
     def smooth_copy(self):
-        from KekLib.SciPyCookbook import smooth
+        from molass_legacy.KekLib.SciPyCookbook import smooth
         y = smooth(self.y)
         return Curve(self.x, y, type=self.type)
 

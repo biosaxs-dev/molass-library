@@ -27,7 +27,7 @@ def get_denoised_data( D, rank=3, svd=None ):
         D_  = np.array(D)
     return D_
 
-def compute_lowrank_matrices(M, ccurves, **kwargs):
+def compute_lowrank_matrices(M, ccurves, E=None, **kwargs):
     """
     Compute the matrices for the low rank approximation.
     """
@@ -42,7 +42,13 @@ def compute_lowrank_matrices(M, ccurves, **kwargs):
     M_ = get_denoised_data(M, rank=svd_rank)
     C = np.array([c.get_xy()[1] for c in ccurves])
     P = M_ @ np.linalg.pinv(C)
-    return M_, C, P
+    if E is not None:
+        # propagate the error
+        from molass.LowRank.ErrorPropagate import compute_propagated_error
+        Pe = compute_propagated_error(M_, P, E)
+    else:
+        Pe = None
+    return M_, C, P, Pe
 
 class LowRankInfo:
     """
@@ -65,16 +71,13 @@ class LowRankInfo:
         self.qv = ssd.xr.qv
         self.xr_icurve = xr_icurve
         self.xr_ccurves = xr_ccurves
-
-        self.xr_matrices = compute_lowrank_matrices(ssd.xr.M, xr_ccurves, **kwargs)
-        xrM = self.xr_matrices[0]
-        xrP = self.xr_matrices[2]
-        self.xrPe = compute_propagated_error(xrM, xrP, ssd.xr.E)
-
+        self.xr_matrices = compute_lowrank_matrices(ssd.xr.M, xr_ccurves, E=ssd.xr.E, **kwargs)
+    
         self.wv = ssd.uv.wv
         self.uv_icurve = uv_icurve
         self.uv_ccurves = uv_ccurves
-        self.uv_matrices = compute_lowrank_matrices(ssd.uv.M, uv_ccurves, **kwargs)
+        self.uv_matrices = compute_lowrank_matrices(ssd.uv.M, uv_ccurves, E=ssd.uv.E, **kwargs)
+
         self.mapping = ssd.mapping
 
     def get_num_components(self):
@@ -95,7 +98,7 @@ class LowRankInfo:
         from molass.PlotUtils.LowRankInfoPlot import plot_components_impl
         return plot_components_impl(self, **kwargs)
 
-    def get_components(self, debug=False):
+    def get_xr_components(self, debug=False):
         """
         Get the components.
         """
@@ -103,20 +106,40 @@ class LowRankInfo:
             from importlib import reload
             import molass.LowRank.Component
             reload(molass.LowRank.Component)
-        from molass.LowRank.Component import Component
+        from molass.LowRank.Component import XrComponent
 
-        frames = self.xr_icurve.x
-        xrC, xrP = self.xr_matrices[1:]
-        uvC, uvP = self.uv_matrices[1:]
+        xrC, xrP, xrPe = self.xr_matrices[1:]
+
         ret_components = []
         for i in range(self.rank):
-            elution = np.array([frames, xrC[i,:]])
-            spectral = np.array([self.qv, xrP[:,i], self.xrPe[:,i]]).T
-            xr_component = elution, spectral
-            uv_component = None
-            ret_components.append(Component(xr_component, uv_component))
+            icurve_array = np.array([self.xr_icurve.x, xrC[i,:]])
+            jcurve_array = np.array([self.qv, xrP[:,i], xrPe[:,i]]).T
+            ret_components.append(XrComponent(icurve_array, jcurve_array))
+
         return ret_components
-    
+
+    def get_uv_components(self, debug=False):
+        """
+        Get the components.
+        """
+        if debug:
+            from importlib import reload
+            import molass.LowRank.Component
+            reload(molass.LowRank.Component)
+        from molass.LowRank.Component import UvComponent
+
+        uvC, uvP, uvPe = self.uv_matrices[1:]
+        if uvPe is None:
+            uvPe = np.zeros_like(uvP)
+
+        ret_components = []
+        for i in range(self.rank):
+            uv_elution = np.array([self.uv_icurve.x, uvC[i,:]])
+            uv_spectral = np.array([self.wv, uvP[:,i], uvPe[:,i]]).T
+            ret_components.append(UvComponent(uv_elution, uv_spectral))
+
+        return ret_components
+
     def make_v1report_ranges(self, area_ratio=0.8, debug=False):
         """
         """
@@ -135,29 +158,3 @@ class LowRankInfo:
         for i, c in enumerate(self.get_components()):
             props[i] = c.compute_xr_area()
         return props/np.sum(props)
-
-    def get_data_for_denss(self, k=0):
-        """xr.get_data_for_denss(k=0)
-        
-        Returns data for Denss input.
-        This method extracts the q, I, and sigq values from the XR data.
-        It uses the first peak in the i-curve to determine the j-curve.
-        
-        Parameters
-        ----------
-        k : int, optional
-            The index of the k-curve to use. If None, the first peak is used.
-
-        Returns
-        -------
-        DenssInputData
-        """
-        from molass.DataObjects.DenssInputData import DenssInputData
-        from molass_legacy.DENSS.DenssUtils import fit_data_impl
-
-        q = self.qv
-        xrP = self.xr_matrices[2]
-        I = xrP[:, k]  # Use the k-th component from the propagated error matrix
-        sigq = self.xrPe[:, k]  # Use the propagated error for the k-th component
-        sasrec, work_info = fit_data_impl(q, I, sigq, "None", use_memory_data=True)
-        return DenssInputData(sasrec.qc, sasrec.Ic, sasrec.Icerr)
