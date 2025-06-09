@@ -32,7 +32,7 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
     x, y = icurve.get_xy()
 
     if smoothing:
-        from KekLib.SciPyCookbook import smooth
+        from molass_legacy.KekLib.SciPyCookbook import smooth
         sy = smooth(y)
         if debug:
             import matplotlib.pyplot as plt

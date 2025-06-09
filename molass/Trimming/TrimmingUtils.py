@@ -71,6 +71,10 @@ def make_trimming_info_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None,
         if flowchange is None:
             flowchange = get_molass_options('flowchange')
 
+        if flowchange == 'auto':
+            from molass.FlowChange.Property import possibly_has_flowchange_points
+            flowchange = possibly_has_flowchange_points(ssd)
+
         if flowchange:
             (i, j), judge_info = ssd.uv.get_flowchange_points()
             start, stop = make_and_slicepair((start, stop), (i, j), judge_info)
