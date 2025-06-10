@@ -6,7 +6,7 @@
 from scipy.stats import linregress
 from molass.Mapping.MappingInfo import MappingInfo
 
-def estimate_mapping_for_mathing_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
+def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
     if len(xr_peaks) > 1:
         x = xr_curve.x[xr_peaks]
         y = uv_curve.x[uv_peaks]
@@ -23,7 +23,7 @@ def estimate_mapping_for_mathing_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
         y = [M - std, M, M + std]
 
     slope, intercept = linregress(x, y)[0:2]
-    return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment)
+    return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve)
 
 def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
     xr_peaks = xr_curve.get_peaks(debug=debug)
@@ -34,7 +34,7 @@ def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
     if len(xr_peaks) == len(uv_peaks):
         """
         note that
-            there can be cases where you need to dicard minor peaks
+            there can be cases where you need to discard minor peaks
             and select matching peaks from the remaining ones.
             e.g.,
             suppose a pair of set of three peaks between which 
@@ -47,7 +47,7 @@ def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
         import molass.Mapping.PeakMatcher
         reload(molass.Mapping.PeakMatcher)
         from molass.Mapping.PeakMatcher import select_matching_peaks
-        xr_peaks, uv_peaks = select_matching_peaks(xr_curve.x, xr_peaks, uv_curve.x, uv_peaks, debug=debug)
+        xr_peaks, uv_peaks = select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=debug)
         if debug:
             import matplotlib.pyplot as plt
             print("xr_peaks=", xr_peaks)
@@ -59,4 +59,4 @@ def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
                 ax.plot(curve.x[peaks], curve.y[peaks], 'o')
             plt.show()
 
-    return estimate_mapping_for_mathing_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks)
+    return estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks)

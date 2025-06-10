@@ -105,6 +105,7 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
+        self.trimming_info = None
         self.trimmed = trimmed
         self.mapping = mapping
         self.bubble_removed = bubble_removed
@@ -141,6 +142,32 @@ class SecSaxsData:
         from molass.PlotUtils.SecSaxsDataPlot import plot_3d_impl
         return plot_3d_impl(self, **kwargs)
  
+    def plot_compact(self, mapping=None, **kwargs):
+        """ssd.plot_compact()
+
+            Plots a pair of compact figures of UV and XR data.
+
+            Parameters
+            ----------
+            None
+
+            Returns
+            -------
+            result : PlotResult
+                A PlotResult object which contains the following attributes.
+
+                fig: Figure
+                axes: Axes
+        """
+        if mapping is None:
+            mapping = self.get_mapping()
+        debug = kwargs.pop('debug', False)
+        if debug:
+            import molass.PlotUtils.SecSaxsDataPlot
+            reload(molass.PlotUtils.SecSaxsDataPlot)
+        from molass.PlotUtils.SecSaxsDataPlot import plot_compact_impl
+        return plot_compact_impl(self, mapping=mapping, **kwargs)
+
     def make_trimming_info(self, **kwargs):
         """ssd.make_trimming_info(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
         
@@ -174,7 +201,9 @@ class SecSaxsData:
             reload(molass.Trimming.TrimmingUtils)
         from molass.Trimming.TrimmingUtils import make_trimming_info_impl
         flowchange = False if self.trimmed else None
-        return make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
+        if self.trimming_info is None:
+            self.trimming_info = make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
+        return self.trimming_info
 
     def plot_baselines(self, debug=True):
         """ssd.plot_baselines()
@@ -309,7 +338,7 @@ class SecSaxsData:
 
         return ssd_copy
     
-    def estimate_mapping(self, return_also_curves=False, debug=False):
+    def estimate_mapping(self, debug=False):
         if debug:
             import molass.Mapping.SimpleMapper
             reload(molass.Mapping.SimpleMapper)
@@ -321,11 +350,27 @@ class SecSaxsData:
 
         xr_curve = self.xr.get_icurve()
         uv_curve = self.uv.get_icurve()
-        mapping =  estimate_mapping_impl(xr_curve, uv_curve)
-        self.mapping = mapping
-        if return_also_curves:
-            return mapping, (xr_curve, uv_curve)
-        return mapping
+        self.mapping = estimate_mapping_impl(xr_curve, uv_curve, debug=debug)
+        return self.mapping
+
+    def get_mapping(self):
+        """ssd.get_mapping()
+
+        Returns the mapping information object.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        mapping : MappingInfo
+            A MappingInfo object which contains the mapping information.
+            If the mapping information is not available, returns None.
+        """
+        if self.mapping is None:
+            self.estimate_mapping()
+        return self.mapping
 
     def get_concfactor(self):
         if self.beamlineinfo is None:

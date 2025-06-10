@@ -97,15 +97,15 @@ def slice_to_values(vec, slice_):
     return values
 
 def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
-    mapping, curves = ssd.estimate_mapping(return_also_curves=True, debug=debug) 
+    mapping = ssd.estimate_mapping(debug=debug) 
 
-    xr_x = curves[0].x
+    xr_x = mapping.xr_curve.x
     xr_ends = slice_to_values(xr_x, xr_jslice)
 
     ainv = 1/mapping.slope
     binv = -mapping.intercept/mapping.slope
 
-    uv_x = curves[1].x
+    uv_x = mapping.uv_curve.x
     uv_ends = slice_to_values(uv_x, uv_jslice)
     mp_ends = [x*ainv + binv for x in uv_ends]
 

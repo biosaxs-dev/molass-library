@@ -1,7 +1,5 @@
 """
     Mapping.PeakMatcher.py
-
-    
 """
 import numpy as np
 from itertools import combinations
@@ -18,7 +16,9 @@ def combination_pairs(m, n):
         else:
             yield less_indeces, list(c)
 
-def evaluate_matching(xr_x, uv_x, x, y):
+def evaluate_matching(xr_x, uv_x, xr_peaks, uv_peaks):
+    x = xr_x[xr_peaks]
+    y = uv_x[uv_peaks]
     slope, intercept, r_value, p_value, std_err = linregress(x, y)
 
     mapped_xr_ends = []
@@ -46,17 +46,49 @@ def evaluate_matching(xr_x, uv_x, x, y):
 
     return score
 
-def select_matching_peaks(xr_x, xr_peaks, uv_x, uv_peaks, debug=False):
+def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False):
+    """
+    Select matching peaks between XR and UV curves.
+
+    For the evaluation using the weights, see the debugging info by using BSA_DATA.
+
+    Parameters
+    ----------
+    xr_curve : Curve
+        The XR curve object.
+    xr_peaks : array-like
+        The indices of the peaks in the XR curve.
+    uv_curve : Curve
+        The UV curve object.
+    uv_peaks : array-like
+        The indices of the peaks in the UV curve.
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the selected matching peaks for XR and UV curves.
+    """
+    xr_x = xr_curve.x
+    xr_y = xr_curve.y
+    uv_x = uv_curve.x
+    uv_y = uv_curve.y
     if debug:
         print("len(xr_peaks)=", len(xr_peaks))
         print("len(uv_peaks)=", len(uv_peaks))
     xr_peaks = np.asarray(xr_peaks)
     uv_peaks = np.asarray(uv_peaks)
+    xr_weights = xr_y[xr_peaks]
+    xr_weights = xr_weights / np.sum(xr_weights)
+    uv_weights = uv_y[uv_peaks]
+    uv_weights = uv_weights / np.sum(uv_weights)
 
     # evaluate all the combination pairs
     score_recs = []
     for index1, index2 in combination_pairs(len(xr_peaks), len(uv_peaks)):
-        score = evaluate_matching(xr_x, uv_x, xr_x[xr_peaks[index1]], uv_x[uv_peaks[index2]])
+        score = evaluate_matching(xr_x, uv_x, xr_peaks[index1], uv_peaks[index2])
+        score *= 1/(np.sum(xr_weights[index1]) * np.sum(uv_weights[index2]))
         if debug:
             print(index1, index2, score)
         score_recs.append((index1, index2, score))

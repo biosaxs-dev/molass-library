@@ -88,3 +88,54 @@ def plot_baselines_impl(ssd, **kwargs):
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, axes)
+
+
+def plot_compact_impl(ssd, title=None, **kwargs):
+    from molass.PlotUtils.TrimmingPlot import ij_from_slice
+
+    trim = ssd.make_trimming_info()
+    mapping = ssd.get_mapping()
+    xr_curve = mapping.xr_curve
+    uv_curve = mapping.uv_curve
+    x = xr_curve.x
+    m = xr_curve.get_max_i()
+    mp_curve = mapping.get_mapped_curve(x, uv_curve)
+    mp_y = mp_curve.y / mp_curve.y[m] * xr_curve.y[m]
+
+    fig = plt.figure(figsize=(12, 5))
+    if title is not None:
+        fig.suptitle(title)
+    gs = GridSpec(2, 2)
+
+    # Plot the UV and XR elution curves
+    ax1 = fig.add_subplot(gs[:, 0])
+    ax1.plot(x, mp_y, linestyle=":", color="C0", label="mapped UV at wavelength=280")
+    ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label="XR at Q=0.02")
+    i, j = ij_from_slice(trim.xr_slices[1])
+    ax1.axvspan(*x[[i,j]], color='green', alpha=0.1)
+    ax1.axvline(x[m], color='yellow')    
+    ax1.legend()
+
+    # Plot the UV spectral curve
+    ax2 = fig.add_subplot(gs[0, 1])
+    n = mapping.get_mapped_index(m, xr_curve.x, uv_curve.x)
+    uv_jcurve = ssd.uv.get_jcurve(j=n)
+    ax2.plot(uv_jcurve.x, uv_jcurve.y, color="C0", label="UV at j=%d" % n)
+    uv_jslice = trim.uv_slices[0]
+    i, j = ij_from_slice(uv_jslice)
+    ax2.axvspan(*uv_jcurve.x[[i,j]], color='green', alpha=0.1)
+
+    # Plot the XR spectral curve
+    ax3 = fig.add_subplot(gs[1, 1])
+    ax3.set_yscale('log')
+
+    xr_jcurve = ssd.xr.get_jcurve(j=m)
+    ax3.plot(xr_jcurve.x, xr_jcurve.y, color="orange", alpha=0.5, label="XR at j=%d" % m)
+    xr_jslice = trim.xr_slices[0]
+    i, j = ij_from_slice(xr_jslice)
+    ax3.axvspan(*xr_jcurve.x[[i,j]], color='green', alpha=0.1)
+
+    fig.tight_layout()
+
+    from molass.PlotUtils.PlotResult import PlotResult
+    return PlotResult(fig, (ax1, ax2, ax3))
