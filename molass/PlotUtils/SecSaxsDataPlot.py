@@ -90,8 +90,10 @@ def plot_baselines_impl(ssd, **kwargs):
     return PlotResult(fig, axes)
 
 
-def plot_compact_impl(ssd, title=None, **kwargs):
+def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.TrimmingPlot import ij_from_slice
+
+    title = kwargs.pop('title', None)
 
     trim = ssd.make_trimming_info()
     mapping = ssd.get_mapping()

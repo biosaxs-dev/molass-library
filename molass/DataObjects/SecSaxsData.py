@@ -142,7 +142,7 @@ class SecSaxsData:
         from molass.PlotUtils.SecSaxsDataPlot import plot_3d_impl
         return plot_3d_impl(self, **kwargs)
  
-    def plot_compact(self, mapping=None, **kwargs):
+    def plot_compact(self, **kwargs):
         """ssd.plot_compact()
 
             Plots a pair of compact figures of UV and XR data.
@@ -159,14 +159,12 @@ class SecSaxsData:
                 fig: Figure
                 axes: Axes
         """
-        if mapping is None:
-            mapping = self.get_mapping()
         debug = kwargs.pop('debug', False)
         if debug:
             import molass.PlotUtils.SecSaxsDataPlot
             reload(molass.PlotUtils.SecSaxsDataPlot)
         from molass.PlotUtils.SecSaxsDataPlot import plot_compact_impl
-        return plot_compact_impl(self, mapping=mapping, **kwargs)
+        return plot_compact_impl(self, **kwargs)
 
     def make_trimming_info(self, **kwargs):
         """ssd.make_trimming_info(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
