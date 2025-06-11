@@ -28,19 +28,24 @@ class SecSaxsData:
         folder : str, optional
             Specifies the folder path where the data are stored.
             It is required if the data_list parameter is ommitted.
-
         object_list : list, optional
             A list which includes [xr_data, uv_data]
             in this order to be used as corresponding data items.
-            It is required if the folder parameter is ommitted.
-        
+            It is required if the folder parameter is ommitted.       
         uv_only : bool, optional
             If it is True, only UV data will be loaded
             to suppress unnecessary data access.
-
         xr_only : bool, optional
             If it is True, only XR data will be loaded
             to suppress unnecessary data access.
+        trimmed : bool, optional
+            If it is True, the data will be treated as trimmed.
+        remove_bubbles : bool, optional
+            If it is True, bubbles will be removed from the data.
+        beamlineinfo : BeamlineInfo, optional
+            If specified, the beamline information will be used.
+        mapping : MappingInfo, optional
+            If specified, the mapping information will be used.
 
         Examples
         --------
@@ -62,10 +67,8 @@ class SecSaxsData:
                 if not os.path.isdir(folder):
                     raise FileNotFoundError(f"Folder {folder} does not exist.")
                 
-                input_list = []
-                for path in glob(folder + "/*.dat"):
-                    input_list.append(np.loadtxt(path))
-                xr_array = np.array(input_list)
+                from molass.DataUtils.XrLoader import load_xr_with_options
+                xr_array = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
                 xrM = xr_array[:,:,1].T
                 xrE = xr_array[:,:,2].T
                 qv = xr_array[0,:,0]
@@ -91,24 +94,12 @@ class SecSaxsData:
             else:
                 from molass.DataObjects.UvData import UvData
                 uv_data = UvData(wv, None, uvM, uvE)
-
-        bubble_removed = None
-        if remove_bubbles:
-            if debug:
-                from importlib import reload
-                import molass.DataUtils.AnomalyHandlers
-                reload(molass.DataUtils.AnomalyHandlers)
-            from molass.DataUtils.AnomalyHandlers import detect_and_remove_bubbles
-            xr_data, bubble_removed = detect_and_remove_bubbles(xr_data)
-            if len(bubble_removed) > 0:
-                self.logger.warning("bubbles have been removed at %s", bubble_removed)
     
         self.xr = xr_data
         self.uv = uv_data
         self.trimming_info = None
         self.trimmed = trimmed
         self.mapping = mapping
-        self.bubble_removed = bubble_removed
         self.beamlineinfo = beamlineinfo
 
     def plot_3d(self, **kwargs):

@@ -15,10 +15,10 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
 
     elif len(xr_peaks) == 1:
         from molass.Stats.EghMoment import EghMoment
-        xr_moment = EghMoment(xr_curve)
+        xr_moment = EghMoment(xr_curve, num_peaks=1)
         M, std = xr_moment.get_meanstd()
         x = [M - std, M, M + std]
-        uv_moment = EghMoment(uv_curve)
+        uv_moment = EghMoment(uv_curve, num_peaks=1)
         M, std = uv_moment.get_meanstd()
         y = [M - std, M, M + std]
 

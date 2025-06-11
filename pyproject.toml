@@ -44,5 +44,6 @@ Repository = "https://github.com/nshimizu0721/molass-library"
 
 [tool.pytest.ini_options]
 pythonpath = [
-  "."
+  ".",
+  "../molass-legacy"
 ]

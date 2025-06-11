@@ -27,6 +27,12 @@ class Moment:
             self.y_ = y_
         return self.y_
     
+    def debug_plot(self, ax):
+        y_ = self.get_y_()
+        ax.plot(self.x, self.y, label='y')
+        ax.plot(self.x, y_, ":", label='y_')
+        ax.legend()
+ 
     def get_meanstd(self):
         if self.y_ is None:
             y_ = self.get_y_()
