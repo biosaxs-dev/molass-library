@@ -52,7 +52,7 @@ class Curve:
             self.set_max()
         return self.max_x, self.max_y
 
-    def get_peaks(self, debug=False):
+    def get_peaks(self, debug=False, **kwargs):
         if debug:
             from importlib import reload
             import molass.Peaks.Recognizer
@@ -60,7 +60,7 @@ class Curve:
         from molass.Peaks.Recognizer import get_peak_positions
         if self.type != 'i':
             raise TypeError("get_peaks works only for i-curves")
-        return get_peak_positions(self, debug=debug)
+        return get_peak_positions(self, debug=debug, **kwargs)
 
     def smooth_copy(self):
         from molass_legacy.KekLib.SciPyCookbook import smooth

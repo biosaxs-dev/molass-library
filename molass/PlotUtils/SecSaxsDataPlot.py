@@ -93,6 +93,8 @@ def plot_baselines_impl(ssd, **kwargs):
 def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.TrimmingPlot import ij_from_slice
 
+    debug = kwargs.get('debug', False)
+
     title = kwargs.pop('title', None)
 
     trim = ssd.make_trimming_info()
@@ -138,6 +140,9 @@ def plot_compact_impl(ssd, **kwargs):
     ax3.axvspan(*xr_jcurve.x[[i,j]], color='green', alpha=0.1)
 
     fig.tight_layout()
+
+    if debug:
+        plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2, ax3))

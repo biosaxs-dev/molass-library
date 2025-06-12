@@ -8,7 +8,7 @@ from scipy.signal import find_peaks
 
 MIN_WIDTH = 10
 
-def get_peak_positions(icurve, debug=False):
+def get_peak_positions(icurve, debug=False, **kwargs):
     """
     Get peak positions from an ICurve object.
 
@@ -27,8 +27,14 @@ def get_peak_positions(icurve, debug=False):
     list
         A list of indices where peaks are found in the curve.
     """
+
+    num_peaks = kwargs.get("num_peaks", None)
     x = icurve.x
     y = icurve.y
+    if num_peaks is not None:
+        from molass.Peaks.RecognizerSpecific import bridge_recognize_peaks
+        return bridge_recognize_peaks(x, y, num_peaks=num_peaks, debug=debug)
+
     m = np.argmax(y)
     max_y = y[m]
     width = MIN_WIDTH

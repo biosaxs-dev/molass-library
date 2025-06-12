@@ -26,8 +26,9 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
     return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve)
 
 def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
-    xr_peaks = xr_curve.get_peaks(debug=debug)
-    uv_peaks = uv_curve.get_peaks(debug=debug)
+    from molass.Mapping.Grouping import get_groupable_peaks
+
+    xr_peaks, uv_peaks = get_groupable_peaks(xr_curve, uv_curve, debug=debug)
     if debug:
         print(f"Peaks: xr_peaks={xr_peaks}, uv_peaks={uv_peaks}")
 

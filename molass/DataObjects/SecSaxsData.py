@@ -150,7 +150,7 @@ class SecSaxsData:
                 fig: Figure
                 axes: Axes
         """
-        debug = kwargs.pop('debug', False)
+        debug = kwargs.get('debug', False)
         if debug:
             import molass.PlotUtils.SecSaxsDataPlot
             reload(molass.PlotUtils.SecSaxsDataPlot)
