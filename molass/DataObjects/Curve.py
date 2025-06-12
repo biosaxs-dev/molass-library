@@ -73,6 +73,16 @@ class Curve:
             self.spline = UnivariateSpline(self.x, self.y, s=0, ext=3)
         return self.spline
 
+    def corrected_copy(self):
+        """
+        Return a copy of the curve with corrected x values.
+        This is a placeholder for actual correction logic.
+        """
+        assert self.type == 'i', "corrected_copy works only for i-curves"
+        from molass_legacy.DataStructure.LPM import get_corrected
+        y = get_corrected(self.y, x=self.x)
+        return Curve(self.x, y, type=self.type)
+
 def create_icurve(x, M, vector, pickvalue):
     if x is None:
         x = np.arange(M.shape[1])

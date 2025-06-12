@@ -36,3 +36,17 @@ def test_040_Kosugi3a():
     ssd = SSD(path)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
+
+def test_050_proteins5():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20191006_proteins5")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_060_20201006_1():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20201006_1")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)

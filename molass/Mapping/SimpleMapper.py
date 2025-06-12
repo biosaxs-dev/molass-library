@@ -6,7 +6,25 @@
 from scipy.stats import linregress
 from molass.Mapping.MappingInfo import MappingInfo
 
-def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
+ACCEPTABLE_COVERAGE_RATIO = 0.6
+
+def check_mapping_coverage(x, y, slope, intercept, debug=False):
+    """
+    Check if the mapping covers the range of x and y.
+    """
+    y_ = x[[0,-1]]*slope + intercept
+    ymin = max(y[0], y_[0])
+    ymax = min(y[-1], y_[1])
+    x_ = (ymin - intercept) / slope, (ymax - intercept) / slope
+    xmin = max(x[0], x_[0])
+    xmax = min(x[-1], x_[1])
+    coverage_ratio = (xmax - xmin) / (x[-1] - x[0]) 
+
+    if debug:
+        print(f"Mapping coverage: {coverage_ratio}")
+    return coverage_ratio >= ACCEPTABLE_COVERAGE_RATIO
+
+def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, retry=True):
     if len(xr_peaks) > 1:
         x = xr_curve.x[xr_peaks]
         y = uv_curve.x[uv_peaks]
@@ -23,7 +41,13 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks):
         y = [M - std, M, M + std]
 
     slope, intercept = linregress(x, y)[0:2]
-    return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve)
+    if check_mapping_coverage(xr_curve.x, uv_curve.x, slope, intercept):
+        return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve)
+    else:
+        assert retry, "Mapping coverage is not acceptable."
+        xr_curve_ = xr_curve.corrected_copy()
+        uv_curve_ = uv_curve.corrected_copy()
+        return estimate_mapping_for_matching_peaks(xr_curve_, xr_peaks, uv_curve_, uv_peaks, retry=False)
 
 def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
     from molass.Mapping.Grouping import get_groupable_peaks

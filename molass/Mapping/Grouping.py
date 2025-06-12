@@ -14,22 +14,25 @@ def get_groupable_peaks(xr_curve, uv_curve, debug=False):
     xr_peaks = np.array(xr_curve.get_peaks(debug=debug))
     uv_peaks = np.array(uv_curve.get_peaks(debug=debug))
     num_groups = max(len(xr_peaks), len(uv_peaks))
-    success, ret_xr_peaks, ret_uv_peaks = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=debug)
-    if success and len(xr_peaks) != len(uv_peaks):
-        if len(xr_peaks) < num_groups:
-            xr_peaks_ = np.array(xr_curve.get_peaks(num_peaks=num_groups, debug=debug))
-        else:
-            xr_peaks_ = xr_peaks
-        if len(uv_peaks) < num_groups:
-            uv_peaks_ = np.array(uv_curve.get_peaks(num_peaks=num_groups, debug=debug))
-        else:
-            uv_peaks_ = uv_peaks
-        success, ret_xr_peaks_, ret_uv_peaks_ = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks_, uv_peaks_, debug=debug)
-        if success:
-            if debug:
-                print(f"Re-evaluated peaks: xr_peaks={ret_xr_peaks_}, uv_peaks={ret_uv_peaks_}")
-            ret_xr_peaks, ret_uv_peaks = ret_xr_peaks_, ret_uv_peaks_
-
+    if num_groups > 3:
+        # as in protein5 where grouping is not applicable
+        ret_xr_peaks, ret_uv_peaks = xr_peaks, uv_peaks
+    else:
+        success, ret_xr_peaks, ret_uv_peaks = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=debug)
+        if success and len(xr_peaks) != len(uv_peaks):
+            if len(xr_peaks) < num_groups:
+                xr_peaks_ = np.array(xr_curve.get_peaks(num_peaks=num_groups, debug=debug))
+            else:
+                xr_peaks_ = xr_peaks
+            if len(uv_peaks) < num_groups:
+                uv_peaks_ = np.array(uv_curve.get_peaks(num_peaks=num_groups, debug=debug))
+            else:
+                uv_peaks_ = uv_peaks
+            success, ret_xr_peaks_, ret_uv_peaks_ = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks_, uv_peaks_, debug=debug)
+            if success:
+                if debug:
+                    print(f"Re-evaluated peaks: xr_peaks={ret_xr_peaks_}, uv_peaks={ret_uv_peaks_}")
+                ret_xr_peaks, ret_uv_peaks = ret_xr_peaks_, ret_uv_peaks_
     return ret_xr_peaks, ret_uv_peaks
 
 def get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=False):
