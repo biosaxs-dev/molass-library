@@ -502,13 +502,32 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.PeakMatcher.evaluate_matching">
-<span class="sig-name descname"><span class="pre">evaluate_matching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.PeakMatcher.evaluate_matching" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">evaluate_matching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.PeakMatcher.evaluate_matching" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.PeakMatcher.select_matching_peaks">
-<span class="sig-name descname"><span class="pre">select_matching_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.PeakMatcher.select_matching_peaks" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">select_matching_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.PeakMatcher.select_matching_peaks" title="Link to this definition">#</a></dt>
+<dd><p>Select matching peaks between XR and UV curves.</p>
+<p>For the evaluation using the weights, see the debugging info by using BSA_DATA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The XR curve object.</p></li>
+<li><p><strong>xr_peaks</strong> (<em>array-like</em>) – The indices of the peaks in the XR curve.</p></li>
+<li><p><strong>uv_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The UV curve object.</p></li>
+<li><p><strong>uv_peaks</strong> (<em>array-like</em>) – The indices of the peaks in the UV curve.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the selected matching peaks for XR and UV curves.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

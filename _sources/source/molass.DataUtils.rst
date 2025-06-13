@@ -19,4 +19,5 @@ Submodules
    molass.DataUtils.ForwardCompat
    molass.DataUtils.UvFileTrimming
    molass.DataUtils.UvLoader
+   molass.DataUtils.XrLoader
    molass.DataUtils.ZipFolder

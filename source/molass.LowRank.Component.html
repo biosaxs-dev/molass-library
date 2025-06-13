@@ -479,12 +479,19 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component"><code class="docutils literal notranslate"><span class="pre">Component</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_rg"><code class="docutils literal notranslate"><span class="pre">Component.compute_rg()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_xr_area"><code class="docutils literal notranslate"><span class="pre">Component.compute_xr_area()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_icurve"><code class="docutils literal notranslate"><span class="pre">Component.get_icurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_jcurve"><code class="docutils literal notranslate"><span class="pre">Component.get_jcurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_jcurve_array"><code class="docutils literal notranslate"><span class="pre">Component.get_jcurve_array()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_area"><code class="docutils literal notranslate"><span class="pre">Component.compute_area()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_range"><code class="docutils literal notranslate"><span class="pre">Component.compute_range()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.make_paired_range"><code class="docutils literal notranslate"><span class="pre">Component.make_paired_range()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.XrComponent"><code class="docutils literal notranslate"><span class="pre">XrComponent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.XrComponent.compute_rg"><code class="docutils literal notranslate"><span class="pre">XrComponent.compute_rg()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.UvComponent"><code class="docutils literal notranslate"><span class="pre">UvComponent</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -503,17 +510,31 @@ document.write(`
 about each component of a LowRankInfo.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.LowRank.Component.Component">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_component</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jcurve_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a component.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Component.Component.compute_rg">
-<span class="sig-name descname"><span class="pre">compute_rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.compute_rg" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="molass.LowRank.Component.Component.get_icurve">
+<span class="sig-name descname"><span class="pre">get_icurve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_icurve" title="Link to this definition">#</a></dt>
+<dd><p>Returns the i-curve object.</p>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Component.Component.compute_xr_area">
-<span class="sig-name descname"><span class="pre">compute_xr_area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.compute_xr_area" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="molass.LowRank.Component.Component.get_jcurve">
+<span class="sig-name descname"><span class="pre">get_jcurve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_jcurve" title="Link to this definition">#</a></dt>
+<dd><p>Returns the j-curve object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Component.Component.get_jcurve_array">
+<span class="sig-name descname"><span class="pre">get_jcurve_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_jcurve_array" title="Link to this definition">#</a></dt>
+<dd><p>Returns the j-curve array which contains qv, I and error in case of XR.</p>
+<p>Currently, error is zeros in case of UV.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Component.Component.compute_area">
+<span class="sig-name descname"><span class="pre">compute_area</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.compute_area" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -526,6 +547,25 @@ about each component of a LowRankInfo.</p>
 <span class="sig-name descname"><span class="pre">make_paired_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.make_paired_range" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="molass.LowRank.Component.XrComponent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XrComponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.XrComponent" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#molass.LowRank.Component.Component" title="molass.LowRank.Component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a></p>
+<p>A class to represent an XR component.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Component.XrComponent.compute_rg">
+<span class="sig-name descname"><span class="pre">compute_rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.XrComponent.compute_rg" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="molass.LowRank.Component.UvComponent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UvComponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.UvComponent" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#molass.LowRank.Component.Component" title="molass.LowRank.Component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a></p>
+<p>A class to represent a UV component.</p>
 </dd></dl>
 
 </section>
@@ -576,12 +616,19 @@ about each component of a LowRankInfo.</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component"><code class="docutils literal notranslate"><span class="pre">Component</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_rg"><code class="docutils literal notranslate"><span class="pre">Component.compute_rg()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_xr_area"><code class="docutils literal notranslate"><span class="pre">Component.compute_xr_area()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_icurve"><code class="docutils literal notranslate"><span class="pre">Component.get_icurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_jcurve"><code class="docutils literal notranslate"><span class="pre">Component.get_jcurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.get_jcurve_array"><code class="docutils literal notranslate"><span class="pre">Component.get_jcurve_array()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_area"><code class="docutils literal notranslate"><span class="pre">Component.compute_area()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.compute_range"><code class="docutils literal notranslate"><span class="pre">Component.compute_range()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.Component.make_paired_range"><code class="docutils literal notranslate"><span class="pre">Component.make_paired_range()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.XrComponent"><code class="docutils literal notranslate"><span class="pre">XrComponent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.XrComponent.compute_rg"><code class="docutils literal notranslate"><span class="pre">XrComponent.compute_rg()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Component.UvComponent"><code class="docutils literal notranslate"><span class="pre">UvComponent</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -480,6 +480,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_3d()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_compact()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.make_trimming_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_baselines"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_baselines()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_trimming_info()</span></code></a></li>
@@ -487,6 +488,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.trimmed_copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.corrected_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.corrected_copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.estimate_mapping()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_conc_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.make_conc_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_lowrank_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_lowrank_info()</span></code></a></li>
@@ -527,6 +529,10 @@ It is required if the folder parameter is ommitted.</p></li>
 to suppress unnecessary data access.</p></li>
 <li><p><strong>xr_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, only XR data will be loaded
 to suppress unnecessary data access.</p></li>
+<li><p><strong>trimmed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the data will be treated as trimmed.</p></li>
+<li><p><strong>remove_bubbles</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, bubbles will be removed from the data.</p></li>
+<li><p><strong>beamlineinfo</strong> (<a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.BeamlineInfo" title="molass.DataUtils.Beamline.BeamlineInfo"><em>BeamlineInfo</em></a><em>, </em><em>optional</em>) – If specified, the beamline information will be used.</p></li>
+<li><p><strong>mapping</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a><em>, </em><em>optional</em>) – If specified, the mapping information will be used.</p></li>
 </ul>
 </dd>
 </dl>
@@ -556,6 +562,26 @@ shows the spectral view. The default is False.</p></li>
 axes: Axes</p>
 </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact">
+<span class="sig-name descname"><span class="pre">plot_compact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact" title="Link to this definition">#</a></dt>
+<dd><p>Plots a pair of compact figures of UV and XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>result</strong> – A PlotResult object which contains the following attributes.</p>
+<p>fig: Figure
+axes: Axes</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult">PlotResult</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -684,8 +710,26 @@ subtracting the baseline from the original data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping">
-<span class="sig-name descname"><span class="pre">estimate_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_also_curves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">estimate_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping">
+<span class="sig-name descname"><span class="pre">get_mapping</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping" title="Link to this definition">#</a></dt>
+<dd><p>Returns the mapping information object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mapping</strong> – A MappingInfo object which contains the mapping information.
+If the mapping information is not available, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor">
@@ -775,6 +819,7 @@ The default is ‘egh’.</p></li>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_3d()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_compact()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.make_trimming_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_baselines"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_baselines()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_trimming_info()</span></code></a></li>
@@ -782,6 +827,7 @@ The default is ‘egh’.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.trimmed_copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.corrected_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.corrected_copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.estimate_mapping()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_conc_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.make_conc_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_lowrank_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_lowrank_info()</span></code></a></li>

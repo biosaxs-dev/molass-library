@@ -478,8 +478,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.bubble_check_impl"><code class="docutils literal notranslate"><span class="pre">bubble_check_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.remove_bubbles_impl"><code class="docutils literal notranslate"><span class="pre">remove_bubbles_impl()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.detect_and_remove_bubbles"><code class="docutils literal notranslate"><span class="pre">detect_and_remove_bubbles()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.exclude_bubble_impl"><code class="docutils literal notranslate"><span class="pre">exclude_bubble_impl()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -495,15 +496,52 @@ document.write(`
 <span id="datautils-anomalyhandlers"></span><h1>DataUtils.AnomalyHandlers<a class="headerlink" href="#module-molass.DataUtils.AnomalyHandlers" title="Link to this heading">#</a></h1>
 <p>DataUtils.AnomalyHandlers.py</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="molass.DataUtils.AnomalyHandlers.remove_bubbles_impl">
-<span class="sig-name descname"><span class="pre">remove_bubbles_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.AnomalyHandlers.remove_bubbles_impl" title="Link to this definition">#</a></dt>
-<dd><p>ported from SerialData.exclude_intensities</p>
+<dt class="sig sig-object py" id="molass.DataUtils.AnomalyHandlers.bubble_check_impl">
+<span class="sig-name descname"><span class="pre">bubble_check_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.AnomalyHandlers.bubble_check_impl" title="Link to this definition">#</a></dt>
+<dd><p>Check for bubbles in the intensity array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – The intensity array to be checked for bubbles.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – If True, debug information will be printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bubbles</strong> – The indices of the detected bubbles.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="molass.DataUtils.AnomalyHandlers.detect_and_remove_bubbles">
-<span class="sig-name descname"><span class="pre">detect_and_remove_bubbles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.AnomalyHandlers.detect_and_remove_bubbles" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="molass.DataUtils.AnomalyHandlers.remove_bubbles_impl">
+<span class="sig-name descname"><span class="pre">remove_bubbles_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intensity_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_be_excluded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.AnomalyHandlers.remove_bubbles_impl" title="Link to this definition">#</a></dt>
+<dd><p>Exclude bubbles from the intensity array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>intensity_array</strong> (<em>np.ndarray</em>) – The intensity array to be modified.</p></li>
+<li><p><strong>to_be_excluded</strong> (<em>np.ndarray</em>) – The indices of the bubbles to be excluded.</p></li>
+<li><p><strong>excluded_set</strong> (<em>set</em>) – The set of excluded indices.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – If True, debug information will be printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>excluded_set</strong> – The set of excluded indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.DataUtils.AnomalyHandlers.exclude_bubble_impl">
+<span class="sig-name descname"><span class="pre">exclude_bubble_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intensity_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_set</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.AnomalyHandlers.exclude_bubble_impl" title="Link to this definition">#</a></dt>
+<dd><p>Exclude a bubble from the intensity array.</p>
+</dd></dl>
 
 </section>
 
@@ -552,8 +590,9 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.bubble_check_impl"><code class="docutils literal notranslate"><span class="pre">bubble_check_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.remove_bubbles_impl"><code class="docutils literal notranslate"><span class="pre">remove_bubbles_impl()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.detect_and_remove_bubbles"><code class="docutils literal notranslate"><span class="pre">detect_and_remove_bubbles()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.AnomalyHandlers.exclude_bubble_impl"><code class="docutils literal notranslate"><span class="pre">exclude_bubble_impl()</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -19,3 +19,4 @@ Submodules
    molass.FlowChange.FlowChangeParams
    molass.FlowChange.FlowChangePlot
    molass.FlowChange.NullFlowChange
+   molass.FlowChange.Property

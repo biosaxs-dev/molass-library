@@ -47,7 +47,7 @@
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Mapping.MappingInfo" href="molass.Mapping.MappingInfo.html" />
+    <link rel="next" title="Mapping.Grouping" href="molass.Mapping.Grouping.html" />
     <link rel="prev" title="LowRank.RankEstimator" href="molass.LowRank.RankEstimator.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -203,7 +203,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ForwardCompat.html">DataUtils.ForwardCompat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvFileTrimming.html">DataUtils.UvFileTrimming</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -254,6 +259,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Mapping</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.Grouping.html">Mapping.Grouping</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Mapping.MappingInfo.html">Mapping.MappingInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Mapping.PeakMatcher.html">Mapping.PeakMatcher</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Mapping.RatioCurve.html">Mapping.RatioCurve</a></li>
@@ -267,6 +273,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Peaks.html">Peaks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.Recognizer.html">Peaks.Recognizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Peaks.RecognizerSpecific.html">Peaks.RecognizerSpecific</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -294,6 +301,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Shapes.Ellipsoid.html">Shapes.Ellipsoid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Shapes.Sphere.html">Shapes.Sphere</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Stats.html">Stats</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -497,6 +509,11 @@ document.write(`
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="molass.Mapping.Grouping.html">Mapping.Grouping</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.Grouping.html#molass.Mapping.Grouping.get_groupable_peaks"><code class="docutils literal notranslate"><span class="pre">get_groupable_peaks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.Grouping.html#molass.Mapping.Grouping.get_groupable_peaks_impl"><code class="docutils literal notranslate"><span class="pre">get_groupable_peaks_impl()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Mapping.MappingInfo.html">Mapping.MappingInfo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo"><code class="docutils literal notranslate"><span class="pre">MappingInfo</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.get_mapped_x"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_x()</span></code></a></li>
@@ -518,7 +535,10 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Mapping.SimpleMapper.html">Mapping.SimpleMapper</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_for_mathing_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_mathing_peaks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.compute_mapping_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_slope_reliability"><code class="docutils literal notranslate"><span class="pre">estimate_slope_reliability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_by_full_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_matching_peaks()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_impl"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_impl()</span></code></a></li>
 </ul>
 </li>
@@ -548,11 +568,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="molass.Mapping.MappingInfo.html"
+       href="molass.Mapping.Grouping.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Mapping.MappingInfo</p>
+        <p class="prev-next-title">Mapping.Grouping</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

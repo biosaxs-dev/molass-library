@@ -14,3 +14,4 @@ Submodules
 
    molass.Peaks.PeakSimilarity
    molass.Peaks.Recognizer
+   molass.Peaks.RecognizerSpecific

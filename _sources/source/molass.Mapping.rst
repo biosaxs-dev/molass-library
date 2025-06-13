@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   molass.Mapping.Grouping
    molass.Mapping.MappingInfo
    molass.Mapping.PeakMatcher
    molass.Mapping.RatioCurve

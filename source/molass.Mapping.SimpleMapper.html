@@ -478,7 +478,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_mathing_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_mathing_peaks()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.compute_mapping_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_coverage()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_slope_reliability"><code class="docutils literal notranslate"><span class="pre">estimate_slope_reliability()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_by_full_coverage()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_matching_peaks()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_impl"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_impl()</span></code></a></li>
 </ul>
             </nav>
@@ -494,10 +497,26 @@ document.write(`
   <section id="module-molass.Mapping.SimpleMapper">
 <span id="mapping-simplemapper"></span><h1>Mapping.SimpleMapper<a class="headerlink" href="#module-molass.Mapping.SimpleMapper" title="Link to this heading">#</a></h1>
 <p>Mapping.SimpleMapperpy</p>
-<p>Copyright (c) 2024-2025, SAXS Team, KEK-PF</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_mapping_for_mathing_peaks">
-<span class="sig-name descname"><span class="pre">estimate_mapping_for_mathing_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_mathing_peaks" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.compute_mapping_coverage">
+<span class="sig-name descname"><span class="pre">compute_mapping_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.compute_mapping_coverage" title="Link to this definition">#</a></dt>
+<dd><p>Check if the mapping covers the range of x and y.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_slope_reliability">
+<span class="sig-name descname"><span class="pre">estimate_slope_reliability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_slope_reliability" title="Link to this definition">#</a></dt>
+<dd><p>Estimate the reliability of the slope by comparing the peak ratios.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage">
+<span class="sig-name descname"><span class="pre">compute_mapping_by_full_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks">
+<span class="sig-name descname"><span class="pre">estimate_mapping_for_matching_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -552,7 +571,10 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_mathing_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_mathing_peaks()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.compute_mapping_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_coverage()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_slope_reliability"><code class="docutils literal notranslate"><span class="pre">estimate_slope_reliability()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage"><code class="docutils literal notranslate"><span class="pre">compute_mapping_by_full_coverage()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_for_matching_peaks()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.SimpleMapper.estimate_mapping_impl"><code class="docutils literal notranslate"><span class="pre">estimate_mapping_impl()</span></code></a></li>
 </ul>
   </nav></div>
