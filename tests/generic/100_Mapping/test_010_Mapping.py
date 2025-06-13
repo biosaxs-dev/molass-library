@@ -37,14 +37,57 @@ def test_040_Kosugi3a():
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
 
-def test_050_proteins5():
+def test_050_Sugiyama():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20170226", "Sugiyama")
+    ssd = SSD(path, remove_bubbles=True)
+    mapping = ssd.estimate_mapping(debug=False)
+    ssd.plot_compact(debug=True)
+
+def test_051_20170304():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20170304", "BackSub_166_195")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=False)
+    ssd.plot_compact(debug=True)
+
+def test_060_proteins5():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20191006_proteins5")
     ssd = SSD(path)
     mapping = ssd.estimate_mapping(debug=True)
     ssd.plot_compact(debug=True)
 
-def test_060_20201006_1():
+def test_070_20200123_3():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20200123_3")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_071_20200125_1():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20200125_1")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_072_20200125_2():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20200125_2")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_073_20201005_1():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20201005_1")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(title=path, debug=True)
+
+
+def test_080_20201006_1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20201006_1")
     ssd = SSD(path)

@@ -3,7 +3,7 @@
 
     Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
-
+import numpy as np
 class MappingInfo:
     def __init__(self, slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve):
         """
@@ -30,13 +30,34 @@ class MappingInfo:
         yi = xr_x[i] * self.slope + self.intercept
         return int(round(yi - uv_x[0]))
 
-    def get_mapped_curve(self, x, icurve):
-        from scipy.interpolate import UnivariateSpline
+    def get_mapped_curve(self, xr_icurve, uv_icurve, extend_x=False):
         from molass.DataObjects.Curve import Curve
-        spline = UnivariateSpline(icurve.x, icurve.y, s=0, ext=3)
-        x_ = x * self.slope + self.intercept
-        y_ = spline(x_)
-        return Curve(x, y_)
+        spline = uv_icurve.get_spline()
+        x_ = xr_icurve.x * self.slope + self.intercept
+        cx = xr_icurve.x
+        if extend_x:
+            def inverse_x(z):
+                return int(round((z - self.intercept) / self.slope))    
+            # extend the curve to cover the full range of uv_icurve.x
+            cx_list = []
+            if uv_icurve.x[0] < x_[0]:
+                x_start = inverse_x(uv_icurve.x[0])
+                cx_list.append(np.arange(x_start, x_[0]))
+            if uv_icurve.x[-1] > x_[-1]:
+                x_end = inverse_x(uv_icurve.x[-1])
+                cx_list.append(np.arange(x_[0], x_end + 1))
+            if len(cx_list) > 0:
+                ex = np.concatenate(cx_list)
+                print(f"Extended x range: {ex[0]} to {ex[-1]}")
+                x_ = ex * self.slope + self.intercept
+                cx = ex
+            else:
+                # no extension needed
+                # and no change to x_, cx
+                pass
+
+        cy = spline(x_)
+        return Curve(cx, cy)
 
     def compute_ratio_curve(self, y1, y2, debug=False, **kwargs):
         if debug:

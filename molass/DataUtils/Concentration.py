@@ -32,6 +32,6 @@ def make_concinfo_impl(ssd, mapping, **kwargs):
             mapping = ssd.estimate_mapping()
         xr_curve = ssd.xr.get_icurve()
         uv_curve = ssd.uv.get_icurve()
-        conc_curve = mapping.get_mapped_curve(xr_curve.x, uv_curve)
+        conc_curve = mapping.get_mapped_curve(xr_curve, uv_curve)
 
     return ConcInfo(conc_curve*concfactor)

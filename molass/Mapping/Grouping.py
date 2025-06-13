@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import linregress
 from sklearn.cluster import KMeans
 
-def get_groupable_peaks(xr_curve, uv_curve, debug=False):
+def get_groupable_peaks(xr_curve, uv_curve, just_return_peaks=False, debug=False):
     """
     Get peaks that can be grouped for mapping.
     This function is a placeholder and should be implemented based on specific criteria for grouping peaks.
@@ -13,6 +13,8 @@ def get_groupable_peaks(xr_curve, uv_curve, debug=False):
 
     xr_peaks = np.array(xr_curve.get_peaks(debug=debug))
     uv_peaks = np.array(uv_curve.get_peaks(debug=debug))
+    if just_return_peaks:
+        return xr_peaks, uv_peaks
     num_groups = max(len(xr_peaks), len(uv_peaks))
     if num_groups > 3:
         # as in protein5 where grouping is not applicable
@@ -21,11 +23,11 @@ def get_groupable_peaks(xr_curve, uv_curve, debug=False):
         success, ret_xr_peaks, ret_uv_peaks = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=debug)
         if success and len(xr_peaks) != len(uv_peaks):
             if len(xr_peaks) < num_groups:
-                xr_peaks_ = np.array(xr_curve.get_peaks(num_peaks=num_groups, debug=debug))
+                xr_peaks_ = np.array(xr_curve.get_peaks(num_peaks=num_groups))
             else:
                 xr_peaks_ = xr_peaks
             if len(uv_peaks) < num_groups:
-                uv_peaks_ = np.array(uv_curve.get_peaks(num_peaks=num_groups, debug=debug))
+                uv_peaks_ = np.array(uv_curve.get_peaks(num_peaks=num_groups))
             else:
                 uv_peaks_ = uv_peaks
             success, ret_xr_peaks_, ret_uv_peaks_ = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks_, uv_peaks_, debug=debug)
