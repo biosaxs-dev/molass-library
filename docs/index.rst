@@ -41,6 +41,7 @@ Submodules
    source/molass.CurveModels.Scattering.FormFactors
    source/molass.DataObjects
    source/molass.DataUtils
+   source/molass.DensitySpace
    source/molass.DENSS
    source/molass.Except
    source/molass.FlowChange
@@ -55,6 +56,7 @@ Submodules
    source/molass.PlotUtils
    source/molass.Progress
    source/molass.Reports
+   source/molass.Shapes
    source/molass.Stats
    source/molass.Stochastic
    source/molass.SurveyUtils

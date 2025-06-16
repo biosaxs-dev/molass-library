@@ -5,6 +5,21 @@ from glob import glob
 import numpy as np
 
 def load_xr(folder_path):
+    """
+    Load X-ray scattering data from a folder containing .dat files.
+    Parameters
+    ----------
+    folder_path : str
+        Path to the folder containing .dat files.
+    Returns
+    -------
+    xr_array : np.ndarray
+        3D array containing the X-ray scattering data.
+    Notes
+    -----
+    The function assumes that each .dat file contains data in a format compatible with np.loadtxt.
+    The first dimension corresponds to the number of files, the second to the number of points, and the third to the data columns.
+    """
     input_list = []
     for path in sorted(glob(folder_path + "/*.dat")):
         input_list.append(np.loadtxt(path))

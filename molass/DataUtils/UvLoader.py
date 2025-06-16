@@ -8,6 +8,21 @@ from molass_legacy.SerialAnalyzer.SerialDataUtils import load_uv_array, load_uv_
 from molass.DataObjects.Curve import create_icurve
 
 def load_uv(path):
+    """
+    Load UV data from a file or directory.
+
+    Parameters
+    ----------
+    path : str
+        Path to the UV data file or directory.
+        
+    Returns
+    -------
+    uvM : np.ndarray
+        UV data matrix.
+    wvector : np.ndarray
+        Wavelength vector.
+    """
     if os.path.isdir(path):
         uvM, wvector, conc_file = load_uv_array(path)
     else:
