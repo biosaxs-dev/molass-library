@@ -30,12 +30,34 @@ def test_030_20160628():
     mapping = ssd.estimate_mapping(debug=True)
     ssd.plot_compact(debug=True)
 
-def test_040_Kosugi3a():
+def test_040_OA_Ald():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20161104", "BL-10C", "OA_Ald")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_041_SUB_TRN1():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20161113", "SUB_TRN1")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=True)
+    ssd.plot_compact(debug=True)
+
+def test_042_Kosugi3a():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")
     ssd = SSD(path)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
+
+def test_043_20161216():
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20161216", "BackSub")
+    ssd = SSD(path)
+    mapping = ssd.estimate_mapping(debug=False)
+    ssd.plot_compact(debug=True)
+    # ssd.plot_trimming_info(debug=True)
 
 def test_050_Sugiyama():
     from molass.DataObjects import SecSaxsData as SSD

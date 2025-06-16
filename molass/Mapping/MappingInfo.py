@@ -30,32 +30,39 @@ class MappingInfo:
         yi = xr_x[i] * self.slope + self.intercept
         return int(round(yi - uv_x[0]))
 
-    def get_mapped_curve(self, xr_icurve, uv_icurve, extend_x=False):
+    def get_mapped_curve(self, xr_icurve, uv_icurve, inverse_range=False, debug=False):
         from molass.DataObjects.Curve import Curve
         spline = uv_icurve.get_spline()
-        x_ = xr_icurve.x * self.slope + self.intercept
-        cx = xr_icurve.x
-        if extend_x:
+    
+        if inverse_range:
             def inverse_x(z):
-                return int(round((z - self.intercept) / self.slope))    
-            # extend the curve to cover the full range of uv_icurve.x
-            cx_list = []
-            if uv_icurve.x[0] < x_[0]:
-                x_start = inverse_x(uv_icurve.x[0])
-                cx_list.append(np.arange(x_start, x_[0]))
-            if uv_icurve.x[-1] > x_[-1]:
-                x_end = inverse_x(uv_icurve.x[-1])
-                cx_list.append(np.arange(x_[0], x_end + 1))
-            if len(cx_list) > 0:
-                ex = np.concatenate(cx_list)
-                print(f"Extended x range: {ex[0]} to {ex[-1]}")
-                x_ = ex * self.slope + self.intercept
-                cx = ex
-            else:
-                # no extension needed
-                # and no change to x_, cx
-                pass
+                return int(round((z - self.intercept) / self.slope))
+            
+            mapped_ends = []
+            for end_uv_x in uv_icurve.x[[0,-1]]:
+                end_xr_x = inverse_x(end_uv_x)
+                mapped_ends.append(end_xr_x)
+            mapped_ends = np.array(mapped_ends)
 
+            if debug:   
+                import matplotlib.pyplot as plt
+                x_ = xr_icurve.x * self.slope + self.intercept
+                fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 5))
+                ax1.plot(uv_icurve.x, uv_icurve.y, label='uv_icurve')
+                ax1.plot(x_, spline(x_), ':', label='mapped range')
+                ax1.legend()
+                ax2.plot(xr_icurve.x, xr_icurve.y, label='xr_icurve')
+                for mapped_x in mapped_ends:
+                    ax2.axvline(mapped_x, color='gray', linestyle='--', label=f'uv_icurve x={mapped_x}')
+                ax2.legend()
+                fig.tight_layout()
+                plt.show()
+
+            cx = np.arange(mapped_ends[0], mapped_ends[1] + 1)
+        else:
+            cx = xr_icurve.x
+
+        x_ = cx * self.slope + self.intercept
         cy = spline(x_)
         return Curve(cx, cy)
 

@@ -102,7 +102,7 @@ def plot_compact_impl(ssd, **kwargs):
     xr_curve = mapping.xr_curve
     uv_curve = mapping.uv_curve
     x = xr_curve.x
-    mp_curve = mapping.get_mapped_curve(xr_curve, uv_curve, extend_x=True)
+    mp_curve = mapping.get_mapped_curve(xr_curve, uv_curve, inverse_range=True, debug=debug)
     xr_max_x, xr_max_y = xr_curve.get_max_xy()
     _, uv_max_y = uv_curve.get_max_xy()
     mp_y = mp_curve.y / uv_max_y * xr_max_y

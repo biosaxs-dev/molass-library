@@ -22,6 +22,9 @@ def plot_trimming_info_impl(ssd, trim, **kwargs):
     if type(trim) is dict:
         from molass.Trimming.TrimmingInfo import TrimmingInfo
         trim = TrimmingInfo(**trim)
+
+    debug = kwargs.get('debug', False)
+
     fig = plt.figure(figsize=(16,8))
     gs = GridSpec(2,10)
 
@@ -209,6 +212,8 @@ def plot_trimming_info_impl(ssd, trim, **kwargs):
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=1.2)
+    if debug:
+        plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, axes, trimming=trim)
