@@ -46,18 +46,20 @@ def flowchange_exclude_slice_impl(x, y, mi, yscale, debug=False):
 
     return points, segments, likelihoods, peaklike, peakpos
 
-def flowchange_exclude_slice(x, y1, y2, debug=False, return_fullinfo=False, counter=None, return_firstinfo=False):
+def flowchange_exclude_slice(curve1, curve2, debug=False, return_fullinfo=False, counter=None, return_firstinfo=False):
     from molass.Stats.Moment import Moment
     from molass.FlowChange.FlowChangeLikely import compute_yscale, flowchange_likelihood
     from molass.FlowChange.FlowChangeJudge import LIMIT_SIGMA, FlowChangeJudge
+    x = curve1.x
+    y1 = curve1.y
+    y2 = curve2.y
     max_y1 = np.max(y1)
     mi = Moment(x, y1)
     M, std = mi.get_meanstd()
     M_lb = M - LIMIT_SIGMA*std
     M_ub = M + LIMIT_SIGMA*std
     slope_ratio = abs(y2[0] - y2[-1])/np.std(y2)
-    if debug:
-        print("slope_ratio=", slope_ratio)
+
     corrected = False
     if slope_ratio > SLOPE_RATIO_LIMIT:
         # as in 20190607_1 or 20170304
@@ -84,7 +86,20 @@ def flowchange_exclude_slice(x, y1, y2, debug=False, return_fullinfo=False, coun
 
     judge = FlowChangeJudge()
 
-    i, j, judge_info = judge.judge(x, y1, y2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos, debug=debug)
+    i, j, judge_info = judge.judge(curve1, curve2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos, debug=debug)
+
+    if debug:
+        import matplotlib.pyplot as plt
+        print("slope_ratio=", slope_ratio)
+        fig, ax = plt.subplots()
+        ax.plot(x, y1, label='curve1')
+        axt = ax.twinx()
+        axt.plot(x, y2, color="C1", alpha=0.5, label='curve2')
+        for k in i, j:
+            if k is not None:
+                ax.axvline(x[k], color='cyan')
+        fig.tight_layout()
+        plt.show()
 
     if return_fullinfo:
         return (i, j), judge_info, segments, (M_lb, M_ub), std

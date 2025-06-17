@@ -37,7 +37,7 @@ def estimate_uvbaseline_params(curve1, curve2, pickat=None, plot_info=None, coun
     # 	            L	        x0	    k	        b	        s1	    s2	    diff_ratio
     # uv_baseline	0.00711615	135.851	0.860483	-0.004567	11.3408	12.131	0.6397
 
-    fc_slice = flowchange_exclude_slice(curve1.x, curve1.y, curve2.y, debug=debug, counter=counter)[0]
+    fc_slice = flowchange_exclude_slice(curve1, curve2, debug=debug, counter=counter)[0]
 
     diff_spline = create_diff_spline(curve1)
     dfef_params = estimate_uvdiffeffect_params(curve1, curve2, fc_slice, diff_spline, pickat=pickat, debug=debug, plot_info=plot_info)

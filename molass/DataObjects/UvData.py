@@ -69,10 +69,7 @@ class UvData(SsMatrixData):
         for pickvalue in pickvalues:
             curve = self.get_icurve(pickat=pickvalue)
             curves.append(curve)
-        x = curves[0].x
-        y1 = curves[0].y
-        y2 = curves[1].y
-        points, judge_info = flowchange_exclude_slice(x, y1, y2)
+        points, judge_info = flowchange_exclude_slice(curves[0], curves[1])
         if return_also_curves:
             return points, judge_info, curves
         else:

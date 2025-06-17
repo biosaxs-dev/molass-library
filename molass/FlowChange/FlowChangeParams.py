@@ -21,7 +21,7 @@ def compute_like_values(for_all=False):
         except:
             print("ERROR: in", in_folder)
             return
-        mi, points, segments, rel_likes, peaklike, peakpos, yscale = flowchange_exclude_slice(c1.x, c1.y, c2.y, return_firstinfo=True)
+        mi, points, segments, rel_likes, peaklike, peakpos, yscale = flowchange_exclude_slice(c1, c2, return_firstinfo=True)
         print([i], in_folder, points)
         abs_likes = []
         for k, p in enumerate(points):
@@ -76,7 +76,7 @@ def make_test_targets(recs):
     targets = []
     for k, rec in enumerate(recs):
         in_folder, c1, c2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos = rec
-        i, j, judge_info = judge.judge(c1.x, c1.y, c2.y, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos)
+        i, j, judge_info = judge.judge(c1, c2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos)
         folder = in_folder.replace(root_folder, '')
         target = (folder, (i,j))
         print([k], target)
@@ -97,7 +97,7 @@ def test_params(recs, params_dict, targets=None):
 
     for k, rec in enumerate(recs):
         in_folder, c1, c2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos = rec
-        i, j, judge_info = judge.judge(c1.x, c1.y, c2.y, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos)
+        i, j, judge_info = judge.judge(c1, c2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos)
         expected = targets[k][1]
         if (i,j) == expected:
             result = 'ok'

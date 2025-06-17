@@ -36,7 +36,10 @@ class FlowChangeJudge:
     def restore_params(self):
         pass
 
-    def judge(self, x, y1, y2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos, debug=False):
+    def judge(self, curve1, curve2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos, debug=False):
+        x = curve1.x
+        y1 = curve1.y
+        y2 = curve2.y
         max_y1 = np.max(y1)
         M, std = mi.get_meanstd()
         N_lb = M - NEAR_SIGMA*std
@@ -75,6 +78,8 @@ class FlowChangeJudge:
             # as in 20190309_1
             i, j = None, None
         else:
+            from .Differential import islike_differential
+            is_differential = islike_differential(curve1, curve2, debug=debug)
             fc_points = []
             gap0 = segments[1].y[0] - segments[0].y[-1]
             gap1 = segments[2].y[0] - segments[1].y[-1]
@@ -89,7 +94,11 @@ class FlowChangeJudge:
                 if debug and k == 1:
                     print("y1_ratio=", y1_ratio, "abs_like=", abs_like, "rel_like=", rel_like)
                 
+                if debug:
+                    print(f"point {k}: M_lb={M_lb}, x={x[p]}, M_ub={M_ub}, peaklike={peaklike}")
                 if k == 0 and peaklike and M_ub < x[p]:                         # as in 20220716\OA_ALD_202
+                    p = None
+                elif k == 0 and M_lb < x[p] and is_differential:                # as in 20210323_1, but not in 20171203 (not differential)
                     p = None
                 elif (rel_like < MIN_REL_LIKE
                     or abs_like < VERYBAD_ABS_LIKE                              # as in 20191109

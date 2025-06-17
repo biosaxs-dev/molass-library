@@ -70,5 +70,5 @@ def test_010_flowchange_exclude_slice():
         path = os.path.join(DATA_ROOT_FOLDER, folder)
         print([k], "path=", path)
         c1, c2= get_uvcurves(path)
-        i, j = flowchange_exclude_slice(c1.x, c1.y, c2.y)[0]
+        i, j = flowchange_exclude_slice(c1, c2)[0]
         assert (k, (i,j)) == (k, result)    # using k in order to identify the case when it fails

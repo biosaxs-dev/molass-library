@@ -108,7 +108,6 @@ def test_073_20201005_1():
     mapping = ssd.estimate_mapping(debug=True)
     ssd.plot_compact(title=path, debug=True)
 
-
 def test_080_20201006_1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20201006_1")
