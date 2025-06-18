@@ -1,7 +1,5 @@
 """
     Mapping.MappingInfo.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import numpy as np
 class MappingInfo:

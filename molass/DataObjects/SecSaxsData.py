@@ -194,6 +194,33 @@ class SecSaxsData:
             self.trimming_info = make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
         return self.trimming_info
 
+    def get_trimming_info(self, **kwargs):
+        """ssd.get_trimming_info()
+
+        Returns the trimming information object.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        trimming_info : TrimmingInfo
+            A TrimmingInfo object which contains the trimming information.
+            If the trimming information is not available, returns None.
+        
+        See Also
+        --------
+        ssd.make_trimming_info()        
+
+        Examples
+        --------
+        >>> trim = ssd.get_trimming_info()
+        """
+        if self.trimming_info is None:
+            self.make_trimming_info(**kwargs)
+        return self.trimming_info
+
     def plot_baselines(self, debug=True):
         """ssd.plot_baselines()
 
@@ -249,9 +276,10 @@ class SecSaxsData:
             reload(molass.PlotUtils.TrimmingPlot)
         from molass.PlotUtils.TrimmingPlot import plot_trimming_info_impl
         baseline = kwargs.pop('baseline', True)
+        title = kwargs.pop('title', None)
         if trim is None:
             trim = self.make_trimming_info(**kwargs)
-        return plot_trimming_info_impl(self, trim, baseline=baseline, **kwargs)
+        return plot_trimming_info_impl(self, trim, baseline=baseline, title=title, **kwargs)
 
     def copy(self, xr_slices=None, uv_slices=None, trimmed=False, mapping=None):
         """ssd.copy(xr_slices=None, uv_slices=None)
@@ -303,7 +331,8 @@ class SecSaxsData:
         elif type(trim) is dict:
             from molass.Trimming.TrimmingInfo import TrimmingInfo
             trim = TrimmingInfo(**trim)
-        return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=True, mapping=trim.mapping)
+        trimmed_mapping = trim.get_trimmed_mapping()
+        return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=True, mapping=trimmed_mapping)
 
     def corrected_copy(self):
         """ssd.corrected_copy()
