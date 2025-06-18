@@ -1,6 +1,5 @@
 """
     Reports.Controller.py
-
 """
 import os
 import logging
@@ -12,22 +11,22 @@ class Controller:
         self.make_temp_folder()
         self.more_multicore = parallel and os.cpu_count() > 4
         if self.more_multicore:
-            from ExcelProcess.ExcelTeller import ExcelTeller
+            from molass_legacy.ExcelProcess.ExcelTeller import ExcelTeller
             self.teller = ExcelTeller(log_folder=self.temp_folder)
             self.logger.info('teller created with log_folder=%s', self.temp_folder)
             self.excel_client = None
         else:
-            from KekLib.ExcelCOM import CoInitialize, ExcelComClient
+            from molass_legacy.KekLib.ExcelCOM import CoInitialize, ExcelComClient
             self.teller = None
             CoInitialize()
             self.excel_client = ExcelComClient()
 
     def make_temp_folder( self ):
-        from KekLib.BasicUtils import clear_dirs_with_retry
+        from molass_legacy.KekLib.BasicUtils import clear_dirs_with_retry
         try:
             clear_dirs_with_retry([self.temp_folder])
         except Exception as exc:
-            from KekLib.ExceptionTracebacker import  ExceptionTracebacker
+            from molass_legacy.KekLib.ExceptionTracebacker import  ExceptionTracebacker
             etb = ExceptionTracebacker()
             self.logger.error( etb )
             raise exc
@@ -39,7 +38,7 @@ class Controller:
             self.teller.stop()
     
     def cleanup(self):
-        from KekLib.ExcelCOM import CoUninitialize
+        from molass_legacy.KekLib.ExcelCOM import CoUninitialize
         self.excel_client.quit()
         self.excel_client = None
         CoUninitialize()

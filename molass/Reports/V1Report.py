@@ -26,8 +26,8 @@ def make_v1report_impl(controller, ssd, bookfile=None, conc_info=None, rg_info=N
         conc_info = ssd.make_conc_info()
 
     if rg_info is None:
-        mo_rgcurve = ssd.compute_rgcurve()
-        at_rgcurve = ssd.compute_rgcurve_atsas()
+        mo_rgcurve = ssd.xr.compute_rgcurve()
+        at_rgcurve = ssd.xr.compute_rgcurve_atsas()
         rg_info = (mo_rgcurve, at_rgcurve)
 
     if lr_info is None:

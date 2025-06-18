@@ -22,12 +22,12 @@ def make_v1report_ranges_impl(lr_info, area_ratio, debug=False):
     if debug:
         print("make_v1analysis_ranges_impl: area_ratio=", area_ratio)
 
-    components = lr_info.get_components()
+    components = lr_info.get_xr_components()
 
     ranges = []
     areas = []
     for comp in components:
-        areas.append(comp.compute_xr_area())
+        areas.append(comp.compute_area())
         ranges.append(comp.compute_range(area_ratio))
 
     area_proportions = np.array(areas)/np.sum(areas)
