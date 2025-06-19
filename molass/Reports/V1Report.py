@@ -6,7 +6,7 @@ import threading
 from tqdm import tqdm
 from molass.Reports.ReportInfo import ReportInfo
 
-def make_v1report_impl(controller, ssd, bookfile=None, conc_info=None, rg_info=None, lr_info=None, ranges=None, debug=False):
+def make_v1report_impl(ssd, bookfile=None, conc_info=None, rg_info=None, lr_info=None, ranges=None, debug=False):
     if debug:
         import molass.Progress.ProgessUtils
         reload(molass.Progress.ProgessUtils)
@@ -54,7 +54,7 @@ def make_v1report_impl(controller, ssd, bookfile=None, conc_info=None, rg_info=N
     kwargs = {}
     kwargs['debug'] = debug
 
-    tread1 = threading.Thread(target=make_guinier_report, args=[controller, pu, ri, kwargs])
+    tread1 = threading.Thread(target=make_guinier_report, args=[pu, ri, kwargs])
     tread1.start()
 
     with tqdm(ps) as t:

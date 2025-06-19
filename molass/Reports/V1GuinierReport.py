@@ -9,7 +9,7 @@ from time import sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_guinier_report(controller, punit, ri, kwargs):
+def make_guinier_report(punit, ri, kwargs):
     debug = kwargs.get('debug')
     if debug:
         import molass_legacy.Reports.GuinierAnalysisResultBook
@@ -20,6 +20,9 @@ def make_guinier_report(controller, punit, ri, kwargs):
         reload(molass.Reports.Controller)
     from molass_legacy.Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
     from molass.Reports.Migrating import make_gunier_row_values
+    from molass.Reports.Controller import Controller
+
+    controller = Controller()
 
     if controller.excel_is_available:
         from openpyxl import Workbook

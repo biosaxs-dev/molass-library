@@ -14,7 +14,6 @@ class Controller:
         self.logger = logging.getLogger(__name__)
         self.temp_folder = ".temp"
         self.make_temp_folder()
-
         self.excel_is_available = True
         self.more_multicore = parallel and os.cpu_count() > 4
         if self.excel_is_available:
