@@ -1,34 +1,30 @@
 """
-Reports.V1GuinierReport.py
+Reports.V1LrfReport.py
 
-This module contains the functions to generate the reports the Guinier Analysis.
+This module contains the functions to generate the reports for the LRF Analysis.
 """
-import os
 from importlib import reload
 from time import sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_guinier_report(controller, punit, ri, kwargs):
+def make_lrf_report(controller, punit, ri, kwargs):
     debug = kwargs.get('debug')
     if debug:
-        import molass_legacy.Reports.GuinierAnalysisResultBook
-        reload(molass_legacy.Reports.GuinierAnalysisResultBook)
+        import molass_legacy.Reports.ZeroExtrapolationResultBook
+        reload(molass_legacy.Reports.ZeroExtrapolationResultBook)
+        import molass_legacy.Reports.ZeroExtrapolationOverlayBook
+        reload(molass_legacy.Reports.ZeroExtrapolationOverlayBook)
         import molass.Reports.Migrating
         reload(molass.Reports.Migrating)
         import molass.Reports.Controller
         reload(molass.Reports.Controller)
-    from molass_legacy.Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
+    from molass_legacy.Reports.ZeroExtrapolationOverlayBook import ZeroExtrapolationOverlayBook
     from molass.Reports.Migrating import make_gunier_row_values
+    from molass.Reports.Controller import Controller
 
-    if controller.excel_is_available:
-        from openpyxl import Workbook
-        wb = Workbook()
-        ws = wb.active
-    else:
-        wb = controller.result_wb
-        ws = wb.create_sheet('Guinier Analysis')
-
+    wb = ri.wb
+    ws = ri.ws
     ssd = ri.ssd
     mo_rgcurve, at_rgcurve = ri.rg_info
     x, y = ri.conc_info.curve.get_xy()
@@ -50,6 +46,7 @@ def make_guinier_report(controller, punit, ri, kwargs):
             mo_result = None
         else:
             mo_result = mo_rgcurve.results[j]
+            mo_quality = mo_result.quality_object
         k = at_rgcurve.index_dict.get(i)
         if k is None:
             at_result = None
@@ -73,15 +70,12 @@ def make_guinier_report(controller, punit, ri, kwargs):
         fh.close()
 
     j0 = int(x[0])
+    controller = Controller()
     book = GuinierAnalysisResultBook(wb, ws, rows, j0, parent=controller)
     ranges = ri.ranges
 
-    if controller.excel_is_available:
-        bookfile = ri.bookfile
-        bookpath = os.path.abspath(bookfile)
-        print("Saving Guinier Analysis Report to", bookpath)
-        book.save(bookpath)
-        sleep(0.1)
-        book.add_annonations(bookpath, ri.ranges, debug=debug)
+    bookfile = ri.bookfile
+    book.save(bookfile)
+    book.add_annonations(bookfile, ri.ranges)
 
     punit.all_done()

@@ -1,7 +1,5 @@
 """
     PlotUtils.LowRankInfoPlot.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +8,7 @@ from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 def plot_components_impl(lr_info, **kwargs):
+    debug = kwargs.get('debug', False)
     rgcurve = kwargs.get('rgcurve', None)
 
     fig = plt.figure(figsize=(16, 8))
@@ -162,6 +161,9 @@ def plot_components_impl(lr_info, **kwargs):
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=1.5)
+
+    if debug:
+        plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2, axt))

@@ -4,7 +4,6 @@
 from importlib import reload
 import threading
 from tqdm import tqdm
-from openpyxl import Workbook
 from molass.Reports.ReportInfo import ReportInfo
 
 def make_v1report_impl(controller, ssd, bookfile=None, conc_info=None, rg_info=None, lr_info=None, ranges=None, debug=False):
@@ -42,14 +41,11 @@ def make_v1report_impl(controller, ssd, bookfile=None, conc_info=None, rg_info=N
     if debug:
         print("make_v1report_impl: ranges=", ranges)
 
-    wb = Workbook()
-    ws = wb.active
     ri = ReportInfo(ssd=ssd,
                     conc_info=conc_info,
                     rg_info=rg_info,
                     lr_info=lr_info,
                     ranges=ranges,
-                    wb=wb, ws=ws,
                     bookfile=bookfile)
  
     ps = ProgressSet()

@@ -23,22 +23,27 @@ class Component:
         self.jcurve_array = jcurve_array
         x, y = self.icurve_array
         self.peak_index = np.argmax(y)
-        self.spline = None
+        self.icurve = None
+        self.jcurve = None
         self.area = None
 
     def get_icurve(self):
         """
         Returns the i-curve object.
         """
-        from molass.DataObjects.Curve import Curve
-        return Curve(*self.icurve_array[0:2], type='i')
+        if self.icurve is None:
+            from molass.DataObjects.Curve import Curve
+            self.icurve = Curve(*self.icurve_array[0:2], type='i')
+        return self.icurve
 
     def get_jcurve(self):
         """
         Returns the j-curve object.
         """
-        from molass.DataObjects.Curve import Curve
-        return Curve(*self.jcurve_array[:,0:2], type='j')
+        if self.jcurve is None:
+            from molass.DataObjects.Curve import Curve
+            self.jcurve = Curve(*self.jcurve_array[:,0:2], type='j')
+        return self.jcurve
 
     def get_jcurve_array(self):
         """
@@ -50,15 +55,17 @@ class Component:
 
     def compute_area(self):
         if self.area is None:
-            x, y = self.icurve_array[:,0:2]
-            self.spline = UnivariateSpline(x, y, s=0)
-            self.area = integrate.quad(self.spline, x[0], x[-1])[0]            
+            icurve = self.get_icurve()
+            spline = icurve.get_spline()
+            x = icurve.x
+            self.area = integrate.quad(spline, x[0], x[-1])[0]            
         return self.area
 
     def compute_range(self, area_ratio, debug=False, return_also_fig=False):
-        x, y = self.icurve_array[:,0:2]
+        icurve = self.get_icurve()
+        x, y = icurve.get_xy()
         entire_area = self.compute_area()
-        entire_spline = self.spline
+        entire_spline = icurve.get_spline()
         target_area = entire_area*area_ratio
         m = self.peak_index
         if debug:
@@ -127,7 +134,7 @@ class Component:
     
     def make_paired_range(self, range_, minor=False):
         from molass.LowRank.PairedRange import PairedRange
-        return PairedRange(range_, minor=minor, peak_index=self.xr_peak_index)
+        return PairedRange(range_, minor=minor, peak_index=self.peak_index)
 
 class XrComponent(Component):
     """

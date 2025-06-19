@@ -24,6 +24,19 @@ def make_v1report_ranges_impl(lr_info, area_ratio, debug=False):
 
     components = lr_info.get_xr_components()
 
+    if debug:
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        for comp in components:
+            icurve = comp.get_icurve()
+            ax.plot(icurve.x, icurve.y, label=f'Component {comp.peak_index}')
+        ax.set_xlabel('Frames')
+        ax.set_ylabel('Intensity')
+        ax.set_title('Components Elution Curves')
+        ax.legend()
+        fig.tight_layout()
+        plt.show()
+
     ranges = []
     areas = []
     for comp in components:
