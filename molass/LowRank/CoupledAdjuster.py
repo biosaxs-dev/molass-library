@@ -51,6 +51,8 @@ def make_lowrank_info_impl(ssd, num_components, ranks, **kwargs):
             import molass.LowRank.ConsistentAdjuster
             reload(molass.LowRank.ConsistentAdjuster)
         from molass.LowRank.ConsistentAdjuster import adjust_components_consistently
+        if ssd.mapping is None:
+            ssd.estimate_mapping()
         uv_ccurves = adjust_components_consistently(ssd.mapping, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
     return LowRankInfo(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs) 
