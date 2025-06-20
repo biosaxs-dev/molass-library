@@ -9,20 +9,15 @@ from time import sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_guinier_report(punit, ri, kwargs):
+def make_guinier_report(punit, controller, ri, kwargs):
     debug = kwargs.get('debug')
     if debug:
         import molass_legacy.Reports.GuinierAnalysisResultBook
         reload(molass_legacy.Reports.GuinierAnalysisResultBook)
         import molass.Reports.Migrating
         reload(molass.Reports.Migrating)
-        import molass.Reports.Controller
-        reload(molass.Reports.Controller)
     from molass_legacy.Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
     from molass.Reports.Migrating import make_gunier_row_values
-    from molass.Reports.Controller import Controller
-
-    controller = Controller()
 
     if controller.excel_is_available:
         from openpyxl import Workbook
@@ -36,8 +31,6 @@ def make_guinier_report(punit, ri, kwargs):
     mo_rgcurve, at_rgcurve = ri.rg_info
     x, y = ri.conc_info.curve.get_xy()
     num_rows = len(x)
-
-    row_list = []
 
     if WRITE_TO_TEMPFILE:
         fh = open("temp.csv", "w")
@@ -77,8 +70,7 @@ def make_guinier_report(punit, ri, kwargs):
 
     j0 = int(x[0])
     book = GuinierAnalysisResultBook(wb, ws, rows, j0, parent=controller)
-    ranges = ri.ranges
-
+ 
     if controller.excel_is_available:
         bookfile = ri.bookfile
         bookpath = os.path.abspath(bookfile)

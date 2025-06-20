@@ -345,7 +345,7 @@ class SecSaxsData:
         None
         """
 
-        ssd_copy = self.copy(trimmed=self.trimmed, mapping=self.mapping)
+        ssd_copy = self.copy(trimmed=self.trimmed)
 
         baseline = ssd_copy.xr.get_baseline2d()
         ssd_copy.xr.M -= baseline

@@ -64,10 +64,13 @@ class MappingInfo:
         cy = spline(x_)
         return Curve(cx, cy)
 
-    def compute_ratio_curve(self, y1, y2, debug=False, **kwargs):
+    def compute_ratio_curve(self, mp_curve=None, data_threshold=0.05, debug=False):
+        """
+        Compute the ratio curve based on the mapping information.
+        """
         if debug:
             from importlib import reload
             import molass.Mapping.RatioCurve
             reload(molass.Mapping.RatioCurve)
         from molass.Mapping.RatioCurve import compute_ratio_curve_impl
-        return compute_ratio_curve_impl(self, y1, y2, **kwargs)
+        return compute_ratio_curve_impl(self, mp_curve=mp_curve, data_threshold=data_threshold, debug=debug)

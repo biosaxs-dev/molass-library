@@ -96,6 +96,7 @@ def plot_compact_impl(ssd, **kwargs):
     debug = kwargs.get('debug', False)
 
     title = kwargs.pop('title', None)
+    ratio_curve = kwargs.pop('ratio_curve', False)
 
     trim = ssd.make_trimming_info()
     mapping = ssd.get_mapping()
@@ -116,12 +117,21 @@ def plot_compact_impl(ssd, **kwargs):
     ax1 = fig.add_subplot(gs[:, 0])
     ax1.plot(mp_curve.x, mp_y, linestyle=":", color="C0", label="mapped UV Elution at wavelength=280")
     ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label="XR Elution at Q=0.02")
+
     ymin, ymax = ax1.get_ylim()
     ax1.set_ylim(ymin, ymax * 1.2)
     i, j = ij_from_slice(trim.xr_slices[1])
     ax1.axvspan(*x[[i,j]], color='green', alpha=0.1)
     ax1.axvline(xr_max_x, color='yellow')    
     ax1.legend()
+    if ratio_curve:
+        axt = ax1.twinx()
+        axt.grid(False)
+        ratio_curve = mapping.compute_ratio_curve(mp_curve=mp_curve, debug=debug)
+        axt.plot(*ratio_curve.get_xy(), color="C2", alpha=0.5, label="UV/XR Ratio")
+        ymin, ymax = axt.get_ylim()
+        axt.set_ylim(0, ymax * 1.2)
+        axt.legend(loc="center left")
 
     # Plot the UV spectral curve
     ax2 = fig.add_subplot(gs[0, 1])

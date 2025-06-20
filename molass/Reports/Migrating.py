@@ -1,7 +1,7 @@
 """
     Reports.Migrating.py
 
-    extracted from Lib.Reports.ReportUtils.py
+    extracted from molass_legacy.Reports.ReportUtils.py
 """
 import numpy as np
 from molass_legacy.AutorgKek.Quality import compute_atsas_fit_consistency

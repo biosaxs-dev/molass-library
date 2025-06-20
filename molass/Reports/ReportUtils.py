@@ -8,14 +8,14 @@ import numpy as np
 
 MINOR_COMPONENT_MAX_PROP = 0.1
 
-def make_v1report(ssd, *args, **kwargs):
+def make_v1report(ssd, **kwargs):
     debug = kwargs.get('debug', False)
     if debug:
         import molass.Reports.V1Report
         from importlib import reload
         reload(molass.Reports.V1Report)
     from molass.Reports.V1Report import make_v1report_impl
-    make_v1report_impl(ssd, *args, **kwargs)
+    make_v1report_impl(ssd, **kwargs)
 
 def make_v1report_ranges_impl(lr_info, area_ratio, debug=False):
     if debug:

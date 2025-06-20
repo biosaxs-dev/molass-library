@@ -6,20 +6,46 @@ import threading
 from tqdm import tqdm
 from molass.Reports.ReportInfo import ReportInfo
 
-def make_v1report_impl(ssd, bookfile=None, conc_info=None, rg_info=None, lr_info=None, ranges=None, debug=False):
+def make_v1report_impl(ssd, **kwargs):
+    """
+
+    """ 
+    from molass.Progress.ProgessUtils import ProgressSet
+    ps = ProgressSet()
+
+    pu = ps.add_unit(10)
+    pu_list = [pu]
+
+    tread1 = threading.Thread(target=make_v1report_runner, args=[pu_list, ssd, kwargs])
+    tread1.start()
+ 
+    with tqdm(ps) as t:
+        for j, ret in enumerate(t):
+            t.set_description(str(([j], ret)))
+
+    tread1.join()
+
+def make_v1report_runner(pu_list, ssd, kwargs):
+    debug = kwargs.get('debug', False)
     if debug:
-        import molass.Progress.ProgessUtils
-        reload(molass.Progress.ProgessUtils)
         import molass.LowRank.PairedRange
         reload(molass.LowRank.PairedRange)
         import molass.Reports.V1GuinierReport
         reload(molass.Reports.V1GuinierReport)
-    from molass.Progress.ProgessUtils import ProgressSet
+        import molass.Reports.Controller
+        reload(molass.Reports.Controller)
     from molass.LowRank.PairedRange import convert_to_flatranges
     from molass.Reports.V1GuinierReport import make_guinier_report
+    from molass.Reports.Controller import Controller
 
-    if bookfile is None:
-        bookfile = "book1.xlsx"
+    controller = Controller()
+
+    bookfile = kwargs.get('bookfile', "book1.xlsx")
+    conc_info = kwargs.get('conc_info', None)
+    rg_info = kwargs.get('rg_info', None)
+    lr_info = kwargs.get('lr_info', None)
+    ranges = kwargs.get('ranges', None)
+ 
 
     if conc_info is None:
         conc_info = ssd.make_conc_info()
@@ -47,18 +73,5 @@ def make_v1report_impl(ssd, bookfile=None, conc_info=None, rg_info=None, lr_info
                     lr_info=lr_info,
                     ranges=ranges,
                     bookfile=bookfile)
- 
-    ps = ProgressSet()
 
-    pu = ps.add_unit(10)
-    kwargs = {}
-    kwargs['debug'] = debug
-
-    tread1 = threading.Thread(target=make_guinier_report, args=[pu, ri, kwargs])
-    tread1.start()
-
-    with tqdm(ps) as t:
-        for j, ret in enumerate(t):
-            t.set_description(str(([j], ret)))
-
-    tread1.join()
+    make_guinier_report(pu_list[0], controller, ri, kwargs)

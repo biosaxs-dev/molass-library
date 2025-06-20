@@ -55,17 +55,8 @@ class Controller:
         self.excel_client = None
         CoUninitialize()
 
-    def make_v1report(self, ssd, *args, **kwargs):
-        """ssd.ake_excel_report(lw_info, rgcurve, rgcurve_atsas)
-
-        Parameters
-        ----------
-        None
+    def stop_check(self):
         """
-        debug = kwargs.get('debug', False)
-        if debug:
-            from importlib import reload
-            import molass.Reports.V1Report
-            reload(molass.Reports.V1Report)
-        from  molass.Reports.V1Report import make_v1report_impl
-        make_v1report_impl(self, ssd, *args, **kwargs)
+        Check if the controller should stop.
+        """
+        self.logger.warning('stop_check is not implemented in Controller.')

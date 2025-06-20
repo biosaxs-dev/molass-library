@@ -58,5 +58,5 @@ def make_lowrank_info_impl(ssd, num_components, ranks, **kwargs):
 def select_components(ssd, xr_ccurves, uv_ccurves):
     import logging
     logger = logging.getLogger(__name__)
-    logger.warning('developper memo: remember that "LowRank.CoupledAdjuster.select_components" is not implemented yet.')
+    logger.warning('developer memo: remember that "LowRank.CoupledAdjuster.select_components" is not implemented yet.')
     return xr_ccurves, uv_ccurves

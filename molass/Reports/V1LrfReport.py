@@ -8,74 +8,45 @@ from time import sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_lrf_report(controller, punit, ri, kwargs):
+def make_lrf_report(punit, controller, ri, kwargs):
+    """
+    Make a report for the LRF Analysis.
+
+    Migrated from molass_legacy.StageExtrapolation.control_extrapolation().
+    """
     debug = kwargs.get('debug')
     if debug:
-        import molass_legacy.Reports.ZeroExtrapolationResultBook
-        reload(molass_legacy.Reports.ZeroExtrapolationResultBook)
-        import molass_legacy.Reports.ZeroExtrapolationOverlayBook
-        reload(molass_legacy.Reports.ZeroExtrapolationOverlayBook)
-        import molass.Reports.Migrating
-        reload(molass.Reports.Migrating)
-        import molass.Reports.Controller
-        reload(molass.Reports.Controller)
-    from molass_legacy.Reports.ZeroExtrapolationOverlayBook import ZeroExtrapolationOverlayBook
-    from molass.Reports.Migrating import make_gunier_row_values
-    from molass.Reports.Controller import Controller
+        import molass_legacy.SerialAnalyzer.StageExtrapolation
+        reload(molass_legacy.SerialAnalyzer.StageExtrapolation)
+    from molass_legacy.SerialAnalyzer.StageExtrapolation import prepare_extrapolation, do_extrapolation, clean_tempfolders
 
-    wb = ri.wb
-    ws = ri.ws
-    ssd = ri.ssd
-    mo_rgcurve, at_rgcurve = ri.rg_info
-    x, y = ri.conc_info.curve.get_xy()
-    num_rows = len(x)
-
-    row_list = []
-
-    if WRITE_TO_TEMPFILE:
-        fh = open("temp.csv", "w")
+    if len(ri.ranges) > 0:
+        controller.logger.info('Starting LRF report generation...')
+        controller.ri = ri
+        controller.applied_ranges = ri.ranges
+        convert_to_guinier_result_array(controller, ri.rg_info)
+        prepare_extrapolation(controller)
+        try:
+            do_extrapolation(controller)
+            clean_tempfolders(controller)
+        except:
+            from molass_legacy.KekLib.ExceptionTracebacker import log_exception
+            log_exception(controller.logger, 'Error during make_lrf_report: ')
+            punit.tell_error()
     else:
-        fh = None
-    num_steps = len(punit)
-    cycle = len(x)//num_steps
-    rows = []
-    for i in range(num_rows):
-        sleep(0.1)
-        j = mo_rgcurve.index_dict.get(i)
-        if j is None:
-            mo_result = None
-        else:
-            mo_result = mo_rgcurve.results[j]
-            mo_quality = mo_result.quality_object
-        k = at_rgcurve.index_dict.get(i)
-        if k is None:
-            at_result = None
-        else:
-            at_result = at_rgcurve.results[k]
-
-        values = make_gunier_row_values(mo_result, at_result, return_selected=True)
-
-        conc = y[i]
-        values = [None, None, conc] + values
-
-        if fh is not None:
-            fh.write(','.join(["" if v is None else "%g" % v for v in values]) + "\n")
-
-        rows.append(values)
-
-        if i % cycle == 0:
-            punit.step_done()
-
-    if fh is not None:
-        fh.close()
-
-    j0 = int(x[0])
-    controller = Controller()
-    book = GuinierAnalysisResultBook(wb, ws, rows, j0, parent=controller)
-    ranges = ri.ranges
-
-    bookfile = ri.bookfile
-    book.save(bookfile)
-    book.add_annonations(bookfile, ri.ranges)
+        controller.logger.warning( 'No range for LRF was found.' )
 
     punit.all_done()
+
+def convert_to_guinier_result_array(controller, rg_info):
+    from molass_legacy.AutorgKek.LightObjects import LightIntensity, LightResult
+    controller.logger.info('Converting to Guinier result array...')
+    
+    guinier_result_array = []
+    for k, (mo_result, at_result) in enumerate(zip(rg_info[0].results, rg_info[1].results)):
+        light_intensity = LightIntensity(mo_result.intensity)
+        light_result    = LightResult(mo_result)
+        guinier_result_array.append([light_intensity, light_result, at_result])
+
+    controller.gu_result_array = guinier_result_array
+    controller.logger.info('Conversion to Guinier result array completed.')
