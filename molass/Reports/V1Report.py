@@ -56,8 +56,7 @@ def make_v1report_runner(pu_list, ssd, kwargs):
         rg_info = (mo_rgcurve, at_rgcurve)
 
     if decomposition is None:
-        from molass.LowRank.CoupledAdjuster import make_lowrank_info_impl
-        decomposition = ssd.quick_lowrank_info()
+        decomposition = ssd.quick_decomposition()
 
     if ranges is None:
         ranges = decomposition.make_v1report_ranges()
