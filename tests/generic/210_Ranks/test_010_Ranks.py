@@ -4,7 +4,6 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-import pytest
 import matplotlib.pyplot as plt
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
@@ -12,28 +11,15 @@ from molass.Local import get_local_settings
 local_settings = get_local_settings()
 DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
 TUTORIAL_DATA = local_settings['TUTORIAL_DATA']
-from molass.DataObjects import SecSaxsData as SSD
 
-@pytest.fixture(scope="module")
-def corrected_ssd_instance():
-    print("Fixture executed")
+def test_010_estimate_ranks():
+    from molass.DataObjects import SecSaxsData as SSD
     ssd = SSD(TUTORIAL_DATA)
     trimmed_ssd = ssd.trimmed_copy()
     corrected_copy = trimmed_ssd.corrected_copy()
-    return corrected_copy
-
-def test_010_default(corrected_ssd_instance):
-    ssd = corrected_ssd_instance
-    ssd.estimate_mapping()
-    lr_info = ssd.quick_lowrank_info()
-    lr_info.plot_components(debug=True)
-
-def test_020_num_components(corrected_ssd_instance):
-    ssd = corrected_ssd_instance
-    ssd.estimate_mapping()
-    lr_info = ssd.quick_lowrank_info(num_components=3)
-    lr_info.plot_components(debug=True)
+    ranks = corrected_copy.estimate_ranks()
+    assert ranks == [1, 1, 1], f"Expected ranks [1, 1, 1], got {ranks}"
 
 if __name__ == "__main__":
-    test_010_default()
+    test_010_estimate_ranks()
     # plt.show()

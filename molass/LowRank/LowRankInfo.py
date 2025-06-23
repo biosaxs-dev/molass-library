@@ -27,7 +27,7 @@ def get_denoised_data( D, rank=3, svd=None ):
         D_  = np.array(D)
     return D_
 
-def compute_lowrank_matrices(M, ccurves, E=None, **kwargs):
+def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
     """
     Compute the matrices for the low rank approximation.
     """
@@ -42,12 +42,13 @@ def compute_lowrank_matrices(M, ccurves, E=None, **kwargs):
     M_ = get_denoised_data(M, rank=svd_rank)
     C = np.array([c.get_xy()[1] for c in ccurves])
     P = M_ @ np.linalg.pinv(C)
-    if E is not None:
+    if E is None:
+        Pe = None
+    else:
         # propagate the error
         from molass.LowRank.ErrorPropagate import compute_propagated_error
         Pe = compute_propagated_error(M_, P, E)
-    else:
-        Pe = None
+        
     return M_, C, P, Pe
 
 class LowRankInfo:
@@ -56,27 +57,21 @@ class LowRankInfo:
     which includes the result of decomposition by LowRank.Decomposer.
     """
 
-    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs):
+    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, ranks, **kwargs):
         """
         """
-
-        debug = kwargs.get('debug', False)
-        if debug:
-            from importlib import reload
-            import molass.LowRank.ErrorPropagate
-            reload(molass.LowRank.ErrorPropagate)
-        from molass.LowRank.ErrorPropagate import compute_propagated_error
         assert len(xr_ccurves) == len(uv_ccurves)
         self.rank = len(xr_ccurves)
         self.qv = ssd.xr.qv
         self.xr_icurve = xr_icurve
         self.xr_ccurves = xr_ccurves
-        self.xr_matrices = compute_lowrank_matrices(ssd.xr.M, xr_ccurves, E=ssd.xr.E, **kwargs)
+        self.xr_matrices = compute_lowrank_matrices(ssd.xr.M, xr_ccurves, ssd.xr.E, ranks, **kwargs)
     
         self.wv = ssd.uv.wv
         self.uv_icurve = uv_icurve
         self.uv_ccurves = uv_ccurves
-        self.uv_matrices = compute_lowrank_matrices(ssd.uv.M, uv_ccurves, E=ssd.uv.E, **kwargs)
+        uv_ranks = [1] * len(uv_ccurves)
+        self.uv_matrices = compute_lowrank_matrices(ssd.uv.M, uv_ccurves, ssd.uv.E, uv_ranks, **kwargs)
 
         self.mapping = ssd.mapping
 

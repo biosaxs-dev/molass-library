@@ -404,8 +404,8 @@ class SecSaxsData:
         from molass.DataUtils.Concentration import make_concinfo_impl
         return make_concinfo_impl(self, mapping, **kwargs)
     
-    def quick_lowrank_info(self, num_components=None, ranks=None, **kwargs):
-        """ssd.make_lowrank_info(elution_model='egh')
+    def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
+        """ssd.quick_decomposition()
 
         Returns a lowrank information object.
 
@@ -419,28 +419,37 @@ class SecSaxsData:
             Specifies the elution model to be used.
             The default is 'egh'.
         """
+        
         debug = kwargs.get('debug', False)
         if debug:
-            import molass.LowRank.CoupledAdjuster
-            reload(molass.LowRank.CoupledAdjuster)
-        from molass.LowRank.CoupledAdjuster import make_lowrank_info_impl
-        if num_components is None:
-            if ranks is None:
-                if debug:
-                    import molass.LowRank.RankEstimator
-                    reload(molass.LowRank.RankEstimator)
-                from molass.LowRank.RankEstimator import estimate_rank
-                num_components = estimate_rank(self)
-                ranks = [1] * num_components
-            else:
-                num_components = len(ranks)
-        else:
-            if ranks is None:
-                ranks = [1] * num_components
-            else:
-                if num_components != len(ranks):
-                    from molass.Except.ExceptionTypes import InconsistentUseError
-                    raise InconsistentUseError("The number of components and ranks should be the same.")
+            import molass.LowRank.QuickImplement
+            reload(molass.LowRank.QuickImplement)
+        from molass.LowRank.QuickImplement import make_lowrank_info_impl
+
+        return make_lowrank_info_impl(self, num_components, ranks, **kwargs)
+
+    def quick_lowrank_info(self, num_components=None, ranks=None, **kwargs):
+        """ssd.quick_lowrank_info()
+
+        Returns a lowrank information object.
+
+        Parameters
+        ----------
+        num_components : int, optional
+            Specifies the number of components which also implies the SVD rank
+            used to denoise the matrix data.
+
+        elution_model : str, optional
+            Specifies the elution model to be used.
+            The default is 'egh'.
+        """
+        
+        debug = kwargs.get('debug', False)
+        if debug:
+            import molass.LowRank.QuickImplement
+            reload(molass.LowRank.QuickImplement)
+        from molass.LowRank.QuickImplement import make_lowrank_info_impl
+
         return make_lowrank_info_impl(self, num_components, ranks, **kwargs)
 
     def inspect_ip_effect(self, debug=False):
