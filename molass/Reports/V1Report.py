@@ -43,7 +43,7 @@ def make_v1report_runner(pu_list, ssd, kwargs):
     bookfile = kwargs.get('bookfile', "book1.xlsx")
     conc_info = kwargs.get('conc_info', None)
     rg_info = kwargs.get('rg_info', None)
-    lr_info = kwargs.get('lr_info', None)
+    decomposition = kwargs.get('decomposition', None)
     ranges = kwargs.get('ranges', None)
  
 
@@ -55,12 +55,12 @@ def make_v1report_runner(pu_list, ssd, kwargs):
         at_rgcurve = ssd.xr.compute_rgcurve_atsas()
         rg_info = (mo_rgcurve, at_rgcurve)
 
-    if lr_info is None:
+    if decomposition is None:
         from molass.LowRank.CoupledAdjuster import make_lowrank_info_impl
-        lr_info = ssd.quick_lowrank_info()
+        decomposition = ssd.quick_lowrank_info()
 
     if ranges is None:
-        ranges = lr_info.make_v1report_ranges()
+        ranges = decomposition.make_v1report_ranges()
 
     ranges = convert_to_flatranges(ranges)
 
@@ -70,7 +70,7 @@ def make_v1report_runner(pu_list, ssd, kwargs):
     ri = ReportInfo(ssd=ssd,
                     conc_info=conc_info,
                     rg_info=rg_info,
-                    lr_info=lr_info,
+                    decomposition=decomposition,
                     ranges=ranges,
                     bookfile=bookfile)
 

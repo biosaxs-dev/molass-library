@@ -17,11 +17,11 @@ def make_v1report(ssd, **kwargs):
     from molass.Reports.V1Report import make_v1report_impl
     make_v1report_impl(ssd, **kwargs)
 
-def make_v1report_ranges_impl(lr_info, area_ratio, debug=False):
+def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
     if debug:
         print("make_v1analysis_ranges_impl: area_ratio=", area_ratio)
 
-    components = lr_info.get_xr_components()
+    components = decomposition.get_xr_components()
 
     if debug:
         import matplotlib.pyplot as plt

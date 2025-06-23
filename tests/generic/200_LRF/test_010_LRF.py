@@ -25,14 +25,14 @@ def corrected_ssd_instance():
 def test_010_default(corrected_ssd_instance):
     ssd = corrected_ssd_instance
     ssd.estimate_mapping()
-    lr_info = ssd.quick_lowrank_info()
-    lr_info.plot_components(debug=True)
+    decomposition = ssd.quick_decomposition()
+    decomposition.plot_components(debug=True)
 
 def test_020_num_components(corrected_ssd_instance):
     ssd = corrected_ssd_instance
     ssd.estimate_mapping()
-    lr_info = ssd.quick_lowrank_info(num_components=3)
-    lr_info.plot_components(debug=True)
+    decomposition = ssd.quick_decomposition(num_components=3)
+    decomposition.plot_components(debug=True)
 
 if __name__ == "__main__":
     test_010_default()

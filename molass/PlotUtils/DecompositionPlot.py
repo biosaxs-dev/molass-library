@@ -7,7 +7,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
-def plot_components_impl(lr_info, **kwargs):
+def plot_components_impl(decomposition, **kwargs):
     debug = kwargs.get('debug', False)
     rgcurve = kwargs.get('rgcurve', None)
 
@@ -41,8 +41,8 @@ def plot_components_impl(lr_info, **kwargs):
     # UV Elution Curve
     ax1.set_xlabel("Frames")
     ax1.set_ylabel("Absorbance")
-    ax1.plot(*lr_info.uv_icurve.get_xy(), label="data")
-    for i, c in enumerate(lr_info.uv_ccurves):
+    ax1.plot(*decomposition.uv_icurve.get_xy(), label="data")
+    for i, c in enumerate(decomposition.uv_ccurves):
         x, y = c.get_xy()
         ax1.plot(x, y, ":", label="component-%d" % (i+1))
     ax1.legend()
@@ -50,9 +50,9 @@ def plot_components_impl(lr_info, **kwargs):
     # XR Elution Curve
     ax2.set_xlabel("Frames")
     ax2.set_ylabel("Scattering Intensity")
-    x, y = lr_info.xr_icurve.get_xy()
+    x, y = decomposition.xr_icurve.get_xy()
     ax2.plot(x, y, label="data")
-    for i, c in enumerate(lr_info.xr_ccurves):
+    for i, c in enumerate(decomposition.xr_ccurves):
         cx, cy = c.get_xy()
         ax2.plot(cx, cy, ":", label="component-%d" % (i+1))
     ax2.legend()
@@ -72,7 +72,7 @@ def plot_components_impl(lr_info, **kwargs):
 
     ranges = kwargs.get('ranges', None)
     if ranges is not None:
-        mapping = lr_info.mapping
+        mapping = decomposition.mapping
         uv_ylim = ax1.get_ylim()
         xr_ylim = ax2.get_ylim()
         for prange in ranges:
@@ -99,8 +99,9 @@ def plot_components_impl(lr_info, **kwargs):
     ax3.set_ylabel("Absorbance")
 
     # UV Absorbance Curves
-    wv = lr_info.wv
-    M, C, P = lr_info.uv_matrices[0:3]
+    wv = decomposition.uv.wv
+    uv_matrices = decomposition.get_uv_matrices(debug=debug)
+    M, C, P = uv_matrices[0:3]
     for i, pv in enumerate(P.T):
         ax3.plot(wv, pv, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
     ax3.legend()
@@ -109,8 +110,9 @@ def plot_components_impl(lr_info, **kwargs):
     ax4.set_xlabel(r"Q $[\AA^{-1}]$")
     ax4.set_ylabel(r"$\log_{10}(I)$")
 
-    qv = lr_info.qv
-    M, C, P = lr_info.xr_matrices[0:3]
+    qv = decomposition.xr.qv
+    xr_matrices = decomposition.get_xr_matrices(debug=debug)
+    M, C, P = xr_matrices[0:3]
     for i, pv in enumerate(P.T):
         ax4.plot(qv, pv, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
     ax4.legend()
@@ -126,7 +128,7 @@ def plot_components_impl(lr_info, **kwargs):
     ax6.set_xlabel("$QR_g$")
     ax6.set_ylabel(r"$(QR_g)^2 \times I(Q)/I_0$")
 
-    for i, xr_component in enumerate(lr_info.get_xr_components()):
+    for i, xr_component in enumerate(decomposition.get_xr_components()):
         data = xr_component.get_jcurve_array()
         pv = data[:,1]
         sg = SimpleGuinier(data)

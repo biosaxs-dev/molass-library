@@ -424,9 +424,9 @@ class SecSaxsData:
         if debug:
             import molass.LowRank.QuickImplement
             reload(molass.LowRank.QuickImplement)
-        from molass.LowRank.QuickImplement import make_lowrank_info_impl
+        from molass.LowRank.QuickImplement import make_decomposition_impl
 
-        return make_lowrank_info_impl(self, num_components, ranks, **kwargs)
+        return make_decomposition_impl(self, num_components, **kwargs)
 
     def quick_lowrank_info(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_lowrank_info()
