@@ -1,16 +1,30 @@
 # 
 import os
 
+def to_int_tuple(version_string):
+    """
+    Convert a version string to a tuple of integers.
+    
+    Parameters
+    ----------
+    version_string: str
+        A version string in the format 'major.minor.patch'.
+        
+    Returns
+    -------
+    tuple: A tuple of integers representing the version.
+    """
+    return tuple(int(part) for part in version_string.split('.'))
+
 class Version:
     def __init__(self, version_string):
         self.version_string = version_string
-        self.tuple = tuple([int(part) for part in version_string.split('.')])
 
     def __lt__(self, other):
-        return self.tuple < tuple(int(part) for part in other.split('.'))
+        return to_int_tuple(self.version_string) < to_int_tuple(other)
 
     def __ge__(self, other):
-        return self.tuple >= tuple(int(part) for part in other.split('.'))
+        return to_int_tuple(self.version_string) >= to_int_tuple(other)
 
     def __repr__(self):
         return self.version_string
