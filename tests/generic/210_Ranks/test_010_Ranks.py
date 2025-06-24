@@ -12,14 +12,15 @@ local_settings = get_local_settings()
 DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
 TUTORIAL_DATA = local_settings['TUTORIAL_DATA']
 
-def test_010_estimate_ranks():
+def test_010_compute_scds():
     from molass.DataObjects import SecSaxsData as SSD
     ssd = SSD(TUTORIAL_DATA)
     trimmed_ssd = ssd.trimmed_copy()
     corrected_copy = trimmed_ssd.corrected_copy()
-    ranks = corrected_copy.estimate_ranks()
-    assert ranks == [1, 1, 1], f"Expected ranks [1, 1, 1], got {ranks}"
+    decomposition = corrected_copy.quick_decomposition()
+    scds = decomposition.compute_scds()
+    assert scds == [1, 1, 1], f"Expected SCDs [1, 1, 1], got {scds}"
 
 if __name__ == "__main__":
-    test_010_estimate_ranks()
+    test_010_compute_scds()
     # plt.show()

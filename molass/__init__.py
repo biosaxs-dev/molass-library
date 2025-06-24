@@ -1,6 +1,20 @@
 # 
 import os
 
+class Version:
+    def __init__(self, version_string):
+        self.version_string = version_string
+        self.tuple = tuple([int(part) for part in version_string.split('.')])
+
+    def __lt__(self, other):
+        return self.tuple < tuple(int(part) for part in other.split('.'))
+
+    def __ge__(self, other):
+        return self.tuple >= tuple(int(part) for part in other.split('.'))
+
+    def __repr__(self):
+        return self.version_string
+
 def _get_version_impl(toml_only, file, package):
     """
     Internal implementation to retrieve the version of the package.
@@ -26,8 +40,8 @@ def get_version(toml_only=False):
     If pyproject.toml is not found, it falls back to using importlib.metadata
     to retrieve the version of the installed package.
 
-    Parameters:
-    ------------
+    Parameters
+    ----------
     toml_only: bool, optional
         If True, the function strictly reads the version from pyproject.toml.
         This is crucial to avoid confusion about the version being used,
@@ -39,8 +53,14 @@ def get_version(toml_only=False):
         installed package, it falls back to using importlib.metadata to retrieve
         this version.
 
-    Raises:
+    Returns
     -------
+    Version: The version of the package.
+        This value is returned as a Version object, which provides
+        comparison operators (as tuple of integers) for version strings.
+
+    Raises
+    ------
     AssertionError:
         If toml_only is True but pyproject.toml is not found. This ensures
         that the function behaves predictably in cases where the local
@@ -48,4 +68,4 @@ def get_version(toml_only=False):
 
     This docstring was improved in collaboration with GitHub Copilot.
     """
-    return  _get_version_impl(toml_only, __file__, __package__)
+    return Version(_get_version_impl(toml_only, __file__, __package__))

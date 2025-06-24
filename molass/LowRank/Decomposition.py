@@ -21,6 +21,7 @@ class Decomposition:
         """
         assert len(xr_ccurves) == len(uv_ccurves)
         self.num_components = len(xr_ccurves)
+        self.ssd = ssd
 
         self.xr = ssd.xr
         self.xr_icurve = xr_icurve
@@ -33,6 +34,7 @@ class Decomposition:
         self.uv_ranks = None
  
         self.mapping = ssd.mapping
+        self.paired_ranges = None
 
     def get_num_components(self):
         """
@@ -128,15 +130,18 @@ class Decomposition:
 
         return ret_components
 
-    def make_v1report_ranges(self, area_ratio=0.8, debug=False):
+    def get_paired_ranges(self, area_ratio=0.8, debug=False):
         """
+        Get the paired ranges.
         """
-        if debug:
-            import molass.Reports.ReportUtils
-            reload(molass.Reports.ReportUtils)
-        from molass.Reports.ReportUtils import make_v1report_ranges_impl
-        return make_v1report_ranges_impl(self, area_ratio, debug=debug)
-    
+        if self.paired_ranges is None:
+            if debug:
+                import molass.Reports.ReportUtils
+                reload(molass.Reports.ReportUtils)
+            from molass.Reports.ReportUtils import make_v1report_ranges_impl
+            self.paired_ranges = make_v1report_ranges_impl(self, area_ratio, debug=debug)
+        return self.paired_ranges
+
     def get_proportions(self):
         """
         Get the proportions of the components.
@@ -149,11 +154,11 @@ class Decomposition:
 
     def compute_scds(self, debug=False):
         """
-        Get the low rank information.
+        Get the list of SCDs (Score of Concentration Dependence) for the decomposition.
         """
         if debug:
-            import molass.LowRank.RankEstimator
-            reload(molass.LowRank.RankEstimator)
-        from molass.LowRank.RankEstimator import compute_scds_impl
-        return compute_scds_impl(self.xr_icurve, self.xr_ccurves, self.uv_icurve, self.uv_ccurves, debug=debug)
+            import molass.Backward.RankEstimator
+            reload(molass.Backward.RankEstimator)
+        from molass.Backward.RankEstimator import compute_scds_impl
+        return compute_scds_impl(self, debug=debug)
     
