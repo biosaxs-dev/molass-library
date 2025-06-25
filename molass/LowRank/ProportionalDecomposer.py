@@ -28,7 +28,7 @@ def decompose_icurve_proportionally(x, y, decompargs, **kwargs):
     n = len(proportions)
     if n == 0:
         raise ValueError("No peak proportions specified.")
-    tau_ratio = decompargs.get('tau_ratio', 0.6)
+    tau_limit = decompargs.get('tau_limit', 0.6)
     max_sigma = decompargs.get('max_sigma', 17)
 
     proportions = np.asarray(proportions)
@@ -83,7 +83,7 @@ def decompose_icurve_proportionally(x, y, decompargs, **kwargs):
             cy_list.append(cy)
             area = compute_egh_area_fast(h, s, t)
             area_list.append(area)
-            tau_penalty += max(0, t/s - tau_ratio)**2
+            tau_penalty += max(0, t/s - tau_limit)**2
         tau_penalty *= 1000
         ty = np.sum(cy_list, axis=0)
         order_penalty = min(0, np.min(np.diff(params[:,1])))*1000
