@@ -16,6 +16,13 @@ dependencies = [
   "statsmodels",
   "scikit-learn",
   "toml",
+  "pywin32",
+  "psutil",
+  "seaborn",
+  "openpyxl",
+  "numba",
+  "numba",
+  "ruptures",
 ]
 
 requires-python = ">=3.9"

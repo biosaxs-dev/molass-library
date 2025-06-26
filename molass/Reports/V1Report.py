@@ -9,7 +9,13 @@ from molass.Reports.ReportInfo import ReportInfo
 def make_v1report_impl(ssd, **kwargs):
     """
 
-    """ 
+    """
+    from molass.PackageUtils.PyWin32Utils import check_pywin32_postinstall
+    if not check_pywin32_postinstall():
+        print("\nPlease run (possibly as administrator) the following command to fix the issue:")
+        print("python -m pywin32_postinstall -install\n")
+        raise RuntimeError("pywin32 post-installation has not been run or is incomplete.")
+
     from molass.Progress.ProgessUtils import ProgressSet
     ps = ProgressSet()
 
