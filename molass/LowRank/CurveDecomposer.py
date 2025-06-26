@@ -10,7 +10,16 @@ from scipy.optimize import minimize
 from molass_legacy.QuickAnalysis.ModeledPeaks import recognize_peaks
 from molass_legacy.Models.ElutionCurveModels import egh
 
-TAU_PENALTY_SCALE = 1000
+TAU_PENALTY_SCALE = 100
+NPLATES_PENALTY_SCALE = 1e-4
+VERY_SMALL_VALUE = 1e-10
+
+
+def safe_log10(x):
+    """
+    Compute the logarithm base 10 of x, returning a large negative number for non-positive x.
+    """
+    return np.log10(x) if x > VERY_SMALL_VALUE else -10
 
 def compute_areas(x, peak_list):
     areas = []
@@ -25,7 +34,7 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
     """
     from molass.LowRank.ComponentCurve import ComponentCurve
 
-    elution_model = kwargs.get('elution_model', 'egh')
+    curve_model = kwargs.get('curve_model', 'EGH')
     smoothing = kwargs.get('smoothing', False)
     debug = kwargs.get('debug', False)
 
@@ -57,32 +66,64 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
     ret_curves = []
     m = len(peak_list)
     if m > 0:
-        assert elution_model == 'egh'   # currently
+        assert curve_model == 'EGH'   # currently
         if decompargs is None:
-            areas = compute_areas(x, peak_list)
-            init_area_ratios = areas/np.sum(areas)
-
+ 
             n = len(peak_list[0])
             shape = (m,n)
             max_y = icurve.get_max_xy()[1]
-            tau_ratio = kwargs.get('tau_ratio', 0.5)
+            tau_limit = kwargs.get('tau_limit', 0.5)
             area_weight = kwargs.get('area_weight', 0.1)
+            proportions = kwargs.get('proportions', None)
+            if proportions is None:
+                areas = compute_areas(x, peak_list)
+                target_proportions = areas/np.sum(areas)
+            else:
+                target_proportions = np.array(proportions)
+
+            num_plates = kwargs.get('num_plates', None)
+            if num_plates is not None:
+                N = np.sqrt(num_plates)
+                params_array = np.array(peak_list)
+                main_peak = np.argmax(params_array[:, 0])  # find the main peak
+                main_params = peak_list[main_peak]
+                main_tR, main_sigma, main_tau = main_params[1:4]
+                tR = np.sqrt(main_sigma**2 + main_tau**2) * N
+                # tR = t - tI
+                tI = main_tR - tR
+                if debug:
+                    import matplotlib.pyplot as plt
+                    print(f"N={N}, main_peak={main_peak}, main_params={main_params}")
+                    fig, ax = plt.subplots()
+                    ax.set_title("decompose_icurve_impl debug")
+                    ax.plot(x, sy, label='sy')
+                    for i, params in enumerate(peak_list):
+                        cy = egh(x, *params)
+                        ax.plot(x, cy, ":", label=f'component {i+1}')
+                    ax.axvline(tI, color='red', linestyle='--', label='tI')        
+                    ax.legend()
+                    plt.show()
 
             def fit_objective(p):
                 cy_list = []
                 areas = []
                 tau_penalty = 0
+                ndev_penalty = 0
                 for h, tr, sigma, tau in p.reshape(shape):
                     cy = egh(x, h, tr, sigma, tau)
-                    tau_penalty += TAU_PENALTY_SCALE*max(0, abs(tau) - sigma*tau_ratio)
+                    tau_penalty += max(0, abs(tau) - sigma*tau_limit)
                     cy_list.append(cy)
                     areas.append(np.sum(cy))
+                    if num_plates is not None:
+                        ndev_penalty = ((tr - tI)**2 / (sigma**2 + tau**2) - N**2)**2
                 ty = np.sum(cy_list, axis=0)
-                arear_ratios = np.array(areas)/np.sum(areas)
-                return (np.sum((ty - sy)**2)
-                        + max_y * area_weight * np.sum((arear_ratios - init_area_ratios)**2)
-                        + tau_penalty)
-            
+                area_proportions = np.array(areas)/np.sum(areas)
+
+                return (safe_log10(np.sum((ty - sy)**2) + area_weight * max_y * np.sum((area_proportions - target_proportions)**2))
+                        + safe_log10(TAU_PENALTY_SCALE * tau_penalty)
+                        + safe_log10(NPLATES_PENALTY_SCALE * ndev_penalty)
+                        )
+
             res = minimize(fit_objective, np.concatenate(peak_list), method='Nelder-Mead')
             opt_params = res.x.reshape(shape)
         else:

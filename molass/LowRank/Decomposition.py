@@ -7,8 +7,6 @@
 """
 from importlib import reload
 import numpy as np
-import matplotlib.pyplot as plt
-from molass.LowRank.LowRankInfo import compute_lowrank_matrices
 
 class Decomposition:
     """
@@ -40,7 +38,7 @@ class Decomposition:
         """
         Get the number of components.
         """
-        return self.rank
+        return self.num_components
 
     def plot_components(self, **kwargs):
         """
@@ -148,8 +146,8 @@ class Decomposition:
         """
         n = self.get_num_components()
         props = np.zeros(n)
-        for i, c in enumerate(self.get_components()):
-            props[i] = c.compute_xr_area()
+        for i, c in enumerate(self.get_xr_components()):
+            props[i] = c.compute_area()
         return props/np.sum(props)
 
     def compute_scds(self, debug=False):

@@ -415,7 +415,7 @@ class SecSaxsData:
             Specifies the number of components which also implies the SVD rank
             used to denoise the matrix data.
 
-        elution_model : str, optional
+        curve_model : str, optional
             Specifies the elution model to be used.
             The default is 'egh'.
         """
@@ -439,7 +439,7 @@ class SecSaxsData:
             Specifies the number of components which also implies the SVD rank
             used to denoise the matrix data.
 
-        elution_model : str, optional
+        curve_model : str, optional
             Specifies the elution model to be used.
             The default is 'egh'.
         """
