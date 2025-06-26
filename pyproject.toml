@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.0.15"
+version = "0.0.16"
 
 dependencies = [
   "numpy",
-  "scipy",
+  "scipy<1.16.0",
   "matplotlib",
   "tqdm",
   "pybaselines",
