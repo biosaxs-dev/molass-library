@@ -3,6 +3,8 @@
 
     This module contains functions used to estimate the rank.
 """
+
+RANK2_SCD_LIMIT = 5.0
 class EcurveProxyCds:
     """
     A proxy class for Ecurve used in ConcDepend.
@@ -55,4 +57,5 @@ def scd_to_rank(scd):
     """
     Convert a single SCD value to a rank.
     """
-    return 1
+    rank = 1 if scd < RANK2_SCD_LIMIT else 2
+    return rank
