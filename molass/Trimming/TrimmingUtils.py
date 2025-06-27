@@ -72,7 +72,7 @@ def make_trimming_info_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None,
             flowchange = get_molass_options('flowchange')
 
         if flowchange == 'auto':
-            from molass.FlowChange.Property import possibly_has_flowchange_points
+            from molass.FlowChange.Possibility import possibly_has_flowchange_points
             flowchange = possibly_has_flowchange_points(ssd)
 
         if flowchange:

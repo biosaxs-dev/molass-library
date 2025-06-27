@@ -325,14 +325,35 @@ class SecSaxsData:
             
         return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamlineinfo=self.beamlineinfo, mapping=mapping)
 
-    def trimmed_copy(self, trim=None):
+    def trimmed_copy(self, trim=None, trimmed=True):
+        """ssd.trimmed_copy(trim=None, trimmed=True)
+
+        Parameters
+        ----------
+        trim : TrimmingInfo or dict, optional
+            The trimming information to apply to the copy. If not specified,
+            the current object's default trimming information will be used.
+
+        trimmed : bool, optional
+            The copy will be marked as specified.
+            If it is True, the copy will be marked as trimmed
+            and its default trimming information will be non-trimming values
+            to avoid minor inconsistencies which may arise due to the default
+            determination algorithm input differences.
+            In case this result is not desired, specify `trimmed=False`.
+
+        Returns
+        -------
+        SecSaxsData
+            A trimmed copy of the SSD object with the specified trimming specification applied.
+        """
         if trim is None:
             trim = self.make_trimming_info()
         elif type(trim) is dict:
             from molass.Trimming.TrimmingInfo import TrimmingInfo
             trim = TrimmingInfo(**trim)
         trimmed_mapping = trim.get_trimmed_mapping()
-        return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=True, mapping=trimmed_mapping)
+        return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=trimmed, mapping=trimmed_mapping)
 
     def corrected_copy(self):
         """ssd.corrected_copy()
@@ -464,3 +485,48 @@ class SecSaxsData:
             reload(molass.InterParticle.IpEffectInspect)
         from molass.InterParticle.IpEffectInspect import inspect_ip_effect_impl
         return inspect_ip_effect_impl(self, debug=debug)
+
+    def get_uv_device_id(self):
+        if self.beamlineinfo is None:
+            return None
+        else:
+            return self.beamlineinfo.uv_device_id
+
+    def get_beamline_name(self):
+        if self.beamlineinfo is None:
+            return None
+        else:
+            return self.beamlineinfo.name
+
+    def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
+        """ssd.export(folder, prefix=None)
+
+        Exports the data to a file.
+
+        Parameters
+        ----------
+        folder : str
+            Specifies the folder path where the data will be exported.
+
+        prefix : str, optional
+            Specifies the filename prefix to be used for the exported data.
+            If it is None, "PREFIX_" will be used.
+
+        fmt : str, optional
+            Specifies the format to be used for the exported data.
+            The default is '%.18e'.
+
+        xr_only : bool, optional
+            If True, only export XR data.
+
+        uv_only : bool, optional
+            If True, only export UV data.            
+
+        Returns
+        -------
+        filepath : str
+            The full path of the exported file.
+        """
+        from molass.DataUtils.ExportSsd import export_ssd_impl
+        uv_device_id = self.get_uv_device_id()
+        return export_ssd_impl(self, folder=folder, prefix=prefix, fmt=fmt, uv_device_id=uv_device_id, xr_only=xr_only, uv_only=uv_only)

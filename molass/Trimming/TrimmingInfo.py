@@ -2,6 +2,15 @@
     Trimming.TrimmingInfo.py
 """
 from molass.DataObjects.Curve import Curve
+
+def custom_slice_string(slice_):
+    """
+    Convert a slice object to a string representation.
+    This function removes the third 'None' from the representation of the slice:
+    e.g., slice(1, 2, None) -> "slice(1, 2)"
+    """
+    return str(slice_).replace(", None)", ")")
+
 class TrimmingInfo:
     def __init__(self, xr_slices=None, uv_slices=None, mapping=None):
         self.xr_slices = xr_slices
@@ -61,7 +70,8 @@ class TrimmingInfo:
         return ret_mapping
 
     def __repr__(self):
-        return f"TrimmingInfo(xr_slices={self.xr_slices}, uv_slices={self.uv_slices}, mapping={self.mapping})"
+        return "TrimmingInfo(xr_slices=%s, uv_slices=%s, mapping=%s)" % (
+            custom_slice_string(self.xr_slices), custom_slice_string(self.uv_slices), self.mapping)
     
     def __str__(self):
         return self.__repr__()

@@ -1,5 +1,5 @@
 """
-Flowchange.Property.py
+Flowchange.Possibility.py
 """
 
 def possibly_has_flowchange_points(ssd):
@@ -17,10 +17,8 @@ def possibly_has_flowchange_points(ssd):
         True if the ssd has flowchange points, False otherwise.    
     """
 
-    if ssd.beamlineinfo is None:
-        return False
-    elif ssd.beamlineinfo.name is None:
+    name = ssd.get_beamline_name()
+    if name is None:
         return False
 
-    # return ssd.beamlineinfo.name == "PF BL-10C"
-    return ssd.beamlineinfo.name[0:2] == "PF"   # some PF BL-15A2 data also have flowchange points
+    return name[0:2] == "PF"    # some PF BL-15A2 data also have flowchange points
