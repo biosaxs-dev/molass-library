@@ -12,10 +12,10 @@ def plot_components_impl(decomposition, **kwargs):
     rgcurve = kwargs.get('rgcurve', None)
 
     fig = plt.figure(figsize=(16, 8))
-    suptitle = kwargs.get('suptitle', None)
-    if suptitle is None:
-        suptitle = "Component Plot"
-    fig.suptitle(suptitle)
+    title = kwargs.get('title', None)
+    if title is None:
+        title = "Component Plot"
+    fig.suptitle(title)
 
     gs = GridSpec(2,10)
     for i, name in enumerate(["UV", "XR"]):

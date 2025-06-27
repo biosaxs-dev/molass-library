@@ -28,7 +28,10 @@ def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
     """
     Compute the matrices for the low rank approximation.
     """
-    rank = len(ccurves)
+    num_components = len(ccurves)
+    if ranks is None:
+        ranks = [1] * num_components
+    rank = np.sum(ranks)
     svd_rank = kwargs.get('svd_rank', None)
     if svd_rank is None:
         svd_rank = rank
@@ -37,13 +40,21 @@ def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
         raise InadequateUseError("svd_rank(%d) must not be less than number of components(%d)" % (svd_rank, rank))
     
     M_ = get_denoised_data(M, rank=svd_rank)
-    C = np.array([c.get_xy()[1] for c in ccurves])
+    cy_list = [c.get_xy()[1] for c in ccurves]
+    for k, r in enumerate(ranks):
+        if r > 1:
+            assert r == 2, "Only rank 2 is supported"
+            cy_list.append(cy_list[k] ** r)
+    C = np.array(cy_list)
     P = M_ @ np.linalg.pinv(C)
+    C_ = C[:num_components,:]   # ignore higher order components
+    P_ = P[:,:num_components]   # ignore higher order components
+
     if E is None:
         Pe = None
     else:
         # propagate the error
         from molass.LowRank.ErrorPropagate import compute_propagated_error
-        Pe = compute_propagated_error(M_, P, E)
+        Pe = compute_propagated_error(M_, P_, E)
         
-    return M_, C, P, Pe
+    return M_, C_, P_, Pe
