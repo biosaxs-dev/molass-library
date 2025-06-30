@@ -3,11 +3,25 @@
 
     Copyright (c) 2025, SAXS Team, KEK-PF
 """
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from molass.PlotUtils.MatrixPlot import simple_plot_3d
 
 def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
+    matrixplot_kwargs = {}
+    title = kwargs.pop('title', None)
+    with_2d_section_lines = kwargs.pop('with_2d_section_lines', False)
+    if with_2d_section_lines:
+        mapping = ssd.get_mapping()
+        xr_curve = mapping.xr_curve
+        uv_curve = mapping.uv_curve
+        alpha = 0.4
+    else:
+        alpha = 1
+    matrixplot_kwargs['cmap'] = 'coolwarm'
+    matrixplot_kwargs['alpha'] = alpha
+
     if xr_only or uv_only:
         ncols = 1
         figsize = (6,5)
@@ -15,6 +29,8 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
         ncols = 2
         figsize = (12,5)
     fig, axes = plt.subplots(ncols=ncols, figsize=figsize, subplot_kw=dict(projection='3d'))
+    if title is not None:
+        fig.suptitle(title)
 
     labelkwarg = dict(fontsize=9)
     tickkwarg = dict(labelsize=9)
@@ -35,67 +51,57 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
             ax1.set_xlabel("wavelength", **labelkwarg)
             ax1.set_ylabel("frames", **labelkwarg)
             ax1.set_zlabel("absorbance", **labelkwarg)
-            simple_plot_3d(ax1, uv.M, x=uv.iv, y=uv.jv, **kwargs)
+            simple_plot_3d(ax1, uv.M, x=uv.iv, y=uv.jv, **matrixplot_kwargs)
             for axis in [ax1.xaxis, ax1.yaxis, ax1.zaxis]:
                 axis.set_tick_params(**tickkwarg)
 
+        if with_2d_section_lines:   
+            uv_x, uv_y = uv_curve.get_xy()
+            ww = np.ones(len(uv_x)) * 280
+            ax1.plot(ww, uv_x, uv_y, color='green', label="280 nm section line")
+
+            m = xr_curve.get_max_i()
+            n = mapping.get_mapped_index(m, xr_curve.x, uv_curve.x)
+            uv_jcurve = ssd.uv.get_jcurve(j=n)
+            ff = np.ones(len(uv_jcurve.x)) * n
+            ax1.plot(uv_jcurve.x, ff, uv_jcurve.y, color="cyan", label="UV Absorbance at j=%d" % n)
+
+            ax1.legend()
+
     if ax2 is not None:
-        ax2.set_title("XR")
+        ax2.set_title("XR (X-ray)")
         xr = ssd.xr
         if xr is not None:
             ax2.set_xlabel("Q", **labelkwarg)
             ax2.set_ylabel("frames", **labelkwarg)
             ax2.set_zlabel("scattering", **labelkwarg)
-            simple_plot_3d(ax2, xr.M, x=xr.iv, y=xr.jv, **kwargs)
+            simple_plot_3d(ax2, xr.M, x=xr.iv, y=xr.jv, **matrixplot_kwargs)
             for axis in [ax2.xaxis, ax2.yaxis, ax2.zaxis]:
                 axis.set_tick_params(**tickkwarg)
+
+        if with_2d_section_lines:     
+            xr_x, xr_y = xr_curve.get_xy()
+            qq = np.ones(len(xr_x)) * 0.02
+            ax2.plot(qq, xr_x, xr_y, color='green', label=r"0.02 $\AA^{-1}$ section line")
+            xr_jcurve = ssd.xr.get_jcurve(j=m)
+            ff = np.ones(len(xr_jcurve.x)) * m
+            ax2.plot(xr_jcurve.x, ff, xr_jcurve.y, color="orange", alpha=0.5, label="XR Scattering at j=%d" % m)
+
+            ax2.legend()
 
     fig.tight_layout()
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2))
 
-def plot_baselines_impl(ssd, **kwargs):
-    fig = plt.figure(figsize=(11,8))
-    gs = GridSpec(2,7)
-
-    title = kwargs.get('title', None)
-    if title is not None:
-        fig.suptitle(title)
-
-    uv_icurve = ssd.uv.get_icurve()
-    uv_ibaseline = ssd.uv.get_ibaseline()
-
-    xr_icurve = ssd.xr.get_icurve()
-    xr_ibaseline = ssd.xr.get_ibaseline()
-
-    axes = []
-    for i, (name, c, b) in enumerate([("UV", uv_icurve, uv_ibaseline),
-                                      ("XR", xr_icurve, xr_ibaseline)]):
-        ax0 = fig.add_subplot(gs[i,0])
-        ax0.set_axis_off()
-        ax0.text(0.8, 0.5, name, va="center", ha="center", fontsize=20)
-
-        ax1 = fig.add_subplot(gs[i,1:4])
-        ax1.plot(c.x, c.y)
-        ax1.plot(b.x, b.y)
-
-        ax2 = fig.add_subplot(gs[i,4:7])
-
-        axes.append((ax0, ax1, ax2))
-
-    fig.tight_layout()
-
-    from molass.PlotUtils.PlotResult import PlotResult
-    return PlotResult(fig, axes)
-
-
 def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.TrimmingPlot import ij_from_slice
+    from molass.PlotUtils.TwinAxesUtils import align_zero_y
 
     debug = kwargs.get('debug', False)
 
     title = kwargs.pop('title', None)
+    baseline = kwargs.pop('baseline', False)
     ratio_curve = kwargs.pop('ratio_curve', False)
 
     trim = ssd.make_trimming_info()
@@ -105,9 +111,7 @@ def plot_compact_impl(ssd, **kwargs):
     x = xr_curve.x
     mp_curve = mapping.get_mapped_curve(xr_curve, uv_curve, inverse_range=True, debug=debug)
     xr_max_x, xr_max_y = xr_curve.get_max_xy()
-    _, uv_max_y = uv_curve.get_max_xy()
-    mp_y = mp_curve.y / uv_max_y * xr_max_y
-
+    
     fig = plt.figure(figsize=(12, 5))
     if title is not None:
         fig.suptitle(title)
@@ -115,14 +119,26 @@ def plot_compact_impl(ssd, **kwargs):
 
     # Plot the UV and XR elution curves
     ax1 = fig.add_subplot(gs[:, 0])
-    ax1.plot(mp_curve.x, mp_y, linestyle=":", color="C0", label="mapped UV Elution at wavelength=280")
     ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label="XR Elution at Q=0.02")
+    axt = ax1.twinx()
+    axt.grid(False)
+    axt.plot(mp_curve.x, mp_curve.y, linestyle=":", color="C0", label="mapped UV Elution at wavelength=280")
+    align_zero_y(ax1, axt)
+
+    if baseline:
+        uv_baseline = ssd.uv.get_ibaseline(debug=False)
+        xr_baseline = ssd.xr.get_ibaseline(debug=False)
+        mp_baseline = mapping.get_mapped_curve(xr_baseline, uv_baseline, inverse_range=True, debug=False)
+        ax1.plot(xr_baseline.x, xr_baseline.y, color='purple', label="XR Baseline")
+        axt.plot(mp_baseline.x, mp_baseline.y, color='red', label="UV Baseline")
+        axt.legend(loc="center left")
 
     ymin, ymax = ax1.get_ylim()
     ax1.set_ylim(ymin, ymax * 1.2)
     i, j = ij_from_slice(trim.xr_slices[1])
     ax1.axvspan(*x[[i,j]], color='green', alpha=0.1)
-    ax1.axvline(xr_max_x, color='yellow')    
+    ax1.axvline(xr_max_x, color='yellow')
+    ax1.set_xlabel("Frame Index for X-ray")    
     ax1.legend()
     if ratio_curve:
         axt = ax1.twinx()
@@ -142,6 +158,8 @@ def plot_compact_impl(ssd, **kwargs):
     uv_jslice = trim.uv_slices[0]
     i, j = ij_from_slice(uv_jslice)
     ax2.axvspan(*uv_jcurve.x[[i,j]], color='green', alpha=0.1)
+    ax2.axvline(280, color='yellow')  # Assuming 280 nm is the wavelength of interest
+    ax2.set_xlabel("Wavelength (nm)")
     ax2.legend()
 
     # Plot the XR spectral curve
@@ -153,6 +171,8 @@ def plot_compact_impl(ssd, **kwargs):
     xr_jslice = trim.xr_slices[0]
     i, j = ij_from_slice(xr_jslice)
     ax3.axvspan(*xr_jcurve.x[[i,j]], color='green', alpha=0.1)
+    ax3.axvline(0.02, color='yellow')  # Assuming xr_max_x is the Q value of interest
+    ax3.set_xlabel(r"Q ($\AA^{-1}$)")
     ax3.legend()
 
     fig.tight_layout()

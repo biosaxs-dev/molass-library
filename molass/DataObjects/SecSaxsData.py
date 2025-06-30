@@ -221,30 +221,18 @@ class SecSaxsData:
             self.make_trimming_info(**kwargs)
         return self.trimming_info
 
-    def plot_baselines(self, debug=True):
-        """ssd.plot_baselines()
-
-            Plots a pair of figures of UV and XR data, which include
-            baselines.
-
-            Parameters
-            ----------
-            None
-        """
-        if debug:
-            import molass.PlotUtils.SecSaxsDataPlot
-            reload(molass.PlotUtils.SecSaxsDataPlot)
-        from molass.PlotUtils.SecSaxsDataPlot import plot_baselines_impl
-        return plot_baselines_impl(self)
-
-    def plot_trimming_info(self, trim=None, **kwargs):
+    def plot_trimming_info(self, trim=None, baseline=False, title=None, **kwargs):
         """ssd.plot_trimming_info(trim)
 
         Plots a set of trimmming info.
 
         Parameters
         ----------
-        trim : 
+        trim : TrimmingInfo or dict, optional
+            The trimming information to be used for the plot.
+
+        baseline : bool, optional
+            If it is True, the baseline will be plotted.
 
         title : str, optional
             If specified, add a super title to the plot.
@@ -275,8 +263,6 @@ class SecSaxsData:
             import molass.PlotUtils.TrimmingPlot
             reload(molass.PlotUtils.TrimmingPlot)
         from molass.PlotUtils.TrimmingPlot import plot_trimming_info_impl
-        baseline = kwargs.pop('baseline', True)
-        title = kwargs.pop('title', None)
         if trim is None:
             trim = self.make_trimming_info(**kwargs)
         return plot_trimming_info_impl(self, trim, baseline=baseline, title=title, **kwargs)
