@@ -1,7 +1,5 @@
 """
     Baseline.LpmBaseline2D.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.PackageUtils.NumbaUtils import get_ready_for_numba
@@ -15,9 +13,9 @@ def individual_axes_impl(self, data, axes, method, method_kwargs):
     from functools import partial
     from pybaselines.two_d.optimizers import _check_scalar, _update_params
 
-    assert method == 'molass_lpm'
-    moment = method_kwargs.get('moment')
-    percent = moment.get_lpm_percent()
+    assert method == 'linear'
+    # moment = method_kwargs.get('moment')
+    # percent = moment.get_lpm_percent()
 
     axes, scalar_axes = _check_scalar(axes, 2, fill_scalar=False, dtype=int)
     if scalar_axes:

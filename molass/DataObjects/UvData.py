@@ -1,7 +1,5 @@
 """
     DataObjects.UvData.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 from molass.DataObjects.SsMatrixData import SsMatrixData
 from molass.DataObjects.Curve import Curve
@@ -15,7 +13,6 @@ class UvData(SsMatrixData):
     def __init__(self, iv, jv, M, E):
         super().__init__(iv, jv, M, E)
         self.wv = iv
-        self.moment = None
 
     def copy(self, **kwargs):
         ssd_copy = super().copy(**kwargs)
@@ -116,7 +113,11 @@ class UvData(SsMatrixData):
             reload(molass.Baseline.BaselineUtils)
         from molass.Baseline.BaselineUtils import get_uv_baseline_func
         icurve = self.get_icurve(pickat=pickat)
+        if method is None:
+            method = self.get_baseline_method()
         compute_baseline_impl = get_uv_baseline_func(method)
         kwargs['moment'] = self.get_moment()
+        if method == 'uvdiff':
+            kwargs['uv_data'] = self
         y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
         return Curve(icurve.x, y, type='i')

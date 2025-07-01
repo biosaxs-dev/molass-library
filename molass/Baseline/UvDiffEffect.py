@@ -1,7 +1,5 @@
 """
     Baseline.UvDiffEffect.py
-
-    Copyright (c) 2024, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.DataObjects.Curve import Curve
@@ -9,7 +7,7 @@ from molass.DataObjects.Curve import Curve
 STDRATIO_UPPER_LIMIT = 0.01
 
 def create_diff_spline(icurve):
-    from SerialAnalyzer.OptimalSmoothing import OptimalSmoothing
+    from molass_legacy.SerialAnalyzer.OptimalSmoothing import OptimalSmoothing
     x = icurve.x
     y = icurve.y
     m = np.argmax(y)
@@ -22,8 +20,8 @@ def create_diff_spline(icurve):
 
 class UvDiffEffect(Curve):
     def __init__(self, ssd, params=None):
-        from Baseline.UvBaseSpline import compute_baseline_impl
-        from Baseline.Constants import SLOPE_SCALE
+        from molass_legacy.Baseline.UvBaseSpline import compute_baseline_impl
+        from molass_legacy.Baseline.Constants import SLOPE_SCALE
         icurve = ssd.uv.get_icurve()
         diff_spline = create_diff_spline(icurve)
         x = icurve.x
@@ -59,6 +57,10 @@ def estimate_uvdiffeffect_params(curve1, curve2, fc_slice, diff_spline, pickat=N
     else:
         p_stdratio = np.nan
 
+    adjusted_scale, slope, intercept = dy_y_result.x
+    # baseline = dy*adjusted_scale + (x*slope + intercept)
+    baseline = dy*adjusted_scale
+
     if debug or plot_info is not None:
         if plot_info is None:
             import matplotlib.pyplot as plt
@@ -72,7 +74,6 @@ def estimate_uvdiffeffect_params(curve1, curve2, fc_slice, diff_spline, pickat=N
             axt.axvline(x_[i], color='yellow', label='flow change')
         if j is not None:
             axt.axvline(x_[j], ls=':', color='blue', label='flow change')
-        adjusted_scale, slope, intercept = dy_y_result.x
         axt.plot(x, dy, color='green', alpha=0.5, label=r'derivative at $\lambda=280$')
         cy = y - (x*slope + intercept)
         lambda_str = r'\geq 400' if pickat is None else "=%g" % pickat
@@ -95,7 +96,7 @@ def estimate_uvdiffeffect_params(curve1, curve2, fc_slice, diff_spline, pickat=N
         if plot_info is None:
             plt.show()
 
-    return np.concatenate([dy_y_result.x, [d_stdratio, p_stdratio]])
+    return np.concatenate([dy_y_result.x, [d_stdratio, p_stdratio]]), dy, baseline
 
 def compute_dfef_curve(x, dfef_params):
     y = np.zeros_like(x)

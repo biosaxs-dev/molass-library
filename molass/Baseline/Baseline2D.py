@@ -16,7 +16,7 @@ class Baseline2D(_Baseline2D):
 
     def individual_axes(self, data, axes=(0, 1), method='asls', method_kwargs=None, debug=True):
         """Override the method to use LPM baseline fitting"""
-        if method == 'molass_lpm':
+        if method == 'linear':
             if debug:
                 from importlib import reload
                 import molass.Baseline.LpmBaseline2D

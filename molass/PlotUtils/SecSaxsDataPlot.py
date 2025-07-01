@@ -129,8 +129,8 @@ def plot_compact_impl(ssd, **kwargs):
         uv_baseline = ssd.uv.get_ibaseline(debug=False)
         xr_baseline = ssd.xr.get_ibaseline(debug=False)
         mp_baseline = mapping.get_mapped_curve(xr_baseline, uv_baseline, inverse_range=True, debug=False)
-        ax1.plot(xr_baseline.x, xr_baseline.y, color='purple', label="XR Baseline")
-        axt.plot(mp_baseline.x, mp_baseline.y, color='red', label="UV Baseline")
+        ax1.plot(xr_baseline.x, xr_baseline.y, color='red', label="XR Baseline")
+        axt.plot(mp_baseline.x, mp_baseline.y, ls=':', color='red', label="UV Baseline")
         axt.legend(loc="center left")
 
     ymin, ymax = ax1.get_ylim()

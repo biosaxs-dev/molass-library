@@ -15,7 +15,7 @@ def test_010_20171203():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20171203")
     ssd = SSD(path)
-    print("Beamline:", ssd.beamlineinfo.name)
+    print("Beamline:", ssd.beamline_info.name)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
 
@@ -31,7 +31,7 @@ def test_020_20201127_2():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20201127_2")
     ssd = SSD(path)
-    print("Beamline:", ssd.beamlineinfo.name)
+    print("Beamline:", ssd.beamline_info.name)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
 
@@ -47,7 +47,7 @@ def test_022_20201127_3():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20201127_3")
     ssd = SSD(path)
-    print("Beamline:", ssd.beamlineinfo.name)
+    print("Beamline:", ssd.beamline_info.name)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
 
@@ -55,7 +55,7 @@ def test_030_20210323_1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20210323_1")
     ssd = SSD(path)
-    print("Beamline:", ssd.beamlineinfo.name)
+    print("Beamline:", ssd.beamline_info.name)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
 

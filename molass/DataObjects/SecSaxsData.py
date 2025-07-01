@@ -16,7 +16,7 @@ class SecSaxsData:
     def __init__(self, folder=None, object_list=None, uv_only=False, xr_only=False,
                  trimmed=False,
                  remove_bubbles=False,
-                 beamlineinfo=None,
+                 beamline_info=None,
                  mapping=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
@@ -42,7 +42,7 @@ class SecSaxsData:
             If it is True, the data will be treated as trimmed.
         remove_bubbles : bool, optional
             If it is True, bubbles will be removed from the data.
-        beamlineinfo : BeamlineInfo, optional
+        beamline_info : BeamlineInfo, optional
             If specified, the beamline information will be used.
         mapping : MappingInfo, optional
             If specified, the mapping information will be used.
@@ -79,7 +79,7 @@ class SecSaxsData:
                 from molass.DataUtils.UvLoader import load_uv
                 from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
                 uvM, wv = load_uv(folder)
-                beamlineinfo = get_beamlineinfo_from_settings()
+                beamline_info = get_beamlineinfo_from_settings()
             uvE = None
  
             if xrM is None:
@@ -100,7 +100,7 @@ class SecSaxsData:
         self.trimming_info = None
         self.trimmed = trimmed
         self.mapping = mapping
-        self.beamlineinfo = beamlineinfo
+        self.beamline_info = beamline_info
 
     def plot_3d(self, **kwargs):
         """ssd.plot_3d(view_init=None)
@@ -309,7 +309,7 @@ class SecSaxsData:
         else:
             uv_data = self.uv.copy(slices=uv_slices)
             
-        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamlineinfo=self.beamlineinfo, mapping=mapping)
+        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping)
 
     def trimmed_copy(self, trim=None, trimmed=True):
         """ssd.trimmed_copy(trim=None, trimmed=True)
@@ -340,6 +340,54 @@ class SecSaxsData:
             trim = TrimmingInfo(**trim)
         trimmed_mapping = trim.get_trimmed_mapping()
         return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=trimmed, mapping=trimmed_mapping)
+
+    def set_baseline_method(self, method):
+        """ssd.set_baseline_method(method)
+
+        Sets the baseline method to be used for the baseline correction.
+
+        Parameters
+        ----------
+        method : str or (str, str)
+            Specifies the baseline method to be used.
+            If it is a string, it will be used for both XR and UV data.
+            If it is a tuple of two strings, the first string will be used for XR data
+            and the second string will be used for UV data.
+
+        Returns
+        -------
+        None
+        """
+        if isinstance(method, str):
+            method = (method, method)
+        if self.xr is not None:
+            self.xr.set_baseline_method(method=method[0])
+        if self.uv is not None:
+            self.uv.set_baseline_method(method=method[1])
+
+    def get_baseline_method(self):
+        """ssd.get_baseline_method()
+
+        Returns the baseline method used for the baseline correction.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        method : (str, str)
+            A tuple of two strings which contains the baseline methods used for XR and UV data.
+            If the baseline method is the same for both XR and UV data,
+            it returns a single string instead of a tuple.
+        """
+        xr_method = self.xr.get_baseline_method() if self.xr is not None else None
+        uv_method = self.uv.get_baseline_method() if self.uv is not None else None
+        if xr_method == uv_method:
+            ret_method = xr_method
+        else:
+            ret_method = (xr_method, uv_method)
+        return ret_method
 
     def corrected_copy(self):
         """ssd.corrected_copy()
@@ -398,10 +446,10 @@ class SecSaxsData:
         return self.mapping
 
     def get_concfactor(self):
-        if self.beamlineinfo is None:
+        if self.beamline_info is None:
             return None
         else:
-            return self.beamlineinfo.get_concfactor()
+            return self.beamline_info.get_concfactor()
 
     def make_conc_info(self, mapping=None, **kwargs):
         debug = kwargs.get('debug', False)
@@ -473,16 +521,16 @@ class SecSaxsData:
         return inspect_ip_effect_impl(self, debug=debug)
 
     def get_uv_device_id(self):
-        if self.beamlineinfo is None:
+        if self.beamline_info is None:
             return None
         else:
-            return self.beamlineinfo.uv_device_id
+            return self.beamline_info.uv_device_id
 
     def get_beamline_name(self):
-        if self.beamlineinfo is None:
+        if self.beamline_info is None:
             return None
         else:
-            return self.beamlineinfo.name
+            return self.beamline_info.name
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
         """ssd.export(folder, prefix=None)

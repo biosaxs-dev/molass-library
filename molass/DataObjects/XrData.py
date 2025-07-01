@@ -1,7 +1,5 @@
 """
     DataObjects.XrData.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from importlib import reload
@@ -16,7 +14,6 @@ class XrData(SsMatrixData):
     def __init__(self, iv, jv, M, E):
         super().__init__(iv, jv, M, E)
         self.qv = iv
-        self.moment = None
 
     def copy(self, **kwargs):
         ssd_copy = super().copy(**kwargs)
@@ -91,6 +88,8 @@ class XrData(SsMatrixData):
             reload(molass.Baseline.BaselineUtils)
         from molass.Baseline.BaselineUtils import get_xr_baseline_func
         icurve = self.get_icurve(pickat=pickat)
+        if method is None:
+            method = self.get_baseline_method()
         compute_baseline_impl = get_xr_baseline_func(method)
         kwargs['moment'] = self.get_moment()
         y = compute_baseline_impl(icurve.x, icurve.y, kwargs)

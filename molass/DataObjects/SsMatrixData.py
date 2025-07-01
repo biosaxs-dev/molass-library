@@ -14,6 +14,8 @@ class SsMatrixData:
         self.jv = jv
         self.M = M
         self.E = E      # may be None
+        self.moment = None
+        self.baseline_method = 'linear'
 
     def copy(self, slices=None):
         if slices is None:
@@ -55,10 +57,17 @@ class SsMatrixData:
             self.moment = EghMoment(icurve)
         return self.moment
 
+    def set_baseline_method(self, method):
+        """Set the baseline method for this data object."""
+        self.baseline_method = method
+
+    def get_baseline_method(self):
+        """Get the baseline method for this data object."""
+        return self.baseline_method
+
     def get_baseline2d(self, **kwargs):
         from molass.Baseline import Baseline2D
-        method = kwargs.get('method', 'molass_lpm')
-        if method == 'molass_lpm':
+        if self.baseline_method == 'linear':
             moment = self.get_moment()
             default_kwargs = dict(moment=moment)
         else:
@@ -66,6 +75,6 @@ class SsMatrixData:
         method_kwargs = kwargs.get('method_kwargs', default_kwargs)
         baseline_fitter = Baseline2D(moment.x, self.iv)
         baseline, params_not_used = baseline_fitter.individual_axes(
-            self.M.T, axes=0, method=method, method_kwargs=method_kwargs
+            self.M.T, axes=0, method=self.baseline_method, method_kwargs=method_kwargs
         )
         return baseline.T
