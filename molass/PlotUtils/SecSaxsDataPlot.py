@@ -123,7 +123,6 @@ def plot_compact_impl(ssd, **kwargs):
     axt = ax1.twinx()
     axt.grid(False)
     axt.plot(mp_curve.x, mp_curve.y, linestyle=":", color="C0", label="mapped UV Elution at wavelength=280")
-    align_zero_y(ax1, axt)
 
     if baseline:
         uv_baseline = ssd.uv.get_ibaseline(debug=False)
@@ -132,6 +131,8 @@ def plot_compact_impl(ssd, **kwargs):
         ax1.plot(xr_baseline.x, xr_baseline.y, color='red', label="XR Baseline")
         axt.plot(mp_baseline.x, mp_baseline.y, ls=':', color='red', label="UV Baseline")
         axt.legend(loc="center left")
+
+    align_zero_y(ax1, axt)
 
     ymin, ymax = ax1.get_ylim()
     ax1.set_ylim(ymin, ymax * 1.2)

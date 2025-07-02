@@ -25,7 +25,7 @@ def align_zero_y(ax1, axt, debug=False):
         p2 = (0 - ymin2_) / (ymax2 - ymin2_)
         scale_ratio = (ymax1 - ymin1_) / (ymax2 - ymin2_)
         return (np.log10(max(VERY_SMALL_NUMBER, (p1 - p2)**2))
-                + np.log10(max(VERY_SMALL_NUMBER, (scale_ratio - original_scale_ratio)**2))
+                # + np.log10(max(VERY_SMALL_NUMBER, (scale_ratio - original_scale_ratio)**2))
                 + np.log10(max(VERY_SMALL_NUMBER, (ymin1_- ymin1)**2))
                 )
     
