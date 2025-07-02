@@ -15,7 +15,11 @@ def compute_lpm_baseline(x, y, kwargs):
     sbl = ScatteringBaseline(y, x=x)
     slope, intercept = sbl.solve()
     baseline = x*slope + intercept
-    return baseline
+    return_also_params = kwargs.get('return_also_params', False)
+    if return_also_params:
+        return baseline, dict(slope=slope, intercept=intercept)
+    else:
+        return baseline
 class LpmBaseline(Curve):
     def __init__(self, icurve):
         x = icurve.x     

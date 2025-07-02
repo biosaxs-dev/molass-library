@@ -10,14 +10,10 @@ PICKAT = PICKVALUES[0]
 class UvData(SsMatrixData):
     """
     UvData class for UV matrix data. """
-    def __init__(self, iv, jv, M, E):
-        super().__init__(iv, jv, M, E)
+    def __init__(self, iv, jv, M, E, **kwargs):
+        super().__init__(iv, jv, M, E, **kwargs)
         self.wv = iv
 
-    def copy(self, **kwargs):
-        ssd_copy = super().copy(**kwargs)
-        return UvData(ssd_copy.iv, ssd_copy.jv, ssd_copy.M, ssd_copy.E)
-    
     def get_ipickvalues(self):
         return PICKVALUES
 
@@ -118,6 +114,7 @@ class UvData(SsMatrixData):
         compute_baseline_impl = get_uv_baseline_func(method)
         kwargs['moment'] = self.get_moment()
         if method == 'uvdiff':
-            kwargs['uv_data'] = self
+            from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
+            kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
         y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
         return Curve(icurve.x, y, type='i')

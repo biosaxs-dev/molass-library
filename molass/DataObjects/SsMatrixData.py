@@ -7,15 +7,17 @@ import numpy as np
 from molass.DataObjects.Curve import create_icurve, create_jcurve
 
 class SsMatrixData:
-    def __init__(self, iv, jv, M, E):
+    def __init__(self, iv, jv, M, E,
+                 moment=None,
+                 baseline_method='linear'):
         self.iv = iv
         if jv is None:
             jv = np.arange(M.shape[1])
         self.jv = jv
         self.M = M
         self.E = E      # may be None
-        self.moment = None
-        self.baseline_method = 'linear'
+        self.moment = moment
+        self.baseline_method = baseline_method
 
     def copy(self, slices=None):
         if slices is None:
@@ -24,11 +26,14 @@ class SsMatrixData:
         else:
             islice, jslice = slices
         Ecopy = None if self.E is None else self.E[islice,jslice].copy()
-        return self.__class__(self.iv[islice].copy(),
-                              self.jv[jslice].copy(),
-                              self.M[islice,jslice].copy(),
-                              Ecopy,
-                              )
+        return self.__class__(  # __class__ is used to ensure that the correct subclass is instantiated
+                            self.iv[islice].copy(),
+                            self.jv[jslice].copy(),
+                            self.M[islice,jslice].copy(),
+                            Ecopy,
+                            moment=None,  # note that moment is not copied
+                            baseline_method=self.baseline_method,
+                            )
 
     def get_icurve(self, pickat):
         return create_icurve(self.jv, self.M, self.iv, pickat)
@@ -67,14 +72,21 @@ class SsMatrixData:
 
     def get_baseline2d(self, **kwargs):
         from molass.Baseline import Baseline2D
-        if self.baseline_method == 'linear':
-            moment = self.get_moment()
-            default_kwargs = dict(moment=moment)
+        debug = kwargs.get('debug', False)
+        counter = [0, 0, 0] if debug else None
+        if self.baseline_method in ['linear', 'uvdiff', 'integral']:
+            default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter)
+            if self.baseline_method == 'uvdiff':
+                from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
+                default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
         else:
             default_kwargs = {}
         method_kwargs = kwargs.get('method_kwargs', default_kwargs)
-        baseline_fitter = Baseline2D(moment.x, self.iv)
+        baseline_fitter = Baseline2D(self.jv, self.iv)
         baseline, params_not_used = baseline_fitter.individual_axes(
             self.M.T, axes=0, method=self.baseline_method, method_kwargs=method_kwargs
         )
+        if debug:
+            if counter is not None:
+                print(f"Baseline fitting completed with {counter} iterations.")  
         return baseline.T

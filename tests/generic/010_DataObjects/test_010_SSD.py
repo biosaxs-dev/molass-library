@@ -3,9 +3,7 @@
 """
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
-from molass.Local import get_local_settings
-local_settings = get_local_settings()
-TUTORIAL_DATA = local_settings['TUTORIAL_DATA']
+from molass_data import SAMPLE1
 
 import pytest
 from molass.DataObjects import SecSaxsData as SSD
@@ -13,7 +11,7 @@ from molass.DataObjects import SecSaxsData as SSD
 @pytest.fixture(scope="module")
 def ssd_instance():
     print("Fixture executed")
-    return SSD(TUTORIAL_DATA)
+    return SSD(SAMPLE1)
 
 def test_01_constructor(ssd_instance):
     assert ssd_instance is not None, "SSD object should not be None"

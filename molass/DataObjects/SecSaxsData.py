@@ -389,7 +389,7 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
-    def corrected_copy(self):
+    def corrected_copy(self, debug=False):
         """ssd.corrected_copy()
         
         Returns a deep copy of this object which has been corrected
@@ -397,16 +397,17 @@ class SecSaxsData:
         
         Parameters
         ----------
-        None
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
         """
 
         ssd_copy = self.copy(trimmed=self.trimmed)
 
-        baseline = ssd_copy.xr.get_baseline2d()
+        baseline = ssd_copy.xr.get_baseline2d(debug=debug)
         ssd_copy.xr.M -= baseline
 
         if ssd_copy.uv is not None:
-            baseline = ssd_copy.uv.get_baseline2d()
+            baseline = ssd_copy.uv.get_baseline2d(debug=debug)
             ssd_copy.uv.M -= baseline
 
         return ssd_copy

@@ -11,14 +11,10 @@ PICKAT = 0.02   # default value for pickat
 class XrData(SsMatrixData):
     """
     XrData class for XR matrix data. """
-    def __init__(self, iv, jv, M, E):
-        super().__init__(iv, jv, M, E)
+    def __init__(self, iv, jv, M, E, **kwargs):
+        super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
 
-    def copy(self, **kwargs):
-        ssd_copy = super().copy(**kwargs)
-        return XrData(ssd_copy.iv, ssd_copy.jv, ssd_copy.M, ssd_copy.E)
- 
     def get_ipickvalue(self):
         return PICKAT
 
