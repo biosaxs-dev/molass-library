@@ -49,7 +49,8 @@ def compute_scds_impl(decomposition, **kwargs):
     rdr = RgDiffRatios(decomposition)
     rdr_hints = rdr.get_rank_hints()
     cds_list = cd.compute_judge_info(rdr_hints)
-    print(f"cds_list: {cds_list}")
+    if debug:
+        print(f"cds_list: {cds_list}")
     scds = [pair[1] for pair in cds_list]
     return scds
 
