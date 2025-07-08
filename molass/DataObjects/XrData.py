@@ -88,7 +88,7 @@ class XrData(SsMatrixData):
             method = self.get_baseline_method()
         compute_baseline_impl = get_xr_baseline_func(method)
         kwargs['moment'] = self.get_moment()
-        y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
+        y = compute_baseline_impl(icurve.x, icurve.y, **kwargs)
         return Curve(icurve.x, y, type='i')
 
     def compute_rgcurve(self, return_info=False, debug=False):

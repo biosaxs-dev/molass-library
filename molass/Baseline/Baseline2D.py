@@ -66,8 +66,7 @@ def _lpm_individual_axes_impl(self, data, axes, method, method_kwargs, debug=Fal
             if counter is not None:
                 counter[0] += 1
         x = kwargs.get('jv', None)
-        kwargs['return_also_params'] = True
-        return compute_lpm_baseline(x, data, kwargs)
+        return compute_lpm_baseline(x, data, return_also_params=True, **kwargs)
     
     return individual_axes_impl(self, data, axes, method, method_kwargs, _lpm_baseline_func)
 
@@ -82,9 +81,8 @@ def _uvdiff_individual_axes_impl(self, data, axes, method, method_kwargs, debug=
             if counter is not None:
                 counter[1] += 1
         x = kwargs.get('jv', None)
-        kwargs['uv_data'] = kwargs.get('ssmatrix', None)
-        kwargs['return_also_params'] = True
-        return compute_uvdiff_baseline(x, data, kwargs)
+        uvdiff_info=kwargs.get('uvdiff_info', None)
+        return compute_uvdiff_baseline(x, data, uvdiff_info, return_also_params=True)
 
     return individual_axes_impl(self, data, axes, method, method_kwargs, _uvdiff_baseline_func)
 
@@ -98,9 +96,8 @@ def _integral_individual_axes_impl(self, data, axes, method, method_kwargs, debu
             counter = kwargs.get('counter', None)
             if counter is not None:
                 counter[2] += 1
-        x = kwargs.get('jv', None)
-        kwargs['return_also_params'] = True
-        return compute_integral_baseline(x, data, kwargs)
+        x = None    # not used in this case
+        return compute_integral_baseline(x, data, return_also_params=True)
 
     return individual_axes_impl(self, data, axes, method, method_kwargs, _integral_baseline_func)
 

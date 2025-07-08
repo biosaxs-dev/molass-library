@@ -115,6 +115,7 @@ class UvData(SsMatrixData):
         kwargs['moment'] = self.get_moment()
         if method == 'uvdiff':
             from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
-            kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
-        y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
+            uvdiff_info = get_uvdiff_baseline_info(self)
+            kwargs['uvdiff_info'] = uvdiff_info
+        y = compute_baseline_impl(icurve.x, icurve.y, **kwargs)
         return Curve(icurve.x, y, type='i')

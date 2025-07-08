@@ -6,31 +6,31 @@ from molass.PackageUtils.NumbaUtils import get_ready_for_numba
 get_ready_for_numba()
 from pybaselines import Baseline
 
-def molass_lpm_impl(x, y, kwargs):
+def molass_lpm_impl(x, y, **kwargs):
     from molass.Baseline.LpmBaseline import compute_lpm_baseline
-    return compute_lpm_baseline(x, y, kwargs)
+    return compute_lpm_baseline(x, y, **kwargs)
 
-def molass_uvdiff_impl(x, y, kwargs):
+def molass_uvdiff_impl(x, y, **kwargs):
     import molass.Baseline.UvdiffBaseline
     reload(molass.Baseline.UvdiffBaseline)  
     from molass.Baseline.UvdiffBaseline import compute_uvdiff_baseline
-    return compute_uvdiff_baseline(x, y, kwargs)
+    return compute_uvdiff_baseline(x, y, **kwargs)
 
-def molass_integral_impl(x, y, kwargs):
+def molass_integral_impl(x, y, **kwargs):
     from molass.Baseline.IntegralBaseline import compute_integral_baseline
     return compute_integral_baseline(x, y)
 
-def pybaselines_asls_impl(x, y, kwargs):
+def pybaselines_asls_impl(x, y, **kwargs):
     baseline_fitter = Baseline(x_data=x)
     baseline = baseline_fitter.asls(y, lam=1e7, p=0.02)[0]
     return baseline
 
-def pybaselines_imor_impl(x, y, kwargs):
+def pybaselines_imor_impl(x, y, **kwargs):
     baseline_fitter = Baseline(x_data=x)
     baseline = baseline_fitter.imor(y, 10)[0]
     return baseline
 
-def pybaselines_mormol_impl(x, y, kwargs):
+def pybaselines_mormol_impl(x, y, **kwargs):
     baseline_fitter = Baseline(x_data=x)
     half_window = 100
     baseline = baseline_fitter.mormol(y, half_window, smooth_half_window=10, pad_kwargs={'extrapolate_window': 20})[0]
