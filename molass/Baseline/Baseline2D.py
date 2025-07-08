@@ -96,7 +96,7 @@ def _integral_individual_axes_impl(self, data, axes, method, method_kwargs, debu
             counter = kwargs.get('counter', None)
             if counter is not None:
                 counter[2] += 1
-        x = None    # not used in this case
+        x = kwargs.get('jv', None)  # but not used in this case
         return compute_integral_baseline(x, data, return_also_params=True)
 
     return individual_axes_impl(self, data, axes, method, method_kwargs, _integral_baseline_func)
