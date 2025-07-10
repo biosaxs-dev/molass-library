@@ -190,9 +190,7 @@ class SecSaxsData:
             reload(molass.Trimming.TrimmingUtils)
         from molass.Trimming.TrimmingUtils import make_trimming_info_impl
         flowchange = False if self.trimmed else None
-        if self.trimming_info is None:
-            self.trimming_info = make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
-        return self.trimming_info
+        return make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
 
     def get_trimming_info(self, **kwargs):
         """ssd.get_trimming_info()
@@ -311,8 +309,8 @@ class SecSaxsData:
             
         return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping)
 
-    def trimmed_copy(self, trim=None, trimmed=True):
-        """ssd.trimmed_copy(trim=None, trimmed=True)
+    def trimmed_copy(self, trim=None, trimmed=True, jranges=None, mapping=None):
+        """ssd.trimmed_copy(trim=None, trimmed=True, jranges=None)
 
         Parameters
         ----------
@@ -328,13 +326,20 @@ class SecSaxsData:
             determination algorithm input differences.
             In case this result is not desired, specify `trimmed=False`.
 
+        jranges : tuple of (double, double), optional
+            The ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
+
+        mapping : MappingInfo, optional
+            If specified, the mapping information will be used for the copy.
+            It must be provided if `jranges` is specified.
+
         Returns
         -------
         SecSaxsData
             A trimmed copy of the SSD object with the specified trimming specification applied.
         """
         if trim is None:
-            trim = self.make_trimming_info()
+            trim = self.make_trimming_info(jranges=jranges, mapping=mapping, debug=False)
         elif type(trim) is dict:
             from molass.Trimming.TrimmingInfo import TrimmingInfo
             trim = TrimmingInfo(**trim)

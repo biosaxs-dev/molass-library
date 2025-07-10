@@ -31,61 +31,84 @@ def make_and_slicepair(pair1, pair2, judge_info, debug=False):
     return start, stop
 
 def make_trimming_info_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None, flowchange=None,
-                            ip_effect_info=None, nsigmas=TRIMMING_NSIGMAS, nguiniers=None, debug=False):
-    # xr_slices
-    if ssd.xr is None or ssd.trimmed:
-        xr_islice = None
-        xr_jslice = None
+                            ip_effect_info=None, nsigmas=TRIMMING_NSIGMAS, nguiniers=None,
+                            jranges=None, mapping=None,
+                            debug=False):
+    if jranges is None:
+        # xr_slices
+        if ssd.xr is None or ssd.trimmed:
+            xr_islice = None
+            xr_jslice = None
+        else:
+            if xr_qr is None:
+                start, stop = ssd.xr.get_usable_qrange(ip_effect_info=ip_effect_info, nguiniers=nguiniers)
+            else:
+                start, stop = xr_qr
+            xr_islice = slice(start, stop)
+
+            if xr_mt is None:
+                from molass.Stats import EghMoment
+                xr_icurve = ssd.xr.get_icurve()
+                xr_mt = EghMoment(xr_icurve)
+            start, stop = xr_mt.get_nsigma_points(nsigmas)
+            xr_jslice = slice(start, stop)
+
+        # uv_slices
+        if ssd.uv is None or ssd.trimmed:
+            uv_islice = None
+            uv_jslice = None
+            mapping = ssd.mapping
+        else:
+            if uv_wr is None:
+                start, stop = ssd.uv.get_usable_wrange()
+            else:
+                start, stop = uv_wr
+            uv_islice = slice(start, stop)
+
+            if uv_mt is None:
+                from molass.Stats import EghMoment
+                uv_icurve = ssd.uv.get_icurve()
+                uv_mt = EghMoment(uv_icurve)
+            start, stop = uv_mt.get_nsigma_points(nsigmas)
+
+            if flowchange is None:
+                flowchange = get_molass_options('flowchange')
+
+            if flowchange == 'auto':
+                from molass.FlowChange.Possibility import possibly_has_flowchange_points
+                flowchange = possibly_has_flowchange_points(ssd)
+
+            if flowchange:
+                (i, j), judge_info = ssd.uv.get_flowchange_points()
+                start, stop = make_and_slicepair((start, stop), (i, j), judge_info)
+
+            uv_jslice = slice(start, stop)
+
+            if mapping is None:
+                if get_molass_options('mapped_trimming'):
+                    xr_jslice, uv_jslice, mapping = make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=debug)
+                    ssd.mapping = mapping
     else:
-        if xr_qr is None:
-            start, stop = ssd.xr.get_usable_qrange(ip_effect_info=ip_effect_info, nguiniers=nguiniers)
-        else:
-            start, stop = xr_qr
-        xr_islice = slice(start, stop)
+        # jranges is specified
+        if len(jranges) != 2 or len(jranges[0]) != 2 or len(jranges[1]) != 2:
+            raise ValueError("jranges must be a tuple of (start, end)")
 
-        if xr_mt is None:
-            from molass.Stats import EghMoment
-            xr_icurve = ssd.xr.get_icurve()
-            xr_mt = EghMoment(xr_icurve)
-        start, stop = xr_mt.get_nsigma_points(nsigmas)
-        xr_jslice = slice(start, stop)
+        from bisect import bisect_right
+        xr_islice = slice(None, None)
+        xr_jslice = slice(bisect_right(ssd.xr.jv, jranges[0][0]),
+                          bisect_right(ssd.xr.jv, jranges[0][1]))
 
-    # uv_slices
-    if ssd.uv is None or ssd.trimmed:
-        uv_islice = None
-        uv_jslice = None
-        mapping = ssd.mapping
-    else:
-        if uv_wr is None:
-            start, stop = ssd.uv.get_usable_wrange()
-        else:
-            start, stop = uv_wr
-        uv_islice = slice(start, stop)
+        uv_islice = slice(None, None)
+        uv_jslice = slice(bisect_right(ssd.uv.jv, jranges[1][0]),
+                          bisect_right(ssd.uv.jv, jranges[1][1]))
+        
+        assert mapping is not None, "Mapping must be provided when jranges is specified"
 
-        if uv_mt is None:
-            from molass.Stats import EghMoment
-            uv_icurve = ssd.uv.get_icurve()
-            uv_mt = EghMoment(uv_icurve)
-        start, stop = uv_mt.get_nsigma_points(nsigmas)
-
-        if flowchange is None:
-            flowchange = get_molass_options('flowchange')
-
-        if flowchange == 'auto':
-            from molass.FlowChange.Possibility import possibly_has_flowchange_points
-            flowchange = possibly_has_flowchange_points(ssd)
-
-        if flowchange:
-            (i, j), judge_info = ssd.uv.get_flowchange_points()
-            start, stop = make_and_slicepair((start, stop), (i, j), judge_info)
-
-        uv_jslice = slice(start, stop)
-
-        if get_molass_options('mapped_trimming'):
-            xr_jslice, uv_jslice, mapping = make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=debug)
-            ssd.mapping = mapping
-        else:
-            mapping = None
+    if debug:
+        print("xr_islice:", xr_islice)
+        print("xr_jslice:", xr_jslice)
+        print("uv_islice:", uv_islice)
+        print("uv_jslice:", uv_jslice)
 
     return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping)
 

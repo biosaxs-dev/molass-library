@@ -103,6 +103,7 @@ def plot_compact_impl(ssd, **kwargs):
     title = kwargs.pop('title', None)
     baseline = kwargs.pop('baseline', False)
     ratio_curve = kwargs.pop('ratio_curve', False)
+    moment_lines = kwargs.pop('moment_lines', False)
 
     trim = ssd.make_trimming_info()
     mapping = ssd.get_mapping()
@@ -140,7 +141,7 @@ def plot_compact_impl(ssd, **kwargs):
     ax1.axvspan(*x[[i,j]], color='green', alpha=0.1)
     ax1.axvline(xr_max_x, color='yellow')
     ax1.set_xlabel("Frame Index for X-ray")    
-    ax1.legend()
+
     if ratio_curve:
         axt = ax1.twinx()
         axt.grid(False)
@@ -149,6 +150,27 @@ def plot_compact_impl(ssd, **kwargs):
         ymin, ymax = axt.get_ylim()
         axt.set_ylim(0, ymax * 1.2)
         axt.legend(loc="center left")
+
+    if moment_lines:
+        moment = xr_curve.get_moment()
+        xmin, xmax = ax1.get_xlim()
+        for n in [1, 2, 3]:
+            i, j = moment.get_nsigma_points(n)
+            xi = xr_curve.x[i]
+            xj = xr_curve.x[j]
+            label= r'XR n-$\sigma$ bounds' if n == 1 else None
+            labeled = False
+            if xi >= xmin:
+                ax1.axvline(xi, color='gray', linestyle=':', alpha=0.5, label=label)
+                labeled = True
+            if xj <= xmax:
+                if labeled:
+                    label = None
+                ax1.axvline(xj, color='gray', linestyle=':', alpha=0.5, label=label)
+    else:
+        moment = None
+
+    ax1.legend()
 
     # Plot the UV spectral curve
     ax2 = fig.add_subplot(gs[0, 1])
@@ -182,4 +204,6 @@ def plot_compact_impl(ssd, **kwargs):
         plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
-    return PlotResult(fig, (ax1, ax2, ax3))
+    return PlotResult(fig, (ax1, ax2, ax3),
+                      mapping=mapping, xr_curve=xr_curve, uv_curve=uv_curve, mp_curve=mp_curve,
+                      moment=moment)

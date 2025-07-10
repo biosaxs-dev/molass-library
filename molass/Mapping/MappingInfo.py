@@ -22,6 +22,7 @@ class MappingInfo:
         return self.__repr__()
 
     def get_mapped_x(self, xr_x):
+        xr_x = np.asarray(xr_x)
         return xr_x * self.slope + self.intercept
 
     def get_mapped_index(self, i, xr_x, uv_x):
