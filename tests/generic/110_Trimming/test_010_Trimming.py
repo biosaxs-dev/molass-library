@@ -14,9 +14,9 @@ def test_010_PKS():
     from molass.DataObjects import SecSaxsData as SSD
     # path = os.path.join(DATA_ROOT_FOLDER, "20211222", "PKS")
     ssd = SSD(SAMPLE2)
-    ssd.plot_trimming_info(debug=True)
+    ssd.plot_trimming(debug=True)
     trimmed_ssd = ssd.trimmed_copy()
-    trimmed_ssd.plot_trimming_info(debug=True)
+    trimmed_ssd.plot_trimming(debug=True)
 
 if __name__ == "__main__":
     test_010_PKS()

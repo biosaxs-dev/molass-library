@@ -97,7 +97,6 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
-        self.trimming_info = None
         self.trimmed = trimmed
         self.mapping = mapping
         self.beamline_info = beamline_info
@@ -157,8 +156,8 @@ class SecSaxsData:
         from molass.PlotUtils.SecSaxsDataPlot import plot_compact_impl
         return plot_compact_impl(self, **kwargs)
 
-    def make_trimming_info(self, **kwargs):
-        """ssd.make_trimming_info(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
+    def make_trimming(self, **kwargs):
+        """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
         
         Returns a pair of indeces which should be used
         as a slice for the spectral axis to trim away
@@ -182,45 +181,18 @@ class SecSaxsData:
 
         Examples
         --------
-        >>> trim = ssd.make_trimming_info()
+        >>> trim = ssd.make_trimming()
         """
         debug = kwargs.get('debug', False)
         if debug:
             import molass.Trimming.TrimmingUtils
             reload(molass.Trimming.TrimmingUtils)
-        from molass.Trimming.TrimmingUtils import make_trimming_info_impl
+        from molass.Trimming.TrimmingUtils import make_trimming_impl
         flowchange = False if self.trimmed else None
-        return make_trimming_info_impl(self, flowchange=flowchange, **kwargs)
+        return make_trimming_impl(self, flowchange=flowchange, **kwargs)
 
-    def get_trimming_info(self, **kwargs):
-        """ssd.get_trimming_info()
-
-        Returns the trimming information object.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        trimming_info : TrimmingInfo
-            A TrimmingInfo object which contains the trimming information.
-            If the trimming information is not available, returns None.
-        
-        See Also
-        --------
-        ssd.make_trimming_info()        
-
-        Examples
-        --------
-        >>> trim = ssd.get_trimming_info()
-        """
-        if self.trimming_info is None:
-            self.make_trimming_info(**kwargs)
-        return self.trimming_info
-
-    def plot_trimming_info(self, trim=None, baseline=False, title=None, **kwargs):
-        """ssd.plot_trimming_info(trim)
+    def plot_trimming(self, trim=None, baseline=False, title=None, **kwargs):
+        """ssd.plot_trimming(trim)
 
         Plots a set of trimmming info.
 
@@ -246,24 +218,15 @@ class SecSaxsData:
             fig: Figure
             axes: Axes
             trimming : TrimmingInfo
-
-        See Also
-        --------
-        ssd.get_trimming_info()        
-
-        Examples
-        --------
-        >>> trim = ssd.get_trimming_info()
-        >>>      
         """
         debug = kwargs.get('debug', False)
         if debug:
             import molass.PlotUtils.TrimmingPlot
             reload(molass.PlotUtils.TrimmingPlot)
-        from molass.PlotUtils.TrimmingPlot import plot_trimming_info_impl
+        from molass.PlotUtils.TrimmingPlot import plot_trimming_impl
         if trim is None:
-            trim = self.make_trimming_info(**kwargs)
-        return plot_trimming_info_impl(self, trim, baseline=baseline, title=title, **kwargs)
+            trim = self.make_trimming(**kwargs)
+        return plot_trimming_impl(self, trim, baseline=baseline, title=title, **kwargs)
 
     def copy(self, xr_slices=None, uv_slices=None, trimmed=False, mapping=None):
         """ssd.copy(xr_slices=None, uv_slices=None)
@@ -284,16 +247,11 @@ class SecSaxsData:
             Otherwise, the returned copy contains the deep copies
             of elements uvM and wv.
 
-        See Also
-        --------
-        ssd.get_trimming_info()        
-
         Examples
         --------
         >>> copied_ssd = ssd.copy()
-
-        >>> ti = ssd.get_trimming_info()
-        >>> trimmed_ssd = ssd.copy(xr_slices=ti.xr_slices, uv_slices=ti.uv_slices)
+        >>> trimming = ssd.make_trimming()
+        >>> trimmed_ssd = ssd.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices)
 
         """
  
@@ -309,26 +267,15 @@ class SecSaxsData:
             
         return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping)
 
-    def trimmed_copy(self, trim=None, trimmed=True, jranges=None, mapping=None):
-        """ssd.trimmed_copy(trim=None, trimmed=True, jranges=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None)
 
         Parameters
         ----------
-        trim : TrimmingInfo or dict, optional
-            The trimming information to apply to the copy. If not specified,
-            the current object's default trimming information will be used.
-
-        trimmed : bool, optional
-            The copy will be marked as specified.
-            If it is True, the copy will be marked as trimmed
-            and its default trimming information will be non-trimming values
-            to avoid minor inconsistencies which may arise due to the default
-            determination algorithm input differences.
-            In case this result is not desired, specify `trimmed=False`.
-
+        trimming : TrimmingInfo, optional
+            If specified, the trimming information will be used for the copy.
         jranges : tuple of (double, double), optional
             The ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
-
         mapping : MappingInfo, optional
             If specified, the mapping information will be used for the copy.
             It must be provided if `jranges` is specified.
@@ -338,13 +285,11 @@ class SecSaxsData:
         SecSaxsData
             A trimmed copy of the SSD object with the specified trimming specification applied.
         """
-        if trim is None:
-            trim = self.make_trimming_info(jranges=jranges, mapping=mapping, debug=False)
-        elif type(trim) is dict:
-            from molass.Trimming.TrimmingInfo import TrimmingInfo
-            trim = TrimmingInfo(**trim)
-        trimmed_mapping = trim.get_trimmed_mapping()
-        return self.copy(xr_slices=trim.xr_slices, uv_slices=trim.uv_slices, trimmed=trimmed, mapping=trimmed_mapping)
+        if trimming is None:
+            trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
+        else:
+            assert jranges is None, "jranges must be None if trimming is specified."
+        return self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping)
 
     def set_baseline_method(self, method):
         """ssd.set_baseline_method(method)

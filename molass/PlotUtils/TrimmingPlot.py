@@ -18,7 +18,7 @@ def ij_from_slice(slice_):
         j = -1 if stop is None else stop
     return i, j
 
-def plot_trimming_info_impl(ssd, trim, **kwargs):
+def plot_trimming_impl(ssd, trim, **kwargs):
     if type(trim) is dict:
         from molass.Trimming.TrimmingInfo import TrimmingInfo
         trim = TrimmingInfo(**trim)

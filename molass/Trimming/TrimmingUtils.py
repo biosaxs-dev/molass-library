@@ -30,7 +30,7 @@ def make_and_slicepair(pair1, pair2, judge_info, debug=False):
         stop = None if l is None else min(j,l)
     return start, stop
 
-def make_trimming_info_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None, flowchange=None,
+def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None, flowchange=None,
                             ip_effect_info=None, nsigmas=TRIMMING_NSIGMAS, nguiniers=None,
                             jranges=None, mapping=None,
                             debug=False):

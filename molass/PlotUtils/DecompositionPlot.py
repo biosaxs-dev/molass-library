@@ -13,9 +13,8 @@ def plot_components_impl(decomposition, **kwargs):
 
     fig = plt.figure(figsize=(16, 8))
     title = kwargs.get('title', None)
-    if title is None:
-        title = "Component Plot"
-    fig.suptitle(title)
+    if title is not None:
+        fig.suptitle(title)
 
     gs = GridSpec(2,10)
     for i, name in enumerate(["UV", "XR"]):
@@ -140,7 +139,12 @@ def plot_components_impl(decomposition, **kwargs):
             color = 'gray' if j == 0 else 'C%d'%(i+1)
             alpha = 0.5 if j == 0 else 1
             label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
-            ax5.plot(qv2, logy - sg.Iz, ":", color=color, alpha=alpha, label=label)
+            if j == 0:
+                ax5.plot(qv2, logy - np.log(sg.Iz), ":", color=color, alpha=alpha, label=label)
+            else:
+                slope = -sg.Rg**2/3
+                gy = qv2 * slope
+                ax5.plot(qv2, gy, color=color, alpha=alpha, label=label)
         
         qrg = qv*sg.Rg
         ax6.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))

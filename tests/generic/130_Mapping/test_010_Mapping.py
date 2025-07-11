@@ -57,7 +57,7 @@ def test_043_20161216():
     ssd = SSD(path)
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=True)
-    # ssd.plot_trimming_info(debug=True)
+    # ssd.plot_trimming(debug=True)
 
 def test_050_Sugiyama():
     from molass.DataObjects import SecSaxsData as SSD

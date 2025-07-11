@@ -105,7 +105,7 @@ def plot_compact_impl(ssd, **kwargs):
     ratio_curve = kwargs.pop('ratio_curve', False)
     moment_lines = kwargs.pop('moment_lines', False)
 
-    trim = ssd.make_trimming_info()
+    trim = ssd.make_trimming()
     mapping = ssd.get_mapping()
     xr_curve = mapping.xr_curve
     uv_curve = mapping.uv_curve

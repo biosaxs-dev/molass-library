@@ -6,7 +6,7 @@ It includes a wrapper to hide the Controller class.
 """
 import numpy as np
 
-MINOR_COMPONENT_MAX_PROP = 0.1
+MINOR_COMPONENT_MAX_PROP = 0.2
 
 def make_v1report(ssd, **kwargs):
     debug = kwargs.get('debug', False)
