@@ -20,3 +20,5 @@ htmlcov
 
 # Ignore the run_denss results
 **/temp/**
+
+*.xlsx
