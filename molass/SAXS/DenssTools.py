@@ -6,7 +6,7 @@ import os
 import numpy as np
 from molass.PackageUtils.NumbaUtils import get_ready_for_numba
 get_ready_for_numba()
-from denss.core import reconstruct_abinitio_from_scattering_profile
+from molass_legacy.DENSS.denss.core import reconstruct_abinitio_from_scattering_profile
 from .DetectorInfo import get_detector_info
 
 np.int = np.int32
