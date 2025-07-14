@@ -10,7 +10,7 @@ class SdProxy:
     def __init__(self, decomposition):
         self.ssd = decomposition.ssd
         self.xr_curve = decomposition.xr_icurve
-        self.paired_ranges = decomposition.get_paired_ranges()
+        self.paired_ranges = decomposition.get_pairedranges()
 
     def get_xr_data_separate_ly(self):
         xr = self.ssd.xr
@@ -20,4 +20,4 @@ class RgDiffRatios(LegacyRgDiffRatios):
     def __init__(self, decomposition):
         self.logger = logging.getLogger(__name__)
         self.sd = SdProxy(decomposition)
-        self.paired_ranges = decomposition.get_paired_ranges()
+        self.paired_ranges = decomposition.get_pairedranges()

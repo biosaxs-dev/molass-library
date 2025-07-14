@@ -16,15 +16,24 @@ def make_lrf_report(punit, controller, ri, kwargs):
     """
     debug = kwargs.get('debug')
     if debug:
+        import molass.Backward.SerialDataProxy
+        reload(molass.Backward.SerialDataProxy)
+        import molass.Backward.PreviewParams
+        reload(molass.Backward.PreviewParams)
         import molass_legacy.SerialAnalyzer.StageExtrapolation
         reload(molass_legacy.SerialAnalyzer.StageExtrapolation)
+    from molass.Backward.SerialDataProxy import SerialDataProxy
+    from molass.Backward.PreviewParams import make_preview_params
     from molass_legacy.SerialAnalyzer.StageExtrapolation import prepare_extrapolation, do_extrapolation, clean_tempfolders
 
-    if len(ri.ranges) > 0:
+    if len(ri.pairedranges) > 0:
         controller.logger.info('Starting LRF report generation...')
         controller.ri = ri
-        controller.applied_ranges = ri.ranges
-        convert_to_guinier_result_array(controller, ri.rg_info)
+        controller.applied_ranges = ri.pairedranges
+        controller.qvector = ri.ssd.xr.qv
+        sd = SerialDataProxy(ri.ssd, ri.concentration)
+        controller.preview_params = make_preview_params(sd=sd, paired_ranges=ri.list_ranges)
+        convert_to_guinier_result_array(controller, ri.rgcurves)
         prepare_extrapolation(controller)
         try:
             do_extrapolation(controller)
@@ -38,15 +47,20 @@ def make_lrf_report(punit, controller, ri, kwargs):
 
     punit.all_done()
 
-def convert_to_guinier_result_array(controller, rg_info):
+def convert_to_guinier_result_array(controller, rgcurves):
+    """
+    Convert the RG curves to a Guinier result array.
+    
+    """
     from molass_legacy.AutorgKek.LightObjects import LightIntensity, LightResult
     controller.logger.info('Converting to Guinier result array...')
     
     guinier_result_array = []
-    for k, (mo_result, at_result) in enumerate(zip(rg_info[0].results, rg_info[1].results)):
-        light_intensity = LightIntensity(mo_result.intensity)
+    intensities = rgcurves[0].intensities   # See RgCurve.construct_rgcurve_from_list
+    for k, (mo_result, at_result) in enumerate(zip(rgcurves[0].results, rgcurves[1].results)):
+        light_intensity = LightIntensity(intensities[k])
         light_result    = LightResult(mo_result)
         guinier_result_array.append([light_intensity, light_result, at_result])
 
-    controller.gu_result_array = guinier_result_array
+    controller.guinier_result_array = guinier_result_array
     controller.logger.info('Conversion to Guinier result array completed.')

@@ -28,8 +28,8 @@ def make_guinier_report(punit, controller, ri, kwargs):
         ws = wb.create_sheet('Guinier Analysis')
 
     ssd = ri.ssd
-    mo_rgcurve, at_rgcurve = ri.rg_info
-    x, y = ri.conc_info.curve.get_xy()
+    mo_rgcurve, at_rgcurve = ri.rgcurves
+    x, y = ri.concentration.curve.get_xy()
     num_rows = len(x)
 
     if WRITE_TO_TEMPFILE:
@@ -77,6 +77,6 @@ def make_guinier_report(punit, controller, ri, kwargs):
         print("Saving Guinier Analysis Report to", bookpath)
         book.save(bookpath)
         sleep(0.1)
-        book.add_annonations(bookpath, ri.ranges, debug=debug)
+        book.add_annonations(bookpath, ri.list_ranges, debug=debug)
 
     punit.all_done()

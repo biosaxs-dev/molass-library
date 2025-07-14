@@ -15,7 +15,14 @@ class PairedRange:
             ranges = [(range_[0], peak_index), (peak_index, range_[1])]
 
         self.ranges = ranges
-    
+
+    def get_fromto_list(self):
+        """
+        for backward compatibility to molass_legacy.AnalysisRangeInfo.PaoiredRange,
+        returns a list of tuples
+        """
+        return self.ranges
+
     def is_minor(self):
         return len(self.ranges) == 1
 
@@ -32,7 +39,7 @@ class PairedRange:
     def __repr__(self):
         return str(self.ranges)
 
-def convert_to_flatranges(pairedranges):
+def convert_to_list_pairedranges(pairedranges):
     ret_list = []
     for prange in pairedranges:
         for range_ in prange.ranges:

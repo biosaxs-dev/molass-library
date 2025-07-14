@@ -3,11 +3,11 @@
 
     Copyright (c) 2025, SAXS Team, KEK-PF
 """
-class ConcInfo:
+class Consentration:
     def __init__(self, curve):
         self.curve = curve
 
-def make_concinfo_impl(ssd, mapping, **kwargs):
+def compute_concentration_impl(ssd, mapping, **kwargs):
     debug = kwargs.get('debug', False)
 
     concfactor = kwargs.get('concfactor', None)
@@ -18,7 +18,7 @@ def make_concinfo_impl(ssd, mapping, **kwargs):
         mapping = ssd.estimate_mapping()
 
     if debug:
-        print("make_concinfo_impl: concfactor=", concfactor)
+        print("compute_concentration_impl: concfactor=", concfactor)
 
     if concfactor is None:
         from molass.Except.ExceptionTypes import NotSpecifedError
@@ -45,4 +45,4 @@ def make_concinfo_impl(ssd, mapping, **kwargs):
             fig.tight_layout()
             plt.show()
 
-    return ConcInfo(conc_curve*concfactor)
+    return Consentration(conc_curve*concfactor)

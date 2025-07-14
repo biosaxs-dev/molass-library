@@ -6,6 +6,16 @@ import logging
 import queue
 
 class ProgressUnit:
+    """    A unit of progress tracking.
+    This class represents a single unit of progress that can be tracked.
+    It allows for tracking the number of steps completed and provides methods to mark steps as done.
+    Attributes:
+        id_ (int): Unique identifier for the progress unit.
+        num_steps (int): Total number of steps in this unit.
+        num_done (int): Number of steps completed.
+        queue_ (queue.Queue): Queue to send progress updates.
+        logger (logging.Logger): Logger for logging progress updates.
+    """
     def __init__(self, id_, num_steps, queue_, logger):
         self.id_ = id_
         self.num_steps = num_steps
@@ -30,6 +40,16 @@ class ProgressUnit:
         self.queue_.put((self.id_, self.num_done, self.num_done==self.num_steps))
 
 class ProgressSet:
+    """    A set of progress units to track the progress of multiple tasks.
+    This class is used to manage multiple progress units and provide a unified interface for tracking their progress.
+    It allows adding new units, checking their status, and iterating over them.
+    Attributes:
+        num_units (int): Total number of progress units.
+        num_steps (int): Total number of steps across all units.
+        unit_status (dict): Dictionary to track the status of each unit.
+        completed_units (int): Number of completed units.
+        queue_ (queue.Queue): Queue to manage progress updates.
+    """
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.num_units = 0

@@ -18,7 +18,7 @@ class EcurveProxyCds:
         self.max_y = e_curve.max_y
         self.spline = e_curve.get_spline()
         self.j_slice = j_slice
-        paired_ranges = decomposition.get_paired_ranges()
+        paired_ranges = decomposition.get_pairedranges()
         peak_info = []
         for pr in paired_ranges:
             if len(pr.ranges) == 1:

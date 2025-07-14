@@ -128,7 +128,7 @@ class Decomposition:
 
         return ret_components
 
-    def get_paired_ranges(self, area_ratio=0.8, debug=False):
+    def get_pairedranges(self, area_ratio=0.8, debug=False):
         """
         Get the paired ranges.
         """

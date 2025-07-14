@@ -2,8 +2,6 @@
     Guinier.RgCurve.py
 
     This module contains the class RgCurve, which is used to store Rg curve information.
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 
@@ -12,7 +10,7 @@ class RgCurve:
     A class to represent a Rg curve.
     """
 
-    def __init__(self, indeces, rgvalues, scores, results=None):
+    def __init__(self, indeces, rgvalues, scores, results=None, intensities=None):
         """
         """
         self.index_dict = {}
@@ -22,6 +20,7 @@ class RgCurve:
         self.rgvalues = rgvalues
         self.scores = scores
         self.results = results  # either, molass results or atsas results
+        self.intensities = intensities  # only for molass results, None for atsas results
 
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
@@ -34,6 +33,7 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
     values = []
     scores = []
     results = []
+    intensities = [] if result_type is None else None
     for k, (i, result) in enumerate(rginfo_list):
         indeces.append(i)
         values.append(result.Rg)
@@ -41,6 +41,7 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
             # SimpleGuinier result
             scores.append(result.score)
             adapter = AutorgKekAdapter(None, guinier=result)
+            intensities.append(adapter.intensity)
             result_ = adapter.run(robust=True, optimize=True)
         else:
             # ATSAS.AutorgRunner result
@@ -48,4 +49,4 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
             result_ = result
         results.append(result_)
     
-    return RgCurve(np.array(indeces), np.array(values), np.array(scores), results=results)
+    return RgCurve(np.array(indeces), np.array(values), np.array(scores), results=results, intensities=intensities)
