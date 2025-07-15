@@ -6,7 +6,8 @@
 """
 
 class PairedRange:
-    def __init__(self, range_, minor=False, peak_index=None):
+    def __init__(self, range_, minor=False, peak_index=None, elm_recs=None):
+        self.peak_index = peak_index
         if minor:
             ranges = [range_]
         else:
@@ -15,6 +16,7 @@ class PairedRange:
             ranges = [(range_[0], peak_index), (peak_index, range_[1])]
 
         self.ranges = ranges
+        self.elm_recs = elm_recs
 
     def get_fromto_list(self):
         """
@@ -22,6 +24,14 @@ class PairedRange:
         returns a list of tuples
         """
         return self.ranges
+
+    def as_list(self, k):
+        from molass_legacy.DataStructure.PeakInfo import PeakInfo
+        peakinfo = PeakInfo(k,
+                         self.peak_index,
+                         self.elm_recs
+                         )  
+        return [peakinfo] + self.ranges
 
     def is_minor(self):
         return len(self.ranges) == 1

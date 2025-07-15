@@ -401,14 +401,6 @@ class SecSaxsData:
             return None
         else:
             return self.beamline_info.get_concfactor()
-
-    def compute_concentration(self, mapping=None, **kwargs):
-        debug = kwargs.get('debug', False)
-        if debug:
-            import molass.DataUtils.Concentration
-            reload(molass.DataUtils.Concentration)
-        from molass.DataUtils.Concentration import compute_concentration_impl
-        return compute_concentration_impl(self, mapping, **kwargs)
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_decomposition()

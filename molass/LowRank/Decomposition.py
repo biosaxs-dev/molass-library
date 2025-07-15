@@ -88,7 +88,8 @@ class Decomposition:
         for i in range(self.num_components):
             icurve_array = np.array([self.xr_icurve.x, xrC[i,:]])
             jcurve_array = np.array([self.xr.qv, xrP[:,i], xrPe[:,i]]).T
-            ret_components.append(XrComponent(icurve_array, jcurve_array))
+            ccurve = self.xr_ccurves[i]
+            ret_components.append(XrComponent(icurve_array, jcurve_array, ccurve))
 
         return ret_components
 
@@ -124,7 +125,8 @@ class Decomposition:
         for i in range(self.num_components):
             uv_elution = np.array([self.uv_icurve.x, uvC[i,:]])
             uv_spectral = np.array([self.uv.wv, uvP[:,i], uvPe[:,i]]).T
-            ret_components.append(UvComponent(uv_elution, uv_spectral))
+            ccurve = self.uv_ccurves[i]
+            ret_components.append(UvComponent(uv_elution, uv_spectral, ccurve))
 
         return ret_components
 
@@ -160,3 +162,17 @@ class Decomposition:
         from molass.Backward.RankEstimator import compute_scds_impl
         return compute_scds_impl(self, debug=debug)
     
+    def get_cd_color_info(self):
+        """
+        Get the color information for the concentration dependence.
+        """
+        if self.xr_ranks is None:
+            import logging
+            logging.warning("Decomposition.get_cd_color_info: xr_ranks is None, using default ranks.")
+            ranks = [1] * self.num_components
+        else:
+            ranks = self.xr_ranks
+
+        peak_top_xes = [ccurve.get_peak_top_x() for ccurve in self.xr_ccurves]
+        scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
+        return peak_top_xes, scd_colors

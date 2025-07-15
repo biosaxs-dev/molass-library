@@ -6,7 +6,7 @@ import threading
 from tqdm import tqdm
 from molass.Reports.ReportInfo import ReportInfo
 
-class V1PreProcessing:
+class PreProcessing:
     """
     A class to prepare the V1 report.
     This class is used to prepare the V1 report by running the necessary steps in a separate thread.
@@ -16,9 +16,6 @@ class V1PreProcessing:
         self.ssd = ssd
         self.kwargs = kwargs
         self.num_steps = 0
-        self.concentration = kwargs.get('concentration', None)
-        if self.concentration is None:
-            self.num_steps = 1
         self.rgcurves = kwargs.get('rgcurves', None)
         if self.rgcurves is None:
             self.num_steps += 2
@@ -33,10 +30,6 @@ class V1PreProcessing:
         return self.num_steps
 
     def run(self, pu):
-        if self.concentration is None:
-            self.concentration = self.ssd.compute_concentration()
-            pu.step_done()
-
         if self.rgcurves is None:
             mo_rgcurve = self.ssd.xr.compute_rgcurve()
             at_rgcurve = self.ssd.xr.compute_rgcurve_atsas()
@@ -48,7 +41,7 @@ class V1PreProcessing:
             pu.step_done()
 
         if self.pairedranges is None:
-            self.pairedranges = self.decomposition.get_pairedranges()
+            self.pairedranges = self.decomposition.get_pairedranges(debug=True)
             pu.step_done()
 
         pu.all_done()
@@ -66,7 +59,7 @@ def make_v1report_impl(ssd, **kwargs):
     from molass.Progress.ProgessUtils import ProgressSet
     ps = ProgressSet()
 
-    preproc = V1PreProcessing(ssd, **kwargs)
+    preproc = PreProcessing(ssd, **kwargs)
 
     pu_list = []
     pu = ps.add_unit(len(preproc))  # Preprocessing
@@ -112,7 +105,6 @@ def make_v1report_runner(pu_list, preproc, ssd, kwargs):
         print("make_v1report_impl: ranges=", list_ranges)
 
     ri = ReportInfo(ssd=ssd,
-                    concentration=preproc.concentration,
                     rgcurves=preproc.rgcurves,
                     decomposition=preproc.decomposition,
                     pairedranges=preproc.pairedranges,      # used in LRF report

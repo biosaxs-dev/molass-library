@@ -69,12 +69,12 @@ def plot_components_impl(decomposition, **kwargs):
         if colorbar:
             fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
 
-    ranges = kwargs.get('ranges', None)
-    if ranges is not None:
+    pairedranges = kwargs.get('pairedranges', None)
+    if pairedranges is not None:
         mapping = decomposition.mapping
         uv_ylim = ax1.get_ylim()
         xr_ylim = ax2.get_ylim()
-        for prange in ranges:
+        for prange in pairedranges:
             color = 'powderblue' if prange.is_minor() else 'cyan'
             for (i, j) in prange:
                 uv_xes = [mapping.get_mapped_x(x[k]) for k in (i, j)]

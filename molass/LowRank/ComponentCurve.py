@@ -22,3 +22,9 @@ class ComponentCurve:
         """
         x = self.x
         return x, egh(x, *self.params)
+    
+    def get_peak_top_x(self):
+        """
+        Returns the x value at the peak top.
+        """
+        return self.params[1]   # peak position in EGH model, note that this in valid only for EGH model

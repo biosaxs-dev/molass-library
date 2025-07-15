@@ -1,21 +1,13 @@
 """
-    DataUtils.Consentration.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
+    Backward.McVector.py
 """
-class Consentration:
-    def __init__(self, curve):
-        self.curve = curve
 
-def compute_concentration_impl(ssd, mapping, **kwargs):
+def compute_mc_vector_impl(ssd, **kwargs):
     debug = kwargs.get('debug', False)
 
     concfactor = kwargs.get('concfactor', None)
     if concfactor is None:
         concfactor = ssd.get_concfactor()
-
-    if mapping is None:
-        mapping = ssd.estimate_mapping()
 
     if debug:
         print("compute_concentration_impl: concfactor=", concfactor)
@@ -28,8 +20,7 @@ def compute_concentration_impl(ssd, mapping, **kwargs):
         ssd.logger.warning("using XR data as concentration.")
         conc_curve = ssd.xr.get_icurve()
     else:
-        if mapping is None:
-            mapping = ssd.estimate_mapping()
+        mapping = ssd.estimate_mapping()
         xr_curve = ssd.xr.get_icurve()
         uv_curve = ssd.uv.get_icurve()
         conc_curve = mapping.get_mapped_curve(xr_curve, uv_curve)
@@ -40,9 +31,9 @@ def compute_concentration_impl(ssd, mapping, **kwargs):
             ax1.plot(uv_curve.x, uv_curve.y, label='UV')
             ax2.plot(xr_curve.x, xr_curve.y, color='orange', label='XR')
             axt = ax2.twinx()
-            axt.plot(conc_curve.x, conc_curve.y, label='Concentration')
+            axt.plot(conc_curve.x, conc_curve.y, label='McVector')
             align_zero_y(ax1, axt)
             fig.tight_layout()
             plt.show()
 
-    return Consentration(conc_curve*concfactor)
+    return conc_curve*concfactor

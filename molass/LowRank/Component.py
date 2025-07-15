@@ -16,7 +16,7 @@ class Component:
     """
     A class to represent a component.
     """
-    def __init__(self, icurve_array, jcurve_array):
+    def __init__(self, icurve_array, jcurve_array, ccurve):
         """
         """
         self.icurve_array = icurve_array
@@ -26,6 +26,7 @@ class Component:
         self.icurve = None
         self.jcurve = None
         self.area = None
+        self.ccurve = ccurve
 
     def get_icurve(self):
         """
@@ -132,10 +133,13 @@ class Component:
 
         return start, stop
     
-    def make_paired_range(self, range_, minor=False):
+    def make_paired_range(self, range_, minor=False, elm_recs=None, debug=False):
+        if debug:
+            from importlib import reload
+            import molass.LowRank.PairedRange
+            reload(molass.LowRank.PairedRange)
         from molass.LowRank.PairedRange import PairedRange
-        return PairedRange(range_, minor=minor, peak_index=self.peak_index)
-
+        return PairedRange(range_, minor=minor, peak_index=self.peak_index, elm_recs=elm_recs)
 class XrComponent(Component):
     """
     A class to represent an XR component.

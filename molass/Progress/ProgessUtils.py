@@ -39,6 +39,11 @@ class ProgressUnit:
         self.num_done = self.num_steps
         self.queue_.put((self.id_, self.num_done, self.num_done==self.num_steps))
 
+    def tell_error(self):
+        """
+        Returns the current progress as a tuple of (id, num_done, False).
+        """
+        self.queue_.put((self.id_, self.num_done, False))
 class ProgressSet:
     """    A set of progress units to track the progress of multiple tasks.
     This class is used to manage multiple progress units and provide a unified interface for tracking their progress.
@@ -79,6 +84,11 @@ class ProgressSet:
                     self.completed_units += 1
                     if self.completed_units == self.num_units:
                         break
+                else:
+                    # error in progress
+                    self.logger.error(f"Progress unit {id_} reported error at step {step}.")
+                    self.unit_status[id_] = False
+                    break
                 yield ret
             except queue.Empty:
                 self.logger.error("Progress queue timeout!")

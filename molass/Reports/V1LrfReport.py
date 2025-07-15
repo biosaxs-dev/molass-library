@@ -18,21 +18,34 @@ def make_lrf_report(punit, controller, ri, kwargs):
     if debug:
         import molass.Backward.SerialDataProxy
         reload(molass.Backward.SerialDataProxy)
+        import molass.Backward.MappedInfoProxy
+        reload(molass.Backward.MappedInfoProxy)
         import molass.Backward.PreviewParams
         reload(molass.Backward.PreviewParams)
         import molass_legacy.SerialAnalyzer.StageExtrapolation
         reload(molass_legacy.SerialAnalyzer.StageExtrapolation)
     from molass.Backward.SerialDataProxy import SerialDataProxy
     from molass.Backward.PreviewParams import make_preview_params
+    from molass.Backward.MappedInfoProxy import make_mapped_info
     from molass_legacy.SerialAnalyzer.StageExtrapolation import prepare_extrapolation, do_extrapolation, clean_tempfolders
+    from molass_legacy._MOLASS.SerialSettings import set_setting
 
     if len(ri.pairedranges) > 0:
+        set_setting('conc_dependence', 1)           # used in ExtrapolationSolver.py
+        set_setting('mapper_cd_color_info', ri.decomposition.get_cd_color_info())
+        set_setting('concentration_datatype', 2)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
+
         controller.logger.info('Starting LRF report generation...')
         controller.ri = ri
         controller.applied_ranges = ri.pairedranges
         controller.qvector = ri.ssd.xr.qv
-        sd = SerialDataProxy(ri.ssd, ri.concentration)
-        controller.preview_params = make_preview_params(sd=sd, paired_ranges=ri.list_ranges)
+        sd = SerialDataProxy(ri.ssd, debug=debug)
+        controller.serial_data = sd
+        mapping = ri.ssd.get_mapping()
+        controller.mapped_info = make_mapped_info(mapping)
+        controller.preview_params = make_preview_params(mapping, sd, ri.pairedranges)
+        controller.known_info_list = None
+
         convert_to_guinier_result_array(controller, ri.rgcurves)
         prepare_extrapolation(controller)
         try:

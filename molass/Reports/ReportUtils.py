@@ -19,7 +19,11 @@ def make_v1report(ssd, **kwargs):
 
 def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
     if debug:
-        print("make_v1analysis_ranges_impl: area_ratio=", area_ratio)
+        from importlib import reload
+        import molass.LowRank.ElementRecords
+        reload(molass.LowRank.ElementRecords)
+    from molass.LowRank.ElementRecords import make_element_records_impl
+    elm_recs = make_element_records_impl(decomposition)
 
     components = decomposition.get_xr_components()
 
@@ -49,6 +53,6 @@ def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
     ret_ranges = []
     for comp, range_, prop in zip(components, ranges, area_proportions):
         minor = prop < MINOR_COMPONENT_MAX_PROP
-        ret_ranges.append(comp.make_paired_range(range_, minor=minor))
+        ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs, debug=debug))
 
     return ret_ranges
