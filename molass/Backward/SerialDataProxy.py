@@ -24,32 +24,35 @@ def convert_to_intensity_array(qv, M, E):
     """
     assert E is not None, "Error: E must not be None"
     data_list = []
-    for i in range(M.shape[1]):
-        data_list.append((qv, M[:, i], E[:, i]))
-    return np.array(data_list)
+    data_files = []
+    for j in range(M.shape[1]):
+        data_list.append(np.array([qv, M[:, j], E[:, j]]).T)
+        data_files.append('PREFIX0_%05d.dat' % j)
+    return np.array(data_list), data_files
 
 class SerialDataProxy:
     """
     SerialData class to hold data for serial processing.
     This class is used to store the data that will be processed in a serial manner.
     """
-    def __init__(self, ssd, debug=False):
-        if debug:
-            from importlib import reload
-            import molass.Backward.McVector
-            reload(molass.Backward.McVector)
-        from molass.Backward.McVector import compute_mc_vector_impl
+    def __init__(self, ssd, mapped_curve, debug=False):
         self.qvector = ssd.xr.qv
-        self.intensity_array = convert_to_intensity_array(ssd.xr.qv, ssd.xr.M, ssd.xr.E)
+        self.intensity_array, self.datafiles = convert_to_intensity_array(ssd.xr.qv, ssd.xr.M, ssd.xr.E)
+        if debug:
+            print("SerialDataProxy: qvector.shape=", self.qvector.shape)
+            print("SerialDataProxy: intensity_array.shape=", self.intensity_array.shape)
         self.pre_recog = PreRecogProxy(ssd)
-        self.mc_vector = compute_mc_vector_impl(ssd)
+        self.mc_vector = mapped_curve.y
         self.conc_factor = ssd.get_concfactor()
         self.mapping = ssd.get_mapping()
         self.baseline_corrected = None
         self.cd_slice = None
+        self.jvector = ssd.xr.jv
         self.xr_j0 = ssd.xr.jv[0]
         jv = ssd.xr.jv
         self.xray_index = (jv[0] + jv[-1]) // 2
+        self.conc_array = ssd.uv.M
+        self.lvector = ssd.uv.wv
 
     def get_id_info(self):
         return 'SD(id=%s, corrected=%s)' % (str(id(self)), str(self.baseline_corrected))

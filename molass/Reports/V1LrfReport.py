@@ -38,13 +38,21 @@ def make_lrf_report(punit, controller, ri, kwargs):
         controller.logger.info('Starting LRF report generation...')
         controller.ri = ri
         controller.applied_ranges = ri.pairedranges
+        controller.report_ranges = ri.list_ranges
         controller.qvector = ri.ssd.xr.qv
-        sd = SerialDataProxy(ri.ssd, debug=debug)
+        sd = SerialDataProxy(ri.ssd, ri.mapped_curve, debug=debug)
         controller.serial_data = sd
+        controller.c_vector = sd.mc_vector  # task: unify c_vector and mc_vector
+        controller.xr_j0 = sd.xr_j0
         mapping = ri.ssd.get_mapping()
-        controller.mapped_info = make_mapped_info(mapping)
+        controller.mapped_info = make_mapped_info(ri.ssd, mapping)
         controller.preview_params = make_preview_params(mapping, sd, ri.pairedranges)
         controller.known_info_list = None
+        controller.doing_sec = True
+        controller.zx_summary_list = []
+        controller.zx_summary_list2 = []
+        controller.temp_books = []
+        controller.temp_books_atsas = []
 
         convert_to_guinier_result_array(controller, ri.rgcurves)
         prepare_extrapolation(controller)

@@ -1,8 +1,8 @@
 """
-    Backward.McVector.py
+    Backward.MappedCurve.py
 """
 
-def compute_mc_vector_impl(ssd, **kwargs):
+def make_mapped_curve(ssd, **kwargs):
     debug = kwargs.get('debug', False)
 
     concfactor = kwargs.get('concfactor', None)
@@ -17,13 +17,13 @@ def compute_mc_vector_impl(ssd, **kwargs):
         raise NotSpecifedError("concfactor is not given as a kwarg nor acquired from a UV file.")
 
     if ssd.uv is None:
-        ssd.logger.warning("using XR data as concentration.")
-        conc_curve = ssd.xr.get_icurve()
+        ssd.logger.warning("using XR data as concentration (mapped curve).")
+        mp_curve = ssd.xr.get_icurve()
     else:
         mapping = ssd.estimate_mapping()
         xr_curve = ssd.xr.get_icurve()
         uv_curve = ssd.uv.get_icurve()
-        conc_curve = mapping.get_mapped_curve(xr_curve, uv_curve)
+        mp_curve = mapping.get_mapped_curve(xr_curve, uv_curve)
         if debug:
             import matplotlib.pyplot as plt
             from molass.PlotUtils.TwinAxesUtils import align_zero_y
@@ -31,9 +31,9 @@ def compute_mc_vector_impl(ssd, **kwargs):
             ax1.plot(uv_curve.x, uv_curve.y, label='UV')
             ax2.plot(xr_curve.x, xr_curve.y, color='orange', label='XR')
             axt = ax2.twinx()
-            axt.plot(conc_curve.x, conc_curve.y, label='McVector')
+            axt.plot(mp_curve.x, mp_curve.y, label='MappedCurve')
             align_zero_y(ax1, axt)
             fig.tight_layout()
             plt.show()
 
-    return conc_curve*concfactor
+    return mp_curve*concfactor

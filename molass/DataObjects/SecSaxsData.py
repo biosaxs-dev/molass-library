@@ -8,7 +8,7 @@ import numpy as np
 from glob import glob
 from importlib import reload
 import logging
-
+from molass_legacy._MOLASS.SerialSettings import set_setting
 class SecSaxsData:
     """
     A class to represent a SEC-SAXS data object."""
@@ -72,14 +72,17 @@ class SecSaxsData:
                 xrM = xr_array[:,:,1].T
                 xrE = xr_array[:,:,2].T
                 qv = xr_array[0,:,0]
+                set_setting('in_folder', folder)    # for backward compatibility
 
             if xr_only:
                 uvM, wv = None, None
             else:
                 from molass.DataUtils.UvLoader import load_uv
                 from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
-                uvM, wv = load_uv(folder)
+                uvM, wv, conc_file = load_uv(folder, return_also_conc_file=True)
                 beamline_info = get_beamlineinfo_from_settings()
+                set_setting('uv_folder', folder)    # for backward compatibility
+                set_setting('uv_file', conc_file)   # for backward compatibility
             uvE = None
  
             if xrM is None:

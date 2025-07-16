@@ -27,17 +27,16 @@ def make_guinier_report(punit, controller, ri, kwargs):
         wb = controller.result_wb
         ws = wb.create_sheet('Guinier Analysis')
 
-    ssd = ri.ssd
     mo_rgcurve, at_rgcurve = ri.rgcurves
-    x, y = ri.concentration.curve.get_xy()
-    num_rows = len(x)
+    x, y = ri.mapped_curve.get_xy()
+    num_rows = len(y)
 
     if WRITE_TO_TEMPFILE:
         fh = open("temp.csv", "w")
     else:
         fh = None
     num_steps = len(punit)
-    cycle = len(x)//num_steps
+    cycle = len(y)//num_steps
     rows = []
     for i in range(num_rows):
         sleep(0.1)

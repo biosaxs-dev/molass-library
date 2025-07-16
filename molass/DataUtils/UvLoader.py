@@ -7,7 +7,7 @@ import os
 from molass_legacy.SerialAnalyzer.SerialDataUtils import load_uv_array, load_uv_file
 from molass.DataObjects.Curve import create_icurve
 
-def load_uv(path):
+def load_uv(path, return_also_conc_file=False):
     """
     Load UV data from a file or directory.
 
@@ -28,8 +28,12 @@ def load_uv(path):
     else:
         data = load_uv_file(path)
         wvector = data[:,0] 
-        uvM = data[:,1:]    
-    return uvM, wvector
+        uvM = data[:,1:]
+        conc_file = path    
+    if return_also_conc_file:
+        return uvM, wvector, conc_file
+    else:
+        return uvM, wvector
 
 def get_uvcurves(in_folder):
     uvM, wvector = load_uv(in_folder)
