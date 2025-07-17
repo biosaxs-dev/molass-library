@@ -36,8 +36,9 @@ def make_lrf_report(punit, controller, ri, kwargs):
     if len(ri.pairedranges) > 0:
         set_setting('conc_dependence', 1)           # used in ExtrapolationSolver.py
         set_setting('mapper_cd_color_info', ri.decomposition.get_cd_color_info())
-        set_setting('concentration_datatype', 2)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
-    
+        concentration_datatype = kwargs['concentration_datatype'] 
+        set_setting('concentration_datatype', concentration_datatype)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
+
         controller.logger.info('Starting LRF report generation...')
         controller.ri = ri
         controller.applied_ranges = ri.pairedranges

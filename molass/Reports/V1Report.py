@@ -34,8 +34,6 @@ class PreProcessing:
         return self.num_steps
 
     def run(self, pu, debug=False):
-        set_setting('concentration_datatype', 2)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
-
         if self.mc_vector is None:
             if debug:
                 from importlib import reload
@@ -75,6 +73,7 @@ def make_v1report_impl(ssd, **kwargs):
     from molass.Progress.ProgessUtils import ProgressSet
 
     guinier_only = kwargs.get('guinier_only', False)
+    kwargs['concentration_datatype'] = 2
 
     env_info = get_global_env_info()    # do this here in the main thread to avoid issues with the reporting thread
     preproc = PreProcessing(ssd, **kwargs)
