@@ -1,11 +1,12 @@
 """
     Reports.V1Report.py
 """
+import os
 from importlib import reload
 import threading
 from tqdm import tqdm
 from molass.Reports.ReportInfo import ReportInfo
-
+from molass_legacy._MOLASS.SerialSettings import set_setting
 class PreProcessing:
     """
     A class to prepare the V1 report.
@@ -33,6 +34,8 @@ class PreProcessing:
         return self.num_steps
 
     def run(self, pu, debug=False):
+        set_setting('concentration_datatype', 2)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
+
         if self.mc_vector is None:
             if debug:
                 from importlib import reload
@@ -71,6 +74,8 @@ def make_v1report_impl(ssd, **kwargs):
 
     from molass.Progress.ProgessUtils import ProgressSet
 
+    guinier_only = kwargs.get('guinier_only', False)
+
     env_info = get_global_env_info()    # do this here in the main thread to avoid issues with the reporting thread
     preproc = PreProcessing(ssd, **kwargs)
     ps = ProgressSet()
@@ -79,10 +84,11 @@ def make_v1report_impl(ssd, **kwargs):
     pu_list.append(pu)
     pu = ps.add_unit(10)    # Guinier Analysis
     pu_list.append(pu)
-    pu = ps.add_unit(10)    # Peak Side LRF Analysis
-    pu_list.append(pu)
-    pu = ps.add_unit(10)    # Summary Report
-    pu_list.append(pu)
+    if not guinier_only:
+        pu = ps.add_unit(10)    # Peak Side LRF Analysis
+        pu_list.append(pu)
+        pu = ps.add_unit(10)    # Summary Report
+        pu_list.append(pu)
 
     tread1 = threading.Thread(target=make_v1report_runner, args=[pu_list, preproc, ssd, env_info, kwargs])
     tread1.start()
@@ -95,6 +101,7 @@ def make_v1report_impl(ssd, **kwargs):
 
 def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
     debug = kwargs.get('debug', False)
+    guinier_only = kwargs.get('guinier_only', False)
     
     if debug:
         import molass.Reports.Controller
@@ -106,34 +113,28 @@ def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
         import molass.Reports.V1LrfReport
         reload(molass.Reports.V1LrfReport)
     from molass.Reports.Controller import Controller
-    from molass.LowRank.PairedRange import convert_to_list_pairedranges
     from molass.Reports.V1GuinierReport import make_guinier_report
     from molass.Reports.V1LrfReport import make_lrf_report
     from molass.Reports.V1SummaryReport import make_summary_report
-    
 
+    report_folder = kwargs.get('report_folder', None)
+    bookname = kwargs.get('bookname', None)
 
-    controller = Controller(env_info)
-
-    bookfile = kwargs.get('bookfile', "book1.xlsx")
+    controller = Controller(env_info, report_folder=report_folder, bookname=bookname)
+    controller.seconds_correction = ssd.time_required_total - ssd.time_initialized
 
     preproc.run(pu_list[0], debug=debug)
-
-    list_ranges = convert_to_list_pairedranges(preproc.pairedranges)
-
-    if debug:
-        print("make_v1report_impl: ranges=", list_ranges)
 
     ri = ReportInfo(ssd=ssd,
                     mapped_curve=preproc.mapped_curve,
                     rgcurves=preproc.rgcurves,
                     decomposition=preproc.decomposition,
                     pairedranges=preproc.pairedranges,      # used in LRF report
-                    list_ranges=list_ranges,                # used in Guinier report
-                    bookfile=bookfile)
+                    )
+
+    controller.temp_books = []
 
     make_guinier_report(pu_list[1], controller, ri, kwargs)
-
-    make_lrf_report(pu_list[2], controller, ri, kwargs)
-
-    make_summary_report(pu_list[3], controller, ri, kwargs)
+    if not guinier_only:
+        make_lrf_report(pu_list[2], controller, ri, kwargs)
+        make_summary_report(pu_list[3], controller, ri, kwargs)

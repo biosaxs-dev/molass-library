@@ -23,9 +23,11 @@ def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
         import molass.LowRank.ElementRecords
         reload(molass.LowRank.ElementRecords)
     from molass.LowRank.ElementRecords import make_element_records_impl
+    # task: concentration_datatype must have been be set before calling this function.
     elm_recs = make_element_records_impl(decomposition)
 
     components = decomposition.get_xr_components()
+    # components = decomposition.get_uv_components()
 
     if debug:
         import matplotlib.pyplot as plt

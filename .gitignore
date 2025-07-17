@@ -22,3 +22,6 @@ htmlcov
 **/temp/**
 
 *.xlsx
+
+**/atsas-results/**
+**/report_folder/**

@@ -3,6 +3,7 @@
 """
 import os
 import logging
+import time
 from molass_legacy._MOLASS.SerialSettings import set_setting
 
 class Controller:
@@ -11,16 +12,26 @@ class Controller:
 
     This class corresponds to the legacy SerialExecuter class in molass_legacy.SerialAnalyzer.SerialController.
     """
-    def __init__(self, env_info, parallel=False):
+    def __init__(self, env_info, report_folder=None, bookname=None, parallel=False):
         self.logger = logging.getLogger(__name__)
-        cwd = os.getcwd()
-        self.work_folder = os.path.join(cwd, 'report_folder')
+        if report_folder is None:
+            cwd = os.getcwd()
+            report_folder = os.path.join(cwd, 'report_folder')
+        self.work_folder = report_folder
         if not os.path.exists( self.work_folder ):
             os.makedirs( self.work_folder )
         self.temp_folder = os.path.join(self.work_folder, '.temp')
         self.make_temp_folder()
         self.logger.info('Controller initialized with temp_folder=%s', self.temp_folder)
+        if bookname is None:
+            bookname = "analysis_report.xlsx"
+        if os.path.isabs(bookname):
+            bookpath = bookname
+        else:
+            bookpath = os.path.join(self.work_folder, bookname)
         self.env_info = env_info
+        self.bookpath= bookpath
+        self.book_file = bookpath   # for compatibility with legacy code
         self.excel_is_available = self.env_info.excel_is_available
         self.excel_version = self.env_info.excel_version
         self.atsas_is_available = self.env_info.atsas_is_available
@@ -30,6 +41,7 @@ class Controller:
         self.use_simpleguinier = 1
         self.log_memory_usage = 0
         self.range_type = 4  # 4:'Decomposed Elution Range', See molass_lagacy.SerialSettings.py
+        self.zx = True
         averaged_data_folder = os.path.join(self.work_folder, 'averaged')
         set_setting('averaged_data_folder', averaged_data_folder)
         
@@ -49,6 +61,12 @@ class Controller:
             from openpyxl import Workbook
             self.excel_client = None
             self.result_wb = Workbook()
+
+        self.seconds_correction = 0     # used in molass_legacy\Reports\SummaryBook.py
+        self.seconds_guinier = 0        # used in molass_legacy\Reports\SummaryBook.py
+        self.seconds_extrapolation = 0  # used in molass_legacy\Reports\SummaryBook.py
+        self.seconds_summary = 0        # used in molass_legacy\Reports\SummaryBook.py
+        self.num_peaks_to_exec = 0      # used in molass_legacy\SerialAnalyzer\StageSummary.py
 
     def make_temp_folder( self ):
         from molass_legacy.KekLib.BasicUtils import clear_dirs_with_retry

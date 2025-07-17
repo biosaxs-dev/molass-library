@@ -5,7 +5,7 @@ This module contains the functions to generate the reports the Guinier Analysis.
 """
 import os
 from importlib import reload
-from time import sleep
+from time import time, sleep
 
 WRITE_TO_TEMPFILE = False
 
@@ -18,6 +18,9 @@ def make_guinier_report(punit, controller, ri, kwargs):
         reload(molass.Reports.Migrating)
     from molass_legacy.Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
     from molass.Reports.Migrating import make_gunier_row_values
+
+    guinier_only = kwargs.get('guinier_only', False)    
+    start_time = time()
 
     if controller.excel_is_available:
         from openpyxl import Workbook
@@ -69,13 +72,23 @@ def make_guinier_report(punit, controller, ri, kwargs):
 
     j0 = int(x[0])
     book = GuinierAnalysisResultBook(wb, ws, rows, j0, parent=controller)
- 
-    if controller.excel_is_available:
-        bookfile = ri.bookfile
-        bookpath = os.path.abspath(bookfile)
-        print("Saving Guinier Analysis Report to", bookpath)
-        book.save(bookpath)
-        sleep(0.1)
-        book.add_annonations(bookpath, ri.list_ranges, debug=debug)
 
+    if guinier_only:
+        temp_book = controller.bookpath
+    else:
+        temp_book = controller.temp_folder + '/--serial_analysis-temp.xlsx'
+
+    if controller.excel_is_available:
+        print("Saving Guinier Analysis Report to", temp_book)
+        book.save(temp_book)
+        sleep(0.1)
+        ranges = []
+        for range_ in ri.pairedranges:
+            fromto_list = range_.get_fromto_list()
+            ranges.append([fromto_list[0][0], fromto_list[-1][1]])
+        book.add_annotations(temp_book, ranges, debug=debug)
+
+    if not guinier_only:
+        controller.temp_books.append(temp_book)
+    controller.seconds_guinier = int(time() - start_time)
     punit.all_done()

@@ -6,6 +6,7 @@
 import os
 import numpy as np
 from glob import glob
+from time import time
 from importlib import reload
 import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
@@ -18,6 +19,7 @@ class SecSaxsData:
                  remove_bubbles=False,
                  beamline_info=None,
                  mapping=None,
+                 time_initialized=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
         
@@ -53,6 +55,7 @@ class SecSaxsData:
 
         >>> uv_only_ssd = SecSacsData('the_data_folder', uv_only=True)
         """
+        start_time = time()
         self.logger = logging.getLogger(__name__)
         if folder is None:
             assert object_list is not None
@@ -103,6 +106,12 @@ class SecSaxsData:
         self.trimmed = trimmed
         self.mapping = mapping
         self.beamline_info = beamline_info
+        if time_initialized is None:
+            self.time_initialized = time() - start_time
+        else:
+            self.time_initialized = time_initialized
+        self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
+        self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
     def plot_3d(self, **kwargs):
         """ssd.plot_3d(view_init=None)
@@ -268,7 +277,8 @@ class SecSaxsData:
         else:
             uv_data = self.uv.copy(slices=uv_slices)
             
-        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping)
+        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping, 
+                           time_initialized=self.time_initialized)
 
     def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
         """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None)
@@ -288,11 +298,15 @@ class SecSaxsData:
         SecSaxsData
             A trimmed copy of the SSD object with the specified trimming specification applied.
         """
+        start_time = time()
         if trimming is None:
             trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
         else:
             assert jranges is None, "jranges must be None if trimming is specified."
-        return self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping)
+        result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping)
+        result.time_required = time() - start_time
+        result.time_required_total = self.time_required_total + result.time_required
+        return result
 
     def set_baseline_method(self, method):
         """ssd.set_baseline_method(method)
@@ -353,7 +367,7 @@ class SecSaxsData:
         debug : bool, optional
             If True, enables debug mode for more verbose output.
         """
-
+        start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed)
 
         baseline = ssd_copy.xr.get_baseline2d(debug=debug)
@@ -363,6 +377,8 @@ class SecSaxsData:
             baseline = ssd_copy.uv.get_baseline2d(debug=debug)
             ssd_copy.uv.M -= baseline
 
+        ssd_copy.time_required = time() - start_time
+        ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
         return ssd_copy
     
     def estimate_mapping(self, debug=False):
