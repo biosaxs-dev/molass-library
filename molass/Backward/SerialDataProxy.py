@@ -1,7 +1,8 @@
 """
-Backward.SerialData.py
+Backward.SerialDataProxy.py
 """
 import numpy as np
+from molass_legacy.SerialAnalyzer.SerialData import SerialData
 class PreRecogProxy:
     """
     A proxy class for the pre-recognition data.
@@ -24,26 +25,29 @@ def convert_to_intensity_array(qv, M, E):
     """
     assert E is not None, "Error: E must not be None"
     data_list = []
-    data_files = []
     for j in range(M.shape[1]):
         data_list.append(np.array([qv, M[:, j], E[:, j]]).T)
-        data_files.append('PREFIX0_%05d.dat' % j)
-    return np.array(data_list), data_files
+    return np.array(data_list)
 
-class SerialDataProxy:
+class SerialDataProxy(SerialData):
     """
     SerialData class to hold data for serial processing.
     This class is used to store the data that will be processed in a serial manner.
+
+    It inherits from SerialData to use the following methods:
+
+        get_averaged_data
+
     """
     def __init__(self, ssd, mapped_curve, debug=False):
         self.qvector = ssd.xr.qv
-        self.intensity_array, self.datafiles = convert_to_intensity_array(ssd.xr.qv, ssd.xr.M, ssd.xr.E)
+        self.intensity_array = convert_to_intensity_array(ssd.xr.qv, ssd.xr.M, ssd.xr.E)
         if debug:
             print("SerialDataProxy: qvector.shape=", self.qvector.shape)
             print("SerialDataProxy: intensity_array.shape=", self.intensity_array.shape)
         self.pre_recog = PreRecogProxy(ssd)
-        self.mc_vector = mapped_curve.y
         self.conc_factor = ssd.get_concfactor()
+        self.mc_vector = mapped_curve.y * self.conc_factor  # task: See molass_legacy.Mapping.ElutionMapper.get_conc_vector
         self.mapping = ssd.get_mapping()
         self.baseline_corrected = None
         self.cd_slice = None

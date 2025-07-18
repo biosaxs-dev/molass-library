@@ -4,13 +4,17 @@
 import os
 import logging
 import time
-from molass_legacy._MOLASS.SerialSettings import set_setting
+from molass_legacy._MOLASS.SerialSettings import get_setting, set_setting
+from molass_legacy.SerialAnalyzer.SerialController import SerialExecuter
 
-class Controller:
+class Controller(SerialExecuter):
     """
     Controller class for managing report generation in MOLASS.
 
     This class corresponds to the legacy SerialExecuter class in molass_legacy.SerialAnalyzer.SerialController.
+
+    Inherits from SerialExecuter to use the following methods:
+        save_smoothed_data
     """
     def __init__(self, env_info, report_folder=None, bookname=None, parallel=False):
         self.logger = logging.getLogger(__name__)
@@ -67,6 +71,28 @@ class Controller:
         self.seconds_extrapolation = 0  # used in molass_legacy\Reports\SummaryBook.py
         self.seconds_summary = 0        # used in molass_legacy\Reports\SummaryBook.py
         self.num_peaks_to_exec = 0      # used in molass_legacy\SerialAnalyzer\StageSummary.py
+        self.input_smoothing = 1
+        self.doing_sec = True
+
+    def prepare_averaged_data(self):
+        self.using_averaged_files = False
+        if self.input_smoothing == 1:
+            num_curves_averaged = get_setting( 'num_curves_averaged' )
+            intensity_array_, average_slice_array, c_vector = self.serial_data.get_averaged_data( num_curves_averaged )
+            assert c_vector is not None
+
+            # save
+            save_averaged_data = get_setting( 'save_averaged_data' )
+            if save_averaged_data == 1:
+                self.using_averaged_files = True        # TODO: check consistency
+                self.save_smoothed_data( intensity_array_, average_slice_array )
+        else:
+            assert False
+
+        if self.doing_sec:
+            self.c_vector = c_vector
+        else:
+            assert False
 
     def make_temp_folder( self ):
         from molass_legacy.KekLib.BasicUtils import clear_dirs_with_retry

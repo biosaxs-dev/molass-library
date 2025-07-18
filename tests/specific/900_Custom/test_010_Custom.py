@@ -18,7 +18,7 @@ def test_010_load_uv():
 
 def test_020_load_xr():
     from molass.DataUtils.XrLoader import load_xr
-    xr_array = load_xr(TUTORIAL_DATA)
+    xr_array, datafiles = load_xr(TUTORIAL_DATA)
     assert xr_array.shape == (287, 1176, 3)
 
 def test_030_plot():

@@ -21,10 +21,12 @@ def load_xr(folder_path):
     The first dimension corresponds to the number of files, the second to the number of points, and the third to the data columns.
     """
     input_list = []
+    datafiles = []
     for path in sorted(glob(folder_path + "/*.dat")):
         input_list.append(np.loadtxt(path))
+        datafiles.append(path)
     xr_array = np.array(input_list)
-    return xr_array
+    return xr_array, datafiles
 
 def xr_remove_bubbles(xr_array, logger=None, debug=False):
     from molass.DataObjects.Curve import create_icurve
@@ -58,7 +60,7 @@ def xr_remove_bubbles(xr_array, logger=None, debug=False):
         plt.show()
 
 def load_xr_with_options(folder_path, remove_bubbles=False, logger=None, debug=False):
-    xr_array = load_xr(folder_path)
+    xr_array, datafiles = load_xr(folder_path)
     if remove_bubbles:
         xr_remove_bubbles(xr_array, logger=logger, debug=debug)
-    return xr_array
+    return xr_array, datafiles

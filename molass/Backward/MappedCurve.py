@@ -5,17 +5,6 @@
 def make_mapped_curve(ssd, **kwargs):
     debug = kwargs.get('debug', False)
 
-    concfactor = kwargs.get('concfactor', None)
-    if concfactor is None:
-        concfactor = ssd.get_concfactor()
-
-    if debug:
-        print("compute_concentration_impl: concfactor=", concfactor)
-
-    if concfactor is None:
-        from molass.Except.ExceptionTypes import NotSpecifedError
-        raise NotSpecifedError("concfactor is not given as a kwarg nor acquired from a UV file.")
-
     if ssd.uv is None:
         ssd.logger.warning("using XR data as concentration (mapped curve).")
         mp_curve = ssd.xr.get_icurve()
@@ -37,4 +26,4 @@ def make_mapped_curve(ssd, **kwargs):
             fig.tight_layout()
             plt.show()
 
-    return mp_curve*concfactor
+    return mp_curve
