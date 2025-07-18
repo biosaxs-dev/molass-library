@@ -31,7 +31,11 @@ def make_guinier_report(punit, controller, ri, kwargs):
         ws = wb.create_sheet('Guinier Analysis')
 
     mo_rgcurve, at_rgcurve = ri.rgcurves
-    x, y = ri.mapped_curve.get_xy()
+    mapped_curve = ri.decomposition.mapped_curve
+    assert mapped_curve is not None, "Mapped curve must be provided for Guinier analysis."
+    concfactor = ri.ssd.get_concfactor()  # ensure concfactor is set
+    # conc_factor?
+    x, y = (mapped_curve * concfactor).get_xy()
     num_rows = len(y)
 
     if WRITE_TO_TEMPFILE:

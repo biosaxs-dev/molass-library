@@ -43,9 +43,8 @@ def make_lrf_report(punit, controller, ri, kwargs):
         controller.ri = ri
         controller.applied_ranges = ri.pairedranges
         controller.qvector = ri.ssd.xr.qv
-        sd = SerialDataProxy(ri.ssd, ri.mapped_curve, debug=debug)
+        sd = SerialDataProxy(ri.ssd, ri.decomposition.mapped_curve, debug=debug)
         controller.serial_data = sd
-        controller.c_vector = sd.mc_vector  # task: unify c_vector and mc_vector
         controller.xr_j0 = sd.xr_j0
         # task: xr_j0 can be incompatible when xr_j0 > 0. Remove xr_j0 eventually.
         controller.report_ranges = report_ranges_from_analysis_ranges(controller.xr_j0, controller.applied_ranges)
@@ -53,10 +52,12 @@ def make_lrf_report(punit, controller, ri, kwargs):
         controller.mapped_info = make_mapped_info(ri.ssd, mapping)
         controller.preview_params = make_preview_params(mapping, sd, ri.pairedranges)
         controller.known_info_list = None
-        controller.doing_sec = True
         controller.zx_summary_list = []
         controller.zx_summary_list2 = []
         controller.temp_books_atsas = []
+        controller.datafiles = ri.ssd.datafiles
+        # controller.c_vector = sd.mc_vector  # task: unify c_vector and mc_vector
+        controller.prepare_averaged_data()  # c_vector is set here
 
         convert_to_guinier_result_array(controller, ri.rgcurves)
         prepare_extrapolation(controller)

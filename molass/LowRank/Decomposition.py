@@ -32,6 +32,7 @@ class Decomposition:
         self.uv_ranks = None
  
         self.mapping = ssd.mapping
+        self.mapped_curve = kwargs.get('mapped_curve', None)
         self.paired_ranges = None
 
     def get_num_components(self):
@@ -130,16 +131,21 @@ class Decomposition:
 
         return ret_components
 
-    def get_pairedranges(self, area_ratio=0.8, debug=False):
+    def get_pairedranges(self, mapped_curve=None, area_ratio=0.7, debug=False):
         """
         Get the paired ranges.
         """
         if self.paired_ranges is None:
             if debug:
-                import molass.Reports.ReportUtils
-                reload(molass.Reports.ReportUtils)
-            from molass.Reports.ReportUtils import make_v1report_ranges_impl
-            self.paired_ranges = make_v1report_ranges_impl(self, area_ratio, debug=debug)
+                import molass.Reports.ReportRange
+                reload(molass.Reports.ReportRange)
+            from molass.Reports.ReportRange import make_v1report_ranges_impl
+            if mapped_curve is None:
+                if self.mapped_curve is None:
+                    from molass.Backward.MappedCurve import make_mapped_curve
+                    self.mapped_curve = make_mapped_curve(self.ssd, debug=debug)
+                mapped_curve = self.mapped_curve
+            self.paired_ranges = make_v1report_ranges_impl(self, self.ssd, mapped_curve, area_ratio, debug=debug)
         return self.paired_ranges
 
     def get_proportions(self):

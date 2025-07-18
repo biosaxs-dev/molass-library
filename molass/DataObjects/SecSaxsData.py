@@ -20,6 +20,7 @@ class SecSaxsData:
                  beamline_info=None,
                  mapping=None,
                  time_initialized=None,
+                 datafiles=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
         
@@ -60,6 +61,7 @@ class SecSaxsData:
         if folder is None:
             assert object_list is not None
             xr_data, uv_data = object_list
+            self.datafiles = datafiles
         else:
             assert object_list is None
             if uv_only:
@@ -71,11 +73,12 @@ class SecSaxsData:
                     raise FileNotFoundError(f"Folder {folder} does not exist.")
                 
                 from molass.DataUtils.XrLoader import load_xr_with_options
-                xr_array = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
+                xr_array, datafiles = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
                 xrM = xr_array[:,:,1].T
                 xrE = xr_array[:,:,2].T
                 qv = xr_array[0,:,0]
                 set_setting('in_folder', folder)    # for backward compatibility
+                self.datafiles = datafiles
 
             if xr_only:
                 uvM, wv = None, None
@@ -240,7 +243,7 @@ class SecSaxsData:
             trim = self.make_trimming(**kwargs)
         return plot_trimming_impl(self, trim, baseline=baseline, title=title, **kwargs)
 
-    def copy(self, xr_slices=None, uv_slices=None, trimmed=False, mapping=None):
+    def copy(self, xr_slices=None, uv_slices=None, trimmed=False, mapping=None, datafiles=None):
         """ssd.copy(xr_slices=None, uv_slices=None)
         
         Returns a deep copy of this object.
@@ -278,7 +281,7 @@ class SecSaxsData:
             uv_data = self.uv.copy(slices=uv_slices)
             
         return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping, 
-                           time_initialized=self.time_initialized)
+                           time_initialized=self.time_initialized, datafiles=datafiles)
 
     def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
         """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None)
@@ -303,7 +306,8 @@ class SecSaxsData:
             trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
         else:
             assert jranges is None, "jranges must be None if trimming is specified."
-        result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping)
+        result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping,
+                           datafiles=self.datafiles)
         result.time_required = time() - start_time
         result.time_required_total = self.time_required_total + result.time_required
         return result
@@ -368,7 +372,7 @@ class SecSaxsData:
             If True, enables debug mode for more verbose output.
         """
         start_time = time()
-        ssd_copy = self.copy(trimmed=self.trimmed)
+        ssd_copy = self.copy(trimmed=self.trimmed, datafiles=self.datafiles)
 
         baseline = ssd_copy.xr.get_baseline2d(debug=debug)
         ssd_copy.xr.M -= baseline

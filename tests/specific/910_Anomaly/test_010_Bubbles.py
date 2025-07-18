@@ -11,7 +11,7 @@ Sugiyama = os.path.join(DATA_ROOT_FOLDER, "20170226","Sugiyama")
 
 def test_010_load_xr():
     from molass.DataUtils.XrLoader import load_xr, xr_remove_bubbles 
-    xr_array = load_xr(Sugiyama)
+    xr_array, datafiles = load_xr(Sugiyama)
     assert xr_array.shape == (367, 1157, 3), "xr_array.shape should be (367, 1157, 3)"
     xr_remove_bubbles(xr_array, debug=True)
 

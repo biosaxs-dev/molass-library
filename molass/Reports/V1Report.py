@@ -17,9 +17,6 @@ class PreProcessing:
         self.ssd = ssd
         self.kwargs = kwargs
         self.num_steps = 0
-        self.mc_vector = kwargs.get('mc_vector', None)
-        if self.mc_vector is None:
-            self.num_steps += 1
         self.rgcurves = kwargs.get('rgcurves', None)
         if self.rgcurves is None:
             self.num_steps += 2
@@ -34,15 +31,6 @@ class PreProcessing:
         return self.num_steps
 
     def run(self, pu, debug=False):
-        if self.mc_vector is None:
-            if debug:
-                from importlib import reload
-                import molass.Backward.MappedCurve
-                reload(molass.Backward.MappedCurve)
-            from molass.Backward.MappedCurve import make_mapped_curve
-            self.mapped_curve = make_mapped_curve(self.ssd, **self.kwargs)
-            pu.step_done()
-
         if self.rgcurves is None:
             mo_rgcurve = self.ssd.xr.compute_rgcurve()
             at_rgcurve = self.ssd.xr.compute_rgcurve_atsas()
@@ -54,12 +42,12 @@ class PreProcessing:
             pu.step_done()
 
         if self.pairedranges is None:
-            self.pairedranges = self.decomposition.get_pairedranges(debug=True)
+            self.pairedranges = self.decomposition.get_pairedranges()
             pu.step_done()
 
         pu.all_done()
 
-def make_v1report_impl(ssd, **kwargs):
+def make_v1report(ssd, **kwargs):
     """
 
     """
@@ -125,7 +113,6 @@ def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
     preproc.run(pu_list[0], debug=debug)
 
     ri = ReportInfo(ssd=ssd,
-                    mapped_curve=preproc.mapped_curve,
                     rgcurves=preproc.rgcurves,
                     decomposition=preproc.decomposition,
                     pairedranges=preproc.pairedranges,      # used in LRF report

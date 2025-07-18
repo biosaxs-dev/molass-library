@@ -1,30 +1,18 @@
 """
-Reports.ReportUtils.py
-
-This module is used to make reports with _MOLASS.
-It includes a wrapper to hide the Controller class.
+Reports.ReportRange.py
 """
 import numpy as np
 
 MINOR_COMPONENT_MAX_PROP = 0.2
 
-def make_v1report(ssd, **kwargs):
-    debug = kwargs.get('debug', False)
-    if debug:
-        import molass.Reports.V1Report
-        from importlib import reload
-        reload(molass.Reports.V1Report)
-    from molass.Reports.V1Report import make_v1report_impl
-    make_v1report_impl(ssd, **kwargs)
-
-def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
+def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debug=False):
     if debug:
         from importlib import reload
         import molass.LowRank.ElementRecords
         reload(molass.LowRank.ElementRecords)
     from molass.LowRank.ElementRecords import make_element_records_impl
     # task: concentration_datatype must have been be set before calling this function.
-    elm_recs = make_element_records_impl(decomposition)
+    elm_recs, elm_recs_uv = make_element_records_impl(decomposition, ssd, mapped_curve, debug=debug)
 
     components = decomposition.get_xr_components()
     # components = decomposition.get_uv_components()
@@ -55,6 +43,6 @@ def make_v1report_ranges_impl(decomposition, area_ratio, debug=False):
     ret_ranges = []
     for comp, range_, prop in zip(components, ranges, area_proportions):
         minor = prop < MINOR_COMPONENT_MAX_PROP
-        ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs, debug=debug))
+        ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs_uv, debug=debug))
 
     return ret_ranges
