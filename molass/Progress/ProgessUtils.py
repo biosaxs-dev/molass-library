@@ -55,14 +55,16 @@ class ProgressSet:
         completed_units (int): Number of completed units.
         queue_ (queue.Queue): Queue to manage progress updates.
     """
-    def __init__(self):
+    def __init__(self, timeout=60):
         self.logger = logging.getLogger(__name__)
         self.num_units = 0
         self.num_steps = 0
         self.unit_status = {}
         self.completed_units = 0
         self.queue_ = queue.Queue()
-
+        self.timeout = timeout
+        self.logger.info('ProgressSet initialized with timeout=%s', self.timeout)
+        
     def add_unit(self, num_steps):
         self.num_steps += num_steps
         self.num_units += 1
@@ -77,7 +79,7 @@ class ProgressSet:
     def __iter__(self):
         while True:
             try:
-                ret = self.queue_.get(timeout=60)
+                ret = self.queue_.get(timeout=self.timeout)
                 id_, step, done = ret
                 if done:
                     self.unit_status[id_] = True

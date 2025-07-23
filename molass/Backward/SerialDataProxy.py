@@ -47,7 +47,13 @@ class SerialDataProxy(SerialData):
             print("SerialDataProxy: intensity_array.shape=", self.intensity_array.shape)
         self.pre_recog = PreRecogProxy(ssd)
         self.conc_factor = ssd.get_concfactor()
-        self.mc_vector = mapped_curve.y * self.conc_factor  # task: See molass_legacy.Mapping.ElutionMapper.get_conc_vector
+        """
+        This (below) is equivalent to the molass_legacy.Mapping.ElutionMapper.get_conc_vector.
+        See molass_legacy.SerialAnalyzer.SerialData.set_mc_vector().
+        i.e., mc_vector is equivalent to the conc_vector = mapper.get_conc_vector(conc_factor)
+        and mc_vector will be averaged to c_vector in prepare_averaged_data().
+        """
+        self.mc_vector = mapped_curve.y * self.conc_factor
         self.mapping = ssd.get_mapping()
         self.baseline_corrected = None
         self.cd_slice = None

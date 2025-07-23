@@ -59,13 +59,15 @@ def make_v1report(ssd, **kwargs):
         raise RuntimeError("pywin32 post-installation has not been run or is incomplete.")
 
     from molass.Progress.ProgessUtils import ProgressSet
-
-    guinier_only = kwargs.get('guinier_only', False)
     kwargs['concentration_datatype'] = 2
+    debug = kwargs.get('debug', False)
+    guinier_only = kwargs.get('guinier_only', False)
+    prepare_lrf_only = kwargs.get('prepare_lrf_only', False)
 
     env_info = get_global_env_info()    # do this here in the main thread to avoid issues with the reporting thread
     preproc = PreProcessing(ssd, **kwargs)
-    ps = ProgressSet()
+    timeout = 5 if prepare_lrf_only else 60
+    ps = ProgressSet(timeout=timeout)
     pu_list = []
     pu = ps.add_unit(len(preproc))  # Preprocessing
     pu_list.append(pu)
@@ -118,8 +120,14 @@ def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
                     pairedranges=preproc.pairedranges,      # used in LRF report
                     )
 
-    controller.temp_books = []
+    prepare_lrf_only = kwargs.get('prepare_lrf_only', False)
+    if prepare_lrf_only:
+        from molass.Reports.V1LrfReport import prepare_controller_for_lrf
+        print("Preparing controller for LRF report... with prepare_lrf_only=True")
+        prepare_controller_for_lrf(controller, ri, kwargs)
+        return
 
+    controller.temp_books = []
     make_guinier_report(pu_list[1], controller, ri, kwargs)
     if not guinier_only:
         make_lrf_report(pu_list[2], controller, ri, kwargs)

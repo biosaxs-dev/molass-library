@@ -8,11 +8,11 @@ from time import time, sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_lrf_report(punit, controller, ri, kwargs):
+def prepare_controller_for_lrf(controller, ri, kwargs):
     """
-    Make a report for the LRF Analysis.
-
-    Migrated from molass_legacy.StageExtrapolation.control_extrapolation().
+    Prepare the controller for LRF report generation.
+    This function sets up the controller with the necessary data and parameters
+    for the LRF report generation process.
     """
     debug = kwargs.get('debug')
     if debug:
@@ -22,44 +22,54 @@ def make_lrf_report(punit, controller, ri, kwargs):
         reload(molass.Backward.MappedInfoProxy)
         import molass.Backward.PreviewParams
         reload(molass.Backward.PreviewParams)
-        import molass_legacy.SerialAnalyzer.StageExtrapolation
-        reload(molass_legacy.SerialAnalyzer.StageExtrapolation)
     from molass.Backward.SerialDataProxy import SerialDataProxy
+    from molass_legacy.DataStructure.AnalysisRangeInfo import report_ranges_from_analysis_ranges
+    from molass_legacy._MOLASS.SerialSettings import set_setting
     from molass.Backward.PreviewParams import make_preview_params
     from molass.Backward.MappedInfoProxy import make_mapped_info
+    set_setting('conc_dependence', 1)           # used in ExtrapolationSolver.py
+    set_setting('mapper_cd_color_info', ri.decomposition.get_cd_color_info())
+    concentration_datatype = kwargs['concentration_datatype'] 
+    set_setting('concentration_datatype', concentration_datatype)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
+
+    controller.logger.info('Starting LRF report generation...')
+    controller.ri = ri
+    controller.applied_ranges = ri.pairedranges
+    controller.qvector = ri.ssd.xr.qv
+    sd = SerialDataProxy(ri.ssd, ri.decomposition.mapped_curve, debug=debug)
+    controller.serial_data = sd
+    controller.xr_j0 = sd.xr_j0
+    # task: xr_j0 can be incompatible when xr_j0 > 0. Remove xr_j0 eventually.
+    controller.report_ranges = report_ranges_from_analysis_ranges(controller.xr_j0, controller.applied_ranges)
+    mapping = ri.ssd.get_mapping()
+    controller.mapped_info = make_mapped_info(ri.ssd, mapping)
+    controller.preview_params = make_preview_params(mapping, sd, ri.pairedranges)
+    controller.known_info_list = None
+    controller.zx_summary_list = []
+    controller.zx_summary_list2 = []
+    controller.temp_books_atsas = []
+    controller.datafiles = ri.ssd.datafiles
+    # controller.c_vector = sd.mc_vector  # task: unify c_vector and mc_vector
+    controller.prepare_averaged_data()  # c_vector is set here
+
+    convert_to_guinier_result_array(controller, ri.rgcurves)
+
+def make_lrf_report(punit, controller, ri, kwargs):
+    """
+    Make a report for the LRF Analysis.
+
+    Migrated from molass_legacy.StageExtrapolation.control_extrapolation().
+    """
+    debug = kwargs.get('debug')
+    if debug:
+        import molass_legacy.SerialAnalyzer.StageExtrapolation
+        reload(molass_legacy.SerialAnalyzer.StageExtrapolation)
     from molass_legacy.SerialAnalyzer.StageExtrapolation import prepare_extrapolation, do_extrapolation, clean_tempfolders
-    from molass_legacy._MOLASS.SerialSettings import set_setting
-    from molass_legacy.DataStructure.AnalysisRangeInfo import report_ranges_from_analysis_ranges
 
     start_time = time()
 
     if len(ri.pairedranges) > 0:
-        set_setting('conc_dependence', 1)           # used in ExtrapolationSolver.py
-        set_setting('mapper_cd_color_info', ri.decomposition.get_cd_color_info())
-        concentration_datatype = kwargs['concentration_datatype'] 
-        set_setting('concentration_datatype', concentration_datatype)    # 0: XR model, 1: XR data, 2: UV model, 3: UV data
-
-        controller.logger.info('Starting LRF report generation...')
-        controller.ri = ri
-        controller.applied_ranges = ri.pairedranges
-        controller.qvector = ri.ssd.xr.qv
-        sd = SerialDataProxy(ri.ssd, ri.decomposition.mapped_curve, debug=debug)
-        controller.serial_data = sd
-        controller.xr_j0 = sd.xr_j0
-        # task: xr_j0 can be incompatible when xr_j0 > 0. Remove xr_j0 eventually.
-        controller.report_ranges = report_ranges_from_analysis_ranges(controller.xr_j0, controller.applied_ranges)
-        mapping = ri.ssd.get_mapping()
-        controller.mapped_info = make_mapped_info(ri.ssd, mapping)
-        controller.preview_params = make_preview_params(mapping, sd, ri.pairedranges)
-        controller.known_info_list = None
-        controller.zx_summary_list = []
-        controller.zx_summary_list2 = []
-        controller.temp_books_atsas = []
-        controller.datafiles = ri.ssd.datafiles
-        # controller.c_vector = sd.mc_vector  # task: unify c_vector and mc_vector
-        controller.prepare_averaged_data()  # c_vector is set here
-
-        convert_to_guinier_result_array(controller, ri.rgcurves)
+        prepare_controller_for_lrf(controller, ri, kwargs)
         prepare_extrapolation(controller)
         try:
             do_extrapolation(controller)

@@ -1,26 +1,62 @@
 """
 Backward.DecompResultAdapter.py
 
-made to unified improvement from molass_legacy.Selective.V1ParamsAdapter.py
+made as unified improvement from molass_legacy.Selective.V1ParamsAdapter.py
 """
 import numpy as np
+from molass_legacy.Models.ElutionCurveModels import EGH
 from molass_legacy.Decomposer.ModelEvaluator import ModelEvaluator
 from molass_legacy.Decomposer.FitRecord import FitRecord
 from molass_legacy.Decomposer.UnifiedDecompResult import UnifiedDecompResult
 from molass_legacy.Selective.PeakProxy import PeakProxy
 
-def adapted_decomp_result(xr_curve, uv_curve, model, peaks, debug=False):
+def adapted_decomp_result(decomposition, ssd, mapped_curve, debug=False):
     """
+    V1-compatible scheme:
+    molass_legacy
+        control_info = decomp_result.get_range_edit_info()
+        DecompEditorFrame.make_range_info
+            DecompUtils.make_range_info_impl(..., control_info, ...)
+
     """
+    concfactor = ssd.get_concfactor()
+
+    if debug:
+        print("compute_concentration_impl: concfactor=", concfactor)
+
+    if concfactor is None:
+        from molass.Except.ExceptionTypes import NotSpecifedError
+        raise NotSpecifedError("concfactor is not given as a kwarg nor acquired from a UV file.")
+
+    xr_peaks = []
+    for comp in decomposition.get_xr_components():
+        xr_peaks.append(comp.ccurve.params)
+    # 
+    model = EGH()
+    xr_curve = decomposition.xr_icurve
+    uv_curve = mapped_curve
+    
     fx = xr_curve.x
     y = xr_curve.y
     uv_y = uv_curve.y
     max_y = xr_curve.get_max_y()
     max_y_uv = uv_curve.get_max_y()
 
-    opt_recs = make_xr_opt_recs_adapted(model, fx, y, peaks)
-    uv_scale = max_y_uv/max_y
-    opt_recs_uv = make_uv_opt_recs_adapted(model, fx, uv_y, peaks, uv_scale)
+    opt_recs = make_xr_opt_recs_adapted(model, fx, y, xr_peaks)
+
+    mapping = ssd.get_mapping()
+    a = mapping.slope
+    b = mapping.intercept
+    a_ = 1/a
+    b_ = -b/a
+    uv_peaks = []
+    for comp in decomposition.get_uv_components():
+        h, m, s, t = comp.ccurve.params
+        uv_peaks.append(np.array((h, m*a_+b_, s*a_, t)))
+
+    # uv_scale = max_y_uv/max_y
+    uv_scale = 1
+    opt_recs_uv = make_uv_opt_recs_adapted(model, fx, uv_y, uv_peaks, uv_scale)
 
     if debug:
         import matplotlib.pyplot as plt

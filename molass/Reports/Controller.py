@@ -2,8 +2,7 @@
     Reports.Controller.py
 """
 import os
-import logging
-import time
+from molass_legacy.KekLib.ChangeableLogger import Logger
 from molass_legacy._MOLASS.SerialSettings import get_setting, set_setting
 from molass_legacy.SerialAnalyzer.SerialController import SerialExecuter
 
@@ -17,13 +16,14 @@ class Controller(SerialExecuter):
         save_smoothed_data
     """
     def __init__(self, env_info, report_folder=None, bookname=None, parallel=False):
-        self.logger = logging.getLogger(__name__)
         if report_folder is None:
             cwd = os.getcwd()
             report_folder = os.path.join(cwd, 'report_folder')
         self.work_folder = report_folder
         if not os.path.exists( self.work_folder ):
             os.makedirs( self.work_folder )
+        # self.logger = logging.getLogger(__name__)
+        self.logger = Logger(os.path.join(self.work_folder, 'molass.log'))
         self.temp_folder = os.path.join(self.work_folder, '.temp')
         self.make_temp_folder()
         self.logger.info('Controller initialized with temp_folder=%s', self.temp_folder)
@@ -80,6 +80,9 @@ class Controller(SerialExecuter):
             num_curves_averaged = get_setting( 'num_curves_averaged' )
             intensity_array_, average_slice_array, c_vector = self.serial_data.get_averaged_data( num_curves_averaged )
             assert c_vector is not None
+            if False:
+                import numpy as np
+                np.savetxt(os.path.join(self.work_folder, 'c_vector.csv'), c_vector, fmt='%.6e', delimiter=',')
 
             # save
             save_averaged_data = get_setting( 'save_averaged_data' )

@@ -6,13 +6,25 @@ import numpy as np
 MINOR_COMPONENT_MAX_PROP = 0.2
 
 def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debug=False):
+    """
+    Make V1 report ranges from the decomposition and mapped curve.
+
+    molass_legacy scheme:
+
+    molass library scheme:
+        decomp_result = Backward.DecompResultAdapter.adapted_decomp_result(...)
+    """
     if debug:
         from importlib import reload
-        import molass.LowRank.ElementRecords
-        reload(molass.LowRank.ElementRecords)
-    from molass.LowRank.ElementRecords import make_element_records_impl
+        import molass.Backward.DecompResultAdapter
+        reload(molass.Backward.DecompResultAdapter)
+    from molass.Backward.DecompResultAdapter import adapted_decomp_result
     # task: concentration_datatype must have been be set before calling this function.
-    elm_recs, elm_recs_uv = make_element_records_impl(decomposition, ssd, mapped_curve, debug=debug)
+
+    decomp_result= adapted_decomp_result(decomposition, ssd, mapped_curve, debug=debug)
+
+    elm_recs = decomp_result.opt_recs
+    elm_recs_uv = decomp_result.opt_recs_uv
 
     components = decomposition.get_xr_components()
     # components = decomposition.get_uv_components()
@@ -44,5 +56,15 @@ def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debu
     for comp, range_, prop in zip(components, ranges, area_proportions):
         minor = prop < MINOR_COMPONENT_MAX_PROP
         ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs_uv, debug=debug))
+
+    if debug:
+        from importlib import reload
+        import molass_legacy.Decomposer.UnifiedDecompResultTest
+        reload(molass_legacy.Decomposer.UnifiedDecompResultTest)
+        from molass_legacy.Decomposer.UnifiedDecompResultTest import plot_decomp_results
+        editor_ranges = []
+        for prange in ret_ranges:
+            editor_ranges.append(prange.get_fromto_list())
+        plot_decomp_results([decomp_result], editor_ranges)
 
     return ret_ranges
