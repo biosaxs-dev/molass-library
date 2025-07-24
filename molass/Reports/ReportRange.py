@@ -2,10 +2,11 @@
 Reports.ReportRange.py
 """
 import numpy as np
+from pydash import result
 
 MINOR_COMPONENT_MAX_PROP = 0.2
 
-def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debug=False):
+def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, concentration_datatype, debug=False):
     """
     Make V1 report ranges from the decomposition and mapped curve.
 
@@ -18,10 +19,25 @@ def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debu
         from importlib import reload
         import molass.Backward.DecompResultAdapter
         reload(molass.Backward.DecompResultAdapter)
+        import molass_legacy.Decomposer.DecompUtils
+        reload(molass_legacy.Decomposer.DecompUtils)
     from molass.Backward.DecompResultAdapter import adapted_decomp_result
+    from molass_legacy.Decomposer.DecompUtils import make_range_info_impl 
     # task: concentration_datatype must have been be set before calling this function.
 
     decomp_result= adapted_decomp_result(decomposition, ssd, mapped_curve, debug=debug)
+    if concentration_datatype == 1:     # Xray measured data
+        opt_recs_ = decomp_result.opt_recs   # will not be used, currenctly
+    else:
+        opt_recs_ = decomp_result.opt_recs_uv
+
+    control_info = decomp_result.get_range_edit_info()
+    print("editor_ranges=", control_info.editor_ranges)
+    print("select_matrix=", control_info.select_matrix)
+    print("top_x_list=", control_info.top_x_list)
+
+    legacy_ranges = make_range_info_impl(opt_recs_, control_info)
+    print("legacy_ranges=", legacy_ranges)
 
     elm_recs = decomp_result.opt_recs
     elm_recs_uv = decomp_result.opt_recs_uv
@@ -53,9 +69,10 @@ def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, debu
         print("area_proportions=", area_proportions)
 
     ret_ranges = []
-    for comp, range_, prop in zip(components, ranges, area_proportions):
+    for comp, range_, prop, legacy_range in zip(components, ranges, area_proportions, legacy_ranges):
         minor = prop < MINOR_COMPONENT_MAX_PROP
-        ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs_uv, debug=debug))
+        elm_recs = legacy_range[0].elm_recs     #  legacy_range[0] is a PeakInfo
+        ret_ranges.append(comp.make_paired_range(range_, minor=minor, elm_recs=elm_recs, debug=debug))
 
     if debug:
         from importlib import reload

@@ -5,7 +5,6 @@ import os
 from importlib import reload
 import threading
 from tqdm import tqdm
-from molass.Reports.ReportInfo import ReportInfo
 from molass_legacy._MOLASS.SerialSettings import set_setting
 class PreProcessing:
     """
@@ -59,10 +58,11 @@ def make_v1report(ssd, **kwargs):
         raise RuntimeError("pywin32 post-installation has not been run or is incomplete.")
 
     from molass.Progress.ProgessUtils import ProgressSet
-    kwargs['concentration_datatype'] = 2
     debug = kwargs.get('debug', False)
     guinier_only = kwargs.get('guinier_only', False)
     prepare_lrf_only = kwargs.get('prepare_lrf_only', False)
+    concentration_datatype = kwargs.get('concentration_datatype', 2)  # Default to UV model
+    kwargs['concentration_datatype'] = concentration_datatype
 
     env_info = get_global_env_info()    # do this here in the main thread to avoid issues with the reporting thread
     preproc = PreProcessing(ssd, **kwargs)
@@ -79,7 +79,7 @@ def make_v1report(ssd, **kwargs):
         pu = ps.add_unit(10)    # Summary Report
         pu_list.append(pu)
 
-    tread1 = threading.Thread(target=make_v1report_runner, args=[pu_list, preproc, ssd, env_info, kwargs])
+    tread1 = threading.Thread(target=make_v1report_runner, args=[pu_list, ssd, preproc, env_info, kwargs])
     tread1.start()
  
     with tqdm(ps) as t:
@@ -88,7 +88,7 @@ def make_v1report(ssd, **kwargs):
 
     tread1.join()
 
-def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
+def make_v1report_runner(pu_list, ssd, preproc, env_info, kwargs):
     debug = kwargs.get('debug', False)
     guinier_only = kwargs.get('guinier_only', False)
     
@@ -106,29 +106,20 @@ def make_v1report_runner(pu_list, preproc, ssd, env_info, kwargs):
     from molass.Reports.V1LrfReport import make_lrf_report
     from molass.Reports.V1SummaryReport import make_summary_report
 
-    report_folder = kwargs.get('report_folder', None)
-    bookname = kwargs.get('bookname', None)
-
-    controller = Controller(env_info, report_folder=report_folder, bookname=bookname)
-    controller.seconds_correction = ssd.time_required_total - ssd.time_initialized
-
     preproc.run(pu_list[0], debug=debug)
 
-    ri = ReportInfo(ssd=ssd,
-                    rgcurves=preproc.rgcurves,
-                    decomposition=preproc.decomposition,
-                    pairedranges=preproc.pairedranges,      # used in LRF report
-                    )
+    controller = Controller(env_info, ssd, preproc, kwargs)
+    controller.seconds_correction = ssd.time_required_total - ssd.time_initialized
 
     prepare_lrf_only = kwargs.get('prepare_lrf_only', False)
     if prepare_lrf_only:
         from molass.Reports.V1LrfReport import prepare_controller_for_lrf
         print("Preparing controller for LRF report... with prepare_lrf_only=True")
-        prepare_controller_for_lrf(controller, ri, kwargs)
+        prepare_controller_for_lrf(controller, kwargs)
         return
 
     controller.temp_books = []
-    make_guinier_report(pu_list[1], controller, ri, kwargs)
+    make_guinier_report(pu_list[1], controller, kwargs)
     if not guinier_only:
-        make_lrf_report(pu_list[2], controller, ri, kwargs)
-        make_summary_report(pu_list[3], controller, ri, kwargs)
+        make_lrf_report(pu_list[2], controller, kwargs)
+        make_summary_report(pu_list[3], controller, kwargs)

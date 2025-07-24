@@ -131,7 +131,7 @@ class Decomposition:
 
         return ret_components
 
-    def get_pairedranges(self, mapped_curve=None, area_ratio=0.7, debug=False):
+    def get_pairedranges(self, mapped_curve=None, area_ratio=0.7, concentration_datatype=2, debug=False):
         """
         Get the paired ranges.
         """
@@ -145,7 +145,7 @@ class Decomposition:
                     from molass.Backward.MappedCurve import make_mapped_curve
                     self.mapped_curve = make_mapped_curve(self.ssd, debug=debug)
                 mapped_curve = self.mapped_curve
-            self.paired_ranges = make_v1report_ranges_impl(self, self.ssd, mapped_curve, area_ratio, debug=debug)
+            self.paired_ranges = make_v1report_ranges_impl(self, self.ssd, mapped_curve, area_ratio, concentration_datatype, debug=debug)
         return self.paired_ranges
 
     def get_proportions(self):

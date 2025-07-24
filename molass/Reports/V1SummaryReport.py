@@ -5,7 +5,7 @@ from time import time
 
 from molass_legacy.SerialAnalyzer.StageSummary import do_summary_stage
 
-def make_summary_report(punit, controller, ri, kwargs):
+def make_summary_report(punit, controller, kwargs):
     """
     Create a summary report for the given controller and run info.
     This function is a wrapper around the do_summary_stage function.

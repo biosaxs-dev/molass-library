@@ -9,7 +9,7 @@ from time import time, sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_guinier_report(punit, controller, ri, kwargs):
+def make_guinier_report(punit, controller, kwargs):
     debug = kwargs.get('debug')
     if debug:
         import molass_legacy.Reports.GuinierAnalysisResultBook
@@ -30,10 +30,10 @@ def make_guinier_report(punit, controller, ri, kwargs):
         wb = controller.result_wb
         ws = wb.create_sheet('Guinier Analysis')
 
-    mo_rgcurve, at_rgcurve = ri.rgcurves
-    mapped_curve = ri.decomposition.mapped_curve
+    mo_rgcurve, at_rgcurve = controller.rgcurves
+    mapped_curve = controller.decomposition.mapped_curve
     assert mapped_curve is not None, "Mapped curve must be provided for Guinier analysis."
-    concfactor = ri.ssd.get_concfactor()  # ensure concfactor is set
+    concfactor = controller.ssd.get_concfactor()  # ensure concfactor is set
     # conc_factor?
     x, y = (mapped_curve * concfactor).get_xy()
     num_rows = len(y)
@@ -87,7 +87,7 @@ def make_guinier_report(punit, controller, ri, kwargs):
         book.save(temp_book)
         sleep(0.1)
         ranges = []
-        for range_ in ri.pairedranges:
+        for range_ in controller.pairedranges:
             fromto_list = range_.get_fromto_list()
             ranges.append([fromto_list[0][0], fromto_list[-1][1]])
         book.add_annotations(temp_book, ranges, debug=debug)

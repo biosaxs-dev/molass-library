@@ -15,7 +15,26 @@ class Controller(SerialExecuter):
     Inherits from SerialExecuter to use the following methods:
         save_smoothed_data
     """
-    def __init__(self, env_info, report_folder=None, bookname=None, parallel=False):
+    def __init__(self, env_info, ssd, preproc, kwargs):
+        debug = kwargs.get('debug', False)
+        if debug:
+            from importlib import reload
+            import molass.Backward.ConcTracker
+            reload(molass.Backward.ConcTracker)
+        from molass.Backward.ConcTracker import ConcTracker
+
+        jupyter = kwargs.get('jupyter', False)
+        report_folder = kwargs.get('report_folder', None)
+        bookname = kwargs.get('bookname', None)
+        parallel = kwargs.get('parallel', False)
+        self.ssd = ssd
+        self.rgcurves = preproc.rgcurves
+        self.pairedranges = preproc.pairedranges
+
+        self.decomposition = preproc.decomposition
+        self.concentration_datatype = kwargs.get('concentration_datatype', 2)  # Default to UV model
+        conc_factor = ssd.get_concfactor()  # Ensure concfactor is set
+        self.conc_tracker = ConcTracker(self.decomposition, conc_factor, self.concentration_datatype, jupyter=jupyter, debug=debug)
         if report_folder is None:
             cwd = os.getcwd()
             report_folder = os.path.join(cwd, 'report_folder')
