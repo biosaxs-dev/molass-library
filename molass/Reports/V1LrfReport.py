@@ -85,8 +85,9 @@ def make_lrf_report(punit, controller, kwargs):
         controller.logger.warning( 'No range for LRF was found.' )
 
     if debug:
-        savepath = os.path.join(controller.work_folder, 'tracked_concentrations.png')
-        controller.conc_tracker.plot(savepath=savepath)
+        if controller.conc_tracker is not None:
+            savepath = os.path.join(controller.work_folder, 'tracked_concentrations.png')
+            controller.conc_tracker.plot(savepath=savepath)
     controller.seconds_extrapolation = int(time() - start_time)
     punit.all_done()
 

@@ -27,6 +27,7 @@ class Controller(SerialExecuter):
         report_folder = kwargs.get('report_folder', None)
         bookname = kwargs.get('bookname', None)
         parallel = kwargs.get('parallel', False)
+        track_concentration = kwargs.get('track_concentration', False)
         self.ssd = ssd
         self.rgcurves = preproc.rgcurves
         self.pairedranges = preproc.pairedranges
@@ -34,7 +35,10 @@ class Controller(SerialExecuter):
         self.decomposition = preproc.decomposition
         self.concentration_datatype = kwargs.get('concentration_datatype', 2)  # Default to UV model
         conc_factor = ssd.get_concfactor()  # Ensure concfactor is set
-        self.conc_tracker = ConcTracker(self.decomposition, conc_factor, self.concentration_datatype, jupyter=jupyter, debug=debug)
+        if track_concentration:
+            self.conc_tracker = ConcTracker(self.decomposition, conc_factor, self.concentration_datatype, jupyter=jupyter, debug=debug)
+        else:
+            self.conc_tracker = None
         if report_folder is None:
             cwd = os.getcwd()
             report_folder = os.path.join(cwd, 'report_folder')

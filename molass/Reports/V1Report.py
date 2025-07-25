@@ -6,6 +6,10 @@ from importlib import reload
 import threading
 from tqdm import tqdm
 from molass_legacy._MOLASS.SerialSettings import set_setting
+
+ALLOWED_KEYS = {'rgcurves', 'ranges', 'decomposition',
+                'debug', 'guinier_only', 'prepare_lrf_only', 'concentration_datatype',
+                'report_folder', 'bookname', 'jupyter', 'parallel', 'track_concentration'}
 class PreProcessing:
     """
     A class to prepare the V1 report.
@@ -56,8 +60,9 @@ def make_v1report(ssd, **kwargs):
         print("\nPlease run (possibly as administrator) the following command to fix the issue:")
         print("python -m pywin32_postinstall -install\n")
         raise RuntimeError("pywin32 post-installation has not been run or is incomplete.")
-
     from molass.Progress.ProgessUtils import ProgressSet
+    if not set(kwargs).issubset(ALLOWED_KEYS):
+        raise TypeError(f"Unknown keyword arguments: {set(kwargs) - ALLOWED_KEYS}")
     debug = kwargs.get('debug', False)
     guinier_only = kwargs.get('guinier_only', False)
     prepare_lrf_only = kwargs.get('prepare_lrf_only', False)

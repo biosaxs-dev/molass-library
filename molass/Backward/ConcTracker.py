@@ -4,6 +4,7 @@ Backward.ConcTracker.py
 Concentration Tracker for Backward Compatibility
 """
 
+import logging
 import numpy as np
 from molass_legacy._MOLASS.SerialSettings import get_setting
 from molass.DataObjects.Curve import Curve
@@ -26,12 +27,14 @@ class DecompositionProxy:
 
 class ConcTracker:
     def __init__(self, decomposition, conc_factor, datatype, jupyter=False, debug=False):
+        self.logger = logging.getLogger(__name__)
         self.xr_curve = decomposition.xr_icurve
         self.mp_curve = decomposition.mapped_curve * conc_factor
         self.datatype = datatype
         self.concentrations = []
         self.jupyter = jupyter
         self.debug = debug
+        self.logger.info(f'Initialized ConcTracker with datatype={datatype}, jupyter={jupyter}, debug={debug}')
 
     def add_concentration(self, start, stop, c_matrix, conc_dependence=1):
         """
@@ -52,6 +55,7 @@ class ConcTracker:
             raise ValueError("Invalid start and stop indices.")
 
         self.concentrations.append((start, stop, c_matrix, conc_dependence))
+        self.logger.info(f'Added concentration from {start} to {stop} with shape {c_matrix.shape} and conc_dependence={conc_dependence}')
 
     def plot(self, savepath=None):
         """
@@ -60,18 +64,24 @@ class ConcTracker:
         """
         import matplotlib.pyplot as plt
         
-        fig, ax = plt.subplots()
-        ax.plot(self.mp_curve.x, self.mp_curve.y, label='Mapped Curve', color='C0')
+        x = self.xr_curve.x
+        fig, axes = plt.subplots(ncols=2, figsize=(12, 5))
+        fig.suptitle('Tracked Concentrations')
+        for k, ax in enumerate(axes):
+            ax.set_title(f'With Rank {k+1}')
+            ax.set_xlabel('Frames')
+            ax.set_ylabel('Concentration')
+            ax.plot(self.mp_curve.x, self.mp_curve.y, label='Mapped Curve', color='C0')
         for start, stop, c_matrix, conc_dependence in self.concentrations:
-            x = np.arange(start, stop)
+            self.logger.info(f'Plotting concentration from {start} to {stop} with shape {c_matrix.shape} and conc_dependence={conc_dependence}')
+            ax = axes[conc_dependence - 1]
+            x_ = x[start:stop]
             num_rows_to_plot = c_matrix.shape[0] if conc_dependence == 1 else c_matrix.shape[0]//2
             for i in range(num_rows_to_plot):
-                ax.plot(x, c_matrix[i,:], label=f'Component {i+1}')
+                ax.plot(x_, c_matrix[i,:], label=f'Component {i+1}')
 
-        ax.set_xlabel('Frames')
-        ax.set_ylabel('Concentration')
-        ax.set_title('Tracked Concentrations')
-        ax.legend()
+        for ax in axes: 
+            ax.legend()
         fig.tight_layout()
         if self.jupyter:
             plt.show()
