@@ -50,7 +50,10 @@ class Decomposition:
             from importlib import reload
             import molass.PlotUtils.DecompositionPlot
             reload(molass.PlotUtils.DecompositionPlot)
-        from molass.PlotUtils.DecompositionPlot import plot_components_impl
+        from molass.PlotUtils.DecompositionPlot import plot_components_impl, ALLOWED_KEYS
+        for key in kwargs.keys():
+            if key not in ALLOWED_KEYS:
+                raise ValueError(f"Invalid key: {key}. Allowed keys are: {ALLOWED_KEYS}")
         return plot_components_impl(self, **kwargs)
 
     def update_xr_ranks(self, ranks, debug=False):

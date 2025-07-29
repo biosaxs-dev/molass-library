@@ -7,6 +7,10 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
+ALLOWED_KEYS = {
+    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug',
+}
+
 def plot_components_impl(decomposition, **kwargs):
     debug = kwargs.get('debug', False)
     rgcurve = kwargs.get('rgcurve', None)
@@ -68,6 +72,8 @@ def plot_components_impl(decomposition, **kwargs):
         colorbar = kwargs.get('colorbar', False)
         if colorbar:
             fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
+        ymin, ymax = axt.get_ylim()
+        axt.set_ylim(min(0,ymin), ymax*1.5)
 
     pairedranges = kwargs.get('pairedranges', None)
     if pairedranges is not None:

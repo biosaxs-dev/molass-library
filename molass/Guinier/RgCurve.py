@@ -4,8 +4,9 @@
     This module contains the class RgCurve, which is used to store Rg curve information.
 """
 import numpy as np
+from molass.DataObjects.Curve import Curve
 
-class RgCurve:
+class RgCurve(Curve):
     """
     A class to represent a Rg curve.
     """
@@ -13,10 +14,13 @@ class RgCurve:
     def __init__(self, indeces, rgvalues, scores, results=None, intensities=None):
         """
         """
+        indeces = np.asarray(indeces, dtype=int)
+        super().__init__(indeces, rgvalues, type='i')
+        assert len(indeces) == len(rgvalues) == len(scores)
         self.index_dict = {}
         for k, i in enumerate(indeces):
             self.index_dict[i] = k
-        self.indeces = np.asarray(indeces, dtype=int)
+        self.indeces = indeces
         self.rgvalues = rgvalues
         self.scores = scores
         self.results = results  # either, molass results or atsas results
