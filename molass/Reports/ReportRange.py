@@ -2,7 +2,6 @@
 Reports.ReportRange.py
 """
 import numpy as np
-from pydash import result
 
 MINOR_COMPONENT_MAX_PROP = 0.2
 
