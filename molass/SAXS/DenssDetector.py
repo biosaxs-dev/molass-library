@@ -85,7 +85,7 @@ def get_denss_detector(q, rho, DENSS_GPU=False, debug=True):
     interp = interpolate.interp1d(qbinsc, Imean, kind='cubic', fill_value="extrapolate")
     I4chi = interp(q)
 
-    from molass.CurveModels.Scattering.FormFactors import homogeneous_sphere
+    from molass.SAXS.Models.Formfactors import homogeneous_sphere
     from learnsaxs import draw_voxles_as_dots
 
     R = 30

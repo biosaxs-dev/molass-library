@@ -8,7 +8,7 @@ from molass.DataObjects.Curve import Curve
 
 class RgCurve(Curve):
     """
-    A class to represent a Rg curve.
+    A class to represent an Rg curve.
     """
 
     def __init__(self, indeces, rgvalues, scores, results=None, intensities=None):

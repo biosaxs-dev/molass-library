@@ -1,5 +1,5 @@
 """
-This module contains functions, which is used to calculate the form factors
+SAXS/Models/FormFactors.py
 """
 import numpy as np
 import scipy.integrate as integrate
