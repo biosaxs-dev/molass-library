@@ -1,5 +1,5 @@
 """
-    PlotUtils.LowRankInfoPlot.py
+    PlotUtils.DecompositionPlot.py
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,21 +11,12 @@ ALLOWED_KEYS = {
     'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug',
 }
 
-def plot_components_impl(decomposition, **kwargs):
-    debug = kwargs.get('debug', False)
-    rgcurve = kwargs.get('rgcurve', None)
-
-    fig = plt.figure(figsize=(16, 8))
-    title = kwargs.get('title', None)
-    if title is not None:
-        fig.suptitle(title)
-
+def create_axes(fig, row_titles=["UV", "XR"]):
     gs = GridSpec(2,10)
-    for i, name in enumerate(["UV", "XR"]):
+    for i, name in enumerate(row_titles):
         ax = fig.add_subplot(gs[i,0])
         ax.set_axis_off()
         ax.text(0.8, 0.5, name, va="center", ha="center", fontsize=20)
-
     axes = []
     for i in range(2):
         axis_row = []
@@ -34,49 +25,124 @@ def plot_components_impl(decomposition, **kwargs):
             ax = fig.add_subplot(gs[i,start:start+3])
             axis_row.append(ax)
         axes.append(axis_row)
-    axes = np.array(axes)
+    return np.array(axes)
 
-    ax1 = axes[0,0]
-    ax2 = axes[1,0]
 
-    ax1.set_title("Elution Curves")
+def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
+    if title is not None:
+        ax.set_title(title)
+    ax.set_xlabel("Frames")
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+    x, y = icurve.get_xy()
+    ax.plot(x, y, label="data")
+    for i, c in enumerate(ccurves):
+        ax.plot(*c.get_xy(), ":", label="component-%d" % (i+1))
+    ax.legend()
 
-    # UV Elution Curve
-    ax1.set_xlabel("Frames")
-    ax1.set_ylabel("Absorbance")
-    ax1.plot(*decomposition.uv_icurve.get_xy(), label="data")
-    for i, c in enumerate(decomposition.uv_ccurves):
-        x, y = c.get_xy()
-        ax1.plot(x, y, ":", label="component-%d" % (i+1))
-    ax1.legend()
-
-    # XR Elution Curve
-    ax2.set_xlabel("Frames")
-    ax2.set_ylabel("Scattering Intensity")
-    x, y = decomposition.xr_icurve.get_xy()
-    ax2.plot(x, y, label="data")
-    for i, c in enumerate(decomposition.xr_ccurves):
-        cx, cy = c.get_xy()
-        ax2.plot(cx, cy, ":", label="component-%d" % (i+1))
-    ax2.legend()
-
+    rgcurve = kwargs.get('rgcurve', None)
+    colorbar = kwargs.get('colorbar', False)
     if rgcurve is None:
         axt = None
     else:
-        axt = ax2.twinx()
+        axt = ax.twinx()
         axt.set_ylabel("$R_g$")
         cm = plt.get_cmap('YlGn')
         x_ = x[rgcurve.indeces]
         axt.grid(False)
         sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm)
-        colorbar = kwargs.get('colorbar', False)
+        
         if colorbar:
-            fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
+            ax.fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
         ymin, ymax = axt.get_ylim()
         axt.set_ylim(min(0,ymin), ymax*1.5)
+    return axt
 
+def make_guinier_plot(ax, qv, xr_components, title=None):
+    """
+    Create a Guinier plot.
+    """
+    if title is not None:
+        ax.set_title(title)
+    ax.set_xlabel(r"$Q^2$")
+    ax.set_ylabel(r"$\log(I) - I_0$")
+
+    sg_list = []
+    for i, xr_component in enumerate(xr_components):
+        data = xr_component.get_jcurve_array()
+        pv = data[:,1]
+        sg = SimpleGuinier(data)
+        sg_list.append(sg)
+        start = sg.guinier_start
+        stop = sg.guinier_stop
+        for j, slice_ in enumerate([slice(0, int(stop*1.2)), slice(start, stop)]):
+            qv2 = qv[slice_]**2
+            logy = np.log(pv[slice_])
+            color = 'gray' if j == 0 else 'C%d'%(i+1)
+            alpha = 0.5 if j == 0 else 1
+            label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
+            if j == 0:
+                ax.plot(qv2, logy - np.log(sg.Iz), ":", color=color, alpha=alpha, label=label)
+            else:
+                slope = -sg.Rg**2/3
+                gy = qv2 * slope
+                ax.plot(qv2, gy, color=color, alpha=alpha, label=label)
+
+    ax.legend()
+    return sg_list
+
+def make_kratky_plot(ax, qv, P, sg_list, title=None):
+    """
+    Create a Kratky plot.
+    """
+    if title is not None:
+        ax.set_title(title)
+    ax.set_xlabel("$QR_g$")
+    ax.set_ylabel(r"$(QR_g)^2 \times I(Q)/I_0$")
+
+    for i, sg in enumerate(sg_list):
+        qrg = qv*sg.Rg
+        pv = P[:,i]
+        ax.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
+
+    px = np.sqrt(3)
+    py = 3/np.e
+    ax.axvline(px, ls=":", color="gray")
+    ax.axhline(py, ls=":", color="gray")
+    ax.axhline(0, color="red", alpha=0.5)
+
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+    dy = (ymax - ymin)*0.01
+    ax.text(px, ymin+dy, r"$ \sqrt{3} $", ha="right")
+    ax.text(xmax, py+2*dy, r"$ 3/e $", ha="right")
+
+    ax.legend()
+
+def plot_components_impl(decomposition, **kwargs):
+    debug = kwargs.get('debug', False)
+
+
+    fig = plt.figure(figsize=(16, 8))
+    title = kwargs.get('title', None)
+    if title is not None:
+        fig.suptitle(title)
+
+    axes = create_axes(fig)
+
+    ax1 = axes[0,0]
+    ax2 = axes[1,0]
+
+    # UV Elution Curve
+    plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="Elution Curves", ylabel="Absorbance")
+
+    # XR Elution Curve
+    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, ylabel="Scattering Intensity", **kwargs)
+
+    # Paired Ranges
     pairedranges = kwargs.get('pairedranges', None)
     if pairedranges is not None:
+        x = decomposition.xr_icurve.x
         mapping = decomposition.mapping
         uv_ylim = ax1.get_ylim()
         xr_ylim = ax2.get_ylim()
@@ -122,54 +188,14 @@ def plot_components_impl(decomposition, **kwargs):
         ax4.plot(qv, pv, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
     ax4.legend()
 
-    # Guinier Plot
     ax5 = axes[0,2]
     ax6 = axes[1,2]
-    ax5.set_title("XR Guinier/Kratky Plots")
-    ax5.set_xlabel(r"$Q^2$")
-    ax5.set_ylabel(r"$\log(I) - I_0$")
+
+    # Guinier Plot
+    sg_list = make_guinier_plot(ax5, qv, decomposition.get_xr_components(), title="XR Guinier/Kratky Plots")
 
     # Kratky Plot
-    ax6.set_xlabel("$QR_g$")
-    ax6.set_ylabel(r"$(QR_g)^2 \times I(Q)/I_0$")
-
-    for i, xr_component in enumerate(decomposition.get_xr_components()):
-        data = xr_component.get_jcurve_array()
-        pv = data[:,1]
-        sg = SimpleGuinier(data)
-        start = sg.guinier_start
-        stop = sg.guinier_stop
-        for j, slice_ in enumerate([slice(0, int(stop*1.2)), slice(start, stop)]):
-            qv2 = qv[slice_]**2
-            logy = np.log(pv[slice_])
-            color = 'gray' if j == 0 else 'C%d'%(i+1)
-            alpha = 0.5 if j == 0 else 1
-            label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
-            if j == 0:
-                ax5.plot(qv2, logy - np.log(sg.Iz), ":", color=color, alpha=alpha, label=label)
-            else:
-                slope = -sg.Rg**2/3
-                gy = qv2 * slope
-                ax5.plot(qv2, gy, color=color, alpha=alpha, label=label)
-        
-        qrg = qv*sg.Rg
-        ax6.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
-
-    ax5.legend()
-
-    px = np.sqrt(3)
-    py = 3/np.e
-    ax6.axvline(px, ls=":", color="gray")
-    ax6.axhline(py, ls=":", color="gray")
-    ax6.axhline(0, color="red", alpha=0.5)
-
-    xmin, xmax = ax6.get_xlim()
-    ymin, ymax = ax6.get_ylim()
-    dy = (ymax - ymin)*0.01
-    ax6.text(px, ymin+dy, r"$ \sqrt{3} $", ha="right")
-    ax6.text(xmax, py+2*dy, r"$ 3/e $", ha="right")
-
-    ax6.legend()
+    make_kratky_plot(ax6, qv, P, sg_list)
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=1.5)
