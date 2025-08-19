@@ -124,7 +124,21 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
                         + safe_log10(NPLATES_PENALTY_SCALE * ndev_penalty)
                         )
 
-            res = minimize(fit_objective, np.concatenate(peak_list), method='Nelder-Mead')
+            init_params = np.concatenate(peak_list)
+            randomize = kwargs.get('randomize', 0)
+            if randomize > 0:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    np.random.seed(seed)
+                init_params += np.random.normal(0, randomize, size=init_params.shape)
+
+            global_opt = kwargs.get('global_opt', False)
+            if global_opt:
+                from scipy.optimize import basinhopping
+                minimizer_kwargs = dict(method="Nelder-Mead")
+                res = basinhopping(fit_objective, init_params, minimizer_kwargs=minimizer_kwargs)
+            else:
+                res = minimize(fit_objective, init_params, method='Nelder-Mead')
             opt_params = res.x.reshape(shape)
         else:
             opt_params = peak_list
