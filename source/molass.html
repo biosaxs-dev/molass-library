@@ -490,6 +490,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.to_int_tuple"><code class="docutils literal notranslate"><span class="pre">to_int_tuple()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Version"><code class="docutils literal notranslate"><span class="pre">Version</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
 </ul>
@@ -506,6 +508,29 @@ document.write(`
   <section id="module-molass">
 <span id="molass-package"></span><h1>molass package<a class="headerlink" href="#module-molass" title="Link to this heading">#</a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="molass.to_int_tuple">
+<span class="sig-name descname"><span class="pre">to_int_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.to_int_tuple" title="Link to this definition">#</a></dt>
+<dd><p>Convert a version string to a tuple of integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>version_string</strong> (<em>str</em>) – A version string in the format ‘major.minor.patch’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple of integers representing the version.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="molass.Version">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Version" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="molass.get_version">
 <span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toml_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.get_version" title="Link to this definition">#</a></dt>
 <dd><p>Retrieve the version of the package from pyproject.toml or importlib.metadata.</p>
@@ -513,10 +538,9 @@ document.write(`
 that the local repository version is used during development or testing.
 If pyproject.toml is not found, it falls back to using importlib.metadata
 to retrieve the version of the installed package.</p>
-<section id="parameters">
-<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<dl>
-<dt>toml_only: bool, optional</dt><dd><p>If True, the function strictly reads the version from pyproject.toml.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>toml_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – <p>If True, the function strictly reads the version from pyproject.toml.
 This is crucial to avoid confusion about the version being used,
 which can lead to significant time loss during testing.
 (confusion about the local repository versus the installed).</p>
@@ -524,19 +548,24 @@ which can lead to significant time loss during testing.
 first. If pyproject.toml does not exist, which means you are using the
 installed package, it falls back to using importlib.metadata to retrieve
 this version.</p>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Version</strong> – This value is returned as a Version object, which provides
+comparison operators (as tuple of integers) for version strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The version of the package.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError:</strong> – If toml_only is True but pyproject.toml is not found. This ensures
+    that the function behaves predictably in cases where the local
+    repository is not available.</p></li>
+<li><p><strong>This docstring was improved in collaboration with GitHub Copilot.</strong> – </p></li>
+</ul>
 </dd>
 </dl>
-</section>
-<section id="raises">
-<h2>Raises:<a class="headerlink" href="#raises" title="Link to this heading">#</a></h2>
-<dl class="simple">
-<dt>AssertionError:</dt><dd><p>If toml_only is True but pyproject.toml is not found. This ensures
-that the function behaves predictably in cases where the local
-repository is not available.</p>
-</dd>
-</dl>
-<p>This docstring was improved in collaboration with GitHub Copilot.</p>
-</section>
 </dd></dl>
 
 <section id="submodules">
@@ -546,14 +575,17 @@ repository is not available.</p>
 <li class="toctree-l1"><a class="reference internal" href="molass.Baseline.html">Baseline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.Baseline2D.html#molass.Baseline.Baseline2D.individual_axes_impl"><code class="docutils literal notranslate"><span class="pre">individual_axes_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.Baseline2D.html#molass.Baseline.Baseline2D.Baseline2D"><code class="docutils literal notranslate"><span class="pre">Baseline2D</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.molass_lpm_impl"><code class="docutils literal notranslate"><span class="pre">molass_lpm_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.molass_uvdiff_impl"><code class="docutils literal notranslate"><span class="pre">molass_uvdiff_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.molass_integral_impl"><code class="docutils literal notranslate"><span class="pre">molass_integral_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.pybaselines_asls_impl"><code class="docutils literal notranslate"><span class="pre">pybaselines_asls_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.pybaselines_imor_impl"><code class="docutils literal notranslate"><span class="pre">pybaselines_imor_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.pybaselines_mormol_impl"><code class="docutils literal notranslate"><span class="pre">pybaselines_mormol_impl()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.molass_lpm_impl"><code class="docutils literal notranslate"><span class="pre">molass_lpm_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.iterlen"><code class="docutils literal notranslate"><span class="pre">iterlen()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.get_baseline_func"><code class="docutils literal notranslate"><span class="pre">get_baseline_func()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.get_uv_baseline_func"><code class="docutils literal notranslate"><span class="pre">get_uv_baseline_func()</span></code></a></li>
@@ -566,13 +598,11 @@ repository is not available.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent"><code class="docutils literal notranslate"><span class="pre">estimate_lpm_percent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.compute_lpm_baseline"><code class="docutils literal notranslate"><span class="pre">compute_lpm_baseline()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html#molass.Baseline.LpmBaseline2D.individual_axes_impl"><code class="docutils literal notranslate"><span class="pre">individual_axes_impl()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html#molass.Baseline.SimpleBaseline.estimate_baseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_baseline_params()</span></code></a></li>
 </ul>
@@ -680,15 +710,11 @@ repository is not available.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataUtils.Beamline.html">DataUtils.Beamline</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.BeamlineInfo"><code class="docutils literal notranslate"><span class="pre">BeamlineInfo</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.get_beamlineinfo"><code class="docutils literal notranslate"><span class="pre">get_beamlineinfo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.get_beamlineinfo_from_folder"><code class="docutils literal notranslate"><span class="pre">get_beamlineinfo_from_folder()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.get_beamlineinfo_from_settings"><code class="docutils literal notranslate"><span class="pre">get_beamlineinfo_from_settings()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.DataUtils.Concentration.html">DataUtils.Concentration</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Concentration.html#molass.DataUtils.Concentration.ConcInfo"><code class="docutils literal notranslate"><span class="pre">ConcInfo</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.Concentration.html#molass.DataUtils.Concentration.make_concinfo_impl"><code class="docutils literal notranslate"><span class="pre">make_concinfo_impl()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataUtils.Concentration.html">DataUtils.Concentration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataUtils.FolderWalker.html">DataUtils.FolderWalker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.FolderWalker.html#molass.DataUtils.FolderWalker.default_iswanted"><code class="docutils literal notranslate"><span class="pre">default_iswanted()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.FolderWalker.html#molass.DataUtils.FolderWalker.default_filter"><code class="docutils literal notranslate"><span class="pre">default_filter()</span></code></a></li>
@@ -769,10 +795,7 @@ repository is not available.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange"><code class="docutils literal notranslate"><span class="pre">NullFlowChange</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.FlowChange.Property.html">FlowChange.Property</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.FlowChange.Property.html#molass.FlowChange.Property.possibly_has_flowchange_points"><code class="docutils literal notranslate"><span class="pre">possibly_has_flowchange_points()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.FlowChange.Property.html">FlowChange.Property</a></li>
 </ul>
 </li>
 </ul>
@@ -874,11 +897,12 @@ repository is not available.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.make_lowrank_info_impl"><code class="docutils literal notranslate"><span class="pre">make_lowrank_info_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.make_component_curves"><code class="docutils literal notranslate"><span class="pre">make_component_curves()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.select_components"><code class="docutils literal notranslate"><span class="pre">select_components()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10"><code class="docutils literal notranslate"><span class="pre">safe_log10()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.compute_areas"><code class="docutils literal notranslate"><span class="pre">compute_areas()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.decompose_icurve_impl"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_impl()</span></code></a></li>
 </ul>
@@ -890,12 +914,11 @@ repository is not available.</p>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.get_denoised_data"><code class="docutils literal notranslate"><span class="pre">get_denoised_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.compute_lowrank_matrices"><code class="docutils literal notranslate"><span class="pre">compute_lowrank_matrices()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo"><code class="docutils literal notranslate"><span class="pre">LowRankInfo</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange"><code class="docutils literal notranslate"><span class="pre">PairedRange</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.convert_to_flatranges"><code class="docutils literal notranslate"><span class="pre">convert_to_flatranges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.convert_to_list_pairedranges"><code class="docutils literal notranslate"><span class="pre">convert_to_list_pairedranges()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a><ul>
@@ -903,10 +926,7 @@ repository is not available.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.LowRank.RankEstimator.html#molass.LowRank.RankEstimator.estimate_rank"><code class="docutils literal notranslate"><span class="pre">estimate_rank()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </li>
 </ul>
@@ -929,7 +949,7 @@ repository is not available.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Mapping.RatioCurve.html">Mapping.RatioCurve</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.Mapping.RatioCurve.html#molass.Mapping.RatioCurve.compute_ratio_curve"><code class="docutils literal notranslate"><span class="pre">compute_ratio_curve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Mapping.RatioCurve.html#molass.Mapping.RatioCurve.compute_ratio_curve_impl"><code class="docutils literal notranslate"><span class="pre">compute_ratio_curve_impl()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Mapping.SimpleMapper.html">Mapping.SimpleMapper</a><ul>
@@ -985,10 +1005,7 @@ repository is not available.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html#molass.PlotUtils.Arrow3D.add_arrow3D"><code class="docutils literal notranslate"><span class="pre">add_arrow3D()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html#molass.PlotUtils.LowRankInfoPlot.plot_components_impl"><code class="docutils literal notranslate"><span class="pre">plot_components_impl()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html#molass.PlotUtils.MatrixPlot.compute_3d_xyz"><code class="docutils literal notranslate"><span class="pre">compute_3d_xyz()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html#molass.PlotUtils.MatrixPlot.simple_plot_3d"><code class="docutils literal notranslate"><span class="pre">simple_plot_3d()</span></code></a></li>
@@ -1001,7 +1018,6 @@ repository is not available.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html#molass.PlotUtils.SecSaxsDataPlot.plot_3d_impl"><code class="docutils literal notranslate"><span class="pre">plot_3d_impl()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html#molass.PlotUtils.SecSaxsDataPlot.plot_baselines_impl"><code class="docutils literal notranslate"><span class="pre">plot_baselines_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html#molass.PlotUtils.SecSaxsDataPlot.plot_compact_impl"><code class="docutils literal notranslate"><span class="pre">plot_compact_impl()</span></code></a></li>
 </ul>
 </li>
@@ -1011,7 +1027,7 @@ repository is not available.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html">PlotUtils.TrimmingPlot</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.ij_from_slice"><code class="docutils literal notranslate"><span class="pre">ij_from_slice()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.plot_trimming_info_impl"><code class="docutils literal notranslate"><span class="pre">plot_trimming_info_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.plot_trimming_impl"><code class="docutils literal notranslate"><span class="pre">plot_trimming_impl()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.PlotUtils.V1GuinierPlot.html">PlotUtils.V1GuinierPlot</a><ul>
@@ -1052,21 +1068,16 @@ repository is not available.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.Reports.Migrating.html#molass.Reports.Migrating.make_gunier_row_values"><code class="docutils literal notranslate"><span class="pre">make_gunier_row_values()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.Reports.ReportInfo.html">Reports.ReportInfo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.Reports.ReportInfo.html#molass.Reports.ReportInfo.ReportInfo"><code class="docutils literal notranslate"><span class="pre">ReportInfo</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.Reports.ReportUtils.html#molass.Reports.ReportUtils.make_v1report"><code class="docutils literal notranslate"><span class="pre">make_v1report()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.Reports.ReportUtils.html#molass.Reports.ReportUtils.make_v1report_ranges_impl"><code class="docutils literal notranslate"><span class="pre">make_v1report_ranges_impl()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Reports.ReportInfo.html">Reports.ReportInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Reports.V1GuinierReport.html#molass.Reports.V1GuinierReport.make_guinier_report"><code class="docutils literal notranslate"><span class="pre">make_guinier_report()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="molass.Reports.V1Report.html#molass.Reports.V1Report.make_v1report_impl"><code class="docutils literal notranslate"><span class="pre">make_v1report_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Reports.V1Report.html#molass.Reports.V1Report.PreProcessing"><code class="docutils literal notranslate"><span class="pre">PreProcessing</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Reports.V1Report.html#molass.Reports.V1Report.make_v1report"><code class="docutils literal notranslate"><span class="pre">make_v1report()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Reports.V1Report.html#molass.Reports.V1Report.make_v1report_runner"><code class="docutils literal notranslate"><span class="pre">make_v1report_runner()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1136,12 +1147,13 @@ repository is not available.</p>
 <li class="toctree-l1"><a class="reference internal" href="molass.Trimming.html">Trimming</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Trimming.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.Trimming.TrimmingInfo.html">Trimming.TrimmingInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.custom_slice_string"><code class="docutils literal notranslate"><span class="pre">custom_slice_string()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo"><code class="docutils literal notranslate"><span class="pre">TrimmingInfo</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html">Trimming.TrimmingUtils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.make_and_slicepair"><code class="docutils literal notranslate"><span class="pre">make_and_slicepair()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.make_trimming_info_impl"><code class="docutils literal notranslate"><span class="pre">make_trimming_info_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.make_trimming_impl"><code class="docutils literal notranslate"><span class="pre">make_trimming_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.slice_to_values"><code class="docutils literal notranslate"><span class="pre">slice_to_values()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.make_mapped_trimming_info"><code class="docutils literal notranslate"><span class="pre">make_mapped_trimming_info()</span></code></a></li>
 </ul>
@@ -1191,6 +1203,8 @@ repository is not available.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.to_int_tuple"><code class="docutils literal notranslate"><span class="pre">to_int_tuple()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Version"><code class="docutils literal notranslate"><span class="pre">Version</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
 </ul>

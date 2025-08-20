@@ -531,6 +531,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve"><code class="docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_xy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_peak_top_x()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -540,11 +541,12 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.make_lowrank_info_impl"><code class="docutils literal notranslate"><span class="pre">make_lowrank_info_impl()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.make_component_curves"><code class="docutils literal notranslate"><span class="pre">make_component_curves()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.select_components"><code class="docutils literal notranslate"><span class="pre">select_components()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10"><code class="docutils literal notranslate"><span class="pre">safe_log10()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.compute_areas"><code class="docutils literal notranslate"><span class="pre">compute_areas()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.decompose_icurve_impl"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_impl()</span></code></a></li>
 </ul>
@@ -556,23 +558,16 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.get_denoised_data"><code class="docutils literal notranslate"><span class="pre">get_denoised_data()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.compute_lowrank_matrices"><code class="docutils literal notranslate"><span class="pre">compute_lowrank_matrices()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo"><code class="docutils literal notranslate"><span class="pre">LowRankInfo</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.get_num_components"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.get_num_components()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.plot_components"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.plot_components()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.get_xr_components"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.get_xr_components()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.get_uv_components"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.get_uv_components()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.make_v1report_ranges"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.make_v1report_ranges()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.LowRankInfo.get_proportions"><code class="docutils literal notranslate"><span class="pre">LowRankInfo.get_proportions()</span></code></a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange"><code class="docutils literal notranslate"><span class="pre">PairedRange</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange.get_fromto_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.get_fromto_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange.as_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.as_list()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange.is_minor"><code class="docutils literal notranslate"><span class="pre">PairedRange.is_minor()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.convert_to_flatranges"><code class="docutils literal notranslate"><span class="pre">convert_to_flatranges()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.convert_to_list_pairedranges"><code class="docutils literal notranslate"><span class="pre">convert_to_list_pairedranges()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a><ul>
@@ -580,10 +575,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html#molass.LowRank.RankEstimator.estimate_rank"><code class="docutils literal notranslate"><span class="pre">estimate_rank()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </div>
 </section>
