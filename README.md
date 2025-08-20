@@ -8,9 +8,6 @@ To install this package, use pip as follows.
 pip install -U molass
 ```
 
-> [!NOTE]
-> The molass package currently depends on molass_legacy. This dependency is planned to be removed.
-
 For details, see also:
 
 - **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
