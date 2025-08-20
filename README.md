@@ -12,7 +12,7 @@ For details, see also:
 
 - **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
 - **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
-- **Technical:** https://nshimizu0721.github.io/molass-technical for technical details,
+- **Technical:** https://freesemt.github.io/molass-technical for technical details,
 - **Reference:** https://nshimizu0721.github.io/molass-library for function reference,
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
 
