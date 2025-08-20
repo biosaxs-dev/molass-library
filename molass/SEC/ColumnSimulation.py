@@ -12,13 +12,13 @@ plt.rcParams['animation.embed_limit'] = 512     # https://stackoverflow.com/ques
 from .ColumnElements import Particle
 from .ColumnStructure import plot_column_structure
 
-def get_animation(use_tqdm=True, num_frames=None, close_plot=True, return_init=False, fig_check=False, debug=False):
+def get_animation(use_tqdm=True, num_frames=None, interval=100, close_plot=True, return_init=False, fig_check=False, debug=False):
     """
     """
     ymin, ymax = 0, 1
     xmin, xmax = 0.35, 0.65
 
-    num_pores = 32
+    num_pores = 16
     rs = 0.04
 
     psizes = np.array([8, 3, 1])
@@ -37,7 +37,7 @@ def get_animation(use_tqdm=True, num_frames=None, close_plot=True, return_init=F
 
     if num_frames is None:
         num_frames = 400
-    sigma = ymax/num_frames*2
+    sigma = ymax/num_frames
     du = sigma
     particle_scale = 1/1000  # [10, 5, 1] => [0.01, 0.005, 0.001]
     radius_map = psizes*particle_scale
@@ -47,17 +47,17 @@ def get_animation(use_tqdm=True, num_frames=None, close_plot=True, return_init=F
         print("radiusv=", radiusv)
     rv = radiusv + rs
 
-    figsize = (10,10)
+    figsize = (20,10)
     fig = plt.figure(figsize=figsize)
-    gs = GridSpec(2, 10)
+    gs = GridSpec(2, 20)
     ax1 = fig.add_subplot(gs[:,0:3])
 
     ax2 = fig.add_subplot(gs[:,3:5])
     ax2.yaxis.set_visible(False)
     ax2.set_xlim(0, 30)
 
-    ax3 = fig.add_subplot(gs[0,5:10])
-    ax4 = fig.add_subplot(gs[1,5:10])
+    ax3 = fig.add_subplot(gs[0,5:20])
+    ax4 = fig.add_subplot(gs[1,5:20])
 
     suptitle_fmt = "SEC-SAXS Illustrative 2D Animation: %3d"
     suptitle_text = fig.suptitle(suptitle_fmt % 0, fontsize=16, y=0.99)
@@ -117,7 +117,8 @@ def get_animation(use_tqdm=True, num_frames=None, close_plot=True, return_init=F
 
     fig.tight_layout()
     fig.subplots_adjust(bottom=0.06)    # to allow for the license text
-    ax2.set_position([0.29, 0.06, 0.17, 0.87])    # [left, bottom, width, height]
+    # ax2.set_position([0.29, 0.06, 0.17, 0.87])    # [left, bottom, width, height]
+    ax2.set_position([0.14, 0.06, 0.085, 0.87])    # [left, bottom, width, height]
 
     inmobile_states = np.ones(num_particles, dtype=bool)
     pxv = init_pxv.copy()
@@ -324,7 +325,7 @@ def get_animation(use_tqdm=True, num_frames=None, close_plot=True, return_init=F
     else:
         frames = num_frames
     anim = FuncAnimation(fig, animate, init_func=init,
-                            frames=frames, interval=100, blit=True)
+                            frames=frames, interval=interval, blit=True)
 
     if close_plot:
         plt.close() # Close the figure to prevent it from displaying in a static form
