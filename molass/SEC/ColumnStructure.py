@@ -65,7 +65,7 @@ def plot_column_structure(ax, xmin, xmax, ymin, ymax, num_pores, rs):
     """
     set_xlim or set_ylim must be called after plot_circles maybe due to NewGrain.graw which calles ax.pie
     """
-    ax.set_xlim(xmin, xmax)    
-    ax.set_ylim(0,1)
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
 
     return grains
