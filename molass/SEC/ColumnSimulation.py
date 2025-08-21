@@ -27,6 +27,7 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     psizes = np.array([5, 2.5, 2])
     markersizes = np.array([5, 3, 2])
     pcolors = ["green", "blue", "red"]
+    uv_absorbance_ratios = np.array([1.0, 1.5, 2.0])
     num_species_particles = 500
     ptype_indeces = np.array(list(np.arange(len(psizes)))*num_species_particles)
     np.random.shuffle(ptype_indeces)
@@ -43,8 +44,8 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
 
     if num_frames is None:
         num_frames = 400
-    sigma = ymax/num_frames
-    du = sigma*4
+    delta = ymax/num_frames
+    du = delta*5    # Increased to enhance particle movement
     particle_scale = 1/1000  # [10, 5, 1] => [0.01, 0.005, 0.001]
     radius_map = psizes*particle_scale
     print("radius_map=", radius_map)    
@@ -65,6 +66,9 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
 
     ax3 = fig.add_subplot(gs[0,6:12])
     ax4 = fig.add_subplot(gs[1,6:12])
+    for ax in (ax3, ax4):
+        ax.set_ylim(0, 40)
+        ax.set_xlim(100, num_frames)
 
     suptitle_fmt = "SEC-SAXS Illustrative 2D Animation: %3d"
     suptitle_text = fig.suptitle(suptitle_fmt % 0, fontsize=16, y=0.99)
@@ -187,7 +191,7 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
             print("(2) inmobile_states=", ''.join(map(lambda b: '%d' % b, inmobile_states)))
         last_pxv = pxv.copy()
         last_pyv = pyv.copy()
-        dxv, dyv = np.random.normal(0, sigma, (2,num_particles))
+        dxv, dyv = np.random.normal(0, delta, (2,num_particles))
         pxv += dxv
         exceed_left = pxv < xmin
         pxv[exceed_left] = 2*xmin - pxv[exceed_left]
@@ -295,9 +299,10 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
         for hist, container in zip(y_hist_list, horizontal_bar_containers):
             for count, rect in zip(hist, container.patches):
                 rect.set_width(count)
-        for hist, container in zip(x_hist_list, vertical_bar_containers_uv):
+        for k, (hist, container) in enumerate(zip(x_hist_list, vertical_bar_containers_uv)):
+            ratio = uv_absorbance_ratios[k]
             for count, rect in zip(hist, container.patches):
-                rect.set_height(count)
+                rect.set_height(count * ratio)
         for hist, container in zip(x_hist_list, vertical_bar_containers_xr):
             for count, rect in zip(hist, container.patches):
                 rect.set_height(count)
@@ -320,10 +325,6 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     print("len(bar_patches)=", len(bar_patches))
     print("bar_patch_lengths=", bar_patch_lengths)
     print("bar_patch_cum_indices=", bar_patch_cum_indices)
-
-    for ax in (ax3, ax4):
-        ax.set_ylim(0, 40)
-        ax.set_xlim(200, num_frames)
 
     if return_init:
         return
