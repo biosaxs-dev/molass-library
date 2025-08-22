@@ -34,11 +34,11 @@ def plot_view_arrows(ax, use_quiver=False, debug=False):
                 y * (ymax - ymin),
                 z * (zmax - zmin))
 
-    xz_view_point = get_coordinates(1.3, 0.5, 0.8)
-    xz_head_vector = get_direction(-0.5, 0, 0)
-    yz_view_point = get_coordinates(0.5, -0.1, 0.8)
-    yz_head_vector = get_direction(0, 0.5, 0)
-
+    xz_view_point = get_coordinates(0.5, -0.6, 0)
+    xz_head_vector = get_direction(0, 0.4, 0)
+    yz_view_point = get_coordinates(1.6, 0.5, 0)
+    yz_head_vector = get_direction(-0.3, 0, 0)
+    
     if use_quiver:
         # Use quiver for 3D arrows
         # Note: currently not available possibly due to a bug.

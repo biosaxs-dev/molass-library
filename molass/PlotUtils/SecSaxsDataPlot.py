@@ -21,6 +21,9 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
         alpha = 1
     matrixplot_kwargs['cmap'] = 'coolwarm'
     matrixplot_kwargs['alpha'] = alpha
+    matrixplot_kwargs['view_init'] = kwargs.get('view_init', (30, 30))
+    matrixplot_kwargs['view_arrows'] = kwargs.get('view_arrows', False)
+    wide_margin_layout = kwargs.get('wide_margin_layout', False)
 
     if xr_only or uv_only:
         ncols = 1
@@ -28,7 +31,19 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
     else:
         ncols = 2
         figsize = (12,5)
-    fig, axes = plt.subplots(ncols=ncols, figsize=figsize, subplot_kw=dict(projection='3d'))
+    
+    if wide_margin_layout:
+        fig = plt.figure(figsize=figsize)
+        gs = GridSpec(1,9)
+        axs0 = fig.add_subplot(gs[0, 0])
+        axs4 = fig.add_subplot(gs[0, 4])
+        axs8 = fig.add_subplot(gs[0, 8])
+        for ax in [axs0, axs4, axs8]:
+            ax.set_axis_off()
+        axes = [fig.add_subplot(gs[0,1:4], projection='3d'), fig.add_subplot(gs[0,5:8], projection='3d')]
+    else:
+        fig, axes = plt.subplots(ncols=ncols, figsize=figsize, subplot_kw=dict(projection='3d'))
+
     if title is not None:
         fig.suptitle(title)
 
