@@ -20,6 +20,8 @@ def make_component_curves(ssd, num_components, **kwargs):
     xr_icurve = ssd.xr.get_icurve()
     if num_components is None:
         num_components = len(xr_icurve.get_peaks())
+    kwargs['data_matrix'] = ssd.xr.M
+    kwargs['qv'] = ssd.xr.qv
     xr_ccurves = decompose_icurve_impl(xr_icurve, num_components, peakpositions=xr_peakpositions, **kwargs)
 
     uv_icurve = ssd.uv.get_icurve()

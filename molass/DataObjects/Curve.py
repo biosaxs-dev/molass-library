@@ -75,6 +75,10 @@ class Curve:
             self.peaks = get_peak_positions(self, debug=debug, **kwargs)
         return self.peaks
 
+    def get_num_major_peaks(self, **kwargs):
+        peaks = self.get_peaks(**kwargs)
+        return len(peaks)
+
     def get_moment(self):
         if self.moment is None:
             from molass.Stats.Moment import Moment

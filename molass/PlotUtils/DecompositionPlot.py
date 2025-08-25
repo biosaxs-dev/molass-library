@@ -73,20 +73,23 @@ def make_guinier_plot(ax, qv, xr_components, title=None):
         pv = data[:,1]
         sg = SimpleGuinier(data)
         sg_list.append(sg)
-        start = sg.guinier_start
-        stop = sg.guinier_stop
-        for j, slice_ in enumerate([slice(0, int(stop*1.2)), slice(start, stop)]):
-            qv2 = qv[slice_]**2
-            logy = np.log(pv[slice_])
-            color = 'gray' if j == 0 else 'C%d'%(i+1)
-            alpha = 0.5 if j == 0 else 1
-            label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
-            if j == 0:
-                ax.plot(qv2, logy - np.log(sg.Iz), ":", color=color, alpha=alpha, label=label)
-            else:
-                slope = -sg.Rg**2/3
-                gy = qv2 * slope
-                ax.plot(qv2, gy, color=color, alpha=alpha, label=label)
+        try:
+            start = sg.guinier_start
+            stop = sg.guinier_stop
+            for j, slice_ in enumerate([slice(0, int(stop*1.2)), slice(start, stop)]):
+                qv2 = qv[slice_]**2
+                logy = np.log(pv[slice_])
+                color = 'gray' if j == 0 else 'C%d'%(i+1)
+                alpha = 0.5 if j == 0 else 1
+                label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
+                if j == 0:
+                    ax.plot(qv2, logy - np.log(sg.Iz), ":", color=color, alpha=alpha, label=label)
+                else:
+                    slope = -sg.Rg**2/3
+                    gy = qv2 * slope
+                    ax.plot(qv2, gy, color=color, alpha=alpha, label=label)
+        except Exception as e:
+            print(f"make_guinier_plot: Error processing component {i+1}: {e}")
 
     ax.legend()
     return sg_list
@@ -101,9 +104,10 @@ def make_kratky_plot(ax, qv, P, sg_list, title=None):
     ax.set_ylabel(r"$(QR_g)^2 \times I(Q)/I_0$")
 
     for i, sg in enumerate(sg_list):
-        qrg = qv*sg.Rg
-        pv = P[:,i]
-        ax.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
+        if sg.Rg is not None:
+            qrg = qv*sg.Rg
+            pv = P[:,i]
+            ax.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
 
     px = np.sqrt(3)
     py = 3/np.e

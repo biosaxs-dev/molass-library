@@ -449,30 +449,6 @@ class SecSaxsData:
 
         return make_decomposition_impl(self, num_components, **kwargs)
 
-    def quick_lowrank_info(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_lowrank_info()
-
-        Returns a lowrank information object.
-
-        Parameters
-        ----------
-        num_components : int, optional
-            Specifies the number of components which also implies the SVD rank
-            used to denoise the matrix data.
-
-        curve_model : str, optional
-            Specifies the elution model to be used.
-            The default is 'egh'.
-        """
-        
-        debug = kwargs.get('debug', False)
-        if debug:
-            import molass.LowRank.QuickImplement
-            reload(molass.LowRank.QuickImplement)
-        from molass.LowRank.QuickImplement import make_lowrank_info_impl
-
-        return make_lowrank_info_impl(self, num_components, ranks, **kwargs)
-
     def inspect_ip_effect(self, debug=False):
         """ssd.inspect_ip_effect()
 
