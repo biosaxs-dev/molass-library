@@ -72,7 +72,7 @@ def decompose_proportionally(x, y, proportions, debug=False):
         import matplotlib.pyplot as plt
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 5))
         fig.suptitle("Decomposition Debug Plots: %s" % (proportions,))
-        ax1.plot(x, y)
+        ax1.plot(x, y, color='gray', alpha=0.5)
         debug_ax = ax2
     else:
         debug_ax = None
@@ -126,7 +126,7 @@ def decompose_proportionally(x, y, proportions, debug=False):
         if return_props:
             return props
         if debug_ax is not None:
-            debug_ax.plot(x, ty, linestyle=':', color='red')
+            debug_ax.plot(x, ty, color='red', alpha=0.3)
         return safe_log10(np.sum((ty - y) ** 2)) + 0.1 * safe_log10(np.sum((props - proportions)**2))
 
     if debug:

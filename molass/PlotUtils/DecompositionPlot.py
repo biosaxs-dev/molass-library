@@ -35,9 +35,14 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
     if ylabel is not None:
         ax.set_ylabel(ylabel)
     x, y = icurve.get_xy()
-    ax.plot(x, y, label="data")
+    ax.plot(x, y, color='gray', alpha=0.5, label="data")
+    cy_list = []
     for i, c in enumerate(ccurves):
-        ax.plot(*c.get_xy(), ":", label="component-%d" % (i+1))
+        cx, cy = c.get_xy()
+        ax.plot(cx, cy, ":", label="component-%d" % (i+1))
+        cy_list.append(cy)
+    ty = np.sum(cy_list, axis=0)
+    ax.plot(x, ty, color='red', alpha=0.3, label="component total")
     ax.legend()
 
     rgcurve = kwargs.get('rgcurve', None)
@@ -79,7 +84,7 @@ def make_guinier_plot(ax, qv, xr_components, title=None):
             for j, slice_ in enumerate([slice(0, int(stop*1.2)), slice(start, stop)]):
                 qv2 = qv[slice_]**2
                 logy = np.log(pv[slice_])
-                color = 'gray' if j == 0 else 'C%d'%(i+1)
+                color = 'gray' if j == 0 else 'C%d'%(i)
                 alpha = 0.5 if j == 0 else 1
                 label = None if j == 0 else r"component-%d, $R_g=%.3g$" % (i+1, sg.Rg)
                 if j == 0:
@@ -107,7 +112,7 @@ def make_kratky_plot(ax, qv, P, sg_list, title=None):
         if sg.Rg is not None:
             qrg = qv*sg.Rg
             pv = P[:,i]
-            ax.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
+            ax.plot(qrg, qrg**2*pv/sg.Iz, ":", color='C%d'%(i), label="component-%d" % (i+1))
 
     px = np.sqrt(3)
     py = 3/np.e
@@ -178,7 +183,7 @@ def plot_components_impl(decomposition, **kwargs):
     uv_matrices = decomposition.get_uv_matrices(debug=debug)
     M, C, P = uv_matrices[0:3]
     for i, pv in enumerate(P.T):
-        ax3.plot(wv, pv, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
+        ax3.plot(wv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
     ax3.legend()
 
     # XR Scattering Curves
@@ -189,7 +194,7 @@ def plot_components_impl(decomposition, **kwargs):
     xr_matrices = decomposition.get_xr_matrices(debug=debug)
     M, C, P = xr_matrices[0:3]
     for i, pv in enumerate(P.T):
-        ax4.plot(qv, pv, ":", color='C%d'%(i+1), label="component-%d" % (i+1))
+        ax4.plot(qv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
     ax4.legend()
 
     ax5 = axes[0,2]
