@@ -1,5 +1,5 @@
 """
-Shapes.Sphere.py
+Shapes.Ellipsoid.py
 """
 
 import numpy as np

@@ -40,7 +40,7 @@ def homogeneous_sphere(q, R):
     # Calculate the form factor using the formula for a homogeneous sphere
     qR = q * R
     F = (3 * (np.sin(qR) - qR * np.cos(qR))) / qR**3
-    return F
+    return F**2
 
 def sphere_volume(R):
     """
@@ -82,7 +82,7 @@ def spherical_shell(q, R, r):
     v1 = sphere_volume(R)
     v2 = sphere_volume(r)
     F = (v1*homogeneous_sphere(q, R) - v2*homogeneous_sphere(q, r)) / (v1 - v2)
-    return F
+    return F**2
 
 def ellipsoid_of_revolution(q, R, epsilon):
     """
@@ -107,7 +107,7 @@ def ellipsoid_of_revolution(q, R, epsilon):
         return R * np.sqrt(np.sin(alpha)**2 + (epsilon**2) * np.cos(alpha)**2)
 
     F = integrate.quad(lambda a: homogeneous_sphere(q, r(R, epsilon, a)), 0, np.pi/2)[0]
-    return F
+    return F**2
 
 def tri_axial_ellipsoid(q, a, b, c):
     """
@@ -134,4 +134,4 @@ def tri_axial_ellipsoid(q, a, b, c):
         return np.sqrt(((a**2 * np.sin(beta)**2 + b**2 * np.cos(beta)**2) * np.sin(alpha)**2 + (c * np.cos(alpha))**2))
 
     F = 2/np.pi * nquad_vec(lambda alpha, beta: homogeneous_sphere(q, r(a, b, c, alpha, beta))*np.sin(alpha), [[0, np.pi/2], [0, np.pi/2]])[0]
-    return F
+    return F**2
