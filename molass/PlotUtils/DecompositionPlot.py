@@ -36,10 +36,12 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
         ax.set_ylabel(ylabel)
     x, y = icurve.get_xy()
     ax.plot(x, y, color='gray', alpha=0.5, label="data")
+    proportions = kwargs.get('proportions', None)
     cy_list = []
     for i, c in enumerate(ccurves):
         cx, cy = c.get_xy()
-        ax.plot(cx, cy, ":", label="component-%d" % (i+1))
+        p = "" if proportions is None else " (%.3g)" % proportions[i]
+        ax.plot(cx, cy, ":", label="component-%d" % (i+1) + p)
         cy_list.append(cy)
     ty = np.sum(cy_list, axis=0)
     ax.plot(x, ty, color='red', alpha=0.3, label="component total")
