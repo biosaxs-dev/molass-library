@@ -101,7 +101,7 @@ Molass Library is freely available under an open-source license at [https://gith
 
 # Acknowledgements
 
-This research was partially supported by the Platform Project for Supporting Drug Discovery and Life Science Research [Basis for Supporting Innovative Drug Discovery and Life Science Research (BINDS)] from AMED under grant numbers ... ...
+This research was partially supported by the Platform Project for Supporting Drug Discovery and Life Science Research [Basis for Supporting Innovative Drug Discovery and Life Science Research (BINDS)] from AMED under grant numbers ...
 
 # References
 
