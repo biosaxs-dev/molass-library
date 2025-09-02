@@ -21,7 +21,7 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
         alpha = 1
     matrixplot_kwargs['cmap'] = 'coolwarm'
     matrixplot_kwargs['alpha'] = alpha
-    matrixplot_kwargs['view_init'] = kwargs.get('view_init', (30, 30))
+    matrixplot_kwargs['view_init'] = kwargs.get('view_init', {})
     matrixplot_kwargs['view_arrows'] = kwargs.get('view_arrows', False)
     wide_margin_layout = kwargs.get('wide_margin_layout', False)
 
