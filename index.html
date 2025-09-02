@@ -514,7 +514,7 @@ document.write(`
                   
   <section id="molass-library-reference">
 <h1>Molass Library Reference<a class="headerlink" href="#molass-library-reference" title="Link to this heading">#</a></h1>
-<p>Molass Library is a rewrite of <a class="reference external" href="https://www.jstage.jst.go.jp/article/biophysico/20/1/20_e200001/_article">MOLASS</a>, an analytical tool for SEC-SAXS experiment data currently hosted at <a class="reference external" href="https://pfwww.kek.jp/saxs/MOLASS.html">Photon Factory</a> or <a class="reference external" href="https://www.spring8.or.jp/en/">SPring-8</a>, Japan.</p>
+<p>Molass Library is a rewrite of <a class="reference external" href="https://pfwww.kek.jp/saxs/MOLASSE.html">MOLASS</a>, an analytical tool for SEC-SAXS experiment data currently hosted at <a class="reference external" href="https://www2.kek.jp/imss/pf/eng/">Photon Factory</a> or <a class="reference external" href="http://www.spring8.or.jp/en/">SPring-8</a>, Japan.</p>
 <p>This document describes each function of the library.</p>
 <p>For details, see also:</p>
 <ul class="simple">
@@ -711,6 +711,7 @@ comparison operators (as tuple of integers) for version strings.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_max_x"><code class="docutils literal notranslate"><span class="pre">Curve.get_max_x()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_max_xy"><code class="docutils literal notranslate"><span class="pre">Curve.get_max_xy()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_peaks"><code class="docutils literal notranslate"><span class="pre">Curve.get_peaks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_num_major_peaks"><code class="docutils literal notranslate"><span class="pre">Curve.get_num_major_peaks()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_moment"><code class="docutils literal notranslate"><span class="pre">Curve.get_moment()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.smooth_copy"><code class="docutils literal notranslate"><span class="pre">Curve.smooth_copy()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_spline"><code class="docutils literal notranslate"><span class="pre">Curve.get_spline()</span></code></a></li>
@@ -738,7 +739,6 @@ comparison operators (as tuple of integers) for version strings.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_decomposition()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.quick_lowrank_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_lowrank_info()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.inspect_ip_effect()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>
@@ -1014,6 +1014,7 @@ comparison operators (as tuple of integers) for version strings.</p>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10"><code class="docutils literal notranslate"><span class="pre">safe_log10()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.compute_areas"><code class="docutils literal notranslate"><span class="pre">compute_areas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.CurveDecomposer"><code class="docutils literal notranslate"><span class="pre">CurveDecomposer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.decompose_icurve_impl"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_impl()</span></code></a></li>
 </ul>
 </li>
@@ -1040,7 +1041,11 @@ comparison operators (as tuple of integers) for version strings.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.PositionedDecomposer.html#molass.LowRank.PositionedDecomposer.decompose_icurve_positioned"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_positioned()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.ProportionalDecomposer.html#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast"><code class="docutils literal notranslate"><span class="pre">compute_egh_area_fast()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.ProportionalDecomposer.html#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_proportionally()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </li>

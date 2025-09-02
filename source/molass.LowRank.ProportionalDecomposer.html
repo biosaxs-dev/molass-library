@@ -469,7 +469,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -485,6 +487,15 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast"><code class="docutils literal notranslate"><span class="pre">compute_egh_area_fast()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_proportionally()</span></code></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -494,8 +505,21 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="lowrank-proportionaldecomposer">
-<h1>LowRank.ProportionalDecomposer<a class="headerlink" href="#lowrank-proportionaldecomposer" title="Link to this heading">#</a></h1>
+  <section id="module-molass.LowRank.ProportionalDecomposer">
+<span id="lowrank-proportionaldecomposer"></span><h1>LowRank.ProportionalDecomposer<a class="headerlink" href="#module-molass.LowRank.ProportionalDecomposer" title="Link to this heading">#</a></h1>
+<p>LowRank.ProportionalDecomposer.py</p>
+<p>This module contains the functions to decompose a curve according to
+specified peak area proportions.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.LowRank.ProportionalDecomposer.compute_egh_area_fast">
+<span class="sig-name descname"><span class="pre">compute_egh_area_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally">
+<span class="sig-name descname"><span class="pre">decompose_icurve_proportionally</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decompargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 
 
@@ -533,6 +557,22 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast"><code class="docutils literal notranslate"><span class="pre">compute_egh_area_fast()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally"><code class="docutils literal notranslate"><span class="pre">decompose_icurve_proportionally()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

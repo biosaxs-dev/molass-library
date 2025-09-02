@@ -544,6 +544,8 @@ document.write(`
 </li>
       <li><a href="source/molass.Baseline.UvDiffEffect.html#molass.Baseline.UvDiffEffect.compute_dfef_curve">compute_dfef_curve() (in module molass.Baseline.UvDiffEffect)</a>
 </li>
+      <li><a href="source/molass.LowRank.ProportionalDecomposer.html#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast">compute_egh_area_fast() (in module molass.LowRank.ProportionalDecomposer)</a>
+</li>
       <li><a href="source/molass.Stats.EghMoment.html#molass.Stats.EghMoment.EghMoment.compute_egh_y">compute_egh_y() (EghMoment method)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChangeLikely.html#molass.FlowChange.FlowChangeLikely.compute_flowchange_likelihoods">compute_flowchange_likelihoods() (in module molass.FlowChange.FlowChangeLikely)</a>
@@ -628,6 +630,8 @@ document.write(`
 </li>
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve">Curve (class in molass.DataObjects.Curve)</a>
 </li>
+      <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.CurveDecomposer">CurveDecomposer (class in molass.LowRank.CurveDecomposer)</a>
+</li>
       <li><a href="source/molass.DataUtils.ForwardCompat.html#molass.DataUtils.ForwardCompat.CurveProxy">CurveProxy (class in molass.DataUtils.ForwardCompat)</a>
 </li>
       <li><a href="source/molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.custom_slice_string">custom_slice_string() (in module molass.Trimming.TrimmingInfo)</a>
@@ -643,6 +647,8 @@ document.write(`
       <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.decompose_icurve_impl">decompose_icurve_impl() (in module molass.LowRank.CurveDecomposer)</a>
 </li>
       <li><a href="source/molass.LowRank.PositionedDecomposer.html#molass.LowRank.PositionedDecomposer.decompose_icurve_positioned">decompose_icurve_positioned() (in module molass.LowRank.PositionedDecomposer)</a>
+</li>
+      <li><a href="source/molass.LowRank.ProportionalDecomposer.html#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally">decompose_icurve_proportionally() (in module molass.LowRank.ProportionalDecomposer)</a>
 </li>
       <li><a href="source/molass.DataUtils.FolderWalker.html#molass.DataUtils.FolderWalker.default_filter">default_filter() (in module molass.DataUtils.FolderWalker)</a>
 </li>
@@ -878,6 +884,8 @@ document.write(`
       <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh">get_num_components_assumming_egh() (in module molass.Bridge.V2Result)</a>
+</li>
+      <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_num_major_peaks">get_num_major_peaks() (Curve method)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_original_ssd">get_original_ssd() (V2Result method)</a>
 </li>
@@ -1227,6 +1235,8 @@ document.write(`
 </li>
         <li><a href="source/molass.LowRank.PositionedDecomposer.html#module-molass.LowRank.PositionedDecomposer">molass.LowRank.PositionedDecomposer</a>
 </li>
+        <li><a href="source/molass.LowRank.ProportionalDecomposer.html#module-molass.LowRank.ProportionalDecomposer">molass.LowRank.ProportionalDecomposer</a>
+</li>
         <li><a href="source/molass.Mapping.html#module-molass.Mapping">molass.Mapping</a>
 </li>
         <li><a href="source/molass.Mapping.Grouping.html#module-molass.Mapping.Grouping">molass.Mapping.Grouping</a>
@@ -1508,8 +1518,6 @@ document.write(`
         <li><a href="source/molass.DataUtils.Beamline.html#module-molass.DataUtils.Beamline">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.FolderWalker
 
@@ -1517,6 +1525,8 @@ document.write(`
         <li><a href="source/molass.DataUtils.FolderWalker.html#module-molass.DataUtils.FolderWalker">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.ForwardCompat
 
@@ -1795,6 +1805,13 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.LowRank.PositionedDecomposer.html#module-molass.LowRank.PositionedDecomposer">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.LowRank.ProportionalDecomposer
+
+      <ul>
+        <li><a href="source/molass.LowRank.ProportionalDecomposer.html#module-molass.LowRank.ProportionalDecomposer">module</a>
 </li>
       </ul></li>
       <li>
@@ -2241,8 +2258,6 @@ document.write(`
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition">quick_decomposition() (SecSaxsData method)</a>
-</li>
-      <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.quick_lowrank_info">quick_lowrank_info() (SecSaxsData method)</a>
 </li>
   </ul></td>
 </tr></table>
