@@ -8,7 +8,7 @@ import numpy as np
 from bisect import bisect_right
 from scipy.optimize import minimize, basinhopping
 from molass_legacy.KekLib.SciPyCookbook import smooth
-from molass_legacy.Peaks.ElutionModels import egh, e0
+from molass.SEC.Models.Simple import egh, e0
 from molass.Stats.Moment import compute_meanstd
 
 SQRT_PI_8 = np.sqrt(np.pi/8)

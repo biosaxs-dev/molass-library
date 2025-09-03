@@ -146,12 +146,18 @@ class XrComponent(Component):
     """
     def __init__(self, *args):
         super().__init__(*args)
+        self.sg = None
+    
+    def get_guinier_object(self):
+        if self.sg is None:
+            from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+            self.sg = SimpleGuinier(self.jcurve_array)
+        return self.sg
 
     def compute_rg(self, return_object=False):
         """
         """
-        from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
-        sg = SimpleGuinier(self.jcurve_array)
+        sg = self.get_guinier_object()
         if return_object:
             return sg
         else:

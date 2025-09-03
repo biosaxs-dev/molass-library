@@ -8,7 +8,7 @@ from importlib import reload
 import numpy as np
 from scipy.optimize import minimize
 from molass_legacy.QuickAnalysis.ModeledPeaks import recognize_peaks
-from molass_legacy.Models.ElutionCurveModels import egh
+from molass.SEC.Models.Simple import egh
 
 TAU_PENALTY_SCALE = 100
 NPLATES_PENALTY_SCALE = 1e-4

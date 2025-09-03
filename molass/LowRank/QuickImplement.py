@@ -15,6 +15,10 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
     if proportions is None:
         xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves(ssd, num_components, **kwargs)
     else:
+        if num_components is None:
+            num_components = len(proportions)
+        else:
+            assert num_components == len(proportions), "num_components must be equal to the length of proportions."
         xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs)
 
     if debug:

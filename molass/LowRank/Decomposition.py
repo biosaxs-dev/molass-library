@@ -97,6 +97,20 @@ class Decomposition:
 
         return ret_components
 
+    def get_guinier_objects(self):
+        """
+        Get the list of Guinier objects for the XR components.
+        """
+        xr_components = self.get_xr_components()
+        return [c.get_guinier_object() for c in xr_components]
+    
+    def get_rgs(self):
+        """
+        Get the list of Rg values for the XR components.
+        """
+        xr_components = self.get_xr_components()
+        return [c.compute_rg() for c in xr_components]
+
     def get_uv_matrices(self, debug=False):
         """
         Get the matrices for the UV data.
@@ -185,3 +199,15 @@ class Decomposition:
         peak_top_xes = [ccurve.get_peak_top_x() for ccurve in self.xr_ccurves]
         scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
         return peak_top_xes, scd_colors
+    
+    def optimize_with_model(self, model_name, debug=False):
+        """
+        Optimize the decomposition with a model.
+        """
+        if debug:
+            import molass.SEC.ModelFactory
+            reload(molass.SEC.ModelFactory)
+        from molass.SEC.ModelFactory import create_model
+        model = create_model(model_name, debug=debug)
+        return model.optimize_decomposition(self, debug=debug)
+

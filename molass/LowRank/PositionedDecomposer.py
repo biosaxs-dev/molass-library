@@ -7,7 +7,7 @@ specified peak positions.
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import minimize
-from molass_legacy.Models.ElutionCurveModels import egh
+from molass.SEC.Models.Simple import egh
 
 def decompose_icurve_positioned(x, y, decompargs, **kwargs):
     debug = kwargs.get('debug', False)
