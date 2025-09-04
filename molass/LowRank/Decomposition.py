@@ -14,7 +14,7 @@ class Decomposition:
     which includes the result of decomposition by LowRank.Decomposer.
     """
 
-    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs):
+    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None):
         """
         """
         assert len(xr_ccurves) == len(uv_ccurves)
@@ -31,9 +31,15 @@ class Decomposition:
         self.uv_ccurves = uv_ccurves
         self.uv_ranks = None
  
-        self.mapping = ssd.mapping
-        self.mapped_curve = kwargs.get('mapped_curve', None)
-        self.paired_ranges = None
+        self.mapping = ssd.get_mapping()
+        self.mapped_curve = mapped_curve
+        self.paired_ranges = paired_ranges
+
+    def copy_with_new_components(self, xr_ccurves, uv_ccurves):
+        """
+        Create a new Decomposition with new component curves.
+        """
+        return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
 
     def get_num_components(self):
         """

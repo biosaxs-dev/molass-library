@@ -15,7 +15,12 @@ class ComponentCurve:
         self.x = x
         self.params = np.asarray(params)
         self.moment = None
-    
+
+    def get_y(self):
+        """
+        """
+        return egh(self.x, *self.params)
+
     def get_xy(self):
         """
         """

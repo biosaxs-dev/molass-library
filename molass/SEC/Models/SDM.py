@@ -1,9 +1,6 @@
 """
 SEC.Models.SDM.py
 """
-from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf
-from molass.PlotUtils.DecompositionPlot import plot_elution_curve
-
 class SDM:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -17,14 +14,20 @@ class SDM:
             reload(molass.SEC.Models.SdmEstimator)
             import molass.SEC.Models.SdmOptimizer
             reload(molass.SEC.Models.SdmOptimizer)
-        from molass.SEC.Models.SdmEstimator import estimate_env_params
-        from molass.SEC.Models.SdmOptimizer import optimize_sdm_decomposition_impl
+            import molass.SEC.Models.UvOptimizer
+            reload(molass.SEC.Models.UvOptimizer)
+        from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
+        from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
+        from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
-        env_params = estimate_env_params(decomposition, **kwargs)
-        sdm_decomposition = optimize_sdm_decomposition_impl(decomposition, env_params, **kwargs)
+        env_params = estimate_sdm_column_params(decomposition, **kwargs)
+        new_xr_ccurves = optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs)
+        new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+        sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if debug:
-            import matplotlib.pyplot as plt            
+            import matplotlib.pyplot as plt
+            from molass.PlotUtils.DecompositionPlot import plot_elution_curve            
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
             fig.suptitle('Optimization Debug Plots')
             plot_elution_curve(axes[0, 0], decomposition.uv_icurve, decomposition.uv_ccurves, title="EGH Elution Curves for UV", ylabel="Absorbance")

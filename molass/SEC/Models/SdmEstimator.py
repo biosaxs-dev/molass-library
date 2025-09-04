@@ -4,11 +4,11 @@ SEC.Models.SdmEstimator.py
 import numpy as np
 from scipy.optimize import minimize
 
-def estimate_env_params(decomposition, **kwargs):
+def estimate_sdm_column_params(decomposition, **kwargs):
     """
-    Estimate environmental parameters from the initial curve and component curves.
+    Estimate column parameters from the initial curve and component curves.
 
-    N, T, N0, t0, poresize
+    N, T, me, mp, N0, t0, poresize
     """
     debug = kwargs.get('debug', False)
 
@@ -46,4 +46,5 @@ def estimate_env_params(decomposition, **kwargs):
         print("Optimization success:", result.success)
         print("Estimated parameters: N=%g, T=%g, N0=%g, t0=%g, poresize=%g" % tuple(result.x))
         print("Objective function value:", result.fun)
-    return result.x
+    N, T, N0, t0, poresize = result.x
+    return N, T, me, mp, N0, t0, poresize
