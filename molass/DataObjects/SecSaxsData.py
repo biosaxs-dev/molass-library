@@ -506,3 +506,37 @@ class SecSaxsData:
         from molass.DataUtils.ExportSsd import export_ssd_impl
         uv_device_id = self.get_uv_device_id()
         return export_ssd_impl(self, folder=folder, prefix=prefix, fmt=fmt, uv_device_id=uv_device_id, xr_only=xr_only, uv_only=uv_only)
+    
+    def plot_varied_decompositions(self, proportions, rgcurve=None, best=None, debug=False):
+        """ssd.plot_varied_decompositions(proportions, **kwargs)
+
+        Plots a set of varied decompositions.
+
+        Parameters
+        ----------
+        proportions : list of float
+            A list of proportions to be used for the varied decompositions.
+
+        rgcurve : object, optional
+            A reference to the RG curve to be used for the plot.
+
+        best : object, optional
+            A reference to the best decomposition to be highlighted in the plot.
+
+        debug : bool, optional
+            If True, enables debug mode.
+
+        Returns
+        -------
+        result : PlotResult
+            A PlotResult object which contains the following attributes.
+
+            fig: Figure
+            axes: Axes
+        """
+        if debug:
+            import molass.Decompose.VaryUtils
+            reload(molass.Decompose.VaryUtils)
+        from molass.Decompose.VaryUtils import plot_varied_decompositions
+        x, y = self.xr.get_icurve().get_xy()
+        return plot_varied_decompositions(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)

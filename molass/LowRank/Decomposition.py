@@ -14,7 +14,7 @@ class Decomposition:
     which includes the result of decomposition by LowRank.Decomposer.
     """
 
-    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None):
+    def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None, **kwargs):
         """
         """
         assert len(xr_ccurves) == len(uv_ccurves)
