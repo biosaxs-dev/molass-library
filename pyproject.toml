@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.6.0"
+version = "0.6.1"
 
 dependencies = [
   "numpy",
@@ -23,6 +23,7 @@ dependencies = [
   "numba",
   "numba",
   "ruptures",
+  "learnsaxs",
 ]
 
 requires-python = ">=3.9,<3.13"

@@ -23,7 +23,10 @@ def simple_plot_3d(ax, M, x=None, y=None, **kwargs):
     xx, yy, zz = compute_3d_xyz(M, x, y)
     view_init_kwargs = kwargs.pop('view_init', {})
     view_arrows = kwargs.pop('view_arrows', False)
-    ax.plot_surface(xx, yy, zz, **kwargs)
+    colorbar = kwargs.pop('colorbar', False)
+    sfp = ax.plot_surface(xx, yy, zz, **kwargs)
+    if colorbar:
+        ax.get_figure().colorbar(sfp, ax=ax)
     if view_arrows:
         from importlib import reload
         import molass.PlotUtils.ViewArrows
