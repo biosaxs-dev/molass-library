@@ -55,7 +55,7 @@ Analysis of SEC-SAXS data is inherently multi-step and complex. A standard workf
 
 The Molass Library currently implements steps 3–7. For steps 1 and 2, users may employ SAngler [@Shimizu:2016], and for step 8, DENSS [@Grant:2018] is recommended. While alternative tools exist—such as the proprietary ATSAS suite [@Manalastas-Cantos:ge5081] and the open-source BioXTAS RAW [@Hopkins:jl5075]—Molass Library distinguishes itself by providing an open, scriptable, and modular platform, empowering researchers to customize and extend their analysis pipelines within the Python ecosystem.
 
-# Key Features and Dependencies
+# Notable package dependencies
 
 Molass Library is built on robust scientific Python libraries, including NumPy [@Harris2020], SciPy [@Virtanen2020], and Matplotlib [@Hunter:2007]. It further integrates:
 
