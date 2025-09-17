@@ -4,24 +4,36 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.0.5"
+version = "0.6.1"
 
 dependencies = [
   "numpy",
-  "scipy",
+  "scipy<1.16.0",
   "matplotlib",
   "tqdm",
-  "pybaselines",
+  "pybaselines>=1.2.0",
+  "molass_legacy>=0.2.4",
+  "statsmodels",
+  "scikit-learn",
+  "toml",
+  "pywin32",
+  "psutil",
+  "seaborn",
+  "openpyxl",
+  "numba",
+  "numba",
+  "ruptures",
+  "learnsaxs",
 ]
 
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13"
 
 authors = [
-  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"},
+  {name = "Molass Community"},
 ]
 
 maintainers = [
-  {name = "Masatsuyo Takahashi", email = "freesemt@gmail.com"}
+  {name = "Molass Community"}
 ]
 
 description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
@@ -36,4 +48,10 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/freesemt/molass-library"
+Repository = "https://github.com/nshimizu0721/molass-library"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".",
+  "../molass-legacy"
+]

@@ -27,6 +27,12 @@ class Moment:
             self.y_ = y_
         return self.y_
     
+    def debug_plot(self, ax):
+        y_ = self.get_y_()
+        ax.plot(self.x, self.y, label='y')
+        ax.plot(self.x, y_, ":", label='y_')
+        ax.legend()
+ 
     def get_meanstd(self):
         if self.y_ is None:
             y_ = self.get_y_()
@@ -39,10 +45,22 @@ class Moment:
     
     def get_nsigma_points(self, n):
         M, std = self.get_meanstd()
-        wanted_range = np.logical_and(M - n*std < self.x, self.x < M + n*std)
-        i, j = np.where(wanted_range)[0][[0,-1]]
-        return i, j
-    
+        try:
+            wanted_range = np.logical_and(M - n*std < self.x, self.x < M + n*std)
+            i, j = np.where(wanted_range)[0][[0,-1]]
+            return i, j
+        except Exception as e:
+            print(f"Error in get_nsigma_points: {e}")
+            import matplotlib.pyplot as plt
+            print("M, std, n, y_:", M, std, n, self.y_)
+            plt.plot(self.x, self.y, label='y')
+            plt.plot(self.x, self.y_, label='y_')
+            plt.axvline(M - n*std, color='r', linestyle='--', label='Lower Bound')
+            plt.axvline(M + n*std, color='r', linestyle='--', label='Upper Bound')
+            plt.legend()
+            plt.show()
+            return None, None
+
     def get_lpm_percent(self, debug=True):
         if self.lpm_percent is None or debug:
             if debug:

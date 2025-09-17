@@ -1,42 +1,49 @@
 """
 Reports.V1GuinierReport.py
 
-This module contains the functions to generate the reports for the Guinier
-Analysis Report.
+This module contains the functions to generate the reports the Guinier Analysis.
 """
+import os
 from importlib import reload
-from time import sleep
+from time import time, sleep
 
 WRITE_TO_TEMPFILE = False
 
-def make_guinier_report(controller, punit, ri, kwargs):
+def make_guinier_report(punit, controller, kwargs):
     debug = kwargs.get('debug')
     if debug:
-        import Reports.GuinierAnalysisResultBook
-        reload(Reports.GuinierAnalysisResultBook)
+        import molass_legacy.Reports.GuinierAnalysisResultBook
+        reload(molass_legacy.Reports.GuinierAnalysisResultBook)
         import molass.Reports.Migrating
         reload(molass.Reports.Migrating)
-        import molass.Reports.Controller
-        reload(molass.Reports.Controller)
-    from Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
+    from molass_legacy.Reports.GuinierAnalysisResultBook import GuinierAnalysisResultBook
     from molass.Reports.Migrating import make_gunier_row_values
-    from molass.Reports.Controller import Controller
 
-    wb = ri.wb
-    ws = ri.ws
-    ssd = ri.ssd
-    mo_rgcurve, at_rgcurve = ri.rg_info
-    x, y = ri.conc_info.curve.get_xy()
-    num_rows = len(x)
+    guinier_only = kwargs.get('guinier_only', False)    
+    start_time = time()
 
-    row_list = []
+    if controller.excel_is_available:
+        from openpyxl import Workbook
+        wb = Workbook()
+        ws = wb.active
+    else:
+        wb = controller.result_wb
+        ws = wb.create_sheet('Guinier Analysis')
+
+    mo_rgcurve, at_rgcurve = controller.rgcurves
+    mapped_curve = controller.decomposition.mapped_curve
+    assert mapped_curve is not None, "Mapped curve must be provided for Guinier analysis."
+    concfactor = controller.ssd.get_concfactor()  # ensure concfactor is set
+    # conc_factor?
+    x, y = (mapped_curve * concfactor).get_xy()
+    num_rows = len(y)
 
     if WRITE_TO_TEMPFILE:
         fh = open("temp.csv", "w")
     else:
         fh = None
     num_steps = len(punit)
-    cycle = len(x)//num_steps
+    cycle = len(y)//num_steps
     rows = []
     for i in range(num_rows):
         sleep(0.1)
@@ -45,7 +52,6 @@ def make_guinier_report(controller, punit, ri, kwargs):
             mo_result = None
         else:
             mo_result = mo_rgcurve.results[j]
-            mo_quality = mo_result.quality_object
         k = at_rgcurve.index_dict.get(i)
         if k is None:
             at_result = None
@@ -69,12 +75,24 @@ def make_guinier_report(controller, punit, ri, kwargs):
         fh.close()
 
     j0 = int(x[0])
-    controller = Controller()
     book = GuinierAnalysisResultBook(wb, ws, rows, j0, parent=controller)
-    ranges = ri.ranges
 
-    bookfile = ri.bookfile
-    book.save(bookfile)
-    book.add_annonations(bookfile, ri.ranges)
+    if guinier_only:
+        temp_book = controller.bookpath
+    else:
+        temp_book = controller.temp_folder + '/--serial_analysis-temp.xlsx'
 
+    if controller.excel_is_available:
+        print("Saving Guinier Analysis Report to", temp_book)
+        book.save(temp_book)
+        sleep(0.1)
+        ranges = []
+        for range_ in controller.pairedranges:
+            fromto_list = range_.get_fromto_list()
+            ranges.append([fromto_list[0][0], fromto_list[-1][1]])
+        book.add_annotations(temp_book, ranges, debug=debug)
+
+    if not guinier_only:
+        controller.temp_books.append(temp_book)
+    controller.seconds_guinier = int(time() - start_time)
     punit.all_done()

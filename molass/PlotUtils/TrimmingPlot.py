@@ -18,10 +18,13 @@ def ij_from_slice(slice_):
         j = -1 if stop is None else stop
     return i, j
 
-def plot_trimming_info_impl(ssd, trim, **kwargs):
+def plot_trimming_impl(ssd, trim, **kwargs):
     if type(trim) is dict:
         from molass.Trimming.TrimmingInfo import TrimmingInfo
         trim = TrimmingInfo(**trim)
+
+    debug = kwargs.get('debug', False)
+
     fig = plt.figure(figsize=(16,8))
     gs = GridSpec(2,10)
 
@@ -151,19 +154,21 @@ def plot_trimming_info_impl(ssd, trim, **kwargs):
         if trim.mapping is not None and uv_icurve is not None:
             uv_k = trim.mapping.get_mapped_index(xr_k, xr_icurve.x, uv_icurve.x)
  
+    colors = "C0", "orange"
     n = 0
-    for ax, icurve, islice, _baseline, k in zip(axes[:,1],
+    for ax, icurve, islice, _baseline, k, color in zip(axes[:,1],
                                   (uv_icurve, xr_icurve),
                                   (uv_islice, xr_islice),
                                   (uv_baseline, xr_baseline),
                                   (uv_k, xr_k),
+                                  colors,
                                   ):
         if n == 0:
             ax.set_title("Elution Range")
         n += 1
         if icurve is None:
             continue
-        ax.plot(icurve.x, icurve.y)
+        ax.plot(icurve.x, icurve.y, color=color, alpha=0.5)
         i, j = ij_from_slice(islice)
         ax.axvspan(*icurve.x[[i,j]], color='green', alpha=0.1)
         ax.axvline(icurve.x[k], color='yellow')
@@ -189,23 +194,26 @@ def plot_trimming_info_impl(ssd, trim, **kwargs):
         xr_pick = ssd.xr.get_ipickvalue()
 
     n = 0
-    for ax, jcurve, jslice, pick in zip(axes[:,2],
+    for ax, jcurve, jslice, pick, color in zip(axes[:,2],
                                   (uv_jcurve, xr_jcurve),
                                   (uv_jslice, xr_jslice),
                                   (uv_pick, xr_pick),
+                                  colors,
                                   ):
         if n == 0:
             ax.set_title("Spectral Range")
         n += 1
         if jcurve is None:
             continue
-        ax.plot(jcurve.x, jcurve.y)
+        ax.plot(jcurve.x, jcurve.y, color=color, alpha=0.5)
         i, j = ij_from_slice(jslice)
         ax.axvspan(*jcurve.x[[i,j]], color='green', alpha=0.1)
         ax.axvline(pick, color='yellow')
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=1.2)
+    if debug:
+        plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, axes, trimming=trim)

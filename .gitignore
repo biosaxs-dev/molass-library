@@ -11,10 +11,26 @@ dist/
 
 # Ignore the Sphinx build directory
 docs/_build/
+docs/source/**
 
+<<<<<<< HEAD
 docs/source/**
 
 # Ignore pytest related files
 .pytest_cache/
 .coverage
 htmlcov
+=======
+# Ignore pytest related files
+.pytest_cache/
+.coverage
+htmlcov
+
+# Ignore the run_denss results
+**/temp/**
+
+*.xlsx
+
+**/atsas-results/**
+**/report_folder/**
+>>>>>>> master

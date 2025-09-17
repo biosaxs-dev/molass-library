@@ -8,9 +8,10 @@ from .Moment import Moment, compute_meanstd
 from molass.LowRank.CurveDecomposer import decompose_icurve_impl
 
 class EghMoment(Moment):
-    def __init__(self, icurve):
+    def __init__(self, icurve, num_peaks=None):
         super().__init__(icurve.x, icurve.y)
         self.icurve = icurve
+        self.num_peaks = num_peaks
 
     def get_y_(self):
         if self.y_ is None:
@@ -19,9 +20,9 @@ class EghMoment(Moment):
 
     def compute_egh_y(self):
         icurve = self.icurve
-        self.peaks = icurve.get_peaks()
-        num_peaks = len(self.peaks)
-        self.curves = decompose_icurve_impl(icurve, num_peaks)   # egh component
+        if self.num_peaks is None:
+            self.num_peaks = len(icurve.get_peaks())
+        self.curves = decompose_icurve_impl(icurve, self.num_peaks)   # egh component
         cy_list = []
         for curve in self.curves:
             _, cy = curve.get_xy()

@@ -16,40 +16,59 @@ class Component:
     """
     A class to represent a component.
     """
+    def __init__(self, icurve_array, jcurve_array, ccurve):
+        """
+        """
+        self.icurve_array = icurve_array
+        self.jcurve_array = jcurve_array
+        x, y = self.icurve_array
+        self.peak_index = np.argmax(y)
+        self.icurve = None
+        self.jcurve = None
+        self.area = None
+        self.ccurve = ccurve
 
-    def __init__(self, xr_component, uv_component):
+    def get_icurve(self):
         """
+        Returns the i-curve object.
         """
-        self.xr_component = xr_component
-        x, y = self.xr_component[0]     # [0] means the elution component
-        self.xr_peak_index = np.argmax(y)
-        self.xr_spline = None
-        self.xr_area = None
-        self.uv_component = uv_component
-    
-    def compute_rg(self, return_object=False):
-        """
-        """
-        from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
-        sg = SimpleGuinier(self.xr_component[1])    # [1] means the spectral component
-        if return_object:
-            return sg
-        else:
-            return sg.Rg
+        if self.icurve is None:
+            from molass.DataObjects.Curve import Curve
+            self.icurve = Curve(*self.icurve_array[0:2], type='i')
+        return self.icurve
 
-    def compute_xr_area(self):
-        if self.xr_area is None:
-            x, y = self.xr_component[0]     # [0] means the elution component
-            self.xr_spline = UnivariateSpline(x, y, s=0)
-            self.ax_area = integrate.quad(self.xr_spline, x[0], x[-1])[0]            
-        return self.ax_area
+    def get_jcurve(self):
+        """
+        Returns the j-curve object.
+        """
+        if self.jcurve is None:
+            from molass.DataObjects.Curve import Curve
+            self.jcurve = Curve(*self.jcurve_array[:,0:2], type='j')
+        return self.jcurve
+
+    def get_jcurve_array(self):
+        """
+        Returns the j-curve array which contains qv, I and error in case of XR.
+
+        Currently, error is zeros in case of UV.
+        """
+        return self.jcurve_array
+
+    def compute_area(self):
+        if self.area is None:
+            icurve = self.get_icurve()
+            spline = icurve.get_spline()
+            x = icurve.x
+            self.area = integrate.quad(spline, x[0], x[-1])[0]            
+        return self.area
 
     def compute_range(self, area_ratio, debug=False, return_also_fig=False):
-        x, y = self.xr_component[0]     # [0] means the elution component
-        entire_area = self.compute_xr_area()
-        entire_spline = self.xr_spline
+        icurve = self.get_icurve()
+        x, y = icurve.get_xy()
+        entire_area = self.compute_area()
+        entire_spline = icurve.get_spline()
         target_area = entire_area*area_ratio
-        m = self.xr_peak_index
+        m = self.peak_index
         if debug:
             print("m=", m, "area_ratio=", area_ratio, "target_area=", target_area)
 
@@ -114,6 +133,38 @@ class Component:
 
         return start, stop
     
-    def make_paired_range(self, range_, minor=False):
+    def make_paired_range(self, range_, minor=False, elm_recs=None, debug=False):
+        if debug:
+            from importlib import reload
+            import molass.LowRank.PairedRange
+            reload(molass.LowRank.PairedRange)
         from molass.LowRank.PairedRange import PairedRange
-        return PairedRange(range_, minor=minor, peak_index=self.xr_peak_index)
+        return PairedRange(range_, minor=minor, peak_index=self.peak_index, elm_recs=elm_recs)
+class XrComponent(Component):
+    """
+    A class to represent an XR component.
+    """
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.sg = None
+    
+    def get_guinier_object(self):
+        if self.sg is None:
+            from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+            self.sg = SimpleGuinier(self.jcurve_array)
+        return self.sg
+
+    def compute_rg(self, return_object=False):
+        """
+        """
+        sg = self.get_guinier_object()
+        if return_object:
+            return sg
+        else:
+            return sg.Rg
+class UvComponent(Component):
+    """
+    A class to represent a UV component.
+    """
+    def __init__(self, *args):
+        super().__init__(*args)

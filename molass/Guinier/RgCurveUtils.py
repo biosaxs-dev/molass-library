@@ -6,6 +6,8 @@ import os
 import numpy as np
 from tqdm import tqdm
 
+ADD_ALL_RESULTS = True
+
 def compute_rgcurve_info(xrdata):
     from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
     qv = xrdata.qv
@@ -14,7 +16,7 @@ def compute_rgcurve_info(xrdata):
     rginfo_list = []
     for j in tqdm(range(xrM.shape[1])):
         sg = SimpleGuinier(np.array([qv, xrM[:,j], xrE[:,j]]).T)
-        if sg.Rg is not None:
+        if sg.Rg is not None or ADD_ALL_RESULTS:
             # rginfo_list.append((j, sg.Rg, sg.score))
             rginfo_list.append((j, sg))
     return rginfo_list
@@ -35,7 +37,7 @@ def compute_rgcurve_info_atsas(xrdata):
     rginfo_list = []
     for j in tqdm(range(xrM.shape[1])):
         orig_result, eval_result = runner.run_from_array(np.array([qv, xrM[:,j], xrE[:,j]]).T)
-        if orig_result is not None and orig_result.Rg is not None:
+        if orig_result is not None and orig_result.Rg is not None or ADD_ALL_RESULTS:
             # rginfo_list.append((j, orig_result.Rg, orig_result.Quality))
             rginfo_list.append((j, orig_result))
     return rginfo_list

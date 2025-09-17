@@ -1,7 +1,5 @@
 """
     DataObjects.UvData.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 from molass.DataObjects.SsMatrixData import SsMatrixData
 from molass.DataObjects.Curve import Curve
@@ -12,15 +10,10 @@ PICKAT = PICKVALUES[0]
 class UvData(SsMatrixData):
     """
     UvData class for UV matrix data. """
-    def __init__(self, iv, jv, M, E):
-        super().__init__(iv, jv, M, E)
+    def __init__(self, iv, jv, M, E, **kwargs):
+        super().__init__(iv, jv, M, E, **kwargs)
         self.wv = iv
-        self.moment = None
 
-    def copy(self, **kwargs):
-        ssd_copy = super().copy(**kwargs)
-        return UvData(ssd_copy.iv, ssd_copy.jv, ssd_copy.M, ssd_copy.E)
-    
     def get_ipickvalues(self):
         return PICKVALUES
 
@@ -69,10 +62,7 @@ class UvData(SsMatrixData):
         for pickvalue in pickvalues:
             curve = self.get_icurve(pickat=pickvalue)
             curves.append(curve)
-        x = curves[0].x
-        y1 = curves[0].y
-        y2 = curves[1].y
-        points, judge_info = flowchange_exclude_slice(x, y1, y2)
+        points, judge_info = flowchange_exclude_slice(curves[0], curves[1])
         if return_also_curves:
             return points, judge_info, curves
         else:
@@ -119,7 +109,13 @@ class UvData(SsMatrixData):
             reload(molass.Baseline.BaselineUtils)
         from molass.Baseline.BaselineUtils import get_uv_baseline_func
         icurve = self.get_icurve(pickat=pickat)
+        if method is None:
+            method = self.get_baseline_method()
         compute_baseline_impl = get_uv_baseline_func(method)
         kwargs['moment'] = self.get_moment()
-        y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
+        if method == 'uvdiff':
+            from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
+            uvdiff_info = get_uvdiff_baseline_info(self)
+            kwargs['uvdiff_info'] = uvdiff_info
+        y = compute_baseline_impl(icurve.x, icurve.y, **kwargs)
         return Curve(icurve.x, y, type='i')

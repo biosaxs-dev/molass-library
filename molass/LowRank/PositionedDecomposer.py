@@ -7,14 +7,14 @@ specified peak positions.
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import minimize
-from molass_legacy.Models.ElutionCurveModels import egh
+from molass.SEC.Models.Simple import egh
 
 def decompose_icurve_positioned(x, y, decompargs, **kwargs):
     debug = kwargs.get('debug', False)
     peakpositions = decompargs.get('peakpositions', [])
     if len(peakpositions) == 0:
         raise ValueError("No peak positions specified.")
-    tau_ratio = decompargs.get('tau_ratio', 0.6)
+    tau_limit = decompargs.get('tau_limit', 0.6)
     max_sigma = decompargs.get('max_sigma', 17)
     spline = UnivariateSpline(x, y, s=0, ext=3)
     init_params_list = []
@@ -35,7 +35,7 @@ def decompose_icurve_positioned(x, y, decompargs, **kwargs):
             cy = egh(x, h, m, s, t)
             dev_penalty += (m - peakpositions[k])**2
             min_penalty += min(0, h - 0.02)**2
-            tau_penalty += max(0, t/s - tau_ratio)**2
+            tau_penalty += max(0, t/s - tau_limit)**2
             sig_penalty += max(0, s - max_sigma)**2
             cy_list.append(cy)
         ty = np.sum(cy_list, axis=0)

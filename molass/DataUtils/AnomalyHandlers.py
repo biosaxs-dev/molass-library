@@ -1,72 +1,118 @@
 """
     DataUtils.AnomalyHandlers.py
 """
+import numpy as np
+from scipy.signal import find_peaks
 
-def remove_bubbles_impl(xr_data, from_, to_, debug=False):
+BUBBLE_WIDTH_RANGE = (1, 5)
+BUBBLE_SEARCH_WIDTH = 10
+BUBBLE_GRADIENT_LIMIT = 0.03
+
+def bubble_check_impl(y, debug=False):
     """
-    ported from SerialData.exclude_intensities
+    Check for bubbles in the intensity array.
+    
+    Parameters
+    ----------
+    y : np.ndarray
+        The intensity array to be checked for bubbles.       
+    debug : bool
+        If True, debug information will be printed.
+
+    Returns
+    -------
+    bubbles : np.ndarray
+        The indices of the detected bubbles.
     """
+    max_y = np.max(y)
+    height = max_y*0.9
+    width = BUBBLE_WIDTH_RANGE
+    prominence = height
+    peaks, _ = find_peaks(y, height=height, width=width, prominence=prominence)
+    if len(peaks) > 0:
+        assert len(peaks) == 1
+        m = peaks[0]
+        start = max(0, m - BUBBLE_SEARCH_WIDTH)
+        stop = min(m + BUBBLE_SEARCH_WIDTH, len(y))
+        y_ = y[start:stop]
+        gy = np.abs(np.gradient(y_))/max_y
+        bubbles = start + np.where(gy > BUBBLE_GRADIENT_LIMIT)[0]
+    else:
+        bubbles = np.array([], dtype=int)
     if debug:
-        print("remove_bubbles_impl:", from_, to_ )
+        import matplotlib.pyplot as plt
+        x = np.arange(len(y))
+        fig, ax = plt.subplots()
+        ax.set_title("find_peaks(y, height=%.3g, width=%s, prominence=%.3g)" % (height, width, prominence))
+        ax.plot(x, y)
+        ax.plot(x[bubbles], y[bubbles], 'o', color='orange', alpha=0.5)
+        ax.plot(x[peaks], y[peaks], 'o', color='red', alpha=0.5)
+        axt = ax.twinx()
+        if False:
+            x_ = x[start:stop]
+            axt.plot(x_, gy, 'x')
+    return bubbles
 
-    M = xr_data.M
-    E = xr_data.E
-    size = M.shape[1]
-    excluded = []
+def remove_bubbles_impl(intensity_array, to_be_excluded, excluded_set, debug=False):
+    """
+    Exclude bubbles from the intensity array.
+
+    Parameters
+    ----------
+    intensity_array : np.ndarray
+        The intensity array to be modified.
+    to_be_excluded : np.ndarray
+        The indices of the bubbles to be excluded.
+    excluded_set : set
+        The set of excluded indices.
+    debug : bool
+        If True, debug information will be printed.
+
+    Returns
+    -------
+    excluded_set : set
+        The set of excluded indices.
+
+    """
+    from_ = None
+    for i in to_be_excluded:
+        if from_ is None:
+            from_ = i
+        else:
+            if i > last + 1:
+                exclude_bubble_impl(intensity_array, from_, last, excluded_set)
+                from_ = i
+
+        last = i
+    if from_ is not None:
+        exclude_bubble_impl(intensity_array, from_, last, excluded_set)
+
+    return excluded_set
+
+def exclude_bubble_impl(intensity_array, from_, to_, excluded_set):
+    """
+    Exclude a bubble from the intensity array.
+    """
+    print( 'exclude_bubble_impl: ', from_, to_ )
+    size = intensity_array.shape[0]
     if from_ == 0:
         j = to_ + 1
         for i in range( from_, j ):
-            M[:,i] = M[:,j]
-            E[:,i] = E[:,j]
-            excluded.append(i)
+            intensity_array[i, :, 1:] = intensity_array[j, :, 1:]
+            excluded_set.add(i)
     elif to_ == size - 1:
         j = from_ - 1
         for i in range( from_, size ):
-            M[:,i] = M[:,j]
-            E[:,i] = E[:,j]
-            excluded.append(i)
+            intensity_array[i, :, 1:] = intensity_array[j, :, 1:]
+            excluded_set.add(i)
     else:
         lower = from_ - 1
         upper = to_ + 1
-        lower_M = M[:,lower]
-        upper_M = M[:,upper]
-        lower_E = E[:,lower]
-        upper_E = E[:,upper]
+        lower_intensity = intensity_array[lower, :, : ]
+        upper_intensity = intensity_array[upper, :, : ]
         width = upper - lower
-        for i in range(1, width):
+        for i in range( 1, width ):
             w = i/width
-            M[:,lower+i] = (1 - w) * lower_M + w * upper_M
-            E[:,lower+i] = (1 - w) * lower_E + w * upper_E
-            excluded.append(lower+i)
-    if debug:
-        print("excluded=", excluded)
-
-def detect_and_remove_bubbles(xr_data, debug=False):
-    if debug:
-        from importlib import reload
-        import SerialAnalyzer.AbnormalityCheck
-        reload(SerialAnalyzer.AbnormalityCheck)
-    from molass_legacy.SerialAnalyzer.AbnormalityCheck import bubble_check_impl
-    curve = xr_data.get_icurve()
-    to_be_removed = bubble_check_impl(curve.y, debug=debug)
-    if debug:
-        print("detect_and_remove_bubbles: to_be_removed=", to_be_removed)
-
-    if len(to_be_removed) > 0:
-        ret_data = xr_data.copy()
-        from_ = None
-        for i in to_be_removed:
-            if from_ is None:
-                from_ = i
-            else:
-                if i > last + 1:
-                    remove_bubbles_impl(ret_data, from_, last)
-                    from_ = i
-
-            last = i
-        if from_ is not None:
-            remove_bubbles_impl(ret_data, from_, last)
-    else:
-        ret_data = xr_data
-
-    return ret_data, to_be_removed
+            intensity = ( 1 - w  ) * lower_intensity[ :, 1: ] + w * upper_intensity[ :, 1: ]
+            intensity_array[lower+i, :, 1:] = intensity
+            excluded_set.add(lower+i)

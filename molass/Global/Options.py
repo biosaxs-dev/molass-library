@@ -1,12 +1,9 @@
 """
     Global.Options.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 
 GLOBAL_OPTIONS = dict(
     mapped_trimming = True,
-    baseline_method = 'default',
     flowchange = False,
     uvdata = True,
     xrdata = True,

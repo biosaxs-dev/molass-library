@@ -1,8 +1,7 @@
 """
     DataObjects.XrData.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
+import numpy as np
 from importlib import reload
 from molass.DataObjects.SsMatrixData import SsMatrixData
 from molass.DataObjects.Curve import Curve
@@ -12,15 +11,10 @@ PICKAT = 0.02   # default value for pickat
 class XrData(SsMatrixData):
     """
     XrData class for XR matrix data. """
-    def __init__(self, iv, jv, M, E):
-        super().__init__(iv, jv, M, E)
+    def __init__(self, iv, jv, M, E, **kwargs):
+        super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
-        self.moment = None
 
-    def copy(self, **kwargs):
-        ssd_copy = super().copy(**kwargs)
-        return XrData(ssd_copy.iv, ssd_copy.jv, ssd_copy.M, ssd_copy.E)
- 
     def get_ipickvalue(self):
         return PICKAT
 
@@ -63,7 +57,6 @@ class XrData(SsMatrixData):
         """
         debug = kwargs.get('debug', False)
         if debug:
-            from importlib import reload
             import molass.Trimming.UsableQrange
             reload(molass.Trimming.UsableQrange)
         from molass.Trimming.UsableQrange import get_usable_qrange_impl
@@ -87,14 +80,15 @@ class XrData(SsMatrixData):
         """
         debug = kwargs.get('debug', False)
         if debug:
-            from importlib import reload
             import molass.Baseline.BaselineUtils
             reload(molass.Baseline.BaselineUtils)
         from molass.Baseline.BaselineUtils import get_xr_baseline_func
         icurve = self.get_icurve(pickat=pickat)
+        if method is None:
+            method = self.get_baseline_method()
         compute_baseline_impl = get_xr_baseline_func(method)
         kwargs['moment'] = self.get_moment()
-        y = compute_baseline_impl(icurve.x, icurve.y, kwargs)
+        y = compute_baseline_impl(icurve.x, icurve.y, **kwargs)
         return Curve(icurve.x, y, type='i')
 
     def compute_rgcurve(self, return_info=False, debug=False):
@@ -107,6 +101,7 @@ class XrData(SsMatrixData):
         None
         """
         if debug:
+            
             import molass.Guinier.RgCurveUtils
             reload(molass.Guinier.RgCurveUtils)
         from molass.Guinier.RgCurveUtils import compute_rgcurve_info
@@ -116,7 +111,6 @@ class XrData(SsMatrixData):
         else:
             if debug:
                 import molass.Guinier.RgCurve
-                reload(molass.Guinier.RgCurve)
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo)
 
@@ -143,3 +137,36 @@ class XrData(SsMatrixData):
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
 
+    def get_jcurve_array(self, j=None, peak=None):
+        """xr.get_jcurve_array(j=None, peak=None)
+
+        Returns the j-curve array.
+        This method extracts the q, I, and sigq values from the XR data.
+        It uses the first peak in the i-curve to determine the j-curve.
+        
+        Parameters
+        ----------
+        j : int, optional
+            The index of the j-curve to use. If None, the peak argument is used.
+
+        peak : int, optional
+            This argument is used only if j is None.
+            The index of the peak in the i-curve to use. If None, the first peak is used.            
+
+        Returns
+        -------
+        jcurve_array : np.ndarray
+        """
+        from molass.DataObjects.Curve import create_jcurve
+
+        q = self.qv
+        if j is None:
+            icurve = self.get_icurve()
+            peaks = icurve.get_peaks()
+            if peak is None:
+                peak = 0
+            j = peaks[peak]
+                
+        I = self.get_jcurve(j).y
+        sigq = create_jcurve(q, self.E, j).y
+        return np.array([q, I, sigq]).T

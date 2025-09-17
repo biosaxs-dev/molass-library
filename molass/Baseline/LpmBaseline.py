@@ -1,10 +1,9 @@
 """
     Baseline.LpmBaseline.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.DataObjects.Curve import Curve
+from molass_legacy.Baseline.ScatteringBaseline import ScatteringBaseline
 
 def estimate_lpm_percent(moment):
     M, std = moment.get_meanstd()
@@ -12,11 +11,16 @@ def estimate_lpm_percent(moment):
     ratio = len(np.where(np.logical_or(x < M - 3*std, M + 3*std < x))[0])/len(x)
     return ratio/2
 
+def compute_lpm_baseline(x, y, return_also_params=False, **kwargs):
+    sbl = ScatteringBaseline(y, x=x)
+    slope, intercept = sbl.solve()
+    baseline = x*slope + intercept
+    if return_also_params:
+        return baseline, dict(slope=slope, intercept=intercept)
+    else:
+        return baseline
 class LpmBaseline(Curve):
     def __init__(self, icurve):
-        from Baseline.ScatteringBaseline import ScatteringBaseline
-        sbl = ScatteringBaseline(icurve.y, suppress_warning=True)
-        A, B = sbl.solve()
         x = icurve.x
-        y = x*A + B
+        y = compute_lpm_baseline(x, icurve.y)
         super().__init__(x, y)
