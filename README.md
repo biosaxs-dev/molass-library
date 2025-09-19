@@ -1,6 +1,6 @@
 <h1 align="center"><a href="https://nshimizu0721.github.io/molass-library"><img src="docs/_static/molass-title.png" width="300"></a></h1>
 
-Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html), an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://www2.kek.jp/imss/pf/eng/) or [SPring-8](http://www.spring8.or.jp/en/), Japan.
+Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html), an analytical tool for SEC-SAXS experiment data currently hosted at [Photon Factory](https://www2.kek.jp/imss/pf/eng/) and [SPring-8](http://www.spring8.or.jp/en/), Japan.
 
 To install this package, use pip as follows.
 

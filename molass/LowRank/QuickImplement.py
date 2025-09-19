@@ -31,6 +31,15 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
 def make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs):
     """
     Make component curves with given proportions.
+
+    Parameters
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    num_components : int
+        The number of components to decompose into.
+    proportions : list of float
+        The proportions for each component.
     """
 
     assert len(proportions) == num_components, "Length of proportions must be equal to num_components."

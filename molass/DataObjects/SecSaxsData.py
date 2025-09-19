@@ -123,6 +123,9 @@ class SecSaxsData:
 
             Parameters
             ----------
+            title : str, optional
+                If specified, add a super title to the plot.
+                
             view_init   : dict, optional
                 A dictionary which specifies the view_init parameters.
                 The default is dict(elev=30, azim=-60) as of matplotlib 3.10.
@@ -132,7 +135,7 @@ class SecSaxsData:
                 One of the arrows shows the elutional view, while the other
                 shows the spectral view. The default is False.
 
-            Rturns
+            Returns
             -------
             result : PlotResult
                 A PlotResult object which contains the following attributes.
@@ -428,7 +431,7 @@ class SecSaxsData:
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_decomposition()
 
-        Returns a lowrank information object.
+        Returns a decompositin object.
 
         Parameters
         ----------
@@ -436,9 +439,16 @@ class SecSaxsData:
             Specifies the number of components which also implies the SVD rank
             used to denoise the matrix data.
 
-        curve_model : str, optional
-            Specifies the elution model to be used.
-            The default is 'egh'.
+        proportions : list of float, optional
+            Specifies the proportions to be used for XR data.
+
+        ranks : list of int, optional
+            Specifies the ranks to be used for XR data.
+
+        Returns
+        -------
+        decomposition : Decomposition
+            A Decomposition object which contains the decomposition result.
         """
         
         debug = kwargs.get('debug', False)

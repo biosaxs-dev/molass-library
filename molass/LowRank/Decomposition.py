@@ -10,8 +10,9 @@ import numpy as np
 
 class Decomposition:
     """
-    A class to store information about the components of a SecSaxsData,
-    which includes the result of decomposition by LowRank.Decomposer.
+    A class to store the result of decomposition which is a low rank approximation.
+
+    The result includes both components of X-ray and UV data and their associated information.
     """
 
     def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None, **kwargs):
@@ -50,6 +51,18 @@ class Decomposition:
     def plot_components(self, **kwargs):
         """
         Plot the components.
+
+        Parameters
+        ----------
+        title : str, optional
+            If specified, add a super title to the plot.
+
+        Returns
+        -------
+        result : PlotResult
+            A PlotResult object which contains the following attributes.
+            - fig: The matplotlib Figure object.
+            - axes: A list of Axes objects.
         """
         debug = kwargs.get('debug', False)
         if debug:
@@ -65,6 +78,15 @@ class Decomposition:
     def update_xr_ranks(self, ranks, debug=False):
         """
         Update the ranks for the X-ray data.
+
+        Parameters
+        ----------
+        ranks : list of int
+            The ranks for each component.
+
+        Returns
+        -------
+        None
         """
         self.xr_ranks = ranks
 
@@ -83,7 +105,11 @@ class Decomposition:
 
     def get_xr_components(self, debug=False):
         """
-        Get the components.
+        Get the components for the X-ray data.
+
+        Returns
+        -------
+        List of XrComponent objects.
         """
         if debug:
             from importlib import reload
@@ -132,7 +158,11 @@ class Decomposition:
 
     def get_uv_components(self, debug=False):
         """
-        Get the components.
+        Get the components for the UV data.
+
+        Returns
+        -------
+        List of UvComponent objects.
         """
         if debug:
             from importlib import reload
