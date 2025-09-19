@@ -354,7 +354,7 @@ def run_pdb2mrc(in_file, queue=None):
     from molass_legacy.KekLib.SubProcess import Popen   # suppresses the child process window.
     from molass_legacy.KekLib.BasicUtils import get_home_folder
     print("Generating an mrc file.")
-    script_path = os.path.join(get_home_folder(), r'molass_legacy\DENSS\denss\scripts\denss_pdb2mrc.py')
+    script_path = os.path.join(get_home_folder(), r'molass\SAXS\denss\scripts\denss_pdb2mrc.py')
     python  = sys.executable.replace('pythonw.exe', 'python.exe')       # running with pythonw.exe seems inappropriate
     out_file = in_file.replace('.pdb', '')
     cmd = [python, script_path, '-f', in_file, '-o', out_file]
@@ -379,7 +379,7 @@ def run_pdb2mrc(in_file, queue=None):
         print("Generated %s" %  out_file)
     else:
         if queue is not None:
-            queue.put((1, ret.stderr.decode() ))
+            queue.put((1, p.stderr.decode() ))
         out_file = None
         print("Failed with returncode: %d" % returncode)
 
