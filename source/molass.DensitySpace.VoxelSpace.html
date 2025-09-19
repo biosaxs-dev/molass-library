@@ -493,8 +493,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.get_meshgrid"><code class="docutils literal notranslate"><span class="pre">get_meshgrid()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl"><code class="docutils literal notranslate"><span class="pre">draw_voxles_as_dots_impl()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.compute_rg()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -525,18 +530,81 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl">
+<span class="sig-name descname"><span class="pre">draw_voxles_as_dots_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.ListedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.add_center_plane">
+<span class="sig-name descname"><span class="pre">add_center_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.add_center_plane" title="Link to this definition">#</a></dt>
+<dd><p>Add a plane at z=k to the 3D axes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.compute_rg_impl">
+<span class="sig-name descname"><span class="pre">compute_rg_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl" title="Link to this definition">#</a></dt>
+<dd><p>Compute the radius of gyration for a 3D density array.
+(This code was generated by Copilot)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>np.ndarray</em>) – 3D density array.</p></li>
+<li><p><strong>min_value</strong> (<em>float</em>) – Minimum density value to include in calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Radius of gyration.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VoxelSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VoxelSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>VoxelSpace class to handle voxel-based density spaces.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots">
-<span class="sig-name descname"><span class="pre">plot_as_dots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_as_dots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.ListedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots" title="Link to this definition">#</a></dt>
 <dd><p>Plot the voxel space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – The axes to plot on.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – The axes to plot on.</p></li>
+<li><p><strong>min_value</strong> (<em>float</em>) – The minimum density value to consider for plotting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density">
+<span class="sig-name descname"><span class="pre">plot_with_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.ListedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value=0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha=0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density" title="Link to this definition">#</a></dt>
+<dd><p>Plot the voxel space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axes</strong> (<em>matplotlib.axes.Axes</em>) – The axes to plot on.</p></li>
+<li><p><strong>min_value</strong> (<em>float</em>) – The minimum density value to consider for plotting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg">
+<span class="sig-name descname"><span class="pre">compute_rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg" title="Link to this definition">#</a></dt>
+<dd><p>Compute the radius of gyration of the voxel space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The radius of gyration.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -591,8 +659,13 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.get_meshgrid"><code class="docutils literal notranslate"><span class="pre">get_meshgrid()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl"><code class="docutils literal notranslate"><span class="pre">draw_voxles_as_dots_impl()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.compute_rg()</span></code></a></li>
 </ul>
 </li>
 </ul>

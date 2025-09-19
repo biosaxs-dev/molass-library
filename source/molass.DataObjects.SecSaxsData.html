@@ -510,6 +510,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.export"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.export()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_varied_decompositions()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -567,18 +568,22 @@ to suppress unnecessary data access.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
 <li><p><strong>view_init</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary which specifies the view_init parameters.
 The default is dict(elev=30, azim=-60) as of matplotlib 3.10.</p></li>
 <li><p><strong>view_arrows</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D view arrows are drawn on the 3D plot.
 One of the arrows shows the elutional view, while the other
 shows the spectral view. The default is False.</p></li>
-<li><p><strong>Rturns</strong></p></li>
-<li><p><strong>-------</strong></p></li>
-<li><p><strong>result</strong> (<a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult"><em>PlotResult</em></a>) – <p>A PlotResult object which contains the following attributes.</p>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>result</strong> – A PlotResult object which contains the following attributes.</p>
 <p>fig: Figure
 axes: Axes</p>
-</p></li>
-</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult">PlotResult</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -782,14 +787,14 @@ If the mapping information is not available, returns None.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition">
 <span class="sig-name descname"><span class="pre">quick_decomposition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition" title="Link to this definition">#</a></dt>
-<dd><p>Returns a lowrank information object.</p>
+<dd><p>Returns a decompositin object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
 used to denoise the matrix data.</p></li>
-<li><p><strong>curve_model</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies the elution model to be used.
-The default is ‘egh’.</p></li>
+<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
+<li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
 </ul>
 </dd>
 </dl>
@@ -836,6 +841,31 @@ The default is ‘%.18e’.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions">
+<span class="sig-name descname"><span class="pre">plot_varied_decompositions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proportions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions" title="Link to this definition">#</a></dt>
+<dd><p>Plots a set of varied decompositions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – A list of proportions to be used for the varied decompositions.</p></li>
+<li><p><strong>rgcurve</strong> (<em>object</em><em>, </em><em>optional</em>) – A reference to the RG curve to be used for the plot.</p></li>
+<li><p><strong>best</strong> (<em>object</em><em>, </em><em>optional</em>) – A reference to the best decomposition to be highlighted in the plot.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>result</strong> – A PlotResult object which contains the following attributes.</p>
+<p>fig: Figure
+axes: Axes</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult">PlotResult</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -907,6 +937,7 @@ The default is ‘%.18e’.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.export"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.export()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_varied_decompositions()</span></code></a></li>
 </ul>
 </li>
 </ul>
