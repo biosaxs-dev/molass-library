@@ -6,7 +6,7 @@ import os
 import numpy as np
 from molass.PackageUtils.NumbaUtils import get_ready_for_numba
 get_ready_for_numba()
-from molass_legacy.DENSS.denss.core import reconstruct_abinitio_from_scattering_profile
+from molass.SAXS.denss.core import reconstruct_abinitio_from_scattering_profile
 from .DetectorInfo import get_detector_info
 
 np.int = np.int32
@@ -37,7 +37,7 @@ def run_denss(jcurve_array, output_folder=None, file_prefix="denss_result", debu
     None
     """
     # from denss.core import reconstruct_abinitio_from_scattering_profile
-    from molass_legacy.DENSS.DenssUtils import fit_data_impl, run_denss_impl
+    from molass.SAXS.DenssUtils import fit_data_impl, run_denss_impl
     q = jcurve_array[:,0]
     I = jcurve_array[:,1]
     sigq = jcurve_array[:,2]

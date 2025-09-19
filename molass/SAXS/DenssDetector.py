@@ -3,7 +3,7 @@ DenssDetector.py
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from molass_legacy.DENSS.denss.core import *
+from molass.SAXS.denss.core import *
 
 class DenssDetector:
     def __init__(self, **entries): 
