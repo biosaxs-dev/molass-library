@@ -1002,7 +1002,10 @@ def calc_rg_by_guinier_first_2_points(q, I, DENSS_GPU=False):
     first two data points. This is meant to be used with a
     calculated scattering profile, such as Imean from denss()."""
     m = (mylog(I[1], DENSS_GPU) - mylog(I[0], DENSS_GPU)) / (q[1] ** 2 - q[0] ** 2)
-    rg = (-3 * m) ** (0.5)
+    if m < 0:
+        rg = (-3 * m) ** (0.5)
+    else:
+        rg = (-3 * -m) ** (0.5) * 1j
     return rg
 
 
@@ -1169,6 +1172,111 @@ def grid_center(rho):
     return np.array(rho.shape) // 2
 
 
+def get_icosahedral_matrices():
+    """Generate the 60 rotation matrices for icosahedral symmetry.
+
+    Returns a list of 60 3x3 numpy arrays representing the rotational symmetry
+    operations of an icosahedron:
+    - 1 identity operation
+    - 24 rotations from 5-fold symmetry (6 axes × 4 rotations each)
+    - 20 rotations from 3-fold symmetry (10 axes × 2 rotations each)
+    - 15 rotations from 2-fold symmetry (15 axes × 1 rotation each)
+    """
+    import numpy as np
+    from scipy.spatial.transform import Rotation
+
+    def normalize(v):
+        """Normalize a vector."""
+        norm = np.linalg.norm(v)
+        if norm < 1e-10:
+            return v
+        return v / norm
+
+    def is_unique_matrix(matrix, existing_matrices, tol=1e-6):
+        """Check if a matrix is unique compared to existing ones."""
+        return not any(np.allclose(matrix, existing, atol=tol) for existing in existing_matrices)
+
+    # Golden ratio for icosahedral geometry
+    phi = (1 + np.sqrt(5)) / 2
+
+    # Vertices of a regular icosahedron arranged in antipodal pairs
+    vertices = np.array([
+        [0, 1, phi], [0, -1, phi],  # Top pair
+        [0, 1, -phi], [0, -1, -phi],  # Bottom pair
+        [1, phi, 0], [-1, phi, 0],  # Front pair
+        [1, -phi, 0], [-1, -phi, 0],  # Back pair
+        [phi, 0, 1], [-phi, 0, 1],  # Right pair
+        [phi, 0, -1], [-phi, 0, -1]  # Left pair
+    ])
+    vertices = np.array([normalize(v) for v in vertices])
+
+    rotations = []
+
+    # Add identity operation
+    rotations.append(np.eye(3))
+
+    # Generate 5-fold rotations
+    # An icosahedron has six 5-fold axes through opposite vertices
+    # Each axis gives 4 rotations (72°, 144°, 216°, 288°)
+    for i in range(0, 12, 2):  # Step by 2 to get one vertex from each antipodal pair
+        axis = vertices[i]
+        for k in range(1, 5):  # 4 rotations per axis
+            angle = k * 2 * np.pi / 5
+            R = Rotation.from_rotvec(angle * axis).as_matrix()
+            if is_unique_matrix(R, rotations):
+                rotations.append(R)
+
+    # Generate 3-fold rotations
+    # An icosahedron has 20 triangular faces
+    # Each face center defines a 3-fold rotation axis
+    faces = [
+        [0, 4, 8], [0, 9, 5],  # Around top vertex
+        [1, 6, 8], [1, 9, 7],  # Around top vertex opposite
+        [2, 6, 10], [2, 11, 7],  # Around bottom vertex
+        [3, 4, 10], [3, 11, 5],  # Around bottom vertex opposite
+        [0, 8, 4], [0, 5, 9],  # Top band
+        [1, 8, 6], [1, 7, 9],  # Top band
+        [2, 10, 6], [2, 7, 11],  # Bottom band
+        [3, 10, 4], [3, 5, 11],  # Bottom band
+        [4, 8, 10], [5, 9, 11],  # Middle band
+        [6, 8, 10], [7, 9, 11]  # Middle band
+    ]
+
+    for face in faces:
+        # Face center is average of three vertices
+        face_center = normalize(vertices[face[0]] + vertices[face[1]] + vertices[face[2]])
+        for k in range(1, 3):  # 2 rotations per axis (120°, 240°)
+            angle = k * 2 * np.pi / 3
+            R = Rotation.from_rotvec(angle * face_center).as_matrix()
+            if is_unique_matrix(R, rotations):
+                rotations.append(R)
+
+    # Generate 2-fold rotations
+    # An icosahedron has 30 edges, but each edge and its opposite
+    # define the same rotation axis, giving 15 unique rotations
+    edge_dot = 1 / np.sqrt(5)  # cosine of angle between adjacent vertices
+
+    # Find all edges by looking for adjacent vertices
+    edges = []
+    for i in range(len(vertices)):
+        for j in range(i + 1, len(vertices)):
+            if abs(np.dot(vertices[i], vertices[j]) - edge_dot) < 1e-6:
+                edges.append([i, j])
+
+    # Generate one rotation per unique edge
+    used_edges = set()
+    for i, j in edges:
+        edge_key = tuple(sorted([i, j]))
+        if edge_key not in used_edges:
+            used_edges.add(edge_key)
+            edge_center = normalize(vertices[i] + vertices[j])
+            R = Rotation.from_rotvec(np.pi * edge_center).as_matrix()
+            if is_unique_matrix(R, rotations):
+                rotations.append(R)
+
+    return rotations
+
+
 def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Iraw=None, sigqraw=None,
                                                  ne=None, voxel=5., oversampling=3., recenter=True, recenter_steps=None,
                                                  recenter_mode="com", positivity=True, positivity_steps=None, extrapolate=True, output="map",
@@ -1265,7 +1373,7 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
     I *= scale_factor
     sigq *= scale_factor
 
-    if steps == 'None' or steps is None or np.int(steps) < 1:
+    if steps == 'None' or steps is None or int(steps) < 1:
         stepsarr = np.concatenate((enforce_connectivity_steps, [shrinkwrap_minstep]))
         maxec = np.max(stepsarr)
         steps = int(shrinkwrap_iter * (
@@ -1275,7 +1383,7 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
         # then just make a round number when using defaults
         steps += 7621
     else:
-        steps = np.int(steps)
+        steps = int(steps)
 
     Imean = np.zeros((len(qbins)))
 
@@ -1294,7 +1402,7 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
     Iq_calc = Iq_calc[Iq_calc[:, 0] <= qmax]
 
     chi = np.zeros((steps + 1))
-    rg = np.zeros((steps + 1))
+    rg = np.zeros((steps + 1), dtype=np.complex128)
     supportV = np.zeros((steps + 1))
     if support_start is not None:
         support = np.copy(support_start)
@@ -1347,6 +1455,10 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
             # make minimum of one pixel
             erosion_width = 1
 
+    # for icosahedral symmetry, just set ncs to 1 to trigger ncs averaging
+    if ncs_type == "icosahedral":
+        ncs = 1
+
     my_logger.info('q range of input data: %3.3f < q < %3.3f', q.min(), q.max())
     my_logger.info('Maximum dimension: %3.3f', D)
     my_logger.info('Sampling ratio: %3.3f', oversampling)
@@ -1356,6 +1468,7 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
     my_logger.info('Recenter Steps: %s', recenter_steps)
     my_logger.info('Recenter Mode: %s', recenter_mode)
     my_logger.info('NCS: %s', ncs)
+    my_logger.info('NCS Type: %s', ncs_type)
     my_logger.info('NCS Steps: %s', ncs_steps)
     my_logger.info('NCS Axis: %s', ncs_axis)
     my_logger.info('Positivity: %s', positivity)
@@ -1478,7 +1591,8 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
         rhoprime = myirfftn(F, DENSS_GPU=DENSS_GPU).real
 
         # use Guinier's law to approximate quickly
-        rg[j] = calc_rg_by_guinier_first_2_points(qbinsc, Imean, DENSS_GPU=DENSS_GPU)
+        rg_j = calc_rg_by_guinier_first_2_points(qbinsc, Imean, DENSS_GPU=DENSS_GPU)
+        rg[j] = rg_j
 
         # Error Reduction
         newrho *= 0
@@ -1497,37 +1611,46 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
         if ncs != 0 and j in ncs_steps:
             if DENSS_GPU:
                 newrho = cp.asnumpy(newrho)
-            newrho = align2xyz(newrho)
+            if ncs_type == "icosahedral":
+                newrho, shift = center_rho_roll(newrho, recenter_mode="com", maxfirst=True, return_shift=True)
+                support = np.roll(np.roll(np.roll(support, shift[0], axis=0), shift[1], axis=1), shift[2], axis=2)
+            else:
+                newrho = align2xyz(newrho)
             if DENSS_GPU:
                 newrho = cp.array(newrho)
 
         if ncs != 0 and j in [stepi + 1 for stepi in ncs_steps]:
             if DENSS_GPU:
                 newrho = cp.asnumpy(newrho)
-            if ncs_axis == 1:
-                axes = (1, 2)  # longest
-                axes2 = (0, 1)  # shortest
-            if ncs_axis == 2:
-                axes = (0, 2)  # middle
-                axes2 = (0, 1)  # shortest
-            if ncs_axis == 3:
-                axes = (0, 1)  # shortest
-                axes2 = (1, 2)  # longest
-            degrees = 360. / ncs
-            newrho_total = np.copy(newrho)
-            if ncs_type == "dihedral":
-                # first, rotate original about perpendicular axis by 180
-                # then apply n-fold cyclical rotation
-                d2fold = ndimage.rotate(newrho, 180, axes=axes2, reshape=False)
-                newrhosym = np.copy(newrho) + d2fold
-                newrhosym /= 2.0
-                newrho_total = np.copy(newrhosym)
+            if ncs_type == "icosahedral":
+                rotations = get_icosahedral_matrices()
+                newrho_total = np.copy(newrho)
+                for R in rotations[1:]:  # Skip identity (first matrix)
+                    sym = transform_rho(newrho, R=R, mode='constant')
+                    newrho_total += sym
+                newrho = newrho_total / len(rotations)
             else:
-                newrhosym = np.copy(newrho)
-            for nrot in range(1, ncs):
-                sym = ndimage.rotate(newrhosym, degrees * nrot, axes=axes, reshape=False)
-                newrho_total += np.copy(sym)
-            newrho = newrho_total / ncs
+                if ncs_axis == 1:
+                    axes = (1, 2)  # longest
+                if ncs_axis == 2:
+                    axes = (0, 2)  # middle
+                if ncs_axis == 3:
+                    axes = (0, 1)  # shortest
+                degrees = 360. / ncs
+                newrho_total = np.copy(newrho)
+                if ncs_type == "dihedral":
+                    # first, rotate original about perpendicular axis by 180
+                    # then apply n-fold cyclical rotation
+                    d2fold = ndimage.rotate(newrho, 180, axes=axes, reshape=False)
+                    newrhosym = np.copy(newrho) + d2fold
+                    newrhosym /= 2.0
+                    newrho_total = np.copy(newrhosym)
+                else:
+                    newrhosym = np.copy(newrho)
+                for nrot in range(1, ncs):
+                    sym = ndimage.rotate(newrhosym, degrees * nrot, axes=axes, reshape=False)
+                    newrho_total += np.copy(sym)
+                newrho = newrho_total / ncs
 
             # run shrinkwrap after ncs averaging to get new support
             if shrinkwrap_old_method:
@@ -1688,16 +1811,21 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
 
         supportV[j] = mysum(support, DENSS_GPU=DENSS_GPU) * dV
 
+        # convert possibly imaginary rg to string for printing
+        rg_str = (f"{rg[j].real:3.2f}" if abs(rg[j].imag) < 1e-10 else
+                  f"{rg[j].imag:3.2f}j" if abs(rg[j].real) < 1e-10 else
+                  f"{rg[j].real:3.2f}{rg[j].imag:+3.2f}j")
+
         if not quiet:
             if gui:
-                my_logger.info("% 5i % 4.2e % 3.2f       % 5i          ", j, chi[j], rg[j], supportV[j])
+                my_logger.info("% 5i % 4.2e %s       % 5i          ", j, chi[j], rg_str, supportV[j])
             else:
-                sys.stdout.write("\r% 5i  % 4.2e % 3.2f       % 5i          " % (j, chi[j], rg[j], supportV[j]))
+                sys.stdout.write("\r% 5i  % 4.2e %s       % 5i          " % (j, chi[j], rg_str, supportV[j]))
                 sys.stdout.flush()
 
         # occasionally report progress in logger
         if j % 500 == 0 and not gui:
-            my_logger.info('Step % 5i: % 4.2e % 3.2f       % 5i          ', j, chi[j], rg[j], supportV[j])
+            my_logger.info('Step % 5i: % 4.2e %s       % 5i          ', j, chi[j], rg_str, supportV[j])
 
         if j > 101 + shrinkwrap_minstep:
             if DENSS_GPU:
@@ -1817,17 +1945,27 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
     final_chi2, exp_scale_factor, offset, fit = calc_chi2(Iq_exp, Iq_calc, scale=True, offset=False, interpolation=True,
                                                           return_sf=True, return_fit=True)
 
+    final_step = j+1
+
+    chi[final_step] = final_chi2
+
     np.savetxt(fprefix + '_map.fit', fit, delimiter=' ', fmt='%.5e',
                header='q(data),I(data),error(data),I(density); chi2=%.3f' % final_chi2)
-    np.savetxt(fprefix + '_stats_by_step.dat', np.vstack((chi, rg, supportV)).T,
-               delimiter=" ", fmt="%.5e", header='Chi2 Rg SupportVolume')
 
-    chi[j + 1] = final_chi2
+    # Create formatted strings for each column (enabling printing of complex rg values)
+    chi_str = [f"{chi[i].real:.5e}" for i in range(final_step)]
+    rg_str = [f"{rg[i].real:.5e}" if abs(rg[i].imag) < 1e-10 else f"{rg[i].imag:.5e}j"
+              for i in range(final_step)]
+    support_str = [f"{supportV[i].real:.5e}" for i in range(final_step)]
+
+    np.savetxt(fprefix + '_stats_by_step.dat',
+               np.column_stack((chi_str, rg_str, support_str)),
+               delimiter=" ", fmt="%s", header='Chi2 Rg SupportVolume')
 
     my_logger.info('Number of steps: %i', j)
-    my_logger.info('Final Chi2: %.3e', chi[j + 1])
-    my_logger.info('Final Rg: %3.3f', rg[j + 1])
-    my_logger.info('Final Support Volume: %3.3f', supportV[j + 1])
+    my_logger.info('Final Chi2: %.3e', chi[-1])
+    my_logger.info('Final Rg: %s', np.round(rg[-1],3))
+    my_logger.info('Final Support Volume: %3.3f', supportV[-1])
     my_logger.info('Mean Density (all voxels): %3.5f', np.mean(rho))
     my_logger.info('Std. Dev. of Density (all voxels): %3.5f', np.std(rho))
     my_logger.info('RMSD of Density (all voxels): %3.5f', np.sqrt(np.mean(np.square(rho))))
@@ -2165,21 +2303,25 @@ def rho_overlap_score(rho1, rho2, threshold=None):
     return -rscc
 
 
-def transform_rho(rho, T, order=1):
-    """ Rotate and translate electron density map by T vector.
-        T = [alpha, beta, gamma, x, y, z], angles in radians
+def transform_rho(rho, T=None, R=None, order=1, mode='wrap'):
+    """ Rotate and translate electron density map.
+        T = [alpha, beta, gamma, x, y, z], angles in radians (if no R provided)
+        R = 3x3 rotation matrix (if provided, ignores angles in T)
         order = interpolation order (0-5)
     """
     ne_rho = np.sum(rho)
-    R = euler2matrix(T[0], T[1], T[2])
+    if R is None and T is not None:
+        R = euler2matrix(T[0], T[1], T[2])
+    elif R is None and T is None:
+        R = np.eye(3)
 
-    # Use the geometric center instead of center of mass
     c_out = np.array(rho.shape) / 2.0
     offset = c_out - R.dot(c_out)
-    offset += T[3:]
+    if T is not None:
+        offset += T[3:]
 
     rho = ndimage.interpolation.affine_transform(rho, R, order=order,
-                                                 offset=offset, output=np.float64, mode='wrap')
+                                                 offset=offset, output=np.float64, mode=mode)
     rho *= ne_rho / np.sum(rho)
     return rho
 
@@ -2721,7 +2863,7 @@ class Sasrec(object):
             i += 1
             if gui:
                 my_logger.info("\rScanning alphas... {:.0%} complete".format(i*1./nalphas))
-            else:
+            else:            
                 sys.stdout.write("\rScanning alphas... {:.0%} complete".format(i * 1. / nalphas))
                 sys.stdout.flush()
             try:
@@ -3177,13 +3319,14 @@ class PDB(object):
         self.unique_radius = None
         self.unique_volume = None
 
-    def read_pdb(self, filename, ignore_waters=True, chain=None):
+    def read_pdb(self, filename, read_all_models=True, chain=None, ignore_waters=True):
         self.filename = filename
         self.natoms = 0
         with open(filename) as f:
             for line in f:
-                if line[0:6] == "ENDMDL":
-                    break
+                if not read_all_models:
+                    if line[0:6] == "ENDMDL":
+                        break
                 if line[0:4] != "ATOM" and line[0:4] != "HETA":
                     continue  # skip other lines
                 if ignore_waters and ((line[17:20] == "HOH") or (line[17:20] == "TIP")):
@@ -3212,8 +3355,9 @@ class PDB(object):
         with open(filename) as f:
             atom = 0
             for line in f:
-                if line[0:6] == "ENDMDL":
-                    break
+                if not read_all_models:
+                    if line[0:6] == "ENDMDL":
+                        break
                 if line[0:6] == "CRYST1":
                     cryst = line.split()
                     self.cella = float(cryst[1])
@@ -3281,6 +3425,7 @@ class PDB(object):
                         dr = vdW['C']
                 self.vdW[atom] = dr
                 atom += 1
+                if atom%100000==0: print(atom)
 
     def read_cif(self, filename, ignore_waters=True):
         """
@@ -5496,7 +5641,7 @@ def denss_3DFs(rho_start, dmax, ne=None, voxel=5., oversampling=3., positivity=T
             shrinkwrap_sigma_decay)) + shrinkwrap_minstep)
         steps += 3000
     else:
-        steps = np.int(steps)
+        steps = int(steps)
     Imean = np.zeros((steps + 1, len(qbins)))
     chi = np.zeros((steps + 1))
     rg = np.zeros((steps + 1))

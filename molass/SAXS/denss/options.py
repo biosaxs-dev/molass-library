@@ -29,10 +29,10 @@ def parse_arguments(parser, data_proxy=None, return_args=False):
     parser.add_argument("-m", "--mode", default="SLOW", type=str, help="Mode. F(AST) sets default options to run quickly for simple particle shapes. S(LOW) useful for more complex molecules. M(EMBRANE) mode allows for negative contrast. (default SLOW)")
     parser.add_argument("-d", "--dmax", default=None, type=float, help="Estimated maximum dimension")
     parser.add_argument("-n", "--nsamples", default=None, type=int, help="Number of samples, i.e. grid points, along a single dimension. (Sets voxel size, overridden by --voxel. Best optimization with n=power of 2. Default=64)")
-    parser.add_argument("-ncs", "--ncs", default=0, type=int, help="Rotational symmetry")
+    parser.add_argument("-ncs", "--ncs", default=0, type=int, help="Rotational symmetry (parameter required, even if icosahedral (in that case just put 1, it is ignored for icosahedral)")
     parser.add_argument("-ncs_steps","--ncs_steps", default=[3000,5000,7000,9000], nargs='+', help="Space separated list of steps for applying NCS averaging (default=3000 5000 7000 9000)")
     parser.add_argument("-ncs_axis", "--ncs_axis", default="1", type=str, help="Rotational symmetry axis (options: 1, 2, or 3 corresponding to (long,medium,short) principal axes)")
-    parser.add_argument("-ncs_type", "--ncs_type", default="C", type=str, help="Symmetry type, either cyclical (default) or dihedral (i.e. C or D, dihedral (Dn) adds n 2-fold perpendicular axes)")
+    parser.add_argument("-ncs_type", "--ncs_type", default="C", type=str, help="Symmetry type, either cyclical (default), dihedral, or icosahedral (i.e. C, D, I;  dihedral (Dn) adds n 2-fold perpendicular axes; icosahedral ignores ncs_axis.)")
     parser.add_argument("-s", "--steps", default=None, help="Maximum number of steps (iterations)")
     parser.add_argument("-o", "--output", default=None, help="Output filename prefix")
     parser.add_argument("-v", "--voxel", default=None, type=float, help="Set desired voxel size, setting resolution of map")
@@ -223,6 +223,8 @@ def parse_arguments(parser, data_proxy=None, return_args=False):
 
     if args.ncs_type[0].upper() == "D":
         args.ncs_type = "dihedral"
+    elif args.ncs_type[0].upper() == "I":
+        args.ncs_type = "icosahedral"
     else:
         args.ncs_type = "cyclical"
 
@@ -402,7 +404,7 @@ def parse_arguments(parser, data_proxy=None, return_args=False):
         else:
             shrinkwrap_old_method = args.shrinkwrap_old_method
 
-    #allow user to give initial support, check for consistency with given grid parameters
+    # allow user to give initial support, check for consistency with given grid parameters
     if args.support_start is not None:
         support_start, support_side = denss.read_mrc(args.support_start)
         support_nsamples = support_start.shape[0]
@@ -422,9 +424,9 @@ def parse_arguments(parser, data_proxy=None, return_args=False):
 
     if args.shrinkwrap is None:
         if args.support_start is not None:
-            #assume if a user gives a support, that they do not want to
-            #run shrinkwrap. However, allow the user to enable shrinkwrap explicitly
-            #by setting the shrinkwrap option on
+            # assume if a user gives a support, that they do not want to
+            # run shrinkwrap. However, allow the user to enable shrinkwrap explicitly
+            # by setting the shrinkwrap option on
             args.shrinkwrap = False
             if args.enforce_connectivity is None:
                 args.enforce_connectivity = False

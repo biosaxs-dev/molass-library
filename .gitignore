@@ -25,3 +25,7 @@ htmlcov
 
 **/atsas-results/**
 **/report_folder/**
+
+# DENSS update temporary scripts
+**/temp-scripts/**
+**/previous-scripts/**
