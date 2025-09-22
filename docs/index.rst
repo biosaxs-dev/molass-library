@@ -57,6 +57,8 @@ Submodules
    source/molass.Progress
    source/molass.Reports
    source/molass.SAXS
+   source/molass.SEC
+   source/molass.SEC.Models
    source/molass.Shapes
    source/molass.Stats
    source/molass.Stochastic

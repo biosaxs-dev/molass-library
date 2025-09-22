@@ -24,6 +24,29 @@ def egh_impl(x, H, tR, sigma, tau):
     return np.hstack( parts )
 
 def egh(x, H, tR, sigma, tau):
+    """
+    The exponential-Gaussian hybrid (EGH) function.
+
+    See also: `Exponential-Gaussian Hybrid <https://nshimizu0721.github.io/molass-essence/chapters/20/egh.html>`_.
+
+    Parameters
+    ----------
+    x : float or array-like
+        The input value(s).
+    H : float
+        The height parameter.
+    tR : float
+        The retention time parameter.
+    sigma : float
+        The standard deviation of the Gaussian component.
+    tau : float
+        The decay constant of the exponential component.
+
+    Returns
+    -------
+    float or array-like
+        The computed EGH value(s).
+    """
     if np.isscalar(x):
         x = np.array([x])
         return egh_impl(x, H, tR, sigma, tau)[0]

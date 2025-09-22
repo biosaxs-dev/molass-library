@@ -3,7 +3,7 @@ import os
 
 def to_int_tuple(version_string):
     """
-    Convert a version string to a tuple of integers.
+    Convert a version string to a tuple of integers for comparison.
     
     Parameters
     ----------
@@ -17,6 +17,7 @@ def to_int_tuple(version_string):
     return tuple(int(part) for part in version_string.split('.'))
 
 class Version:
+    """A class to represent and compare software version strings."""
     def __init__(self, version_string):
         self.version_string = version_string
 
@@ -69,9 +70,8 @@ def get_version(toml_only=False):
 
     Returns
     -------
-    Version: The version of the package.
-        This value is returned as a Version object, which provides
-        comparison operators (as tuple of integers) for version strings.
+    Version
+        An instance of the Version class representing the package version.
 
     Raises
     ------
