@@ -93,12 +93,16 @@ class XrData(SsMatrixData):
 
     def compute_rgcurve(self, return_info=False, debug=False):
         """ssd.compute_rgcurve()
-        
-        Returns a Rg-curve.
-        
+
+        Returns a Rg-curve which is computed using the Molass standard method.
+
         Parameters
         ----------
         None
+
+        Returns
+        -------
+        An :class:`~molass.Guinier.RgCurve` object.
         """
         if debug:
             
@@ -116,12 +120,16 @@ class XrData(SsMatrixData):
 
     def compute_rgcurve_atsas(self, return_info=False, debug=False):
         """ssd.compute_rgcurve_atsas()
-        
-        Returns an Rg-curve.
-        
+
+        Returns an Rg-curve which is computed using the ATSAS `autorg <https://www.embl-hamburg.de/biosaxs/manuals/autorg.html>`_.
+
         Parameters
         ----------
         None
+
+        Returns
+        -------
+        An :class:`~molass.Guinier.RgCurve` object.
         """
         if debug:
             import molass.Guinier.RgCurveUtils

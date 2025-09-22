@@ -6,6 +6,9 @@
 """
 
 class PairedRange:
+    """A class to represent a paired range.
+    It contains a pair of ranges which correspond to the ascending and descending parts of the peak.
+    """
     def __init__(self, range_, minor=False, peak_index=None, elm_recs=None):
         self.peak_index = peak_index
         if minor:
@@ -26,6 +29,7 @@ class PairedRange:
         return self.ranges
 
     def as_list(self, k):
+        """Returns a list of PeakInfo and RangeInfo objects."""
         from molass_legacy.DataStructure.PeakInfo import PeakInfo
         peakinfo = PeakInfo(k,
                          self.peak_index,
@@ -34,6 +38,7 @@ class PairedRange:
         return [peakinfo] + self.ranges
 
     def is_minor(self):
+        """Returns True if the PairedRange is a minor peak (i.e., has only one range)."""
         return len(self.ranges) == 1
 
     def __len__(self):

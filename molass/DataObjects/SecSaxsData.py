@@ -11,7 +11,7 @@ from molass_legacy._MOLASS.SerialSettings import set_setting
 class SecSaxsData:
     """
     A class to represent a SEC-SAXS data object.
-    It contains a pair of XR and UV data objects.
+    It contains a pair of :class:`~molass.DataObjects.XrData` and :class:`~molass.DataObjects.UvData` objects.
     It also contains the beamline information and mapping information if available.
     """
 
@@ -118,7 +118,7 @@ class SecSaxsData:
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
     def plot_3d(self, **kwargs):
-        """ssd.plot_3d(title=None, view_init=None, view_arrows=False)
+        """ssd.plot_3d(title=None, view_init=None, view_arrows=False, with_2d_section_lines=False, **kwargs)
 
             Plots a pair of 3D figures of UV and XR data.
 
@@ -136,6 +136,10 @@ class SecSaxsData:
                 One of the arrows shows the elutional view, while the other
                 shows the spectral view. The default is False.
 
+            with_2d_section_lines : bool, optional
+                If it is True, the 2D section lines are drawn on the 3D plot.
+                The default is False.
+
             Returns
             -------
             result : PlotResult
@@ -152,13 +156,20 @@ class SecSaxsData:
         return plot_3d_impl(self, **kwargs)
  
     def plot_compact(self, **kwargs):
-        """ssd.plot_compact()
+        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, **kwargs)
 
             Plots a pair of compact figures of UV and XR data.
 
             Parameters
             ----------
-            None
+            title : str, optional
+                If specified, add a super title to the plot.
+            baseline : bool, optional
+                If it is True, the baseline will be plotted.
+            ratio_curve : Curve, optional    
+                If specified, the ratio curve will be plotted.
+            moment_lines : bool, optional
+                If it is True, the moment lines will be plotted.
 
             Returns
             -------
@@ -167,6 +178,11 @@ class SecSaxsData:
 
                 fig: Figure
                 axes: Axes
+                mapping: MappingInfo (if available)
+                xr_curve: Curve (if available)
+                uv_curve: Curve (if available)
+                mp_curve: Curve (if available)
+                moment: Moment of the XR data (if available)
         """
         debug = kwargs.get('debug', False)
         if debug:
@@ -176,7 +192,7 @@ class SecSaxsData:
         return plot_compact_impl(self, **kwargs)
 
     def make_trimming(self, **kwargs):
-        """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
+        """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None)
         
         Returns a pair of indeces which should be used
         as a slice for the spectral axis to trim away
@@ -184,15 +200,23 @@ class SecSaxsData:
 
         Parameters
         ----------
-        xr_qr : 
+        xr_qr : tuple of (int, int), optional
+            The angular range (start, stop) to be used for the XR data.
+            If it is None, the full range will be used.
+        xr_mt : tuple of (int, int), optional
+            The range (start, stop) of frames to be used for the XR data.
+            If it is None, the full range will be used.
+        uv_wr : tuple of (int, int), optional
+            The wavelength range to be used for the UV data.
+            If it is None, the full range will be used.
+        uv_mt : tuple of (int, int), optional
+            The range (start, stop) of frames to be used for the UV data.
+            If it is None, the full range will be used.
 
-        xr_mt : 
-
-        uv_wr : 
-
-        uv_mt :
-
-        uv_fc :  
+        Returns
+        -------
+        trimming : TrimmingInfo
+            A TrimmingInfo object which contains the trimming information.
 
         See Also
         --------
@@ -211,9 +235,9 @@ class SecSaxsData:
         return make_trimming_impl(self, flowchange=flowchange, **kwargs)
 
     def plot_trimming(self, trim=None, baseline=False, title=None, **kwargs):
-        """ssd.plot_trimming(trim)
+        """ssd.plot_trimming(trim=None, baseline=False, title=None, return_fig=False, **kwargs)
 
-        Plots a set of trimmming info.
+        Plots a set of trimming info.
 
         Parameters
         ----------
@@ -265,6 +289,11 @@ class SecSaxsData:
             of elements uvM[uv_islice:uv_jslice] and wv[uv_islice].
             Otherwise, the returned copy contains the deep copies
             of elements uvM and wv.
+
+        Returns
+        -------
+        SecSaxsData
+            A deep copy of the SSD object with the specified slices applied.
 
         Examples
         --------
@@ -374,6 +403,11 @@ class SecSaxsData:
         ----------
         debug : bool, optional
             If True, enables debug mode for more verbose output.
+
+        Returns
+        -------
+        SecSaxsData
+            A deep copy of the SSD object with the baseline correction applied.
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, datafiles=self.datafiles)
@@ -430,7 +464,7 @@ class SecSaxsData:
             return self.beamline_info.get_concfactor()
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, **kwargs)
+        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
 
         Performs a quick decomposition of the SEC-SAXS data.
 
@@ -445,6 +479,9 @@ class SecSaxsData:
 
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
+
+        num_plates : int, optional
+            Specifies the number of theoretical plates to be used for the optimization constraint.
 
         Returns
         -------

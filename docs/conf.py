@@ -36,7 +36,11 @@ autoclass_content = 'both'
 # napoleon_numpy_docstring = True
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [
+    '_build', 'Thumbs.db', '.DS_Store',
+    'source/molass.SAXS.denss*',
+    'source/molass.SAXS.resources*',
+]
 
 # Customize autodoc behavior
 autodoc_default_options = {

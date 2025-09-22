@@ -5,6 +5,19 @@ import matplotlib.pylab as plt
 from molass_legacy.Saxs.EdPlotter import ed_scatter
 
 def show_mrc(mrc_file):
+    """show_mrc(mrc_file)
+    
+    Displays a 3D scatter plot and a 2D projection of the data in an MRC file.
+
+    Parameters
+    ----------
+    mrc_file : str
+        Path to the MRC file to be displayed.
+
+    Returns
+    -------
+    None
+    """
     import mrcfile
     with mrcfile.open(mrc_file) as mrc:
         data = mrc.data

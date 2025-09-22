@@ -80,6 +80,9 @@ class Decomposition:
         """
         Update the ranks for the X-ray data.
 
+        Default ranks are one for each component which means that interparticle interactions are not considered.
+        This method allows the user to set different ranks for each component.
+
         Parameters
         ----------
         ranks : list of int
@@ -194,6 +197,22 @@ class Decomposition:
     def get_pairedranges(self, mapped_curve=None, area_ratio=0.7, concentration_datatype=2, debug=False):
         """
         Get the paired ranges.
+
+        Parameters
+        ----------
+        mapped_curve : MappedCurve, optional
+            If specified, use this mapped curve instead of computing a new one.
+        area_ratio : float, optional
+            The area ratio for the range computation.
+        concentration_datatype : int, optional
+            The concentration datatype for the range computation.
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        list of PairedRange
+            The list of :class:`~molass.LowRank.PairedRange` objects.
         """
         if self.paired_ranges is None:
             if debug:

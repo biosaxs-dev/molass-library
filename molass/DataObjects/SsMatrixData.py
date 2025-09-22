@@ -5,6 +5,10 @@ import numpy as np
 from molass.DataObjects.Curve import create_icurve, create_jcurve
 
 class SsMatrixData:
+    """A class to represent a SAXS/UV matrix data object.
+    It contains a 2D matrix M where M[i,j] is the intensity value
+    at the i-th value of the first variable (iv) and the j-th value
+    of the second variable (jv)."""
     def __init__(self, iv, jv, M, E,
                  moment=None,
                  baseline_method='linear'):
@@ -34,12 +38,26 @@ class SsMatrixData:
                             )
 
     def get_icurve(self, pickat):
+        """md.get_icurve(pickat)
+        get an i-curve from the matrix data.
+        
+        Parameters
+        ----------
+        pickat : float
+            Specifies the value to pick an i-curve.
+            The i-curve will be made from ssd.M[i,:] where ssd.iv[i] is the largest value
+            that is less than or equal to pickat.
+
+        Examples
+        --------
+        >>> curve = md.get_icurve(0.1)
+        """
         return create_icurve(self.jv, self.M, self.iv, pickat)
     
     def get_jcurve(self, j):
-        """sd.get_jcurve(j)
-        
-        Returns a j-curve from the XR matrix data.
+        """md.get_jcurve(j)
+
+        Returns a j-curve from the matrix data.
 
         Parameters
         ----------
@@ -49,7 +67,7 @@ class SsMatrixData:
             
         Examples
         --------
-        >>> curve = sd.get_jcurve(150)
+        >>> curve = md.get_jcurve(150)
         """
         return create_jcurve(self.iv, self.M, j)
 

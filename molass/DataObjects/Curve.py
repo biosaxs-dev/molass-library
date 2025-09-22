@@ -64,6 +64,19 @@ class Curve:
         return self.max_x, self.max_y
 
     def get_peaks(self, debug=False, **kwargs):
+        """
+        Get the peak positions.
+        
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+        
+        Returns
+        -------
+        list of int
+            The list of peak positions (indices of self.x).
+        """
         if self.peaks is None:
             if debug:
                 from importlib import reload

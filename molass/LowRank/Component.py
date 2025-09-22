@@ -18,6 +18,14 @@ class Component:
     """
     def __init__(self, icurve_array, jcurve_array, ccurve):
         """
+        Parameters
+        ----------
+        icurve_array : array-like, shape (N, 2)
+            The i-curve array, where the first column is x and the second column is y.
+        jcurve_array : array-like, shape (M, 3)
+            The j-curve array, where the first column is x, the second column is y, and the third column is error.
+        ccurve : array-like, shape (N,) 
+            The concentration curve. 
         """
         self.icurve_array = icurve_array
         self.jcurve_array = jcurve_array
@@ -30,7 +38,11 @@ class Component:
 
     def get_icurve(self):
         """
-        Returns the i-curve object.
+        Returns the i-curve object instead of the array.
+
+        Returns
+        -------
+        The i-curve object which is of type Curve.
         """
         if self.icurve is None:
             from molass.DataObjects.Curve import Curve
@@ -39,7 +51,11 @@ class Component:
 
     def get_jcurve(self):
         """
-        Returns the j-curve object.
+        Returns the j-curve object instead of the array.
+
+        Returns
+        -------
+        The j-curve object which is of type Curve.
         """
         if self.jcurve is None:
             from molass.DataObjects.Curve import Curve
@@ -51,6 +67,12 @@ class Component:
         Returns the j-curve array which contains qv, I and error in case of XR.
 
         Currently, error is zeros in case of UV.
+
+        This type of array is used as portable data storage for SAXS tools.
+
+        Returns
+        -------
+        The j-curve array which is of type numpy array of shape (M, 3).
         """
         return self.jcurve_array
 
@@ -142,7 +164,7 @@ class Component:
         return PairedRange(range_, minor=minor, peak_index=self.peak_index, elm_recs=elm_recs)
 class XrComponent(Component):
     """
-    A class to represent an XR component.
+    A class to represent an X-ray component.
     """
     def __init__(self, *args):
         super().__init__(*args)
@@ -156,6 +178,11 @@ class XrComponent(Component):
 
     def compute_rg(self, return_object=False):
         """
+        Compute the Rg of the component.
+        Parameters
+        ----------
+        return_object : bool, optional
+            If True, return the Guinier object instead of Rg value.
         """
         sg = self.get_guinier_object()
         if return_object:
