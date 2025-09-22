@@ -6,11 +6,11 @@
 Molass Library Reference
 ========================
 
-Molass Library is a rewrite of `MOLASS <https://pfwww.kek.jp/saxs/MOLASSE.html>`_, an analytical tool for SEC-SAXS experiment data currently hosted at `Photon Factory <https://www2.kek.jp/imss/pf/eng/>`_ and `SPring-8 <http://www.spring8.or.jp/en/>`_, Japan.
+Molass Library is a rewrite of `MOLASS <https://pfwww.kek.jp/saxs/MOLASSE.html>`_, a tool for the analysis of SEC-SAXS experiment data currently hosted at `Photon Factory <https://www2.kek.jp/imss/pf/eng/>`_ and `SPring-8 <http://www.spring8.or.jp/en/>`_, Japan.
 
 This document describes each function of the library.
 
-For details, see also:
+For more structural information, see also:
 
 - **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
 - **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
