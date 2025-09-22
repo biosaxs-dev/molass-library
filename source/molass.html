@@ -311,6 +311,29 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.Models.html">SEC.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EDM.html">SEC.Models.EDM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmEstimator.html">SEC.Models.SdmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmOptimizer.html">SEC.Models.SdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.Simple.html">SEC.Models.Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.UvComponentCurve.html">SEC.Models.UvComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.UvOptimizer.html">SEC.Models.UvOptimizer</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Shapes.Ellipsoid.html">Shapes.Ellipsoid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Shapes.Sphere.html">Shapes.Sphere</a></li>
@@ -518,7 +541,7 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.to_int_tuple">
 <span class="sig-name descname"><span class="pre">to_int_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.to_int_tuple" title="Link to this definition">#</a></dt>
-<dd><p>Convert a version string to a tuple of integers.</p>
+<dd><p>Convert a version string to a tuple of integers for comparison.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>version_string</strong> (<em>str</em>) – A version string in the format ‘major.minor.patch’.</p>
@@ -536,6 +559,7 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Version">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Version" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent and compare software version strings.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -559,11 +583,10 @@ this version.</p>
 </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Version</strong> – This value is returned as a Version object, which provides
-comparison operators (as tuple of integers) for version strings.</p>
+<dd class="field-even"><p>An instance of the Version class representing the package version.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The version of the package.</p>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.Version" title="molass.Version">Version</a></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">

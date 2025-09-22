@@ -314,6 +314,29 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SEC.Models.html">SEC.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EDM.html">SEC.Models.EDM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html">SEC.Models.SdmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html">SEC.Models.SdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.Simple.html">SEC.Models.Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html">SEC.Models.UvComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.UvOptimizer.html">SEC.Models.UvOptimizer</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Shapes.Ellipsoid.html">Shapes.Ellipsoid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Shapes.Sphere.html">Shapes.Sphere</a></li>
@@ -540,7 +563,7 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.to_int_tuple">
 <span class="sig-name descname"><span class="pre">to_int_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.to_int_tuple" title="Link to this definition">#</a></dt>
-<dd><p>Convert a version string to a tuple of integers.</p>
+<dd><p>Convert a version string to a tuple of integers for comparison.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>version_string</strong> (<em>str</em>) – A version string in the format ‘major.minor.patch’.</p>
@@ -558,6 +581,7 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Version">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Version" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent and compare software version strings.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -581,11 +605,10 @@ this version.</p>
 </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Version</strong> – This value is returned as a Version object, which provides
-comparison operators (as tuple of integers) for version strings.</p>
+<dd class="field-even"><p>An instance of the Version class representing the package version.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The version of the package.</p>
+<dd class="field-odd"><p><a class="reference internal" href="source/molass.html#molass.Version" title="molass.Version">Version</a></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -1343,6 +1366,150 @@ comparison operators (as tuple of integers) for version strings.</p>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.compute_saxs"><code class="docutils literal notranslate"><span class="pre">compute_saxs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.draw_saxs"><code class="docutils literal notranslate"><span class="pre">draw_saxs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/molass.SEC.html">SEC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.ColumnElements.html">SEC.ColumnElements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain"><code class="docutils literal notranslate"><span class="pre">SolidGrain</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_poreentries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.draw_entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw_entries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.draw"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_point_from_angle"><code class="docutils literal notranslate"><span class="pre">SolidGrain.get_point_from_angle()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_entry_including"><code class="docutils literal notranslate"><span class="pre">SolidGrain.get_entry_including()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_bounce_vector"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_bounce_vector()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_inpore_nextpos"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_inpore_nextpos()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle"><code class="docutils literal notranslate"><span class="pre">Particle</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.draw"><code class="docutils literal notranslate"><span class="pre">Particle.draw()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.enters_stationary"><code class="docutils literal notranslate"><span class="pre">Particle.enters_stationary()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.stationary_move"><code class="docutils literal notranslate"><span class="pre">Particle.stationary_move()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain"><code class="docutils literal notranslate"><span class="pre">NewGrain</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">NewGrain.compute_poreentries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain.draw"><code class="docutils literal notranslate"><span class="pre">NewGrain.draw()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.new_grain_unit_test"><code class="docutils literal notranslate"><span class="pre">new_grain_unit_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.grain_particle_test"><code class="docutils literal notranslate"><span class="pre">grain_particle_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.draw_wedges"><code class="docutils literal notranslate"><span class="pre">draw_wedges()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnSimulation.html#molass.SEC.ColumnSimulation.get_animation"><code class="docutils literal notranslate"><span class="pre">get_animation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnSliceStates.html#molass.SEC.ColumnSliceStates.draw_slice_states_impl"><code class="docutils literal notranslate"><span class="pre">draw_slice_states_impl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ColumnStructure.html#molass.SEC.ColumnStructure.plot_column_structure"><code class="docutils literal notranslate"><span class="pre">plot_column_structure()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.StationaryMove.html">SEC.StationaryMove</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.find_nearest_wall"><code class="docutils literal notranslate"><span class="pre">find_nearest_wall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_boundary_walls"><code class="docutils literal notranslate"><span class="pre">compute_boundary_walls()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.mirrorImage"><code class="docutils literal notranslate"><span class="pre">mirrorImage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_reflected_point"><code class="docutils literal notranslate"><span class="pre">compute_reflected_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl"><code class="docutils literal notranslate"><span class="pre">get_next_position_impl()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/molass.SEC.Models.html">SEC.Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EDM.html">SEC.Models.EDM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EDM.html#molass.SEC.Models.EDM.EDM"><code class="docutils literal notranslate"><span class="pre">EDM</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EDM.html#molass.SEC.Models.EDM.EDM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">EDM.optimize_decomposition()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmColumn"><code class="docutils literal notranslate"><span class="pre">EdmColumn</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmColumn.get_params"><code class="docutils literal notranslate"><span class="pre">EdmColumn.get_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_y()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_xy()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_peak_top_x()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html#molass.SEC.Models.EdmEstimator.estimate_edm_init_params"><code class="docutils literal notranslate"><span class="pre">estimate_edm_init_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html#molass.SEC.Models.EdmEstimatorImpl.guess"><code class="docutils literal notranslate"><span class="pre">guess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html#molass.SEC.Models.EdmEstimatorImpl.guess_multiple_impl"><code class="docutils literal notranslate"><span class="pre">guess_multiple_impl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html#molass.SEC.Models.EdmOptimizer.optimize_edm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_edm_xr_decomposition()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SDM.html#molass.SEC.Models.SDM.SDM"><code class="docutils literal notranslate"><span class="pre">SDM</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SDM.html#molass.SEC.Models.SDM.SDM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">SDM.optimize_decomposition()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn"><code class="docutils literal notranslate"><span class="pre">SdmColumn</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn.get_params"><code class="docutils literal notranslate"><span class="pre">SdmColumn.get_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><code class="docutils literal notranslate"><span class="pre">SdmComponentCurve</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">SdmComponentCurve.get_y()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">SdmComponentCurve.get_xy()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">SdmComponentCurve.get_peak_top_x()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html">SEC.Models.SdmEstimator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.estimate_sdm_column_params"><code class="docutils literal notranslate"><span class="pre">estimate_sdm_column_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html">SEC.Models.SdmOptimizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.optimize_sdm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_sdm_xr_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.optimize_sdm_uv_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_sdm_uv_decomposition()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.Simple.html">SEC.Models.Simple</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.egh_impl"><code class="docutils literal notranslate"><span class="pre">egh_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.egh"><code class="docutils literal notranslate"><span class="pre">egh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.e0"><code class="docutils literal notranslate"><span class="pre">e0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.egh_var"><code class="docutils literal notranslate"><span class="pre">egh_var()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.egh_std"><code class="docutils literal notranslate"><span class="pre">egh_std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.Simple.html#molass.SEC.Models.Simple.egh_pdf"><code class="docutils literal notranslate"><span class="pre">egh_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html">SEC.Models.UvComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve"><code class="docutils literal notranslate"><span class="pre">UvComponentCurve</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">UvComponentCurve.get_y()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">UvComponentCurve.get_xy()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">UvComponentCurve.get_peak_top_x()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.UvOptimizer.html">SEC.Models.UvOptimizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.UvOptimizer.html#molass.SEC.Models.UvOptimizer.optimize_uv_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_uv_decomposition()</span></code></a></li>
 </ul>
 </li>
 </ul>
