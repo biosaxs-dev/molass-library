@@ -212,10 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -252,6 +248,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -303,6 +300,17 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -517,7 +525,7 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.PlotUtils.Annotation3D.Annotation3D">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Annotation3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.PlotUtils.Annotation3D.Annotation3D" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://matplotlib.org/stable/api/text_api.html#matplotlib.text.Annotation" title="(in Matplotlib v3.10.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a></p>
 <p>Annotate the point <em>xy</em> with text <em>text</em>.</p>
 <p>In the simplest form, the text is placed at <em>xy</em>.</p>
 <p>Optionally, the text can be displayed in another position <em>xytext</em>.
@@ -602,7 +610,7 @@ center top of the bounding box.</p></li>
 systems for <em>x</em> and <em>y</em>. <em>xcoords</em> and <em>ycoords</em> must each be
 of one of the above described types.</p></li>
 </ul>
-<p>See <span class="xref std std-ref">plotting-guide-annotation</span> for more details.</p>
+<p>See <a class="reference external" href="https://matplotlib.org/stable/users/explain/text/annotations.html#plotting-guide-annotation" title="(in Matplotlib v3.10.6)"><span>Advanced annotation</span></a> for more details.</p>
 </p></li>
 <li><p><strong>textcoords</strong> (single or two-tuple of str or <cite>.Artist</cite> or <cite>.Transform</cite> or callable, default: value of <em>xycoords</em>) – <p>The coordinate system that <em>xytext</em> is given in.</p>
 <p>All <em>xycoords</em> values are valid as well as the following strings:</p>
@@ -730,7 +738,7 @@ the Axes and <em>xycoords</em> is ‘data’.</p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><span class="xref std std-ref">annotations</span></p>
+<p><a class="reference external" href="https://matplotlib.org/stable/users/explain/text/annotations.html#annotations" title="(in Matplotlib v3.10.6)"><span>Annotations</span></a></p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.PlotUtils.Annotation3D.Annotation3D.draw">

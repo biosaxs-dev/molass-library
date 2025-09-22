@@ -212,10 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -252,6 +248,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -303,6 +300,17 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -527,12 +535,13 @@ document.write(`
   <section id="module-molass.DataObjects.SecSaxsData">
 <span id="dataobjects-secsaxsdata"></span><h1>DataObjects.SecSaxsData<a class="headerlink" href="#module-molass.DataObjects.SecSaxsData" title="Link to this heading">#</a></h1>
 <p>DataObjects.SecSacsData.py</p>
-<p>Copyright (c) 2024-2025, SAXS Team, KEK-PF</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SecSaxsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_bubbles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beamline_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_initialized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to represent a SEC-SAXS data object.</p>
+<p>A class to represent a SEC-SAXS data object.
+It contains a pair of <a class="reference internal" href="molass.DataObjects.XrData.html#module-molass.DataObjects.XrData" title="molass.DataObjects.XrData"><code class="xref py py-class docutils literal notranslate"><span class="pre">XrData</span></code></a> and <a class="reference internal" href="molass.DataObjects.UvData.html#module-molass.DataObjects.UvData" title="molass.DataObjects.UvData"><code class="xref py py-class docutils literal notranslate"><span class="pre">UvData</span></code></a> objects.
+It also contains the beamline information and mapping information if available.</p>
 <p>ssd = SecSacsData(data_folder)</p>
 <p>Creates a SEC-SAXS data object.</p>
 <dl class="field-list simple">
@@ -563,7 +572,7 @@ to suppress unnecessary data access.</p></li>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d">
-<span class="sig-name descname"><span class="pre">plot_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_arrows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_2d_section_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_3d" title="Link to this definition">#</a></dt>
 <dd><p>Plots a pair of 3D figures of UV and XR data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -574,6 +583,8 @@ The default is dict(elev=30, azim=-60) as of matplotlib 3.10.</p></li>
 <li><p><strong>view_arrows</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D view arrows are drawn on the 3D plot.
 One of the arrows shows the elutional view, while the other
 shows the spectral view. The default is False.</p></li>
+<li><p><strong>with_2d_section_lines</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D section lines are drawn on the 3D plot.
+The default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -590,16 +601,26 @@ axes: Axes</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact">
-<span class="sig-name descname"><span class="pre">plot_compact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_compact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moment_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_compact" title="Link to this definition">#</a></dt>
 <dd><p>Plots a pair of compact figures of UV and XR data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
+<li><p><strong>baseline</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the baseline will be plotted.</p></li>
+<li><p><strong>ratio_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – If specified, the ratio curve will be plotted.</p></li>
+<li><p><strong>moment_lines</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the moment lines will be plotted.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p><strong>result</strong> – A PlotResult object which contains the following attributes.</p>
 <p>fig: Figure
-axes: Axes</p>
+axes: Axes
+mapping: MappingInfo (if available)
+xr_curve: Curve (if available)
+uv_curve: Curve (if available)
+mp_curve: Curve (if available)
+moment: Moment of the XR data (if available)</p>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -610,19 +631,28 @@ axes: Axes</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming">
-<span class="sig-name descname"><span class="pre">make_trimming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_qr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_mt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_wr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_mt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_fc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">make_trimming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_qr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_mt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_wr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_mt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming" title="Link to this definition">#</a></dt>
 <dd><p>Returns a pair of indeces which should be used
 as a slice for the spectral axis to trim away
 unusable UV data regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xr_qr</strong></p></li>
-<li><p><strong>xr_mt</strong></p></li>
-<li><p><strong>uv_wr</strong></p></li>
-<li><p><strong>uv_mt</strong></p></li>
-<li><p><strong>uv_fc</strong></p></li>
+<li><p><strong>xr_qr</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The angular range (start, stop) to be used for the XR data.
+If it is None, the full range will be used.</p></li>
+<li><p><strong>xr_mt</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The range (start, stop) of frames to be used for the XR data.
+If it is None, the full range will be used.</p></li>
+<li><p><strong>uv_wr</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The wavelength range to be used for the UV data.
+If it is None, the full range will be used.</p></li>
+<li><p><strong>uv_mt</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The range (start, stop) of frames to be used for the UV data.
+If it is None, the full range will be used.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>trimming</strong> – A TrimmingInfo object which contains the trimming information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo">TrimmingInfo</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -637,8 +667,8 @@ unusable UV data regions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming">
-<span class="sig-name descname"><span class="pre">plot_trimming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming" title="Link to this definition">#</a></dt>
-<dd><p>Plots a set of trimmming info.</p>
+<span class="sig-name descname"><span class="pre">plot_trimming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming" title="Link to this definition">#</a></dt>
+<dd><p>Plots a set of trimming info.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -677,6 +707,12 @@ of elements uvM[uv_islice:uv_jslice] and wv[uv_islice].
 Otherwise, the returned copy contains the deep copies
 of elements uvM and wv.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A deep copy of the SSD object with the specified slices applied.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -753,6 +789,12 @@ subtracting the baseline from the original data.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A deep copy of the SSD object with the baseline correction applied.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -786,8 +828,8 @@ If the mapping information is not available, returns None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition">
-<span class="sig-name descname"><span class="pre">quick_decomposition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition" title="Link to this definition">#</a></dt>
-<dd><p>Returns a decompositin object.</p>
+<span class="sig-name descname"><span class="pre">quick_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_plates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition" title="Link to this definition">#</a></dt>
+<dd><p>Performs a quick decomposition of the SEC-SAXS data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -795,6 +837,7 @@ If the mapping information is not available, returns None.</p>
 used to denoise the matrix data.</p></li>
 <li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
 <li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
+<li><p><strong>num_plates</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

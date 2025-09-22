@@ -211,10 +211,6 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -251,6 +247,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -302,6 +299,17 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -607,6 +615,8 @@ document.write(`
 </li>
       <li><a href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.compute_rgcurve_info_atsas">compute_rgcurve_info_atsas() (in module molass.Guinier.RgCurveUtils)</a>
 </li>
+      <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.compute_saxs">compute_saxs() (in module molass.SAXS.Simulator)</a>
+</li>
       <li><a href="source/molass.InterParticle.ConcDepend.html#molass.InterParticle.ConcDepend.compute_scd">compute_scd() (in module molass.InterParticle.ConcDepend)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.compute_scds">compute_scds() (Decomposition method)</a>
@@ -687,8 +697,20 @@ document.write(`
 </li>
       <li><a href="source/molass.DataUtils.FolderWalker.html#molass.DataUtils.FolderWalker.default_iswanted">default_iswanted() (in module molass.DataUtils.FolderWalker)</a>
 </li>
+      <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.demo">demo() (in module molass.SAXS.DmaxEstimation)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.DenssDetector">DenssDetector (class in molass.SAXS.DenssDetector)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.DetectorInfo">DetectorInfo (class in molass.SAXS.DenssTools)</a>
+
+      <ul>
+        <li><a href="source/molass.SAXS.DetectorInfo.html#molass.SAXS.DetectorInfo.DetectorInfo">(class in molass.SAXS.DetectorInfo)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.PlotUtils.Arrow3D.html#molass.PlotUtils.Arrow3D.Arrow3D.do_3d_projection">do_3d_projection() (Arrow3D method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     docs.tools.EditRst
 
@@ -696,8 +718,6 @@ document.write(`
         <li><a href="source/EditRst.html#module-docs.tools.EditRst">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.PlotUtils.Annotation3D.html#molass.PlotUtils.Annotation3D.Annotation3D.draw">draw() (Annotation3D method)</a>
 
       <ul>
@@ -711,6 +731,8 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.draw_entries">draw_entries() (SolidGrain method)</a>
+</li>
+      <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.draw_saxs">draw_saxs() (in module molass.SAXS.Simulator)</a>
 </li>
       <li><a href="source/molass.SEC.ColumnSliceStates.html#molass.SEC.ColumnSliceStates.draw_slice_states_impl">draw_slice_states_impl() (in module molass.SEC.ColumnSliceStates)</a>
 </li>
@@ -736,14 +758,16 @@ document.write(`
 </li>
       <li><a href="source/molass.Baseline.SimpleBaseline.html#molass.Baseline.SimpleBaseline.estimate_baseline_params">estimate_baseline_params() (in module molass.Baseline.SimpleBaseline)</a>
 </li>
+      <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.estimate_dmax">estimate_dmax() (in module molass.SAXS.DmaxEstimation)</a>
+</li>
       <li><a href="source/molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent">estimate_lpm_percent() (in module molass.Baseline.LpmBaseline)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping">estimate_mapping() (SecSaxsData method)</a>
 </li>
-      <li><a href="source/molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks">estimate_mapping_for_matching_peaks() (in module molass.Mapping.SimpleMapper)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks">estimate_mapping_for_matching_peaks() (in module molass.Mapping.SimpleMapper)</a>
+</li>
       <li><a href="source/molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_mapping_impl">estimate_mapping_impl() (in module molass.Mapping.SimpleMapper)</a>
 </li>
       <li><a href="source/molass.Mapping.SimpleMapper.html#molass.Mapping.SimpleMapper.estimate_slope_reliability">estimate_slope_reliability() (in module molass.Mapping.SimpleMapper)</a>
@@ -772,12 +796,18 @@ document.write(`
 </li>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.find_nearest_wall">find_nearest_wall() (in module molass.SEC.StationaryMove)</a>
 </li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data">fit_data() (in module molass.SAXS.DenssUtils)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data_bc">fit_data_bc() (in module molass.SAXS.DenssUtils)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data_impl">fit_data_impl() (in module molass.SAXS.DenssUtils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChange.html#molass.FlowChange.FlowChange.flowchange_exclude_slice">flowchange_exclude_slice() (in module molass.FlowChange.FlowChange)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChange.html#molass.FlowChange.FlowChange.flowchange_exclude_slice_impl">flowchange_exclude_slice_impl() (in module molass.FlowChange.FlowChange)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChangeLikely.html#molass.FlowChange.FlowChangeLikely.flowchange_likelihood">flowchange_likelihood() (in module molass.FlowChange.FlowChangeLikely)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChangeInfo.html#molass.FlowChange.FlowChangeInfo.FlowChangeInfo">FlowChangeInfo (class in molass.FlowChange.FlowChangeInfo)</a>
@@ -797,6 +827,8 @@ document.write(`
       <li><a href="source/molass.Baseline.Surface.html#molass.Baseline.Surface.Surface.get">get() (Surface method)</a>
 </li>
       <li><a href="source/molass.SEC.ColumnSimulation.html#molass.SEC.ColumnSimulation.get_animation">get_animation() (in module molass.SEC.ColumnSimulation)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_argparser">get_argparser() (in module molass.SAXS.DenssUtils)</a>
 </li>
       <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d">get_baseline2d() (SsMatrixData method)</a>
 </li>
@@ -830,9 +862,23 @@ document.write(`
         <li><a href="source/molass.Shapes.Sphere.html#molass.Shapes.Sphere.Sphere.get_condition">(Sphere method)</a>
 </li>
       </ul></li>
+      <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo.get_curve">get_curve() (SaxsInfo method)</a>
+</li>
       <li><a href="source/molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.get_denoised_data">get_denoised_data() (in module molass.LowRank.LowRankInfo)</a>
 </li>
+      <li><a href="source/molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.get_denss_detector">get_denss_detector() (in module molass.SAXS.DenssDetector)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_denss_log_items">get_denss_log_items() (in module molass.SAXS.DenssUtils)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_denssfolder">get_denssfolder() (in module molass.SAXS.DenssUtils)</a>
+</li>
+      <li><a href="source/molass.SAXS.DetectorInfo.html#molass.SAXS.DetectorInfo.get_detector_info">get_detector_info() (in module molass.SAXS.DetectorInfo)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.get_detector_info_from_density">get_detector_info_from_density() (in module molass.SAXS.DenssTools)</a>
+</li>
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_diff_spline">get_diff_spline() (Curve method)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_dmax_with_datgnom">get_dmax_with_datgnom() (in module molass.SAXS.DenssUtils)</a>
 </li>
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_entry_including">get_entry_including() (SolidGrain method)</a>
 </li>
@@ -912,6 +958,8 @@ document.write(`
 </li>
       <li><a href="source/molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.get_meshgrid">get_meshgrid() (in module molass.DensitySpace.VoxelSpace)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Peaks.PeakSimilarity.html#molass.Peaks.PeakSimilarity.PeakSimilarity.get_minimizer_result">get_minimizer_result() (PeakSimilarity method)</a>
 </li>
       <li><a href="source/molass.Global.Options.html#molass.Global.Options.get_molass_options">get_molass_options() (in module molass.Global.Options)</a>
@@ -924,8 +972,6 @@ document.write(`
         <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment">(SsMatrixData method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl">get_next_position_impl() (in module molass.SEC.StationaryMove)</a>
 </li>
       <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
@@ -937,6 +983,8 @@ document.write(`
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_num_major_peaks">get_num_major_peaks() (Curve method)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_original_ssd">get_original_ssd() (V2Result method)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_outfolder">get_outfolder() (in module molass.SAXS.DenssUtils)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_pairedranges">get_pairedranges() (Decomposition method)</a>
 </li>
@@ -1061,6 +1109,8 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.ij_from_slice">ij_from_slice() (in module molass.PlotUtils.TrimmingPlot)</a>
+</li>
+      <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.illustrate_dmax">illustrate_dmax() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_best_params">import_best_params() (V2Result method)</a>
 </li>
@@ -1422,6 +1472,24 @@ document.write(`
 </li>
         <li><a href="source/molass.Reports.V1SummaryReport.html#module-molass.Reports.V1SummaryReport">molass.Reports.V1SummaryReport</a>
 </li>
+        <li><a href="source/molass.SAXS.html#module-molass.SAXS">molass.SAXS</a>
+</li>
+        <li><a href="source/molass.SAXS.DenssDetector.html#module-molass.SAXS.DenssDetector">molass.SAXS.DenssDetector</a>
+</li>
+        <li><a href="source/molass.SAXS.DenssTools.html#module-molass.SAXS.DenssTools">molass.SAXS.DenssTools</a>
+</li>
+        <li><a href="source/molass.SAXS.DenssUtils.html#module-molass.SAXS.DenssUtils">molass.SAXS.DenssUtils</a>
+</li>
+        <li><a href="source/molass.SAXS.DetectorInfo.html#module-molass.SAXS.DetectorInfo">molass.SAXS.DetectorInfo</a>
+</li>
+        <li><a href="source/molass.SAXS.DmaxEstimation.html#module-molass.SAXS.DmaxEstimation">molass.SAXS.DmaxEstimation</a>
+</li>
+        <li><a href="source/molass.SAXS.FourierIllust.html#module-molass.SAXS.FourierIllust">molass.SAXS.FourierIllust</a>
+</li>
+        <li><a href="source/molass.SAXS.MrcViewer.html#module-molass.SAXS.MrcViewer">molass.SAXS.MrcViewer</a>
+</li>
+        <li><a href="source/molass.SAXS.Simulator.html#module-molass.SAXS.Simulator">molass.SAXS.Simulator</a>
+</li>
         <li><a href="source/molass.SEC.html#module-molass.SEC">molass.SEC</a>
 </li>
         <li><a href="source/molass.SEC.ColumnElements.html#module-molass.SEC.ColumnElements">molass.SEC.ColumnElements</a>
@@ -1666,8 +1734,6 @@ document.write(`
         <li><a href="source/molass.DataUtils.ExportSsd.html#module-molass.DataUtils.ExportSsd">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.FolderWalker
 
@@ -1682,6 +1748,8 @@ document.write(`
         <li><a href="source/molass.DataUtils.ForwardCompat.html#module-molass.DataUtils.ForwardCompat">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.Outliers
 
@@ -2271,6 +2339,69 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    molass.SAXS
+
+      <ul>
+        <li><a href="source/molass.SAXS.html#module-molass.SAXS">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.DenssDetector
+
+      <ul>
+        <li><a href="source/molass.SAXS.DenssDetector.html#module-molass.SAXS.DenssDetector">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.DenssTools
+
+      <ul>
+        <li><a href="source/molass.SAXS.DenssTools.html#module-molass.SAXS.DenssTools">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.DenssUtils
+
+      <ul>
+        <li><a href="source/molass.SAXS.DenssUtils.html#module-molass.SAXS.DenssUtils">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.DetectorInfo
+
+      <ul>
+        <li><a href="source/molass.SAXS.DetectorInfo.html#module-molass.SAXS.DetectorInfo">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.DmaxEstimation
+
+      <ul>
+        <li><a href="source/molass.SAXS.DmaxEstimation.html#module-molass.SAXS.DmaxEstimation">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.FourierIllust
+
+      <ul>
+        <li><a href="source/molass.SAXS.FourierIllust.html#module-molass.SAXS.FourierIllust">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.MrcViewer
+
+      <ul>
+        <li><a href="source/molass.SAXS.MrcViewer.html#module-molass.SAXS.MrcViewer">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.Simulator
+
+      <ul>
+        <li><a href="source/molass.SAXS.Simulator.html#module-molass.SAXS.Simulator">module</a>
+</li>
+      </ul></li>
+      <li>
     molass.SEC
 
       <ul>
@@ -2482,12 +2613,16 @@ document.write(`
 </li>
       <li><a href="source/molass.PlotUtils.DecompositionPlot.html#molass.PlotUtils.DecompositionPlot.plot_elution_curve">plot_elution_curve() (in module molass.PlotUtils.DecompositionPlot)</a>
 </li>
-      <li><a href="source/molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.plot_segments">plot_segments() (in module molass.Geometric.Linesegment)</a>
+      <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.plot_input">plot_input() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
-      <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming">plot_trimming() (SecSaxsData method)</a>
+      <li><a href="source/molass.SAXS.FourierIllust.html#molass.SAXS.FourierIllust.plot_saxs_illust">plot_saxs_illust() (in module molass.SAXS.FourierIllust)</a>
+</li>
+      <li><a href="source/molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.plot_segments">plot_segments() (in module molass.Geometric.Linesegment)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_trimming">plot_trimming() (SecSaxsData method)</a>
+</li>
       <li><a href="source/molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.plot_trimming_impl">plot_trimming_impl() (in module molass.PlotUtils.TrimmingPlot)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions">plot_varied_decompositions() (SecSaxsData method)</a>
@@ -2548,17 +2683,25 @@ document.write(`
 </li>
       <li><a href="source/molass.DataUtils.Outliers.html#molass.DataUtils.Outliers.remove_outliers">remove_outliers() (in module molass.DataUtils.Outliers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChangeJudge.html#molass.FlowChange.FlowChangeJudge.FlowChangeJudge.restore_params">restore_params() (FlowChangeJudge method)</a>
 </li>
       <li><a href="source/molass.Geometric.LinesegmentUtils.html#molass.Geometric.LinesegmentUtils.restore_segments">restore_segments() (in module molass.Geometric.LinesegmentUtils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve">RgCurve (class in molass.Guinier.RgCurve)</a>
 </li>
       <li><a href="source/molass.Reports.V1Report.html#molass.Reports.V1Report.PreProcessing.run">run() (PreProcessing method)</a>
 </li>
+      <li><a href="source/molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.run_denss">run_denss() (in module molass.SAXS.DenssTools)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_denss_impl">run_denss_impl() (in module molass.SAXS.DenssUtils)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_denss_impl_dummy">run_denss_impl_dummy() (in module molass.SAXS.DenssUtils)</a>
+</li>
       <li><a href="source/molass.Batch.V1Legacy.html#molass.Batch.V1Legacy.run_fullyautomatic_v1">run_fullyautomatic_v1() (in module molass.Batch.V1Legacy)</a>
+</li>
+      <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_pdb2mrc">run_pdb2mrc() (in module molass.SAXS.DenssUtils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2569,6 +2712,8 @@ document.write(`
       <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10">safe_log10() (in module molass.LowRank.CurveDecomposer)</a>
 </li>
       <li><a href="source/molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult.savefig">savefig() (PlotResult method)</a>
+</li>
+      <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo">SaxsInfo (class in molass.SAXS.Simulator)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData (class in molass.DataObjects.SecSaxsData)</a>
 </li>
@@ -2595,6 +2740,8 @@ document.write(`
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Global.Options.html#molass.Global.Options.set_molass_options">set_molass_options() (in module molass.Global.Options)</a>
+</li>
+      <li><a href="source/molass.SAXS.MrcViewer.html#molass.SAXS.MrcViewer.show_mrc">show_mrc() (in module molass.SAXS.MrcViewer)</a>
 </li>
       <li><a href="source/molass.PlotUtils.MatrixPlot.html#molass.PlotUtils.MatrixPlot.simple_plot_3d">simple_plot_3d() (in module molass.PlotUtils.MatrixPlot)</a>
 </li>

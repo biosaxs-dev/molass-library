@@ -212,10 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -252,6 +248,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -303,6 +300,17 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -516,11 +524,14 @@ document.write(`
   <section id="module-molass.DataObjects.SsMatrixData">
 <span id="dataobjects-ssmatrixdata"></span><h1>DataObjects.SsMatrixData<a class="headerlink" href="#module-molass.DataObjects.SsMatrixData" title="Link to this heading">#</a></h1>
 <p>DataObjects.SsMatrixData.py</p>
-<p>Copyright (c) 2025, SAXS Team, KEK-PF</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SsMatrixData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent a SAXS/UV matrix data object.
+It contains a 2D matrix M where M[i,j] is the intensity value
+at the i-th value of the first variable (iv) and the j-th value
+of the second variable (jv).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy" title="Link to this definition">#</a></dt>
@@ -529,12 +540,24 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve">
 <span class="sig-name descname"><span class="pre">get_icurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pickat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>get an i-curve from the matrix data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pickat</strong> (<em>float</em>) – Specifies the value to pick an i-curve.
+The i-curve will be made from ssd.M[i,:] where ssd.iv[i] is the largest value
+that is less than or equal to pickat.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">get_icurve</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve">
 <span class="sig-name descname"><span class="pre">get_jcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve" title="Link to this definition">#</a></dt>
-<dd><p>Returns a j-curve from the XR matrix data.</p>
+<dd><p>Returns a j-curve from the matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>j</strong> (<em>int</em>) – Specifies the index to pick a j-curve.
@@ -542,7 +565,7 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">sd</span><span class="o">.</span><span class="n">get_jcurve</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">get_jcurve</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>

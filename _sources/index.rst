@@ -43,7 +43,6 @@ Submodules
    source/molass.DataObjects
    source/molass.DataUtils
    source/molass.DensitySpace
-   source/molass.DENSS
    source/molass.Except
    source/molass.FlowChange
    source/molass.Guinier
@@ -57,6 +56,7 @@ Submodules
    source/molass.PlotUtils
    source/molass.Progress
    source/molass.Reports
+   source/molass.SAXS
    source/molass.Shapes
    source/molass.Stats
    source/molass.Stochastic

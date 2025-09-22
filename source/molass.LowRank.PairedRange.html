@@ -212,10 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -252,6 +248,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">LowRank.PairedRange</a></li>
@@ -303,6 +300,17 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -519,6 +527,8 @@ about the valid elution ranges for the analysis report.</p>
 <dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PairedRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elm_recs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent a paired range.
+It contains a pair of ranges which correspond to the ascending and descending parts of the peak.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.get_fromto_list">
 <span class="sig-name descname"><span class="pre">get_fromto_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.get_fromto_list" title="Link to this definition">#</a></dt>
@@ -529,12 +539,14 @@ returns a list of tuples</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.as_list">
 <span class="sig-name descname"><span class="pre">as_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.as_list" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of PeakInfo and RangeInfo objects.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.is_minor">
 <span class="sig-name descname"><span class="pre">is_minor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.is_minor" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns True if the PairedRange is a minor peak (i.e., has only one range).</p>
+</dd></dl>
 
 </dd></dl>
 

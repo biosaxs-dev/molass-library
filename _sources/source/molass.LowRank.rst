@@ -17,6 +17,7 @@ Submodules
    molass.LowRank.ConsistentAdjuster
    molass.LowRank.CoupledAdjuster
    molass.LowRank.CurveDecomposer
+   molass.LowRank.Decomposition
    molass.LowRank.ErrorPropagate
    molass.LowRank.LowRankInfo
    molass.LowRank.PairedRange

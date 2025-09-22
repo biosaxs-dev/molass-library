@@ -212,10 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.DENSS.html">DENSS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.DENSS.DenssUtils.html">DENSS.DenssUtils</a></li>
-</ul>
-</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Except.html">Except</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Except.ExceptionTypes.html">Except.ExceptionTypes</a></li>
 </ul>
@@ -252,6 +248,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -303,6 +300,17 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.ReportUtils.html">Reports.ReportUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1GuinierReport.html">Reports.V1GuinierReport</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Reports.V1Report.html">Reports.V1Report</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Shapes.html">Shapes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -528,16 +536,35 @@ about each component of a LowRankInfo.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jcurve_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccurve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>icurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>2</em><em>)</em>) – The i-curve array, where the first column is x and the second column is y.</p></li>
+<li><p><strong>jcurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>M</em><em>, </em><em>3</em><em>)</em>) – The j-curve array, where the first column is x, the second column is y, and the third column is error.</p></li>
+<li><p><strong>ccurve</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>,</em><em>)</em>) – The concentration curve.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Component.Component.get_icurve">
 <span class="sig-name descname"><span class="pre">get_icurve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_icurve" title="Link to this definition">#</a></dt>
-<dd><p>Returns the i-curve object.</p>
+<dd><p>Returns the i-curve object instead of the array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The i-curve object which is of type Curve.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Component.Component.get_jcurve">
 <span class="sig-name descname"><span class="pre">get_jcurve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_jcurve" title="Link to this definition">#</a></dt>
-<dd><p>Returns the j-curve object.</p>
+<dd><p>Returns the j-curve object instead of the array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The j-curve object which is of type Curve.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -545,6 +572,12 @@ about each component of a LowRankInfo.</p>
 <span class="sig-name descname"><span class="pre">get_jcurve_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.Component.get_jcurve_array" title="Link to this definition">#</a></dt>
 <dd><p>Returns the j-curve array which contains qv, I and error in case of XR.</p>
 <p>Currently, error is zeros in case of UV.</p>
+<p>This type of array is used as portable data storage for SAXS tools.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The j-curve array which is of type numpy array of shape (M, 3).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -568,7 +601,16 @@ about each component of a LowRankInfo.</p>
 <dt class="sig sig-object py" id="molass.LowRank.Component.XrComponent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XrComponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.XrComponent" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#molass.LowRank.Component.Component" title="molass.LowRank.Component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a></p>
-<p>A class to represent an XR component.</p>
+<p>A class to represent an X-ray component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>icurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>2</em><em>)</em>) – The i-curve array, where the first column is x and the second column is y.</p></li>
+<li><p><strong>jcurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>M</em><em>, </em><em>3</em><em>)</em>) – The j-curve array, where the first column is x, the second column is y, and the third column is error.</p></li>
+<li><p><strong>ccurve</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>,</em><em>)</em>) – The concentration curve.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Component.XrComponent.get_guinier_object">
 <span class="sig-name descname"><span class="pre">get_guinier_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.XrComponent.get_guinier_object" title="Link to this definition">#</a></dt>
@@ -577,7 +619,10 @@ about each component of a LowRankInfo.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Component.XrComponent.compute_rg">
 <span class="sig-name descname"><span class="pre">compute_rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.XrComponent.compute_rg" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the Rg of the component.
+:param return_object: If True, return the Guinier object instead of Rg value.
+:type return_object: bool, optional</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -586,6 +631,15 @@ about each component of a LowRankInfo.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UvComponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Component.UvComponent" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#molass.LowRank.Component.Component" title="molass.LowRank.Component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a></p>
 <p>A class to represent a UV component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>icurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>2</em><em>)</em>) – The i-curve array, where the first column is x and the second column is y.</p></li>
+<li><p><strong>jcurve_array</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>M</em><em>, </em><em>3</em><em>)</em>) – The j-curve array, where the first column is x, the second column is y, and the third column is error.</p></li>
+<li><p><strong>ccurve</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>N</em><em>,</em><em>)</em>) – The concentration curve.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
