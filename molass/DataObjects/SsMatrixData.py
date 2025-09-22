@@ -1,7 +1,5 @@
 """
     DataObjects.SsMatrixData.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.DataObjects.Curve import create_icurve, create_jcurve

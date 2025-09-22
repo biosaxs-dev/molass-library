@@ -28,6 +28,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     'sphinx_copybutton',
     'myst_parser',
+    "sphinx.ext.intersphinx",  # <-- Add this line
 ]
 
 autoclass_content = 'both'
@@ -59,4 +60,9 @@ html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_logo = "_static/molamola.png"
 html_favicon = "_static/molamola.png"
+
+# Intersphinx mapping for external documentation cross-references
+intersphinx_mapping = {
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+}
 

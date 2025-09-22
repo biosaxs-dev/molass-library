@@ -1,7 +1,5 @@
 """
     DataObjects.SecSacsData.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import os
 import numpy as np
@@ -12,7 +10,10 @@ import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
 class SecSaxsData:
     """
-    A class to represent a SEC-SAXS data object."""
+    A class to represent a SEC-SAXS data object.
+    It contains a pair of XR and UV data objects.
+    It also contains the beamline information and mapping information if available.
+    """
 
     def __init__(self, folder=None, object_list=None, uv_only=False, xr_only=False,
                  trimmed=False,
@@ -117,7 +118,7 @@ class SecSaxsData:
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
     def plot_3d(self, **kwargs):
-        """ssd.plot_3d(view_init=None)
+        """ssd.plot_3d(title=None, view_init=None, view_arrows=False)
 
             Plots a pair of 3D figures of UV and XR data.
 
@@ -429,9 +430,9 @@ class SecSaxsData:
             return self.beamline_info.get_concfactor()
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition()
+        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, **kwargs)
 
-        Returns a decompositin object.
+        Performs a quick decomposition of the SEC-SAXS data.
 
         Parameters
         ----------

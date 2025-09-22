@@ -49,7 +49,8 @@ class Decomposition:
         return self.num_components
 
     def plot_components(self, **kwargs):
-        """
+        """decomposition.plot_components(title=None, **kwargs)
+
         Plot the components.
 
         Parameters
@@ -107,9 +108,15 @@ class Decomposition:
         """
         Get the components for the X-ray data.
 
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
         Returns
         -------
-        List of XrComponent objects.
+        list of :class:`~molass.LowRank.Component.XrComponent`
+            The list of XrComponent objects.
         """
         if debug:
             from importlib import reload
