@@ -161,11 +161,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Surface.html">Baseline.Surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html">Baseline.UvBaseline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a></li>
 </ul>
 </details></li>
@@ -187,7 +188,6 @@
 <li class="toctree-l1"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html">DataObjects.SsMatrixData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.UvData.html">DataObjects.UvData</a></li>
@@ -204,6 +204,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -627,13 +632,16 @@ this version.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.Basesurface.html#molass.Baseline.Basesurface.get_linear_surface"><code class="docutils literal notranslate"><span class="pre">get_linear_surface()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html#molass.Baseline.IntegralBaseline.compute_integral_baseline"><code class="docutils literal notranslate"><span class="pre">compute_integral_baseline()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent"><code class="docutils literal notranslate"><span class="pre">estimate_lpm_percent()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.compute_lpm_baseline"><code class="docutils literal notranslate"><span class="pre">compute_lpm_baseline()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html#molass.Baseline.SimpleBaseline.estimate_baseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_baseline_params()</span></code></a></li>
 </ul>
@@ -646,6 +654,11 @@ this version.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.estimate_uvbaseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvbaseline_params()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.inspect_uv_baseline"><code class="docutils literal notranslate"><span class="pre">inspect_uv_baseline()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html#molass.Baseline.UvdiffBaseline.get_uvdiff_baseline_info"><code class="docutils literal notranslate"><span class="pre">get_uvdiff_baseline_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html#molass.Baseline.UvdiffBaseline.compute_uvdiff_baseline"><code class="docutils literal notranslate"><span class="pre">compute_uvdiff_baseline()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a><ul>
@@ -703,7 +716,6 @@ this version.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.create_jcurve"><code class="docutils literal notranslate"><span class="pre">create_jcurve()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a></li>
 </ul>
@@ -770,6 +782,38 @@ this version.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="molass.DataUtils.ZipFolder.html#molass.DataUtils.ZipFolder.zip_folder"><code class="docutils literal notranslate"><span class="pre">zip_folder()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.Decompose.html">Decompose</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.Proportional.html#molass.Decompose.Proportional.safe_log10"><code class="docutils literal notranslate"><span class="pre">safe_log10()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.Proportional.html#molass.Decompose.Proportional.get_proportional_slices"><code class="docutils literal notranslate"><span class="pre">get_proportional_slices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.Proportional.html#molass.Decompose.Proportional.estimate_initial_params"><code class="docutils literal notranslate"><span class="pre">estimate_initial_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.Proportional.html#molass.Decompose.Proportional.debug_plot"><code class="docutils literal notranslate"><span class="pre">debug_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.Proportional.html#molass.Decompose.Proportional.decompose_proportionally"><code class="docutils literal notranslate"><span class="pre">decompose_proportionally()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Decompose.VaryUtils.html#molass.Decompose.VaryUtils.plot_varied_decompositions"><code class="docutils literal notranslate"><span class="pre">plot_varied_decompositions()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.DensitySpace.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html">DensitySpace.VoxelSpace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.get_meshgrid"><code class="docutils literal notranslate"><span class="pre">get_meshgrid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl"><code class="docutils literal notranslate"><span class="pre">draw_voxles_as_dots_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1117,6 +1161,66 @@ this version.</p>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="molass.SAXS.html">SAXS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.html#submodules">Submodules</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.html#id1">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.DenssDetector.html">SAXS.DenssDetector</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.DenssDetector"><code class="docutils literal notranslate"><span class="pre">DenssDetector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.get_denss_detector"><code class="docutils literal notranslate"><span class="pre">get_denss_detector()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.DenssTools.html">SAXS.DenssTools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.DetectorInfo"><code class="docutils literal notranslate"><span class="pre">DetectorInfo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.run_denss"><code class="docutils literal notranslate"><span class="pre">run_denss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.get_detector_info_from_density"><code class="docutils literal notranslate"><span class="pre">get_detector_info_from_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.DenssUtils.html">SAXS.DenssUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data_impl"><code class="docutils literal notranslate"><span class="pre">fit_data_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data"><code class="docutils literal notranslate"><span class="pre">fit_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.fit_data_bc"><code class="docutils literal notranslate"><span class="pre">fit_data_bc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_dmax_with_datgnom"><code class="docutils literal notranslate"><span class="pre">get_dmax_with_datgnom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_argparser"><code class="docutils literal notranslate"><span class="pre">get_argparser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_denss_impl"><code class="docutils literal notranslate"><span class="pre">run_denss_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_denss_impl_dummy"><code class="docutils literal notranslate"><span class="pre">run_denss_impl_dummy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_denssfolder"><code class="docutils literal notranslate"><span class="pre">get_denssfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_outfolder"><code class="docutils literal notranslate"><span class="pre">get_outfolder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_denss_log_items"><code class="docutils literal notranslate"><span class="pre">get_denss_log_items()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.run_pdb2mrc"><code class="docutils literal notranslate"><span class="pre">run_pdb2mrc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.DetectorInfo.html">SAXS.DetectorInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DetectorInfo.html#molass.SAXS.DetectorInfo.DetectorInfo"><code class="docutils literal notranslate"><span class="pre">DetectorInfo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DetectorInfo.html#molass.SAXS.DetectorInfo.get_detector_info"><code class="docutils literal notranslate"><span class="pre">get_detector_info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html">SAXS.DmaxEstimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.estimate_dmax"><code class="docutils literal notranslate"><span class="pre">estimate_dmax()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.plot_input"><code class="docutils literal notranslate"><span class="pre">plot_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.illustrate_dmax"><code class="docutils literal notranslate"><span class="pre">illustrate_dmax()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.demo"><code class="docutils literal notranslate"><span class="pre">demo()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.FourierIllust.html#molass.SAXS.FourierIllust.plot_saxs_illust"><code class="docutils literal notranslate"><span class="pre">plot_saxs_illust()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.MrcViewer.html#molass.SAXS.MrcViewer.show_mrc"><code class="docutils literal notranslate"><span class="pre">show_mrc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo"><code class="docutils literal notranslate"><span class="pre">SaxsInfo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.Simulator.html#molass.SAXS.Simulator.compute_saxs"><code class="docutils literal notranslate"><span class="pre">compute_saxs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="molass.SAXS.Simulator.html#molass.SAXS.Simulator.draw_saxs"><code class="docutils literal notranslate"><span class="pre">draw_saxs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="molass.SEC.html">SEC</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a><ul>
@@ -1146,6 +1250,20 @@ this version.</p>
 <li class="toctree-l4"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.mirrorImage"><code class="docutils literal notranslate"><span class="pre">mirrorImage()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_reflected_point"><code class="docutils literal notranslate"><span class="pre">compute_reflected_point()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl"><code class="docutils literal notranslate"><span class="pre">get_next_position_impl()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.Shapes.html">Shapes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Shapes.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="molass.Shapes.Ellipsoid.html">Shapes.Ellipsoid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Shapes.Ellipsoid.html#molass.Shapes.Ellipsoid.Ellipsoid"><code class="docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="molass.Shapes.Sphere.html">Shapes.Sphere</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="molass.Shapes.Sphere.html#molass.Shapes.Sphere.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a></li>
 </ul>
 </li>
 </ul>

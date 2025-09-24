@@ -16,9 +16,10 @@ Submodules
    molass.Batch
    molass.Bridge
    molass.CurveModels
-   molass.DENSS
    molass.DataObjects
    molass.DataUtils
+   molass.Decompose
+   molass.DensitySpace
    molass.Except
    molass.FlowChange
    molass.Geometric
@@ -34,7 +35,9 @@ Submodules
    molass.PlotUtils
    molass.Progress
    molass.Reports
+   molass.SAXS
    molass.SEC
+   molass.Shapes
    molass.Stats
    molass.SurveyUtils
    molass.Trimming

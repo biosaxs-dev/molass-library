@@ -48,7 +48,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="DataObjects.SsMatrixData" href="molass.DataObjects.SsMatrixData.html" />
-    <link rel="prev" title="DataObjects.DenssInputData" href="molass.DataObjects.DenssInputData.html" />
+    <link rel="prev" title="DataObjects.Curve" href="molass.DataObjects.Curve.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -163,11 +163,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Surface.html">Baseline.Surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html">Baseline.UvBaseline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a></li>
 </ul>
 </details></li>
@@ -189,7 +190,6 @@
 <li class="toctree-l1"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">DataObjects.SecSaxsData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html">DataObjects.SsMatrixData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.UvData.html">DataObjects.UvData</a></li>
@@ -206,6 +206,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -823,8 +828,20 @@ subtracting the baseline from the original data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping">
-<span class="sig-name descname"><span class="pre">estimate_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">estimate_mapping</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping" title="Link to this definition">#</a></dt>
+<dd><p>Estimates the mapping information between UV and XR data.
+:param debug: If True, enables debug mode for more verbose output.
+:type debug: bool, optional</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mapping</strong> – A MappingInfo object which contains the mapping information.
+If the mapping information is not available, returns None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping">
@@ -847,7 +864,20 @@ If the mapping information is not available, returns None.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor">
 <span class="sig-name descname"><span class="pre">get_concfactor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the concentration factor from the beamline information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>concfactor</strong> – The concentration factor from the beamline information.
+If the beamline information is not available, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition">
@@ -875,9 +905,16 @@ used to denoise the matrix data.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect">
 <span class="sig-name descname"><span class="pre">inspect_ip_effect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Inspects the inter-particle effect of the SEC-SAXS data.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ip_effect_info</strong> – An IpEffectInfo object which contains the inspection result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.InterParticle.IpEffectInspect.html#molass.InterParticle.IpEffectInspect.IpEffectInfo" title="molass.InterParticle.IpEffectInspect.IpEffectInfo">IpEffectInfo</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -885,12 +922,38 @@ used to denoise the matrix data.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id">
 <span class="sig-name descname"><span class="pre">get_uv_device_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the UV device ID from the beamline information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>uv_device_id</strong> – The UV device ID from the beamline information.
+If the beamline information is not available, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name">
 <span class="sig-name descname"><span class="pre">get_beamline_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the beamline name from the beamline information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>beamline_name</strong> – The beamline name from the beamline information.
+If the beamline information is not available, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.export">
@@ -926,7 +989,7 @@ The default is ‘%.18e’.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – A list of proportions to be used for the varied decompositions.</p></li>
 <li><p><strong>rgcurve</strong> (<em>object</em><em>, </em><em>optional</em>) – A reference to the RG curve to be used for the plot.</p></li>
-<li><p><strong>best</strong> (<em>object</em><em>, </em><em>optional</em>) – A reference to the best decomposition to be highlighted in the plot.</p></li>
+<li><p><strong>best</strong> (<em>int</em><em>, </em><em>optional</em>) – number of best results to be highlighted.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode.</p></li>
 </ul>
 </dd>
@@ -958,12 +1021,12 @@ axes: Axes</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="molass.DataObjects.DenssInputData.html"
+       href="molass.DataObjects.Curve.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">DataObjects.DenssInputData</p>
+        <p class="prev-next-title">DataObjects.Curve</p>
       </div>
     </a>
     <a class="right-next"

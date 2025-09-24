@@ -163,11 +163,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Surface.html">Baseline.Surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html">Baseline.UvBaseline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a></li>
 </ul>
 </details></li>
@@ -189,7 +190,6 @@
 <li class="toctree-l1"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html">DataObjects.SsMatrixData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.UvData.html">DataObjects.UvData</a></li>
@@ -206,6 +206,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -568,13 +573,16 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html#molass.Baseline.Basesurface.get_linear_surface"><code class="docutils literal notranslate"><span class="pre">get_linear_surface()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html#molass.Baseline.IntegralBaseline.compute_integral_baseline"><code class="docutils literal notranslate"><span class="pre">compute_integral_baseline()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent"><code class="docutils literal notranslate"><span class="pre">estimate_lpm_percent()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.compute_lpm_baseline"><code class="docutils literal notranslate"><span class="pre">compute_lpm_baseline()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html#molass.Baseline.SimpleBaseline.estimate_baseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_baseline_params()</span></code></a></li>
 </ul>
@@ -590,6 +598,11 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.estimate_uvbaseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvbaseline_params()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.inspect_uv_baseline"><code class="docutils literal notranslate"><span class="pre">inspect_uv_baseline()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html#molass.Baseline.UvdiffBaseline.get_uvdiff_baseline_info"><code class="docutils literal notranslate"><span class="pre">get_uvdiff_baseline_info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html#molass.Baseline.UvdiffBaseline.compute_uvdiff_baseline"><code class="docutils literal notranslate"><span class="pre">compute_uvdiff_baseline()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a><ul>

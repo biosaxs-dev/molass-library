@@ -163,11 +163,12 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Surface.html">Baseline.Surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvBaseline.html">Baseline.UvBaseline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a></li>
 </ul>
 </details></li>
@@ -189,7 +190,6 @@
 <li class="toctree-l1"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">DataObjects.SsMatrixData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.UvData.html">DataObjects.UvData</a></li>
@@ -206,6 +206,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -555,10 +560,17 @@ document.write(`
 It contains a 2D matrix M where M[i,j] is the intensity value
 at the i-th value of the first variable (iv) and the j-th value
 of the second variable (jv).</p>
+<p>Initialize the SsMatrixData object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Return a copy of the SsMatrixData object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slices</strong> (<em>tuple</em><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve">
@@ -596,7 +608,16 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_moment">
 <span class="sig-name descname"><span class="pre">get_moment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the moment of the matrix data along the iv axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>moment</strong> – The moment object representing the moment along the iv axis.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Stats.EghMoment.html#molass.Stats.EghMoment.EghMoment" title="molass.Stats.EghMoment.EghMoment">EghMoment</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method">
@@ -613,7 +634,22 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d">
 <span class="sig-name descname"><span class="pre">get_baseline2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the 2D baseline for the matrix data using the specified method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline fitting method.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The 2D baseline array with the same shape as self.M.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

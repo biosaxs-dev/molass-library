@@ -12,10 +12,10 @@ This document describes each function of the library.
 
 For more structural information, see also:
 
-- **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
-- **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
-- **Technical Report:** https://freesemt.github.io/molass-technical/ for technical details,
-- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for the GUI application version.
+- **Essence:** https://nshimizu0721.github.io/molass-essence on theory for researchers,
+- **Tutorial:** https://nshimizu0721.github.io/molass-tutorial on how to use for begginners,
+- **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details for developers,
+- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
 
 To join the community, see also:
 
@@ -42,6 +42,7 @@ Submodules
    source/molass.CurveModels.Scattering.FormFactors
    source/molass.DataObjects
    source/molass.DataUtils
+   source/molass.Decompose
    source/molass.DensitySpace
    source/molass.Except
    source/molass.FlowChange
@@ -61,7 +62,6 @@ Submodules
    source/molass.SEC.Models
    source/molass.Shapes
    source/molass.Stats
-   source/molass.Stochastic
    source/molass.SurveyUtils
    source/molass.Trimming
 
@@ -72,4 +72,3 @@ Tool Functions
    :maxdepth: 5
 
    source/EditRst
-   source/UsualUpdate

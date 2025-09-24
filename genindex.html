@@ -162,11 +162,12 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.LpmBaseline2D.html">Baseline.LpmBaseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.Surface.html">Baseline.Surface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.UvBaseline.html">Baseline.UvBaseline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.UvdiffBaseline.html">Baseline.UvdiffBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.UvDiffEffect.html">Baseline.UvDiffEffect</a></li>
 </ul>
 </details></li>
@@ -188,7 +189,6 @@
 <li class="toctree-l1"><a class="reference internal" href="source/molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.DenssInputData.html">DataObjects.DenssInputData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html">DataObjects.SsMatrixData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.UvData.html">DataObjects.UvData</a></li>
@@ -205,6 +205,11 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.UvLoader.html">DataUtils.UvLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.XrLoader.html">DataUtils.XrLoader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.ZipFolder.html">DataUtils.ZipFolder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -706,13 +711,19 @@ document.write(`
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.debug_plot">debug_plot() (Moment method)</a>
+      <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.debug_plot">debug_plot() (in module molass.Decompose.Proportional)</a>
+
+      <ul>
+        <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.debug_plot">(Moment method)</a>
 </li>
+      </ul></li>
       <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.decompose_icurve_impl">decompose_icurve_impl() (in module molass.LowRank.CurveDecomposer)</a>
 </li>
       <li><a href="source/molass.LowRank.PositionedDecomposer.html#molass.LowRank.PositionedDecomposer.decompose_icurve_positioned">decompose_icurve_positioned() (in module molass.LowRank.PositionedDecomposer)</a>
 </li>
       <li><a href="source/molass.LowRank.ProportionalDecomposer.html#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally">decompose_icurve_proportionally() (in module molass.LowRank.ProportionalDecomposer)</a>
+</li>
+      <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.decompose_proportionally">decompose_proportionally() (in module molass.Decompose.Proportional)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition">Decomposition (class in molass.LowRank.Decomposition)</a>
 </li>
@@ -730,10 +741,10 @@ document.write(`
         <li><a href="source/molass.SAXS.DetectorInfo.html#molass.SAXS.DetectorInfo.DetectorInfo">(class in molass.SAXS.DetectorInfo)</a>
 </li>
       </ul></li>
-      <li><a href="source/molass.PlotUtils.Arrow3D.html#molass.PlotUtils.Arrow3D.Arrow3D.do_3d_projection">do_3d_projection() (Arrow3D method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.PlotUtils.Arrow3D.html#molass.PlotUtils.Arrow3D.Arrow3D.do_3d_projection">do_3d_projection() (Arrow3D method)</a>
+</li>
       <li>
     docs.tools.EditRst
 
@@ -804,6 +815,8 @@ document.write(`
       <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.estimate_dmax">estimate_dmax() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
       <li><a href="source/molass.SEC.Models.EdmEstimator.html#molass.SEC.Models.EdmEstimator.estimate_edm_init_params">estimate_edm_init_params() (in module molass.SEC.Models.EdmEstimator)</a>
+</li>
+      <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.estimate_initial_params">estimate_initial_params() (in module molass.Decompose.Proportional)</a>
 </li>
       <li><a href="source/molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent">estimate_lpm_percent() (in module molass.Baseline.LpmBaseline)</a>
 </li>
@@ -1062,6 +1075,8 @@ document.write(`
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_point_from_angle">get_point_from_angle() (SolidGrain method)</a>
 </li>
       <li><a href="source/molass.Legacy.BackCompatUtils.html#molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i">get_primarypeak_i() (ElutioCurvProxy method)</a>
+</li>
+      <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.get_proportional_slices">get_proportional_slices() (in module molass.Decompose.Proportional)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_proportions">get_proportions() (Decomposition method)</a>
 </li>
@@ -1390,6 +1405,12 @@ document.write(`
         <li><a href="source/molass.DataUtils.XrLoader.html#module-molass.DataUtils.XrLoader">molass.DataUtils.XrLoader</a>
 </li>
         <li><a href="source/molass.DataUtils.ZipFolder.html#module-molass.DataUtils.ZipFolder">molass.DataUtils.ZipFolder</a>
+</li>
+        <li><a href="source/molass.Decompose.html#module-molass.Decompose">molass.Decompose</a>
+</li>
+        <li><a href="source/molass.Decompose.Proportional.html#module-molass.Decompose.Proportional">molass.Decompose.Proportional</a>
+</li>
+        <li><a href="source/molass.Decompose.VaryUtils.html#module-molass.Decompose.VaryUtils">molass.Decompose.VaryUtils</a>
 </li>
         <li><a href="source/molass.DensitySpace.html#module-molass.DensitySpace">molass.DensitySpace</a>
 </li>
@@ -1886,6 +1907,27 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.DataUtils.ZipFolder.html#module-molass.DataUtils.ZipFolder">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.Decompose
+
+      <ul>
+        <li><a href="source/molass.Decompose.html#module-molass.Decompose">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.Decompose.Proportional
+
+      <ul>
+        <li><a href="source/molass.Decompose.Proportional.html#module-molass.Decompose.Proportional">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.Decompose.VaryUtils
+
+      <ul>
+        <li><a href="source/molass.Decompose.VaryUtils.html#module-molass.Decompose.VaryUtils">module</a>
 </li>
       </ul></li>
       <li>
@@ -2835,8 +2877,12 @@ document.write(`
 </li>
       <li><a href="source/molass.PlotUtils.TrimmingPlot.html#molass.PlotUtils.TrimmingPlot.plot_trimming_impl">plot_trimming_impl() (in module molass.PlotUtils.TrimmingPlot)</a>
 </li>
-      <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions">plot_varied_decompositions() (SecSaxsData method)</a>
+      <li><a href="source/molass.Decompose.VaryUtils.html#molass.Decompose.VaryUtils.plot_varied_decompositions">plot_varied_decompositions() (in module molass.Decompose.VaryUtils)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions">(SecSaxsData method)</a>
 </li>
+      </ul></li>
       <li><a href="source/molass.PlotUtils.ViewArrows.html#molass.PlotUtils.ViewArrows.plot_view_arrows">plot_view_arrows() (in module molass.PlotUtils.ViewArrows)</a>
 </li>
       <li><a href="source/molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density">plot_with_density() (VoxelSpace method)</a>
@@ -2919,8 +2965,12 @@ document.write(`
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10">safe_log10() (in module molass.LowRank.CurveDecomposer)</a>
+      <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.safe_log10">safe_log10() (in module molass.Decompose.Proportional)</a>
+
+      <ul>
+        <li><a href="source/molass.LowRank.CurveDecomposer.html#molass.LowRank.CurveDecomposer.safe_log10">(in module molass.LowRank.CurveDecomposer)</a>
 </li>
+      </ul></li>
       <li><a href="source/molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult.savefig">savefig() (PlotResult method)</a>
 </li>
       <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo">SaxsInfo (class in molass.SAXS.Simulator)</a>
@@ -2949,10 +2999,10 @@ document.write(`
         <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method">(SsMatrixData method)</a>
 </li>
       </ul></li>
-      <li><a href="source/molass.PlotUtils.V1GuinierPlot.html#molass.PlotUtils.V1GuinierPlot.set_limits_from_interval">set_limits_from_interval() (in module molass.PlotUtils.V1GuinierPlot)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.PlotUtils.V1GuinierPlot.html#molass.PlotUtils.V1GuinierPlot.set_limits_from_interval">set_limits_from_interval() (in module molass.PlotUtils.V1GuinierPlot)</a>
+</li>
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.set_max">set_max() (Curve method)</a>
 </li>
       <li><a href="source/molass.Global.Options.html#molass.Global.Options.set_molass_options">set_molass_options() (in module molass.Global.Options)</a>

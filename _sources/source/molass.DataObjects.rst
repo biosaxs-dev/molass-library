@@ -13,7 +13,6 @@ Submodules
    :maxdepth: 4
 
    molass.DataObjects.Curve
-   molass.DataObjects.DenssInputData
    molass.DataObjects.SecSaxsData
    molass.DataObjects.SsMatrixData
    molass.DataObjects.UvData
