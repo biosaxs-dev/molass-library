@@ -12,6 +12,7 @@ class SsMatrixData:
     def __init__(self, iv, jv, M, E,
                  moment=None,
                  baseline_method='linear'):
+        """Initialize the SsMatrixData object."""
         self.iv = iv
         if jv is None:
             jv = np.arange(M.shape[1])
@@ -22,6 +23,13 @@ class SsMatrixData:
         self.baseline_method = baseline_method
 
     def copy(self, slices=None):
+        """Return a copy of the SsMatrixData object.
+
+        Parameters
+        ----------
+        slices : tuple of slices, optional
+            The slices to apply to the iv, jv, and M attributes.
+        """
         if slices is None:
             islice = slice(None, None)
             jslice = slice(None, None)
@@ -72,6 +80,13 @@ class SsMatrixData:
         return create_jcurve(self.iv, self.M, j)
 
     def get_moment(self):
+        """Get the moment of the matrix data along the iv axis.
+
+        Returns
+        -------
+        moment: EghMoment
+            The moment object representing the moment along the iv axis.
+        """
         if self.moment is None:
             from molass.Stats.EghMoment import EghMoment
             icurve = self.get_icurve()
@@ -87,6 +102,20 @@ class SsMatrixData:
         return self.baseline_method
 
     def get_baseline2d(self, **kwargs):
+        """Get the 2D baseline for the matrix data using the specified method.
+
+        Parameters
+        ----------
+        method_kwargs : dict, optional
+            Additional keyword arguments to pass to the baseline fitting method.
+        debug : bool, optional
+            If True, enable debug mode.
+            
+        Returns
+        -------
+        baseline : ndarray
+            The 2D baseline array with the same shape as self.M.
+        """
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
         counter = [0, 0, 0] if debug else None

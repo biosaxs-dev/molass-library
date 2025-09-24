@@ -424,6 +424,18 @@ class SecSaxsData:
         return ssd_copy
     
     def estimate_mapping(self, debug=False):
+        """ssd.estimate_mapping()
+        Estimates the mapping information between UV and XR data.
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
+        Returns
+        -------
+        mapping : MappingInfo
+            A MappingInfo object which contains the mapping information.
+            If the mapping information is not available, returns None.
+        """
         if debug:
             import molass.Mapping.SimpleMapper
             reload(molass.Mapping.SimpleMapper)
@@ -458,6 +470,19 @@ class SecSaxsData:
         return self.mapping
 
     def get_concfactor(self):
+        """ssd.get_concfactor()
+        Returns the concentration factor from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        concfactor : float or None
+            The concentration factor from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
@@ -499,10 +524,16 @@ class SecSaxsData:
 
     def inspect_ip_effect(self, debug=False):
         """ssd.inspect_ip_effect()
+        Inspects the inter-particle effect of the SEC-SAXS data.
 
         Parameters
         ----------
         None
+
+        Returns
+        -------
+        ip_effect_info : IpEffectInfo
+            An IpEffectInfo object which contains the inspection result.
         """
         if debug:
             import molass.InterParticle.IpEffectInspect
@@ -511,12 +542,38 @@ class SecSaxsData:
         return inspect_ip_effect_impl(self, debug=debug)
 
     def get_uv_device_id(self):
+        """ssd.get_uv_device_id()
+        Returns the UV device ID from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        uv_device_id : str or None
+            The UV device ID from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
             return self.beamline_info.uv_device_id
 
     def get_beamline_name(self):
+        """ssd.get_beamline_name()
+        Returns the beamline name from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        beamline_name : str or None
+            The beamline name from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
@@ -568,8 +625,8 @@ class SecSaxsData:
         rgcurve : object, optional
             A reference to the RG curve to be used for the plot.
 
-        best : object, optional
-            A reference to the best decomposition to be highlighted in the plot.
+        best : int, optional
+            number of best results to be highlighted.
 
         debug : bool, optional
             If True, enables debug mode.

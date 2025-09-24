@@ -11,10 +11,17 @@ class UvData(SsMatrixData):
     """
     UvData class for UV matrix data. """
     def __init__(self, iv, jv, M, E, **kwargs):
+        """Initialize the UvData object."""
         super().__init__(iv, jv, M, E, **kwargs)
         self.wv = iv
 
     def get_ipickvalues(self):
+        """Get the default pickvalues for i-curves.
+        Returns
+        -------
+        list
+            The default pickvalues for i-curves.
+        """
         return PICKVALUES
 
     def get_icurve(self, pickat=PICKAT):
@@ -96,6 +103,21 @@ class UvData(SsMatrixData):
         pickvalue : float, optional
             See uv.get_icurve().
 
+        method : str, optional
+            The baseline method to use. If None, the method set in
+            self.baseline_method will be used.
+
+        debug : bool, optional
+            If True, enable debug mode.
+
+        kwargs : dict, optional
+            Additional keyword arguments to pass to the baseline fitting method.
+            These will be merged with the default_kwargs defined above.
+
+        Returns
+        -------
+        baseline: Curve
+            
         Examples
         --------
         >>> curve = uv.get_icurve()
