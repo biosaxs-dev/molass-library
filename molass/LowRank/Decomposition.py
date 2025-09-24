@@ -230,6 +230,11 @@ class Decomposition:
     def get_proportions(self):
         """
         Get the proportions of the components.
+
+        Returns
+        -------
+        np.ndarray
+            The proportions of the components as a numpy array.
         """
         n = self.get_num_components()
         props = np.zeros(n)
@@ -240,6 +245,11 @@ class Decomposition:
     def compute_scds(self, debug=False):
         """
         Get the list of SCDs (Score of Concentration Dependence) for the decomposition.
+
+        Returns
+        -------
+        list of float
+            The list of SCD values for each component.
         """
         if debug:
             import molass.Backward.RankEstimator
@@ -250,6 +260,13 @@ class Decomposition:
     def get_cd_color_info(self):
         """
         Get the color information for the concentration dependence.
+
+        Returns
+        -------
+        peak_top_xes : list of float
+            The list of peak top x values for each component.
+        scd_colors : list of str
+            The list of colors for each component based on their ranks.
         """
         if self.xr_ranks is None:
             import logging
@@ -265,6 +282,24 @@ class Decomposition:
     def optimize_with_model(self, model_name, debug=False):
         """
         Optimize the decomposition with a model.
+
+        Parameters
+        ----------
+        model_name : str
+            The name of the model to use for optimization.
+
+            Supported models:
+
+            - ``SDM``: `Stochastic Dispersive Model <https://nshimizu0721.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
+            - ``EDM``: `Equilibrium Dispersive Model <https://nshimizu0721.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        result : Decomposition
+            A new Decomposition object with optimized components.
         """
         if debug:
             import molass.SEC.ModelFactory
