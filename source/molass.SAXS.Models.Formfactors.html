@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>LowRank.Decomposition &#8212; Molass Library  documentation</title>
+    <title>SAXS.Models.Formfactors &#8212; Molass Library  documentation</title>
   
   
   
@@ -43,12 +43,12 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.LowRank.Decomposition';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.SAXS.Models.Formfactors';</script>
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="LowRank.ErrorPropagate" href="molass.LowRank.ErrorPropagate.html" />
-    <link rel="prev" title="LowRank.CurveDecomposer" href="molass.LowRank.CurveDecomposer.html" />
+    <link rel="next" title="SAXS.Models.Simple" href="molass.SAXS.Models.Simple.html" />
+    <link rel="prev" title="SAXS.Models" href="molass.SAXS.Models.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -247,13 +247,13 @@
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="molass.Local.html">Local</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">LowRank.Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
@@ -318,8 +318,8 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">SAXS.Models.Formfactors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
 </ul>
 </details></li>
@@ -439,7 +439,7 @@
       
       
       
-      <li><a href="../_sources/source/molass.LowRank.Decomposition.rst" target="_blank"
+      <li><a href="../_sources/source/molass.SAXS.Models.Formfactors.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -523,7 +523,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>LowRank.Decomposition</h1>
+    <h1>SAXS.Models.Formfactors</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -533,24 +533,12 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.copy_with_new_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.update_xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.update_xr_ranks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_matrices()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_guinier_objects()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rgs"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rgs()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_matrices()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_pairedranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_pairedranges()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_proportions"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_proportions()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.nquad_vec"><code class="docutils literal notranslate"><span class="pre">nquad_vec()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.homogeneous_sphere"><code class="docutils literal notranslate"><span class="pre">homogeneous_sphere()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.sphere_volume"><code class="docutils literal notranslate"><span class="pre">sphere_volume()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.spherical_shell"><code class="docutils literal notranslate"><span class="pre">spherical_shell()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.ellipsoid_of_revolution"><code class="docutils literal notranslate"><span class="pre">ellipsoid_of_revolution()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.tri_axial_ellipsoid"><code class="docutils literal notranslate"><span class="pre">tri_axial_ellipsoid()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -562,208 +550,136 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-molass.LowRank.Decomposition">
-<span id="lowrank-decomposition"></span><h1>LowRank.Decomposition<a class="headerlink" href="#module-molass.LowRank.Decomposition" title="Link to this heading">#</a></h1>
-<p>LowRank.LowRankInfo.py</p>
-<p>This module contains the class LowRankInfo, which is used to store information
-about the components of a SecSaxsData, which is mathematically interpreted as
-a low rank approximation of a matrix.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paired_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to store the result of decomposition which is a low rank approximation.</p>
-<p>The result includes both components of X-ray and UV data and their associated information.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.copy_with_new_components">
-<span class="sig-name descname"><span class="pre">copy_with_new_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components" title="Link to this definition">#</a></dt>
-<dd><p>Create a new Decomposition with new component curves.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_num_components">
-<span class="sig-name descname"><span class="pre">get_num_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_num_components" title="Link to this definition">#</a></dt>
-<dd><p>Get the number of components.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.plot_components">
-<span class="sig-name descname"><span class="pre">plot_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.plot_components" title="Link to this definition">#</a></dt>
-<dd><p>Plot the components.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>result</strong> – A PlotResult object which contains the following attributes.
-- fig: The matplotlib Figure object.
-- axes: A list of Axes objects.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult">PlotResult</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.update_xr_ranks">
-<span class="sig-name descname"><span class="pre">update_xr_ranks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.update_xr_ranks" title="Link to this definition">#</a></dt>
-<dd><p>Update the ranks for the X-ray data.</p>
-<p>Default ranks are one for each component which means that interparticle interactions are not considered.
-This method allows the user to set different ranks for each component.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em>) – The ranks for each component.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_xr_matrices">
-<span class="sig-name descname"><span class="pre">get_xr_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices" title="Link to this definition">#</a></dt>
-<dd><p>Get the matrices for the X-ray data.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_xr_components">
-<span class="sig-name descname"><span class="pre">get_xr_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components" title="Link to this definition">#</a></dt>
-<dd><p>Get the components for the X-ray data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The list of XrComponent objects.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.LowRank.Component.html#molass.LowRank.Component.XrComponent" title="molass.LowRank.Component.XrComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">XrComponent</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_guinier_objects">
-<span class="sig-name descname"><span class="pre">get_guinier_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects" title="Link to this definition">#</a></dt>
-<dd><p>Get the list of Guinier objects for the XR components.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_rgs">
-<span class="sig-name descname"><span class="pre">get_rgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_rgs" title="Link to this definition">#</a></dt>
-<dd><p>Get the list of Rg values for the XR components.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_uv_matrices">
-<span class="sig-name descname"><span class="pre">get_uv_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices" title="Link to this definition">#</a></dt>
-<dd><p>Get the matrices for the UV data.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_uv_components">
-<span class="sig-name descname"><span class="pre">get_uv_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_uv_components" title="Link to this definition">#</a></dt>
-<dd><p>Get the components for the UV data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of UvComponent objects.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_pairedranges">
-<span class="sig-name descname"><span class="pre">get_pairedranges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapped_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concentration_datatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_pairedranges" title="Link to this definition">#</a></dt>
-<dd><p>Get the paired ranges.</p>
+  <section id="module-molass.SAXS.Models.Formfactors">
+<span id="saxs-models-formfactors"></span><h1>SAXS.Models.Formfactors<a class="headerlink" href="#module-molass.SAXS.Models.Formfactors" title="Link to this heading">#</a></h1>
+<p>SAXS/Models/FormFactors.py</p>
+<p>The term “form factor” is used in two different ways in the literature:
+1. The form factor amplitude F(q), which is the Fourier transform of the scattering length density.
+2. The form factor intensity P(q), which is the square of the amplitude.</p>
+<p>In this module, we use “form factor intensity” to refer to the intensity P(q), which is the square of the amplitude F(q).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.nquad_vec">
+<span class="sig-name descname"><span class="pre">nquad_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.nquad_vec" title="Link to this definition">#</a></dt>
+<dd><p>Vectorized version of scipy.integrate.nquad.
+Integrate a function of multiple variables over given limits.
+This is borrowed from <a class="reference external" href="https://github.com/scipy/scipy/issues/12209">a scipy issue</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mapped_curve</strong> (<em>MappedCurve</em><em>, </em><em>optional</em>) – If specified, use this mapped curve instead of computing a new one.</p></li>
-<li><p><strong>area_ratio</strong> (<em>float</em><em>, </em><em>optional</em>) – The area ratio for the range computation.</p></li>
-<li><p><strong>concentration_datatype</strong> (<em>int</em><em>, </em><em>optional</em>) – The concentration datatype for the range computation.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+<li><p><strong>f</strong> (<em>callable</em>) – The integrand function. It must accept as many arguments as there are
+integration variables.</p></li>
+<li><p><strong>limits</strong> (<em>list</em><em> of </em><em>tuples</em>) – The integration limits for each variable. Each tuple should contain the
+lower and upper limits for the corresponding variable.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The list of <a class="reference internal" href="molass.LowRank.PairedRange.html#module-molass.LowRank.PairedRange" title="molass.LowRank.PairedRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairedRange</span></code></a> objects.</p>
+<dd class="field-even"><p><strong>result</strong> – The result of the integration.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange" title="molass.LowRank.PairedRange.PairedRange">PairedRange</a></p>
+<dd class="field-odd"><p>float or array-like</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_proportions">
-<span class="sig-name descname"><span class="pre">get_proportions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_proportions" title="Link to this definition">#</a></dt>
-<dd><p>Get the proportions of the components.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The proportions of the components as a numpy array.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.compute_scds">
-<span class="sig-name descname"><span class="pre">compute_scds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.compute_scds" title="Link to this definition">#</a></dt>
-<dd><p>Get the list of SCDs (Score of Concentration Dependence) for the decomposition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The list of SCD values for each component.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_cd_color_info">
-<span class="sig-name descname"><span class="pre">get_cd_color_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info" title="Link to this definition">#</a></dt>
-<dd><p>Get the color information for the concentration dependence.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>peak_top_xes</strong> (<em>list of float</em>) – The list of peak top x values for each component.</p></li>
-<li><p><strong>scd_colors</strong> (<em>list of str</em>) – The list of colors for each component based on their ranks.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.optimize_with_model">
-<span class="sig-name descname"><span class="pre">optimize_with_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model" title="Link to this definition">#</a></dt>
-<dd><p>Optimize the decomposition with a model.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.homogeneous_sphere">
+<span class="sig-name descname"><span class="pre">homogeneous_sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.homogeneous_sphere" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor intensity of a homogeneous sphere.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_name</strong> (<em>str</em>) – <p>The name of the model to use for optimization.</p>
-<p>Supported models:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">SDM</span></code>: <a class="reference external" href="https://nshimizu0721.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model">Stochastic Dispersive Model</a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">EDM</span></code>: <a class="reference external" href="https://nshimizu0721.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model">Equilibrium Dispersive Model</a></p></li>
-</ul>
-</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The radius of the sphere.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>result</strong> – A new Decomposition object with optimized components.</p>
+<dd class="field-even"><p><strong>P</strong> – The form factor intensity of the homogeneous sphere.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+<dd class="field-odd"><p>float or array-like</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.sphere_volume">
+<span class="sig-name descname"><span class="pre">sphere_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.sphere_volume" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the volume of a sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>R</strong> (<em>float</em>) – The radius of the sphere.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>V</strong> – The volume of the sphere.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.spherical_shell">
+<span class="sig-name descname"><span class="pre">spherical_shell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.spherical_shell" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor intensity of a spherical shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The outer radius of the shell.</p></li>
+<li><p><strong>r</strong> (<em>float</em>) – The inner radius of the shell.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>P</strong> – The form factor intensity of the spherical shell.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.ellipsoid_of_revolution">
+<span class="sig-name descname"><span class="pre">ellipsoid_of_revolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.ellipsoid_of_revolution" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor intensity of an ellipsoid of revolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – The aspect ratio of the ellipsoid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>P</strong> – The form factor intensity of the ellipsoid of revolution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Models.Formfactors.tri_axial_ellipsoid">
+<span class="sig-name descname"><span class="pre">tri_axial_ellipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Models.Formfactors.tri_axial_ellipsoid" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the form factor intensity of a tri-axial ellipsoid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the x-y plane.</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the z direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>F</strong> – The form factor intensity of the tri-axial ellipsoid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -780,20 +696,20 @@ This method allows the user to set different ranks for each component.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="molass.LowRank.CurveDecomposer.html"
+       href="molass.SAXS.Models.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">LowRank.CurveDecomposer</p>
+        <p class="prev-next-title">SAXS.Models</p>
       </div>
     </a>
     <a class="right-next"
-       href="molass.LowRank.ErrorPropagate.html"
+       href="molass.SAXS.Models.Simple.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">LowRank.ErrorPropagate</p>
+        <p class="prev-next-title">SAXS.Models.Simple</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -813,24 +729,12 @@ This method allows the user to set different ranks for each component.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.copy_with_new_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.update_xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.update_xr_ranks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_matrices()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_guinier_objects()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rgs"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rgs()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_matrices()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_components()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_pairedranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_pairedranges()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_proportions"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_proportions()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.nquad_vec"><code class="docutils literal notranslate"><span class="pre">nquad_vec()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.homogeneous_sphere"><code class="docutils literal notranslate"><span class="pre">homogeneous_sphere()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.sphere_volume"><code class="docutils literal notranslate"><span class="pre">sphere_volume()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.spherical_shell"><code class="docutils literal notranslate"><span class="pre">spherical_shell()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.ellipsoid_of_revolution"><code class="docutils literal notranslate"><span class="pre">ellipsoid_of_revolution()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Models.Formfactors.tri_axial_ellipsoid"><code class="docutils literal notranslate"><span class="pre">tri_axial_ellipsoid()</span></code></a></li>
 </ul>
   </nav></div>
 

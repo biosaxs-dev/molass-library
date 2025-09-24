@@ -317,6 +317,11 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -802,6 +807,8 @@ document.write(`
 </li>
       <li><a href="source/molass.Shapes.Ellipsoid.html#molass.Shapes.Ellipsoid.Ellipsoid">Ellipsoid (class in molass.Shapes.Ellipsoid)</a>
 </li>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.ellipsoid_of_revolution">ellipsoid_of_revolution() (in module molass.SAXS.Models.Formfactors)</a>
+</li>
       <li><a href="source/molass.Legacy.BackCompatUtils.html#molass.Legacy.BackCompatUtils.ElutioCurvProxy">ElutioCurvProxy (class in molass.Legacy.BackCompatUtils)</a>
 </li>
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle.enters_stationary">enters_stationary() (Particle method)</a>
@@ -1032,10 +1039,10 @@ document.write(`
       </ul></li>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl">get_next_position_impl() (in module molass.SEC.StationaryMove)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_num_components">get_num_components() (Decomposition method)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh">get_num_components_assumming_egh() (in module molass.Bridge.V2Result)</a>
@@ -1186,6 +1193,8 @@ document.write(`
 </li>
       <li><a href="source/molass.PlotUtils.V1GuinierPlot.html#molass.PlotUtils.V1GuinierPlot.guinier_plot">guinier_plot() (in module molass.PlotUtils.V1GuinierPlot)</a>
 </li>
+      <li><a href="source/molass.SAXS.Models.Simple.html#molass.SAXS.Models.Simple.guinier_porod">guinier_porod() (in module molass.SAXS.Models.Simple)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1193,6 +1202,10 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange.has_special">has_special() (NullFlowChange method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.homogeneous_sphere">homogeneous_sphere() (in module molass.SAXS.Models.Formfactors)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1584,6 +1597,12 @@ document.write(`
 </li>
         <li><a href="source/molass.SAXS.FourierIllust.html#module-molass.SAXS.FourierIllust">molass.SAXS.FourierIllust</a>
 </li>
+        <li><a href="source/molass.SAXS.Models.html#module-molass.SAXS.Models">molass.SAXS.Models</a>
+</li>
+        <li><a href="source/molass.SAXS.Models.Formfactors.html#module-molass.SAXS.Models.Formfactors">molass.SAXS.Models.Formfactors</a>
+</li>
+        <li><a href="source/molass.SAXS.Models.Simple.html#module-molass.SAXS.Models.Simple">molass.SAXS.Models.Simple</a>
+</li>
         <li><a href="source/molass.SAXS.MrcViewer.html#module-molass.SAXS.MrcViewer">molass.SAXS.MrcViewer</a>
 </li>
         <li><a href="source/molass.SAXS.Simulator.html#module-molass.SAXS.Simulator">molass.SAXS.Simulator</a>
@@ -1900,8 +1919,6 @@ document.write(`
         <li><a href="source/molass.DataUtils.XrLoader.html#module-molass.DataUtils.XrLoader">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.ZipFolder
 
@@ -1909,6 +1926,8 @@ document.write(`
         <li><a href="source/molass.DataUtils.ZipFolder.html#module-molass.DataUtils.ZipFolder">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.Decompose
 
@@ -2533,6 +2552,27 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    molass.SAXS.Models
+
+      <ul>
+        <li><a href="source/molass.SAXS.Models.html#module-molass.SAXS.Models">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.Models.Formfactors
+
+      <ul>
+        <li><a href="source/molass.SAXS.Models.Formfactors.html#module-molass.SAXS.Models.Formfactors">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.SAXS.Models.Simple
+
+      <ul>
+        <li><a href="source/molass.SAXS.Models.Simple.html#module-molass.SAXS.Models.Simple">module</a>
+</li>
+      </ul></li>
+      <li>
     molass.SAXS.MrcViewer
 
       <ul>
@@ -2797,6 +2837,8 @@ document.write(`
 </li>
       <li><a href="source/molass.Except.ExceptionTypes.html#molass.Except.ExceptionTypes.NotSpecifedError">NotSpecifedError</a>
 </li>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.nquad_vec">nquad_vec() (in module molass.SAXS.Models.Formfactors)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange">NullFlowChange (class in molass.FlowChange.NullFlowChange)</a>
@@ -2999,10 +3041,10 @@ document.write(`
         <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method">(SsMatrixData method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.PlotUtils.V1GuinierPlot.html#molass.PlotUtils.V1GuinierPlot.set_limits_from_interval">set_limits_from_interval() (in module molass.PlotUtils.V1GuinierPlot)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.set_max">set_max() (Curve method)</a>
 </li>
       <li><a href="source/molass.Global.Options.html#molass.Global.Options.set_molass_options">set_molass_options() (in module molass.Global.Options)</a>
@@ -3018,6 +3060,10 @@ document.write(`
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain">SolidGrain (class in molass.SEC.ColumnElements)</a>
 </li>
       <li><a href="source/molass.Shapes.Sphere.html#molass.Shapes.Sphere.Sphere">Sphere (class in molass.Shapes.Sphere)</a>
+</li>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.sphere_volume">sphere_volume() (in module molass.SAXS.Models.Formfactors)</a>
+</li>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.spherical_shell">spherical_shell() (in module molass.SAXS.Models.Formfactors)</a>
 </li>
       <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData">SsMatrixData (class in molass.DataObjects.SsMatrixData)</a>
 </li>
@@ -3045,6 +3091,8 @@ document.write(`
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.SAXS.Models.Formfactors.html#molass.SAXS.Models.Formfactors.tri_axial_ellipsoid">tri_axial_ellipsoid() (in module molass.SAXS.Models.Formfactors)</a>
+</li>
       <li><a href="source/molass.DataUtils.UvFileTrimming.html#molass.DataUtils.UvFileTrimming.trim_uvfile">trim_uvfile() (in module molass.DataUtils.UvFileTrimming)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy">trimmed_copy() (SecSaxsData method)</a>
