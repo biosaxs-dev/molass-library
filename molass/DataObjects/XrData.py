@@ -10,12 +10,40 @@ PICKAT = 0.02   # default value for pickat
 
 class XrData(SsMatrixData):
     """
-    XrData class for XR matrix data. """
+    XrData class for XR matrix data. 
+    Inherits from SsMatrixData and adds XR-specific functionality.
+
+    Attributes
+    ----------
+    qv : array-like
+        The q-values corresponding to the angular axis.
+    """
     def __init__(self, iv, jv, M, E, **kwargs):
+        """Initialize the XrData object.
+
+        Parameters
+        ----------
+        iv : array-like
+            The q-values corresponding to the angular axis.
+        jv : array-like
+            The values corresponding to the temporal axis.
+        M : 2D array-like
+            The 2D matrix of intensity values.
+        E : 2D array-like or None
+            The 2D matrix of error values. It can be None if errors are not available
+        kwargs : dict, optional
+            Additional keyword arguments to pass to the SsMatrixData constructor.
+        """
         super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
 
     def get_ipickvalue(self):
+        """Get the default pickvalue for i-curves.
+        Returns
+        -------
+        float
+            The default pickvalue for i-curves.
+        """
         return PICKAT
 
     def get_icurve(self, pickat=PICKAT):
@@ -31,6 +59,11 @@ class XrData(SsMatrixData):
             the picking index i will be determined to satisfy
                 self.qv[i-1] <= pickat < self.qv[i]
             according to bisect_right.
+        
+        Returns
+        -------
+        Curve
+            The extracted i-curve.
 
         Examples
         --------
@@ -50,7 +83,12 @@ class XrData(SsMatrixData):
         Parameters
         ----------
         None
-            
+
+        Returns
+        -------
+        (int, int)
+            A pair of indeces (i_start, i_end) to be used as a slice for the angular axis.
+
         Examples
         --------
         >>> i, j = xr.get_usable_qrange()
@@ -71,6 +109,21 @@ class XrData(SsMatrixData):
         ----------
         pickvalue : float, optional
             See ssd.get_xr_icurve().
+
+        method : str, optional
+            The baseline method to be used. If None, the method set in the object will be
+            used.
+        kwargs : dict, optional
+            Additional keyword arguments to pass to the baseline computation function.
+            These will be merged with the default_kwargs defined above.
+        debug : bool, optional
+            If True, enable debug mode.
+            
+        Returns
+        -------
+        baseline: Curve
+            The computed baseline i-curve.
+            This curve can be subtracted from the original i-curve to obtain a background-subtracted curve.
 
         Examples
         --------

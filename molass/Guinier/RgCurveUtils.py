@@ -9,6 +9,20 @@ from tqdm import tqdm
 ADD_ALL_RESULTS = True
 
 def compute_rgcurve_info(xrdata):
+    """
+    Computes Rg curve information from XR data.
+    It uses the SimpleGuinier class to compute Rg values for each j-curve in the XR data.
+    
+    Parameters
+    ----------
+    xrdata : XrData
+        The XR data from which to compute the Rg curve information.
+
+    Returns
+    -------
+    rginfo_list : list of tuples
+        A list of tuples where each tuple contains (index, SimpleGuinier result).
+    """
     from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
     qv = xrdata.qv
     xrM = xrdata.M
@@ -22,6 +36,20 @@ def compute_rgcurve_info(xrdata):
     return rginfo_list
 
 def compute_rgcurve_info_atsas(xrdata):
+    """
+    Computes Rg curve information from XR data using ATSAS autorg.
+    It uses the AutorgRunner class to compute Rg values for each j-curve in
+    the XR data.
+    
+    Parameters
+    ----------
+    xrdata : XrData
+        The XR data from which to compute the Rg curve information.
+    Returns
+    -------
+    rginfo_list : list of tuples
+        A list of tuples where each tuple contains (index, ATSAS Autorg result).
+    """
     from molass_legacy.ATSAS.AutorgRunner import AutorgRunner
     from molass_legacy._MOLASS.SerialSettings import set_setting
 

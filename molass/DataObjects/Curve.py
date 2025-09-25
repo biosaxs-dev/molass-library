@@ -5,7 +5,32 @@ import numpy as np
 from bisect import bisect_right
 
 class Curve:
-    """A class representing a 1D curve with x and y data."""
+    """A class representing a 1D curve with x and y data.
+    
+    Attributes
+    ----------
+    x : array-like
+        The x-values of the curve.
+    y : array-like
+        The y-values of the curve.
+    type : str or None
+        The type of the curve, e.g., 'i' for intensity curves.  If None, the type is unspecified.
+    max_i : int or None
+        The index of the maximum y-value. Computed on demand. If None, it has not been computed yet.
+    max_x : float or None
+        The x-value corresponding to the maximum y-value. Computed on demand. If None, it has not been computed yet.
+    max_y : float or None
+        The maximum y-value. Computed on demand. If None, it has not been computed yet.
+    peaks : list of int or None
+        The indices of the peaks in the curve. Computed on demand. If None, it has not been computed yet.
+    moment : Moment or None
+        The moment of the curve. Computed on demand. If None, it has not been computed yet.
+    spline : UnivariateSpline or None
+        A spline representation of the curve. Computed on demand. If None, it has not been computed yet.
+    diff_spline : UnivariateSpline or None
+        The derivative spline representation of the curve. Computed on demand. If None, it has not been computed yet.
+        
+    """
     def __init__(self, x, y, type=None):
         assert len(x) == len(y)
         self.x = x

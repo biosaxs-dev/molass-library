@@ -4,7 +4,33 @@
 import numpy as np
 from molass.DataObjects.Curve import Curve
 
-def compute_ratio_curve_impl(mapping, mp_curve=None, data_threshold=0.05, debug=False):
+class RatioCurve(Curve):
+    """
+    Represents the ratio curve between mapped UV data and XR data.
+
+    Attributes
+    ----------
+    x : array-like
+        The x-values of the ratio curve.
+    y : array-like
+        The y-values of the ratio curve, representing the ratio of mapped UV intensity to XR intensity.
+    """
+    def __init__(self, x, y, type="i"):
+        """
+        Initializes the RatioCurve with given x and y values.
+
+        Parameters
+        ----------
+        x : array-like
+            The x-values of the ratio curve.
+        y : array-like
+            The y-values of the ratio curve.
+        type : str, optional
+            The type of the ratio curve (default is "i").
+        """
+        super().__init__(x, y, type=type)
+
+def _compute_ratio_curve_impl(mapping, mp_curve=None, data_threshold=0.05, debug=False):
     if debug:
         import molass.DataUtils.Outliers
         from importlib import reload
@@ -24,4 +50,4 @@ def compute_ratio_curve_impl(mapping, mp_curve=None, data_threshold=0.05, debug=
     if not np.any(valid):
         raise ValueError("No valid data points found for ratio calculation.")
     ratio[~valid] = np.nan  # Set invalid points to NaN
-    return Curve(mp_curve.x, ratio)
+    return RatioCurve(mp_curve.x, ratio)

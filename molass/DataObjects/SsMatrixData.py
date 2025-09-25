@@ -8,7 +8,23 @@ class SsMatrixData:
     """A class to represent a SAXS/UV matrix data object.
     It contains a 2D matrix M where M[i,j] is the intensity value
     at the i-th value of the first variable (iv) and the j-th value
-    of the second variable (jv)."""
+    of the second variable (jv).
+    
+    Attributes
+    ----------
+    iv : array-like
+        The values of the first variable (e.g., scattering angle or q).
+    jv : array-like
+        The values of the second variable (e.g., time or wavelength).
+    M : 2D array-like
+        The 2D matrix of intensity values.
+    E : 2D array-like or None
+        The 2D matrix of error values. It can be None if errors are not available
+    moment : Moment or None
+        The moment of the data along the iv axis. It can be None if not computed.
+    baseline_method : str
+        The method used for baseline correction. Default is 'linear'.
+    """
     def __init__(self, iv, jv, M, E,
                  moment=None,
                  baseline_method='linear'):

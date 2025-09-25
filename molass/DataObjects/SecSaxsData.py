@@ -13,6 +13,30 @@ class SecSaxsData:
     A class to represent a SEC-SAXS data object.
     It contains a pair of :class:`~molass.DataObjects.XrData` and :class:`~molass.DataObjects.UvData` objects.
     It also contains the beamline information and mapping information if available.
+
+    Attributes
+    ----------
+    xr : XrData or None
+        The XR data object.
+    uv : UvData or None
+        The UV data object.
+    trimmed : bool
+        Indicates whether the data has been trimmed.
+    mapping : MappingInfo or None
+        The mapping information between XR and UV data.
+    beamline_info : BeamlineInfo or None
+        The beamline information.
+    time_initialized : float
+        The time when the object was initialized.
+    time_required : float
+        The time required for processing the data.
+    time_required_total : float
+        The total time required for processing all data. This includes the time required for processing the data
+    datafiles : list of str or None
+        The list of data files used for the analysis.
+    logger : logging.Logger
+        The logger object for logging messages.
+
     """
 
     def __init__(self, folder=None, object_list=None, uv_only=False, xr_only=False,
@@ -50,6 +74,14 @@ class SecSaxsData:
             If specified, the beamline information will be used.
         mapping : MappingInfo, optional
             If specified, the mapping information will be used.
+        time_initialized : float, optional
+            If specified, the time when the object was initialized.
+            If it is None, the time will be set to the time taken for initialization.
+        datafiles : list of str, optional
+            If specified, the list of data files used for the analysis.
+            If it is None, the data files will be set to the list of files loaded from the folder.
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
 
         Examples
         --------
@@ -195,8 +227,8 @@ class SecSaxsData:
         """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None)
         
         Returns a pair of indeces which should be used
-        as a slice for the spectral axis to trim away
-        unusable UV data regions. 
+        as slices for the spectral axis and the temporal axis
+        to trim the data.
 
         Parameters
         ----------
@@ -204,13 +236,13 @@ class SecSaxsData:
             The angular range (start, stop) to be used for the XR data.
             If it is None, the full range will be used.
         xr_mt : tuple of (int, int), optional
-            The range (start, stop) of frames to be used for the XR data.
+            The temporal range (start, stop) to be used for the XR data.
             If it is None, the full range will be used.
         uv_wr : tuple of (int, int), optional
             The wavelength range to be used for the UV data.
             If it is None, the full range will be used.
         uv_mt : tuple of (int, int), optional
-            The range (start, stop) of frames to be used for the UV data.
+            The temporal range (start, stop) to be used for the UV data.
             If it is None, the full range will be used.
 
         Returns
@@ -324,7 +356,7 @@ class SecSaxsData:
         trimming : TrimmingInfo, optional
             If specified, the trimming information will be used for the copy.
         jranges : tuple of (double, double), optional
-            The ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
+            The temporal ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
         mapping : MappingInfo, optional
             If specified, the mapping information will be used for the copy.
             It must be provided if `jranges` is specified.
@@ -350,6 +382,8 @@ class SecSaxsData:
 
         Sets the baseline method to be used for the baseline correction.
 
+        See also: `Baseline Correction <https://nshimizu0721.github.io/molass-tutorial/chapters/04/data_correction.html>`_
+
         Parameters
         ----------
         method : str or (str, str)
@@ -357,6 +391,12 @@ class SecSaxsData:
             If it is a string, it will be used for both XR and UV data.
             If it is a tuple of two strings, the first string will be used for XR data
             and the second string will be used for UV data.
+
+            The available methods are:
+
+            - ``linear`` : Linear baseline (default)
+            - ``uvdiff`` : UV differential method (for UV data only)
+            - ``integral`` : Integral method
 
         Returns
         -------
@@ -373,6 +413,8 @@ class SecSaxsData:
         """ssd.get_baseline_method()
 
         Returns the baseline method used for the baseline correction.
+
+        See also: `Baseline Correction <https://nshimizu0721.github.io/molass-tutorial/chapters/04/data_correction.html>`_
 
         Parameters
         ----------
@@ -528,7 +570,8 @@ class SecSaxsData:
 
         Parameters
         ----------
-        None
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
 
         Returns
         -------
@@ -538,8 +581,8 @@ class SecSaxsData:
         if debug:
             import molass.InterParticle.IpEffectInspect
             reload(molass.InterParticle.IpEffectInspect)
-        from molass.InterParticle.IpEffectInspect import inspect_ip_effect_impl
-        return inspect_ip_effect_impl(self, debug=debug)
+        from molass.InterParticle.IpEffectInspect import _inspect_ip_effect_impl
+        return _inspect_ip_effect_impl(self, debug=debug)
 
     def get_uv_device_id(self):
         """ssd.get_uv_device_id()
@@ -642,6 +685,6 @@ class SecSaxsData:
         if debug:
             import molass.Decompose.VaryUtils
             reload(molass.Decompose.VaryUtils)
-        from molass.Decompose.VaryUtils import plot_varied_decompositions
+        from molass.Decompose.VaryUtils import _plot_varied_decompositions_impl
         x, y = self.xr.get_icurve().get_xy()
-        return plot_varied_decompositions(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)
+        return _plot_varied_decompositions_impl(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)

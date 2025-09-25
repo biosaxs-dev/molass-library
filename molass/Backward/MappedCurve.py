@@ -3,6 +3,23 @@
 """
 
 def make_mapped_curve(ssd, **kwargs):
+    """make_mapped_curve(ssd, **kwargs)
+    Create a mapped curve from the SecSaxsData object.
+    This function estimates the mapping between the UV and XR data in the SecSaxsData object
+    and generates a mapped curve accordingly.
+
+    Parameters
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the SAXS data.
+    debug : bool, optional
+        If True, enables debug mode for more verbose output.
+        
+    Returns
+    -------
+    mp_curve : Curve
+        The mapped curve object.
+    """
     debug = kwargs.get('debug', False)
 
     if ssd.uv is None:

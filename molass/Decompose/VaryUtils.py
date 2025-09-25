@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from molass.SEC.Models.Simple import egh
 
-def plot_varied_decompositions(x, y, proportions, rgcurve=None, best=None, debug=False):
+def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None, debug=False):
     if debug:
         from importlib import reload
         import molass.Decompose.Proportional

@@ -9,6 +9,20 @@ from molass.DataObjects.Curve import Curve
 class RgCurve(Curve):
     """
     A class to represent an Rg curve.
+
+    Attributes
+    ----------
+    indeces : np.ndarray
+        The indices of the frames used to compute the Rg values.
+    rgvalues : np.ndarray
+        The Rg values corresponding to the indeces.
+    scores : np.ndarray
+        The scores corresponding to the indeces and rgvalues.
+    results : list or None
+        The results of the Rg computation. It can be None if not specified.
+    intensities : list or None
+        The intensities corresponding to the indeces. It can be None if not specified.
+
     """
 
     def __init__(self, indeces, rgvalues, scores, results=None, intensities=None):
@@ -28,11 +42,25 @@ class RgCurve(Curve):
 
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
-    from molass_legacy.GuinierAnalyzer.AutorgKekAdapter import AutorgKekAdapter
     """
     Constructs an RgCurve from a result list.
-    
+
+    Parameters
+    ----------
+    rginfo_list : list of tuples
+        A list of tuples where each tuple contains (index, result).
+        The result can be either a SimpleGuinier result or an ATSAS Autorg result.
+    result_type : str or None
+        If None, the results are assumed to be SimpleGuinier results.
+        If 'atsas', the results are assumed to be ATSAS Autorg results.
+        Default is None.
+
+    Returns
+    -------
+    RgCurve
+        An RgCurve object constructed from the provided result list.
     """
+    from molass_legacy.GuinierAnalyzer.AutorgKekAdapter import AutorgKekAdapter
     indeces = []
     values = []
     scores = []

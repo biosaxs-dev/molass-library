@@ -19,7 +19,7 @@ class CsProxy:
     def get_mapped_info(self):
         if self.mapped_info is None:
             # task: consider moving this to __init__ and improve mapping if necessary
-            from Mapping.PeakMapper import PeakMapper
+            from molass_legacy.Mapping.PeakMapper import PeakMapper
             pm = PeakMapper(self.a_curve, self.x_curve)
             self.mapped_info = pm.mapped_info
         return self.mapped_info

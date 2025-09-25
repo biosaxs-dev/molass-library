@@ -26,7 +26,45 @@ class DecompositionProxy:
         self.mapped_curve = Curve(xr_curve.x, c_vector)
 
 class ConcTracker:
+    """
+    A class to track concentrations for backward compatibility.
+    This class is used to track concentrations in a way that is compatible with older versions of the MOLASS library.
+
+    Attributes
+    ----------
+    xr_curve : Curve
+        The XR curve object.
+    mp_curve : Curve
+        The mapped curve object.
+    datatype : str
+        The type of data being processed (e.g., "i", "d", etc.).
+    concentrations : list of tuples
+        A list of tuples containing concentration data.
+    jupyter : bool
+        A flag indicating whether the code is running in a Jupyter notebook.
+    debug : bool
+        A flag indicating whether to enable debug mode.
+    """
     def __init__(self, decomposition, conc_factor, datatype, jupyter=False, debug=False):
+        """
+        Initializes the ConcTracker object with the given parameters.
+
+        Parameters
+        ----------
+        decomposition : DecompositionProxy
+            The decomposition data proxy object.
+        conc_factor : float
+            The concentration factor to be applied to the concentration data.
+        datatype : str
+            The type of data being processed (e.g., "i", "d", etc.).
+        jupyter : bool, optional
+            A flag indicating whether the code is running in a Jupyter notebook.
+            Default is False.
+        debug : bool, optional
+            A flag indicating whether to enable debug mode.
+            Default is False.
+        """
+
         self.logger = logging.getLogger(__name__)
         self.xr_curve = decomposition.xr_icurve
         self.mp_curve = decomposition.mapped_curve * conc_factor
@@ -39,11 +77,18 @@ class ConcTracker:
     def add_concentration(self, start, stop, c_matrix, conc_dependence=1):
         """
         Add a concentration value to the tracker.
-        
-        Parameters:
-        start (int): Start index for the concentration data.
-        stop (int): Stop index for the concentration data.
-        c_matrix (np.ndarray): Concentration matrix to be added.
+
+        Parameters
+        ----------
+        start : int
+            The starting index of the concentration data.
+        stop : int
+            The ending index of the concentration data.
+        c_matrix : np.ndarray
+            The concentration data matrix.
+        conc_dependence : int, optional
+            The concentration dependence (1 or 2).
+            Default is 1.
         """
         if not isinstance(c_matrix, np.ndarray):
             raise ValueError("c_matrix must be a numpy ndarray.")
@@ -61,6 +106,16 @@ class ConcTracker:
         """
         Plot the tracked concentrations.
         This method can be extended to visualize the concentration data.
+
+        Parameters
+        ----------
+        savepath : str, optional
+            The path to save the plot. If None, the plot will not be saved.
+            Default is None.
+            
+        Returns
+        -------
+        None
         """
         import matplotlib.pyplot as plt
         

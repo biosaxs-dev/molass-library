@@ -8,6 +8,15 @@
 class PairedRange:
     """A class to represent a paired range.
     It contains a pair of ranges which correspond to the ascending and descending parts of the peak.
+
+    Attributes
+    ----------
+    ranges : list of tuples
+        A list of tuples representing the ranges. Each tuple contains two integers (start, end).
+    peak_index : int or None
+        The index of the peak. It can be None if not specified.
+    elm_recs : list or None
+        The elution records associated with the ranges. It can be None if not specified.
     """
     def __init__(self, range_, minor=False, peak_index=None, elm_recs=None):
         self.peak_index = peak_index

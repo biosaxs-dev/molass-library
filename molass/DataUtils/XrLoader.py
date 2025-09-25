@@ -7,14 +7,20 @@ import numpy as np
 def load_xr(folder_path):
     """
     Load X-ray scattering data from a folder containing .dat files.
+
     Parameters
     ----------
     folder_path : str
         Path to the folder containing .dat files.
+
     Returns
     -------
     xr_array : np.ndarray
         3D array containing the X-ray scattering data.
+
+    datafiles : list of str
+        List of data file paths corresponding to the loaded data.
+        
     Notes
     -----
     The function assumes that each .dat file contains data in a format compatible with np.loadtxt.

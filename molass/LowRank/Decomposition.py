@@ -13,10 +13,59 @@ class Decomposition:
     A class to store the result of decomposition which is a low rank approximation.
 
     The result includes both components of X-ray and UV data and their associated information.
+
+    Attributes
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object from which the decomposition was performed.
+    xr : XrData
+        The XrData object from the SecSaxsData.
+    xr_icurve : Curve
+        The i-curve used for the decomposition of the X-ray data.
+    xr_ccurves : list of Curve
+        The component curves for the X-ray data.
+    xr_ranks : list of int or None
+        The ranks for each component of the X-ray data. If None, default ranks are used.
+    uv : UvData
+        The UvData object from the SecSaxsData.
+    uv_icurve : Curve
+        The i-curve used for the decomposition of the UV data.
+    uv_ccurves : list of Curve
+        The component curves for the UV data.
+    uv_ranks : list of int or None
+        The ranks for each component of the UV data. If None, default ranks are used.
+    mapping : MappingInfo
+        The mapping information between the X-ray and UV data.
+    mapped_curve : MappedCurve or None
+        The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.
+    paired_ranges : list of PairedRange or None
+        The paired ranges for the X-ray and UV data. If None, it can be computed when needed.
+    num_components : int
+        The number of components in the decomposition.
     """
 
     def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None, **kwargs):
         """
+        Initialize the Decomposition object.
+
+        Parameters
+        ----------
+        ssd : SecSaxsData
+            The SecSaxsData object from which the decomposition was performed.
+        xr_icurve : Curve
+            The i-curve used for the decomposition of the X-ray data.
+        xr_ccurves : list of Curve
+            The component curves for the X-ray data.
+        uv_icurve : Curve
+            The i-curve used for the decomposition of the UV data.
+        uv_ccurves : list of Curve
+            The component curves for the UV data.
+        mapped_curve : MappedCurve, optional
+            The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.
+        paired_ranges : list of PairedRange, optional
+            The paired ranges for the X-ray and UV data. If None, it can be computed when needed.
+        kwargs : dict, optional
+            Additional keyword arguments (not used).
         """
         assert len(xr_ccurves) == len(uv_ccurves)
         self.num_components = len(xr_ccurves)
@@ -39,12 +88,29 @@ class Decomposition:
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
         """
         Create a new Decomposition with new component curves.
+
+        Parameters
+        ----------
+        xr_ccurves : list of Curve
+            The new component curves for the X-ray data.
+        uv_ccurves : list of Curve
+            The new component curves for the UV data.
+
+        Returns
+        -------
+        Decomposition
+            A new Decomposition object with the specified component curves.
         """
         return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
 
     def get_num_components(self):
         """
         Get the number of components.
+
+        Returns
+        -------
+        int
+            The number of components in the decomposition.
         """
         return self.num_components
 
@@ -62,6 +128,7 @@ class Decomposition:
         -------
         result : PlotResult
             A PlotResult object which contains the following attributes.
+            
             - fig: The matplotlib Figure object.
             - axes: A list of Axes objects.
         """
@@ -97,6 +164,15 @@ class Decomposition:
     def get_xr_matrices(self, debug=False):
         """
         Get the matrices for the X-ray data.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)
         """
         if debug:
             from importlib import reload
@@ -142,6 +218,11 @@ class Decomposition:
     def get_guinier_objects(self):
         """
         Get the list of Guinier objects for the XR components.
+
+        Returns
+        -------
+        list of Guinier
+            The list of Guinier objects for each XR component.
         """
         xr_components = self.get_xr_components()
         return [c.get_guinier_object() for c in xr_components]
@@ -149,6 +230,11 @@ class Decomposition:
     def get_rgs(self):
         """
         Get the list of Rg values for the XR components.
+
+        Returns
+        -------
+        list of float
+            The list of Rg values for each XR component.
         """
         xr_components = self.get_xr_components()
         return [c.compute_rg() for c in xr_components]
@@ -156,6 +242,16 @@ class Decomposition:
     def get_uv_matrices(self, debug=False):
         """
         Get the matrices for the UV data.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)
+            The matrices for the UV data.
         """
         if debug:
             from importlib import reload
