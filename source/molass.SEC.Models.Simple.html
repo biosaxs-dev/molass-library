@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,7 +534,6 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh_impl"><code class="docutils literal notranslate"><span class="pre">egh_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh"><code class="docutils literal notranslate"><span class="pre">egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.e0"><code class="docutils literal notranslate"><span class="pre">e0</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh_var"><code class="docutils literal notranslate"><span class="pre">egh_var()</span></code></a></li>
@@ -552,12 +556,24 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.Simple.gaussian">
 <span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.Simple.gaussian" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="molass.SEC.Models.Simple.egh_impl">
-<span class="sig-name descname"><span class="pre">egh_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.Simple.egh_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The Gaussian function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em><em> or </em><em>array-like</em>) – The input value(s).</p></li>
+<li><p><strong>A</strong> (<em>float</em>) – The amplitude of the Gaussian.</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – The mean of the Gaussian.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the Gaussian.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The computed Gaussian value(s).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.Simple.egh">
@@ -593,18 +609,64 @@ document.write(`
 <dt class="sig sig-object py" id="molass.SEC.Models.Simple.egh_var">
 <span class="sig-name descname"><span class="pre">egh_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.Simple.egh_var" title="Link to this definition">#</a></dt>
 <dd><p>Returns the variance of the EGH distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the Gaussian component.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – The decay constant of the exponential component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The variance of the EGH distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.Simple.egh_std">
 <span class="sig-name descname"><span class="pre">egh_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.Simple.egh_std" title="Link to this definition">#</a></dt>
 <dd><p>Returns the standard deviation for the EGH distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the Gaussian component.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – The decay constant of the exponential component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The standard deviation for the EGH distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.Simple.egh_pdf">
 <span class="sig-name descname"><span class="pre">egh_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.Simple.egh_pdf" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>The probability density function (PDF) of the EGH distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em><em> or </em><em>array-like</em>) – The input value(s).</p></li>
+<li><p><strong>tR</strong> (<em>float</em><em>, </em><em>optional</em>) – The retention time parameter, by default 0.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – The standard deviation of the Gaussian component, by default 1.0.</p></li>
+<li><p><strong>tau</strong> (<em>float</em><em>, </em><em>optional</em>) – The decay constant of the exponential component, by default 0.0.</p></li>
+<li><p><strong>scale</strong> (<em>float</em><em>, </em><em>optional</em>) – The scaling factor, by default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The computed PDF value(s).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -654,7 +716,6 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh_impl"><code class="docutils literal notranslate"><span class="pre">egh_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh"><code class="docutils literal notranslate"><span class="pre">egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.e0"><code class="docutils literal notranslate"><span class="pre">e0</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.Simple.egh_var"><code class="docutils literal notranslate"><span class="pre">egh_var()</span></code></a></li>

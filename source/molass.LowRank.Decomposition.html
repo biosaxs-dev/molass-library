@@ -534,6 +534,19 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.ssd"><code class="docutils literal notranslate"><span class="pre">Decomposition.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_icurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_ccurves"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_ccurves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_ranks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_icurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_ccurves"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_ccurves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_ranks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.mapping"><code class="docutils literal notranslate"><span class="pre">Decomposition.mapping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.mapped_curve"><code class="docutils literal notranslate"><span class="pre">Decomposition.mapped_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.paired_ranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.paired_ranges</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.num_components</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.copy_with_new_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_components()</span></code></a></li>
@@ -574,16 +587,196 @@ a low rank approximation of a matrix.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to store the result of decomposition which is a low rank approximation.</p>
 <p>The result includes both components of X-ray and UV data and their associated information.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.ssd">
+<span class="sig-name descname"><span class="pre">ssd</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.ssd" title="Link to this definition">#</a></dt>
+<dd><p>The SecSaxsData object from which the decomposition was performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.xr">
+<span class="sig-name descname"><span class="pre">xr</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr" title="Link to this definition">#</a></dt>
+<dd><p>The XrData object from the SecSaxsData.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData" title="molass.DataObjects.XrData.XrData">XrData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.xr_icurve">
+<span class="sig-name descname"><span class="pre">xr_icurve</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr_icurve" title="Link to this definition">#</a></dt>
+<dd><p>The i-curve used for the decomposition of the X-ray data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.xr_ccurves">
+<span class="sig-name descname"><span class="pre">xr_ccurves</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr_ccurves" title="Link to this definition">#</a></dt>
+<dd><p>The component curves for the X-ray data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.xr_ranks">
+<span class="sig-name descname"><span class="pre">xr_ranks</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr_ranks" title="Link to this definition">#</a></dt>
+<dd><p>The ranks for each component of the X-ray data. If None, default ranks are used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.uv">
+<span class="sig-name descname"><span class="pre">uv</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv" title="Link to this definition">#</a></dt>
+<dd><p>The UvData object from the SecSaxsData.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData" title="molass.DataObjects.UvData.UvData">UvData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.uv_icurve">
+<span class="sig-name descname"><span class="pre">uv_icurve</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv_icurve" title="Link to this definition">#</a></dt>
+<dd><p>The i-curve used for the decomposition of the UV data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.uv_ccurves">
+<span class="sig-name descname"><span class="pre">uv_ccurves</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv_ccurves" title="Link to this definition">#</a></dt>
+<dd><p>The component curves for the UV data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.uv_ranks">
+<span class="sig-name descname"><span class="pre">uv_ranks</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv_ranks" title="Link to this definition">#</a></dt>
+<dd><p>The ranks for each component of the UV data. If None, default ranks are used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.mapping">
+<span class="sig-name descname"><span class="pre">mapping</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.mapping" title="Link to this definition">#</a></dt>
+<dd><p>The mapping information between the X-ray and UV data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.mapped_curve">
+<span class="sig-name descname"><span class="pre">mapped_curve</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.mapped_curve" title="Link to this definition">#</a></dt>
+<dd><p>The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MappedCurve or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.paired_ranges">
+<span class="sig-name descname"><span class="pre">paired_ranges</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.paired_ranges" title="Link to this definition">#</a></dt>
+<dd><p>The paired ranges for the X-ray and UV data. If None, it can be computed when needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange" title="molass.LowRank.PairedRange.PairedRange">PairedRange</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.num_components">
+<span class="sig-name descname"><span class="pre">num_components</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.num_components" title="Link to this definition">#</a></dt>
+<dd><p>The number of components in the decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Decomposition object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a>) – The SecSaxsData object from which the decomposition was performed.</p></li>
+<li><p><strong>xr_icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The i-curve used for the decomposition of the X-ray data.</p></li>
+<li><p><strong>xr_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The component curves for the X-ray data.</p></li>
+<li><p><strong>uv_icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The i-curve used for the decomposition of the UV data.</p></li>
+<li><p><strong>uv_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The component curves for the UV data.</p></li>
+<li><p><strong>mapped_curve</strong> (<em>MappedCurve</em><em>, </em><em>optional</em>) – The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.</p></li>
+<li><p><strong>paired_ranges</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.LowRank.PairedRange.html#molass.LowRank.PairedRange.PairedRange" title="molass.LowRank.PairedRange.PairedRange"><em>PairedRange</em></a><em>, </em><em>optional</em>) – The paired ranges for the X-ray and UV data. If None, it can be computed when needed.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments (not used).</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.copy_with_new_components">
 <span class="sig-name descname"><span class="pre">copy_with_new_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components" title="Link to this definition">#</a></dt>
 <dd><p>Create a new Decomposition with new component curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The new component curves for the X-ray data.</p></li>
+<li><p><strong>uv_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The new component curves for the UV data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Decomposition object with the specified component curves.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_num_components">
 <span class="sig-name descname"><span class="pre">get_num_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_num_components" title="Link to this definition">#</a></dt>
 <dd><p>Get the number of components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of components in the decomposition.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -595,9 +788,12 @@ a low rank approximation of a matrix.</p>
 <dd class="field-odd"><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>result</strong> – A PlotResult object which contains the following attributes.
-- fig: The matplotlib Figure object.
-- axes: A list of Axes objects.</p>
+<dd class="field-even"><p><p><strong>result</strong> – A PlotResult object which contains the following attributes.</p>
+<ul class="simple">
+<li><p>fig: The matplotlib Figure object.</p></li>
+<li><p>axes: A list of Axes objects.</p></li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult" title="molass.PlotUtils.PlotResult.PlotResult">PlotResult</a></p>
@@ -625,6 +821,14 @@ This method allows the user to set different ranks for each component.</p>
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_xr_matrices">
 <span class="sig-name descname"><span class="pre">get_xr_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices" title="Link to this definition">#</a></dt>
 <dd><p>Get the matrices for the X-ray data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -648,18 +852,45 @@ This method allows the user to set different ranks for each component.</p>
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_guinier_objects">
 <span class="sig-name descname"><span class="pre">get_guinier_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects" title="Link to this definition">#</a></dt>
 <dd><p>Get the list of Guinier objects for the XR components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of Guinier objects for each XR component.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of Guinier</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_rgs">
 <span class="sig-name descname"><span class="pre">get_rgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_rgs" title="Link to this definition">#</a></dt>
 <dd><p>Get the list of Rg values for the XR components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of Rg values for each XR component.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_uv_matrices">
 <span class="sig-name descname"><span class="pre">get_uv_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices" title="Link to this definition">#</a></dt>
 <dd><p>Get the matrices for the UV data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matrices for the UV data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -814,6 +1045,19 @@ This method allows the user to set different ranks for each component.</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.ssd"><code class="docutils literal notranslate"><span class="pre">Decomposition.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_icurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_ccurves"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_ccurves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.xr_ranks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_icurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_ccurves"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_ccurves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.uv_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.uv_ranks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.mapping"><code class="docutils literal notranslate"><span class="pre">Decomposition.mapping</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.mapped_curve"><code class="docutils literal notranslate"><span class="pre">Decomposition.mapped_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.paired_ranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.paired_ranges</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.num_components</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.copy_with_new_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_components()</span></code></a></li>

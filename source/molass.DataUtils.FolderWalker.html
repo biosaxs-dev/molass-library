@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -545,21 +550,61 @@ document.write(`
   <section id="module-molass.DataUtils.FolderWalker">
 <span id="datautils-folderwalker"></span><h1>DataUtils.FolderWalker<a class="headerlink" href="#module-molass.DataUtils.FolderWalker" title="Link to this heading">#</a></h1>
 <p>DataUtils.FolderWalker.py</p>
-<p>Copyright (c) 2024, SAXS Team, KEK-PF</p>
+<p>Utility functions to walk through folders and find those containing specific data files.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.FolderWalker.default_iswanted">
 <span class="sig-name descname"><span class="pre">default_iswanted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.FolderWalker.default_iswanted" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Determine if a folder is wanted based on the presence of .dat files.
+A folder is considered wanted if it contains more than 10 .dat files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodes</strong> (<em>list</em><em> of </em><em>str</em>) – List of file and folder names in the directory.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the folder is wanted, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.FolderWalker.default_filter">
 <span class="sig-name descname"><span class="pre">default_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.FolderWalker.default_filter" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Default filter to exclude folders with ‘_micro’ in their names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder</strong> (<em>str</em>) – The folder path.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the folder is wanted, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.FolderWalker.walk_folders">
 <span class="sig-name descname"><span class="pre">walk_folders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iswanted=&lt;function</span> <span class="pre">default_iswanted&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter=&lt;function</span> <span class="pre">default_filter&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.FolderWalker.walk_folders" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Walk through folders up to a certain depth and yield those that are wanted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – The root folder to start walking from.</p></li>
+<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – The current depth level (default is 0).</p></li>
+<li><p><strong>depth</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum depth to walk (default is 3).</p></li>
+<li><p><strong>iswanted</strong> (<em>function</em><em>, </em><em>optional</em>) – A function that takes a list of nodes and returns True if the folder is wanted (default is default_iswanted).</p></li>
+<li><p><strong>filter</strong> (<em>function</em><em>, </em><em>optional</em>) – A function that takes a folder path and returns True if the folder should be excluded (default is default_filter).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>str</em> – The path of the wanted folder.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

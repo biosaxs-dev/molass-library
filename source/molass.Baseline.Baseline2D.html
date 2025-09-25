@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -553,6 +558,27 @@ document.write(`
 <dd><p>Implementation of the LPM baseline fitting for 2D data</p>
 <p>This is overriding the implementation in
 pybaselines.two_d.optimizers._Optimizers.individual_axes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – The 2D data array to fit the baseline to.</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em><em> of </em><em>int</em>) – The axes to fit the baseline along. Should be a tuple of two integers (0, 1).</p></li>
+<li><p><strong>method</strong> (<em>str</em>) – The method to use for baseline fitting.</p></li>
+<li><p><strong>method_kwargs</strong> (<em>dict</em><em> or </em><em>list</em><em> of </em><em>dict</em>) – Additional keyword arguments to pass to the baseline fitting function.</p></li>
+<li><p><strong>baseline_func</strong> (<em>callable</em>) – The baseline fitting function to use. This should be a function that takes
+the data and additional keyword arguments, and returns the fitted baseline
+and optionally additional parameters.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>baseline</strong> (<em>ndarray</em>) – The fitted baseline array.</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – A dictionary containing the parameters of the fitted baseline.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">

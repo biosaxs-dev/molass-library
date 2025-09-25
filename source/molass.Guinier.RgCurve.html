@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -528,7 +533,14 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve"><code class="docutils literal notranslate"><span class="pre">RgCurve</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve"><code class="docutils literal notranslate"><span class="pre">RgCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.indeces"><code class="docutils literal notranslate"><span class="pre">RgCurve.indeces</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.rgvalues"><code class="docutils literal notranslate"><span class="pre">RgCurve.rgvalues</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.scores"><code class="docutils literal notranslate"><span class="pre">RgCurve.scores</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.results"><code class="docutils literal notranslate"><span class="pre">RgCurve.results</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.intensities"><code class="docutils literal notranslate"><span class="pre">RgCurve.intensities</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.construct_rgcurve_from_list"><code class="docutils literal notranslate"><span class="pre">construct_rgcurve_from_list()</span></code></a></li>
 </ul>
             </nav>
@@ -550,12 +562,85 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RgCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indeces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgvalues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Curve</span></code></a></p>
 <p>A class to represent an Rg curve.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Guinier.RgCurve.RgCurve.indeces">
+<span class="sig-name descname"><span class="pre">indeces</span></span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve.indeces" title="Link to this definition">#</a></dt>
+<dd><p>The indices of the frames used to compute the Rg values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Guinier.RgCurve.RgCurve.rgvalues">
+<span class="sig-name descname"><span class="pre">rgvalues</span></span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve.rgvalues" title="Link to this definition">#</a></dt>
+<dd><p>The Rg values corresponding to the indeces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Guinier.RgCurve.RgCurve.scores">
+<span class="sig-name descname"><span class="pre">scores</span></span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve.scores" title="Link to this definition">#</a></dt>
+<dd><p>The scores corresponding to the indeces and rgvalues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Guinier.RgCurve.RgCurve.results">
+<span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve.results" title="Link to this definition">#</a></dt>
+<dd><p>The results of the Rg computation. It can be None if not specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Guinier.RgCurve.RgCurve.intensities">
+<span class="sig-name descname"><span class="pre">intensities</span></span><a class="headerlink" href="#molass.Guinier.RgCurve.RgCurve.intensities" title="Link to this definition">#</a></dt>
+<dd><p>The intensities corresponding to the indeces. It can be None if not specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Guinier.RgCurve.construct_rgcurve_from_list">
 <span class="sig-name descname"><span class="pre">construct_rgcurve_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rginfo_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Guinier.RgCurve.construct_rgcurve_from_list" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Constructs an RgCurve from a result list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rginfo_list</strong> (<em>list</em><em> of </em><em>tuples</em>) – A list of tuples where each tuple contains (index, result).
+The result can be either a SimpleGuinier result or an ATSAS Autorg result.</p></li>
+<li><p><strong>result_type</strong> (<em>str</em><em> or </em><em>None</em>) – If None, the results are assumed to be SimpleGuinier results.
+If ‘atsas’, the results are assumed to be ATSAS Autorg results.
+Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An RgCurve object constructed from the provided result list.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.Guinier.RgCurve.RgCurve" title="molass.Guinier.RgCurve.RgCurve">RgCurve</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -604,7 +689,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve"><code class="docutils literal notranslate"><span class="pre">RgCurve</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve"><code class="docutils literal notranslate"><span class="pre">RgCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.indeces"><code class="docutils literal notranslate"><span class="pre">RgCurve.indeces</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.rgvalues"><code class="docutils literal notranslate"><span class="pre">RgCurve.rgvalues</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.scores"><code class="docutils literal notranslate"><span class="pre">RgCurve.scores</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.results"><code class="docutils literal notranslate"><span class="pre">RgCurve.results</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.RgCurve.intensities"><code class="docutils literal notranslate"><span class="pre">RgCurve.intensities</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Guinier.RgCurve.construct_rgcurve_from_list"><code class="docutils literal notranslate"><span class="pre">construct_rgcurve_from_list()</span></code></a></li>
 </ul>
   </nav></div>

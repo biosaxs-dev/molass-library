@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,14 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo"><code class="docutils literal notranslate"><span class="pre">MappingInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.slope"><code class="docutils literal notranslate"><span class="pre">MappingInfo.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.intercept"><code class="docutils literal notranslate"><span class="pre">MappingInfo.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_peaks"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_peaks"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_moment"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_moment"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_curve</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_x"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_x()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_index"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_index()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_curve()</span></code></a></li>
@@ -553,25 +566,176 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MappingInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_moment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_moment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains information about the mapping between XR and UV data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.slope">
+<span class="sig-name descname"><span class="pre">slope</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.slope" title="Link to this definition">#</a></dt>
+<dd><p>The slope of the linear mapping from XR to UV in the form y = slope * x + intercept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.intercept">
+<span class="sig-name descname"><span class="pre">intercept</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.intercept" title="Link to this definition">#</a></dt>
+<dd><p>The intercept of the linear mapping from XR to UV in the form y = slope * x + intercept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.xr_peaks">
+<span class="sig-name descname"><span class="pre">xr_peaks</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.xr_peaks" title="Link to this definition">#</a></dt>
+<dd><p>List of (position, intensity) tuples for XR peaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.uv_peaks">
+<span class="sig-name descname"><span class="pre">uv_peaks</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.uv_peaks" title="Link to this definition">#</a></dt>
+<dd><p>List of (position, intensity) tuples for UV peaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.xr_moment">
+<span class="sig-name descname"><span class="pre">xr_moment</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.xr_moment" title="Link to this definition">#</a></dt>
+<dd><p>The moment of the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.uv_moment">
+<span class="sig-name descname"><span class="pre">uv_moment</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.uv_moment" title="Link to this definition">#</a></dt>
+<dd><p>The moment of the UV data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.xr_curve">
+<span class="sig-name descname"><span class="pre">xr_curve</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.xr_curve" title="Link to this definition">#</a></dt>
+<dd><p>The XR curve object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.uv_curve">
+<span class="sig-name descname"><span class="pre">uv_curve</span></span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.uv_curve" title="Link to this definition">#</a></dt>
+<dd><p>The UV curve object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the MappingInfo object with the given parameters.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.get_mapped_x">
 <span class="sig-name descname"><span class="pre">get_mapped_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_x" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Map XR x-values to UV x-values using the linear mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xr_x</strong> (<em>float</em><em> or </em><em>array-like</em>) – The x-values in the XR domain.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>uv_x</strong> – The corresponding x-values in the UV domain.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.get_mapped_index">
 <span class="sig-name descname"><span class="pre">get_mapped_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_index" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the index in the UV data corresponding to the given index in the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – The index in the XR data.</p></li>
+<li><p><strong>xr_x</strong> (<em>array-like</em>) – The x-values in the XR domain.</p></li>
+<li><p><strong>uv_x</strong> (<em>array-like</em>) – The x-values in the UV domain.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>index</strong> – The corresponding index in the UV data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.get_mapped_curve">
 <span class="sig-name descname"><span class="pre">get_mapped_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_curve" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the mapped curve from XR to UV domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The XR curve object.</p></li>
+<li><p><strong>uv_icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The UV curve object.</p></li>
+<li><p><strong>inverse_range</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, map the range of uv_icurve back to xr_icurve, by default False.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mapped_curve</strong> – The mapped curve in the UV domain.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Mapping.MappingInfo.MappingInfo.compute_ratio_curve">
 <span class="sig-name descname"><span class="pre">compute_ratio_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mp_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.MappingInfo.MappingInfo.compute_ratio_curve" title="Link to this definition">#</a></dt>
-<dd><p>Compute the ratio curve based on the mapping information.</p>
+<dd><p>Compute the ratio curve, which is the ratio of the UV absorbance to the XR intensity,
+based on the mapping information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mp_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – The mapping curve to use, by default None.</p></li>
+<li><p><strong>data_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The data threshold to apply, by default 0.05.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ratio_curve</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.RatioCurve.html#molass.Mapping.RatioCurve.RatioCurve" title="molass.Mapping.RatioCurve.RatioCurve">RatioCurve</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -624,6 +788,14 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo"><code class="docutils literal notranslate"><span class="pre">MappingInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.slope"><code class="docutils literal notranslate"><span class="pre">MappingInfo.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.intercept"><code class="docutils literal notranslate"><span class="pre">MappingInfo.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_peaks"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_peaks"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_moment"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_moment"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.xr_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.xr_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.uv_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.uv_curve</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_x"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_x()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_index"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_index()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.MappingInfo.MappingInfo.get_mapped_curve"><code class="docutils literal notranslate"><span class="pre">MappingInfo.get_mapped_curve()</span></code></a></li>

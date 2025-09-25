@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -548,12 +553,39 @@ which is maked of Rg values computed from scattering curves.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Guinier.RgCurveUtils.compute_rgcurve_info">
 <span class="sig-name descname"><span class="pre">compute_rgcurve_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xrdata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Guinier.RgCurveUtils.compute_rgcurve_info" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Computes Rg curve information from XR data.
+It uses the SimpleGuinier class to compute Rg values for each j-curve in the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xrdata</strong> (<a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData" title="molass.DataObjects.XrData.XrData"><em>XrData</em></a>) – The XR data from which to compute the Rg curve information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rginfo_list</strong> – A list of tuples where each tuple contains (index, SimpleGuinier result).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Guinier.RgCurveUtils.compute_rgcurve_info_atsas">
 <span class="sig-name descname"><span class="pre">compute_rgcurve_info_atsas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xrdata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Guinier.RgCurveUtils.compute_rgcurve_info_atsas" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Computes Rg curve information from XR data using ATSAS autorg.
+It uses the AutorgRunner class to compute Rg values for each j-curve in
+the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xrdata</strong> (<a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData" title="molass.DataObjects.XrData.XrData"><em>XrData</em></a>) – The XR data from which to compute the Rg curve information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rginfo_list</strong> – A list of tuples where each tuple contains (index, ATSAS Autorg result).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -316,6 +316,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -543,21 +548,64 @@ document.write(`
   <section id="module-molass.Geometric.LinesegmentUtils">
 <span id="geometric-linesegmentutils"></span><h1>Geometric.LinesegmentUtils<a class="headerlink" href="#module-molass.Geometric.LinesegmentUtils" title="Link to this heading">#</a></h1>
 <p>Geometric.LinesegmentUtils.py</p>
-<p>Copyright (c) 2024, SAXS Team, KEK-PF</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.LinesegmentUtils.linregress_segments">
 <span class="sig-name descname"><span class="pre">linregress_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.LinesegmentUtils.linregress_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Perform linear regression on the center points of the given line segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments to perform regression on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>slope</strong> (<em>float</em>) – The slope of the fitted line.</p></li>
+<li><p><strong>intercept</strong> (<em>float</em>) – The intercept of the fitted line.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.LinesegmentUtils.reduce_segments">
 <span class="sig-name descname"><span class="pre">reduce_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.LinesegmentUtils.reduce_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Reduce two adjacent line segments into one by merging them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – The index of the first segment to merge with the next one.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The function modifies the segments list in place.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.LinesegmentUtils.restore_segments">
 <span class="sig-name descname"><span class="pre">restore_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.LinesegmentUtils.restore_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Restore the original y-values of the line segments by reversing the linear transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slope</strong> (<em>float</em>) – The slope of the linear transformation applied to the y-values.</p></li>
+<li><p><strong>intercept</strong> (<em>float</em>) – The intercept of the linear transformation applied to the y-values.</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments to restore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of restored line segments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment">Linesegment</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

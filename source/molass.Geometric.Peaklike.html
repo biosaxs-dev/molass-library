@@ -316,6 +316,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -542,16 +547,62 @@ document.write(`
   <section id="module-molass.Geometric.Peaklike">
 <span id="geometric-peaklike"></span><h1>Geometric.Peaklike<a class="headerlink" href="#module-molass.Geometric.Peaklike" title="Link to this heading">#</a></h1>
 <p>Geometric.Peaklike.py</p>
-<p>Copyright (c) 2024-2025, SAXS Team, KEK-PF</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.Peaklike.judge_peaklike_segment">
 <span class="sig-name descname"><span class="pre">judge_peaklike_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entire_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Peaklike.judge_peaklike_segment" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Judge if the segment at index i is peak-like.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>mi</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a>) – The mapping information.</p></li>
+<li><p><strong>points</strong> (<em>list</em><em> of </em><em>int</em>) – The breakpoints of the segments.</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments.</p></li>
+<li><p><strong>entire_height</strong> (<em>float</em>) – The entire height between the highest and lowest segments.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – The index of the segment to judge.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If the segment is peak-like, returns (points, segments, j, k, new
+y), where j and k are the indices of the breakpoints around the peak-like
+segment, and new_y is the modified y-values. If not peak-like, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.Peaklike.check_peaklike_segment">
 <span class="sig-name descname"><span class="pre">check_peaklike_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Peaklike.check_peaklike_segment" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Check if there is a peak-like segment in the data.
+:param x: The x-values of the data.
+:type x: array-like
+:param y: The y-values of the data.
+:type y: array-like
+:param mt: The mapping information.
+:type mt: MappingInfo
+:param points: The breakpoints of the segments.
+:type points: list of int
+:param segments: The list of line segments.
+:type segments: list of Linesegment
+:param debug: If True, enables debug mode for more verbose output.
+:type debug: bool, optional</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If a peak-like segment is found, returns (points, segments, j, k, new_y, sign),
+where j and k are the indices of the breakpoints around the peak-like segment,
+new_y is the modified y-values, and sign is +1 for positive peak-like and -1 for negative peak-like.
+If no peak-like segment is found, returns (None, 0).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple or (None, 0)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

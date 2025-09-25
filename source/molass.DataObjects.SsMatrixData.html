@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData"><code class="docutils literal notranslate"><span class="pre">SsMatrixData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.iv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.iv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.jv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.jv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.M"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_jcurve()</span></code></a></li>
@@ -560,6 +571,72 @@ document.write(`
 It contains a 2D matrix M where M[i,j] is the intensity value
 at the i-th value of the first variable (iv) and the j-th value
 of the second variable (jv).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.iv">
+<span class="sig-name descname"><span class="pre">iv</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.iv" title="Link to this definition">#</a></dt>
+<dd><p>The values of the first variable (e.g., scattering angle or q).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.jv">
+<span class="sig-name descname"><span class="pre">jv</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.jv" title="Link to this definition">#</a></dt>
+<dd><p>The values of the second variable (e.g., time or wavelength).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.M">
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.M" title="Link to this definition">#</a></dt>
+<dd><p>The 2D matrix of intensity values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.E">
+<span class="sig-name descname"><span class="pre">E</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E" title="Link to this definition">#</a></dt>
+<dd><p>The 2D matrix of error values. It can be None if errors are not available</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array-like or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.moment">
+<span class="sig-name descname"><span class="pre">moment</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.moment" title="Link to this definition">#</a></dt>
+<dd><p>The moment of the data along the iv axis. It can be None if not computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment">Moment</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method">
+<span class="sig-name descname"><span class="pre">baseline_method</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method" title="Link to this definition">#</a></dt>
+<dd><p>The method used for baseline correction. Default is ‘linear’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p>Initialize the SsMatrixData object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.copy">
@@ -701,6 +778,12 @@ The j-curve will be made from ssd.xrM[:,j].</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData"><code class="docutils literal notranslate"><span class="pre">SsMatrixData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.iv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.iv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.jv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.jv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.M"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_jcurve()</span></code></a></li>

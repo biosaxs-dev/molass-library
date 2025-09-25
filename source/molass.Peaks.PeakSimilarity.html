@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,8 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.objective"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.objective</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.results"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_minimizer_result"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.get_minimizer_result()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_stdratio"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.get_stdratio()</span></code></a></li>
 </ul>
@@ -552,15 +559,57 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Peaks.PeakSimilarity.PeakSimilarity">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PeakSimilarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_both_signs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Peaks.PeakSimilarity.PeakSimilarity" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to evaluate the similarity between two peaks by fitting one peak to another.
+It uses a scaling factor and a linear baseline (slope and intercept) to fit the first peak to the second peak.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Peaks.PeakSimilarity.PeakSimilarity.objective">
+<span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.objective" title="Link to this definition">#</a></dt>
+<dd><p>The objective function to minimize, which computes the difference between the scaled and shifted first peak and the second peak.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Peaks.PeakSimilarity.PeakSimilarity.results">
+<span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.results" title="Link to this definition">#</a></dt>
+<dd><p>The results of the optimization for different initial conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of OptimizeResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the PeakSimilarity object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The x values of the peaks.</p></li>
+<li><p><strong>y1</strong> (<em>np.ndarray</em>) – The y values of the first peak to be fitted.</p></li>
+<li><p><strong>y2</strong> (<em>np.ndarray</em>) – The y values of the second peak to which the first peak is fitted.</p></li>
+<li><p><strong>try_both_signs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, try both positive and negative scaling factors for the first peak.
+Default is False.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Peaks.PeakSimilarity.PeakSimilarity.get_minimizer_result">
 <span class="sig-name descname"><span class="pre">get_minimizer_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_minimizer_result" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the best minimizer result.
+:returns: The best result from the optimization.
+:rtype: OptimizeResult</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Peaks.PeakSimilarity.PeakSimilarity.get_stdratio">
 <span class="sig-name descname"><span class="pre">get_stdratio</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_stdratio" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the standard deviation to scale ratio from the best minimizer result.
+:returns: The standard deviation to scale ratio.
+:rtype: float</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -612,6 +661,8 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.objective"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.objective</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.results"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_minimizer_result"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.get_minimizer_result()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Peaks.PeakSimilarity.PeakSimilarity.get_stdratio"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.get_stdratio()</span></code></a></li>
 </ul>

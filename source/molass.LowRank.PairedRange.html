@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,9 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange"><code class="docutils literal notranslate"><span class="pre">PairedRange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.ranges"><code class="docutils literal notranslate"><span class="pre">PairedRange.ranges</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.peak_index"><code class="docutils literal notranslate"><span class="pre">PairedRange.peak_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.elm_recs"><code class="docutils literal notranslate"><span class="pre">PairedRange.elm_recs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.get_fromto_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.get_fromto_list()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.as_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.as_list()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.is_minor"><code class="docutils literal notranslate"><span class="pre">PairedRange.is_minor()</span></code></a></li>
@@ -557,6 +565,39 @@ about the valid elution ranges for the analysis report.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a paired range.
 It contains a pair of ranges which correspond to the ascending and descending parts of the peak.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.ranges">
+<span class="sig-name descname"><span class="pre">ranges</span></span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.ranges" title="Link to this definition">#</a></dt>
+<dd><p>A list of tuples representing the ranges. Each tuple contains two integers (start, end).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.peak_index">
+<span class="sig-name descname"><span class="pre">peak_index</span></span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.peak_index" title="Link to this definition">#</a></dt>
+<dd><p>The index of the peak. It can be None if not specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.elm_recs">
+<span class="sig-name descname"><span class="pre">elm_recs</span></span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.elm_recs" title="Link to this definition">#</a></dt>
+<dd><p>The elution records associated with the ranges. It can be None if not specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.PairedRange.PairedRange.get_fromto_list">
 <span class="sig-name descname"><span class="pre">get_fromto_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.PairedRange.PairedRange.get_fromto_list" title="Link to this definition">#</a></dt>
@@ -631,6 +672,9 @@ returns a list of tuples</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange"><code class="docutils literal notranslate"><span class="pre">PairedRange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.ranges"><code class="docutils literal notranslate"><span class="pre">PairedRange.ranges</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.peak_index"><code class="docutils literal notranslate"><span class="pre">PairedRange.peak_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.elm_recs"><code class="docutils literal notranslate"><span class="pre">PairedRange.elm_recs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.get_fromto_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.get_fromto_list()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.as_list"><code class="docutils literal notranslate"><span class="pre">PairedRange.as_list()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.PairedRange.PairedRange.is_minor"><code class="docutils literal notranslate"><span class="pre">PairedRange.is_minor()</span></code></a></li>

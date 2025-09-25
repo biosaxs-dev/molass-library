@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ipickvalue"><code class="docutils literal notranslate"><span class="pre">XrData.get_ipickvalue()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_icurve"><code class="docutils literal notranslate"><span class="pre">XrData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_usable_qrange"><code class="docutils literal notranslate"><span class="pre">XrData.get_usable_qrange()</span></code></a></li>
@@ -556,12 +562,38 @@ document.write(`
 <dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XrData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData" title="molass.DataObjects.SsMatrixData.SsMatrixData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SsMatrixData</span></code></a></p>
-<p>XrData class for XR matrix data.</p>
-<p>Initialize the SsMatrixData object.</p>
+<p>XrData class for XR matrix data.
+Inherits from SsMatrixData and adds XR-specific functionality.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.qv">
+<span class="sig-name descname"><span class="pre">qv</span></span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.qv" title="Link to this definition">#</a></dt>
+<dd><p>The q-values corresponding to the angular axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the XrData object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iv</strong> (<em>array-like</em>) – The q-values corresponding to the angular axis.</p></li>
+<li><p><strong>jv</strong> (<em>array-like</em>) – The values corresponding to the temporal axis.</p></li>
+<li><p><strong>M</strong> (<em>2D array-like</em>) – The 2D matrix of intensity values.</p></li>
+<li><p><strong>E</strong> (<em>2D array-like</em><em> or </em><em>None</em>) – The 2D matrix of error values. It can be None if errors are not available</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the SsMatrixData constructor.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_ipickvalue">
 <span class="sig-name descname"><span class="pre">get_ipickvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_ipickvalue" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the default pickvalue for i-curves.
+:returns: The default pickvalue for i-curves.
+:rtype: float</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_icurve">
@@ -577,6 +609,12 @@ the picking index i will be determined to satisfy</p>
 </div></blockquote>
 <p>according to bisect_right.</p>
 </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted i-curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -598,6 +636,12 @@ unusable XR data regions.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>None</strong></p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pair of indeces (i_start, i_end) to be used as a slice for the angular axis.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int, int)</p>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">get_usable_qrange</span><span class="p">()</span>
@@ -611,7 +655,21 @@ unusable XR data regions.</p>
 <dd><p>Returns a baseline i-curve from the XR matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pickvalue</strong> (<em>float</em><em>, </em><em>optional</em>) – See ssd.get_xr_icurve().</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pickvalue</strong> (<em>float</em><em>, </em><em>optional</em>) – See ssd.get_xr_icurve().</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The baseline method to be used. If None, the method set in the object will be
+used.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline computation function.
+These will be merged with the default_kwargs defined above.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline i-curve.
+This curve can be subtracted from the original i-curve to obtain a background-subtracted curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -723,6 +781,7 @@ The index of the peak in the i-curve to use. If None, the first peak is used.</p
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ipickvalue"><code class="docutils literal notranslate"><span class="pre">XrData.get_ipickvalue()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_icurve"><code class="docutils literal notranslate"><span class="pre">XrData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_usable_qrange"><code class="docutils literal notranslate"><span class="pre">XrData.get_usable_qrange()</span></code></a></li>

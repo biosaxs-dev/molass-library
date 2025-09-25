@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -528,7 +533,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.compute_ratio_curve_impl"><code class="docutils literal notranslate"><span class="pre">compute_ratio_curve_impl()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve"><code class="docutils literal notranslate"><span class="pre">RatioCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve.x"><code class="docutils literal notranslate"><span class="pre">RatioCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve.y"><code class="docutils literal notranslate"><span class="pre">RatioCurve.y</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -543,10 +552,44 @@ document.write(`
   <section id="module-molass.Mapping.RatioCurve">
 <span id="mapping-ratiocurve"></span><h1>Mapping.RatioCurve<a class="headerlink" href="#module-molass.Mapping.RatioCurve" title="Link to this heading">#</a></h1>
 <p>Mapping.RatioCurve.py</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="molass.Mapping.RatioCurve.compute_ratio_curve_impl">
-<span class="sig-name descname"><span class="pre">compute_ratio_curve_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.RatioCurve.compute_ratio_curve_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="molass.Mapping.RatioCurve.RatioCurve">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RatioCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'i'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.RatioCurve.RatioCurve" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Curve</span></code></a></p>
+<p>Represents the ratio curve between mapped UV data and XR data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.RatioCurve.RatioCurve.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.Mapping.RatioCurve.RatioCurve.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the ratio curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Mapping.RatioCurve.RatioCurve.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Mapping.RatioCurve.RatioCurve.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the ratio curve, representing the ratio of mapped UV intensity to XR intensity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the RatioCurve with given x and y values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the ratio curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the ratio curve.</p></li>
+<li><p><strong>type</strong> (<em>str</em><em>, </em><em>optional</em>) – The type of the ratio curve (default is “i”).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -595,7 +638,11 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.compute_ratio_curve_impl"><code class="docutils literal notranslate"><span class="pre">compute_ratio_curve_impl()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve"><code class="docutils literal notranslate"><span class="pre">RatioCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve.x"><code class="docutils literal notranslate"><span class="pre">RatioCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Mapping.RatioCurve.RatioCurve.y"><code class="docutils literal notranslate"><span class="pre">RatioCurve.y</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

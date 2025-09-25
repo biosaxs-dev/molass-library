@@ -316,6 +316,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -527,6 +532,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment"><code class="docutils literal notranslate"><span class="pre">Linesegment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.slope"><code class="docutils literal notranslate"><span class="pre">Linesegment.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.intercept"><code class="docutils literal notranslate"><span class="pre">Linesegment.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.std_err"><code class="docutils literal notranslate"><span class="pre">Linesegment.std_err</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.x"><code class="docutils literal notranslate"><span class="pre">Linesegment.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.y"><code class="docutils literal notranslate"><span class="pre">Linesegment.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.center_x"><code class="docutils literal notranslate"><span class="pre">Linesegment.center_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.center_y"><code class="docutils literal notranslate"><span class="pre">Linesegment.center_y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.get_std"><code class="docutils literal notranslate"><span class="pre">Linesegment.get_std()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.get_y"><code class="docutils literal notranslate"><span class="pre">Linesegment.get_y()</span></code></a></li>
 </ul>
@@ -553,32 +565,163 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Linesegment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regress_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class representing a line segment defined by linear regression.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.slope">
+<span class="sig-name descname"><span class="pre">slope</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.slope" title="Link to this definition">#</a></dt>
+<dd><p>The slope of the line segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.intercept">
+<span class="sig-name descname"><span class="pre">intercept</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.intercept" title="Link to this definition">#</a></dt>
+<dd><p>The intercept of the line segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.std_err">
+<span class="sig-name descname"><span class="pre">std_err</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.std_err" title="Link to this definition">#</a></dt>
+<dd><p>The standard error of the linear regression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the line segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the line segment, computed as y = slope * x + intercept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.center_x">
+<span class="sig-name descname"><span class="pre">center_x</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.center_x" title="Link to this definition">#</a></dt>
+<dd><p>The center x-value of the line segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.center_y">
+<span class="sig-name descname"><span class="pre">center_y</span></span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.center_y" title="Link to this definition">#</a></dt>
+<dd><p>The center y-value of the line segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Linesegment object.
+:param x: The x-values of the line segment.
+:type x: array-like
+:param y: The y-values of the line segment.
+:type y: array-like
+:param regress_info: Precomputed regression information. If None, it will be computed from x and y.
+:type regress_info: tuple of (slope, intercept, std_err), optional</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.get_std">
 <span class="sig-name descname"><span class="pre">get_std</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.get_std" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the standard error of the linear regression.
+:returns: The standard error of the linear regression.
+:rtype: float</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.Linesegment.get_y">
 <span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.Linesegment.get_y" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the y-values of the line segment.
+:returns: The y-values of the line segment.
+:rtype: array-like</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.get_segments">
 <span class="sig-name descname"><span class="pre">get_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bkps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.get_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Segment the data into line segments using change point detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>breakpoints</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – The breakpoints for segmentation. If None, they will be computed using change point detection.</p></li>
+<li><p><strong>n_bkps</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of breakpoints to detect if breakpoints is None. Default is 2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the list of breakpoints and the list of Linesegment objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.plot_segments">
 <span class="sig-name descname"><span class="pre">plot_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.plot_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Plot the data and the line segments.
+:param x: The x-values of the data.
+:type x: array-like
+:param y: The y-values of the data.
+:type y: array-like
+:param segments: The list of line segments to plot.
+:type segments: list of Linesegment
+:param title: The title of the plot. If None, no title is set.
+:type title: str, optional
+:param ax: The axes to plot on. If None, a new figure and axes are created.
+:type ax: matplotlib.axes.Axes, optional</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Geometric.Linesegment.to_negative_segments">
 <span class="sig-name descname"><span class="pre">to_negative_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Geometric.Linesegment.to_negative_segments" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Convert a list of line segments to their negative counterparts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments to convert.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of negative line segments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment">Linesegment</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -610,6 +753,13 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment"><code class="docutils literal notranslate"><span class="pre">Linesegment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.slope"><code class="docutils literal notranslate"><span class="pre">Linesegment.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.intercept"><code class="docutils literal notranslate"><span class="pre">Linesegment.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.std_err"><code class="docutils literal notranslate"><span class="pre">Linesegment.std_err</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.x"><code class="docutils literal notranslate"><span class="pre">Linesegment.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.y"><code class="docutils literal notranslate"><span class="pre">Linesegment.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.center_x"><code class="docutils literal notranslate"><span class="pre">Linesegment.center_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.center_y"><code class="docutils literal notranslate"><span class="pre">Linesegment.center_y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.get_std"><code class="docutils literal notranslate"><span class="pre">Linesegment.get_std()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Geometric.Linesegment.Linesegment.get_y"><code class="docutils literal notranslate"><span class="pre">Linesegment.get_y()</span></code></a></li>
 </ul>

@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -553,22 +558,53 @@ document.write(`
 <dt class="sig sig-object py" id="molass.DataUtils.Beamline.BeamlineInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BeamlineInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.Beamline.BeamlineInfo" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to hold information about a beamline.</p>
+<p>Initialize the BeamlineInfo object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**entries</strong> (<em>dict</em>) – Keyword arguments to initialize the beamline information.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataUtils.Beamline.BeamlineInfo.get_concfactor">
 <span class="sig-name descname"><span class="pre">get_concfactor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.Beamline.BeamlineInfo.get_concfactor" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the concentration factor, which is the product of path length and extinction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The concentration factor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.Beamline.get_beamlineinfo_from_folder">
 <span class="sig-name descname"><span class="pre">get_beamlineinfo_from_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.Beamline.get_beamlineinfo_from_folder" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get beamline information from a folder containing UV data files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder</strong> (<em>str</em>) – The folder path containing the UV data files.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The beamline information object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.DataUtils.Beamline.BeamlineInfo" title="molass.DataUtils.Beamline.BeamlineInfo">BeamlineInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.Beamline.get_beamlineinfo_from_settings">
 <span class="sig-name descname"><span class="pre">get_beamlineinfo_from_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.Beamline.get_beamlineinfo_from_settings" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get beamline information from settings.
+:returns: The beamline information object.
+:rtype: BeamlineInfo</p>
+</dd></dl>
 
 </section>
 

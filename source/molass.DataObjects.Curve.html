@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,16 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve"><code class="docutils literal notranslate"><span class="pre">Curve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.x"><code class="docutils literal notranslate"><span class="pre">Curve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.y"><code class="docutils literal notranslate"><span class="pre">Curve.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.type"><code class="docutils literal notranslate"><span class="pre">Curve.type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_i"><code class="docutils literal notranslate"><span class="pre">Curve.max_i</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_x"><code class="docutils literal notranslate"><span class="pre">Curve.max_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_y"><code class="docutils literal notranslate"><span class="pre">Curve.max_y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.peaks"><code class="docutils literal notranslate"><span class="pre">Curve.peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.moment"><code class="docutils literal notranslate"><span class="pre">Curve.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.spline"><code class="docutils literal notranslate"><span class="pre">Curve.spline</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.diff_spline"><code class="docutils literal notranslate"><span class="pre">Curve.diff_spline</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.get_xy"><code class="docutils literal notranslate"><span class="pre">Curve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.set_max"><code class="docutils literal notranslate"><span class="pre">Curve.set_max()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.get_max_i"><code class="docutils literal notranslate"><span class="pre">Curve.get_max_i()</span></code></a></li>
@@ -565,6 +580,116 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.Curve.Curve" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class representing a 1D curve with x and y data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.type" title="Link to this definition">#</a></dt>
+<dd><p>The type of the curve, e.g., ‘i’ for intensity curves.  If None, the type is unspecified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.max_i">
+<span class="sig-name descname"><span class="pre">max_i</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.max_i" title="Link to this definition">#</a></dt>
+<dd><p>The index of the maximum y-value. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.max_x">
+<span class="sig-name descname"><span class="pre">max_x</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.max_x" title="Link to this definition">#</a></dt>
+<dd><p>The x-value corresponding to the maximum y-value. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.max_y">
+<span class="sig-name descname"><span class="pre">max_y</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.max_y" title="Link to this definition">#</a></dt>
+<dd><p>The maximum y-value. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.peaks">
+<span class="sig-name descname"><span class="pre">peaks</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.peaks" title="Link to this definition">#</a></dt>
+<dd><p>The indices of the peaks in the curve. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.moment">
+<span class="sig-name descname"><span class="pre">moment</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.moment" title="Link to this definition">#</a></dt>
+<dd><p>The moment of the curve. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment">Moment</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.spline">
+<span class="sig-name descname"><span class="pre">spline</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.spline" title="Link to this definition">#</a></dt>
+<dd><p>A spline representation of the curve. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UnivariateSpline or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.diff_spline">
+<span class="sig-name descname"><span class="pre">diff_spline</span></span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.diff_spline" title="Link to this definition">#</a></dt>
+<dd><p>The derivative spline representation of the curve. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UnivariateSpline or None</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.Curve.Curve.get_xy">
 <span class="sig-name descname"><span class="pre">get_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.Curve.Curve.get_xy" title="Link to this definition">#</a></dt>
@@ -759,6 +884,16 @@ This is a placeholder for actual correction logic.</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve"><code class="docutils literal notranslate"><span class="pre">Curve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.x"><code class="docutils literal notranslate"><span class="pre">Curve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.y"><code class="docutils literal notranslate"><span class="pre">Curve.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.type"><code class="docutils literal notranslate"><span class="pre">Curve.type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_i"><code class="docutils literal notranslate"><span class="pre">Curve.max_i</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_x"><code class="docutils literal notranslate"><span class="pre">Curve.max_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.max_y"><code class="docutils literal notranslate"><span class="pre">Curve.max_y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.peaks"><code class="docutils literal notranslate"><span class="pre">Curve.peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.moment"><code class="docutils literal notranslate"><span class="pre">Curve.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.spline"><code class="docutils literal notranslate"><span class="pre">Curve.spline</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.diff_spline"><code class="docutils literal notranslate"><span class="pre">Curve.diff_spline</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.get_xy"><code class="docutils literal notranslate"><span class="pre">Curve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.set_max"><code class="docutils literal notranslate"><span class="pre">Curve.set_max()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.Curve.Curve.get_max_i"><code class="docutils literal notranslate"><span class="pre">Curve.get_max_i()</span></code></a></li>
