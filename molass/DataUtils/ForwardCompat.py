@@ -9,6 +9,19 @@ from scipy.interpolate import UnivariateSpline
 from molass.FlowChange.NullFlowChange import CsProxy, NullFlowChange
 
 class CurveProxy:
+    """A proxy class for Curve to hold x, y, spline, and peak_info.
+
+    Attributes
+    ----------
+    x : array-like
+        The x-values of the curve.
+    y : array-like
+        The y-values of the curve.
+    spline : UnivariateSpline
+        A spline representation of the curve.    
+    peak_info : list of lists
+        List of peak information, where each peak is represented by a list of indices.
+    """
     def __init__(self, x, y, peak_info):
         self.x = x
         self.y = y
@@ -16,17 +29,56 @@ class CurveProxy:
         self.peak_info = peak_info
 
 class PreRecogProxy:
+    """A proxy class for PreRecog to hold flowchange and cs.
+
+    Attributes
+    ----------
+    flowchange : NullFlowChange
+        The flow change object.
+    cs : CsProxy
+        The calibration slope and intercept proxy.
+    """
     def __init__(self, flowchange, cs):
         self.flowchange = flowchange
         self.cs = cs
 
 def get_start_index(slice_):
+    """Get the start index from a slice object.
+
+    Parameters
+    ----------
+    slice_ : slice
+        The slice object.
+
+    Returns
+    -------
+    int
+        The start index of the slice.
+    """
     j = slice_.start
     if j is None:
         j = 0
     return j
 
 def get_trimmed_curve(curve, slice_, renumber=True, convert_peak_info=True):
+    """Get a trimmed version of the curve based on the given slice.
+
+    Parameters
+    ----------
+    curve : CurveProxy
+        The original curve to be trimmed.
+    slice_ : slice
+        The slice object defining the portion to keep.
+    renumber : bool, optional
+        If True, renumber the x-values to start from 0, by default True.
+    convert_peak_info : bool, optional
+        If True, adjust the peak_info indices according to the slice, by default True.
+
+    Returns
+    -------
+    CurveProxy
+        The trimmed curve.
+    """
     size = slice_.stop
     if size is None:
         size = len(curve.x)
@@ -46,6 +98,27 @@ def get_trimmed_curve(curve, slice_, renumber=True, convert_peak_info=True):
     return CurveProxy(x_, y_, new_peak_info)
 
 def convert_to_trimmed_prerecog(pre_recog, uv_restrict_list, xr_restrict_list, renumber=True, debug=False):
+    """Convert an old PreRecog object to a trimmed PreRecogProxy object.
+
+    Parameters
+    ----------
+    pre_recog : PreRecog
+        The original PreRecog object to be converted.
+    uv_restrict_list : list of Restrict
+        List of Restrict objects for UV data.
+    xr_restrict_list : list of Restrict
+        List of Restrict objects for XR data.
+    renumber : bool, optional
+        If True, renumber the x-values to start from 0, by default True.
+    debug : bool, optional
+        If True, enable debug mode, by default False.
+        
+    Returns
+    -------
+    PreRecogProxy
+        The converted and trimmed PreRecogProxy object.
+    """
+    
     if debug:
         print("convert_to_trimmed_prerecog")
         print("uv_restrict_list=", uv_restrict_list)

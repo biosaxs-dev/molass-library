@@ -6,6 +6,23 @@ import matplotlib.pyplot as plt
 from molass.SEC.Models.Simple import egh
 
 def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None, debug=False):
+    """
+    Plot varied decompositions of the data (x, y) based on different proportions.
+    Parameters
+    ----------
+    x : array-like
+        The x values of the data.
+    y : array-like
+        The y values of the data.
+    proportions : array-like
+        A 2D array where each row represents a set of proportions for the components.
+    rgcurve : RGCurve or None, optional
+        An optional RGCurve object for additional plotting, by default None.
+    best : int or None, optional
+        If specified, highlights the best 'best' decompositions based on the objective function value, by default None.
+    debug : bool, optional
+        If True, enable debug mode, by default False.
+    """
     if debug:
         from importlib import reload
         import molass.Decompose.Proportional

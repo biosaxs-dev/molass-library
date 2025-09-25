@@ -73,6 +73,7 @@ def get_beamlineinfo_from_folder(folder):
 def get_beamlineinfo_from_settings():
     """
     Get beamline information from settings.
+    
     Returns
     -------
     BeamlineInfo

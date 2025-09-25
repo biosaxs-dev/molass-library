@@ -10,6 +10,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def get_denoised_data( D, rank=3, svd=None ):
+    """
+    Get the denoised data by low rank approximation using SVD.
+
+    Parameters
+    ----------
+    D : 2D array-like
+        The data matrix to be denoised.
+    rank : int, optional
+        The rank for the low rank approximation, by default 3.
+    svd : tuple or None, optional
+        Precomputed SVD (U, s, VT) to use instead of computing it again
+
+    Returns
+    -------
+    D_ : 2D array-like
+        The denoised data matrix.
+    """
     # print( 'get_denoised_data: rank=', rank )
     if svd is None:
         U, s, VT = np.linalg.svd( D )
@@ -27,7 +44,36 @@ def get_denoised_data( D, rank=3, svd=None ):
 def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
     """
     Compute the matrices for the low rank approximation.
-    """
+    The low rank approximation is computed using the formula:
+        M_ = P @ C
+    where M_ is the denoised data matrix, P is the projected matrix,
+    and C is the component matrix.
+    Parameters
+    ----------
+    M : 2D array-like
+        The data matrix to be approximated.
+    ccurves : list of ComponentCurve
+        The list of component curves.
+    E : 2D array-like or None
+        The error matrix corresponding to M. It can be None if errors are not available.
+    ranks : list of int or None
+        The list of ranks for each component curve. If None, all ranks are assumed to be 1.
+    kwargs : dict, optional
+        Additional keyword arguments for the low rank approximation.
+        Possible keys include:
+            - svd_rank: int or None
+                The rank for the SVD used in the low rank approximation. If None, it will be set to the sum of ranks.
+    Returns
+    -------
+    M_ : 2D array-like
+        The denoised data matrix.
+    C : 2D array-like
+        The concentration matrix.
+    P : 2D array-like
+        The spectral factor matrix.
+    Pe : 2D array-like or None
+        The propagated error matrix corresponding to P. It can be None if E is None.
+    """ 
     num_components = len(ccurves)
     if ranks is None:
         ranks = [1] * num_components

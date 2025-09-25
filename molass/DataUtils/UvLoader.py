@@ -36,6 +36,21 @@ def load_uv(path, return_also_conc_file=False):
         return uvM, wvector
 
 def get_uvcurves(in_folder):
+    """ Get two UV curves from the UV data in the given folder.
+    The two curves correspond to wavelengths 280 nm and 400 nm.
+    
+    Parameters
+    ----------
+    in_folder : str
+        Path to the folder containing UV data files.
+        
+    Returns
+    -------
+    c1 : Curve
+        UV curve at 280 nm.
+    c2 : Curve
+        UV curve at 400 nm.
+    """
     uvM, wvector = load_uv(in_folder)
     assert wvector is not None
     c1 = create_icurve(None, uvM, wvector, 280)

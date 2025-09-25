@@ -20,7 +20,7 @@ def load_xr(folder_path):
 
     datafiles : list of str
         List of data file paths corresponding to the loaded data.
-        
+
     Notes
     -----
     The function assumes that each .dat file contains data in a format compatible with np.loadtxt.
@@ -35,6 +35,17 @@ def load_xr(folder_path):
     return xr_array, datafiles
 
 def xr_remove_bubbles(xr_array, logger=None, debug=False):
+    """Remove bubbles from the XR data array.
+
+    Parameters
+    ----------
+    xr_array : np.ndarray
+        3D array containing the X-ray scattering data.
+    logger : logging.Logger, optional
+        Logger for logging messages. If None, print to console.
+    debug : bool, optional
+        If True, enable debug mode with additional output.
+    """
     from molass.DataObjects.Curve import create_icurve
     from molass.DataUtils.AnomalyHandlers import bubble_check_impl, remove_bubbles_impl
     qv = xr_array[0,:,0]
@@ -66,6 +77,26 @@ def xr_remove_bubbles(xr_array, logger=None, debug=False):
         plt.show()
 
 def load_xr_with_options(folder_path, remove_bubbles=False, logger=None, debug=False):
+    """Load X-ray scattering data from a folder with options to preprocess.
+
+    Parameters
+    ----------
+    folder_path : str
+        Path to the folder containing .dat files.
+    remove_bubbles : bool, optional
+        If True, remove bubbles from the data, by default False.
+    logger : logging.Logger, optional
+        Logger for logging messages. If None, print to console.
+    debug : bool, optional
+        If True, enable debug mode with additional output, by default False.
+        
+    Returns
+    -------
+    xr_array : np.ndarray
+        3D array containing the X-ray scattering data.
+    datafiles : list of str
+        List of data file paths corresponding to the loaded data.
+    """
     xr_array, datafiles = load_xr(folder_path)
     if remove_bubbles:
         xr_remove_bubbles(xr_array, logger=logger, debug=debug)

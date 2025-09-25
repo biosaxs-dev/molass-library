@@ -248,6 +248,14 @@ class XrComponent(Component):
         self.sg = None
     
     def get_guinier_object(self):
+        """
+        Get the SimpleGuinier object for Rg computation.
+
+        Returns
+        -------
+        SimpleGuinier
+            The SimpleGuinier object.
+        """
         if self.sg is None:
             from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
             self.sg = SimpleGuinier(self.jcurve_array)
@@ -256,6 +264,7 @@ class XrComponent(Component):
     def compute_rg(self, return_object=False):
         """
         Compute the Rg of the component.
+        
         Parameters
         ----------
         return_object : bool, optional

@@ -124,6 +124,7 @@ class VoxelSpace:
     """
     VoxelSpace class to handle voxel-based density spaces.
     It can be initialized with a shape or a density array.
+    
     Attributes
     ----------
     rho : np.ndarray

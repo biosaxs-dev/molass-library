@@ -1,7 +1,7 @@
 """
     FlowChange.FlowChangeParams.py
 
-    Copyright (c) 2025, SAXS Team, KEK-PF
+    It seems that this module is broken. Will fix it later.
 """
 import os
 import numpy as np

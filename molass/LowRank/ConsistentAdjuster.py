@@ -19,6 +19,26 @@ def _debug_plot(title, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves):
 def adjust_components_consistently(mapping, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs):
     """
     Adjust the component curves consistently.
+
+    Parameters
+    ----------
+    mapping : MappingInfo
+        The mapping information between XR and UV domains.
+    xr_icurve : Curve
+        The XR intensity curve.
+    xr_ccurves : list of ComponentCurve
+        The list of XR component curves.
+    uv_icurve : Curve
+        The UV intensity curve.
+    uv_ccurves : list of ComponentCurve
+        The list of UV component curves.
+    debug : bool, optional
+        If True, print debug information and plot intermediate results, by default False.
+
+    Returns
+    -------
+    new_ccurves : list of ComponentCurve
+        The adjusted UV component curves.
     """
     from molass.LowRank.ComponentCurve import ComponentCurve
     debug = kwargs.get('debug', False)
