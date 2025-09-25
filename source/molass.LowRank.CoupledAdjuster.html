@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -547,13 +552,78 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.CoupledAdjuster.make_component_curves">
 <span class="sig-name descname"><span class="pre">make_component_curves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.CoupledAdjuster.make_component_curves" title="Link to this definition">#</a></dt>
-<dd><p>Make a LowRankInfo object.</p>
+<dd><p>Make a LowRankInfo object.
+:param ssd: The SsData object containing XR and UV data.
+:type ssd: SsData
+:param num_components: The number of components to decompose into. If None, it will be determined automatically.
+:type num_components: int or None
+:param kwargs: Additional keyword arguments for decomposition and adjustment.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Possible keys include:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>xr_peakpositions: list of float or None</dt><dd><p>Initial peak positions for XR decomposition.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>smooth_uv: bool</dt><dd><p>If True, smooth the UV i-curve before decomposition.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>consistent_uv: bool</dt><dd><p>If True, adjust UV components to be consistent with XR components.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ip_effect_info: IpEffectInfo or None</dt><dd><p>Information about the instrumental polarization effect.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>debug: bool</dt><dd><p>If True, enable debug mode.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>xr_icurve</strong> (<em>Curve</em>) – The extracted XR i-curve.</p></li>
+<li><p><strong>xr_ccurves</strong> (<em>list of ComponentCurve</em>) – The list of XR component curves.</p></li>
+<li><p><strong>uv_icurve</strong> (<em>Curve</em>) – The extracted UV i-curve.</p></li>
+<li><p><strong>uv_ccurves</strong> (<em>list of ComponentCurve</em>) – The list of UV component curves.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.CoupledAdjuster.select_components">
 <span class="sig-name descname"><span class="pre">select_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.CoupledAdjuster.select_components" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Select the relevant components from the decomposed curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssd</strong> (<em>SsData</em>) – The SsData object containing XR and UV data.</p></li>
+<li><p><strong>xr_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve"><em>ComponentCurve</em></a>) – The list of XR component curves.</p></li>
+<li><p><strong>uv_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve"><em>ComponentCurve</em></a>) – The list of UV component curves.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>xr_ccurves</strong> (<em>list of ComponentCurve</em>) – The selected list of XR component curves.</p></li>
+<li><p><strong>uv_ccurves</strong> (<em>list of ComponentCurve</em>) – The selected list of UV component curves.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -544,16 +549,47 @@ document.write(`
   <section id="module-molass.FlowChange.FlowChange">
 <span id="flowchange-flowchange"></span><h1>FlowChange.FlowChange<a class="headerlink" href="#module-molass.FlowChange.FlowChange" title="Link to this heading">#</a></h1>
 <p>FlowChange.FlowChange.py</p>
-<p>Copyright (c) 2024-2025, SAXS Team, KEK-PF</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChange.flowchange_exclude_slice_impl">
 <span class="sig-name descname"><span class="pre">flowchange_exclude_slice_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChange.flowchange_exclude_slice_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Exclude certain slices from the flow change analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the curve.</p></li>
+<li><p><strong>mi</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a>) – The mapping information.</p></li>
+<li><p><strong>yscale</strong> (<em>float</em>) – The y-scale for likelihood computation.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChange.flowchange_exclude_slice">
-<span class="sig-name descname"><span class="pre">flowchange_exclude_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_fullinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_firstinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChange.flowchange_exclude_slice" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">flowchange_exclude_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_fullinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChange.flowchange_exclude_slice" title="Link to this definition">#</a></dt>
+<dd><p>Exclude certain slices from the flow change analysis between two curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curve1</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The first curve object.</p></li>
+<li><p><strong>curve2</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The second curve object.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+<li><p><strong>return_fullinfo</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return full information including segments and statistics.</p></li>
+<li><p><strong>counter</strong> (<em>list</em><em>, </em><em>optional</em>) – A list to keep track of the number of analyses performed.</p></li>
+<li><p><strong>return_firstinfo</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return initial information including mapping info and yscale.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If return_fullinfo is False, returns ((i, j), judge_info).
+If return_fullinfo is True, returns ((i, j), judge_info, segments, (M_lb, M_ub), std).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

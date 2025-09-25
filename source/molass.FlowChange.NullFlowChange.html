@@ -534,11 +534,20 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy"><code class="docutils literal notranslate"><span class="pre">CsProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.slope"><code class="docutils literal notranslate"><span class="pre">CsProxy.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.intercept"><code class="docutils literal notranslate"><span class="pre">CsProxy.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.mapped_info"><code class="docutils literal notranslate"><span class="pre">CsProxy.mapped_info</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.a_curve"><code class="docutils literal notranslate"><span class="pre">CsProxy.a_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.x_curve"><code class="docutils literal notranslate"><span class="pre">CsProxy.x_curve</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.compute_whole_similarity"><code class="docutils literal notranslate"><span class="pre">CsProxy.compute_whole_similarity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.get_mapped_info"><code class="docutils literal notranslate"><span class="pre">CsProxy.get_mapped_info()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange"><code class="docutils literal notranslate"><span class="pre">NullFlowChange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.a_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve2"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.a_curve2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.x_curve"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.x_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.cs"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.cs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_similarity"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.get_similarity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_real_flow_changes"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.get_real_flow_changes()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.has_special"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.has_special()</span></code></a></li>
@@ -563,15 +572,100 @@ document.write(`
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CsProxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A proxy class for Cs similarity computation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.slope">
+<span class="sig-name descname"><span class="pre">slope</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.slope" title="Link to this definition">#</a></dt>
+<dd><p>The slope of the linear regression line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.intercept">
+<span class="sig-name descname"><span class="pre">intercept</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.intercept" title="Link to this definition">#</a></dt>
+<dd><p>The intercept of the linear regression line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.mapped_info">
+<span class="sig-name descname"><span class="pre">mapped_info</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.mapped_info" title="Link to this definition">#</a></dt>
+<dd><p>The mapping information, computed on demand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.a_curve">
+<span class="sig-name descname"><span class="pre">a_curve</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.a_curve" title="Link to this definition">#</a></dt>
+<dd><p>The A-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.x_curve">
+<span class="sig-name descname"><span class="pre">x_curve</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.x_curve" title="Link to this definition">#</a></dt>
+<dd><p>The X-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the CsProxy with given slope and intercept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slope</strong> (<em>float</em>) – The slope of the linear regression line.</p></li>
+<li><p><strong>intercept</strong> (<em>float</em>) – The intercept of the linear regression line.</p></li>
+<li><p><strong>a_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The A-curve. If None, no A-curve is associated.</p></li>
+<li><p><strong>x_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The X-curve. If None, no X-curve is associated.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.compute_whole_similarity">
 <span class="sig-name descname"><span class="pre">compute_whole_similarity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.compute_whole_similarity" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the whole similarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The whole similarity value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.CsProxy.get_mapped_info">
 <span class="sig-name descname"><span class="pre">get_mapped_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.CsProxy.get_mapped_info" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the mapping information, computing it if necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The mapping information.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -579,25 +673,113 @@ document.write(`
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NullFlowChange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_curve2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_curve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class representing a null flow change.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.a_curve">
+<span class="sig-name descname"><span class="pre">a_curve</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve" title="Link to this definition">#</a></dt>
+<dd><p>The A-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.a_curve2">
+<span class="sig-name descname"><span class="pre">a_curve2</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve2" title="Link to this definition">#</a></dt>
+<dd><p>The second A-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.x_curve">
+<span class="sig-name descname"><span class="pre">x_curve</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.x_curve" title="Link to this definition">#</a></dt>
+<dd><p>The X-curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.cs">
+<span class="sig-name descname"><span class="pre">cs</span></span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.cs" title="Link to this definition">#</a></dt>
+<dd><p>The CsProxy object for similarity computation, computed on demand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.FlowChange.NullFlowChange.CsProxy" title="molass.FlowChange.NullFlowChange.CsProxy">CsProxy</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the NullFlowChange with given curves.
+:param a_curve: The A-curve.
+:type a_curve: Curve
+:param a_curve2: The second A-curve.
+:type a_curve2: Curve
+:param x_curve: The X-curve.
+:type x_curve: Curve</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.get_similarity">
 <span class="sig-name descname"><span class="pre">get_similarity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_similarity" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the similarity value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The similarity value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.get_real_flow_changes">
 <span class="sig-name descname"><span class="pre">get_real_flow_changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_real_flow_changes" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the real flow changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Indicates no real flow changes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None, None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.has_special">
 <span class="sig-name descname"><span class="pre">has_special</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.has_special" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Indicates whether there are special flow changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Always returns False.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.FlowChange.NullFlowChange.NullFlowChange.remove_irregular_points">
 <span class="sig-name descname"><span class="pre">remove_irregular_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.NullFlowChange.NullFlowChange.remove_irregular_points" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Removes irregular points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty arrays and a full slice.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array, array, slice</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -649,11 +831,20 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy"><code class="docutils literal notranslate"><span class="pre">CsProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.slope"><code class="docutils literal notranslate"><span class="pre">CsProxy.slope</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.intercept"><code class="docutils literal notranslate"><span class="pre">CsProxy.intercept</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.mapped_info"><code class="docutils literal notranslate"><span class="pre">CsProxy.mapped_info</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.a_curve"><code class="docutils literal notranslate"><span class="pre">CsProxy.a_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.x_curve"><code class="docutils literal notranslate"><span class="pre">CsProxy.x_curve</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.compute_whole_similarity"><code class="docutils literal notranslate"><span class="pre">CsProxy.compute_whole_similarity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.CsProxy.get_mapped_info"><code class="docutils literal notranslate"><span class="pre">CsProxy.get_mapped_info()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange"><code class="docutils literal notranslate"><span class="pre">NullFlowChange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.a_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.a_curve2"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.a_curve2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.x_curve"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.x_curve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.cs"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.cs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_similarity"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.get_similarity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.get_real_flow_changes"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.get_real_flow_changes()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.NullFlowChange.NullFlowChange.has_special"><code class="docutils literal notranslate"><span class="pre">NullFlowChange.has_special()</span></code></a></li>

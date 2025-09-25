@@ -536,6 +536,10 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.get_num_components_assumming_egh"><code class="docutils literal notranslate"><span class="pre">get_num_components_assumming_egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.extract_params_assumming_egh"><code class="docutils literal notranslate"><span class="pre">extract_params_assumming_egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result"><code class="docutils literal notranslate"><span class="pre">V2Result</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.folder"><code class="docutils literal notranslate"><span class="pre">V2Result.folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.trimming</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.init_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.best_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.import_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.import_trimming()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.import_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_init_params()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.get_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_init_params()</span></code></a></li>
@@ -575,53 +579,167 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">V2Result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>V2Result class</p>
+<p>A class to handle the results from a V2 analysis.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.folder">
+<span class="sig-name descname"><span class="pre">folder</span></span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.folder" title="Link to this definition">#</a></dt>
+<dd><p>The folder containing the V2 result files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.trimming">
+<span class="sig-name descname"><span class="pre">trimming</span></span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.trimming" title="Link to this definition">#</a></dt>
+<dd><p>The trimming information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo">TrimmingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.init_params">
+<span class="sig-name descname"><span class="pre">init_params</span></span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.init_params" title="Link to this definition">#</a></dt>
+<dd><p>The initial parameters for the analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of lists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.best_params">
+<span class="sig-name descname"><span class="pre">best_params</span></span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.best_params" title="Link to this definition">#</a></dt>
+<dd><p>The best parameters from the analysis, if available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of lists or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the V2Result object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder</strong> (<em>str</em>) – The folder containing the V2 result files.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.import_trimming">
 <span class="sig-name descname"><span class="pre">import_trimming</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.import_trimming" title="Link to this definition">#</a></dt>
 <dd><p>Import the parameters from the V2 result folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The trimming information.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo">TrimmingInfo</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.import_init_params">
 <span class="sig-name descname"><span class="pre">import_init_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.import_init_params" title="Link to this definition">#</a></dt>
 <dd><p>Import the parameters from the V2 result folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The initial parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.get_init_params">
 <span class="sig-name descname"><span class="pre">get_init_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.get_init_params" title="Link to this definition">#</a></dt>
 <dd><p>Get the parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The initial parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.import_best_params">
 <span class="sig-name descname"><span class="pre">import_best_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.import_best_params" title="Link to this definition">#</a></dt>
 <dd><p>Import the best parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The best parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.get_best_params">
 <span class="sig-name descname"><span class="pre">get_best_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.get_best_params" title="Link to this definition">#</a></dt>
 <dd><p>Get the best parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The best parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.get_trimming">
 <span class="sig-name descname"><span class="pre">get_trimming</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.get_trimming" title="Link to this definition">#</a></dt>
 <dd><p>Get the trimming</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The trimming information.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo">TrimmingInfo</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.get_original_ssd">
 <span class="sig-name descname"><span class="pre">get_original_ssd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.get_original_ssd" title="Link to this definition">#</a></dt>
 <dd><p>Get the original ssd</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The original SecSaxsData object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result.get_trimmed_ssd">
 <span class="sig-name descname"><span class="pre">get_trimmed_ssd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.V2Result.get_trimmed_ssd" title="Link to this definition">#</a></dt>
 <dd><p>Get the trimmed ssd</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The trimmed SecSaxsData object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -676,6 +794,10 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.get_num_components_assumming_egh"><code class="docutils literal notranslate"><span class="pre">get_num_components_assumming_egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.extract_params_assumming_egh"><code class="docutils literal notranslate"><span class="pre">extract_params_assumming_egh()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result"><code class="docutils literal notranslate"><span class="pre">V2Result</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.folder"><code class="docutils literal notranslate"><span class="pre">V2Result.folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.trimming</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.init_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.best_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.import_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.import_trimming()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.import_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_init_params()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Bridge.V2Result.V2Result.get_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_init_params()</span></code></a></li>

@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -528,8 +533,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.caseid"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo.caseid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.kwargs"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo.kwargs</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.j</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.curves"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.curves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.judge_info"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.judge_info</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -548,12 +562,78 @@ document.write(`
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FlowChangeJudgeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caseid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to hold information about the flow change judgment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.caseid">
+<span class="sig-name descname"><span class="pre">caseid</span></span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.caseid" title="Link to this definition">#</a></dt>
+<dd><p>The identifier for the judgment case.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.kwargs" title="Link to this definition">#</a></dt>
+<dd><p>Additional keyword arguments holding various judgment details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FlowChangeInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">judge_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to hold information about the flow change analysis.
+.. attribute:: i</p>
+<blockquote>
+<div><p>The index along the iv axis where the flow change is analyzed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j">
+<span class="sig-name descname"><span class="pre">j</span></span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j" title="Link to this definition">#</a></dt>
+<dd><p>The index along the jv axis where the flow change is analyzed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeInfo.curves">
+<span class="sig-name descname"><span class="pre">curves</span></span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.curves" title="Link to this definition">#</a></dt>
+<dd><p>The list of curves involved in the flow change analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.DataUtils.ForwardCompat.html#molass.DataUtils.ForwardCompat.CurveProxy" title="molass.DataUtils.ForwardCompat.CurveProxy">CurveProxy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangeInfo.FlowChangeInfo.judge_info">
+<span class="sig-name descname"><span class="pre">judge_info</span></span><a class="headerlink" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.judge_info" title="Link to this definition">#</a></dt>
+<dd><p>The judgment information for the flow change.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo" title="molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo">FlowChangeJudgeInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -603,8 +683,17 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.caseid"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo.caseid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeJudgeInfo.kwargs"><code class="docutils literal notranslate"><span class="pre">FlowChangeJudgeInfo.kwargs</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.j</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.curves"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.curves</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.judge_info"><code class="docutils literal notranslate"><span class="pre">FlowChangeInfo.judge_info</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

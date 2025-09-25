@@ -533,8 +533,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy"><code class="docutils literal notranslate"><span class="pre">CurveProxy</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy"><code class="docutils literal notranslate"><span class="pre">CurveProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.x"><code class="docutils literal notranslate"><span class="pre">CurveProxy.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.y"><code class="docutils literal notranslate"><span class="pre">CurveProxy.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.spline"><code class="docutils literal notranslate"><span class="pre">CurveProxy.spline</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.peak_info"><code class="docutils literal notranslate"><span class="pre">CurveProxy.peak_info</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.flowchange"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy.flowchange</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.cs"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy.cs</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.get_start_index"><code class="docutils literal notranslate"><span class="pre">get_start_index()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.get_trimmed_curve"><code class="docutils literal notranslate"><span class="pre">get_trimmed_curve()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.convert_to_trimmed_prerecog"><code class="docutils literal notranslate"><span class="pre">convert_to_trimmed_prerecog()</span></code></a></li>
@@ -557,28 +567,143 @@ document.write(`
 <dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.CurveProxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CurveProxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.CurveProxy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A proxy class for Curve to hold x, y, spline, and peak_info.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.CurveProxy.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.CurveProxy.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.CurveProxy.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.CurveProxy.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.CurveProxy.spline">
+<span class="sig-name descname"><span class="pre">spline</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.CurveProxy.spline" title="Link to this definition">#</a></dt>
+<dd><p>A spline representation of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UnivariateSpline</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.CurveProxy.peak_info">
+<span class="sig-name descname"><span class="pre">peak_info</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.CurveProxy.peak_info" title="Link to this definition">#</a></dt>
+<dd><p>List of peak information, where each peak is represented by a list of indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of lists</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.PreRecogProxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PreRecogProxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flowchange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.PreRecogProxy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A proxy class for PreRecog to hold flowchange and cs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.PreRecogProxy.flowchange">
+<span class="sig-name descname"><span class="pre">flowchange</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.flowchange" title="Link to this definition">#</a></dt>
+<dd><p>The flow change object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange" title="molass.FlowChange.NullFlowChange.NullFlowChange">NullFlowChange</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.PreRecogProxy.cs">
+<span class="sig-name descname"><span class="pre">cs</span></span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.cs" title="Link to this definition">#</a></dt>
+<dd><p>The calibration slope and intercept proxy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.CsProxy" title="molass.FlowChange.NullFlowChange.CsProxy">CsProxy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.get_start_index">
 <span class="sig-name descname"><span class="pre">get_start_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.get_start_index" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the start index from a slice object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slice</strong> (<em>slice</em>) – The slice object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The start index of the slice.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.get_trimmed_curve">
 <span class="sig-name descname"><span class="pre">get_trimmed_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_peak_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.get_trimmed_curve" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get a trimmed version of the curve based on the given slice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curve</strong> (<a class="reference internal" href="#molass.DataUtils.ForwardCompat.CurveProxy" title="molass.DataUtils.ForwardCompat.CurveProxy"><em>CurveProxy</em></a>) – The original curve to be trimmed.</p></li>
+<li><p><strong>slice</strong> (<em>slice</em>) – The slice object defining the portion to keep.</p></li>
+<li><p><strong>renumber</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, renumber the x-values to start from 0, by default True.</p></li>
+<li><p><strong>convert_peak_info</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, adjust the peak_info indices according to the slice, by default True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trimmed curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.DataUtils.ForwardCompat.CurveProxy" title="molass.DataUtils.ForwardCompat.CurveProxy">CurveProxy</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.ForwardCompat.convert_to_trimmed_prerecog">
 <span class="sig-name descname"><span class="pre">convert_to_trimmed_prerecog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_recog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_restrict_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_restrict_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.ForwardCompat.convert_to_trimmed_prerecog" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Convert an old PreRecog object to a trimmed PreRecogProxy object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pre_recog</strong> (<em>PreRecog</em>) – The original PreRecog object to be converted.</p></li>
+<li><p><strong>uv_restrict_list</strong> (<em>list</em><em> of </em><em>Restrict</em>) – List of Restrict objects for UV data.</p></li>
+<li><p><strong>xr_restrict_list</strong> (<em>list</em><em> of </em><em>Restrict</em>) – List of Restrict objects for XR data.</p></li>
+<li><p><strong>renumber</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, renumber the x-values to start from 0, by default True.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The converted and trimmed PreRecogProxy object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.DataUtils.ForwardCompat.PreRecogProxy" title="molass.DataUtils.ForwardCompat.PreRecogProxy">PreRecogProxy</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -627,8 +752,18 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy"><code class="docutils literal notranslate"><span class="pre">CurveProxy</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy"><code class="docutils literal notranslate"><span class="pre">CurveProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.x"><code class="docutils literal notranslate"><span class="pre">CurveProxy.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.y"><code class="docutils literal notranslate"><span class="pre">CurveProxy.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.spline"><code class="docutils literal notranslate"><span class="pre">CurveProxy.spline</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.CurveProxy.peak_info"><code class="docutils literal notranslate"><span class="pre">CurveProxy.peak_info</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.flowchange"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy.flowchange</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.PreRecogProxy.cs"><code class="docutils literal notranslate"><span class="pre">PreRecogProxy.cs</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.get_start_index"><code class="docutils literal notranslate"><span class="pre">get_start_index()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.get_trimmed_curve"><code class="docutils literal notranslate"><span class="pre">get_trimmed_curve()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataUtils.ForwardCompat.convert_to_trimmed_prerecog"><code class="docutils literal notranslate"><span class="pre">convert_to_trimmed_prerecog()</span></code></a></li>

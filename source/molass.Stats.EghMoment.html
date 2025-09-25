@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,9 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment"><code class="docutils literal notranslate"><span class="pre">EghMoment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.icurve"><code class="docutils literal notranslate"><span class="pre">EghMoment.icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.num_peaks"><code class="docutils literal notranslate"><span class="pre">EghMoment.num_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.curves"><code class="docutils literal notranslate"><span class="pre">EghMoment.curves</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.get_y_"><code class="docutils literal notranslate"><span class="pre">EghMoment.get_y_()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.compute_egh_y"><code class="docutils literal notranslate"><span class="pre">EghMoment.compute_egh_y()</span></code></a></li>
 </ul>
@@ -547,20 +555,82 @@ document.write(`
   <section id="module-molass.Stats.EghMoment">
 <span id="stats-eghmoment"></span><h1>Stats.EghMoment<a class="headerlink" href="#module-molass.Stats.EghMoment" title="Link to this heading">#</a></h1>
 <p>Stats.EghMoment.py</p>
-<p>Copyright (c) 2025, SAXS Team, KEK-PF</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EghMoment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_peaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Moment</span></code></a></p>
+<p>A class to represent the Egh moment of a SAXS/UV curve.
+It decomposes the input intensity curve into multiple EGH components
+and computes the mean and standard deviation of the combined components.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment.icurve">
+<span class="sig-name descname"><span class="pre">icurve</span></span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment.icurve" title="Link to this definition">#</a></dt>
+<dd><p>The input intensity curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IntensityCurve</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment.num_peaks">
+<span class="sig-name descname"><span class="pre">num_peaks</span></span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment.num_peaks" title="Link to this definition">#</a></dt>
+<dd><p>The number of Gaussian peaks to fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment.curves">
+<span class="sig-name descname"><span class="pre">curves</span></span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment.curves" title="Link to this definition">#</a></dt>
+<dd><p>The list of fitted Gaussian curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of GaussianCurve</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the EghMoment object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>icurve</strong> (<em>IntensityCurve</em>) – The input intensity curve.</p></li>
+<li><p><strong>num_peaks</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of Gaussian peaks to fit. If None, it will be determined automatically.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment.get_y_">
 <span class="sig-name descname"><span class="pre">get_y_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment.get_y_" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the computed y values from the EGH decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The computed y values from the EGH decomposition.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.EghMoment.EghMoment.compute_egh_y">
 <span class="sig-name descname"><span class="pre">compute_egh_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.EghMoment.EghMoment.compute_egh_y" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the y values from the EGH decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The computed y values from the EGH decomposition.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -612,6 +682,9 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment"><code class="docutils literal notranslate"><span class="pre">EghMoment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.icurve"><code class="docutils literal notranslate"><span class="pre">EghMoment.icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.num_peaks"><code class="docutils literal notranslate"><span class="pre">EghMoment.num_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.curves"><code class="docutils literal notranslate"><span class="pre">EghMoment.curves</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.get_y_"><code class="docutils literal notranslate"><span class="pre">EghMoment.get_y_()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.EghMoment.EghMoment.compute_egh_y"><code class="docutils literal notranslate"><span class="pre">EghMoment.compute_egh_y()</span></code></a></li>
 </ul>

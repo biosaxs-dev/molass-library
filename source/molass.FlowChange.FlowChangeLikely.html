@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -547,31 +552,125 @@ document.write(`
   <section id="module-molass.FlowChange.FlowChangeLikely">
 <span id="flowchange-flowchangelikely"></span><h1>FlowChange.FlowChangeLikely<a class="headerlink" href="#module-molass.FlowChange.FlowChangeLikely" title="Link to this heading">#</a></h1>
 <p>Baseline.FlowChangeLikely.py</p>
-<p>Copyright (c) 2024, SAXS Team, KEK-PF</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeLikely.compute_yscale">
 <span class="sig-name descname"><span class="pre">compute_yscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeLikely.compute_yscale" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the y-scale for likelihood computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the curve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The y-scale value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeLikely.get_safeslice">
 <span class="sig-name descname"><span class="pre">get_safeslice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeLikely.get_safeslice" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get a safe slice within the bounds [lb, ub).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lb</strong> (<em>int</em>) – The lower bound (inclusive).</p></li>
+<li><p><strong>ub</strong> (<em>int</em>) – The upper bound (exclusive).</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – The start index of the slice.</p></li>
+<li><p><strong>stop</strong> (<em>int</em>) – The stop index of the slice.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The safe slice object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>slice</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeLikely.find_nearest_point">
 <span class="sig-name descname"><span class="pre">find_nearest_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yscale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeLikely.find_nearest_point" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Find the nearest point to (px, py) around index i.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> (<em>float</em>) – The x-coordinate of the point.</p></li>
+<li><p><strong>py</strong> (<em>float</em>) – The y-coordinate of the point.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – The index around which to search.</p></li>
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the curve.</p></li>
+<li><p><strong>yscale</strong> (<em>float</em>) – The y-scale for distance computation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the nearest point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeLikely.compute_flowchange_likelihoods">
 <span class="sig-name descname"><span class="pre">compute_flowchange_likelihoods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_neighbours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeLikely.compute_flowchange_likelihoods" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the flow change likelihoods at the given points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the curve.</p></li>
+<li><p><strong>points</strong> (<em>list</em><em> of </em><em>int</em>) – The breakpoints of the segments.</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The list of line segments.</p></li>
+<li><p><strong>yscale</strong> (<em>float</em><em>, </em><em>optional</em>) – The y-scale for likelihood computation. If None, it will be computed from the data.</p></li>
+<li><p><strong>return_neighbours</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, also return the neighbouring point indices for each breakpoint.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>likelihoods</strong> (<em>array-like</em>) – The normalized likelihoods for each breakpoint.</p></li>
+<li><p><strong>neighbours</strong> (<em>list of tuples, optional</em>) – If return_neighbours is True, a list of (j, k) tuples where j
+and k are the indices of the nearest points on either side of each breakpoint.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.FlowChange.FlowChangeLikely.flowchange_likelihood">
 <span class="sig-name descname"><span class="pre">flowchange_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yscale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangeLikely.flowchange_likelihood" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the flow change likelihood at the given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the curve.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – The index of the breakpoint.</p></li>
+<li><p><strong>seg1</strong> (<a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The segment before the breakpoint.</p></li>
+<li><p><strong>seg2</strong> (<a class="reference internal" href="molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.Linesegment" title="molass.Geometric.Linesegment.Linesegment"><em>Linesegment</em></a>) – The segment after the breakpoint.</p></li>
+<li><p><strong>yscale</strong> (<em>float</em>) – The y-scale for likelihood computation.</p></li>
+<li><p><strong>neighbours</strong> (<em>list</em><em> of </em><em>tuples</em><em>, </em><em>optional</em>) – If provided, the function will append the (j, k) indices of the nearest points
+on either side of the breakpoint to this list.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The likelihood value for the breakpoint.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

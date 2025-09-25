@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -529,6 +534,8 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.x"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.y"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.get_primarypeak_i()</span></code></a></li>
 </ul>
 </li>
@@ -546,15 +553,50 @@ document.write(`
   <section id="module-molass.Legacy.BackCompatUtils">
 <span id="legacy-backcompatutils"></span><h1>Legacy.BackCompatUtils<a class="headerlink" href="#module-molass.Legacy.BackCompatUtils" title="Link to this heading">#</a></h1>
 <p>Legacy.BackCompatUtils.py</p>
-<p>Copyright (c) 2018-2024, SAXS Team, KEK-PF</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Legacy.BackCompatUtils.ElutioCurvProxy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ElutioCurvProxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A proxy class to provide backward compatibility for ElutioCurve.
+It mimics the interface of ElutioCurve using an instance of Curve.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Legacy.BackCompatUtils.ElutioCurvProxy.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Legacy.BackCompatUtils.ElutioCurvProxy.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the ElutioCurvProxy with a Curve instance.
+:param icurve: The Curve instance to proxy.
+:type icurve: Curve</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i">
 <span class="sig-name descname"><span class="pre">get_primarypeak_i</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the index of the primary peak (maximum y-value).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The index of the primary peak.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -606,6 +648,8 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.x"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.y"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i"><code class="docutils literal notranslate"><span class="pre">ElutioCurvProxy.get_primarypeak_i()</span></code></a></li>
 </ul>
 </li>

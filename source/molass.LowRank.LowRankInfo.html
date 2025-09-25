@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -550,12 +555,66 @@ a low rank approximation of a matrix.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.LowRankInfo.get_denoised_data">
 <span class="sig-name descname"><span class="pre">get_denoised_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.LowRankInfo.get_denoised_data" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the denoised data by low rank approximation using SVD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>D</strong> (<em>2D array-like</em>) – The data matrix to be denoised.</p></li>
+<li><p><strong>rank</strong> (<em>int</em><em>, </em><em>optional</em>) – The rank for the low rank approximation, by default 3.</p></li>
+<li><p><strong>svd</strong> (<em>tuple</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Precomputed SVD (U, s, VT) to use instead of computing it again</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>D_</strong> – The denoised data matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.LowRankInfo.compute_lowrank_matrices">
 <span class="sig-name descname"><span class="pre">compute_lowrank_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.LowRankInfo.compute_lowrank_matrices" title="Link to this definition">#</a></dt>
-<dd><p>Compute the matrices for the low rank approximation.</p>
+<dd><p>Compute the matrices for the low rank approximation.
+The low rank approximation is computed using the formula:</p>
+<blockquote>
+<div><p><a href="#id1"><span class="problematic" id="id2">M_</span></a> = P &#64; C</p>
+</div></blockquote>
+<p>where <a href="#id3"><span class="problematic" id="id4">M_</span></a> is the denoised data matrix, P is the projected matrix,
+and C is the component matrix.
+:param M: The data matrix to be approximated.
+:type M: 2D array-like
+:param ccurves: The list of component curves.
+:type ccurves: list of ComponentCurve
+:param E: The error matrix corresponding to M. It can be None if errors are not available.
+:type E: 2D array-like or None
+:param ranks: The list of ranks for each component curve. If None, all ranks are assumed to be 1.
+:type ranks: list of int or None
+:param kwargs: Additional keyword arguments for the low rank approximation.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Possible keys include:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>svd_rank: int or None</dt><dd><p>The rank for the SVD used in the low rank approximation. If None, it will be set to the sum of ranks.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>M_</strong> (<em>2D array-like</em>) – The denoised data matrix.</p></li>
+<li><p><strong>C</strong> (<em>2D array-like</em>) – The concentration matrix.</p></li>
+<li><p><strong>P</strong> (<em>2D array-like</em>) – The spectral factor matrix.</p></li>
+<li><p><strong>Pe</strong> (<em>2D array-like or None</em>) – The propagated error matrix corresponding to P. It can be None if E is None.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

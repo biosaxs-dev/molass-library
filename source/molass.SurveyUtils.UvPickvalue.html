@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -543,11 +548,25 @@ document.write(`
   <section id="module-molass.SurveyUtils.UvPickvalue">
 <span id="surveyutils-uvpickvalue"></span><h1>SurveyUtils.UvPickvalue<a class="headerlink" href="#module-molass.SurveyUtils.UvPickvalue" title="Link to this heading">#</a></h1>
 <p>SurveyUtils.UvPickvalue.py</p>
-<p>Copyright (c) 2024, SAXS Team, KEK-PF</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SurveyUtils.UvPickvalue.get_pickvalue">
 <span class="sig-name descname"><span class="pre">get_pickvalue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wvector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SurveyUtils.UvPickvalue.get_pickvalue" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Determine the UV pickvalue based on the input folder name and wvector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_folder</strong> (<em>str</em>) – The input folder name.</p></li>
+<li><p><strong>wvector</strong> (<em>array-like</em>) – The wavelength vector.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>pickvalue</strong> – The determined pickvalue.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

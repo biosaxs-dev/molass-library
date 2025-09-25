@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -530,6 +535,11 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.compute_meanstd"><code class="docutils literal notranslate"><span class="pre">compute_meanstd()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment"><code class="docutils literal notranslate"><span class="pre">Moment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.y"><code class="docutils literal notranslate"><span class="pre">Moment.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.y_"><code class="docutils literal notranslate"><span class="pre">Moment.y_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.M"><code class="docutils literal notranslate"><span class="pre">Moment.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.std"><code class="docutils literal notranslate"><span class="pre">Moment.std</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.lpm_percent"><code class="docutils literal notranslate"><span class="pre">Moment.lpm_percent</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.get_y_"><code class="docutils literal notranslate"><span class="pre">Moment.get_y_()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.debug_plot"><code class="docutils literal notranslate"><span class="pre">Moment.debug_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.get_meanstd"><code class="docutils literal notranslate"><span class="pre">Moment.get_meanstd()</span></code></a></li>
@@ -556,41 +566,201 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Stats.Moment.compute_meanstd">
 <span class="sig-name descname"><span class="pre">compute_meanstd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.compute_meanstd" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the mean and standard deviation of a distribution defined by x and y.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the distribution.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the distribution.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>M1</strong> (<em>float</em>) – The mean of the distribution.</p></li>
+<li><p><strong>std</strong> (<em>float</em>) – The standard deviation of the distribution.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Moment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent the moment of a distribution defined by x and y.
+.. attribute:: x</p>
+<blockquote>
+<div><p>The x-values of the distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.Moment.Moment.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Stats.Moment.Moment.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.Moment.Moment.y_">
+<span class="sig-name descname"><span class="pre">y_</span></span><a class="headerlink" href="#molass.Stats.Moment.Moment.y_" title="Link to this definition">#</a></dt>
+<dd><p>The processed y-values of the distribution. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.Moment.Moment.M">
+<span class="sig-name descname"><span class="pre">M</span></span><a class="headerlink" href="#molass.Stats.Moment.Moment.M" title="Link to this definition">#</a></dt>
+<dd><p>The mean of the distribution. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.Moment.Moment.std">
+<span class="sig-name descname"><span class="pre">std</span></span><a class="headerlink" href="#molass.Stats.Moment.Moment.std" title="Link to this definition">#</a></dt>
+<dd><p>The standard deviation of the distribution. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Stats.Moment.Moment.lpm_percent">
+<span class="sig-name descname"><span class="pre">lpm_percent</span></span><a class="headerlink" href="#molass.Stats.Moment.Moment.lpm_percent" title="Link to this definition">#</a></dt>
+<dd><p>The estimated percentage of low-q plateau in the distribution. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Moment object.
+:param x: The x-values of the distribution.
+:type x: array-like
+:param y: The y-values of the distribution.
+:type y: array-like</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.get_y_">
 <span class="sig-name descname"><span class="pre">get_y_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.get_y_" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>Get the processed y-values of the distribution.</dt><dd><p>If <a href="#id1"><span class="problematic" id="id2">y_</span></a> is None, it will be computed using the provided processing function.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>keyword arguments</em>) – Additional keyword arguments to pass to the processing function.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>y_</strong> – The processed y-values of the distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.debug_plot">
 <span class="sig-name descname"><span class="pre">debug_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.debug_plot" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Plot the original and processed y-values for debugging purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a>) – The axes to plot on.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.get_meanstd">
 <span class="sig-name descname"><span class="pre">get_meanstd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.get_meanstd" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>Get the mean and standard deviation of the distribution.</dt><dd><p>If M and std are None, they will be computed using the processed y-values.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>M</strong> (<em>float</em>) – The mean of the distribution.</p></li>
+<li><p><strong>std</strong> (<em>float</em>) – The standard deviation of the distribution.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.is_in_nsigma">
 <span class="sig-name descname"><span class="pre">is_in_nsigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.is_in_nsigma" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Check if a given x-value is within n standard deviations from the mean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>float</em>) – The number of standard deviations.</p></li>
+<li><p><strong>px</strong> (<em>float</em>) – The x-value to check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if px is within n standard deviations from the mean, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.get_nsigma_points">
 <span class="sig-name descname"><span class="pre">get_nsigma_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.get_nsigma_points" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the indices of the x-values that are within n standard deviations from the mean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>float</em>) – The number of standard deviations.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>(i, j)</strong> – The indices of the first and last x-values within n standard deviations from the mean.
+If no such points exist, returns (None, None).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Stats.Moment.Moment.get_lpm_percent">
 <span class="sig-name descname"><span class="pre">get_lpm_percent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Stats.Moment.Moment.get_lpm_percent" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the percentage of low-q plateau in the distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output, by default True.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>lpm_percent</strong> – The estimated percentage of low-q plateau in the distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -643,6 +813,11 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.compute_meanstd"><code class="docutils literal notranslate"><span class="pre">compute_meanstd()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment"><code class="docutils literal notranslate"><span class="pre">Moment</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.y"><code class="docutils literal notranslate"><span class="pre">Moment.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.y_"><code class="docutils literal notranslate"><span class="pre">Moment.y_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.M"><code class="docutils literal notranslate"><span class="pre">Moment.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.std"><code class="docutils literal notranslate"><span class="pre">Moment.std</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.lpm_percent"><code class="docutils literal notranslate"><span class="pre">Moment.lpm_percent</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.get_y_"><code class="docutils literal notranslate"><span class="pre">Moment.get_y_()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.debug_plot"><code class="docutils literal notranslate"><span class="pre">Moment.debug_plot()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Stats.Moment.Moment.get_meanstd"><code class="docutils literal notranslate"><span class="pre">Moment.get_meanstd()</span></code></a></li>

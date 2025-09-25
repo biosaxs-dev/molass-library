@@ -535,7 +535,11 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.estimate_lpm_percent"><code class="docutils literal notranslate"><span class="pre">estimate_lpm_percent()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.compute_lpm_baseline"><code class="docutils literal notranslate"><span class="pre">compute_lpm_baseline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline.x"><code class="docutils literal notranslate"><span class="pre">LpmBaseline.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline.y"><code class="docutils literal notranslate"><span class="pre">LpmBaseline.y</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -553,17 +557,71 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.LpmBaseline.estimate_lpm_percent">
 <span class="sig-name descname"><span class="pre">estimate_lpm_percent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.LpmBaseline.estimate_lpm_percent" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the percentage of low-q plateau in the distribution using the moment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>moment</strong> (<a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment"><em>Moment</em></a>) – The moment object containing the distribution information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ratio</strong> – The estimated percentage of low-q plateau in the distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.LpmBaseline.compute_lpm_baseline">
 <span class="sig-name descname"><span class="pre">compute_lpm_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_also_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.LpmBaseline.compute_lpm_baseline" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the linear plus minimum baseline for a given curve.
+The baseline is computed by fitting a linear function to the data and then taking the minimum of the linear function and the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-coordinates of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-coordinates of the curve.</p></li>
+<li><p><strong>return_also_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function returns a tuple containing the baseline and a dictionary of the slope and intercept of the linear function.
+If False, it returns only the baseline.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the ScatteringBaseline solver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Baseline.LpmBaseline.LpmBaseline">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LpmBaseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.LpmBaseline.LpmBaseline" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Curve</span></code></a></p>
+<p>A class to represent the linear plus minimum baseline of a curve.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.LpmBaseline.LpmBaseline.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.Baseline.LpmBaseline.LpmBaseline.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-coordinates of the baseline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.LpmBaseline.LpmBaseline.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Baseline.LpmBaseline.LpmBaseline.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-coordinates of the baseline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -615,7 +673,11 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.estimate_lpm_percent"><code class="docutils literal notranslate"><span class="pre">estimate_lpm_percent()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.compute_lpm_baseline"><code class="docutils literal notranslate"><span class="pre">compute_lpm_baseline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline"><code class="docutils literal notranslate"><span class="pre">LpmBaseline</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline.x"><code class="docutils literal notranslate"><span class="pre">LpmBaseline.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.LpmBaseline.LpmBaseline.y"><code class="docutils literal notranslate"><span class="pre">LpmBaseline.y</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

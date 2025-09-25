@@ -557,23 +557,134 @@ a given I-curve into a set of component curves.</p>
 <dt class="sig sig-object py" id="molass.LowRank.CurveDecomposer.safe_log10">
 <span class="sig-name descname"><span class="pre">safe_log10</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.CurveDecomposer.safe_log10" title="Link to this definition">#</a></dt>
 <dd><p>Compute the logarithm base 10 of x, returning a large negative number for non-positive x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – The input value.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The logarithm base 10 of x, or -10 if x is non-positive.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.CurveDecomposer.compute_areas">
 <span class="sig-name descname"><span class="pre">compute_areas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.CurveDecomposer.compute_areas" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the areas under the peaks defined by peak_list over the x values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x values.</p></li>
+<li><p><strong>peak_list</strong> (<em>list</em><em> of </em><em>tuples</em>) – The list of peak parameters, where each tuple contains (height, tR, sigma, tau).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>areas</strong> – The areas under each peak.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.LowRank.CurveDecomposer.CurveDecomposer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CurveDecomposer</span></span><a class="headerlink" href="#molass.LowRank.CurveDecomposer.CurveDecomposer" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for decomposing curves into component curves.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.CurveDecomposer.decompose_icurve_impl">
 <span class="sig-name descname"><span class="pre">decompose_icurve_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.CurveDecomposer.decompose_icurve_impl" title="Link to this definition">#</a></dt>
-<dd><p>Decompose a curve into component curves.</p>
+<dd><p>Decompose a curve into component curves.
+:param icurve: The input curve to be decomposed.
+:type icurve: Curve
+:param num_components: The number of components to decompose into.
+:type num_components: int
+:param curve_model: The model to use for curve decomposition.</p>
+<blockquote>
+<div><p>Currently, only ‘EGH’ (Exponentially-Gaussian Hybrid) is supported. Default is ‘EGH’.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>smoothing</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to apply smoothing to the input curve before decomposition. Default is False.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information and plot intermediate results. Default is False.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Additional keyword arguments for decomposition.
+Possible keys include:</p>
+<blockquote>
+<div><ul>
+<li><dl class="simple">
+<dt>decompargs: dict or None</dt><dd><p>If provided, use these arguments for decomposition instead of peak recognition.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>tau_limit: float</dt><dd><p>Limit for the tau parameter in the EGH model. Default is 0.5.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>area_weight: float</dt><dd><p>Weight for the area proportion penalty in the fitting objective. Default is 0.1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>proportions: list of float or None</dt><dd><p>Target proportions for the areas of the components. If None, use areas from initial peak recognition.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>sec_constraints: bool</dt><dd><p>If True, apply SEC-related constraints during fitting. Default is False.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>data_matrix: array-like or None</dt><dd><p>The data matrix for SEC constraints. Required if sec_constraints is True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>qv: array-like or None</dt><dd><p>The q-values corresponding to the data matrix. Required if sec_constraints is True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>num_plates: int or None</dt><dd><p>The number of plates to use for decomposition. If None, use the default value.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>randomize: float</dt><dd><p>Standard deviation of Gaussian noise to add to initial parameters for randomization. Default is 0 (no randomization).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>seed: int or None</dt><dd><p>Random seed for parameter randomization. Default is None.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>global_opt: bool</dt><dd><p>If True, use global optimization (basinhopping) for fitting. Default is False.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ret_curves</strong> – The list of decomposed component curves.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve">ComponentCurve</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

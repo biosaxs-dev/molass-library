@@ -574,12 +574,40 @@ The first dimension corresponds to the number of files, the second to the number
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.XrLoader.xr_remove_bubbles">
 <span class="sig-name descname"><span class="pre">xr_remove_bubbles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.XrLoader.xr_remove_bubbles" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Remove bubbles from the XR data array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_array</strong> (<em>np.ndarray</em>) – 3D array containing the X-ray scattering data.</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em><em>, </em><em>optional</em>) – Logger for logging messages. If None, print to console.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.DataUtils.XrLoader.load_xr_with_options">
 <span class="sig-name descname"><span class="pre">load_xr_with_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_bubbles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataUtils.XrLoader.load_xr_with_options" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Load X-ray scattering data from a folder with options to preprocess.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> (<em>str</em>) – Path to the folder containing .dat files.</p></li>
+<li><p><strong>remove_bubbles</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, remove bubbles from the data, by default False.</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em><em>, </em><em>optional</em>) – Logger for logging messages. If None, print to console.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>xr_array</strong> (<em>np.ndarray</em>) – 3D array containing the X-ray scattering data.</p></li>
+<li><p><strong>datafiles</strong> (<em>list of str</em>) – List of data file paths corresponding to the loaded data.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

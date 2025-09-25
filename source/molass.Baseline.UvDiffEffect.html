@@ -534,7 +534,11 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.create_diff_spline"><code class="docutils literal notranslate"><span class="pre">create_diff_spline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.y"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.params"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.params</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.estimate_uvdiffeffect_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvdiffeffect_params()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.compute_dfef_curve"><code class="docutils literal notranslate"><span class="pre">compute_dfef_curve()</span></code></a></li>
 </ul>
@@ -554,23 +558,109 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.create_diff_spline">
 <span class="sig-name descname"><span class="pre">create_diff_spline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.create_diff_spline" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Create a derivative spline from the given intensity curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The intensity curve from which to create the derivative spline.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>diff_spline</strong> – A callable representing the derivative spline of the curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.UvDiffEffect">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UvDiffEffect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.UvDiffEffect" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Curve</span></code></a></p>
+<p>A class to represent the UV difference effect.
+.. attribute:: x</p>
+<blockquote>
+<div><p>The x-coordinates of the DFEF curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.UvDiffEffect.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-coordinates of the DFEF curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.UvDiffEffect.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.params" title="Link to this definition">#</a></dt>
+<dd><p>The parameters used to compute the DFEF curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the UvDiffEffect object with the given SSD and parameters.
+:param ssd: The SSD object containing the UV data.
+:type ssd: SSD
+:param params: The parameters used to compute the DFEF curve. If None, default parameters are used.
+:type params: array-like, optional</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.estimate_uvdiffeffect_params">
 <span class="sig-name descname"><span class="pre">estimate_uvdiffeffect_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_spline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.estimate_uvdiffeffect_params" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate UV difference effect parameters by analyzing the difference between two curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curve1</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The first curve (usually the original UV curve).</p></li>
+<li><p><strong>curve2</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The second curve (usually the UV curve with pickat applied).</p></li>
+<li><p><strong>fc_slice</strong> (<em>tuple</em>) – A tuple (i, j) representing the slice of the curves to analyze.</p></li>
+<li><p><strong>diff_spline</strong> (<em>callable</em>) – A callable representing the derivative spline of the first curve.</p></li>
+<li><p><strong>pickat</strong> (<em>int</em><em>, </em><em>optional</em>) – The index at which the pickat was applied. If None, it will be estimated.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, debug information is printed and plots are generated.</p></li>
+<li><p><strong>plot_info</strong> (<em>tuple</em><em>, </em><em>optional</em>) – A tuple containing (fig, ax) for plotting. If None, no plot is generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>uvbaseline_params</strong> (<em>array-like</em>) – The estimated UV baseline parameters.</p></li>
+<li><p><strong>dfef_curve</strong> (<em>Curve</em>) – The computed DFEF curve.</p></li>
+<li><p><strong>baseline</strong> (<em>array-like</em>) – The computed baseline.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.UvDiffEffect.compute_dfef_curve">
 <span class="sig-name descname"><span class="pre">compute_dfef_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfef_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvDiffEffect.compute_dfef_curve" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the DFEF curve using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-coordinates at which to compute the DFEF curve.</p></li>
+<li><p><strong>dfef_params</strong> (<em>array-like</em>) – The parameters used to compute the DFEF curve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dfef_curve</strong> – The computed DFEF curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -620,7 +710,11 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.create_diff_spline"><code class="docutils literal notranslate"><span class="pre">create_diff_spline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.y"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.params"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.params</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.estimate_uvdiffeffect_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvdiffeffect_params()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.compute_dfef_curve"><code class="docutils literal notranslate"><span class="pre">compute_dfef_curve()</span></code></a></li>
 </ul>

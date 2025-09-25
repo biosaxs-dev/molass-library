@@ -318,6 +318,11 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.Models.html">SAXS.Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Formfactors.html">SAXS.Models.Formfactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -555,52 +560,204 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.molass_lpm_impl">
 <span class="sig-name descname"><span class="pre">molass_lpm_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.molass_lpm_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Linear plus minimum baseline implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments to pass to the baseline computation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.molass_uvdiff_impl">
 <span class="sig-name descname"><span class="pre">molass_uvdiff_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.molass_uvdiff_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>UV difference baseline implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments to pass to the baseline computation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.molass_integral_impl">
 <span class="sig-name descname"><span class="pre">molass_integral_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.molass_integral_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Integral baseline implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments to pass to the baseline computation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.pybaselines_asls_impl">
 <span class="sig-name descname"><span class="pre">pybaselines_asls_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.pybaselines_asls_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Asymmetric least squares baseline implementation using pybaselines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments to pass to the baseline computation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.pybaselines_imor_impl">
 <span class="sig-name descname"><span class="pre">pybaselines_imor_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.pybaselines_imor_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Improved modified polynomial fitting baseline implementation using pybaselines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the data.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y-values of the data.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments to pass to the baseline computation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.pybaselines_mormol_impl">
 <span class="sig-name descname"><span class="pre">pybaselines_mormol_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.pybaselines_mormol_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Morphological operations baseline implementation using pybaselines.
+:param x: The x-values of the data.
+:type x: array-like
+:param y: The y-values of the data.
+:type y: array-like
+:param kwargs: Additional keyword arguments to pass to the baseline computation function.
+:type kwargs: dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>baseline</strong> – The computed baseline values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.iterlen">
 <span class="sig-name descname"><span class="pre">iterlen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.iterlen" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the length of an iterable, or 1 if it is not iterable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>a</strong> (<em>any</em>) – The object to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>length</strong> – The length of the iterable, or 1 if it is not iterable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.get_baseline_func">
 <span class="sig-name descname"><span class="pre">get_baseline_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.get_baseline_func" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the baseline function(s) corresponding to the given method(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em><em>, </em><em>callable</em><em>, or </em><em>list/tuple</em><em> of </em><em>str/callable</em>) – The method(s) to get the baseline function(s) for.
+If a single method is given, it will be used for both UV and XR baselines.
+If a list or tuple of two methods is given, the first will be used for UV and the second for XR.
+Each method can be either a string (key in METHOD_DICT) or a callable (custom function).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>functions</strong> – A list containing the baseline function for UV and XR, respectively.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of callables</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.get_uv_baseline_func">
 <span class="sig-name descname"><span class="pre">get_uv_baseline_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.get_uv_baseline_func" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the UV baseline function corresponding to the given method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em><em>, </em><em>callable</em><em>, or </em><em>list/tuple</em><em> of </em><em>str/callable</em>) – The method(s) to get the baseline function(s) for.
+If a single method is given, it will be used for both UV and XR baselines.
+If a list or tuple of two methods is given, the first will be used for UV and the second for XR.
+Each method can be either a string (key in METHOD_DICT) or a callable (custom function).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>function</strong> – The baseline function for UV.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.BaselineUtils.get_xr_baseline_func">
 <span class="sig-name descname"><span class="pre">get_xr_baseline_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.BaselineUtils.get_xr_baseline_func" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the XR baseline function corresponding to the given method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em><em>, </em><em>callable</em><em>, or </em><em>list/tuple</em><em> of </em><em>str/callable</em>) – The method(s) to get the baseline function(s) for.
+If a single method is given, it will be used for both UV and XR baselines.
+If a list or tuple of two methods is given, the first will be used for UV and the second for XR.
+Each method can be either a string (key in METHOD_DICT) or a callable (custom function).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>function</strong> – The baseline function for XR.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

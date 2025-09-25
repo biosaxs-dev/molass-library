@@ -534,6 +534,9 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve"><code class="docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.moment</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_moment()</span></code></a></li>
@@ -560,31 +563,116 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ComponentCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a component curve.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-values of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.params" title="Link to this definition">#</a></dt>
+<dd><p>The parameters of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.moment">
+<span class="sig-name descname"><span class="pre">moment</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.moment" title="Link to this definition">#</a></dt>
+<dd><p>The moment of the component curve. Computed on demand. If None, it has not been computed yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment">Moment</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the ComponentCurve object with the given x-values and parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x-values of the component curve.</p></li>
+<li><p><strong>params</strong> (<em>array-like</em>) – The parameters of the component curve.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_y">
 <span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the y-values of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The y-values of the component curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_xy">
 <span class="sig-name descname"><span class="pre">get_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_xy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the x and y values of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The x and y values of the component curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_moment">
 <span class="sig-name descname"><span class="pre">get_moment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_moment" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the moment of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The moment of the component curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment">Moment</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_params">
 <span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_params" title="Link to this definition">#</a></dt>
 <dd><p>Returns the parameters of the component curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The parameters of the component curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_peak_top_x">
 <span class="sig-name descname"><span class="pre">get_peak_top_x</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_peak_top_x" title="Link to this definition">#</a></dt>
 <dd><p>Returns the x value at the peak top.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The x value at the peak top.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -637,6 +725,9 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve"><code class="docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.moment</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_moment()</span></code></a></li>

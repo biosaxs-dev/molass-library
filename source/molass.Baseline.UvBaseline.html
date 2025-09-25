@@ -533,7 +533,12 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.x"><code class="docutils literal notranslate"><span class="pre">UvBaseline.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.y"><code class="docutils literal notranslate"><span class="pre">UvBaseline.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.params"><code class="docutils literal notranslate"><span class="pre">UvBaseline.params</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.estimate_uvbaseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvbaseline_params()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.inspect_uv_baseline"><code class="docutils literal notranslate"><span class="pre">inspect_uv_baseline()</span></code></a></li>
 </ul>
@@ -554,17 +559,98 @@ document.write(`
 <dt class="sig sig-object py" id="molass.Baseline.UvBaseline.UvBaseline">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UvBaseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvBaseline.UvBaseline" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Curve</span></code></a></p>
+<p>A class to represent the UV baseline correction.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.UvBaseline.UvBaseline.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.Baseline.UvBaseline.UvBaseline.x" title="Link to this definition">#</a></dt>
+<dd><p>The x-coordinates of the baseline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.UvBaseline.UvBaseline.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.Baseline.UvBaseline.UvBaseline.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-coordinates of the baseline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Baseline.UvBaseline.UvBaseline.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.Baseline.UvBaseline.UvBaseline.params" title="Link to this definition">#</a></dt>
+<dd><p>The parameters used to compute the baseline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the UvBaseline object with the given SSD and parameters.
+:param ssd: The SSD object containing the UV data.
+:type ssd: SSD
+:param params: The parameters used to compute the baseline. If None, default parameters are used.
+:type params: array-like, optional</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.UvBaseline.estimate_uvbaseline_params">
 <span class="sig-name descname"><span class="pre">estimate_uvbaseline_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curve2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_also_baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvBaseline.estimate_uvbaseline_params" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate UV baseline parameters by analyzing the difference between two curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curve1</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The first curve (usually the original UV curve).</p></li>
+<li><p><strong>curve2</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The second curve (usually the UV curve with pickat applied).</p></li>
+<li><p><strong>pickat</strong> (<em>int</em><em>, </em><em>optional</em>) – The index at which the pickat was applied. If None, it will be estimated.</p></li>
+<li><p><strong>plot_info</strong> (<em>tuple</em><em>, </em><em>optional</em>) – A tuple containing (fig, ax) for plotting. If None, no plot is generated.</p></li>
+<li><p><strong>counter</strong> (<em>int</em><em>, </em><em>optional</em>) – A counter for labeling plots. If None, no labeling is done.</p></li>
+<li><p><strong>return_also_baseline</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function returns a tuple containing the parameters, the DFEF curve, and the baseline.
+If False, it returns only the parameters.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, debug information is printed and plots are generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>uvbaseline_params</strong> (<em>array-like</em>) – The estimated UV baseline parameters.</p></li>
+<li><p><strong>dy</strong> (<em>array-like, optional</em>) – The DFEF curve if return_also_baseline is True.</p></li>
+<li><p><strong>baseline</strong> (<em>array-like, optional</em>) – The estimated baseline if return_also_baseline is True.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Baseline.UvBaseline.inspect_uv_baseline">
 <span class="sig-name descname"><span class="pre">inspect_uv_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uv_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_also_plotresult</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Baseline.UvBaseline.inspect_uv_baseline" title="Link to this definition">#</a></dt>
 <dd><p>Estimate UV baseline parameters and plot the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uv_data</strong> (<a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData" title="molass.DataObjects.UvData.UvData"><em>UvData</em></a>) – The UV data object containing the curves.</p></li>
+<li><p><strong>pickat</strong> (<em>int</em><em>, </em><em>optional</em>) – The index at which the pickat was applied. Default is 400.</p></li>
+<li><p><strong>smooth</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, smooth the curves before analysis. Default is False.</p></li>
+<li><p><strong>return_also_plotresult</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return a PlotResult object along with the parameters. Default is False.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – The title for the plot. If None, no title is set. Default is None.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>params</strong> (<em>array-like</em>) – The estimated UV baseline parameters.</p></li>
+<li><p><strong>plot_result</strong> (<em>PlotResult, optional</em>) – The PlotResult object if return_also_plotresult is True.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -614,7 +700,12 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline"><code class="docutils literal notranslate"><span class="pre">UvBaseline</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.x"><code class="docutils literal notranslate"><span class="pre">UvBaseline.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.y"><code class="docutils literal notranslate"><span class="pre">UvBaseline.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.UvBaseline.params"><code class="docutils literal notranslate"><span class="pre">UvBaseline.params</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.estimate_uvbaseline_params"><code class="docutils literal notranslate"><span class="pre">estimate_uvbaseline_params()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvBaseline.inspect_uv_baseline"><code class="docutils literal notranslate"><span class="pre">inspect_uv_baseline()</span></code></a></li>
 </ul>

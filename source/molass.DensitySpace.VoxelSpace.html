@@ -538,6 +538,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.rho"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.rho</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.compute_rg()</span></code></a></li>
@@ -639,16 +640,18 @@ None, the limits will be set to the size of the image.</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VoxelSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>VoxelSpace class to handle voxel-based density spaces.
-It can be initialized with a shape or a density array.
-.. attribute:: rho</p>
-<blockquote>
-<div><p>3D density array.</p>
+It can be initialized with a shape or a density array.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace.rho">
+<span class="sig-name descname"><span class="pre">rho</span></span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.rho" title="Link to this definition">#</a></dt>
+<dd><p>3D density array.</p>
 <dl class="field-list simple">
-<dt class="field-odd">type<span class="colon">:</span></dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots">
 <span class="sig-name descname"><span class="pre">plot_as_dots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.ListedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots" title="Link to this definition">#</a></dt>
@@ -755,6 +758,7 @@ It can be initialized with a shape or a density array.
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.rho"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.rho</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.compute_rg"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.compute_rg()</span></code></a></li>
