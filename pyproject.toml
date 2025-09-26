@@ -48,7 +48,7 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/nshimizu0721/molass-library"
+Repository = "https://github.com/molass-saxs/molass-library"
 
 [tool.pytest.ini_options]
 pythonpath = [

@@ -386,8 +386,8 @@ class Decomposition:
 
             Supported models:
 
-            - ``SDM``: `Stochastic Dispersive Model <https://nshimizu0721.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
-            - ``EDM``: `Equilibrium Dispersive Model <https://nshimizu0721.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+            - ``SDM``: `Stochastic Dispersive Model <https://molass-saxs.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
+            - ``EDM``: `Equilibrium Dispersive Model <https://molass-saxs.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
 
         debug : bool, optional
             If True, enable debug mode.

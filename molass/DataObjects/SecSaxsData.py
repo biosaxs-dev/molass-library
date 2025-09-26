@@ -382,7 +382,7 @@ class SecSaxsData:
 
         Sets the baseline method to be used for the baseline correction.
 
-        See also: `Baseline Correction <https://nshimizu0721.github.io/molass-tutorial/chapters/04/data_correction.html>`_
+        See also: `Baseline Correction <https://molass-saxs.github.io/molass-tutorial/chapters/04/data_correction.html>`_
 
         Parameters
         ----------
@@ -414,7 +414,7 @@ class SecSaxsData:
 
         Returns the baseline method used for the baseline correction.
 
-        See also: `Baseline Correction <https://nshimizu0721.github.io/molass-tutorial/chapters/04/data_correction.html>`_
+        See also: `Baseline Correction <https://molass-saxs.github.io/molass-tutorial/chapters/04/data_correction.html>`_
 
         Parameters
         ----------

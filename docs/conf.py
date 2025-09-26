@@ -56,7 +56,7 @@ add_module_names = False  # Removes the "molass." prefix from module names in ti
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme_options = {
-    "repository_url": "https://github.com/nshimizu0721/molass-library",
+    "repository_url": "https://github.com/molass-saxs/molass-library",
     "use_repository_button": True,
 }
 
