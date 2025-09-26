@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -521,6 +519,8 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.radius"><code class="docutils literal notranslate"><span class="pre">Sphere.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.center"><code class="docutils literal notranslate"><span class="pre">Sphere.center</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_condition"><code class="docutils literal notranslate"><span class="pre">Sphere.get_condition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_rg"><code class="docutils literal notranslate"><span class="pre">Sphere.get_rg()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_volume"><code class="docutils literal notranslate"><span class="pre">Sphere.get_volume()</span></code></a></li>
@@ -545,10 +545,60 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Shapes.Sphere.Sphere" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Sphere class to represent a spherical density space.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Sphere.Sphere.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#molass.Shapes.Sphere.Sphere.radius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Sphere.Sphere.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#molass.Shapes.Sphere.Sphere.center" title="Link to this definition">#</a></dt>
+<dd><p>The center of the sphere. If None, the center is assumed to be at the
+center of the grid when used in get_condition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Sphere object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the sphere.</p></li>
+<li><p><strong>center</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – The center of the sphere. If None, the center is assumed to be at the
+center of the grid when used in get_condition.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Shapes.Sphere.Sphere.get_condition">
 <span class="sig-name descname"><span class="pre">get_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Shapes.Sphere.Sphere.get_condition" title="Link to this definition">#</a></dt>
 <dd><p>Get the condition for the sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xx</strong> (<em>np.ndarray</em>) – The x-coordinates grid.</p></li>
+<li><p><strong>yy</strong> (<em>np.ndarray</em>) – The y-coordinates grid.</p></li>
+<li><p><strong>zz</strong> (<em>np.ndarray</em>) – The z-coordinates grid.</p></li>
+<li><p><strong>center</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – The center of the sphere. If None, the center attribute of the object is used.
+If the center attribute is also None, the center is assumed to be at the center of the grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean array where points inside the sphere are True.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -629,6 +679,8 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.radius"><code class="docutils literal notranslate"><span class="pre">Sphere.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.center"><code class="docutils literal notranslate"><span class="pre">Sphere.center</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_condition"><code class="docutils literal notranslate"><span class="pre">Sphere.get_condition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_rg"><code class="docutils literal notranslate"><span class="pre">Sphere.get_rg()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Sphere.Sphere.get_volume"><code class="docutils literal notranslate"><span class="pre">Sphere.get_volume()</span></code></a></li>

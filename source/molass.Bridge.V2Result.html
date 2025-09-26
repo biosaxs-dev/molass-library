@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -554,13 +552,39 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.get_num_components_assumming_egh">
 <span class="sig-name descname"><span class="pre">get_num_components_assumming_egh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.get_num_components_assumming_egh" title="Link to this definition">#</a></dt>
-<dd><p>n * 4 + n + 2 + n + 7 + 2 + 2 + 6 = n * 6 + 19</p>
+<dd><p>Given the length of the parameter array, return the number of components
+assuming the EGH model is used.
+n * 4 + n + 2 + n + 7 + 2 + 2 + 6 = n * 6 + 19
+where n is the number of components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>length</strong> (<em>int</em>) – The length of the parameter array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of components.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.extract_params_assumming_egh">
 <span class="sig-name descname"><span class="pre">extract_params_assumming_egh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Bridge.V2Result.extract_params_assumming_egh" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Extract the parameters assuming the EGH model is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>np.ndarray</em>) – The parameter array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Bridge.V2Result.V2Result">

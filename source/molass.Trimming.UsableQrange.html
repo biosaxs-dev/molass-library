@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -520,7 +518,13 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange"><code class="docutils literal notranslate"><span class="pre">UsableQrange</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange"><code class="docutils literal notranslate"><span class="pre">UsableQrange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.start"><code class="docutils literal notranslate"><span class="pre">UsableQrange.start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.stop"><code class="docutils literal notranslate"><span class="pre">UsableQrange.stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.icurve"><code class="docutils literal notranslate"><span class="pre">UsableQrange.icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.pre_rg"><code class="docutils literal notranslate"><span class="pre">UsableQrange.pre_rg</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.get_usable_qrange_impl"><code class="docutils literal notranslate"><span class="pre">get_usable_qrange_impl()</span></code></a></li>
 </ul>
             </nav>
@@ -536,17 +540,89 @@ document.write(`
   <section id="module-molass.Trimming.UsableQrange">
 <span id="trimming-usableqrange"></span><h1>Trimming.UsableQrange<a class="headerlink" href="#module-molass.Trimming.UsableQrange" title="Link to this heading">#</a></h1>
 <p>Trimming.UsableQrange.py</p>
-<p>Copyright (c) 2025, SAXS Team, KEK-PF</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Trimming.UsableQrange.UsableQrange">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UsableQrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_rg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Trimming.UsableQrange.UsableQrange" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds information about the usable Q range in XR data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Trimming.UsableQrange.UsableQrange.start">
+<span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#molass.Trimming.UsableQrange.UsableQrange.start" title="Link to this definition">#</a></dt>
+<dd><p>The starting index of the usable Q range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Trimming.UsableQrange.UsableQrange.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><a class="headerlink" href="#molass.Trimming.UsableQrange.UsableQrange.stop" title="Link to this definition">#</a></dt>
+<dd><p>The stopping index of the usable Q range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Trimming.UsableQrange.UsableQrange.icurve">
+<span class="sig-name descname"><span class="pre">icurve</span></span><a class="headerlink" href="#molass.Trimming.UsableQrange.UsableQrange.icurve" title="Link to this definition">#</a></dt>
+<dd><p>The intensity curve associated with the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ICurve</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Trimming.UsableQrange.UsableQrange.pre_rg">
+<span class="sig-name descname"><span class="pre">pre_rg</span></span><a class="headerlink" href="#molass.Trimming.UsableQrange.UsableQrange.pre_rg" title="Link to this definition">#</a></dt>
+<dd><p>The preliminary Rg information associated with the XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PreliminaryRg</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>int</em>) – The starting index of the usable Q range.</p></li>
+<li><p><strong>stop</strong> (<em>int</em>) – The stopping index of the usable Q range.</p></li>
+<li><p><strong>icurve</strong> (<em>ICurve</em>) – The intensity curve associated with the XR data.</p></li>
+<li><p><strong>pre_rg</strong> (<em>PreliminaryRg</em>) – The preliminary Rg information associated with the XR data.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Trimming.UsableQrange.get_usable_qrange_impl">
 <span class="sig-name descname"><span class="pre">get_usable_qrange_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_effect_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nguiniers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Trimming.UsableQrange.get_usable_qrange_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the usable Q range for the given XR data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_data</strong> (<em>XRData</em>) – The XR data to analyze.</p></li>
+<li><p><strong>ip_effect_info</strong> (<em>bool</em>) – Whether to consider inter-particle effects.</p></li>
+<li><p><strong>nguiniers</strong> (<em>int</em><em> or </em><em>None</em>) – Number of Guinier points to consider. If None, use default.</p></li>
+<li><p><strong>return_object</strong> (<em>bool</em>) – If True, return a UsableQrange object. If False, return (start, stop).</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The usable Q range as a UsableQrange object or as (start, stop) tuple.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.Trimming.UsableQrange.UsableQrange" title="molass.Trimming.UsableQrange.UsableQrange">UsableQrange</a> or (int, int)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -595,7 +671,13 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange"><code class="docutils literal notranslate"><span class="pre">UsableQrange</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange"><code class="docutils literal notranslate"><span class="pre">UsableQrange</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.start"><code class="docutils literal notranslate"><span class="pre">UsableQrange.start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.stop"><code class="docutils literal notranslate"><span class="pre">UsableQrange.stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.icurve"><code class="docutils literal notranslate"><span class="pre">UsableQrange.icurve</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.UsableQrange.pre_rg"><code class="docutils literal notranslate"><span class="pre">UsableQrange.pre_rg</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Trimming.UsableQrange.get_usable_qrange_impl"><code class="docutils literal notranslate"><span class="pre">get_usable_qrange_impl()</span></code></a></li>
 </ul>
   </nav></div>

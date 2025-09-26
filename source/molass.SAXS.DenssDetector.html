@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -540,12 +538,30 @@ document.write(`
 <dt class="sig sig-object py" id="molass.SAXS.DenssDetector.DenssDetector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DenssDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">entries</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssDetector.DenssDetector" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to simulate SAXS data from a given electron density map using DENSS-like approach.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssDetector.get_denss_detector">
 <span class="sig-name descname"><span class="pre">get_denss_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DENSS_GPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssDetector.get_denss_detector" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Simulate SAXS data from a given electron density map using DENSS-like approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values at which to compute the SAXS intensity.</p></li>
+<li><p><strong>rho</strong> (<em>np.ndarray</em>) – The 3D electron density map.</p></li>
+<li><p><strong>DENSS_GPU</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use GPU acceleration for computations.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the DenssDetector class.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.SAXS.DenssDetector.DenssDetector" title="molass.SAXS.DenssDetector.DenssDetector">DenssDetector</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

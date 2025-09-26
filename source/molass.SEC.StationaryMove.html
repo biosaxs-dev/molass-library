@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -543,29 +541,124 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.StationaryMove.find_nearest_wall">
 <span class="sig-name descname"><span class="pre">find_nearest_wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.StationaryMove.find_nearest_wall" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Find the nearest wall of the grain to the point (px, py).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grain</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain" title="molass.SEC.ColumnElements.NewGrain"><em>NewGrain</em></a>) – The grain to find the nearest wall.</p></li>
+<li><p><strong>px</strong> (<em>float</em>) – The x coordinate of the point.</p></li>
+<li><p><strong>py</strong> (<em>float</em>) – The y coordinate of the point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – The index of the nearest wall in the first dimension.</p></li>
+<li><p><strong>j</strong> (<em>int</em>) – The index of the nearest wall in the second dimension.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.StationaryMove.compute_boundary_walls">
 <span class="sig-name descname"><span class="pre">compute_boundary_walls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.StationaryMove.compute_boundary_walls" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the boundary walls of the grain considering the entry points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cx</strong> (<em>float</em>) – The x coordinate of the grain center.</p></li>
+<li><p><strong>cy</strong> (<em>float</em>) – The y coordinate of the grain center.</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – The radius of the grain.</p></li>
+<li><p><strong>r</strong> (<em>float</em>) – The radius of the particle.</p></li>
+<li><p><strong>entry_points</strong> (<em>list</em><em> of </em><em>tuples</em>) – The entry points of the grain.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bpoints</strong> – The boundary points of the grain.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.StationaryMove.mirrorImage">
 <span class="sig-name descname"><span class="pre">mirrorImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.StationaryMove.mirrorImage" title="Link to this definition">#</a></dt>
-<dd><p>borrowed from
+<dd><p>Find the mirror image of point (x1, y1) against the line ax + by + c = 0.
+Formula borrowed from
 <a class="reference external" href="https://www.geeksforgeeks.org/find-mirror-image-point-2-d-plane/">https://www.geeksforgeeks.org/find-mirror-image-point-2-d-plane/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>float</em>) – The coefficient of x in the line equation.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The coefficient of y in the line equation.</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – The constant term in the line equation.</p></li>
+<li><p><strong>x1</strong> (<em>float</em>) – The x coordinate of the point.</p></li>
+<li><p><strong>y1</strong> (<em>float</em>) – The y coordinate of the point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – The x coordinate of the mirror image point.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – The y coordinate of the mirror image point.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.StationaryMove.compute_reflected_point">
 <span class="sig-name descname"><span class="pre">compute_reflected_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.StationaryMove.compute_reflected_point" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the reflected point of (nx, ny) against the boundary walls defined by bpoints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bpoints</strong> (<em>list</em><em> of </em><em>tuples</em>) – The boundary points defining the walls.</p></li>
+<li><p><strong>wx</strong> (<em>float</em>) – The x coordinate of the last position.</p></li>
+<li><p><strong>wy</strong> (<em>float</em>) – The y coordinate of the last position.</p></li>
+<li><p><strong>nx</strong> (<em>float</em>) – The x coordinate of the new position.</p></li>
+<li><p><strong>ny</strong> (<em>float</em>) – The y coordinate of the new position.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>(mx, my)</strong> – The coordinates of the reflected point, or None if no reflection occurs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.StationaryMove.get_next_position_impl">
 <span class="sig-name descname"><span class="pre">get_next_position_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.StationaryMove.get_next_position_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the next position of the particle considering reflections against the grain walls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>particle</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle" title="molass.SEC.ColumnElements.Particle"><em>Particle</em></a>) – The particle to move.</p></li>
+<li><p><strong>grain</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain" title="molass.SEC.ColumnElements.NewGrain"><em>NewGrain</em></a>) – The grain containing the particle.</p></li>
+<li><p><strong>last_px</strong> (<em>float</em>) – The x coordinate of the last position.</p></li>
+<li><p><strong>last_py</strong> (<em>float</em>) – The y coordinate of the last position.</p></li>
+<li><p><strong>px</strong> (<em>float</em>) – The x coordinate of the proposed new position.</p></li>
+<li><p><strong>py</strong> (<em>float</em>) – The y coordinate of the proposed new position.</p></li>
+<li><p><strong>debug_info</strong> (<em>tuple</em><em> of </em><em>(</em><em>fig</em><em>, </em><em>ax</em><em>)</em><em>, </em><em>optional</em>) – If provided, enables debug mode with the given figure and axes for drawing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nx</strong> (<em>float</em>) – The x coordinate of the next position.</p></li>
+<li><p><strong>ny</strong> (<em>float</em>) – The y coordinate of the next position.</p></li>
+<li><p><strong>inmobile</strong> (<em>bool</em>) – True if the particle is inmobile (stuck), False otherwise.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

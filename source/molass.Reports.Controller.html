@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -521,6 +519,22 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller"><code class="docutils literal notranslate"><span class="pre">Controller</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.env_info"><code class="docutils literal notranslate"><span class="pre">Controller.env_info</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.ssd"><code class="docutils literal notranslate"><span class="pre">Controller.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.preproc"><code class="docutils literal notranslate"><span class="pre">Controller.preproc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.kwargs"><code class="docutils literal notranslate"><span class="pre">Controller.kwargs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.logger"><code class="docutils literal notranslate"><span class="pre">Controller.logger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.work_folder"><code class="docutils literal notranslate"><span class="pre">Controller.work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.bookpath"><code class="docutils literal notranslate"><span class="pre">Controller.bookpath</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_is_available"><code class="docutils literal notranslate"><span class="pre">Controller.excel_is_available</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_version"><code class="docutils literal notranslate"><span class="pre">Controller.excel_version</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.atsas_is_available"><code class="docutils literal notranslate"><span class="pre">Controller.atsas_is_available</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.more_multicore"><code class="docutils literal notranslate"><span class="pre">Controller.more_multicore</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.conc_tracker"><code class="docutils literal notranslate"><span class="pre">Controller.conc_tracker</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.temp_folder"><code class="docutils literal notranslate"><span class="pre">Controller.temp_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.result_wb"><code class="docutils literal notranslate"><span class="pre">Controller.result_wb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.teller"><code class="docutils literal notranslate"><span class="pre">Controller.teller</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_client"><code class="docutils literal notranslate"><span class="pre">Controller.excel_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.prepare_averaged_data"><code class="docutils literal notranslate"><span class="pre">Controller.prepare_averaged_data()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.make_temp_folder"><code class="docutils literal notranslate"><span class="pre">Controller.make_temp_folder()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.stop"><code class="docutils literal notranslate"><span class="pre">Controller.stop()</span></code></a></li>
@@ -553,20 +567,209 @@ document.write(`
 <dt>Inherits from SerialExecuter to use the following methods:</dt><dd><p>save_smoothed_data</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.env_info">
+<span class="sig-name descname"><span class="pre">env_info</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.env_info" title="Link to this definition">#</a></dt>
+<dd><p>Information about the environment, including Excel and ATSAS availability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>EnvironmentInfo</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.ssd">
+<span class="sig-name descname"><span class="pre">ssd</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.ssd" title="Link to this definition">#</a></dt>
+<dd><p>The serial SAXS data to be analyzed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SerialSaxsData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.preproc">
+<span class="sig-name descname"><span class="pre">preproc</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.preproc" title="Link to this definition">#</a></dt>
+<dd><p>The preprocessor containing preprocessed data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Preprocessor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.kwargs" title="Link to this definition">#</a></dt>
+<dd><p>Additional keyword arguments for configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.logger" title="Link to this definition">#</a></dt>
+<dd><p>Logger for logging messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.work_folder">
+<span class="sig-name descname"><span class="pre">work_folder</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.work_folder" title="Link to this definition">#</a></dt>
+<dd><p>The working folder for report generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.bookpath">
+<span class="sig-name descname"><span class="pre">bookpath</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.bookpath" title="Link to this definition">#</a></dt>
+<dd><p>The path to the Excel report file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.excel_is_available">
+<span class="sig-name descname"><span class="pre">excel_is_available</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.excel_is_available" title="Link to this definition">#</a></dt>
+<dd><p>Indicates if Excel is available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.excel_version">
+<span class="sig-name descname"><span class="pre">excel_version</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.excel_version" title="Link to this definition">#</a></dt>
+<dd><p>The version of Excel being used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.atsas_is_available">
+<span class="sig-name descname"><span class="pre">atsas_is_available</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.atsas_is_available" title="Link to this definition">#</a></dt>
+<dd><p>Indicates if ATSAS is available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.more_multicore">
+<span class="sig-name descname"><span class="pre">more_multicore</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.more_multicore" title="Link to this definition">#</a></dt>
+<dd><p>Indicates if more than 4 CPU cores are available for parallel processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.conc_tracker">
+<span class="sig-name descname"><span class="pre">conc_tracker</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.conc_tracker" title="Link to this definition">#</a></dt>
+<dd><p>The concentration tracker, if concentration tracking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ConcTracker or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.temp_folder">
+<span class="sig-name descname"><span class="pre">temp_folder</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.temp_folder" title="Link to this definition">#</a></dt>
+<dd><p>Temporary folder for intermediate files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.result_wb">
+<span class="sig-name descname"><span class="pre">result_wb</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.result_wb" title="Link to this definition">#</a></dt>
+<dd><p>The Excel workbook for results, if Excel is available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Workbook or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.teller">
+<span class="sig-name descname"><span class="pre">teller</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.teller" title="Link to this definition">#</a></dt>
+<dd><p>The Excel teller for managing Excel operations in parallel mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ExcelTeller or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Reports.Controller.Controller.excel_client">
+<span class="sig-name descname"><span class="pre">excel_client</span></span><a class="headerlink" href="#molass.Reports.Controller.Controller.excel_client" title="Link to this definition">#</a></dt>
+<dd><p>The Excel COM client for managing Excel operations in single-threaded mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ExcelComClient or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Controller.
+:param env_info: Information about the environment, including Excel and ATSAS availability.
+:type env_info: EnvironmentInfo
+:param ssd: The serial SAXS data to be analyzed.
+:type ssd: SerialSaxsData
+:param preproc: The preprocessor containing preprocessed data.
+:type preproc: Preprocessor
+:param kwargs: Additional keyword arguments for configuration.
+:type kwargs: dict</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.prepare_averaged_data">
 <span class="sig-name descname"><span class="pre">prepare_averaged_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Reports.Controller.Controller.prepare_averaged_data" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Prepare averaged data if input_smoothing is set to 1.
+This method updates the using_averaged_files attribute based on the settings.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.make_temp_folder">
 <span class="sig-name descname"><span class="pre">make_temp_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Reports.Controller.Controller.make_temp_folder" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Create a temporary folder for intermediate files.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.stop">
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Reports.Controller.Controller.stop" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Stop the controller and clean up resources.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.stop_check">
@@ -577,12 +780,14 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.cleanup">
 <span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Reports.Controller.Controller.cleanup" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Cleanup temporary files and resources.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Reports.Controller.Controller.error_cleanup">
 <span class="sig-name descname"><span class="pre">error_cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Reports.Controller.Controller.error_cleanup" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Cleanup resources in case of an error.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -634,6 +839,22 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller"><code class="docutils literal notranslate"><span class="pre">Controller</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.env_info"><code class="docutils literal notranslate"><span class="pre">Controller.env_info</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.ssd"><code class="docutils literal notranslate"><span class="pre">Controller.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.preproc"><code class="docutils literal notranslate"><span class="pre">Controller.preproc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.kwargs"><code class="docutils literal notranslate"><span class="pre">Controller.kwargs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.logger"><code class="docutils literal notranslate"><span class="pre">Controller.logger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.work_folder"><code class="docutils literal notranslate"><span class="pre">Controller.work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.bookpath"><code class="docutils literal notranslate"><span class="pre">Controller.bookpath</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_is_available"><code class="docutils literal notranslate"><span class="pre">Controller.excel_is_available</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_version"><code class="docutils literal notranslate"><span class="pre">Controller.excel_version</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.atsas_is_available"><code class="docutils literal notranslate"><span class="pre">Controller.atsas_is_available</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.more_multicore"><code class="docutils literal notranslate"><span class="pre">Controller.more_multicore</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.conc_tracker"><code class="docutils literal notranslate"><span class="pre">Controller.conc_tracker</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.temp_folder"><code class="docutils literal notranslate"><span class="pre">Controller.temp_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.result_wb"><code class="docutils literal notranslate"><span class="pre">Controller.result_wb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.teller"><code class="docutils literal notranslate"><span class="pre">Controller.teller</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.excel_client"><code class="docutils literal notranslate"><span class="pre">Controller.excel_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.prepare_averaged_data"><code class="docutils literal notranslate"><span class="pre">Controller.prepare_averaged_data()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.make_temp_folder"><code class="docutils literal notranslate"><span class="pre">Controller.make_temp_folder()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Reports.Controller.Controller.stop"><code class="docutils literal notranslate"><span class="pre">Controller.stop()</span></code></a></li>

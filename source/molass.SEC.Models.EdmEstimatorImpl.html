@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -539,12 +537,50 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmEstimatorImpl.guess">
 <span class="sig-name descname"><span class="pre">guess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmEstimatorImpl.guess" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Guess initial parameters for the EDM model based on the given curve (x, y).
+N, T, N0, t0, poresize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y values of the curve.</p></li>
+<li><p><strong>init_params</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Initial guess for the parameters. If None, a guess will be made.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, debug information will be printed and plots will be shown.</p></li>
+<li><p><strong>debug_info</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params</strong> – Estimated parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmEstimatorImpl.guess_multiple_impl">
 <span class="sig-name descname"><span class="pre">guess_multiple_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">respect_egh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmEstimatorImpl.guess_multiple_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Guess initial parameters for multiple EDM component curves based on the given curve (x, y).
+N, T, N0, t0, poresize</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x values of the curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y values of the curve.</p></li>
+<li><p><strong>xr_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve" title="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve"><em>EdmComponentCurve</em></a>) – The list of EDM component curves.</p></li>
+<li><p><strong>respect_egh</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, respect the EGH parameters of the component curves.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, debug information will be printed and plots will be shown.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params_array</strong> – Estimated parameters for each component curve.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -47,7 +47,7 @@
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="LowRank.RankEstimator" href="molass.LowRank.RankEstimator.html" />
+    <link rel="next" title="Mapping" href="molass.Mapping.html" />
     <link rel="prev" title="LowRank.PositionedDecomposer" href="molass.LowRank.PositionedDecomposer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -541,12 +539,55 @@ specified peak area proportions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.ProportionalDecomposer.compute_egh_area_fast">
 <span class="sig-name descname"><span class="pre">compute_egh_area_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ProportionalDecomposer.compute_egh_area_fast" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the area under an exponentially modified Gaussian (EMG)
+function quickly using an analytical formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h</strong> (<em>float</em>) – The height of the EMG function.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the Gaussian component.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – The decay constant of the exponential component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The area under the EMG function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally">
 <span class="sig-name descname"><span class="pre">decompose_icurve_proportionally</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decompargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ProportionalDecomposer.decompose_icurve_proportionally" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Decompose the given curve (x, y) into a sum of Exponential-
+Gaussian Hybrid (EGH) functions, with area proportions specified
+in decompargs[‘proportions’].
+The number of peaks is determined by the length of the proportions list.
+The initial peak positions are estimated based on the cumulative area
+of the smoothed curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – The area proportions for each peak.</p></li>
+<li><p><strong>tau_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum allowed ratio of tau/sigma for each peak. Default is 0.6.</p></li>
+<li><p><strong>max_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum allowed sigma for each peak. Default is 17.</p></li>
+<li><p><strong>dev_weights</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Weights for the deviation penalties in the optimization.</p></li>
+<li><p><strong>basinhopping</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use basinhopping optimization. Default is False.
+This can help to escape local minima.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params</strong> – A 2D array of shape (number of peaks, 4), where each row
+contains the parameters (height, mean, sigma, tau) of the corresponding EMG function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -571,11 +612,11 @@ specified peak area proportions.</p>
       </div>
     </a>
     <a class="right-next"
-       href="molass.LowRank.RankEstimator.html"
+       href="molass.Mapping.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">LowRank.RankEstimator</p>
+        <p class="prev-next-title">Mapping</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -542,29 +540,136 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.compute_mapping_coverage">
 <span class="sig-name descname"><span class="pre">compute_mapping_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.compute_mapping_coverage" title="Link to this definition">#</a></dt>
-<dd><p>Check if the mapping covers the range of x and y.</p>
+<dd><p>Compute the coverage ratio of the mapping from x to y.
+The coverage ratio is defined as the ratio of the overlapping range
+of the mapped x values and the y values to the total range of x values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array-like</em>) – The x values.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y values.</p></li>
+<li><p><strong>slope</strong> (<em>float</em>) – The slope of the mapping line.</p></li>
+<li><p><strong>intercept</strong> (<em>float</em>) – The intercept of the mapping line.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>coverage_ratio</strong> – The coverage ratio of the mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_slope_reliability">
 <span class="sig-name descname"><span class="pre">estimate_slope_reliability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_slope_reliability" title="Link to this definition">#</a></dt>
-<dd><p>Estimate the reliability of the slope by comparing the peak ratios.</p>
+<dd><p>Estimate the reliability of the slope based on coverage ratio and peak ratio.
+This is particularly important when there is only one peak in the curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The X-ray curve.</p></li>
+<li><p><strong>x</strong> (<em>array-like</em>) – The x values of the peak (mean - std, mean, mean + std).</p></li>
+<li><p><strong>uv_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The UV curve.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em>) – The y values of the peak (mean - std, mean, mean + std).</p></li>
+<li><p><strong>coverage_ratio</strong> (<em>float</em>) – The coverage ratio of the mapping.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>reliable</strong> – True if the slope is considered reliable, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage">
 <span class="sig-name descname"><span class="pre">compute_mapping_by_full_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.compute_mapping_by_full_coverage" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the mapping by using the full coverage of the curves.
+This is used when there is only one peak in the curves.
+The mapping is computed by linear regression using three points:</p>
+<blockquote>
+<div><p>(mean - std, mean, mean + std)</p>
+</div></blockquote>
+<p>The peak point is given more weight than the edges.
+The peak point is determined by the first peak in the curves:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The X-ray curve.</p></li>
+<li><p><strong>xr_peaks</strong> (<em>list</em><em> of </em><em>int</em>) – The peak positions in the X-ray curve.</p></li>
+<li><p><strong>uv_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The UV curve.</p></li>
+<li><p><strong>uv_peaks</strong> (<em>list</em><em> of </em><em>int</em>) – The peak positions in the UV curve.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mapping</strong> – The computed mapping information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks">
 <span class="sig-name descname"><span class="pre">estimate_mapping_for_matching_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_mapping_for_matching_peaks" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the mapping between xr_curve and uv_curve using the given peak positions.
+The mapping is computed by linear regression using the peak positions.
+If the coverage ratio is not acceptable, it retries with corrected curves.
+:param xr_curve: The X-ray curve.
+:type xr_curve: Curve
+:param xr_peaks: The peak positions in the X-ray curve.
+:type xr_peaks: list of int
+:param uv_curve: The UV curve.
+:type uv_curve: Curve
+:param uv_peaks: The peak positions in the UV curve.
+:type uv_peaks: list of int
+:param retry: If True, retries with corrected curves if the coverage ratio is not acceptable.</p>
+<blockquote>
+<div><p>Default is True.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mapping</strong> – The estimated mapping information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Mapping.SimpleMapper.estimate_mapping_impl">
 <span class="sig-name descname"><span class="pre">estimate_mapping_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_curve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Mapping.SimpleMapper.estimate_mapping_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the mapping between xr_curve and uv_curve.
+The mapping is computed by identifying groupable peaks in both curves,
+matching them, and then performing linear regression on the matched peaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xr_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The X-ray curve.</p></li>
+<li><p><strong>uv_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The UV curve.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print debug information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mapping</strong> – The estimated mapping information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo">MappingInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -539,7 +537,21 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.ColumnSliceStates.draw_slice_states_impl">
 <span class="sig-name descname"><span class="pre">draw_slice_states_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pxv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pyv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inmobile_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnSliceStates.draw_slice_states_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw the slice states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.10.6)"><em>matplotlib.figure.Figure</em></a>) – The figure to draw on.</p></li>
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a>) – The axes to draw on.</p></li>
+<li><p><strong>grains</strong> (<em>list</em><em> of </em><em>Grain</em>) – The list of grains.</p></li>
+<li><p><strong>pxv</strong> (<em>np.ndarray</em>) – The x values.</p></li>
+<li><p><strong>pyv</strong> (<em>np.ndarray</em>) – The y values.</p></li>
+<li><p><strong>inmobile_states</strong> (<em>np.ndarray</em>) – A boolean array indicating the inmobile states.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

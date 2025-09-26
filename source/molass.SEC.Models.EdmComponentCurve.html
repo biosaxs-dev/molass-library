@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -521,10 +519,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn"><code class="docutils literal notranslate"><span class="pre">EdmColumn</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.params"><code class="docutils literal notranslate"><span class="pre">EdmColumn.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.get_params"><code class="docutils literal notranslate"><span class="pre">EdmColumn.get_params()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_peak_top_x()</span></code></a></li>
@@ -549,11 +550,35 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EdmColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent an EDM column.</p>
-<p>params: (N, T, me, mp, x0, tI, N0, poresize, timescale)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmColumn.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.params" title="Link to this definition">#</a></dt>
+<dd><p>The parameters of the EDM column (N, T, me, mp, x0, tI, N0, poresize, timescale).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the EDM column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>tuple</em>) – The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmColumn.get_params">
 <span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.get_params" title="Link to this definition">#</a></dt>
-<dd><p>Returns the parameters of the SDM column.</p>
+<dd><p>Returns the parameters of the EDM column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The parameters of the EDM column.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -563,21 +588,70 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EdmComponentCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a></p>
 <p>A class to represent an EDM component curve.</p>
-<p>Initializes the EDM component curve.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.x" title="Link to this definition">#</a></dt>
+<dd><p>The x values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.params" title="Link to this definition">#</a></dt>
+<dd><p>The parameters of the EDM column (N, T, me, mp, x0,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initializes the EDM component curve.
+:param x: The x values.
+:type x: array-like
+:param params: The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).
+:type params: tuple</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_y">
 <span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_y" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the y values for the given x values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>array-like</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The x values to get the y values for. If None, uses the object’s x values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_xy">
 <span class="sig-name descname"><span class="pre">get_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_xy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the x and y values as a tuple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the x values and the corresponding y values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_peak_top_x">
 <span class="sig-name descname"><span class="pre">get_peak_top_x</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_peak_top_x" title="Link to this definition">#</a></dt>
 <dd><p>Returns the x value at the peak top.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – If the peak top x calculation is not implemented for the current model.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -630,10 +704,13 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn"><code class="docutils literal notranslate"><span class="pre">EdmColumn</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.params"><code class="docutils literal notranslate"><span class="pre">EdmColumn.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmColumn.get_params"><code class="docutils literal notranslate"><span class="pre">EdmColumn.get_params()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.EdmComponentCurve.EdmComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">EdmComponentCurve.get_peak_top_x()</span></code></a></li>

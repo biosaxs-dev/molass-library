@@ -14,7 +14,6 @@ Submodules
 
    molass.PlotUtils.Annotation3D
    molass.PlotUtils.Arrow3D
-   molass.PlotUtils.LowRankInfoPlot
    molass.PlotUtils.MatrixPlot
    molass.PlotUtils.PlotResult
    molass.PlotUtils.SecSaxsDataPlot

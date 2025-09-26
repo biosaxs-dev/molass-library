@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -555,57 +553,274 @@ and retains the original copyright.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.fit_data_impl">
 <span class="sig-name descname"><span class="pre">fit_data_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_memory_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.fit_data_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Fit the provided SAXS data using DENSS’s fit_data logic.
+This function processes the input data and prepares it for DENSS reconstruction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
+<li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
+<li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
+<li><p><strong>file</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data file. If None, data is taken from memory.</p></li>
+<li><p><strong>D</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
+from the data.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The regularization parameter. If None, it will be optimized.</p></li>
+<li><p><strong>max_alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value for alpha during optimization.</p></li>
+<li><p><strong>nes</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of electrons per voxel.</p></li>
+<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+<li><p><strong>gui</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable GUI mode for optimization.</p></li>
+<li><p><strong>use_memory_data</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use the provided q, a, e arrays instead of reading from file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>sasrec</strong> (<em>denss.Sasrec</em>) – The fitted Sasrec object containing the processed data.</p></li>
+<li><p><strong>work_info</strong> (<em>Struct</em>) – A structure containing additional information about the fitting process.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.fit_data">
 <span class="sig-name descname"><span class="pre">fit_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sasrec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.fit_data" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Fit the provided SAXS data using DENSS’s fit_data logic.
+This function processes the input data and prepares it for DENSS reconstruction.
+This is a simplified wrapper around fit_data_impl().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
+<li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
+<li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
+<li><p><strong>D</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
+from the data.</p></li>
+<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+<li><p><strong>return_sasrec</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return the Sasrec object. If False, return qc, Ic, Icerr, D.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul>
+<li><p><em>If return_sasrec is True</em> –</p>
+<dl class="simple">
+<dt>sasrec<span class="classifier">denss.Sasrec</span></dt><dd><p>The fitted Sasrec object containing the processed data.</p>
+</dd>
+</dl>
+</li>
+<li><p><em>Else</em> –</p>
+<dl class="simple">
+<dt>qc<span class="classifier">np.ndarray</span></dt><dd><p>The q values used in the fitted data.</p>
+</dd>
+<dt>Ic<span class="classifier">np.ndarray</span></dt><dd><p>The fitted intensity values.</p>
+</dd>
+<dt>Icerr<span class="classifier">np.ndarray</span></dt><dd><p>The fitted error values.</p>
+</dd>
+<dt>D<span class="classifier">float</span></dt><dd><p>The estimated maximum dimension (Dmax) of the particle.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.fit_data_bc">
 <span class="sig-name descname"><span class="pre">fit_data_bc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrapolate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.fit_data_bc" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Fit the provided SAXS data using DENSS’s fit_data logic.
+This function processes the input data and prepares it for DENSS reconstruction.
+This is a simplified wrapper around fit_data_impl().
+This function is for backward compatibility.
+It always sets alpha=0 and does not return the sasrec object.
+This function is for backward compatibility with older versions of molass.
+It is recommended to use fit_data() instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
+<li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
+<li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
+<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>qc</strong> (<em>np.ndarray</em>) – The q values used in the fitted data.</p></li>
+<li><p><strong>Ic</strong> (<em>np.ndarray</em>) – The fitted intensity values.</p></li>
+<li><p><strong>Icerr</strong> (<em>np.ndarray</em>) – The fitted error values.</p></li>
+<li><p><strong>D</strong> (<em>float</em>) – The estimated maximum dimension (Dmax) of the particle.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.get_dmax_with_datgnom">
 <span class="sig-name descname"><span class="pre">get_dmax_with_datgnom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.get_dmax_with_datgnom" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate Dmax from a DATGNOM file using AtsasDatGnomDdf.
+This function reads the DATGNOM file and estimates the best Dmax value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – The path to the DATGNOM file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dmax</strong> – The estimated Dmax value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.get_argparser">
 <span class="sig-name descname"><span class="pre">get_argparser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.get_argparser" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the argument parser for DENSS.
+This function returns the argument parser for DENSS.
+If return_args is True, it returns the parsed arguments instead.
+This function is used to parse command line arguments for DENSS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_args</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return the parsed arguments instead of the parser.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The argument parser or the parsed arguments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>argparse.ArgumentParser or argparse.Namespace</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.run_denss_impl">
-<span class="sig-name descname"><span class="pre">run_denss_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_cb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.run_denss_impl" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">run_denss_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">MAXNUM_STEPS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_cb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.run_denss_impl" title="Link to this definition">#</a></dt>
+<dd><p>Run the DENSS reconstruction using the provided SAXS data.
+This function sets up and runs the DENSS reconstruction process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qc</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
+<li><p><strong>ac</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
+<li><p><strong>ec</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
+<li><p><strong>dmax</strong> (<em>float</em>) – The maximum dimension (Dmax) of the particle.</p></li>
+<li><p><strong>data_name</strong> (<em>str</em>) – The name of the data set.</p></li>
+<li><p><strong>steps</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of steps for the reconstruction.</p></li>
+<li><p><strong>progress_cb</strong> (<em>callable</em><em>, </em><em>optional</em>) – A callback function to report progress.</p></li>
+<li><p><strong>use_gpu</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use GPU acceleration for the reconstruction.</p></li>
+<li><p><strong>gui</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable GUI mode for the reconstruction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.run_denss_impl_dummy">
 <span class="sig-name descname"><span class="pre">run_denss_impl_dummy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infile_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.run_denss_impl_dummy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>A dummy implementation of run_denss_impl() for testing purposes.
+This function simulates the DENSS reconstruction process without performing any actual computation.
+It prints progress messages to the console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qc</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
+<li><p><strong>ac</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
+<li><p><strong>ec</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
+<li><p><strong>dmax</strong> (<em>float</em>) – The maximum dimension (Dmax) of the particle.</p></li>
+<li><p><strong>infile_name</strong> (<em>str</em>) – The name of the input data file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.get_denssfolder">
 <span class="sig-name descname"><span class="pre">get_denssfolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.get_denssfolder" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the DENSS output folder.
+This function retrieves the DENSS output folder from the settings.
+If the folder does not exist, it creates it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> (<em>object</em><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the DENSS output folder, or None if not set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.get_outfolder">
 <span class="sig-name descname"><span class="pre">get_outfolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.get_outfolder" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the DENSS output folder for a specific job ID.
+This function retrieves the DENSS output folder and appends a job ID to it.
+If the folder does not exist, it creates it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_id</strong> (<em>int</em><em>, </em><em>optional</em>) – The job ID to append to the folder name. If None, uses ‘000’ and increments if the folder exists.</p></li>
+<li><p><strong>parent</strong> (<em>object</em><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the DENSS output folder for the job, or None if the base folder
+is not set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.get_denss_log_items">
 <span class="sig-name descname"><span class="pre">get_denss_log_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.get_denss_log_items" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Extract key-value pairs from a DENSS log file.
+This function reads a DENSS log file and extracts lines containing key-value pairs
+in the format “Final &lt;key&gt;: &lt;value&gt;”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The path to the DENSS log file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the extracted key-value pairs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SAXS.DenssUtils.run_pdb2mrc">
 <span class="sig-name descname"><span class="pre">run_pdb2mrc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.DenssUtils.run_pdb2mrc" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Run the DENSS pdb2mrc script to convert a PDB file to an MRC file.
+This function invokes the DENSS pdb2mrc script as a subprocess to convert
+a PDB file to an MRC file. It can report progress through a queue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_file</strong> (<em>str</em>) – The path to the input PDB file.</p></li>
+<li><p><strong>queue</strong> (<em>multiprocessing.Queue</em><em>, </em><em>optional</em>) – A queue to report progress. If None, no progress is reported.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the generated MRC file, or None if the conversion failed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

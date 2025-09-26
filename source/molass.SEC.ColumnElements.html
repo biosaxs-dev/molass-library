@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -521,6 +519,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain"><code class="docutils literal notranslate"><span class="pre">SolidGrain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.id_"><code class="docutils literal notranslate"><span class="pre">SolidGrain.id_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.center"><code class="docutils literal notranslate"><span class="pre">SolidGrain.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.radius"><code class="docutils literal notranslate"><span class="pre">SolidGrain.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.poreradius"><code class="docutils literal notranslate"><span class="pre">SolidGrain.poreradius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.poredist"><code class="docutils literal notranslate"><span class="pre">SolidGrain.poredist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_poreentries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.draw_entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw_entries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.draw"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw()</span></code></a></li>
@@ -531,12 +535,20 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle"><code class="docutils literal notranslate"><span class="pre">Particle</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.center"><code class="docutils literal notranslate"><span class="pre">Particle.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.radius"><code class="docutils literal notranslate"><span class="pre">Particle.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.draw"><code class="docutils literal notranslate"><span class="pre">Particle.draw()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.enters_stationary"><code class="docutils literal notranslate"><span class="pre">Particle.enters_stationary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.stationary_move"><code class="docutils literal notranslate"><span class="pre">Particle.stationary_move()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain"><code class="docutils literal notranslate"><span class="pre">NewGrain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.id_"><code class="docutils literal notranslate"><span class="pre">NewGrain.id_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.center"><code class="docutils literal notranslate"><span class="pre">NewGrain.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.radius"><code class="docutils literal notranslate"><span class="pre">NewGrain.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.num_pores"><code class="docutils literal notranslate"><span class="pre">NewGrain.num_pores</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.poreradius"><code class="docutils literal notranslate"><span class="pre">NewGrain.poreradius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.entries"><code class="docutils literal notranslate"><span class="pre">NewGrain.entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">NewGrain.compute_poreentries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.draw"><code class="docutils literal notranslate"><span class="pre">NewGrain.draw()</span></code></a></li>
 </ul>
@@ -558,45 +570,169 @@ document.write(`
   <section id="module-molass.SEC.ColumnElements">
 <span id="sec-columnelements"></span><h1>SEC.ColumnElements<a class="headerlink" href="#module-molass.SEC.ColumnElements" title="Link to this heading">#</a></h1>
 <p>SEC.ColumnElements.py</p>
-<p>Copyright (c) 2024-2025, Molass Community</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SolidGrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poreradius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poredist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent a solid grain with pores.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.id_">
+<span class="sig-name descname"><span class="pre">id_</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.id_" title="Link to this definition">#</a></dt>
+<dd><p>The identifier of the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.center" title="Link to this definition">#</a></dt>
+<dd><p>The (x, y) coordinates of the grain center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.radius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.poreradius">
+<span class="sig-name descname"><span class="pre">poreradius</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.poreradius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the pores in the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.poredist">
+<span class="sig-name descname"><span class="pre">poredist</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.poredist" title="Link to this definition">#</a></dt>
+<dd><p>The distance between the centers of adjacent pores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.entries">
+<span class="sig-name descname"><span class="pre">entries</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.entries" title="Link to this definition">#</a></dt>
+<dd><p>An array of tuples representing the angular ranges of the pores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize a SolidGrain instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>any</em>) – The identifier of the grain.</p></li>
+<li><p><strong>center</strong> (<em>array-like</em>) – The (x, y) coordinates of the grain center.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the grain.</p></li>
+<li><p><strong>poreradius</strong> (<em>float</em>) – The radius of the pores in the grain.</p></li>
+<li><p><strong>poredist</strong> (<em>float</em>) – The distance between the centers of adjacent pores.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.compute_poreentries">
 <span class="sig-name descname"><span class="pre">compute_poreentries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.compute_poreentries" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the angular ranges of the pores in the grain.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.draw_entries">
 <span class="sig-name descname"><span class="pre">draw_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.draw_entries" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw the pore entries on the given axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a>) – The axes on which to draw the pore entries.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.draw">
 <span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.draw" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw the grain on the given axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a>) – The axes on which to draw the grain.</p></li>
+<li><p><strong>color</strong> (<em>str</em><em>, </em><em>optional</em>) – The color of the grain. If None, a default color will be used.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The transparency of the grain. Default is 1 (opaque).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.get_point_from_angle">
 <span class="sig-name descname"><span class="pre">get_point_from_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.get_point_from_angle" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get a point on the grain surface corresponding to the given angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>angle</strong> (<em>float</em>) – The angle in radians.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>point</strong> – The (x, y) coordinates of the point on the grain surface.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.get_entry_including">
 <span class="sig-name descname"><span class="pre">get_entry_including</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.get_entry_including" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the index of the pore entry that includes the given angular range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<em>array-like</em>) – A tuple or list of two angles (in radians) defining the angular range.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the pore entry that includes the angular range, or None if no such entry exists.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.compute_bounce_vector">
 <span class="sig-name descname"><span class="pre">compute_bounce_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.compute_bounce_vector" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the bounce vector for a particle colliding with the grain.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.SolidGrain.compute_inpore_nextpos">
 <span class="sig-name descname"><span class="pre">compute_inpore_nextpos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.SolidGrain.compute_inpore_nextpos" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the next position of a particle inside a pore.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -604,20 +740,103 @@ document.write(`
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Particle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to represent a particle.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle.center" title="Link to this definition">#</a></dt>
+<dd><p>The (x, y) coordinates of the particle center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle.radius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize a Particle instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> (<em>array-like</em>) – The (x, y) coordinates of the particle center.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the particle.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle.draw">
 <span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle.draw" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw the particle on the given axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a>) – The axes on which to draw the particle.</p></li>
+<li><p><strong>color</strong> (<em>str</em><em>, </em><em>optional</em>) – The color of the particle. If None, a default color will be used.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The transparency of the particle. Default is 1 (opaque).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle.enters_stationary">
 <span class="sig-name descname"><span class="pre">enters_stationary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_particle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_point_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle.enters_stationary" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Determine if the particle enters a stationary grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grain</strong> (<a class="reference internal" href="#molass.SEC.ColumnElements.SolidGrain" title="molass.SEC.ColumnElements.SolidGrain"><em>SolidGrain</em></a>) – The grain to check for entry.</p></li>
+<li><p><strong>last_particle</strong> (<a class="reference internal" href="#molass.SEC.ColumnElements.Particle" title="molass.SEC.ColumnElements.Particle"><em>Particle</em></a><em>, </em><em>optional</em>) – The last particle in the trajectory, used for edge cases.</p></li>
+<li><p><strong>return_point_info</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return detailed point information.</p></li>
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.6)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – The axes for drawing debug information.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If the particle enters the grain, returns a tuple containing:
+- angles: list of two angles where the particle enters the grain.
+- points: list of two points where the particle intersects the grain surface.
+- entry_index: index of the pore entry that the particle enters.
+If the particle does not enter, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple or None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.Particle.stationary_move">
 <span class="sig-name descname"><span class="pre">stationary_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.Particle.stationary_move" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the next position of the particle while moving inside a stationary grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grain</strong> (<a class="reference internal" href="#molass.SEC.ColumnElements.SolidGrain" title="molass.SEC.ColumnElements.SolidGrain"><em>SolidGrain</em></a>) – The grain in which the particle is moving.</p></li>
+<li><p><strong>last_px</strong> (<em>float</em>) – The last x-coordinate of the particle.</p></li>
+<li><p><strong>last_py</strong> (<em>float</em>) – The last y-coordinate of the particle.</p></li>
+<li><p><strong>px</strong> (<em>float</em>) – The current x-coordinate of the particle.</p></li>
+<li><p><strong>py</strong> (<em>float</em>) – The current y-coordinate of the particle.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the next (x, y) coordinates of the particle and the state.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -625,32 +844,127 @@ document.write(`
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NewGrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_pores</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#molass.SEC.ColumnElements.SolidGrain" title="molass.SEC.ColumnElements.SolidGrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolidGrain</span></code></a></p>
+<p>A class to represent a grain with multiple pores.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.id_">
+<span class="sig-name descname"><span class="pre">id_</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.id_" title="Link to this definition">#</a></dt>
+<dd><p>The identifier of the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.center" title="Link to this definition">#</a></dt>
+<dd><p>The (x, y) coordinates of the grain center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.radius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.num_pores">
+<span class="sig-name descname"><span class="pre">num_pores</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.num_pores" title="Link to this definition">#</a></dt>
+<dd><p>The number of pores in the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.poreradius">
+<span class="sig-name descname"><span class="pre">poreradius</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.poreradius" title="Link to this definition">#</a></dt>
+<dd><p>The radius of the pores in the grain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.entries">
+<span class="sig-name descname"><span class="pre">entries</span></span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.entries" title="Link to this definition">#</a></dt>
+<dd><p>An array of tuples representing the angular ranges of the pores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize a NewGrain instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>any</em>) – The identifier of the grain.</p></li>
+<li><p><strong>center</strong> (<em>array-like</em>) – The (x, y) coordinates of the grain center.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the grain.</p></li>
+<li><p><strong>num_pores</strong> (<em>int</em>) – The number of pores in the grain.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.compute_poreentries">
 <span class="sig-name descname"><span class="pre">compute_poreentries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.compute_poreentries" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the angular ranges of the pores in the grain.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.NewGrain.draw">
 <span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.NewGrain.draw" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw the grain on the given axes.
+:param ax: The axes on which to draw the grain.
+:type ax: matplotlib.axes.Axes</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.new_grain_unit_test">
 <span class="sig-name descname"><span class="pre">new_grain_unit_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.new_grain_unit_test" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Unit test for the NewGrain class.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.grain_particle_test">
 <span class="sig-name descname"><span class="pre">grain_particle_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.grain_particle_test" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Unit test for the SolidGrain and Particle classes.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.SEC.ColumnElements.draw_wedges">
 <span class="sig-name descname"><span class="pre">draw_wedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rad_pairs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.ColumnElements.draw_wedges" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Draw wedges on the given axes.
+:param ax: The axes on which to draw the wedges.
+:type ax: matplotlib.axes.Axes
+:param center: The (x, y) coordinates of the center of the wedges.
+:type center: array-like
+:param radius: The radius of the wedges.
+:type radius: float
+:param rad_pairs: A list of tuples, each containing two angles (in radians) defining the angular range of a wedge.
+:type rad_pairs: list of tuples
+:param colors: A list of colors for the wedges.
+:type colors: list of str</p>
+</dd></dl>
 
 </section>
 
@@ -700,6 +1014,12 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain"><code class="docutils literal notranslate"><span class="pre">SolidGrain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.id_"><code class="docutils literal notranslate"><span class="pre">SolidGrain.id_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.center"><code class="docutils literal notranslate"><span class="pre">SolidGrain.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.radius"><code class="docutils literal notranslate"><span class="pre">SolidGrain.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.poreradius"><code class="docutils literal notranslate"><span class="pre">SolidGrain.poreradius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.poredist"><code class="docutils literal notranslate"><span class="pre">SolidGrain.poredist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.compute_poreentries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.draw_entries"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw_entries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.SolidGrain.draw"><code class="docutils literal notranslate"><span class="pre">SolidGrain.draw()</span></code></a></li>
@@ -710,12 +1030,20 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle"><code class="docutils literal notranslate"><span class="pre">Particle</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.center"><code class="docutils literal notranslate"><span class="pre">Particle.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.radius"><code class="docutils literal notranslate"><span class="pre">Particle.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.draw"><code class="docutils literal notranslate"><span class="pre">Particle.draw()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.enters_stationary"><code class="docutils literal notranslate"><span class="pre">Particle.enters_stationary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.Particle.stationary_move"><code class="docutils literal notranslate"><span class="pre">Particle.stationary_move()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain"><code class="docutils literal notranslate"><span class="pre">NewGrain</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.id_"><code class="docutils literal notranslate"><span class="pre">NewGrain.id_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.center"><code class="docutils literal notranslate"><span class="pre">NewGrain.center</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.radius"><code class="docutils literal notranslate"><span class="pre">NewGrain.radius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.num_pores"><code class="docutils literal notranslate"><span class="pre">NewGrain.num_pores</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.poreradius"><code class="docutils literal notranslate"><span class="pre">NewGrain.poreradius</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.entries"><code class="docutils literal notranslate"><span class="pre">NewGrain.entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.compute_poreentries"><code class="docutils literal notranslate"><span class="pre">NewGrain.compute_poreentries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.ColumnElements.NewGrain.draw"><code class="docutils literal notranslate"><span class="pre">NewGrain.draw()</span></code></a></li>
 </ul>

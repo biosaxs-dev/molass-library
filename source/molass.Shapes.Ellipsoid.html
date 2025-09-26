@@ -246,7 +246,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.RankEstimator.html">LowRank.RankEstimator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Mapping.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -270,7 +269,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.LowRankInfoPlot.html">PlotUtils.LowRankInfoPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.MatrixPlot.html">PlotUtils.MatrixPlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.PlotResult.html">PlotUtils.PlotResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.SecSaxsDataPlot.html">PlotUtils.SecSaxsDataPlot</a></li>
@@ -521,6 +519,10 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid"><code class="docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.a"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.b"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.c"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.c</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.center"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.center</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_condition"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_condition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_rg"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_rg()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_volume"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_volume()</span></code></a></li>
@@ -545,10 +547,85 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ellipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Sphere class to represent a spherical density space.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Ellipsoid.Ellipsoid.a">
+<span class="sig-name descname"><span class="pre">a</span></span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid.a" title="Link to this definition">#</a></dt>
+<dd><p>The semi-axis length along the x-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Ellipsoid.Ellipsoid.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid.b" title="Link to this definition">#</a></dt>
+<dd><p>The semi-axis length along the y-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Ellipsoid.Ellipsoid.c">
+<span class="sig-name descname"><span class="pre">c</span></span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid.c" title="Link to this definition">#</a></dt>
+<dd><p>The semi-axis length along the z-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Shapes.Ellipsoid.Ellipsoid.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid.center" title="Link to this definition">#</a></dt>
+<dd><p>The center of the ellipsoid. If None, the center is assumed to be at the
+center of the grid when used in get_condition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Initialize the Ellipsoid object.
+:param a: The semi-axis length along the x-axis.
+:type a: float
+:param b: The semi-axis length along the y-axis.
+:type b: float
+:param c: The semi-axis length along the z-axis.
+:type c: float
+:param center: The center of the ellipsoid. If None, the center is assumed to be at the</p>
+<blockquote>
+<div><p>center of the grid when used in get_condition.</p>
+</div></blockquote>
+<dl class="field-list simple">
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Shapes.Ellipsoid.Ellipsoid.get_condition">
 <span class="sig-name descname"><span class="pre">get_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_condition" title="Link to this definition">#</a></dt>
 <dd><p>Get the condition for the ellipsoid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xx</strong> (<em>np.ndarray</em>) – The x-coordinates grid.</p></li>
+<li><p><strong>yy</strong> (<em>np.ndarray</em>) – The y-coordinates grid.</p></li>
+<li><p><strong>zz</strong> (<em>np.ndarray</em>) – The z-coordinates grid.</p></li>
+<li><p><strong>center</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – The center of the ellipsoid. If None, the center attribute of the object is used.
+If the center attribute is also None, the center is assumed to be at the center of the grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean array where True indicates points inside the ellipsoid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -629,6 +706,10 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid"><code class="docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.a"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.b"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.c"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.c</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.center"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.center</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_condition"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_condition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_rg"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_rg()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Shapes.Ellipsoid.Ellipsoid.get_volume"><code class="docutils literal notranslate"><span class="pre">Ellipsoid.get_volume()</span></code></a></li>
