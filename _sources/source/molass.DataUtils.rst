@@ -14,7 +14,6 @@ Submodules
 
    molass.DataUtils.AnomalyHandlers
    molass.DataUtils.Beamline
-   molass.DataUtils.Concentration
    molass.DataUtils.FolderWalker
    molass.DataUtils.ForwardCompat
    molass.DataUtils.UvFileTrimming

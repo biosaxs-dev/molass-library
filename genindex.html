@@ -175,18 +175,6 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.CurveModels.html">CurveModels</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="source/molass.CurveModels.Scattering.html">CurveModels.Scattering</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="source/molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
-</ul>
-</details></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.CurveModels.Scattering.html">CurveModels.Scattering</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="source/molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
@@ -198,7 +186,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DataUtils.html">DataUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.AnomalyHandlers.html">DataUtils.AnomalyHandlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.Beamline.html">DataUtils.Beamline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.Concentration.html">DataUtils.Concentration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.FolderWalker.html">DataUtils.FolderWalker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.ForwardCompat.html">DataUtils.ForwardCompat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.DataUtils.UvFileTrimming.html">DataUtils.UvFileTrimming</a></li>
@@ -228,7 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.FlowChange.FlowChangeParams.html">FlowChange.FlowChangeParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.FlowChange.FlowChangePlot.html">FlowChange.FlowChangePlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.FlowChange.NullFlowChange.html">FlowChange.NullFlowChange</a></li>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.FlowChange.Property.html">FlowChange.Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.FlowChange.Possibility.html">FlowChange.Possibility</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -412,7 +399,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/nshimizu0721/molass-library" target="_blank"
+<a href="https://github.com/molass-saxs/molass-library" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -628,6 +615,8 @@ document.write(`
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_inpore_nextpos">compute_inpore_nextpos() (SolidGrain method)</a>
 </li>
       <li><a href="source/molass.Baseline.IntegralBaseline.html#molass.Baseline.IntegralBaseline.compute_integral_baseline">compute_integral_baseline() (in module molass.Baseline.IntegralBaseline)</a>
+</li>
+      <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.compute_like_values">compute_like_values() (in module molass.FlowChange.FlowChangeParams)</a>
 </li>
       <li><a href="source/molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.compute_lowrank_matrices">compute_lowrank_matrices() (in module molass.LowRank.LowRankInfo)</a>
 </li>
@@ -976,6 +965,8 @@ document.write(`
       </ul></li>
       <li><a href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo.get_curve">get_curve() (SaxsInfo method)</a>
 </li>
+      <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.get_datafolder">get_datafolder() (in module molass.FlowChange.FlowChangeParams)</a>
+</li>
       <li><a href="source/molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.get_denoised_data">get_denoised_data() (in module molass.LowRank.LowRankInfo)</a>
 </li>
       <li><a href="source/molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.get_denss_detector">get_denss_detector() (in module molass.SAXS.DenssDetector)</a>
@@ -1084,10 +1075,10 @@ document.write(`
       </ul></li>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl">get_next_position_impl() (in module molass.SEC.StationaryMove)</a>
 </li>
-      <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
+</li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_num_components">get_num_components() (Decomposition method)</a>
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh">get_num_components_assumming_egh() (in module molass.Bridge.V2Result)</a>
@@ -1418,9 +1409,13 @@ document.write(`
 </li>
       <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.Component.make_paired_range">make_paired_range() (Component method)</a>
 </li>
+      <li><a href="source/molass.FlowChange.FlowChangePlot.html#molass.FlowChange.FlowChangePlot.make_plot">make_plot() (in module molass.FlowChange.FlowChangePlot)</a>
+</li>
       <li><a href="source/molass.Reports.V1SummaryReport.html#molass.Reports.V1SummaryReport.make_summary_report">make_summary_report() (in module molass.Reports.V1SummaryReport)</a>
 </li>
       <li><a href="source/molass.Reports.Controller.html#molass.Reports.Controller.Controller.make_temp_folder">make_temp_folder() (Controller method)</a>
+</li>
+      <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.make_test_targets">make_test_targets() (in module molass.FlowChange.FlowChangeParams)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.make_trimming">make_trimming() (SecSaxsData method)</a>
 </li>
@@ -1496,10 +1491,6 @@ document.write(`
 </li>
         <li><a href="source/molass.Bridge.V2Result.html#module-molass.Bridge.V2Result">molass.Bridge.V2Result</a>
 </li>
-        <li><a href="source/molass.CurveModels.html#module-molass.CurveModels">molass.CurveModels</a>
-</li>
-        <li><a href="source/molass.CurveModels.Scattering.html#module-molass.CurveModels.Scattering">molass.CurveModels.Scattering</a>
-</li>
         <li><a href="source/molass.DataObjects.html#module-molass.DataObjects">molass.DataObjects</a>
 </li>
         <li><a href="source/molass.DataObjects.Curve.html#module-molass.DataObjects.Curve">molass.DataObjects.Curve</a>
@@ -1561,6 +1552,10 @@ document.write(`
         <li><a href="source/molass.FlowChange.FlowChangeJudge.html#module-molass.FlowChange.FlowChangeJudge">molass.FlowChange.FlowChangeJudge</a>
 </li>
         <li><a href="source/molass.FlowChange.FlowChangeLikely.html#module-molass.FlowChange.FlowChangeLikely">molass.FlowChange.FlowChangeLikely</a>
+</li>
+        <li><a href="source/molass.FlowChange.FlowChangeParams.html#module-molass.FlowChange.FlowChangeParams">molass.FlowChange.FlowChangeParams</a>
+</li>
+        <li><a href="source/molass.FlowChange.FlowChangePlot.html#module-molass.FlowChange.FlowChangePlot">molass.FlowChange.FlowChangePlot</a>
 </li>
         <li><a href="source/molass.FlowChange.NullFlowChange.html#module-molass.FlowChange.NullFlowChange">molass.FlowChange.NullFlowChange</a>
 </li>
@@ -1909,20 +1904,6 @@ document.write(`
 </li>
       </ul></li>
       <li>
-    molass.CurveModels
-
-      <ul>
-        <li><a href="source/molass.CurveModels.html#module-molass.CurveModels">module</a>
-</li>
-      </ul></li>
-      <li>
-    molass.CurveModels.Scattering
-
-      <ul>
-        <li><a href="source/molass.CurveModels.Scattering.html#module-molass.CurveModels.Scattering">module</a>
-</li>
-      </ul></li>
-      <li>
     molass.DataObjects
 
       <ul>
@@ -2027,8 +2008,6 @@ document.write(`
         <li><a href="source/molass.DataUtils.UvLoader.html#module-molass.DataUtils.UvLoader">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.DataUtils.XrLoader
 
@@ -2043,6 +2022,8 @@ document.write(`
         <li><a href="source/molass.DataUtils.ZipFolder.html#module-molass.DataUtils.ZipFolder">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     molass.Decompose
 
@@ -2139,6 +2120,20 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.FlowChange.FlowChangeLikely.html#module-molass.FlowChange.FlowChangeLikely">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.FlowChange.FlowChangeParams
+
+      <ul>
+        <li><a href="source/molass.FlowChange.FlowChangeParams.html#module-molass.FlowChange.FlowChangeParams">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.FlowChange.FlowChangePlot
+
+      <ul>
+        <li><a href="source/molass.FlowChange.FlowChangePlot.html#module-molass.FlowChange.FlowChangePlot">module</a>
 </li>
       </ul></li>
       <li>
@@ -3058,6 +3053,8 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.PlotUtils.DecompositionPlot.html#molass.PlotUtils.DecompositionPlot.plot_elution_curve">plot_elution_curve() (in module molass.PlotUtils.DecompositionPlot)</a>
 </li>
+      <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.plot_flowchange">plot_flowchange() (in module molass.FlowChange.FlowChangeParams)</a>
+</li>
       <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.plot_input">plot_input() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
       <li><a href="source/molass.SAXS.FourierIllust.html#molass.SAXS.FourierIllust.plot_saxs_illust">plot_saxs_illust() (in module molass.SAXS.FourierIllust)</a>
@@ -3271,6 +3268,8 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Progress.ProgessUtils.html#molass.Progress.ProgessUtils.ProgressUnit.tell_error">tell_error() (ProgressUnit method)</a>
+</li>
+      <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.test_params">test_params() (in module molass.FlowChange.FlowChangeParams)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.time_initialized">time_initialized (SecSaxsData attribute)</a>
 </li>

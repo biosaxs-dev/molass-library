@@ -176,18 +176,6 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.CurveModels.html">CurveModels</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="molass.CurveModels.Scattering.html">CurveModels.Scattering</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
-</ul>
-</details></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="molass.CurveModels.Scattering.html">CurveModels.Scattering</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="molass.CurveModels.Scattering.FormFactors.html">CurveModels.Scattering.FormFactors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.Curve.html">DataObjects.Curve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.SecSaxsData.html">DataObjects.SecSaxsData</a></li>
@@ -199,7 +187,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataUtils.html">DataUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.AnomalyHandlers.html">DataUtils.AnomalyHandlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.Beamline.html">DataUtils.Beamline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.Concentration.html">DataUtils.Concentration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.FolderWalker.html">DataUtils.FolderWalker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.ForwardCompat.html">DataUtils.ForwardCompat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataUtils.UvFileTrimming.html">DataUtils.UvFileTrimming</a></li>
@@ -229,7 +216,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangeParams.html">FlowChange.FlowChangeParams</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">FlowChange.FlowChangePlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.NullFlowChange.html">FlowChange.NullFlowChange</a></li>
-<li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.Property.html">FlowChange.Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.Possibility.html">FlowChange.Possibility</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -413,7 +400,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/nshimizu0721/molass-library" target="_blank"
+<a href="https://github.com/molass-saxs/molass-library" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -510,7 +497,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -526,6 +515,14 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangePlot.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -535,8 +532,26 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="flowchange-flowchangeplot">
-<h1>FlowChange.FlowChangePlot<a class="headerlink" href="#flowchange-flowchangeplot" title="Link to this heading">#</a></h1>
+  <section id="module-molass.FlowChange.FlowChangePlot">
+<span id="flowchange-flowchangeplot"></span><h1>FlowChange.FlowChangePlot<a class="headerlink" href="#module-molass.FlowChange.FlowChangePlot" title="Link to this heading">#</a></h1>
+<p>FlowChange.FlowChangePlot.py</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.FlowChange.FlowChangePlot.make_plot">
+<span class="sig-name descname"><span class="pre">make_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.FlowChange.FlowChangePlot.make_plot" title="Link to this definition">#</a></dt>
+<dd><p>Create 3D plots for the flow change records.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recs</strong> (<em>list</em><em> of </em><em>tuples</em>) – Each tuple contains (in_folder, mi, points, abs_likes, rel_likes, peaklike, peakpos).</p></li>
+<li><p><strong>axes</strong> (<em>list</em><em> of </em><em>Axes3D</em><em>, </em><em>optional</em>) – If provided, use these axes for plotting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -574,6 +589,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.FlowChange.FlowChangePlot.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

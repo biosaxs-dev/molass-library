@@ -12,14 +12,14 @@ This document describes each function of the library.
 
 For more structural information, see also:
 
-- **Essence:** https://nshimizu0721.github.io/molass-essence on theory for researchers,
-- **Tutorial:** https://nshimizu0721.github.io/molass-tutorial on how to use for begginners,
+- **Essence:** https://molass-saxs.github.io/molass-essence on theory for researchers,
+- **Tutorial:** https://molass-saxs.github.io/molass-tutorial on how to use for begginners,
 - **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details for developers,
 - **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
 
 To join the community, see also:
 
-- **Handbook:** https://nshimizu0721.github.io/molass-develop for maintenance.
+- **Handbook:** https://molass-saxs.github.io/molass-develop for maintenance.
 
 Module Functions
 ----------------
@@ -37,9 +37,6 @@ Submodules
 
    source/molass.Baseline
    source/molass.Bridge
-   source/molass.CurveModels
-   source/molass.CurveModels.Scattering
-   source/molass.CurveModels.Scattering.FormFactors
    source/molass.DataObjects
    source/molass.DataUtils
    source/molass.Decompose
