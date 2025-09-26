@@ -13,6 +13,26 @@ def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, conc
 
     molass library scheme:
         decomp_result = Backward.DecompResultAdapter.adapted_decomp_result(...)
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition object containing the components.
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    mapped_curve : ICurve
+        The mapped curve used for decomposition.
+    area_ratio : float
+        The area ratio used for determining ranges.
+    concentration_datatype : int
+        The concentration data type (1 for X-ray measured data, else for UV measured data).
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    list of PairedRange
+        The list of paired ranges for the components.
     """
     if debug:
         from importlib import reload

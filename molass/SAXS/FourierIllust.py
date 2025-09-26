@@ -8,6 +8,24 @@ import matplotlib.pyplot as plt
 from learnsaxs import draw_voxles_as_dots, get_detector_info, draw_detector_image
 
 def plot_saxs_illust(center, a, b, c):
+    """Plot the SAXS illustration of a 3D ellipsoid and its scattering curve.
+    
+    Parameters
+    ----------
+    center : tuple
+        The center of the ellipsoid (cx, cy, cz).
+    a : float
+        The semi-axis length along the x-axis.
+    b : float
+        The semi-axis length along the y-axis.
+    c : float
+        The semi-axis length along the z-axis.
+    
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure containing the plots.
+    """
     N = 32
     x = y = z = np.arange(N)
     xx, yy, zz = np.meshgrid(x, y, z)    

@@ -6,6 +6,22 @@ from scipy.optimize import minimize
 from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf, DEFUALT_TIMESCALE
 
 def optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs):
+    """ Optimize the SDM decomposition.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition to optimize.
+    env_params : tuple
+        The environmental parameters (N, T, me, mp, N0, t0, poresize).
+    kwargs : dict
+        Additional parameters for the optimization process.
+
+    Returns
+    -------
+    new_xr_ccurves : list of SdmComponentCurve
+        The optimized SDM component curves.
+    """
     # N, T, N0, t0, poresize
     debug = kwargs.get('debug', False)
     if debug:
@@ -60,6 +76,22 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs):
     return new_xr_ccurves
 
 def optimize_sdm_uv_decomposition(decomposition, xr_ccurves, **kwargs):
+    """ Optimize the SDM UV decomposition.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition to optimize.
+    xr_ccurves : list of SdmComponentCurve
+        The SDM component curves from the XR decomposition.
+    kwargs : dict
+        Additional parameters for the optimization process.
+        
+    Returns
+    -------
+    new_uv_ccurves : list of UvComponentCurve
+        The optimized UV component curves.
+    """
     debug = kwargs.get('debug', False)
     from molass.Mapping.Mapping import Mapping
     if debug:

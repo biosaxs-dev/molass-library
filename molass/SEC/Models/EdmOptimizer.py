@@ -8,6 +8,23 @@ from molass_legacy.Models.RateTheory.EDM import edm_impl
 from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf, DEFUALT_TIMESCALE
 
 def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
+    """ Optimize the EDM decomposition.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition to optimize.
+    init_params : array-like
+        The initial parameters for the EDM components.
+    kwargs : dict
+        Additional parameters for the optimization process.
+        
+    Returns
+    -------
+    new_xr_ccurves : list of EdmComponentCurve
+        The optimized EDM component curves.
+    """
+
     # N, T, N0, t0, poresize
     debug = kwargs.get('debug', False)
     if debug:

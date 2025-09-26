@@ -7,14 +7,50 @@ import numpy as np
 class Sphere:
     """
     Sphere class to represent a spherical density space.
+
+    Attributes
+    ----------
+    radius : float
+        The radius of the sphere.
+    center : tuple of float, optional
+        The center of the sphere. If None, the center is assumed to be at the
+        center of the grid when used in get_condition.
     """
     def __init__(self, radius, center=None):
+        """
+        Initialize the Sphere object.
+
+        Parameters
+        ----------
+        radius : float
+            The radius of the sphere.
+        center : tuple of float, optional
+            The center of the sphere. If None, the center is assumed to be at the
+            center of the grid when used in get_condition.
+        """
         self.radius = radius
         self.center = center
 
     def get_condition(self, xx, yy, zz, center=None):
         """
         Get the condition for the sphere.
+
+        Parameters
+        ----------
+        xx : np.ndarray
+            The x-coordinates grid.
+        yy : np.ndarray
+            The y-coordinates grid.
+        zz : np.ndarray
+            The z-coordinates grid.
+        center : tuple of float, optional
+            The center of the sphere. If None, the center attribute of the object is used.
+            If the center attribute is also None, the center is assumed to be at the center of the grid.
+            
+        Returns
+        -------
+        np.ndarray
+            A boolean array where points inside the sphere are True.
         """
         if center is None:
             center = self.center

@@ -12,7 +12,27 @@ ACCEPTABLE_2SIGMA_RATIO = 0.05      #
 
 def compute_mapping_coverage(x, y, slope, intercept, debug=False):
     """
-    Check if the mapping covers the range of x and y.
+    Compute the coverage ratio of the mapping from x to y.
+    The coverage ratio is defined as the ratio of the overlapping range
+    of the mapped x values and the y values to the total range of x values.
+    
+    Parameters
+    ----------
+    x : array-like
+        The x values.
+    y : array-like
+        The y values.
+    slope : float
+        The slope of the mapping line.
+    intercept : float
+        The intercept of the mapping line.
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    coverage_ratio : float
+        The coverage ratio of the mapping.
     """
     y_ = x[[0,-1]]*slope + intercept
     ymin = max(y[0], y_[0])
@@ -25,7 +45,28 @@ def compute_mapping_coverage(x, y, slope, intercept, debug=False):
 
 def estimate_slope_reliability(xr_curve, x, uv_curve, y, coverage_ratio, debug=False):
     """
-    Estimate the reliability of the slope by comparing the peak ratios.
+    Estimate the reliability of the slope based on coverage ratio and peak ratio.
+    This is particularly important when there is only one peak in the curves.
+
+    Parameters
+    ----------
+    xr_curve : Curve
+        The X-ray curve.
+    x : array-like
+        The x values of the peak (mean - std, mean, mean + std).
+    uv_curve : Curve
+        The UV curve.
+    y : array-like
+        The y values of the peak (mean - std, mean, mean + std).
+    coverage_ratio : float
+        The coverage ratio of the mapping.
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    reliable : bool
+        True if the slope is considered reliable, False otherwise.
     """
     if coverage_ratio >= RELIABLE_COVERAGE_RATIO:
         # as in 20201006_1, 20200125_1, 20200125_2
@@ -42,6 +83,32 @@ def estimate_slope_reliability(xr_curve, x, uv_curve, y, coverage_ratio, debug=F
     return peak_ratio >= ACCEPTABLE_2SIGMA_RATIO
 
 def compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False):
+    """
+    Compute the mapping by using the full coverage of the curves.
+    This is used when there is only one peak in the curves.
+    The mapping is computed by linear regression using three points:
+        (mean - std, mean, mean + std)
+    The peak point is given more weight than the edges.
+    The peak point is determined by the first peak in the curves:
+
+    Parameters
+    ----------
+    xr_curve : Curve
+        The X-ray curve.
+    xr_peaks : list of int
+        The peak positions in the X-ray curve.
+    uv_curve : Curve
+        The UV curve.
+    uv_peaks : list of int
+        The peak positions in the UV curve.
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    mapping : MappingInfo
+        The computed mapping information.
+    """
     px = xr_curve.x[xr_peaks[0]]
     py = uv_curve.x[uv_peaks[0]]
     """
@@ -66,6 +133,31 @@ def compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, deb
     return MappingInfo(slope, intercept, xr_peaks, uv_peaks, None, None, xr_curve, uv_curve)
 
 def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, retry=True, debug=False):
+    """
+    Estimate the mapping between xr_curve and uv_curve using the given peak positions.
+    The mapping is computed by linear regression using the peak positions.
+    If the coverage ratio is not acceptable, it retries with corrected curves.
+    Parameters
+    ----------
+    xr_curve : Curve
+        The X-ray curve.
+    xr_peaks : list of int
+        The peak positions in the X-ray curve.
+    uv_curve : Curve
+        The UV curve.
+    uv_peaks : list of int
+        The peak positions in the UV curve.
+    retry : bool, optional
+        If True, retries with corrected curves if the coverage ratio is not acceptable.
+        Default is True.
+    debug : bool, optional
+        If True, print debug information.
+
+    Returns
+    -------
+    mapping : MappingInfo
+        The estimated mapping information.
+    """
     if len(xr_peaks) > 1:
         x = xr_curve.x[xr_peaks]
         y = uv_curve.x[uv_peaks]
@@ -103,6 +195,25 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, 
         return estimate_mapping_for_matching_peaks(xr_curve_, xr_peaks, uv_curve_, uv_peaks, retry=False, debug=debug)
 
 def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
+    """
+    Estimate the mapping between xr_curve and uv_curve.
+    The mapping is computed by identifying groupable peaks in both curves,
+    matching them, and then performing linear regression on the matched peaks.
+
+    Parameters
+    ----------
+    xr_curve : Curve
+        The X-ray curve.
+    uv_curve : Curve
+        The UV curve.
+    debug : bool, optional
+        If True, print debug information.
+        
+    Returns
+    -------
+    mapping : MappingInfo
+        The estimated mapping information.
+    """
     from molass.Mapping.Grouping import get_groupable_peaks
 
     xr_peaks, uv_peaks = get_groupable_peaks(xr_curve, uv_curve, debug=debug)

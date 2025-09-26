@@ -15,8 +15,33 @@ class PreProcessing:
     A class to prepare the V1 report.
     This class is used to prepare the V1 report by running the necessary steps in a separate thread.
     It uses a progress set to track the progress of the report generation.
+
+    Attributes
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+    num_steps : int
+        The number of steps to be performed.
+    rgcurves : tuple of ICurve
+        The tuple containing the molecular and ATSAS Rg curves.
+    decomposition : Decomposition
+        The decomposition object containing the components.
+    pairedranges : list of PairedRange
+        The list of paired ranges for the components.
     """
     def __init__(self, ssd, **kwargs):
+        """
+        Initialize the PreProcessing class.
+
+        Parameters
+        ----------
+        ssd : SecSaxsData
+            The SecSaxsData object containing the data.
+        kwargs : dict
+            Additional keyword arguments for configuration.
+        """
         self.ssd = ssd
         self.kwargs = kwargs
         self.num_steps = 0
@@ -34,6 +59,18 @@ class PreProcessing:
         return self.num_steps
 
     def run(self, pu, debug=False):
+        """
+        Run the preprocessing steps to prepare the V1 report.
+        This method performs the necessary preprocessing steps to prepare the V1 report.
+        It updates the progress unit as each step is completed.
+
+        Parameters
+        ----------
+        pu : ProgressUnit
+            The progress unit to track the progress of the report generation.
+        debug : bool, optional
+            If True, print debug information.
+        """
         if self.rgcurves is None:
             mo_rgcurve = self.ssd.xr.compute_rgcurve()
             at_rgcurve = self.ssd.xr.compute_rgcurve_atsas()
@@ -52,7 +89,19 @@ class PreProcessing:
 
 def make_v1report(ssd, **kwargs):
     """
+    Make the V1 report using the provided SecSaxsData and parameters.
+    This function generates the V1 analysis report and saves it to an Excel file.
 
+    Parameters
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+
+    Returns
+    -------
+    None
     """
     from molass_legacy.Env.EnvInfo import get_global_env_info
     from molass.PackageUtils.PyWin32Utils import check_pywin32_postinstall
@@ -94,6 +143,28 @@ def make_v1report(ssd, **kwargs):
     tread1.join()
 
 def make_v1report_runner(pu_list, ssd, preproc, env_info, kwargs):
+    """
+    The runner function for generating the V1 report.
+    This function is executed in a separate thread to generate the V1 report.
+    It performs the necessary preprocessing and report generation steps.
+
+    Parameters
+    ----------
+    pu_list : list of ProgressUnit
+        The list of progress units to track the progress of the report generation.
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    preproc : PreProcessing
+        The PreProcessing object to prepare the report.
+    env_info : EnvironmentInfo
+        Information about the environment, including Excel and ATSAS availability.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+        
+    Returns
+    -------
+    None
+    """
     debug = kwargs.get('debug', False)
     guinier_only = kwargs.get('guinier_only', False)
     

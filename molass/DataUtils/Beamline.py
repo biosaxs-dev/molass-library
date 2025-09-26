@@ -1,7 +1,5 @@
 """
     DataUtils.PfBeamline.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import os
 

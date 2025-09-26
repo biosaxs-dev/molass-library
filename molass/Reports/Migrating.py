@@ -52,6 +52,24 @@ SELECT_COLUMS = [ 2, 3, 5, 6, 7, ATSAS_QUALITY, 10, GPFIT_I0, ATSAS_I0, 11, GPFI
 SELECT_COLUMS_ = np.array(SELECT_COLUMS) - 2
 
 def make_gunier_row_values(result, result_atsas, return_selected=False):
+    """
+    Make a list of values for the gunier analysis report.
+
+    Parameters
+    ----------
+    result : object
+        The result object from the gunier analysis.
+    result_atsas : object
+        The result object from the ATSAS analysis.
+    return_selected : bool, optional
+        If True, return only the selected columns.
+        Default is False.
+        
+    Returns
+    -------
+    list
+        A list of values for the report.
+    """
     if result is not None and result.quality_object is not None:
         raw_factors = result.quality_object.get_raw_factors()
     else:

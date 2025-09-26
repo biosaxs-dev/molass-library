@@ -5,10 +5,28 @@ import numpy as np
 from scipy import ndimage, interpolate
 
 class DetectorInfo:
+    """ A class to hold detector information and simulated SAXS data.
+    """
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
 def get_detector_info(q, F, dmax=100):
+    """ Simulate SAXS data from a given electron density map using DENSS-like approach.
+
+    Parameters
+    ----------
+    q : np.ndarray
+        The q values at which to compute the SAXS intensity.
+    F : np.ndarray
+        The 3D Fourier transform of the electron density map.
+    dmax : float, optional
+        The maximum dimension of the particle in Angstroms. Default is 100.
+        
+    Returns
+    -------
+    DetectorInfo
+        An instance of the DetectorInfo class.
+    """
     shape = F.shape
     voxel = 5
     oversampling = 3

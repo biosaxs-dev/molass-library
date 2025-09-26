@@ -8,6 +8,30 @@ from matplotlib.patches import Rectangle, Circle
 from .ColumnElements import NewGrain, solvant_color
 
 def plot_column_structure(ax, xmin, xmax, ymin, ymax, num_pores, rs):
+    """ Plot the column structure with grains on the given axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes on which to plot the column structure.
+    xmin : float
+        The minimum x value of the column.
+    xmax : float
+        The maximum x value of the column.
+    ymin : float
+        The minimum y value of the column.
+    ymax : float
+        The maximum y value of the column.
+    num_pores : int
+        The number of pores in each grain.
+    rs : float
+        The radius of each grain.
+        
+    Returns
+    -------
+    grains : list of NewGrain
+        The list of grains created in the column structure.
+    """
 
     xm = 0.01
     ym = 0.03

@@ -10,6 +10,23 @@ from time import time, sleep
 WRITE_TO_TEMPFILE = False
 
 def make_guinier_report(punit, controller, kwargs):
+    """
+    Make the Guinier report using the provided controller and parameters.
+    This function generates the Guinier analysis report and saves it to an Excel file.
+    
+    Parameters
+    ----------
+    punit : ProgressUnit
+        The progress unit to track the progress of the report generation.
+    controller : Controller
+        The controller containing the data and settings for the report.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+
+    Returns
+    -------
+    None
+    """
     debug = kwargs.get('debug')
     if debug:
         import molass_legacy.Reports.GuinierAnalysisResultBook

@@ -7,8 +7,34 @@ import numpy as np
 class Ellipsoid:
     """
     Sphere class to represent a spherical density space.
+
+    Attributes
+    ----------
+    a : float
+        The semi-axis length along the x-axis.
+    b : float
+        The semi-axis length along the y-axis.
+    c : float
+        The semi-axis length along the z-axis.
+    center : tuple of float, optional
+        The center of the ellipsoid. If None, the center is assumed to be at the
+        center of the grid when used in get_condition.
     """
     def __init__(self, a, b, c, center=None):
+        """
+        Initialize the Ellipsoid object.
+        Parameters
+        ----------
+        a : float
+            The semi-axis length along the x-axis.
+        b : float
+            The semi-axis length along the y-axis.
+        c : float
+            The semi-axis length along the z-axis.
+        center : tuple of float, optional
+            The center of the ellipsoid. If None, the center is assumed to be at the
+            center of the grid when used in get_condition.
+        """
         self.a = a
         self.b = b
         self.c = c
@@ -17,6 +43,23 @@ class Ellipsoid:
     def get_condition(self, xx, yy, zz, center=None):
         """
         Get the condition for the ellipsoid.
+
+        Parameters
+        ----------
+        xx : np.ndarray
+            The x-coordinates grid.
+        yy : np.ndarray
+            The y-coordinates grid.
+        zz : np.ndarray
+            The z-coordinates grid.
+        center : tuple of float, optional
+            The center of the ellipsoid. If None, the center attribute of the object is used.
+            If the center attribute is also None, the center is assumed to be at the center of the grid.
+            
+        Returns
+        -------
+        np.ndarray
+            A boolean array where True indicates points inside the ellipsoid.
         """
         if center is None:
             center = self.center

@@ -12,6 +12,28 @@ from molass.SEC.Models.Simple import egh
 save_reg_data_fh = None
 
 def guess(x, y, init_params=None, debug=False, debug_info=None):
+    """ Guess initial parameters for the EDM model based on the given curve (x, y).
+    N, T, N0, t0, poresize
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the curve.
+    y : array-like
+        The y values of the curve.
+    init_params : tuple, optional
+        Initial guess for the parameters. If None, a guess will be made.
+    debug : bool, optional
+        If True, debug information will be printed and plots will be shown.
+    debug_info : dict, optional
+        Additional debug information.
+
+    Returns
+    -------
+    params : tuple
+        Estimated parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).
+    """
+
     if debug:
         from importlib import reload
         import molass_legacy.Models.RateTheory.RobustEDM
@@ -51,6 +73,27 @@ def guess(x, y, init_params=None, debug=False, debug_info=None):
     return ret.x
 
 def guess_multiple_impl(x, y, xr_ccurves, respect_egh=False, debug=False):
+    """ Guess initial parameters for multiple EDM component curves based on the given curve (x, y).
+    N, T, N0, t0, poresize
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the curve.
+    y : array-like
+        The y values of the curve.
+    xr_ccurves : list of EdmComponentCurve
+        The list of EDM component curves.
+    respect_egh : bool, optional
+        If True, respect the EGH parameters of the component curves.
+    debug : bool, optional
+        If True, debug information will be printed and plots will be shown.
+
+    Returns
+    -------
+    params_array : ndarray
+        Estimated parameters for each component curve.
+    """
     num_components = len(xr_ccurves)
 
     cy_list = []

@@ -1,7 +1,5 @@
 """
     DataUtils.UvLoader.py
-
-    Copyright (c) 2024, SAXS Team, KEK-PF
 """
 import os
 from molass_legacy.SerialAnalyzer.SerialDataUtils import load_uv_array, load_uv_file

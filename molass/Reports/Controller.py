@@ -14,8 +14,56 @@ class Controller(SerialExecuter):
 
     Inherits from SerialExecuter to use the following methods:
         save_smoothed_data
+
+    Attributes
+    ----------
+    env_info : EnvironmentInfo
+        Information about the environment, including Excel and ATSAS availability.
+    ssd : SerialSaxsData
+        The serial SAXS data to be analyzed.
+    preproc : Preprocessor
+        The preprocessor containing preprocessed data.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+    logger : Logger
+        Logger for logging messages.
+    work_folder : str
+        The working folder for report generation.
+    bookpath : str
+        The path to the Excel report file.
+    excel_is_available : bool
+        Indicates if Excel is available.
+    excel_version : str
+        The version of Excel being used.
+    atsas_is_available : bool
+        Indicates if ATSAS is available.
+    more_multicore : bool
+        Indicates if more than 4 CPU cores are available for parallel processing.
+    conc_tracker : ConcTracker or None
+        The concentration tracker, if concentration tracking is enabled.
+    temp_folder : str
+        Temporary folder for intermediate files.
+    result_wb : Workbook or None
+        The Excel workbook for results, if Excel is available.
+    teller : ExcelTeller or None
+        The Excel teller for managing Excel operations in parallel mode.
+    excel_client : ExcelComClient or None
+        The Excel COM client for managing Excel operations in single-threaded mode.
     """
     def __init__(self, env_info, ssd, preproc, kwargs):
+        """
+        Initialize the Controller.
+        Parameters
+        ----------
+        env_info : EnvironmentInfo
+            Information about the environment, including Excel and ATSAS availability.
+        ssd : SerialSaxsData
+            The serial SAXS data to be analyzed.
+        preproc : Preprocessor
+            The preprocessor containing preprocessed data.
+        kwargs : dict
+            Additional keyword arguments for configuration.
+        """
         debug = kwargs.get('debug', False)
         if debug:
             from importlib import reload
@@ -98,6 +146,10 @@ class Controller(SerialExecuter):
         self.doing_sec = True
 
     def prepare_averaged_data(self):
+        """
+        Prepare averaged data if input_smoothing is set to 1.
+        This method updates the using_averaged_files attribute based on the settings.
+        """
         self.using_averaged_files = False
         if self.input_smoothing == 1:
             num_curves_averaged = get_setting( 'num_curves_averaged' )
@@ -121,6 +173,9 @@ class Controller(SerialExecuter):
             assert False
 
     def make_temp_folder( self ):
+        """
+        Create a temporary folder for intermediate files.
+        """
         from molass_legacy.KekLib.BasicUtils import clear_dirs_with_retry
         try:
             clear_dirs_with_retry([self.temp_folder])
@@ -131,17 +186,14 @@ class Controller(SerialExecuter):
             raise exc
     
     def stop(self):
+        """
+        Stop the controller and clean up resources.
+        """
         if self.teller is None:
             self.cleanup()
         else:
             self.teller.stop()
     
-    def cleanup(self):
-        from molass_legacy.KekLib.ExcelCOM import CoUninitialize
-        self.excel_client.quit()
-        self.excel_client = None
-        CoUninitialize()
-
     def stop_check(self):
         """
         Check if the controller should stop.
@@ -153,6 +205,9 @@ class Controller(SerialExecuter):
         on_stop_raise(cleanup=self.error_cleanup, log_closure=log_closure)
     
     def cleanup(self):
+        """
+        Cleanup temporary files and resources.
+        """
         self.logger.info("Cleanup started. This may take some time (not more than a few minutes). Please be patient.")
 
         if self.more_multicore:
@@ -173,6 +228,9 @@ class Controller(SerialExecuter):
         self.logger.info("Cleanup done.")
 
     def error_cleanup(self):
+        """
+        Cleanup resources in case of an error.
+        """
         from molass_legacy.KekLib.ExcelCOM import cleanup_created_excels
         self.cleanup()
         cleanup_created_excels()

@@ -5,6 +5,22 @@ import numpy as np
 from scipy.optimize import minimize
 
 def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
+    """ Optimize the UV decomposition based on the given XR component curves.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The initial decomposition containing the UV initial curve and component curves.
+    xr_ccurves : list of UvComponentCurve
+        The XR component curves to be used for UV optimization.
+    kwargs : dict
+        Additional parameters for the optimization process.
+        
+    Returns
+    -------
+    new_uv_ccurves : list of UvComponentCurve
+        The optimized UV component curves.
+    """
     debug = kwargs.get('debug', False)
     from molass.Mapping.Mapping import Mapping
     if debug:

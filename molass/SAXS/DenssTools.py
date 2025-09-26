@@ -12,6 +12,8 @@ from .DetectorInfo import get_detector_info
 np.int = np.int32
 
 class DetectorInfo:
+    """ A class to hold detector information and simulated SAXS data.
+    """
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 

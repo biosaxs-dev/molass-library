@@ -12,6 +12,24 @@ REFLECT_LIMIT_DIST = 1e-5
 REFLECT_NUM_TRIALS = 5
 
 def find_nearest_wall(grain, px, py):
+    """ Find the nearest wall of the grain to the point (px, py).
+
+    Parameters
+    ----------
+    grain : NewGrain
+        The grain to find the nearest wall.
+    px : float
+        The x coordinate of the point.
+    py : float
+        The y coordinate of the point.
+
+    Returns
+    -------
+    i : int
+        The index of the nearest wall in the first dimension.
+    j : int
+        The index of the nearest wall in the second dimension.
+    """
     cx, cy = grain.center
     dx = px - cx
     dy = py - cy
@@ -22,6 +40,26 @@ def find_nearest_wall(grain, px, py):
     return i, j
 
 def compute_boundary_walls(cx, cy, R, r, entry_points):
+    """ Compute the boundary walls of the grain considering the entry points.
+
+    Parameters
+    ----------
+    cx : float
+        The x coordinate of the grain center.
+    cy : float
+        The y coordinate of the grain center.
+    R : float
+        The radius of the grain.
+    r : float
+        The radius of the particle.
+    entry_points : list of tuples
+        The entry points of the grain.
+
+    Returns
+    -------
+    bpoints : list of tuples
+        The boundary points of the grain.
+    """
     outerx = [cx]
     outery = [cy]
     for ex, ey in entry_points:
@@ -45,8 +83,29 @@ def compute_boundary_walls(cx, cy, R, r, entry_points):
 
 def mirrorImage(a, b, c, x1, y1):
     """
-    borrowed from
+    Find the mirror image of point (x1, y1) against the line ax + by + c = 0.
+    Formula borrowed from
     https://www.geeksforgeeks.org/find-mirror-image-point-2-d-plane/
+
+    Parameters
+    ----------
+    a : float
+        The coefficient of x in the line equation.
+    b : float
+        The coefficient of y in the line equation.
+    c : float
+        The constant term in the line equation.
+    x1 : float
+        The x coordinate of the point.
+    y1 : float
+        The y coordinate of the point.
+        
+    Returns
+    -------
+    x : float
+        The x coordinate of the mirror image point.
+    y : float
+        The y coordinate of the mirror image point.
     """
     temp = -2 * (a * x1 + b * y1 + c) /(a * a + b * b)
     x = temp * a + x1
@@ -54,6 +113,28 @@ def mirrorImage(a, b, c, x1, y1):
     return (x, y)
 
 def compute_reflected_point(bpoints, wx, wy, nx, ny, debug=False):
+    """ Compute the reflected point of (nx, ny) against the boundary walls defined by bpoints.
+
+    Parameters
+    ----------
+    bpoints : list of tuples
+        The boundary points defining the walls.
+    wx : float
+        The x coordinate of the last position.
+    wy : float
+        The y coordinate of the last position.
+    nx : float
+        The x coordinate of the new position.
+    ny : float
+        The y coordinate of the new position.
+    debug : bool, optional
+        If True, enables debug mode with additional output.
+
+    Returns
+    -------
+    (mx, my) : tuple of float
+        The coordinates of the reflected point, or None if no reflection occurs.
+    """
     ls = LineString([(wx, wy), (nx, ny)])
     cpoint = bpoints[0]
     ret = None
@@ -84,6 +165,34 @@ def compute_reflected_point(bpoints, wx, wy, nx, ny, debug=False):
     return ret
 
 def get_next_position_impl(particle, grain, last_px, last_py, px, py, debug_info=None):
+    """ Get the next position of the particle considering reflections against the grain walls.
+
+    Parameters
+    ----------
+    particle : Particle
+        The particle to move.
+    grain : NewGrain
+        The grain containing the particle.
+    last_px : float
+        The x coordinate of the last position.
+    last_py : float
+        The y coordinate of the last position.
+    px : float
+        The x coordinate of the proposed new position.
+    py : float
+        The y coordinate of the proposed new position.
+    debug_info : tuple of (fig, ax), optional
+        If provided, enables debug mode with the given figure and axes for drawing.
+        
+    Returns
+    -------
+    nx : float
+        The x coordinate of the next position.
+    ny : float
+        The y coordinate of the next position.
+    inmobile : bool
+        True if the particle is inmobile (stuck), False otherwise.
+    """
     inmobile = False
     cx, cy = grain.center
     nx, ny = px, py

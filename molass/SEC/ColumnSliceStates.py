@@ -6,6 +6,25 @@
 import numpy as np
 
 def draw_slice_states_impl(fig, ax, grains, pxv, pyv, inmobile_states, debug=False):
+    """ Draw the slice states.
+    
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        The figure to draw on.
+    ax : matplotlib.axes.Axes
+        The axes to draw on.
+    grains : list of Grain
+        The list of grains.
+    pxv : np.ndarray
+        The x values.
+    pyv : np.ndarray
+        The y values.
+    inmobile_states : np.ndarray
+        A boolean array indicating the inmobile states.
+    debug : bool
+        If True, enable debug mode.
+    """
     print("draw_slice_states_impl")
  
     dy = 0.01

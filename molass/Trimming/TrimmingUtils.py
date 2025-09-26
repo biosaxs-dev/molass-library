@@ -10,6 +10,25 @@ from molass.Trimming.TrimmingInfo import TrimmingInfo
 TRIMMING_NSIGMAS = 10
 
 def make_and_slicepair(pair1, pair2, judge_info, debug=False):
+    """
+    Create slices for a pair of ranges, considering the judge_info.
+
+    Parameters
+    ----------
+    pair1 : tuple (i, j)
+        The first range (start, stop).
+    pair2 : tuple (k, l)
+        The second range (start, stop).
+    judge_info : any
+        Information to judge how to combine the ranges.
+    debug : bool
+        If True, print debug information.
+
+    Returns
+    -------
+    start, stop : tuple
+        The combined range (start, stop).
+    """
     if debug:
         print("judge_info=", judge_info)
     i, j = pair1
@@ -34,6 +53,43 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
                             ip_effect_info=None, nsigmas=TRIMMING_NSIGMAS, nguiniers=None,
                             jranges=None, mapping=None,
                             debug=False):
+    """ 
+    Create trimming slices for the given data.
+
+    Parameters
+    ----------
+    ssd : SampledScatteringData
+        The data to be trimmed.
+    xr_qr : tuple (start, stop) or None
+        The q-range for XR data. If None, use the usable q-range.
+    xr_mt : Moment or None
+        The moment for XR data. If None, compute from the data.
+    uv_wr : tuple (start, stop) or None
+        The w-range for UV data. If None, use the usable w-range.
+    uv_mt : Moment or None
+        The moment for UV data. If None, compute from the data.
+    uv_fc : any
+        Flow change information for UV data. (Not used in this function)
+    flowchange : bool or 'auto' or None
+        Whether to consider flow change points. If 'auto', determine automatically.
+    ip_effect_info : any
+        Information for IP effect. (Not used in this function)
+    nsigmas : int
+        Number of sigmas for moment calculation.
+    nguiniers : int or None
+        Number of Guinier points to consider. If None, use default.
+    jranges : tuple of tuples or None
+        The j-ranges for XR and UV data. If None, compute from the data.
+    mapping : MappingInfo or None
+        The mapping information between XR and UV data. If None, compute if needed.
+    debug : bool
+        If True, print debug information.
+
+    Returns
+    -------
+    TrimmingInfo
+        The trimming information with slices and mapping.
+    """
     if jranges is None:
         # xr_slices
         if ssd.xr is None or ssd.trimmed:
@@ -113,6 +169,21 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
     return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping)
 
 def slice_to_values(vec, slice_):
+    """ Convert a slice to its start and stop values in the given vector. 
+    If start or stop is None, use the first or last element of the vector.
+
+    Parameters
+    ----------
+    vec : array-like
+        The vector from which to extract values.
+    slice_ : slice
+        The slice object to convert.
+
+    Returns
+    -------
+    values : list
+        A list containing the start and stop values corresponding to the slice.
+    """
     values = []
     for i, j in (slice_.start, 0), (slice_.stop, -1):
         k = j if i is None else i
@@ -120,6 +191,28 @@ def slice_to_values(vec, slice_):
     return values
 
 def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
+    """ Create mapped trimming slices for XR and UV data.
+
+    Parameters
+    ----------
+    ssd : SampledScatteringData
+        The data to be trimmed.
+    xr_jslice : slice
+        The j-slice for XR data.
+    uv_jslice : slice
+        The j-slice for UV data.
+    debug : bool
+        If True, print debug information.
+        
+    Returns
+    -------
+    xr_jslice : slice
+        The adjusted j-slice for XR data.
+    uv_jslice : slice
+        The adjusted j-slice for UV data.
+    mapping : MappingInfo
+        The mapping information between XR and UV data.
+    """
     mapping = ssd.estimate_mapping(debug=debug) 
 
     xr_x = mapping.xr_curve.x

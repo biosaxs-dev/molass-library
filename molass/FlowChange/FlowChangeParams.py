@@ -11,8 +11,15 @@ from molass.DataUtils.UvLoader import get_uvcurves
 TEST_TARGETS = []
 # from molass.Test.TestSettings import get_datafolder
 def get_datafolder():
+    """Get the data folder path.
+    
+    Returns
+    -------
+    str
+        The data folder path.
+    """
     # Adjust this function to return the correct data folder path
-        return
+    return
 
 def compute_like_values(for_all=False):
     """Compute likelihood values for flow change detection on test datasets.

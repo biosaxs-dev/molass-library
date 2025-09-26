@@ -6,10 +6,30 @@ import matplotlib.pyplot as plt
 from molass.SAXS.denss.core import *
 
 class DenssDetector:
+    """ A class to simulate SAXS data from a given electron density map using DENSS-like approach.
+    """
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
 def get_denss_detector(q, rho, DENSS_GPU=False, debug=True):
+    """ Simulate SAXS data from a given electron density map using DENSS-like approach.
+
+    Parameters
+    ----------
+    q : np.ndarray
+        The q values at which to compute the SAXS intensity.
+    rho : np.ndarray
+        The 3D electron density map.
+    DENSS_GPU : bool, optional
+        If True, use GPU acceleration for computations.
+    debug : bool, optional
+        If True, enable debug mode with additional output.
+        
+    Returns
+    -------
+    DenssDetector
+        An instance of the DenssDetector class.
+    """
     # return DenssDetector(q=q, y=curve_y, spline=interp)
     # Initialize variables
 

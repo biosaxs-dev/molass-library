@@ -22,6 +22,43 @@ from molass_legacy.KekLib.BasicUtils import Struct
 MAXNUM_STEPS = 20000
 
 def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2, extrapolate=True, gui=False, use_memory_data=False):
+    """ fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2, extrapolate=True, gui=False, use_memory_data=False)
+    Fit the provided SAXS data using DENSS's fit_data logic.
+    This function processes the input data and prepares it for DENSS reconstruction.
+
+    Parameters
+    ----------
+    q : np.ndarray
+        The q values of the SAXS data.
+    a : np.ndarray
+        The intensity values of the SAXS data.
+    e : np.ndarray
+        The error values of the SAXS data.
+    file : str, optional
+        The path to the data file. If None, data is taken from memory.
+    D : float, optional
+        The maximum dimension (Dmax) of the particle. If None, it will be estimated
+        from the data.
+    alpha : float, optional
+        The regularization parameter. If None, it will be optimized.
+    max_alpha : float, optional
+        The maximum value for alpha during optimization.
+    nes : int, optional
+        The number of electrons per voxel.
+    extrapolate : bool, optional
+        If True, extrapolate the data to higher q values.
+    gui : bool, optional
+        If True, enable GUI mode for optimization.
+    use_memory_data : bool, optional
+        If True, use the provided q, a, e arrays instead of reading from file.
+
+    Returns
+    -------
+    sasrec : denss.Sasrec
+        The fitted Sasrec object containing the processed data.
+    work_info : Struct
+        A structure containing additional information about the fitting process.
+    """
     Iq = np.vstack( [q, a, e] ).T
 
     # task: update this construction automatically from bin\denss.fit_data.py
@@ -192,6 +229,42 @@ def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2,
     return sasrec, work_info
 
 def fit_data(q, a, e, D=None, extrapolate=False, return_sasrec=False):
+    """ fit_data(q, a, e, D=None, extrapolate=False, return_sasrec=False)
+    Fit the provided SAXS data using DENSS's fit_data logic.
+    This function processes the input data and prepares it for DENSS reconstruction.
+    This is a simplified wrapper around fit_data_impl().
+
+    Parameters
+    ----------
+    q : np.ndarray
+        The q values of the SAXS data.
+    a : np.ndarray
+        The intensity values of the SAXS data.
+    e : np.ndarray
+        The error values of the SAXS data.
+    D : float, optional
+        The maximum dimension (Dmax) of the particle. If None, it will be estimated
+        from the data.
+    extrapolate : bool, optional
+        If True, extrapolate the data to higher q values.
+    return_sasrec : bool, optional
+        If True, return the Sasrec object. If False, return qc, Ic, Icerr, D.
+
+    Returns
+    -------
+    If return_sasrec is True:
+        sasrec : denss.Sasrec
+            The fitted Sasrec object containing the processed data.
+    Else:
+        qc : np.ndarray
+            The q values used in the fitted data.
+        Ic : np.ndarray
+            The fitted intensity values.
+        Icerr : np.ndarray
+            The fitted error values.
+        D : float
+            The estimated maximum dimension (Dmax) of the particle.
+    """
     sasrec, work_info = fit_data_impl(q, a, e,
                                         D=D,
                                         alpha=0,        # backward compatibility
@@ -204,6 +277,37 @@ def fit_data(q, a, e, D=None, extrapolate=False, return_sasrec=False):
         return sasrec.qc, sasrec.Ic, sasrec.Icerr, sasrec.D
 
 def fit_data_bc(q, a, e, extrapolate=False):    # backward compatible
+    """ fit_data_bc(q, a, e, extrapolate=False)
+    Fit the provided SAXS data using DENSS's fit_data logic.
+    This function processes the input data and prepares it for DENSS reconstruction.
+    This is a simplified wrapper around fit_data_impl().
+    This function is for backward compatibility.
+    It always sets alpha=0 and does not return the sasrec object.
+    This function is for backward compatibility with older versions of molass.
+    It is recommended to use fit_data() instead.
+
+    Parameters
+    ----------
+    q : np.ndarray
+        The q values of the SAXS data.
+    a : np.ndarray
+        The intensity values of the SAXS data.
+    e : np.ndarray
+        The error values of the SAXS data.
+    extrapolate : bool, optional
+        If True, extrapolate the data to higher q values.
+
+    Returns
+    -------
+    qc : np.ndarray
+        The q values used in the fitted data.
+    Ic : np.ndarray
+        The fitted intensity values.
+    Icerr : np.ndarray
+        The fitted error values.
+    D : float
+        The estimated maximum dimension (Dmax) of the particle.
+    """
     sasrec, work_info = fit_data_impl(q, a, e,
                                         D=100,
                                         alpha=0,
@@ -213,12 +317,42 @@ def fit_data_bc(q, a, e, extrapolate=False):    # backward compatible
     return sasrec.qc, sasrec.Ic, sasrec.Icerr, sasrec.D
 
 def get_dmax_with_datgnom(file_path):
+    """ get_dmax_with_datgnom(file_path)
+    Estimate Dmax from a DATGNOM file using AtsasDatGnomDdf.
+    This function reads the DATGNOM file and estimates the best Dmax value.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the DATGNOM file.
+
+    Returns
+    -------
+    dmax : float
+        The estimated Dmax value.
+    """
     from molass_legacy.Saxs.Rdf import AtsasDatGnomDdf
     ddf = AtsasDatGnomDdf(file_path)
     dmax = ddf.guess_best_dmax()
     return dmax
 
 def get_argparser(return_args=False):
+    """ get_argparser(return_args=False)
+    Get the argument parser for DENSS.
+    This function returns the argument parser for DENSS.
+    If return_args is True, it returns the parsed arguments instead.
+    This function is used to parse command line arguments for DENSS.
+
+    Parameters
+    ----------
+    return_args : bool, optional
+        If True, return the parsed arguments instead of the parser.
+
+    Returns
+    -------
+    argparse.ArgumentParser or argparse.Namespace
+        The argument parser or the parsed arguments.
+    """
     parser = argparse.ArgumentParser(description="DENSS: DENsity from Solution Scattering.\n A tool for calculating an electron density map from solution scattering data",
                                      formatter_class=argparse.RawTextHelpFormatter)
     if return_args:
@@ -228,7 +362,35 @@ def get_argparser(return_args=False):
         return parser
 
 def run_denss_impl(qc, ac, ec, dmax, data_name, steps=MAXNUM_STEPS, progress_cb=None, use_gpu=False, gui=False):
+    """ run_denss_impl(qc, ac, ec, dmax, data_name, steps=MAXNUM_STEPS, progress_cb=None, use_gpu=False, gui=False)
+    Run the DENSS reconstruction using the provided SAXS data.
+    This function sets up and runs the DENSS reconstruction process.
 
+    Parameters
+    ----------
+    qc : np.ndarray
+        The q values of the SAXS data.
+    ac : np.ndarray
+        The intensity values of the SAXS data.
+    ec : np.ndarray
+        The error values of the SAXS data.
+    dmax : float
+        The maximum dimension (Dmax) of the particle.
+    data_name : str
+        The name of the data set.
+    steps : int, optional
+        The maximum number of steps for the reconstruction.
+    progress_cb : callable, optional
+        A callback function to report progress.
+    use_gpu : bool, optional
+        If True, use GPU acceleration for the reconstruction.
+    gui : bool, optional
+        If True, enable GUI mode for the reconstruction.
+
+    Returns
+    -------
+    None
+    """
     q = qc
     I = ac
     sigq = ec
@@ -289,6 +451,28 @@ def run_denss_impl(qc, ac, ec, dmax, data_name, steps=MAXNUM_STEPS, progress_cb=
         progress_cb=progress_cb)
 
 def run_denss_impl_dummy(qc, ac, ec, dmax, infile_name):
+    """ run_denss_impl_dummy(qc, ac, ec, dmax, infile_name)
+    A dummy implementation of run_denss_impl() for testing purposes.
+    This function simulates the DENSS reconstruction process without performing any actual computation.
+    It prints progress messages to the console.
+
+    Parameters
+    ----------
+    qc : np.ndarray
+        The q values of the SAXS data.
+    ac : np.ndarray
+        The intensity values of the SAXS data.
+    ec : np.ndarray
+        The error values of the SAXS data.
+    dmax : float
+        The maximum dimension (Dmax) of the particle.
+    infile_name : str
+        The name of the input data file.
+
+    Returns
+    -------
+
+    """
     import time
     print("\n Step     Chi2     Rg    Support Volume")
     print(" ----- --------- ------- --------------")
@@ -299,6 +483,21 @@ def run_denss_impl_dummy(qc, ac, ec, dmax, infile_name):
         sys.stdout.flush()
 
 def get_denssfolder(parent=None):
+    """ get_denssfolder(parent=None)
+    Get the DENSS output folder.
+    This function retrieves the DENSS output folder from the settings.
+    If the folder does not exist, it creates it.
+
+    Parameters
+    ----------
+    parent : object, optional
+        The parent object to retrieve settings from. If None, uses global settings.
+
+    Returns
+    -------
+    str or None
+        The path to the DENSS output folder, or None if not set.
+    """
     from molass_legacy._MOLASS.SerialSettings import get_setting
     from molass_legacy.KekLib.BasicUtils import mkdirs_with_retry
 
@@ -313,6 +512,24 @@ def get_denssfolder(parent=None):
     return denss_folder
 
 def get_outfolder(job_id=None, parent=None):
+    """ get_outfolder(job_id=None, parent=None)
+    Get the DENSS output folder for a specific job ID.
+    This function retrieves the DENSS output folder and appends a job ID to it.
+    If the folder does not exist, it creates it.
+
+    Parameters
+    ----------
+    job_id : int, optional
+        The job ID to append to the folder name. If None, uses '000' and increments if the folder exists.
+    parent : object, optional
+        The parent object to retrieve settings from. If None, uses global settings.
+
+    Returns
+    -------
+    str or None
+        The path to the DENSS output folder for the job, or None if the base folder
+        is not set.
+    """
     denss_folder = get_denssfolder(parent=parent)
     if denss_folder is None:
         return None
@@ -339,6 +556,21 @@ def get_outfolder(job_id=None, parent=None):
     return out_folder
 
 def get_denss_log_items(path):
+    """ get_denss_log_items(path)
+    Extract key-value pairs from a DENSS log file.
+    This function reads a DENSS log file and extracts lines containing key-value pairs
+    in the format "Final <key>: <value>".
+
+    Parameters
+    ----------
+    path : str
+        The path to the DENSS log file.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the extracted key-value pairs.
+    """
     import re
     item_re = re.compile(r'^\d+:\d+:\d+\s+Final\s+(.+):\s+(.+)$')
     ret_dict = {}
@@ -350,6 +582,23 @@ def get_denss_log_items(path):
     return ret_dict
 
 def run_pdb2mrc(in_file, queue=None):
+    """ run_pdb2mrc(in_file, queue=None)
+    Run the DENSS pdb2mrc script to convert a PDB file to an MRC file.
+    This function invokes the DENSS pdb2mrc script as a subprocess to convert
+    a PDB file to an MRC file. It can report progress through a queue.
+
+    Parameters
+    ----------
+    in_file : str
+        The path to the input PDB file.
+    queue : multiprocessing.Queue, optional
+        A queue to report progress. If None, no progress is reported.
+        
+    Returns
+    -------
+    str or None
+        The path to the generated MRC file, or None if the conversion failed.
+    """
     import time
     from molass_legacy.KekLib.SubProcess import Popen   # suppresses the child process window.
     from molass_legacy.KekLib.BasicUtils import get_home_folder

@@ -9,6 +9,18 @@ def estimate_edm_init_params(decomposition, **kwargs):
     Estimate column parameters from the initial curve and component curves.
 
     N, T, N0, t0, poresize
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition containing the initial curve and component curves.
+    kwargs : dict
+        Additional parameters for the estimation process.
+        
+    Returns
+    -------
+    (N, T, N0, t0, poresize) : tuple
+        Estimated parameters for the EDM column.
     """
     debug = kwargs.get('debug', False)
     if debug:

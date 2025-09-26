@@ -7,13 +7,39 @@ from molass.Trimming.TrimmingInfo import TrimmingInfo as MoTrimmingInfo
 
 def get_num_components_assumming_egh(length):
     """
+    Given the length of the parameter array, return the number of components
+    assuming the EGH model is used.
     n * 4 + n + 2 + n + 7 + 2 + 2 + 6 = n * 6 + 19
+    where n is the number of components.
+
+    Parameters
+    ----------
+    length : int
+        The length of the parameter array.
+
+    Returns
+    -------
+    int
+        The number of components.
     """
     n, r = divmod(length - 19, 6)
     assert r == 0, f"Invalid number of parameters: {length}"
     return n
 
 def extract_params_assumming_egh(params):
+    """
+    Extract the parameters assuming the EGH model is used.
+
+    Parameters
+    ----------
+    params : np.ndarray
+        The parameter array.
+        
+    Returns
+    -------
+    np.ndarray
+        The extracted parameters.
+    """
     n = get_num_components_assumming_egh(len(params))
     return params[0:n*4].reshape((n,4))
 
