@@ -18,10 +18,9 @@ affiliations:
     index: 1
   - name: Photon Factory, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK)
     index: 2
-    ror: 0327y7e25
   - name: Life Science Research Infrastructure Group, R&D of Technology and Systems for Synchrotron Radiation Applications Division, RIKEN SPring-8 Center
     index: 3
-    ror: 01sjwvz98
+    ror: 01d1kv753
 date: 2 October 2025
 bibliography: paper.bib
 
