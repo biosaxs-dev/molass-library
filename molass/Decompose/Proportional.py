@@ -12,9 +12,41 @@ TAU_RATIO_LIMIT = 0.5
 TAU_PENALTY_SCALE = 1e5
 
 def safe_log10(x):
+    """Compute the base-10 logarithm of x, ensuring numerical stability.
+    Parameters
+    ----------
+    x : float or array-like
+        The input value(s) for which to compute the logarithm.
+
+    Returns
+    -------
+    float or array-like
+        The base-10 logarithm of the input value(s), with a lower bound to avoid
+        logarithm of zero or negative values."""
     return np.log10(np.maximum(x, VERY_SMALL_VALUE))
 
 def get_proportional_slices(x, y, proportions, debug_ax=None):
+    """
+    Get slices of x and y based on the specified proportions.
+    Each slice corresponds to a component whose area is proportional to the given proportions.
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the data.
+    y : array-like
+        The y values of the data.
+    proportions : array-like
+        The proportions for each component. Should sum to 1.
+    debug_ax : matplotlib.axes.Axes, optional
+        An optional axis for debugging plots. If provided, the cumulative curve and slice boundaries
+        will be plotted on this axis.
+
+    Returns
+    -------
+    list of slice
+        A list of slices corresponding to the proportional areas of each component.
+    """
     proportions = np.asarray(proportions)
     proportions = proportions / proportions.sum()
 
@@ -43,7 +75,23 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     return xslices
 
 def estimate_initial_params(x, y, moment):
-    # Estimate initial parameters for each slice
+    """
+    Estimate initial parameters for the egh function based on the given data and moment.
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the data.
+    y : array-like
+        The y values of the data.
+    moment : Moment
+        The moment object containing statistical information about the data.
+
+    Returns
+    -------
+    params : array-like
+        The estimated parameters for the egh function: (height, mean, std, tau).
+    """
     mean, std = moment.get_meanstd()
 
     def objective(params):
@@ -61,6 +109,24 @@ def estimate_initial_params(x, y, moment):
     return result.x
 
 def debug_plot(ax, x, xslices, plot_params):
+    """
+    Plot the initial decomposition parameters for debugging.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axis on which to plot the debug information.
+    x : array-like
+        The x values of the data.
+    xslices : list of slice
+        The slices corresponding to each component.
+    plot_params : array-like
+        The parameters for each component to be plotted.
+
+    Returns
+    -------
+    None
+    """
     for k, sl in enumerate(xslices):
         params = plot_params[k]
         if sl.stop is not None:
@@ -68,6 +134,27 @@ def debug_plot(ax, x, xslices, plot_params):
         ax.plot(x, egh(x, *params), linestyle=':')
 
 def decompose_proportionally(x, y, proportions, debug=False):
+    """
+    Decompose the given data (x, y) into components based on the specified proportions.
+    Each component is modeled using the egh function from molass.SEC.Models.Simple.
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the data.
+    y : array-like
+        The y values of the data.
+        proportions : array-like
+        The proportions for each component. Should sum to 1.
+    debug : bool, optional
+        If True, enable debug mode to visualize the decomposition process.
+        Default is False.
+
+    Returns
+    -------
+    result : OptimizeResult
+        The result of the optimization containing the optimized parameters.            
+    """
     if debug:
         import matplotlib.pyplot as plt
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 5))

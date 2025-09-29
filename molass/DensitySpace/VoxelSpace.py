@@ -10,6 +10,11 @@ def get_meshgrid(N):
     """
     Create a meshgrid for the electron density space.
 
+    Parameters
+    ----------
+    N : int
+        The size of the grid along each axis.
+
     Returns
     -------
     tuple
@@ -19,6 +24,33 @@ def get_meshgrid(N):
     return np.meshgrid(x, y, z)
 
 def draw_voxles_as_dots_impl(ax, image, cmap=cm.plasma, min_value=0, colorbar=False, limits=None, alpha=1, s=30):
+    """
+    Draw voxels as dots in a 3D plot.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes to plot on.
+    image : np.ndarray
+        The 3D density array.
+    min_value : float
+        The minimum density value to consider for plotting.
+
+    colorbar : bool
+        Whether to display a colorbar.
+    limits : tuple or None
+        The limits for the axes in the form (xlim, ylim, zlim). If
+        None, the limits will be set to the size of the image.
+    alpha : float
+        The alpha value for the dots.
+    s : float
+        The size of the dots.
+
+    Returns
+    -------
+    None
+    """
+    
     w = np.where(image > min_value)
     wi = np.array(w, dtype=int).T
     xyz = wi
@@ -34,6 +66,17 @@ def draw_voxles_as_dots_impl(ax, image, cmap=cm.plasma, min_value=0, colorbar=Fa
 def add_center_plane(ax, N, k=None, alpha=0.2, color='gray'):
     """
     Add a plane at z=k to the 3D axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes to plot on.
+    N : int
+        The size of the grid along each axis.
+    k : int or None
+        The z value for the plane. If None, it will be set to N//2
+    alpha : float
+        The alpha value for the plane.
     """
     if k is None:
         k = N // 2
@@ -80,6 +123,12 @@ def compute_rg_impl(rho, min_value=0):
 class VoxelSpace:
     """
     VoxelSpace class to handle voxel-based density spaces.
+    It can be initialized with a shape or a density array.
+    
+    Attributes
+    ----------
+    rho : np.ndarray
+        3D density array.
     """
     def __init__(self, N, shape=None, density=None):
         self.rho = np.zeros((N, N, N))
@@ -120,6 +169,18 @@ class VoxelSpace:
             The axes to plot on.
         min_value : float
             The minimum density value to consider for plotting.
+        colorbar : bool
+            Whether to display a colorbar.
+        alpha : float
+            The alpha value for the plots.
+        s : float
+            The size of the dots.
+        k : int or None
+            The z value for the cross-sectional plane. If None, it will be set to N//2
+
+        Returns
+        -------
+        None
         """
         from molass.PlotUtils.MatrixPlot import simple_plot_3d
         if axes is None:
@@ -138,6 +199,11 @@ class VoxelSpace:
     def compute_rg(self, min_value=0):
         """
         Compute the radius of gyration of the voxel space.
+
+        Parameters
+        ----------
+        min_value : float
+            Minimum density value to include in calculation.
 
         Returns
         -------

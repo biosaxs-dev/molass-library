@@ -34,6 +34,27 @@ class SaxsInfo:
         return Curve(self.detector_info.q, self.detector_info.y, type='j')
 
 def compute_saxs(rho, q=None, dmax=None, use_denss=False, debug=True):
+    """ Compute SAXS data from a given electron density map.
+
+    Parameters
+    ----------
+    rho : np.ndarray
+        The 3D electron density map.
+    q : np.ndarray, optional
+        The q values at which to compute the SAXS intensity. If None, a default range will be used.
+    dmax : float, optional
+        The maximum dimension of the particle in Angstroms. If None, it will be estimated
+        from the electron density map.
+    use_denss : bool, optional
+        If True, use DENSS-like approach for computation.
+    debug : bool, optional
+        If True, enable debug mode with additional output.
+
+    Returns
+    -------
+    SaxsInfo
+        An instance of the SaxsInfo class containing the computed SAXS data.
+    """
     if debug:
         from importlib import reload
         import molass.SAXS.DenssTools
@@ -61,6 +82,11 @@ def draw_saxs(saxs_info):
     ----------
     shape_condition : np.ndarray
         A boolean array representing the shape to be drawn.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure containing the drawn shape.
     """
 
     fig = plt.figure(figsize=(12,3))

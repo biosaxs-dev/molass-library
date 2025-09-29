@@ -7,7 +7,27 @@ from molass.DataObjects.Curve import Curve
 from molass.Baseline.UvDiffEffect import create_diff_spline
 
 class UvBaseline(Curve):
+    """
+    A class to represent the UV baseline correction.
+
+    Attributes
+    ----------
+    x : array-like
+        The x-coordinates of the baseline.
+    y : array-like
+        The y-coordinates of the baseline.
+    params : array-like
+        The parameters used to compute the baseline.
+    """
     def __init__(self, ssd, params=None):
+        """ Initializes the UvBaseline object with the given SSD and parameters.
+        Parameters
+        ----------
+        ssd : SSD
+            The SSD object containing the UV data.
+        params : array-like, optional
+            The parameters used to compute the baseline. If None, default parameters are used.
+        """
         from molass_legacy.Baseline.UvBaseSpline import compute_baseline_impl
         from molass_legacy.Baseline.Constants import SLOPE_SCALE
         icurve = ssd.uv.get_icurve()
@@ -20,6 +40,35 @@ class UvBaseline(Curve):
         self.params = params
 
 def estimate_uvbaseline_params(curve1, curve2, pickat=None, plot_info=None, counter=None, return_also_baseline=False, debug=False):
+    """ Estimate UV baseline parameters by analyzing the difference between two curves.
+
+    Parameters
+    ----------
+    curve1 : Curve
+        The first curve (usually the original UV curve).
+    curve2 : Curve
+        The second curve (usually the UV curve with pickat applied).
+    pickat : int, optional
+        The index at which the pickat was applied. If None, it will be estimated.
+    plot_info : tuple, optional
+        A tuple containing (fig, ax) for plotting. If None, no plot is generated.
+    counter : int, optional
+        A counter for labeling plots. If None, no labeling is done.
+    return_also_baseline : bool, optional
+        If True, the function returns a tuple containing the parameters, the DFEF curve, and the baseline.
+        If False, it returns only the parameters.
+    debug : bool, optional
+        If True, debug information is printed and plots are generated.
+
+    Returns
+    -------
+    uvbaseline_params : array-like
+        The estimated UV baseline parameters.
+    dy : array-like, optional
+        The DFEF curve if return_also_baseline is True.
+    baseline : array-like, optional
+        The estimated baseline if return_also_baseline is True.
+    """
     if debug:
         from importlib import reload
         import molass.FlowChange.FlowChange
@@ -52,6 +101,29 @@ def estimate_uvbaseline_params(curve1, curve2, pickat=None, plot_info=None, coun
 def inspect_uv_baseline(uv_data, pickat=400, smooth=False, return_also_plotresult=False, title=None, debug=False):
     """
     Estimate UV baseline parameters and plot the result.
+    
+    Parameters
+    ----------
+    uv_data : UvData
+        The UV data object containing the curves.
+    pickat : int, optional
+        The index at which the pickat was applied. Default is 400.
+    smooth : bool, optional
+        If True, smooth the curves before analysis. Default is False.
+    return_also_plotresult : bool, optional
+        If True, return a PlotResult object along with the parameters. Default is False.
+    title : str, optional
+        The title for the plot. If None, no title is set. Default is None.
+    debug : bool, optional
+        If True, enable debug mode. Default is False.
+
+    Returns
+    -------
+    params : array-like
+        The estimated UV baseline parameters.
+    plot_result : PlotResult, optional
+        The PlotResult object if return_also_plotresult is True.
+
     """
     import matplotlib.pyplot as plt
     c1 = uv_data.get_icurve()

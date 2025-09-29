@@ -2,11 +2,33 @@
 SEC.Models.EDM.py
 """
 class EDM:
+    """
+    Equilibrium Dispersive Model (EDM) for SEC data analysis.
+    """
     def __init__(self, **kwargs):
+        """ Initialize the EDM model with given parameters.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Additional parameters for the EDM model.
+        """
         self.kwargs = kwargs
 
     def optimize_decomposition(self, decomposition, **kwargs):
-        # Implement optimization logic here
+        """ Optimize the given decomposition using the EDM model.
+
+        Parameters
+        ----------
+        decomposition : Decomposition
+            The initial decomposition to be optimized.
+        kwargs : dict
+            Additional parameters for the optimization process.
+        Returns
+        -------
+        Decomposition
+            The optimized decomposition.
+        """
         debug = kwargs.get('debug', False)
         if debug:
             from importlib import reload

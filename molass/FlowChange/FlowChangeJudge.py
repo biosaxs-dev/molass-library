@@ -1,7 +1,5 @@
 """
     FlowChange.FlowChangeJudge.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.FlowChange.FlowChangeInfo import FlowChangeJudgeInfo
@@ -22,21 +20,72 @@ Y1_RATIO_SAFE_LIMIT = 0.9
 ERR_RATIO_LIMIT = 1.0
 
 class FlowChangeJudge:
+    """Class to judge flow changes based on given criteria.
+
+    Attributes
+    ----------
+    init_params : np.ndarray
+        Initial parameters for the judgment criteria.
+    """
     def __init__(self):
+        """Initialize the FlowChangeJudge with default parameters.
+
+        Parameters
+        ----------
+        None
+        """
         self.init_params = np.array([NEAR_SIGMA, LIMIT_SIGMA, MIN_REL_LIKE, VERYBAD_ABS_LIKE, BAD_ABS_LIKE,
                                      MIN_ABS_LIKE, SAFE_REL_LIKE, ALLOW_REL_LIKE, ALLOW_ABS_LIKE, SAFE_ABS_LIKE,
                                      MIN_LIKE, Y1_RATIO_LIMIT, ERR_RATIO_LIMIT])
 
     def update_params(self, params_dict):
+        """Update the judgment parameters.
+        Parameters
+        ----------
+        params_dict : dict
+            A dictionary containing parameter names and their new values.
+        """
         for name, value in params_dict.items():
             var = globals().get(name)
             assert var is not None
             var = value
 
     def restore_params(self):
+        """Restore the judgment parameters to their initial values.
+        """
         pass
 
     def judge(self, curve1, curve2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos, debug=False):
+        """Judge the flow changes between two curves based on given criteria.
+
+        Parameters
+        ----------
+        curve1 : Curve
+            The first curve object.
+        curve2 : Curve
+            The second curve object.
+        mi : Moment
+            The Moment object for statistical calculations.
+        points : list
+            A list of points to analyze.
+        segments : list
+            A list of segments corresponding to the points.
+        abs_likes : list
+            A list of absolute likelihoods for the points.
+        rel_likes : list
+            A list of relative likelihoods for the points.
+        peaklike : bool
+            Indicates if a peak-like feature is present.
+        peakpos : float
+            The position of the peak if peaklike is True.
+        debug : bool, optional
+            If True, print debug information, by default False.
+
+        Returns
+        -------
+        tuple
+            A tuple (i, j, info) where i and j are the judged points and info is a FlowChangeJudgeInfo object.
+        """
         x = curve1.x
         y1 = curve1.y
         y2 = curve2.y

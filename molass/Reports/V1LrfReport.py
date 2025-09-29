@@ -14,6 +14,17 @@ def prepare_controller_for_lrf(controller, kwargs):
     Prepare the controller for LRF report generation.
     This function sets up the controller with the necessary data and parameters
     for the LRF report generation process.
+
+    Parameters
+    ----------
+    controller : Controller
+        The controller object to be prepared.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+
+    Returns
+    -------
+    None
     """
     debug = kwargs.get('debug')
     if debug:
@@ -62,6 +73,19 @@ def make_lrf_report(punit, controller, kwargs):
     Make a report for the LRF Analysis.
 
     Migrated from molass_legacy.StageExtrapolation.control_extrapolation().
+
+    Parameters
+    ----------
+    punit : ProgressUnit
+        The progress unit to track the progress of the report generation.
+    controller : Controller
+        The controller containing the data and settings for the report.
+    kwargs : dict
+        Additional keyword arguments for configuration.
+
+    Returns
+    -------
+    None
     """
     debug = kwargs.get('debug')
     if debug:
@@ -93,8 +117,19 @@ def make_lrf_report(punit, controller, kwargs):
 
 def convert_to_guinier_result_array(controller, rgcurves):
     """
-    Convert the RG curves to a Guinier result array.
-    
+    This function converts the RG curves from the controller into a format
+    suitable for Guinier analysis and stores it in the controller.
+
+    Parameters
+    ----------
+    controller : Controller
+        The controller containing the RG curves to be converted.
+    rgcurves : list
+        The list of RG curves to be converted.
+
+    Returns
+    -------
+    None
     """
     from molass_legacy.AutorgKek.LightObjects import LightIntensity, LightResult
     controller.logger.info('Converting to Guinier result array...')

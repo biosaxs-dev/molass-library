@@ -20,10 +20,34 @@ VERY_SMALL_VALUE = 1e-10
 def safe_log10(x):
     """
     Compute the logarithm base 10 of x, returning a large negative number for non-positive x.
+
+    Parameters
+    ----------
+    x : float
+        The input value.
+
+    Returns
+    -------
+    float
+        The logarithm base 10 of x, or -10 if x is non-positive.
     """
     return np.log10(x) if x > VERY_SMALL_VALUE else -10
 
 def compute_areas(x, peak_list):
+    """Compute the areas under the peaks defined by peak_list over the x values.
+
+    Parameters
+    ----------
+    x : array-like
+        The x values.
+    peak_list : list of tuples
+        The list of peak parameters, where each tuple contains (height, tR, sigma, tau).
+
+    Returns
+    -------
+    areas : array-like
+        The areas under each peak.
+    """
     areas = []
     for params in peak_list:
         y = egh(x, *params)
@@ -31,12 +55,56 @@ def compute_areas(x, peak_list):
     return np.array(areas)
 
 class CurveDecomposer:
+    """ A class for decomposing curves into component curves.
+    """
     def __init__(self):
         pass
 
 def decompose_icurve_impl(icurve, num_components, **kwargs):
     """
     Decompose a curve into component curves.
+    Parameters
+    ----------
+    icurve : Curve
+        The input curve to be decomposed.
+    num_components : int
+        The number of components to decompose into.
+    curve_model : str, optional
+        The model to use for curve decomposition.
+        Currently, only 'EGH' (Exponentially-Gaussian Hybrid) is supported. Default is 'EGH'.
+    smoothing : bool, optional
+        Whether to apply smoothing to the input curve before decomposition. Default is False.
+    debug : bool, optional
+        If True, print debug information and plot intermediate results. Default is False.
+    kwargs : dict, optional
+        Additional keyword arguments for decomposition.
+        Possible keys include:
+            - decompargs: dict or None
+                If provided, use these arguments for decomposition instead of peak recognition.
+            - tau_limit: float
+                Limit for the tau parameter in the EGH model. Default is 0.5.
+            - area_weight: float
+                Weight for the area proportion penalty in the fitting objective. Default is 0.1.
+            - proportions: list of float or None
+                Target proportions for the areas of the components. If None, use areas from initial peak recognition.
+            - sec_constraints: bool
+                If True, apply SEC-related constraints during fitting. Default is False.
+            - data_matrix: array-like or None
+                The data matrix for SEC constraints. Required if sec_constraints is True.
+            - qv: array-like or None
+                The q-values corresponding to the data matrix. Required if sec_constraints is True.
+            - num_plates: int or None
+                The number of plates to use for decomposition. If None, use the default value.
+            - randomize: float
+                Standard deviation of Gaussian noise to add to initial parameters for randomization. Default is 0 (no randomization).
+            - seed: int or None
+                Random seed for parameter randomization. Default is None.
+            - global_opt: bool
+                If True, use global optimization (basinhopping) for fitting. Default is False.
+    Returns
+    -------
+    ret_curves : list of ComponentCurve
+        The list of decomposed component curves.
     """
     from molass.LowRank.ComponentCurve import ComponentCurve
 

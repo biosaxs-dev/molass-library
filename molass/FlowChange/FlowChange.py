@@ -1,7 +1,5 @@
 """
     FlowChange.FlowChange.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from scipy.stats import linregress
@@ -9,6 +7,22 @@ from scipy.stats import linregress
 SLOPE_RATIO_LIMIT = 3.0     # < 3.01 for 20190607_1
 
 def flowchange_exclude_slice_impl(x, y, mi, yscale, debug=False):
+    """
+    Exclude certain slices from the flow change analysis.
+
+    Parameters
+    ----------
+    x : array-like
+        The x-values of the curve.
+    y : array-like
+        The y-values of the curve.
+    mi : MappingInfo
+        The mapping information.
+    yscale : float
+        The y-scale for likelihood computation.
+    debug : bool, optional
+        If True, print debug information.
+    """
     from molass.Geometric.Linesegment import get_segments
     from molass.Geometric.Peaklike import check_peaklike_segment
     from molass.FlowChange.FlowChangeLikely import compute_flowchange_likelihoods
@@ -47,6 +61,30 @@ def flowchange_exclude_slice_impl(x, y, mi, yscale, debug=False):
     return points, segments, likelihoods, peaklike, peakpos
 
 def flowchange_exclude_slice(curve1, curve2, debug=False, return_fullinfo=False, counter=None, return_firstinfo=False):
+    """flowchange_exclude_slice(curve1, curve2, debug=False, return_fullinfo=False, counter=None)
+    Exclude certain slices from the flow change analysis between two curves.
+    
+    Parameters
+    ----------
+    curve1 : Curve
+        The first curve object.
+    curve2 : Curve
+        The second curve object.
+    debug : bool, optional
+        If True, print debug information.
+    return_fullinfo : bool, optional
+        If True, return full information including segments and statistics.
+    counter : list, optional
+        A list to keep track of the number of analyses performed.
+    return_firstinfo : bool, optional
+        If True, return initial information including mapping info and yscale.
+
+    Returns
+    -------
+    tuple
+        If return_fullinfo is False, returns ((i, j), judge_info).
+        If return_fullinfo is True, returns ((i, j), judge_info, segments, (M_lb, M_ub), std).
+    """
     from molass.Stats.Moment import Moment
     from molass.FlowChange.FlowChangeLikely import compute_yscale, flowchange_likelihood
     from molass.FlowChange.FlowChangeJudge import LIMIT_SIGMA, FlowChangeJudge

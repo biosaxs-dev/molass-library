@@ -14,6 +14,35 @@ from .ColumnStructure import plot_column_structure
 
 def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, return_init=False, fig_check=False, blit=False, use_tqdm=True, large_only=False, debug=False):
     """
+    Create an animation of particles moving through a column structure.
+    
+    Parameters
+    ----------
+    num_frames : int, optional
+        The number of frames in the animation. If None, defaults to 400.
+    interval : int, optional
+        The delay between frames in milliseconds. Default is 100.
+    seed : int, optional
+        The random seed for reproducibility. If None, no seed is set.
+    close_plot : bool, optional
+        If True, close the plot after creating the animation to prevent static display. Default is True.
+    return_init : bool, optional
+        If True, return after initializing the plot without starting the animation. Default is False.
+    fig_check : bool, optional
+        If True, return after creating the figure without starting the animation. Default is False.
+    blit : bool, optional
+        If True, use blitting to optimize the animation. Default is False.
+    use_tqdm : bool, optional
+        If True, use tqdm to show a progress bar during animation. Default is True.
+    large_only : bool, optional
+        If True, only animate the largest particles. Default is False.
+    debug : bool, optional
+        If True, enable debug mode with additional output. Default is False.
+
+    Returns
+    -------
+    anim : matplotlib.animation.FuncAnimation
+        The animation object.
     """
     ymin, ymax = 0, 1
     xmin, xmax = 0.35, 0.65

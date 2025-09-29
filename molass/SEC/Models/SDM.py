@@ -2,11 +2,33 @@
 SEC.Models.SDM.py
 """
 class SDM:
+    """
+    Stochastic Dispersive Model (SDM) for SEC data analysis.
+    """
     def __init__(self, **kwargs):
+        """ Initialize the SDM model with given parameters.
+        Parameters
+        ----------
+        kwargs : dict
+            Additional parameters for the SDM model.
+        """
         self.kwargs = kwargs
 
     def optimize_decomposition(self, decomposition, **kwargs):
-        # Implement optimization logic here
+        """ Optimize the given decomposition using the SDM model.
+
+        Parameters
+        ----------
+        decomposition : Decomposition
+            The initial decomposition to be optimized.
+        kwargs : dict
+            Additional parameters for the optimization process.
+
+        Returns
+        -------
+        Decomposition
+            The optimized decomposition.
+        """
         debug = kwargs.get('debug', False)
         if debug:
             from importlib import reload

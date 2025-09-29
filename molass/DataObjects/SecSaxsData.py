@@ -1,7 +1,5 @@
 """
     DataObjects.SecSacsData.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import os
 import numpy as np
@@ -12,7 +10,34 @@ import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
 class SecSaxsData:
     """
-    A class to represent a SEC-SAXS data object."""
+    A class to represent a SEC-SAXS data object.
+    It contains a pair of :class:`~molass.DataObjects.XrData` and :class:`~molass.DataObjects.UvData` objects.
+    It also contains the beamline information and mapping information if available.
+
+    Attributes
+    ----------
+    xr : XrData or None
+        The XR data object.
+    uv : UvData or None
+        The UV data object.
+    trimmed : bool
+        Indicates whether the data has been trimmed.
+    mapping : MappingInfo or None
+        The mapping information between XR and UV data.
+    beamline_info : BeamlineInfo or None
+        The beamline information.
+    time_initialized : float
+        The time when the object was initialized.
+    time_required : float
+        The time required for processing the data.
+    time_required_total : float
+        The total time required for processing all data. This includes the time required for processing the data
+    datafiles : list of str or None
+        The list of data files used for the analysis.
+    logger : logging.Logger
+        The logger object for logging messages.
+
+    """
 
     def __init__(self, folder=None, object_list=None, uv_only=False, xr_only=False,
                  trimmed=False,
@@ -49,6 +74,14 @@ class SecSaxsData:
             If specified, the beamline information will be used.
         mapping : MappingInfo, optional
             If specified, the mapping information will be used.
+        time_initialized : float, optional
+            If specified, the time when the object was initialized.
+            If it is None, the time will be set to the time taken for initialization.
+        datafiles : list of str, optional
+            If specified, the list of data files used for the analysis.
+            If it is None, the data files will be set to the list of files loaded from the folder.
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
 
         Examples
         --------
@@ -117,12 +150,15 @@ class SecSaxsData:
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
     def plot_3d(self, **kwargs):
-        """ssd.plot_3d(view_init=None)
+        """ssd.plot_3d(title=None, view_init=None, view_arrows=False, with_2d_section_lines=False, **kwargs)
 
             Plots a pair of 3D figures of UV and XR data.
 
             Parameters
             ----------
+            title : str, optional
+                If specified, add a super title to the plot.
+                
             view_init   : dict, optional
                 A dictionary which specifies the view_init parameters.
                 The default is dict(elev=30, azim=-60) as of matplotlib 3.10.
@@ -132,7 +168,11 @@ class SecSaxsData:
                 One of the arrows shows the elutional view, while the other
                 shows the spectral view. The default is False.
 
-            Rturns
+            with_2d_section_lines : bool, optional
+                If it is True, the 2D section lines are drawn on the 3D plot.
+                The default is False.
+
+            Returns
             -------
             result : PlotResult
                 A PlotResult object which contains the following attributes.
@@ -148,13 +188,20 @@ class SecSaxsData:
         return plot_3d_impl(self, **kwargs)
  
     def plot_compact(self, **kwargs):
-        """ssd.plot_compact()
+        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, **kwargs)
 
             Plots a pair of compact figures of UV and XR data.
 
             Parameters
             ----------
-            None
+            title : str, optional
+                If specified, add a super title to the plot.
+            baseline : bool, optional
+                If it is True, the baseline will be plotted.
+            ratio_curve : Curve, optional    
+                If specified, the ratio curve will be plotted.
+            moment_lines : bool, optional
+                If it is True, the moment lines will be plotted.
 
             Returns
             -------
@@ -163,6 +210,11 @@ class SecSaxsData:
 
                 fig: Figure
                 axes: Axes
+                mapping: MappingInfo (if available)
+                xr_curve: Curve (if available)
+                uv_curve: Curve (if available)
+                mp_curve: Curve (if available)
+                moment: Moment of the XR data (if available)
         """
         debug = kwargs.get('debug', False)
         if debug:
@@ -172,23 +224,31 @@ class SecSaxsData:
         return plot_compact_impl(self, **kwargs)
 
     def make_trimming(self, **kwargs):
-        """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None)
+        """ssd.make_trimming(xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None)
         
         Returns a pair of indeces which should be used
-        as a slice for the spectral axis to trim away
-        unusable UV data regions. 
+        as slices for the spectral axis and the temporal axis
+        to trim the data.
 
         Parameters
         ----------
-        xr_qr : 
+        xr_qr : tuple of (int, int), optional
+            The angular range (start, stop) to be used for the XR data.
+            If it is None, the full range will be used.
+        xr_mt : tuple of (int, int), optional
+            The temporal range (start, stop) to be used for the XR data.
+            If it is None, the full range will be used.
+        uv_wr : tuple of (int, int), optional
+            The wavelength range to be used for the UV data.
+            If it is None, the full range will be used.
+        uv_mt : tuple of (int, int), optional
+            The temporal range (start, stop) to be used for the UV data.
+            If it is None, the full range will be used.
 
-        xr_mt : 
-
-        uv_wr : 
-
-        uv_mt :
-
-        uv_fc :  
+        Returns
+        -------
+        trimming : TrimmingInfo
+            A TrimmingInfo object which contains the trimming information.
 
         See Also
         --------
@@ -207,9 +267,9 @@ class SecSaxsData:
         return make_trimming_impl(self, flowchange=flowchange, **kwargs)
 
     def plot_trimming(self, trim=None, baseline=False, title=None, **kwargs):
-        """ssd.plot_trimming(trim)
+        """ssd.plot_trimming(trim=None, baseline=False, title=None, return_fig=False, **kwargs)
 
-        Plots a set of trimmming info.
+        Plots a set of trimming info.
 
         Parameters
         ----------
@@ -262,6 +322,11 @@ class SecSaxsData:
             Otherwise, the returned copy contains the deep copies
             of elements uvM and wv.
 
+        Returns
+        -------
+        SecSaxsData
+            A deep copy of the SSD object with the specified slices applied.
+
         Examples
         --------
         >>> copied_ssd = ssd.copy()
@@ -291,7 +356,7 @@ class SecSaxsData:
         trimming : TrimmingInfo, optional
             If specified, the trimming information will be used for the copy.
         jranges : tuple of (double, double), optional
-            The ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
+            The temporal ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].
         mapping : MappingInfo, optional
             If specified, the mapping information will be used for the copy.
             It must be provided if `jranges` is specified.
@@ -317,6 +382,8 @@ class SecSaxsData:
 
         Sets the baseline method to be used for the baseline correction.
 
+        See also: `Baseline Correction <https://molass-saxs.github.io/molass-tutorial/chapters/04/data_correction.html>`_
+
         Parameters
         ----------
         method : str or (str, str)
@@ -324,6 +391,12 @@ class SecSaxsData:
             If it is a string, it will be used for both XR and UV data.
             If it is a tuple of two strings, the first string will be used for XR data
             and the second string will be used for UV data.
+
+            The available methods are:
+
+            - ``linear`` : Linear baseline (default)
+            - ``uvdiff`` : UV differential method (for UV data only)
+            - ``integral`` : Integral method
 
         Returns
         -------
@@ -340,6 +413,8 @@ class SecSaxsData:
         """ssd.get_baseline_method()
 
         Returns the baseline method used for the baseline correction.
+
+        See also: `Baseline Correction <https://molass-saxs.github.io/molass-tutorial/chapters/04/data_correction.html>`_
 
         Parameters
         ----------
@@ -370,6 +445,11 @@ class SecSaxsData:
         ----------
         debug : bool, optional
             If True, enables debug mode for more verbose output.
+
+        Returns
+        -------
+        SecSaxsData
+            A deep copy of the SSD object with the baseline correction applied.
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, datafiles=self.datafiles)
@@ -386,6 +466,18 @@ class SecSaxsData:
         return ssd_copy
     
     def estimate_mapping(self, debug=False):
+        """ssd.estimate_mapping()
+        Estimates the mapping information between UV and XR data.
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
+        Returns
+        -------
+        mapping : MappingInfo
+            A MappingInfo object which contains the mapping information.
+            If the mapping information is not available, returns None.
+        """
         if debug:
             import molass.Mapping.SimpleMapper
             reload(molass.Mapping.SimpleMapper)
@@ -420,15 +512,28 @@ class SecSaxsData:
         return self.mapping
 
     def get_concfactor(self):
+        """ssd.get_concfactor()
+        Returns the concentration factor from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        concfactor : float or None
+            The concentration factor from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
             return self.beamline_info.get_concfactor()
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition()
+        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
 
-        Returns a lowrank information object.
+        Performs a quick decomposition of the SEC-SAXS data.
 
         Parameters
         ----------
@@ -436,9 +541,19 @@ class SecSaxsData:
             Specifies the number of components which also implies the SVD rank
             used to denoise the matrix data.
 
-        curve_model : str, optional
-            Specifies the elution model to be used.
-            The default is 'egh'.
+        proportions : list of float, optional
+            Specifies the proportions to be used for XR data.
+
+        ranks : list of int, optional
+            Specifies the ranks to be used for XR data.
+
+        num_plates : int, optional
+            Specifies the number of theoretical plates to be used for the optimization constraint.
+
+        Returns
+        -------
+        decomposition : Decomposition
+            A Decomposition object which contains the decomposition result.
         """
         
         debug = kwargs.get('debug', False)
@@ -451,24 +566,57 @@ class SecSaxsData:
 
     def inspect_ip_effect(self, debug=False):
         """ssd.inspect_ip_effect()
+        Inspects the inter-particle effect of the SEC-SAXS data.
 
         Parameters
         ----------
-        None
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
+
+        Returns
+        -------
+        ip_effect_info : IpEffectInfo
+            An IpEffectInfo object which contains the inspection result.
         """
         if debug:
             import molass.InterParticle.IpEffectInspect
             reload(molass.InterParticle.IpEffectInspect)
-        from molass.InterParticle.IpEffectInspect import inspect_ip_effect_impl
-        return inspect_ip_effect_impl(self, debug=debug)
+        from molass.InterParticle.IpEffectInspect import _inspect_ip_effect_impl
+        return _inspect_ip_effect_impl(self, debug=debug)
 
     def get_uv_device_id(self):
+        """ssd.get_uv_device_id()
+        Returns the UV device ID from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        uv_device_id : str or None
+            The UV device ID from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
             return self.beamline_info.uv_device_id
 
     def get_beamline_name(self):
+        """ssd.get_beamline_name()
+        Returns the beamline name from the beamline information.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        beamline_name : str or None
+            The beamline name from the beamline information.
+            If the beamline information is not available, returns None.
+        """
         if self.beamline_info is None:
             return None
         else:
@@ -520,8 +668,8 @@ class SecSaxsData:
         rgcurve : object, optional
             A reference to the RG curve to be used for the plot.
 
-        best : object, optional
-            A reference to the best decomposition to be highlighted in the plot.
+        best : int, optional
+            number of best results to be highlighted.
 
         debug : bool, optional
             If True, enables debug mode.
@@ -537,6 +685,6 @@ class SecSaxsData:
         if debug:
             import molass.Decompose.VaryUtils
             reload(molass.Decompose.VaryUtils)
-        from molass.Decompose.VaryUtils import plot_varied_decompositions
+        from molass.Decompose.VaryUtils import _plot_varied_decompositions_impl
         x, y = self.xr.get_icurve().get_xy()
-        return plot_varied_decompositions(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)
+        return _plot_varied_decompositions_impl(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)

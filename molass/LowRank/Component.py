@@ -15,9 +15,39 @@ LOW_VALUE_RATIO = 0.01
 class Component:
     """
     A class to represent a component.
+    It contains the i-curve, j-curve, concentration curve, and related information.
+
+    Attributes
+    ----------
+    icurve_array : array-like, shape (N, 2)
+        The i-curve array, where the first column is x and the second column is y
+    jcurve_array : array-like, shape (M, 3)
+        The j-curve array, where the first column is x, the second column is y
+        and the third column is error.
+    ccurve : array-like, shape (N,)
+        The concentration curve.
+    peak_index : int
+        The index of the peak in the i-curve.
+    icurve : Curve or None
+        The i-curve object. It is None until it is computed.
+    jcurve : Curve or None
+        The j-curve object. It is None until it is computed.
+    area : float or None
+        The area under the i-curve. It is None until it is computed.
+    ccurve : array-like, shape (N,) 
+        The concentration curve.
+
     """
     def __init__(self, icurve_array, jcurve_array, ccurve):
         """
+        Parameters
+        ----------
+        icurve_array : array-like, shape (N, 2)
+            The i-curve array, where the first column is x and the second column is y.
+        jcurve_array : array-like, shape (M, 3)
+            The j-curve array, where the first column is x, the second column is y, and the third column is error.
+        ccurve : array-like, shape (N,) 
+            The concentration curve. 
         """
         self.icurve_array = icurve_array
         self.jcurve_array = jcurve_array
@@ -30,7 +60,11 @@ class Component:
 
     def get_icurve(self):
         """
-        Returns the i-curve object.
+        Returns the i-curve object instead of the array.
+
+        Returns
+        -------
+        The i-curve object which is of type Curve.
         """
         if self.icurve is None:
             from molass.DataObjects.Curve import Curve
@@ -39,7 +73,11 @@ class Component:
 
     def get_jcurve(self):
         """
-        Returns the j-curve object.
+        Returns the j-curve object instead of the array.
+
+        Returns
+        -------
+        The j-curve object which is of type Curve.
         """
         if self.jcurve is None:
             from molass.DataObjects.Curve import Curve
@@ -51,10 +89,24 @@ class Component:
         Returns the j-curve array which contains qv, I and error in case of XR.
 
         Currently, error is zeros in case of UV.
+
+        This type of array is used as portable data storage for SAXS tools.
+
+        Returns
+        -------
+        The j-curve array which is of type numpy array of shape (M, 3).
         """
         return self.jcurve_array
 
     def compute_area(self):
+        """
+        Compute the area under the i-curve.
+
+        Returns
+        -------
+        float
+            The area under the i-curve.
+        """
         if self.area is None:
             icurve = self.get_icurve()
             spline = icurve.get_spline()
@@ -63,6 +115,27 @@ class Component:
         return self.area
 
     def compute_range(self, area_ratio, debug=False, return_also_fig=False):
+        """ Compute the range of the i-curve that contains the given area ratio.
+        The range is determined by finding the height that gives the desired area ratio
+        and then finding the corresponding x values on the ascending and descending
+        parts of the curve.
+
+        Parameters
+        ----------
+        area_ratio : float
+            The area ratio to compute the range for. It should be between 0 and 1.
+        debug : bool, optional
+            If True, print debug information and show a plot of the i-curve with the
+            computed range. Default is False.
+        return_also_fig : bool, optional
+            If True, return the matplotlib figure object along with the range.
+            Default is False.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the start and stop indices of the range.
+        """
         icurve = self.get_icurve()
         x, y = icurve.get_xy()
         entire_area = self.compute_area()
@@ -134,6 +207,25 @@ class Component:
         return start, stop
     
     def make_paired_range(self, range_, minor=False, elm_recs=None, debug=False):
+        """
+        Create a paired range from the given range.
+        Parameters
+        ----------
+        range_ : tuple of (int, int)
+            The range to create the paired range from.
+        minor : bool, optional
+            If True, create a minor paired range (i.e., only one range).
+            If False, create a major paired range (i.e., two ranges). Default is False.
+        elm_recs : list or None, optional
+            The elution records associated with the ranges. Default is None.
+        debug : bool, optional
+            If True, print debug information. Default is False.
+
+        Returns
+        -------
+        PairedRange
+            The created PairedRange object.
+        """
         if debug:
             from importlib import reload
             import molass.LowRank.PairedRange
@@ -142,13 +234,28 @@ class Component:
         return PairedRange(range_, minor=minor, peak_index=self.peak_index, elm_recs=elm_recs)
 class XrComponent(Component):
     """
-    A class to represent an XR component.
+    A class to represent an X-ray component.
+    It contains the i-curve, j-curve, concentration curve, and related information.
+
+    Attributes
+    ----------
+    sg : SimpleGuinier or None
+        The SimpleGuinier object for Rg computation. It is None until it is computed.
+    
     """
     def __init__(self, *args):
         super().__init__(*args)
         self.sg = None
     
     def get_guinier_object(self):
+        """
+        Get the SimpleGuinier object for Rg computation.
+
+        Returns
+        -------
+        SimpleGuinier
+            The SimpleGuinier object.
+        """
         if self.sg is None:
             from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
             self.sg = SimpleGuinier(self.jcurve_array)
@@ -156,6 +263,12 @@ class XrComponent(Component):
 
     def compute_rg(self, return_object=False):
         """
+        Compute the Rg of the component.
+        
+        Parameters
+        ----------
+        return_object : bool, optional
+            If True, return the Guinier object instead of Rg value.
         """
         sg = self.get_guinier_object()
         if return_object:

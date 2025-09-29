@@ -6,20 +6,20 @@
 Molass Library Reference
 ========================
 
-Molass Library is a rewrite of `MOLASS <https://pfwww.kek.jp/saxs/MOLASSE.html>`_, an analytical tool for SEC-SAXS experiment data currently hosted at `Photon Factory <https://www2.kek.jp/imss/pf/eng/>`_ or `SPring-8 <http://www.spring8.or.jp/en/>`_, Japan.
+Molass Library is a rewrite of `MOLASS <https://pfwww.kek.jp/saxs/MOLASSE.html>`_, a tool for the analysis of SEC-SAXS experiment data currently hosted at `Photon Factory <https://www2.kek.jp/imss/pf/eng/>`_ and `SPring-8 <http://www.spring8.or.jp/en/>`_, Japan.
 
 This document describes each function of the library.
 
-For details, see also:
+For more structural information, see also:
 
-- **Essence:** https://nshimizu0721.github.io/molass-essence for theory,
-- **Tutorial:** https://nshimizu0721.github.io/molass-tutorial for how to use,
-- **Technical Report:** https://freesemt.github.io/molass-technical/ for technical details,
-- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for the GUI application version.
+- **Essence:** https://molass-saxs.github.io/molass-essence on theory for researchers,
+- **Tutorial:** https://molass-saxs.github.io/molass-tutorial on how to use for begginners,
+- **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details for developers,
+- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
 
 To join the community, see also:
 
-- **Handbook:** https://nshimizu0721.github.io/molass-develop for maintenance.
+- **Handbook:** https://molass-saxs.github.io/molass-develop for maintenance.
 
 Module Functions
 ----------------
@@ -37,13 +37,10 @@ Submodules
 
    source/molass.Baseline
    source/molass.Bridge
-   source/molass.CurveModels
-   source/molass.CurveModels.Scattering
-   source/molass.CurveModels.Scattering.FormFactors
    source/molass.DataObjects
    source/molass.DataUtils
+   source/molass.Decompose
    source/molass.DensitySpace
-   source/molass.DENSS
    source/molass.Except
    source/molass.FlowChange
    source/molass.Guinier
@@ -57,9 +54,12 @@ Submodules
    source/molass.PlotUtils
    source/molass.Progress
    source/molass.Reports
+   source/molass.SAXS
+   source/molass.SAXS.Models
+   source/molass.SEC
+   source/molass.SEC.Models
    source/molass.Shapes
    source/molass.Stats
-   source/molass.Stochastic
    source/molass.SurveyUtils
    source/molass.Trimming
 
@@ -70,4 +70,3 @@ Tool Functions
    :maxdepth: 5
 
    source/EditRst
-   source/UsualUpdate

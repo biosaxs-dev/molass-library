@@ -33,4 +33,11 @@ htmlcov
 
 **/atsas-results/**
 **/report_folder/**
+<<<<<<< HEAD
+>>>>>>> master
+=======
+
+# DENSS update temporary scripts
+**/temp-scripts/**
+**/previous-scripts/**
 >>>>>>> master

@@ -9,8 +9,34 @@ class EcurveProxyCds:
     """
     A proxy class for Ecurve used in ConcDepend.
     Originally from molass_legacy.Baseline.LpmInspect.
+
+    Attributes
+    ----------
+    e_curve : Curve
+        The e-curve object.
+    x : array-like
+        The x-values of the e-curve.
+    y : array-like
+        The y-values of the e-curve.
+    max_y : float
+        The maximum y-value of the e-curve.
+    spline : UnivariateSpline
+        The spline representation of the e-curve.
+    j_slice : slice
+        The slice for the j-axis.
+    peak_info : list of tuples
+        List of (start, middle, end) tuples for each peak.
     """
     def __init__(self, decomposition, j_slice):
+        """
+        Initialize the proxy with a decomposition object and a slice for the j-axis.
+        Parameters
+        ----------
+        decomposition : DecompositionProxy
+            The decomposition data proxy object.
+        j_slice : slice
+            The slice for the j-axis.
+        """
         e_curve = decomposition.xr_icurve
         self.e_curve = e_curve
         self.x = e_curve.x
@@ -34,6 +60,18 @@ def compute_scds_impl(decomposition, **kwargs):
     Compute the SCDs (Score of Concentration Dependence) for a given decomposition.
 
     Task: Verify the precision of the SCDs.
+
+    Parameters
+    ----------
+    decomposition : DecompositionProxy
+        The decomposition data proxy object.
+    kwargs : dict, optional
+        Additional keyword arguments for debugging.
+
+    Returns
+    -------
+    list of float
+        The computed SCD values.
     """
     debug = kwargs.get('debug', False)
     if debug:
@@ -57,6 +95,16 @@ def compute_scds_impl(decomposition, **kwargs):
 def scd_to_rank(scd):
     """
     Convert a single SCD value to a rank.
+    
+    Parameters
+    ----------
+    scd : float
+        The SCD value to convert.
+
+    Returns
+    -------
+    int
+        The estimated rank (1 or 2).
     """
     rank = 1 if scd < RANK2_SCD_LIMIT else 2
     return rank

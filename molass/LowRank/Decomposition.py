@@ -10,12 +10,62 @@ import numpy as np
 
 class Decomposition:
     """
-    A class to store information about the components of a SecSaxsData,
-    which includes the result of decomposition by LowRank.Decomposer.
+    A class to store the result of decomposition which is a low rank approximation.
+
+    The result includes both components of X-ray and UV data and their associated information.
+
+    Attributes
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object from which the decomposition was performed.
+    xr : XrData
+        The XrData object from the SecSaxsData.
+    xr_icurve : Curve
+        The i-curve used for the decomposition of the X-ray data.
+    xr_ccurves : list of Curve
+        The component curves for the X-ray data.
+    xr_ranks : list of int or None
+        The ranks for each component of the X-ray data. If None, default ranks are used.
+    uv : UvData
+        The UvData object from the SecSaxsData.
+    uv_icurve : Curve
+        The i-curve used for the decomposition of the UV data.
+    uv_ccurves : list of Curve
+        The component curves for the UV data.
+    uv_ranks : list of int or None
+        The ranks for each component of the UV data. If None, default ranks are used.
+    mapping : MappingInfo
+        The mapping information between the X-ray and UV data.
+    mapped_curve : MappedCurve or None
+        The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.
+    paired_ranges : list of PairedRange or None
+        The paired ranges for the X-ray and UV data. If None, it can be computed when needed.
+    num_components : int
+        The number of components in the decomposition.
     """
 
     def __init__(self, ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, mapped_curve=None, paired_ranges=None, **kwargs):
         """
+        Initialize the Decomposition object.
+
+        Parameters
+        ----------
+        ssd : SecSaxsData
+            The SecSaxsData object from which the decomposition was performed.
+        xr_icurve : Curve
+            The i-curve used for the decomposition of the X-ray data.
+        xr_ccurves : list of Curve
+            The component curves for the X-ray data.
+        uv_icurve : Curve
+            The i-curve used for the decomposition of the UV data.
+        uv_ccurves : list of Curve
+            The component curves for the UV data.
+        mapped_curve : MappedCurve, optional
+            The mapped curve from the X-ray to UV domain. If None, it can be computed when needed.
+        paired_ranges : list of PairedRange, optional
+            The paired ranges for the X-ray and UV data. If None, it can be computed when needed.
+        kwargs : dict, optional
+            Additional keyword arguments (not used).
         """
         assert len(xr_ccurves) == len(uv_ccurves)
         self.num_components = len(xr_ccurves)
@@ -38,18 +88,49 @@ class Decomposition:
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
         """
         Create a new Decomposition with new component curves.
+
+        Parameters
+        ----------
+        xr_ccurves : list of Curve
+            The new component curves for the X-ray data.
+        uv_ccurves : list of Curve
+            The new component curves for the UV data.
+
+        Returns
+        -------
+        Decomposition
+            A new Decomposition object with the specified component curves.
         """
         return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
 
     def get_num_components(self):
         """
         Get the number of components.
+
+        Returns
+        -------
+        int
+            The number of components in the decomposition.
         """
         return self.num_components
 
     def plot_components(self, **kwargs):
-        """
+        """decomposition.plot_components(title=None, **kwargs)
+
         Plot the components.
+
+        Parameters
+        ----------
+        title : str, optional
+            If specified, add a super title to the plot.
+
+        Returns
+        -------
+        result : PlotResult
+            A PlotResult object which contains the following attributes.
+            
+            - fig: The matplotlib Figure object.
+            - axes: A list of Axes objects.
         """
         debug = kwargs.get('debug', False)
         if debug:
@@ -65,12 +146,33 @@ class Decomposition:
     def update_xr_ranks(self, ranks, debug=False):
         """
         Update the ranks for the X-ray data.
+
+        Default ranks are one for each component which means that interparticle interactions are not considered.
+        This method allows the user to set different ranks for each component.
+
+        Parameters
+        ----------
+        ranks : list of int
+            The ranks for each component.
+
+        Returns
+        -------
+        None
         """
         self.xr_ranks = ranks
 
     def get_xr_matrices(self, debug=False):
         """
         Get the matrices for the X-ray data.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)
         """
         if debug:
             from importlib import reload
@@ -83,7 +185,17 @@ class Decomposition:
 
     def get_xr_components(self, debug=False):
         """
-        Get the components.
+        Get the components for the X-ray data.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        list of :class:`~molass.LowRank.Component.XrComponent`
+            The list of XrComponent objects.
         """
         if debug:
             from importlib import reload
@@ -106,6 +218,11 @@ class Decomposition:
     def get_guinier_objects(self):
         """
         Get the list of Guinier objects for the XR components.
+
+        Returns
+        -------
+        list of Guinier
+            The list of Guinier objects for each XR component.
         """
         xr_components = self.get_xr_components()
         return [c.get_guinier_object() for c in xr_components]
@@ -113,6 +230,11 @@ class Decomposition:
     def get_rgs(self):
         """
         Get the list of Rg values for the XR components.
+
+        Returns
+        -------
+        list of float
+            The list of Rg values for each XR component.
         """
         xr_components = self.get_xr_components()
         return [c.compute_rg() for c in xr_components]
@@ -120,6 +242,16 @@ class Decomposition:
     def get_uv_matrices(self, debug=False):
         """
         Get the matrices for the UV data.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        tuple of (np.ndarray, np.ndarray, np.ndarray, np.ndarray)
+            The matrices for the UV data.
         """
         if debug:
             from importlib import reload
@@ -132,7 +264,11 @@ class Decomposition:
 
     def get_uv_components(self, debug=False):
         """
-        Get the components.
+        Get the components for the UV data.
+
+        Returns
+        -------
+        List of UvComponent objects.
         """
         if debug:
             from importlib import reload
@@ -157,6 +293,22 @@ class Decomposition:
     def get_pairedranges(self, mapped_curve=None, area_ratio=0.7, concentration_datatype=2, debug=False):
         """
         Get the paired ranges.
+
+        Parameters
+        ----------
+        mapped_curve : MappedCurve, optional
+            If specified, use this mapped curve instead of computing a new one.
+        area_ratio : float, optional
+            The area ratio for the range computation.
+        concentration_datatype : int, optional
+            The concentration datatype for the range computation.
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        list of PairedRange
+            The list of :class:`~molass.LowRank.PairedRange` objects.
         """
         if self.paired_ranges is None:
             if debug:
@@ -174,6 +326,11 @@ class Decomposition:
     def get_proportions(self):
         """
         Get the proportions of the components.
+
+        Returns
+        -------
+        np.ndarray
+            The proportions of the components as a numpy array.
         """
         n = self.get_num_components()
         props = np.zeros(n)
@@ -184,6 +341,11 @@ class Decomposition:
     def compute_scds(self, debug=False):
         """
         Get the list of SCDs (Score of Concentration Dependence) for the decomposition.
+
+        Returns
+        -------
+        list of float
+            The list of SCD values for each component.
         """
         if debug:
             import molass.Backward.RankEstimator
@@ -194,6 +356,13 @@ class Decomposition:
     def get_cd_color_info(self):
         """
         Get the color information for the concentration dependence.
+
+        Returns
+        -------
+        peak_top_xes : list of float
+            The list of peak top x values for each component.
+        scd_colors : list of str
+            The list of colors for each component based on their ranks.
         """
         if self.xr_ranks is None:
             import logging
@@ -209,6 +378,24 @@ class Decomposition:
     def optimize_with_model(self, model_name, debug=False):
         """
         Optimize the decomposition with a model.
+
+        Parameters
+        ----------
+        model_name : str
+            The name of the model to use for optimization.
+
+            Supported models:
+
+            - ``SDM``: `Stochastic Dispersive Model <https://molass-saxs.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
+            - ``EDM``: `Equilibrium Dispersive Model <https://molass-saxs.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        result : Decomposition
+            A new Decomposition object with optimized components.
         """
         if debug:
             import molass.SEC.ModelFactory

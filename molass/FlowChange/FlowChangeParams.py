@@ -1,16 +1,39 @@
 """
     FlowChange.FlowChangeParams.py
 
-    Copyright (c) 2025, SAXS Team, KEK-PF
+    It seems that this module is broken. Will fix it later.
 """
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from molass.DataUtils.UvLoader import get_uvcurves
-from molass.Test.TestFlowChange import TEST_TARGETS
+# from molass.Test.TestFlowChange import TEST_TARGETS
+TEST_TARGETS = []
+# from molass.Test.TestSettings import get_datafolder
+def get_datafolder():
+    """Get the data folder path.
+    
+    Returns
+    -------
+    str
+        The data folder path.
+    """
+    # Adjust this function to return the correct data folder path
+    return
 
 def compute_like_values(for_all=False):
-    from molass.Test.TestSettings import get_datafolder
+    """Compute likelihood values for flow change detection on test datasets.
+
+    Parameters
+    ----------
+    for_all : bool, optional
+        If True, process all folders in the data directory. If False, process only predefined test targets. Default is False.
+
+    Returns
+    -------
+    list of tuples
+        Each tuple contains (in_folder, c1, c2, mi, points, segments, abs_likes, rel_likes, peaklike, peakpos)
+    """
     from molass.FlowChange.FlowChange import flowchange_exclude_slice
     from molass.FlowChange.FlowChangeLikely import flowchange_likelihood
     root_folder = get_datafolder()
@@ -41,6 +64,30 @@ def compute_like_values(for_all=False):
     return recs
 
 def plot_flowchange(in_folder, c1, c2, mi, points, segments, axes=None):
+    """Plot the flow change analysis results.
+
+    Parameters
+    ----------
+    in_folder : str
+        The input folder path.
+    c1 : UvCurve
+        The first UV curve.
+    c2 : UvCurve
+        The second UV curve.
+    mi : Moment
+        The moment information object.
+    points : list of int
+        List of points where flow changes are detected.
+    segments : list of int
+        List of segment boundaries.
+    axes : list of Axes, optional
+        If provided, use these axes for plotting.
+
+    Returns
+    -------
+    None
+    """
+
     from molass.Geometric.Linesegment import plot_segments
     from molass.FlowChange.FlowChangeJudge import LIMIT_SIGMA
     if axes is None:
@@ -65,7 +112,19 @@ def plot_flowchange(in_folder, c1, c2, mi, points, segments, axes=None):
     fig.tight_layout()
 
 def make_test_targets(recs):
-    from molass.Test.TestSettings import get_datafolder
+    """Make test targets from the computed records.
+
+    Parameters
+    ----------
+    recs : list of tuples
+        The computed records from the flow change analysis.
+
+    Returns
+    -------
+    list of tuples
+        Each tuple contains (folder, (i, j)) where i and j are the test target indices.
+    """
+    # from molass.Test.TestSettings import get_datafolder
     from importlib import reload
     import molass.FlowChange.FlowChangeJudge
     reload(molass.FlowChange.FlowChangeJudge)
@@ -84,6 +143,22 @@ def make_test_targets(recs):
     return targets
 
 def test_params(recs, params_dict, targets=None):
+    """Test the flow change parameters against expected targets.
+
+    Parameters
+    ----------
+    recs : list of tuples
+        The computed records from the flow change analysis.
+    params_dict : dict
+        The parameters for the FlowChangeJudge.
+    targets : list of tuples, optional
+        The expected targets for the flow change analysis.
+        If None, use the predefined TEST_TARGETS. Default is None.
+
+    Returns
+    -------
+    None
+    """
     from importlib import reload
     import molass.FlowChange.FlowChangeJudge
     reload(molass.FlowChange.FlowChangeJudge)

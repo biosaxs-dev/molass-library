@@ -18,6 +18,22 @@ def adapted_decomp_result(decomposition, ssd, mapped_curve, debug=False):
         DecompEditorFrame.make_range_info
             DecompUtils.make_range_info_impl(..., control_info, ...)
 
+    Parameters
+    ----------
+    decomposition : DecompositionProxy
+        The decomposition data proxy object.
+    ssd : SecSaxsData
+        The SAXS data object.
+    mapped_curve : Curve
+        The mapped curve object.
+    debug : bool, optional
+        A flag indicating whether to enable debug mode.
+        Default is False.
+
+    Returns
+    -------
+    UnifiedDecompResult
+        The adapted decomposition result object.
     """
     concfactor = ssd.get_concfactor()
 
@@ -91,6 +107,25 @@ def adapted_decomp_result(decomposition, ssd, mapped_curve, debug=False):
     return decomp_result
 
 def make_xr_opt_recs_adapted(model, fx, y, peaks):
+    """
+    Create optimization records for X-ray data.
+
+    Parameters
+    ----------
+    model : Model
+        The model used for fitting.
+    fx : array-like
+        The x-values of the data.
+    y : array-like
+        The y-values of the data.
+    peaks : list of array-like
+        The list of peak parameters.
+
+    Returns
+    -------
+    list of FitRecord
+        The list of optimization records.
+    """
     chisqr_n = np.nan
     ret_recs = []
     top_y_list = []
@@ -109,6 +144,26 @@ def make_xr_opt_recs_adapted(model, fx, y, peaks):
     return ret_recs
 
 def make_uv_opt_recs_adapted(model, fx, uv_y, peaks, scale):
+    """ Create optimization records for UV data.
+
+    Parameters
+    ----------
+    model : Model
+        The model used for fitting.
+    fx : array-like
+        The x-values of the data.
+    uv_y : array-like
+        The y-values of the UV data.
+    peaks : list of array-like
+        The list of peak parameters.
+    scale : float
+        The scaling factor for the peak heights.
+        
+    Returns
+    -------
+    list of FitRecord
+        The list of optimization records.
+    """
     if model.is_traditional():
         converted_list = []
         for kno, params in enumerate(peaks):

@@ -4,7 +4,20 @@ DataUtils.UvFileTrimming.py
 from molass_legacy.SerialAnalyzer.SerialDataUtils import load_uv_file
 
 def trim_uvfile(in_uvfile, uv_slices, trimmed_uvfile, debug=False):
-    """Trim the UV file with the given trimming information"""
+    """Trim the UV file with the given trimming information
+    and save the trimmed data to a new file.
+    
+    Parameters
+    ----------
+    in_uvfile : str
+        The input UV file path.
+    uv_slices : tuple of slices
+        The slices to apply to the UV data (spectral axis, temporal axis).
+    trimmed_uvfile : str
+        The output UV file path.
+    debug : bool, optional
+        If True, print debug information. Default is False.
+    """
     if debug:
         print(f"Trimming UV file {in_uvfile} to {trimmed_uvfile}")
     

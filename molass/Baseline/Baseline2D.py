@@ -13,6 +13,30 @@ def individual_axes_impl(self, data, axes, method, method_kwargs, baseline_func)
 
     This is overriding the implementation in
     pybaselines.two_d.optimizers._Optimizers.individual_axes
+
+    Parameters
+    ----------
+    data : ndarray
+        The 2D data array to fit the baseline to.
+    axes : tuple of int
+        The axes to fit the baseline along. Should be a tuple of two integers (0, 1).
+    method : str
+        The method to use for baseline fitting.
+    method_kwargs : dict or list of dict
+        Additional keyword arguments to pass to the baseline fitting function.
+    baseline_func : callable
+        The baseline fitting function to use. This should be a function that takes
+        the data and additional keyword arguments, and returns the fitted baseline
+        and optionally additional parameters.
+    debug : bool, optional
+        If True, enable debug mode.
+        
+    Returns
+    -------
+    baseline : ndarray
+        The fitted baseline array.
+    params : dict
+        A dictionary containing the parameters of the fitted baseline.
     """
 
     from collections import defaultdict

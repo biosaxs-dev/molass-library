@@ -14,6 +14,23 @@ from molass.Stats.Moment import compute_meanstd
 SQRT_PI_8 = np.sqrt(np.pi/8)
 
 def compute_egh_area_fast(h, sigma, tau):
+    """ Compute the area under an exponentially modified Gaussian (EMG)
+    function quickly using an analytical formula.
+
+    Parameters
+    ----------
+    h : float
+        The height of the EMG function.
+    sigma : float
+        The standard deviation of the Gaussian component.
+    tau : float
+        The decay constant of the exponential component.
+
+    Returns
+    -------
+    float
+        The area under the EMG function.
+    """
     tau_ = abs(tau)
     th = np.arctan2(tau_, sigma)
     return h * (sigma * SQRT_PI_8 + tau_)*e0(th)
@@ -22,6 +39,35 @@ IGNORE_PROP = 0.02
 BASIN_HOPPING = False
 
 def decompose_icurve_proportionally(x, y, decompargs, **kwargs):
+    """ Decompose the given curve (x, y) into a sum of Exponential-
+    Gaussian Hybrid (EGH) functions, with area proportions specified
+    in decompargs['proportions'].
+    The number of peaks is determined by the length of the proportions list.
+    The initial peak positions are estimated based on the cumulative area
+    of the smoothed curve
+
+    Parameters
+    ----------
+    debug : bool, optional
+        If True, enables debug mode with additional output.
+    proportions : list of float
+        The area proportions for each peak.
+    tau_limit : float, optional
+        The maximum allowed ratio of tau/sigma for each peak. Default is 0.6.
+    max_sigma : float, optional
+        The maximum allowed sigma for each peak. Default is 17.
+    dev_weights : tuple of float, optional
+        Weights for the deviation penalties in the optimization.
+    basinhopping : bool, optional
+        If True, use basinhopping optimization. Default is False.
+        This can help to escape local minima.
+
+    Returns
+    -------
+    params : np.ndarray
+        A 2D array of shape (number of peaks, 4), where each row
+        contains the parameters (height, mean, sigma, tau) of the corresponding EMG function.
+    """
     debug = kwargs.get('debug', False)
     proportions = decompargs.get('proportions', [])
     print("proportions=", proportions)

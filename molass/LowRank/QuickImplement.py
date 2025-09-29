@@ -31,6 +31,15 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
 def make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs):
     """
     Make component curves with given proportions.
+
+    Parameters
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    num_components : int
+        The number of components to decompose into.
+    proportions : list of float
+        The proportions for each component.
     """
 
     assert len(proportions) == num_components, "Length of proportions must be equal to num_components."
@@ -45,6 +54,26 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves
 
 def create_decomposition_from_params(icurve, num_components, proportions, **kwargs):
+    """
+    Create a decomposition from the given parameters.
+
+    Parameters
+    ----------
+    icurve : ICurve
+        The input curve to decompose.
+    num_components : int
+        The number of components to decompose into.
+    proportions : list of float
+        The proportions for each component.
+    debug : bool, optional
+        If True, enables debug mode with additional output.
+        Default is False.
+
+    Returns
+    -------
+    list of ComponentCurve
+        The list of component curves.
+    """
     debug = kwargs.get('debug', False)
     if debug:
         import molass.Decompose.Proportional

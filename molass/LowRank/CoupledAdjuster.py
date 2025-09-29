@@ -7,6 +7,36 @@ import numpy as np
 def make_component_curves(ssd, num_components, **kwargs):
     """
     Make a LowRankInfo object.
+    Parameters
+    ----------
+    ssd : SsData
+        The SsData object containing XR and UV data.
+    num_components : int or None
+        The number of components to decompose into. If None, it will be determined automatically.
+    kwargs : dict, optional
+        Additional keyword arguments for decomposition and adjustment.
+        Possible keys include:
+            - xr_peakpositions: list of float or None
+                Initial peak positions for XR decomposition.
+            - smooth_uv: bool
+                If True, smooth the UV i-curve before decomposition.
+            - consistent_uv: bool
+                If True, adjust UV components to be consistent with XR components.
+            - ip_effect_info: IpEffectInfo or None
+                Information about the instrumental polarization effect.
+            - debug: bool
+                If True, enable debug mode.
+
+    Returns
+    -------
+    xr_icurve : Curve
+        The extracted XR i-curve.
+    xr_ccurves : list of ComponentCurve
+        The list of XR component curves.
+    uv_icurve : Curve
+        The extracted UV i-curve.
+    uv_ccurves : list of ComponentCurve
+        The list of UV component curves.
     """
     ip_effect_info = kwargs.get('ip_effect_info', None)
     debug = kwargs.get('debug', False)
@@ -53,6 +83,25 @@ def make_component_curves(ssd, num_components, **kwargs):
     return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves
 
 def select_components(ssd, xr_ccurves, uv_ccurves):
+    """
+    Select the relevant components from the decomposed curves.
+    
+    Parameters
+    ----------
+    ssd : SsData
+        The SsData object containing XR and UV data.
+    xr_ccurves : list of ComponentCurve
+        The list of XR component curves.
+    uv_ccurves : list of ComponentCurve
+        The list of UV component curves.
+
+    Returns
+    -------
+    xr_ccurves : list of ComponentCurve
+        The selected list of XR component curves.
+    uv_ccurves : list of ComponentCurve
+        The selected list of UV component curves.
+    """
     import logging
     logger = logging.getLogger(__name__)
     logger.warning('developer memo: remember that "LowRank.CoupledAdjuster.select_components" is not implemented yet.')

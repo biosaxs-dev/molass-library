@@ -1,16 +1,61 @@
 """
     Trimming.UsableQrange.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 class UsableQrange:
+    """
+    Holds information about the usable Q range in XR data.
+
+    Attributes
+    ----------
+    start : int
+        The starting index of the usable Q range.
+    stop : int
+        The stopping index of the usable Q range.
+    icurve : ICurve
+        The intensity curve associated with the XR data.
+    pre_rg : PreliminaryRg
+        The preliminary Rg information associated with the XR data.
+    """
     def __init__(self, start, stop, icurve, pre_rg):
+        """ 
+        Parameters
+        ----------
+        start : int
+            The starting index of the usable Q range.
+        stop : int
+            The stopping index of the usable Q range.
+        icurve : ICurve
+            The intensity curve associated with the XR data.
+        pre_rg : PreliminaryRg
+            The preliminary Rg information associated with the XR data.
+        """
         self.start = start
         self.stop = stop
         self.icurve = icurve
         self.pre_rg = pre_rg
 
 def get_usable_qrange_impl(xr_data, ip_effect_info=False, nguiniers=None, return_object=False, debug=True):
+    """
+    Get the usable Q range for the given XR data.
+
+    Parameters
+    ----------
+    xr_data : XRData
+        The XR data to analyze.
+    ip_effect_info : bool
+        Whether to consider inter-particle effects.
+    nguiniers : int or None
+        Number of Guinier points to consider. If None, use default.
+    return_object : bool
+        If True, return a UsableQrange object. If False, return (start, stop).
+    debug : bool
+        If True, enable debug mode.
+        
+    Returns
+    -------
+    UsableQrange or (int, int)
+        The usable Q range as a UsableQrange object or as (start, stop) tuple.
+    """
     if debug:
         from importlib import reload
         import molass.Legacy.BackCompatUtils

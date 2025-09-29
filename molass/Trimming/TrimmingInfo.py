@@ -12,7 +12,34 @@ def custom_slice_string(slice_):
     return str(slice_).replace(", None)", ")")
 
 class TrimmingInfo:
+    """
+    Holds information about trimming of XR and UV data, as well as the associated mapping.
+
+    Attributes
+    ----------
+    xr_slices : tuple of slices or None
+        The slices applied to the XR data (spectral axis, temporal axis).
+    uv_slices : tuple of slices or None
+        The slices applied to the UV data (spectral axis, temporal axis).
+    mapping : MappingInfo or None
+        The mapping information between XR and UV data.
+    """
     def __init__(self, xr_slices=None, uv_slices=None, mapping=None):
+        """
+        Initializes the TrimmingInfo object with the given parameters.
+        
+        Parameters
+        ----------
+        xr_slices : tuple of slices or None, optional
+            The slices applied to the XR data (spectral axis, temporal axis).
+            If None, no trimming is applied to the XR data.
+        uv_slices : tuple of slices or None, optional
+            The slices applied to the UV data (spectral axis, temporal axis).
+            If None, no trimming is applied to the UV data.
+        mapping : MappingInfo or None, optional
+            The mapping information between XR and UV data.
+            If None, no mapping information is associated.
+        """
         self.xr_slices = xr_slices
         self.uv_slices = uv_slices
         self.mapping = mapping

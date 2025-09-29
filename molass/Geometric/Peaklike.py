@@ -1,7 +1,5 @@
 """
     Geometric.Peaklike.py
-
-    Copyright (c) 2024-2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.Geometric.Linesegment import get_segments, to_negative_segments
@@ -10,6 +8,35 @@ ERRRATIO_LIMIT = 0.00029    # < 0.0005 for OA_Ald_Fer, > 0.00024 for Kosugi8, < 
 PEAKLIKE_NSIGMA = 2
 
 def judge_peaklike_segment(x, y, mi, points, segments, entire_height, i, debug=False):
+    """Judge if the segment at index i is peak-like.
+
+    Parameters
+    ----------
+    x : array-like
+        The x-values of the data.
+    y : array-like
+        The y-values of the data.
+    mi : MappingInfo
+        The mapping information.
+    points : list of int
+        The breakpoints of the segments.
+    segments : list of Linesegment
+        The list of line segments.
+    entire_height : float
+        The entire height between the highest and lowest segments.
+    i : int
+        The index of the segment to judge.
+    debug : bool, optional
+        If True, enables debug mode for more verbose output.
+    
+    Returns
+    -------
+    tuple or None
+        If the segment is peak-like, returns (points, segments, j, k, new
+        y), where j and k are the indices of the breakpoints around the peak-like
+        segment, and new_y is the modified y-values. If not peak-like, returns None.
+    """
+    
     if i == 0 or i == len(segments) - 1:
         # not peaklike
         return None
@@ -58,6 +85,30 @@ def judge_peaklike_segment(x, y, mi, points, segments, entire_height, i, debug=F
     return None
 
 def check_peaklike_segment(x, y, mt, points, segments, debug=False):
+    """Check if there is a peak-like segment in the data.
+    Parameters
+    ----------
+    x : array-like
+        The x-values of the data.
+    y : array-like
+        The y-values of the data.
+    mt : MappingInfo
+        The mapping information.
+    points : list of int
+        The breakpoints of the segments.
+    segments : list of Linesegment
+        The list of line segments.
+    debug : bool, optional
+        If True, enables debug mode for more verbose output.
+        
+    Returns
+    -------
+    tuple or (None, 0)
+        If a peak-like segment is found, returns (points, segments, j, k, new_y, sign),
+        where j and k are the indices of the breakpoints around the peak-like segment,
+        new_y is the modified y-values, and sign is +1 for positive peak-like and -1 for negative peak-like.
+        If no peak-like segment is found, returns (None, 0).
+    """
     heights = []
     for n, seg in enumerate(segments):
         heights.append((n, seg.center_y))

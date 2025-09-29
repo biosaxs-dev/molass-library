@@ -1,20 +1,21 @@
 """
     PlotUtils.PlotResult.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF 
 """
 
 class PlotResult:
+    """A class to represent the result of a plotting function.
+    It contains the figure and axes objects, as well as any other relevant information.
+    """
     def __init__(self, fig, axes, **others):
         self.fig = fig
-        self.axes = axes = axes
+        self.axes = axes
         self.__dict__.update(others)
 
     def savefig(self, filename, **kwargs):
         """
         Save the figure to a file.
 
-        See matplotlib.pyplot.savefig for details on the parameters.
+        See :func:`matplotlib.pyplot.savefig` for details on the parameters.
         """
         self.fig.savefig(filename, **kwargs)
 

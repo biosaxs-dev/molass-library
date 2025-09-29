@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.6.1"
+version = "0.6.3"
 
 dependencies = [
   "numpy",
@@ -12,7 +12,7 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-  "molass_legacy>=0.2.4",
+  "molass_legacy>=0.2.5",
   "statsmodels",
   "scikit-learn",
   "toml",
@@ -48,7 +48,7 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/nshimizu0721/molass-library"
+Repository = "https://github.com/molass-saxs/molass-library"
 
 [tool.pytest.ini_options]
 pythonpath = [

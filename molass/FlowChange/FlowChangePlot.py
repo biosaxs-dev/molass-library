@@ -1,7 +1,5 @@
 """
     FlowChange.FlowChangePlot.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import os
 import numpy as np
@@ -9,6 +7,19 @@ import matplotlib.pyplot as plt
 from molass.FlowChange.FlowChangeParams import TEST_TARGETS
 
 def make_plot(recs, axes=None):
+    """Create 3D plots for the flow change records.
+    
+    Parameters
+    ----------
+    recs : list of tuples
+        Each tuple contains (in_folder, mi, points, abs_likes, rel_likes, peaklike, peakpos).
+    axes : list of Axes3D, optional
+        If provided, use these axes for plotting.
+
+    Returns
+    -------
+    None
+    """
     if axes is None:
         fig, axes = plt.subplots(ncols=2, figsize=(16,8), subplot_kw=dict(projection='3d'))
     else:

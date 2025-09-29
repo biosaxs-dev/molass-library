@@ -10,6 +10,28 @@ from scipy.optimize import minimize
 from molass.SEC.Models.Simple import egh
 
 def decompose_icurve_positioned(x, y, decompargs, **kwargs):
+    """ Decompose the given curve (x, y) into a sum of exponentially
+    modified Gaussian (EMG) functions, with peak positions specified
+    in decompargs['peakpositions'].
+
+    Parameters
+    ----------
+    x : np.ndarray
+        The x values of the curve.
+    y : np.ndarray
+        The y values of the curve.
+    decompargs : dict
+        A dictionary containing decomposition arguments. Must include
+        'peakpositions', a list of peak positions.
+    debug : bool, optional
+        If True, enables debug mode with additional output.
+        
+    Returns
+    -------
+    params : np.ndarray
+        A 2D array of shape (number of peaks, 4), where each row contains
+        the parameters (height, mean, sigma, tau) of the corresponding EMG function.
+    """
     debug = kwargs.get('debug', False)
     peakpositions = decompargs.get('peakpositions', [])
     if len(peakpositions) == 0:

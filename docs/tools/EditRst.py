@@ -3,7 +3,7 @@ This script edits all .rst files in the docs directory to update the title lines
 
 See also: `"Modify *.rst files" <LINK1_>`__.
 
-.. _LINK1: https://nshimizu0721.github.io/molass-develop/chapters/07/documentation.html#modify-rst-files
+.. _LINK1: https://molass-saxs.github.io/molass-develop/chapters/07/documentation.html#modify-rst-files
 
 """
 import os
