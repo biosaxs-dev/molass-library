@@ -63,7 +63,7 @@ Molass Library is built on robust scientific Python libraries, including NumPy [
 * **ruptures** [@TRUONG2020107299] for change point detection
 * **scipy.signal.find_peaks** for peak recognition
 
-By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter [@lundh1999introduction]) to Jupyter-based scripting further streamlines reproducibility and collaboration.
+By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter) to Jupyter-based scripting further streamlines reproducibility and collaboration.
 
 # Theoretical Foundation
 
