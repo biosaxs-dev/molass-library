@@ -48,7 +48,7 @@ Analysis of SEC-SAXS data is inherently multi-step and complex. A typical workfl
 3. Trimming of data
 4. Baseline correction
 5. Low rank factorization
-6. Radius of gyration ($R_g$) estimation – Guinier plot [@Guinier_1939]
+6. Radius of gyration (*R*~g~) estimation – Guinier plot [@Guinier_1939]
 7. Folding state estimation – Kratky plot [@Kratky_1963]
 8. Electron density calculation 
 
