@@ -28,7 +28,7 @@ bibliography: paper.bib
 
 # Summary
 
-Molass Library is a modern, open-source Python package designed for the analysis of SEC-SAXS (Small-Angle X-ray Scattering coupled with Size Exclusion Chromatography) experimental data. It represents a comprehensive rewrite of the original MOLASS tool [@Yonezawa:2023], currently hosted at the [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html), Japan. By leveraging the Python ecosystem and supporting interactive scripting in Jupyter notebooks [@Kluyver:2016aa], the Molass Library provides enhanced flexibility, reproducibility, and extensibility compared to its predecessor.
+Molass Library is a modern, open-source Python package designed for the analysis of SEC-SAXS (Small-Angle X-ray Scattering coupled with Size Exclusion Chromatography) experimental data. It represents a comprehensive rewrite of the original MOLASS tool [@Yonezawa:2023], currently hosted at the [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html), Japan. By leveraging the Python ecosystem and supporting interactive scripting in Jupyter notebooks [@Kluyver:2016aa], Molass Library provides enhanced flexibility, reproducibility, and extensibility compared to its predecessor.
 
 A typical SEC-SAXS experiment involves two interconnected processes:
 
