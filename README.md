@@ -8,6 +8,14 @@ To install this package, use pip as follows.
 pip install -U molass
 ```
 
+If you want to use Excel reporting features (Windows only), install with the `excel` extra:
+
+```
+pip install -U molass[excel]
+```
+
+> **Note:** The `excel` extra installs `pywin32`, which is required for Excel reporting and only works on Windows.
+
 For details, see also:
 
 - **Essence:** https://molass-saxs.github.io/molass-essence for theory,
