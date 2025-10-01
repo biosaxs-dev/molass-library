@@ -27,11 +27,6 @@ dependencies = [
 
 requires-python = ">=3.9,<3.13"
 
-[project.optional-dependencies]
-excel = [
-  "pywin32"
-]
-
 authors = [
   {name = "Molass Community"},
 ]
@@ -49,6 +44,11 @@ classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Programming Language :: Python",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+[project.optional-dependencies]
+excel = [
+  "pywin32"
 ]
 
 [project.urls]
