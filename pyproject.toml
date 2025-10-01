@@ -25,12 +25,12 @@ dependencies = [
   "learnsaxs",
 ]
 
+requires-python = ">=3.9,<3.13"
+
 [project.optional-dependencies]
 excel = [
   "pywin32"
 ]
-
-requires-python = ">=3.9,<3.13"
 
 authors = [
   {name = "Molass Community"},
