@@ -92,7 +92,7 @@ To address underdeterminedness and enhance interpretability, Molass Library inco
 * **SDM**: Stochastic Dispersive Model [@Felinger1999]
 * **EDM**: Equilibrium Dispersive Model [@Ur2021]
 
-These models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition. For comparison, Molass Library also supports model-free approaches, such as REGALS [@Meisburger:mf5050].
+These models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
 
 # Availability and Documentation
 
