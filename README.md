@@ -8,7 +8,7 @@ To install this package, use pip as follows.
 pip install -U molass
 ```
 
-If you want to use Excel reporting features (Windows only), install with the `excel` extra:
+If you want to use Excel reporting features (Windows only) for backward compatibility, install with the `excel` extra:
 
 ```
 pip install -U molass[excel]
