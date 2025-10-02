@@ -16,16 +16,16 @@ pip install -U molass[excel]
 
 > **Note:** The `excel` extra installs `pywin32`, which is required for Excel reporting and only works on Windows.
 
-For details, see also:
+For more information, see:
 
-- **Essence:** https://molass-saxs.github.io/molass-essence for theory,
-- **Tutorial:** https://molass-saxs.github.io/molass-tutorial for how to use,
-- **Technical:** https://freesemt.github.io/molass-technical for technical details,
-- **Reference:** https://molass-saxs.github.io/molass-library for function reference,
-- **Legacy Repository:** https://github.com/freesemt/molass-legacy for legacy codes.
+- **Tutorial:** https://molass-saxs.github.io/molass-tutorial — on practical usage, for beginners
+- **Essence:** https://molass-saxs.github.io/molass-essence — on theory, for researchers
+- **Technical Report:** https://freesemt.github.io/molass-technical — on technical details, for advanced users
+- **Reference:** https://molass-saxs.github.io/molass-library — on function reference, for developers/coders
+- **Legacy Repository:** https://github.com/freesemt/molass-legacy — for legacy code and historical context
 
 To join the community, see also:
 
-- **Handbook:** https://molass-saxs.github.io/molass-develop for maintenance.
+- **Handbook:** https://molass-saxs.github.io/molass-develop on maintenance, for developers.
 
 <br>
