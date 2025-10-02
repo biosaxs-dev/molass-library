@@ -21,8 +21,8 @@ For more information, see:
 - **Tutorial:** https://molass-saxs.github.io/molass-tutorial — on practical usage, for beginners
 - **Essence:** https://molass-saxs.github.io/molass-essence — on theory, for researchers
 - **Technical Report:** https://freesemt.github.io/molass-technical — on technical details, for advanced users
-- **Reference:** https://molass-saxs.github.io/molass-library — on function reference, for developers/coders
-- **Legacy Repository:** https://github.com/freesemt/molass-legacy — for legacy code and historical context
+- **Reference:** https://molass-saxs.github.io/molass-library — on function reference, for coding
+- **Legacy Repository:** https://github.com/freesemt/molass-legacy — for legacy code
 
 To join the community, see also:
 
