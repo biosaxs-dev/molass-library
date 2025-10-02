@@ -192,6 +192,8 @@ def slice_to_values(vec, slice_):
 
 def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
     """ Create mapped trimming slices for XR and UV data.
+    In mapped trimming, the trimming ranges of XR and UV data are adjusted
+    to correspond to each other based on the mapping information.
 
     Parameters
     ----------

@@ -12,14 +12,14 @@ This document describes each function of the library.
 
 For more structural information, see also:
 
-- **Essence:** https://molass-saxs.github.io/molass-essence on theory for researchers,
-- **Tutorial:** https://molass-saxs.github.io/molass-tutorial on how to use for begginners,
-- **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details for developers,
+- **Tutorial:** https://molass-saxs.github.io/molass-tutorial on practical usage, for beginners
+- **Essence:** https://molass-saxs.github.io/molass-essence on theory, for researchers
+- **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details, for advanced users
 - **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
 
 To join the community, see also:
 
-- **Handbook:** https://molass-saxs.github.io/molass-develop for maintenance.
+- **Handbook:** https://molass-saxs.github.io/molass-develop on maintenance, for developers.
 
 Module Functions
 ----------------
@@ -43,6 +43,7 @@ Submodules
    source/molass.DensitySpace
    source/molass.Except
    source/molass.FlowChange
+   source/molass.Global
    source/molass.Guinier
    source/molass.InterParticle
    source/molass.Legacy
