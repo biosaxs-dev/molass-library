@@ -219,6 +219,10 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.Possibility.html">FlowChange.Possibility</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.Global.html">Global</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Global.Options.html">Global.Options</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
@@ -614,7 +618,9 @@ If start or stop is None, use the first or last element of the vector.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Trimming.TrimmingUtils.make_mapped_trimming_info">
 <span class="sig-name descname"><span class="pre">make_mapped_trimming_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_jslice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_jslice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Trimming.TrimmingUtils.make_mapped_trimming_info" title="Link to this definition">#</a></dt>
-<dd><p>Create mapped trimming slices for XR and UV data.</p>
+<dd><p>Create mapped trimming slices for XR and UV data.
+In mapped trimming, the trimming ranges of XR and UV data are adjusted
+to correspond to each other based on the mapping information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

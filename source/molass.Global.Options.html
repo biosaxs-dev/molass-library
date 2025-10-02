@@ -47,6 +47,8 @@
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Guinier" href="molass.Guinier.html" />
+    <link rel="prev" title="Global" href="molass.Global.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -156,7 +158,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Baseline.html">Baseline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
@@ -215,6 +217,10 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.FlowChangePlot.html">FlowChange.FlowChangePlot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.NullFlowChange.html">FlowChange.NullFlowChange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.FlowChange.Possibility.html">FlowChange.Possibility</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Global.html">Global</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Global.Options</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -534,10 +540,25 @@ document.write(`
 <p>Global.Options.py</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Global.Options.set_molass_options">
-<span class="sig-name descname"><span class="pre">set_molass_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Global.Options.set_molass_options" title="Link to this definition">#</a></dt>
-<dd><p>Set global options for molass.
-:param kwargs: Key-value pairs of options to set.
-:type kwargs: dict</p>
+<span class="sig-name descname"><span class="pre">set_molass_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapped_trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flowchange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Global.Options.set_molass_options" title="Link to this definition">#</a></dt>
+<dd><p>Set global options for molass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mapped_trimming</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to perform mapped trimming. Default is True.
+See <a class="reference internal" href="molass.Trimming.TrimmingUtils.html#molass.Trimming.TrimmingUtils.make_mapped_trimming_info" title="molass.Trimming.TrimmingUtils.make_mapped_trimming_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">molass.Trimming.TrimmingUtils.make_mapped_trimming_info()</span></code></a> for details.</p></li>
+<li><p><strong>flowchange</strong> (<em>bool</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – <p>Whether to consider flow change. Default is False.
+If a string is given and equal to ‘auto’, flow change will be considered
+according to the beamline info of input data as follows.</p>
+<ul>
+<li><p>If the beamline name starts with “PF”, flow change will be considered.</p></li>
+<li><p>Otherwise, flow change will not be considered.</p></li>
+</ul>
+</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Other options to set.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -546,7 +567,13 @@ document.write(`
 <dd><p>Get global options for molass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>args</strong> (<em>str</em>) – The names of the options to get.</p>
+<dd class="field-odd"><p><strong>args</strong> (<em>str</em>) – <p>The names of the options to get.
+The options are:</p>
+<ul class="simple">
+<li><p>’mapped_trimming’: Whether to perform mapped trimming.</p></li>
+<li><p>’flowchange’: Whether to consider flow change.</p></li>
+</ul>
+</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The values of the requested options.</p>
@@ -570,6 +597,24 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="molass.Global.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Global</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="molass.Guinier.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Guinier</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               

@@ -43,6 +43,7 @@ Submodules
    source/molass.DensitySpace
    source/molass.Except
    source/molass.FlowChange
+   source/molass.Global
    source/molass.Guinier
    source/molass.InterParticle
    source/molass.Legacy
