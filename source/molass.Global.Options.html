@@ -312,6 +312,10 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SAXS.Models.Simple.html">SAXS.Models.Simple</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="molass.ScipyUtils.html">ScipyUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.ScipyUtils.BoundsChecker.html">ScipyUtils.BoundsChecker</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SEC.html">SEC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnElements.html">SEC.ColumnElements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSimulation.html">SEC.ColumnSimulation</a></li>
@@ -540,7 +544,7 @@ document.write(`
 <p>Global.Options.py</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Global.Options.set_molass_options">
-<span class="sig-name descname"><span class="pre">set_molass_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapped_trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flowchange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Global.Options.set_molass_options" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_molass_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapped_trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flowchange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deveoloper_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Global.Options.set_molass_options" title="Link to this definition">#</a></dt>
 <dd><p>Set global options for molass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -555,6 +559,7 @@ according to the beamline info of input data as follows.</p>
 <li><p>Otherwise, flow change will not be considered.</p></li>
 </ul>
 </p></li>
+<li><p><strong>developer_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to enable developer mode. Default is False.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em>) – Other options to set.</p></li>
 </ul>
 </dd>
@@ -572,6 +577,7 @@ The options are:</p>
 <ul class="simple">
 <li><p>’mapped_trimming’: Whether to perform mapped trimming.</p></li>
 <li><p>’flowchange’: Whether to consider flow change.</p></li>
+<li><p>’developer_mode’: Whether to enable developer mode.</p></li>
 </ul>
 </p>
 </dd>
