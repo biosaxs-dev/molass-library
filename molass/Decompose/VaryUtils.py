@@ -66,7 +66,7 @@ def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None,
             ax.plot(x, ty, color='red', alpha=0.3)
             props_str = ", ".join(["%.3g" % p for p in normalized_proportions[i]])
             ax.set_title("%s - Proportions: [%s]" % (trials[i], props_str))
-            ax.legend()
+            # ax.legend()  # UserWarning: No artists with labels found ...
             if rgcurve is not None:
                 axt = ax.twinx()
                 axt.set_ylabel("$R_g$")

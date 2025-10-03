@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.6.3"
+version = "0.7.0"
 
 dependencies = [
   "numpy",
@@ -12,11 +12,10 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-  "molass_legacy>=0.2.5",
+  "molass_legacy>=0.3.0",
   "statsmodels",
   "scikit-learn",
   "toml",
-  "pywin32",
   "psutil",
   "seaborn",
   "openpyxl",
@@ -24,6 +23,7 @@ dependencies = [
   "numba",
   "ruptures",
   "learnsaxs",
+  "mrcfile",
 ]
 
 requires-python = ">=3.9,<3.13"
@@ -45,6 +45,11 @@ classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Programming Language :: Python",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+[project.optional-dependencies]
+excel = [
+  "pywin32"
 ]
 
 [project.urls]

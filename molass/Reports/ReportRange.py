@@ -51,12 +51,12 @@ def make_v1report_ranges_impl(decomposition, ssd, mapped_curve, area_ratio, conc
         opt_recs_ = decomp_result.opt_recs_uv
 
     control_info = decomp_result.get_range_edit_info()
-    print("editor_ranges=", control_info.editor_ranges)
-    print("select_matrix=", control_info.select_matrix)
-    print("top_x_list=", control_info.top_x_list)
+    # print("editor_ranges=", control_info.editor_ranges)
+    # print("select_matrix=", control_info.select_matrix)
+    # print("top_x_list=", control_info.top_x_list)
 
     legacy_ranges = make_range_info_impl(opt_recs_, control_info)
-    print("legacy_ranges=", legacy_ranges)
+    # print("legacy_ranges=", legacy_ranges)
 
     elm_recs = decomp_result.opt_recs
     elm_recs_uv = decomp_result.opt_recs_uv

@@ -102,7 +102,10 @@ def select_components(ssd, xr_ccurves, uv_ccurves):
     uv_ccurves : list of ComponentCurve
         The selected list of UV component curves.
     """
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning('developer memo: remember that "LowRank.CoupledAdjuster.select_components" is not implemented yet.')
+    from molass.Global.Options import get_molass_options
+    developer_mode = get_molass_options('developer_mode')
+    if developer_mode:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning('developer memo: remember that "LowRank.CoupledAdjuster.select_components" is not implemented yet.')
     return xr_ccurves, uv_ccurves

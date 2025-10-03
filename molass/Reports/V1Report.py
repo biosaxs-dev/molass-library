@@ -3,7 +3,9 @@
 """
 import os
 from importlib import reload
+from sys import platform
 import threading
+import molass_legacy
 from tqdm import tqdm
 from molass_legacy._MOLASS.SerialSettings import set_setting
 
@@ -103,6 +105,10 @@ def make_v1report(ssd, **kwargs):
     -------
     None
     """
+    import platform
+    if platform.system() != "Windows":
+        raise RuntimeError("V1 report generation is only supported on Windows.")
+
     from molass_legacy.Env.EnvInfo import get_global_env_info
     from molass.PackageUtils.PyWin32Utils import check_pywin32_postinstall
     if not check_pywin32_postinstall():
