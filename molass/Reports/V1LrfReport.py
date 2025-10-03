@@ -53,8 +53,8 @@ def prepare_controller_for_lrf(controller, kwargs):
     controller.xr_j0 = sd.xr_j0
     # task: xr_j0 can be incompatible when xr_j0 > 0. Remove xr_j0 eventually.
     controller.report_ranges = report_ranges_from_analysis_ranges(controller.xr_j0, controller.applied_ranges)
-    print("applied ranges:", controller.applied_ranges)
-    print("report ranges:", controller.report_ranges)
+    # print("applied ranges:", controller.applied_ranges)
+    # print("report ranges:", controller.report_ranges)
     mapping = ssd.get_mapping()
     controller.mapped_info = make_mapped_info(controller.ssd, mapping)
     controller.preview_params = make_preview_params(mapping, sd, controller.pairedranges)

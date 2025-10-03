@@ -166,7 +166,7 @@ def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2,
     else:
         qc = None
 
-    print("Dmax = %.2f"%D)
+    # print("Dmax = %.2f"%D)
     qmax = Iq[n1:n2,0].max()
     if (qc is None) and (args.extrapolate):
         qmaxc = qmax*3.0
@@ -193,8 +193,8 @@ def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2,
 
     nsh = qmax/(np.pi/D)
     nshc = qmaxc/(np.pi/D)
-    print("Number of experimental Shannon channels: %d"%(nsh))
-    print("Number of calculated Shannon channels: %d"%(nshc))
+    # print("Number of experimental Shannon channels: %d"%(nsh))
+    # print("Number of calculated Shannon channels: %d"%(nshc))
     if (nsh > 500) or (nshc>500):
         print("WARNING: Nsh > 500. Calculation may take a while. Please double check Dmax is accurate.")
         #give the user a few seconds to cancel with CTRL-C

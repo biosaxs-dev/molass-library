@@ -5,9 +5,10 @@
 GLOBAL_OPTIONS = dict(
     mapped_trimming = True,
     flowchange = False,
+    developer_mode = False,
 )
 
-def set_molass_options(mapped_trimming=True, flowchange=False, **kwargs):
+def set_molass_options(mapped_trimming=True, flowchange=False, deveoloper_mode=False, **kwargs):
     """Set global options for molass.
 
     Parameters
@@ -22,6 +23,8 @@ def set_molass_options(mapped_trimming=True, flowchange=False, **kwargs):
 
         - If the beamline name starts with "PF", flow change will be considered.
         - Otherwise, flow change will not be considered.
+    developer_mode : bool, optional
+        Whether to enable developer mode. Default is False.
     kwargs : dict
         Other options to set.
     """
@@ -42,7 +45,8 @@ def get_molass_options(*args):
         The options are:
 
         - 'mapped_trimming': Whether to perform mapped trimming.
-        - 'flowchange': Whether to consider flow change.        
+        - 'flowchange': Whether to consider flow change.
+        - 'developer_mode': Whether to enable developer mode.
     Returns
     -------
     dict

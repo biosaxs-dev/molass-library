@@ -129,7 +129,7 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
 
     decompargs = kwargs.pop('decompargs', None)
     if decompargs is None:
-        peak_list = recognize_peaks(x, sy, num_components, correct=False)
+        peak_list = recognize_peaks(x, sy, num_peaks=num_components, exact_num_peaks=num_components, correct=False)
     else:
         if debug:
             import molass.LowRank.ProportionalDecomposer
@@ -252,6 +252,13 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
                 if seed is not None:
                     np.random.seed(seed)
                 init_params += np.random.normal(0, randomize, size=init_params.shape)
+
+            if debug:
+                import molass.ScipyUtils.BoundsChecker
+                from importlib import reload
+                reload(molass.ScipyUtils.BoundsChecker)
+            from molass.ScipyUtils.BoundsChecker import check_egh_bounds
+            init_params = check_egh_bounds(x, y, init_params, bounds, modify=True, debug=debug)
 
             global_opt = kwargs.get('global_opt', False)
             if global_opt:
