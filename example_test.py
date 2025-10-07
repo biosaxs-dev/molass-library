@@ -12,10 +12,10 @@ def test_010_default():
     ssd = SSD(SAMPLE1)
     trimmed_ssd = ssd.trimmed_copy()
     corrected_copy = trimmed_ssd.corrected_copy()
-    ssd.estimate_mapping()
+    corrected_copy.estimate_mapping()
     
     # Use is_interactive() to control debug parameter
-    decomposition = ssd.quick_decomposition()
+    decomposition = corrected_copy.quick_decomposition()
     decomposition.plot_components(debug=is_interactive())
     
     # If the plot_components method doesn't automatically handle show/save,

@@ -4,14 +4,14 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass_data import SAMPLE1
-from molass.DataObjects import SecSaxsData as SSD
+from molass.Testing import configure_for_test
 
 # Global variables to share state between ordered tests
 ssd = None
 decomposition = None
 
 @pytest.mark.order(1)
+@configure_for_test
 def test_001_plot_3d():
     from molass import get_version
     assert get_version() >= '0.6.1', "This tutorial requires molass version 0.6.1 or higher."
@@ -23,6 +23,7 @@ def test_001_plot_3d():
     ssd.plot_3d(title="3D Plot of Sample1");
 
 @pytest.mark.order(2)
+@configure_for_test
 def test_002_plot_components():
     global decomposition
     trimmed_ssd = ssd.trimmed_copy()
@@ -32,13 +33,20 @@ def test_002_plot_components():
 
 output_folder = "temp"
 @pytest.mark.order(3)
+@configure_for_test
 def test_003_run_denss():
+    import warnings
     from molass.SAXS.DenssTools import run_denss
-    # Get, for example, the first component's scattering curve as an array
-    jcurve_array = decomposition.get_xr_components()[0].get_jcurve_array()
-    run_denss(jcurve_array, output_folder=output_folder)
+    
+    # Suppress deprecation warnings for this specific test
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        # Get, for example, the first component's scattering curve as an array
+        jcurve_array = decomposition.get_xr_components()[0].get_jcurve_array()
+        run_denss(jcurve_array, output_folder=output_folder)
 
 @pytest.mark.order(4)
+@configure_for_test
 def test_004_show_mrc():
     import matplotlib.pyplot as plt
     from molass.SAXS.MrcViewer import show_mrc
