@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.7.0"
+version = "0.7.1"
 
 dependencies = [
   "numpy",
@@ -24,6 +24,7 @@ dependencies = [
   "ruptures",
   "learnsaxs",
   "mrcfile",
+  "pytest-env",
 ]
 
 requires-python = ">=3.9,<3.13"
@@ -58,5 +59,9 @@ Repository = "https://github.com/molass-saxs/molass-library"
 [tool.pytest.ini_options]
 pythonpath = [
   ".",
-  "../molass-legacy"
+  "../molass-legacy",
+]
+env = [
+    "MOLASS_ENABLE_PLOTS=false",
+    "MOLASS_SAVE_PLOTS=false"
 ]

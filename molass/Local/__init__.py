@@ -11,6 +11,31 @@ def get_local_settings(filename='local_settings.py', debug=False):
     the local_settings.py is supposed to be in one of the upper directories
     relative to this code file. The function will search for the file in the
     directories above this code file and will return the settings as a dictionary.
+
+    An example of a local_settings.py file::
+
+        LocalSettings = dict(
+            DATA_ROOT_FOLDER=r"D:\\AllExperimentData",
+        )
+
+    Parameters
+    ----------
+    filename : str
+        The name of the local settings file to search for.
+    debug : bool
+        If True, print debug information about the search process.
+
+    Returns
+    -------
+    dict
+        The local settings as a dictionary.
+    
+    Examples
+    --------
+    >>> from molass.Local import get_local_settings
+    >>> local_settings = get_local_settings()
+    >>> print(local_settings)
+    {'DATA_ROOT_FOLDER': 'D:\\AllExperimentData', ...}
     """
 
     import os
