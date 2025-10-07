@@ -62,6 +62,7 @@ testing = [
 Repository = "https://github.com/molass-saxs/molass-library"
 
 [tool.pytest.ini_options]
+python_files = ["test_*.py", "*_test.py", "*.py"]
 pythonpath = [
   ".",
   "../molass-legacy",
@@ -70,3 +71,4 @@ env = [
     "MOLASS_ENABLE_PLOTS=false",
     "MOLASS_SAVE_PLOTS=false"
 ]
+order-scope = "session"

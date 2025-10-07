@@ -44,21 +44,54 @@ def run_tests(test_path=None, mode='batch'):
     else:
         raise ValueError(f"Unknown mode: {mode}")
     
-    # Build pytest command
-    cmd = [sys.executable, '-m', 'pytest']
-    
-    if test_path:
-        cmd.append(test_path)
+    # Handle directory vs file differently to preserve order
+    if test_path and Path(test_path).is_dir():
+        # For directories, run each file individually to preserve order within files
+        test_dir = Path(test_path)
+        test_files = sorted(test_dir.glob('*.py'))  # Sort to get predictable order
+        
+        if not test_files:
+            print(f"No Python files found in {test_path}")
+            return 1
+            
+        print(f"Running {len(test_files)} test files individually to preserve order...")
+        total_failures = 0
+        
+        for test_file in test_files:
+            print(f"\n{'='*60}")
+            print(f"Running {test_file.name}")
+            print('='*60)
+            
+            cmd = [sys.executable, '-m', 'pytest', str(test_file), '-v', '--tb=short']
+            print(f"Command: {' '.join(cmd)}")
+            result = subprocess.run(cmd, cwd=Path(__file__).parent)
+            
+            if result.returncode != 0:
+                total_failures += 1
+                print(f"❌ {test_file.name} FAILED")
+            else:
+                print(f"✅ {test_file.name} PASSED")
+        
+        print(f"\n{'='*60}")
+        print(f"Summary: {len(test_files) - total_failures}/{len(test_files)} files passed")
+        print('='*60)
+        return total_failures
     else:
-        cmd.extend(['tests/'])
-    
-    # Add useful pytest options
-    cmd.extend(['-v', '--tb=short'])
-    
-    # Run the tests
-    print(f"Command: {' '.join(cmd)}")
-    result = subprocess.run(cmd, cwd=Path(__file__).parent)
-    return result.returncode
+        # For single files or default, run normally
+        cmd = [sys.executable, '-m', 'pytest']
+        
+        if test_path:
+            cmd.append(test_path)
+        else:
+            cmd.extend(['tests/'])
+        
+        # Add useful pytest options
+        cmd.extend(['-v', '--tb=short'])
+        
+        # Run the tests
+        print(f"Command: {' '.join(cmd)}")
+        result = subprocess.run(cmd, cwd=Path(__file__).parent)
+        return result.returncode
 
 if __name__ == '__main__':
     import argparse
