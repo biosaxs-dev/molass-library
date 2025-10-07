@@ -16,6 +16,20 @@ pip install -U molass[excel]
 
 > **Note:** The `excel` extra installs `pywin32`, which is required for Excel reporting and only works on Windows.
 
+For testing and development, install with the `testing` extra to get additional pytest plugins:
+
+```
+pip install -U molass[testing]
+```
+
+> **Note:** The `testing` extra installs `pytest-env` and `pytest-order` for enhanced test execution control.
+
+You can also combine extras as needed:
+
+```
+pip install -U molass[excel,testing]
+```
+
 For more information, see:
 
 - **Tutorial:** https://molass-saxs.github.io/molass-tutorial — on practical usage, for beginners

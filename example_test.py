@@ -1,20 +1,15 @@
 """
 Example of updating an existing test to use plot control
 """
-import os
-import matplotlib.pyplot as plt
 from molass import get_version
 get_version(toml_only=True)
-from molass.Local import get_local_settings
+from molass_data import SAMPLE1
 from molass.Testing import show_or_save, configure_for_test, is_interactive
-
-local_settings = get_local_settings()
-TUTORIAL_DATA = local_settings['TUTORIAL_DATA']
 
 @configure_for_test
 def test_010_default():
     from molass.DataObjects import SecSaxsData as SSD
-    ssd = SSD(TUTORIAL_DATA)
+    ssd = SSD(SAMPLE1)
     trimmed_ssd = ssd.trimmed_copy()
     corrected_copy = trimmed_ssd.corrected_copy()
     ssd.estimate_mapping()

@@ -24,7 +24,6 @@ dependencies = [
   "ruptures",
   "learnsaxs",
   "mrcfile",
-  "pytest-env",
 ]
 
 requires-python = ">=3.9,<3.13"
@@ -51,6 +50,12 @@ classifiers = [
 [project.optional-dependencies]
 excel = [
   "pywin32"
+]
+testing = [
+  "pytest",
+  "pytest-cov",
+  "pytest-env",
+  "pytest-order",
 ]
 
 [project.urls]
