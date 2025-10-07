@@ -15,7 +15,6 @@ Submodules
    molass.Baseline
    molass.Batch
    molass.Bridge
-   molass.CurveModels
    molass.DataObjects
    molass.DataUtils
    molass.Decompose
@@ -37,7 +36,9 @@ Submodules
    molass.Reports
    molass.SAXS
    molass.SEC
+   molass.ScipyUtils
    molass.Shapes
    molass.Stats
    molass.SurveyUtils
+   molass.Testing
    molass.Trimming

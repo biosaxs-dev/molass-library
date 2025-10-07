@@ -7,6 +7,16 @@ SAXS
    :show-inheritance:
 
 Submodules
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   molass.SAXS.Models
+   molass.SAXS.denss
+   molass.SAXS.resources
+
+Submodules
 ----------
 
 .. toctree::

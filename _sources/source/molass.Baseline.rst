@@ -20,5 +20,5 @@ Submodules
    molass.Baseline.SimpleBaseline
    molass.Baseline.Surface
    molass.Baseline.UvBaseline
-   molass.Baseline.UvdiffBaseline
    molass.Baseline.UvDiffEffect
+   molass.Baseline.UvdiffBaseline

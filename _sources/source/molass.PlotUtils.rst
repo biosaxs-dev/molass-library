@@ -14,11 +14,14 @@ Submodules
 
    molass.PlotUtils.Annotation3D
    molass.PlotUtils.Arrow3D
+   molass.PlotUtils.Comparison
+   molass.PlotUtils.DecompositionPlot
    molass.PlotUtils.MatrixPlot
    molass.PlotUtils.PlotResult
    molass.PlotUtils.SecSaxsDataPlot
    molass.PlotUtils.SsMatrixDataPlot
    molass.PlotUtils.TrimmingPlot
+   molass.PlotUtils.TwinAxesUtils
    molass.PlotUtils.V1GuinierPlot
    molass.PlotUtils.V1KratkyPlot
    molass.PlotUtils.ViewArrows

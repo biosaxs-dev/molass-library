@@ -23,3 +23,4 @@ Submodules
    molass.LowRank.PairedRange
    molass.LowRank.PositionedDecomposer
    molass.LowRank.ProportionalDecomposer
+   molass.LowRank.QuickImplement

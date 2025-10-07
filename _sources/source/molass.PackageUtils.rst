@@ -13,3 +13,4 @@ Submodules
    :maxdepth: 4
 
    molass.PackageUtils.NumbaUtils
+   molass.PackageUtils.PyWin32Utils

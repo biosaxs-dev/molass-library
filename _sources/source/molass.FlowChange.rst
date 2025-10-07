@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   molass.FlowChange.Differential
    molass.FlowChange.FlowChange
    molass.FlowChange.FlowChangeInfo
    molass.FlowChange.FlowChangeJudge

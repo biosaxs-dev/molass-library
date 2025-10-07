@@ -1,7 +1,7 @@
-Reports.ReportUtils
+Testing.PlotControl
 =================================
 
-.. automodule:: molass.Reports.ReportUtils
+.. automodule:: molass.Testing.PlotControl
    :members:
    :undoc-members:
    :show-inheritance:

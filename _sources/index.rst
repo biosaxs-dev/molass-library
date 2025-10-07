@@ -63,6 +63,7 @@ Submodules
    source/molass.Shapes
    source/molass.Stats
    source/molass.SurveyUtils
+   source/molass.Testing
    source/molass.Trimming
 
 Tool Functions

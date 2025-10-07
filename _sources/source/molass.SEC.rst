@@ -7,6 +7,14 @@ SEC
    :show-inheritance:
 
 Submodules
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   molass.SEC.Models
+
+Submodules
 ----------
 
 .. toctree::
@@ -16,4 +24,5 @@ Submodules
    molass.SEC.ColumnSimulation
    molass.SEC.ColumnSliceStates
    molass.SEC.ColumnStructure
+   molass.SEC.ModelFactory
    molass.SEC.StationaryMove
