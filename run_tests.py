@@ -14,7 +14,7 @@ def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     os.environ['MOLASS_SAVE_PLOTS'] = 'true' if save_plots else 'false'
     os.environ['MOLASS_PLOT_DIR'] = str(plot_dir)
 
-def run_tests(test_path=None, mode='batch'):
+def run_tests(test_path=None, mode='batch', order_range=None):
     """
     Run tests with specified plot mode.
     
@@ -27,6 +27,8 @@ def run_tests(test_path=None, mode='batch'):
         'save' - No plots shown, plots saved to files (good for debugging)  
         'interactive' - Plots shown interactively (for manual inspection)
         'both' - Plots shown AND saved (for thorough testing)
+    order_range : tuple, optional
+        Range of test orders to run, e.g., (1, 3) runs orders 1, 2, 3
     """
     
     if mode == 'batch':
@@ -85,6 +87,19 @@ def run_tests(test_path=None, mode='batch'):
         else:
             cmd.extend(['tests/'])
         
+        # Add order range filtering if specified
+        if order_range:
+            start, end = order_range
+            test_patterns = []
+            for i in range(start, end + 1):
+                test_patterns.append(f"test_{i:03d}")
+            # Use pytest's -k option with 'and' logic for partial matching
+            k_expression = ' or '.join([f"'{pattern}' in test_name" for pattern in test_patterns])
+            # Simpler approach: just use the test name prefixes
+            k_expression = ' or '.join(test_patterns)
+            cmd.extend(['-k', k_expression])
+            print(f"Running tests with orders {start} to {end}")
+        
         # Add useful pytest options
         cmd.extend(['-v', '--tb=short'])
         
@@ -100,15 +115,26 @@ if __name__ == '__main__':
     parser.add_argument('--mode', choices=['batch', 'save', 'interactive', 'both'], 
                        default='batch', help='Plot display mode')
     parser.add_argument('--test', help='Specific test file or directory to run')
+    parser.add_argument('--range', help='Range of test orders to run, e.g., "1-3" or "2-5"')
     parser.add_argument('--plot-dir', default='test_plots', 
                        help='Directory for saved plots')
     
     args = parser.parse_args()
     
+    # Parse range argument
+    order_range = None
+    if args.range:
+        try:
+            start, end = map(int, args.range.split('-'))
+            order_range = (start, end)
+        except ValueError:
+            print(f"Error: Invalid range format '{args.range}'. Use format like '1-3'")
+            sys.exit(1)
+    
     # Set plot directory
     os.environ['MOLASS_PLOT_DIR'] = args.plot_dir
     
-    exit_code = run_tests(args.test, args.mode)
+    exit_code = run_tests(args.test, args.mode, order_range)
     
     if args.mode in ['save', 'both'] and Path(args.plot_dir).exists():
         plot_count = len(list(Path(args.plot_dir).glob('*.png')))

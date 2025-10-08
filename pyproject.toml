@@ -71,4 +71,8 @@ env = [
     "MOLASS_ENABLE_PLOTS=false",
     "MOLASS_SAVE_PLOTS=false"
 ]
-order-scope = "session"
+filterwarnings = [
+    "ignore::SyntaxWarning",
+    "ignore::DeprecationWarning",
+    "ignore:.*non-interactive.*:UserWarning",
+]
