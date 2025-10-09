@@ -4,12 +4,12 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 import numpy as np
 import matplotlib.pyplot as plt
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_fourier_transform_figures():
     from learnsaxs import draw_voxles_as_dots, get_detector_info, draw_detector_image
 
@@ -61,7 +61,7 @@ def test_001_fourier_transform_figures():
 q = np.linspace(0.005, 0.7, 100)
 
 @pytest.mark.order(2)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_homogeneous_sphere():
     from molass import get_version
     assert get_version() >= '0.6.0', "This tutorial requires molass version 0.6.0 or higher."
@@ -123,11 +123,11 @@ def test_003_def_plot_tri_axial_ellipsoid():
         ax2.set_xlabel('q (1/Å)')
 
 @pytest.mark.order(4)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_004_plot_tri_axial_ellipsoid():
     plot_tri_axial_ellipsoid(10, 8, 6)
 
 @pytest.mark.order(5)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_005_plot_tri_axial_ellipsoid_equal_axes():
     plot_tri_axial_ellipsoid(10, 10, 10)

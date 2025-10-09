@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_homogeneous_sphere():
     from molass import get_version
     assert get_version() >= '0.5.0', "This tutorial requires molass version 0.5.0 or higher."

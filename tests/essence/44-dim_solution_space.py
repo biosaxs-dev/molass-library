@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_distance_in_solution_space():
     import numpy as np
     import matplotlib.pyplot as plt
@@ -123,7 +123,7 @@ def test_001_distance_in_solution_space():
     plt.show()
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_two_degrees_of_freedom():
     import numpy as np
     import matplotlib.pyplot as plt

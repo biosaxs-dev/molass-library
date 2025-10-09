@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_guinier_porod():
     import numpy as np
     import matplotlib.pyplot as plt

@@ -8,9 +8,9 @@ get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings
 local_settings = get_local_settings()
 DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
-from molass.Testing import control_matplotlib_plots, suppress_numerical_warnings, is_interactive
+from molass.Testing import control_matplotlib_plot, suppress_numerical_warnings, is_interactive
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_010_OA_ALD_201():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20220716", "OA_ALD_201")
@@ -18,7 +18,7 @@ def test_010_OA_ALD_201():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_020_20160227():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20160227", "backsub")
@@ -26,7 +26,7 @@ def test_020_20160227():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 @suppress_numerical_warnings
 def test_030_20160628():
     from molass.DataObjects import SecSaxsData as SSD
@@ -35,7 +35,7 @@ def test_030_20160628():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_040_OA_Ald():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161104", "BL-10C", "OA_Ald")
@@ -43,7 +43,7 @@ def test_040_OA_Ald():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_041_SUB_TRN1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161113", "SUB_TRN1")
@@ -51,7 +51,7 @@ def test_041_SUB_TRN1():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_042_Kosugi3a():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")
@@ -59,7 +59,7 @@ def test_042_Kosugi3a():
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_043_20161216():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161216", "BackSub")
@@ -68,7 +68,7 @@ def test_043_20161216():
     ssd.plot_compact(debug=is_interactive())
     # ssd.plot_trimming(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 @suppress_numerical_warnings
 def test_050_Sugiyama():
     from molass.DataObjects import SecSaxsData as SSD
@@ -77,7 +77,7 @@ def test_050_Sugiyama():
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 @suppress_numerical_warnings
 def test_051_20170304():
     from molass.DataObjects import SecSaxsData as SSD
@@ -86,7 +86,7 @@ def test_051_20170304():
     mapping = ssd.estimate_mapping(debug=False)
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_060_proteins5():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20191006_proteins5")
@@ -94,7 +94,7 @@ def test_060_proteins5():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_070_20200123_3():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20200123_3")
@@ -102,7 +102,7 @@ def test_070_20200123_3():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_071_20200125_1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20200125_1")
@@ -110,7 +110,7 @@ def test_071_20200125_1():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_072_20200125_2():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20200125_2")
@@ -118,7 +118,7 @@ def test_072_20200125_2():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_073_20201005_1():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20201005_1")
@@ -126,7 +126,7 @@ def test_073_20201005_1():
     mapping = ssd.estimate_mapping(debug=is_interactive())
     ssd.plot_compact(title=path, debug=is_interactive())
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 @suppress_numerical_warnings
 def test_080_20201006_1():
     from molass.DataObjects import SecSaxsData as SSD

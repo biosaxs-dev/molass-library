@@ -6,11 +6,11 @@ Requires: pip install pytest-order
 import numpy as np
 import matplotlib.pyplot as plt
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 from molass.SAXS.Models.Formfactors import homogeneous_sphere
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_homogeneous_sphere():
     from molass import get_version
     assert get_version() >= '0.6.1', 'Please update molass to the latest version'
@@ -27,7 +27,7 @@ def test_001_homogeneous_sphere():
     ax.legend();
 
 @pytest.mark.order(2)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_guinier_plot():
     fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(20, 8))
 

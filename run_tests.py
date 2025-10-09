@@ -69,14 +69,106 @@ def run_tests(test_path=None, mode='batch', order_range=None):
             print(f"Running {test_file.name}")
             print('='*60)
             
-            pytest_args = ['-v', '--tb=short', '-s']
+            # Use direct execution for interactive mode to avoid pytest GUI issues
             if mode == 'interactive':
-                pytest_args.extend(['--capture=no', '--tb=line'])
-            
-            cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
-            print(f"Command: {' '.join(cmd)}")
-            env = os.environ.copy()  # Copy current environment
-            result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
+                print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
+                try:
+                    # Set up the environment 
+                    env = os.environ.copy()
+                    
+                    # Use absolute path to avoid path issues
+                    abs_test_path = str(test_file.resolve())
+                    
+                    # Create a temporary script that discovers and runs all test functions
+                    temp_script = f"""
+import os
+import sys
+import importlib.util
+import inspect
+sys.path.insert(0, '.')
+
+# Set environment variables
+os.environ['MOLASS_ENABLE_PLOTS'] = r'{env.get("MOLASS_ENABLE_PLOTS", "false")}'
+os.environ['MOLASS_SAVE_PLOTS'] = r'{env.get("MOLASS_SAVE_PLOTS", "false")}'
+os.environ['MOLASS_PLOT_DIR'] = r'{env.get("MOLASS_PLOT_DIR", "test_plots")}'
+
+# Import the test module
+print(f"Python executable: {{sys.executable}}")
+print(f"Current working directory: {{os.getcwd()}}")
+print(f"Test file path: {{r'{abs_test_path}'}}")
+print(f"Test file exists: {{os.path.exists(r'{abs_test_path}')}}")
+
+try:
+    spec = importlib.util.spec_from_file_location("test_module", r'{abs_test_path}')
+    test_module = importlib.util.module_from_spec(spec)
+    print(f"Module spec created successfully")
+    spec.loader.exec_module(test_module)
+    print(f"Module loaded successfully")
+except Exception as e:
+    print(f"Error loading module: {{e}}")
+    import traceback
+    traceback.print_exc()
+    test_module = None
+
+# Find all test functions (including decorated ones)
+test_functions = []
+if test_module:
+    print(f"Module attributes: {{[name for name in dir(test_module) if not name.startswith('__')]}}")
+    for name in dir(test_module):
+        obj = getattr(test_module, name)
+        if name.startswith('test_') and callable(obj):
+            test_functions.append((name, obj))
+            print(f"Found test function: {{name}}")
+else:
+    print("No test module loaded, cannot find test functions")
+
+# Sort test functions by name for predictable order
+test_functions.sort(key=lambda x: x[0])
+
+print(f"Found {{len(test_functions)}} test functions: {{[name for name, func in test_functions]}}")
+
+# Run each test function
+for test_name, test_func in test_functions:
+    print(f"\\nRunning {{test_name}}...")
+    try:
+        test_func()
+        print(f"✅ {{test_name}} PASSED")
+    except Exception as e:
+        print(f"❌ {{test_name}} FAILED: {{e}}")
+        import traceback
+        traceback.print_exc()
+
+print("\\nAll test functions completed.")
+"""
+                    
+                    # Write to a temporary file to avoid command line escaping issues
+                    temp_file = Path(f"temp_interactive_test_{test_file.stem}.py")
+                    temp_file.write_text(temp_script, encoding='utf-8')
+                    
+                    try:
+                        exec_cmd = [sys.executable, str(temp_file)]
+                        print("Running test directly for better interactive display...")
+                        result = subprocess.run(exec_cmd, cwd=Path(__file__).parent)
+                    finally:
+                        # Clean up temp file
+                        if temp_file.exists():
+                            temp_file.unlink()
+                            
+                except Exception as e:
+                    print(f"Direct execution failed: {e}, falling back to pytest...")
+                    # Fall back to pytest
+                    pytest_args = ['-v', '--tb=short', '-s', '--capture=no', '--tb=line']
+                    cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+                    print(f"Command: {' '.join(cmd)}")
+                    env = os.environ.copy()
+                    result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
+            else:
+                # Use pytest for non-interactive modes
+                pytest_args = ['-v', '--tb=short', '-s']
+                cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+                print(f"Command: {' '.join(cmd)}")
+                env = os.environ.copy()  # Copy current environment
+                result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
             
             if result.returncode != 0:
                 total_failures += 1
@@ -138,9 +230,55 @@ os.environ['MOLASS_ENABLE_PLOTS'] = r'{env.get("MOLASS_ENABLE_PLOTS", "false")}'
 os.environ['MOLASS_SAVE_PLOTS'] = r'{env.get("MOLASS_SAVE_PLOTS", "false")}'
 os.environ['MOLASS_PLOT_DIR'] = r'{env.get("MOLASS_PLOT_DIR", "test_plots")}'
 
-# Import and execute the test
-with open(r'{abs_test_path}', 'r', encoding='utf-8') as f:
-    exec(f.read())
+# Import the test module and run all test functions
+import importlib.util
+
+print(f"Python executable: {{sys.executable}}")
+print(f"Current working directory: {{os.getcwd()}}")
+print(f"Test file path: {{r'{abs_test_path}'}}")
+print(f"Test file exists: {{os.path.exists(r'{abs_test_path}')}}")
+
+try:
+    spec = importlib.util.spec_from_file_location("test_module", r'{abs_test_path}')
+    test_module = importlib.util.module_from_spec(spec)
+    print(f"Module spec created successfully")
+    spec.loader.exec_module(test_module)
+    print(f"Module loaded successfully")
+except Exception as e:
+    print(f"Error loading module: {{e}}")
+    import traceback
+    traceback.print_exc()
+    test_module = None
+
+# Find all test functions (including decorated ones)
+test_functions = []
+if test_module:
+    print(f"Module attributes: {{[name for name in dir(test_module) if not name.startswith('__')]}}")
+    for name in dir(test_module):
+        obj = getattr(test_module, name)
+        if name.startswith('test_') and callable(obj):
+            test_functions.append((name, obj))
+            print(f"Found test function: {{name}}")
+else:
+    print("No test module loaded, cannot find test functions")
+
+# Sort test functions by name for predictable order
+test_functions.sort(key=lambda x: x[0])
+
+print(f"Found {{len(test_functions)}} test functions: {{[name for name, func in test_functions]}}")
+
+# Run each test function
+for test_name, test_func in test_functions:
+    print(f"\\nRunning {{test_name}}...")
+    try:
+        test_func()
+        print(f"✅ {{test_name}} PASSED")
+    except Exception as e:
+        print(f"❌ {{test_name}} FAILED: {{e}}")
+        import traceback
+        traceback.print_exc()
+
+print("\\nAll test functions completed.")
 """
                     
                     # Write to a temporary file to avoid command line escaping issues

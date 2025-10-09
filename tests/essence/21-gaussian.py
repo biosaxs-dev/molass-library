@@ -6,7 +6,7 @@ Requires: pip install pytest-order
 import numpy as np
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
 def test_001_gaussian():
@@ -25,7 +25,7 @@ def test_002_mean_std():
     assert (mean, np.sqrt(variance)) == pytest.approx(expected, abs=1e-2)
 
 @pytest.mark.order(3)
-@control_matplotlib_plots 
+@control_matplotlib_plot 
 def test_003_def_plot_gaussian():
     import matplotlib.pyplot as plt
     global plot_gaussian
@@ -53,7 +53,7 @@ def test_003_def_plot_gaussian():
         plt.show()
 
 @pytest.mark.order(4)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_004_plot_gaussian():
     x = np.arange(300)
     plot_gaussian(x, A=1.0, mu=150.0, sigma=30.0)

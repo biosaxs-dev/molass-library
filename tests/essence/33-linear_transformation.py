@@ -4,7 +4,7 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
 def test_001_def_plot_multiple_component_data_with_svd():
@@ -65,7 +65,7 @@ def test_001_def_plot_multiple_component_data_with_svd():
         fig.subplots_adjust(right=0.95)
 
 @pytest.mark.order(2)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_plot_multiple_component_data_with_svd():
     rgs = (35, 32, 23)
     scattering_params = [(1, rgs[0], 2), (1, rgs[1], 3), (1, rgs[2], 4)]

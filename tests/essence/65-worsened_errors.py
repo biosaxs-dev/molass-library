@@ -4,7 +4,7 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 import numpy as np
 import matplotlib.pyplot as plt
 from molass.SAXS.Models.Formfactors import homogeneous_sphere
@@ -14,7 +14,7 @@ Rg = 35
 R = np.sqrt(5/3)*Rg
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_homogeneous_sphere():
     I = homogeneous_sphere(q, R)
     fig, ax = plt.subplots()
@@ -22,7 +22,7 @@ def test_001_homogeneous_sphere():
     ax.plot(q, I, label='homogeneous sphere')
 
 @pytest.mark.order(2)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_djKinning1984():
     I1 = homogeneous_sphere(q, R)
     I2 = I1 * S0(q, R)
@@ -34,7 +34,7 @@ def test_002_djKinning1984():
     ax.legend()
 
 @pytest.mark.order(3)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_003_def_plot_structure_factor():
     from bisect import bisect_right
     from molass.SEC.Models.Simple import gaussian
@@ -98,11 +98,11 @@ def test_003_def_plot_structure_factor():
         fig.tight_layout()
 
 @pytest.mark.order(4)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_004_plot_structure_factor():
     plot_structure_factor(error_level=0.05)
 
 @pytest.mark.order(5)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_005_plot_structure_factor_no_error():
     plot_structure_factor(error_level=0.0)

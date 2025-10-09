@@ -4,9 +4,9 @@
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass_data import SAMPLE2
-from molass.Testing import control_matplotlib_plots, is_interactive
+from molass.Testing import control_matplotlib_plot, is_interactive
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_010_PKS():
     from molass.DataObjects import SecSaxsData as SSD
     ssd = SSD(SAMPLE2)

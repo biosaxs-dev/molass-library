@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import control_matplotlib_plots
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_001_def_plot_single_component_data():
     import numpy as np
     import matplotlib.pyplot as plt
@@ -69,6 +69,6 @@ def test_001_def_plot_single_component_data():
         fig.tight_layout()
 
 @pytest.mark.order(2)
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_002_plot_single_component_data():
     plot_single_component_data((1, 35, 3), (1, 150, 30), noise=0.1)

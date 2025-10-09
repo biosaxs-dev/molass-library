@@ -5,9 +5,9 @@ import os
 from molass import get_version
 get_version(toml_only=True)
 from molass_data import SAMPLE1
-from molass.Testing import show_or_save, control_matplotlib_plots, is_interactive
+from molass.Testing import show_or_save, control_matplotlib_plot, is_interactive
 
-@control_matplotlib_plots
+@control_matplotlib_plot
 def test_010_default():
     from molass.DataObjects import SecSaxsData as SSD
     ssd = SSD(SAMPLE1)

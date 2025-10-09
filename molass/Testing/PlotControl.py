@@ -107,12 +107,12 @@ class PlotController:
         self._refresh_config()
         return self.enable_plots
     
-    def control_matplotlib_plots(self, test_func):
+    def control_matplotlib_plot(self, test_func):
         """
         Decorator to control matplotlib behavior for test functions.
         
         Usage:
-        @plot_controller.control_matplotlib_plots
+        @plot_controller.control_matplotlib_plot
         def test_my_function():
             # Your test code with plots
             plt.plot([1, 2, 3])
@@ -163,14 +163,14 @@ def is_interactive():
     """Returns True if plots should be shown interactively."""
     return plot_controller.is_interactive()
 
-def control_matplotlib_plots(test_func):
+def control_matplotlib_plot(test_func):
     """Decorator for test functions with matplotlib plots."""
-    return plot_controller.control_matplotlib_plots(test_func)
+    return plot_controller.control_matplotlib_plot(test_func)
 
 # Backward compatibility alias
-def control_matplotlib_plots(test_func):
-    """Deprecated: Use control_matplotlib_plots instead."""
-    return plot_controller.control_matplotlib_plots(test_func)
+def configure_for_test(test_func):
+    """Deprecated: Use control_matplotlib_plot instead."""
+    return plot_controller.control_matplotlib_plot(test_func)
 
 def suppress_numerical_warnings(test_func):
     """Decorator to suppress numerical computation warnings."""
