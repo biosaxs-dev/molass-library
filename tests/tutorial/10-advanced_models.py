@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plots
 
 @pytest.mark.order(1)
-@configure_for_test
+@control_matplotlib_plots
 def test_001_plot_compact():
     from molass import get_version
     assert get_version() >= '0.6.0', "This tutorial requires molass version 0.6.0 or higher."
@@ -21,13 +21,13 @@ def test_001_plot_compact():
     decomposition.plot_components(title="EGH decomposition of sample4 with proportions [3, 1.86, 1]");
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plots
 def test_002_optimize_with_model_sdm():
     sdm_decomposition = decomposition.optimize_with_model('SDM')
     sdm_decomposition.plot_components(title="SDM decomposition of sample4 from EGH result");
 
 @pytest.mark.order(3)
-@configure_for_test
+@control_matplotlib_plots
 def test_003_optimize_with_model_edm():
     import warnings
     # Suppress runtime warnings for this specific test

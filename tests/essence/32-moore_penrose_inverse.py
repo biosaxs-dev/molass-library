@@ -4,7 +4,7 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plots
 import numpy as np
 import matplotlib.pyplot as plt
 from molass.SAXS.Models.Simple import guinier_porod
@@ -51,12 +51,12 @@ def test_001_def_plot_single_component_data():
         fig.tight_layout()
     
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plots
 def test_002_plot_single_component_data():
     plot_single_component_data((1, 35, 3), (1, 150, 30))
 
 @pytest.mark.order(3)
-@configure_for_test
+@control_matplotlib_plots
 def test_003_plot_single_component_data_no_noise():
     plot_single_component_data((1, 35, 3), (1, 150, 30), noise=0.1)
 
@@ -129,7 +129,7 @@ def test_004_def_plot_multiple_component_data():
 
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plots
 def test_005_plot_multiple_component_data():
     rgs = (35, 32, 23)
     scattering_params = [(1, rgs[0], 3), (1, rgs[1], 3), (1, rgs[2], 4)]

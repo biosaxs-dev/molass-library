@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plots
 
 @pytest.mark.order(1)
 def test_001_def_plot_egh():
@@ -34,14 +34,14 @@ def test_001_def_plot_egh():
         plt.show()
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plots
 def test_002_plot_egh():
     global x
     x = np.arange(300)
     plot_egh(x, A=1.0, mu=150.0, sigma=30.0, tau=0)
 
 @pytest.mark.order(3)
-@configure_for_test 
+@control_matplotlib_plots 
 def test_003_def_plot_egh_curves():
     global plot_egh_curves
     def plot_egh_curves(x, params):
@@ -71,7 +71,7 @@ def test_003_def_plot_egh_curves():
         plt.show()
 
 @pytest.mark.order(4)
-@configure_for_test
+@control_matplotlib_plots
 def test_004_plot_egh_curves():
     plot_egh_curves(x, [
         {'A': 1.0, 'mu': 150.0, 'sigma': 30.0, 'tau': 0},
@@ -79,7 +79,7 @@ def test_004_plot_egh_curves():
     ])
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plots
 def test_005_plot_egh_curves_negative_tau():
     plot_egh_curves(x, [
         {'A': 1.0, 'mu': 150.0, 'sigma': 30.0, 'tau': 0},

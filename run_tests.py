@@ -50,10 +50,15 @@ def run_tests(test_path=None, mode='batch', order_range=None):
     if test_path and Path(test_path).is_dir():
         # For directories, run each file individually to preserve order within files
         test_dir = Path(test_path)
-        test_files = sorted(test_dir.glob('*.py'))  # Sort to get predictable order
+        # First try direct .py files, then recursive search
+        test_files = sorted(test_dir.glob('*.py'))
         
         if not test_files:
-            print(f"No Python files found in {test_path}")
+            # No direct .py files, look recursively
+            test_files = sorted(test_dir.rglob('*.py'))
+            
+        if not test_files:
+            print(f"No Python files found in {test_path} or its subdirectories")
             return 1
             
         print(f"Running {len(test_files)} test files individually to preserve order...")
@@ -64,9 +69,14 @@ def run_tests(test_path=None, mode='batch', order_range=None):
             print(f"Running {test_file.name}")
             print('='*60)
             
-            cmd = [sys.executable, '-m', 'pytest', str(test_file), '-v', '--tb=short']
+            pytest_args = ['-v', '--tb=short', '-s']
+            if mode == 'interactive':
+                pytest_args.extend(['--capture=no', '--tb=line'])
+            
+            cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
             print(f"Command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, cwd=Path(__file__).parent)
+            env = os.environ.copy()  # Copy current environment
+            result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
             
             if result.returncode != 0:
                 total_failures += 1
@@ -101,11 +111,61 @@ def run_tests(test_path=None, mode='batch', order_range=None):
             print(f"Running tests with orders {start} to {end}")
         
         # Add useful pytest options
-        cmd.extend(['-v', '--tb=short'])
+        pytest_args = ['-v', '--tb=short', '-s']  # -s shows print output
         
-        # Run the tests
+        # For interactive mode, add additional options to help with GUI display
+        if mode == 'interactive':
+            pytest_args.extend(['--capture=no', '--tb=line'])
+            
+            # Special handling for single file interactive mode to avoid pytest issues
+            if test_path and Path(test_path).is_file():
+                print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
+                try:
+                    # Set up the environment 
+                    env = os.environ.copy()
+                    
+                    # Use absolute path to avoid path issues
+                    abs_test_path = str(Path(test_path).resolve())
+                    
+                    # Create a temporary script to avoid string escaping issues
+                    temp_script = f"""
+import os
+import sys
+sys.path.insert(0, '.')
+
+# Set environment variables
+os.environ['MOLASS_ENABLE_PLOTS'] = r'{env.get("MOLASS_ENABLE_PLOTS", "false")}'
+os.environ['MOLASS_SAVE_PLOTS'] = r'{env.get("MOLASS_SAVE_PLOTS", "false")}'
+os.environ['MOLASS_PLOT_DIR'] = r'{env.get("MOLASS_PLOT_DIR", "test_plots")}'
+
+# Import and execute the test
+with open(r'{abs_test_path}', 'r', encoding='utf-8') as f:
+    exec(f.read())
+"""
+                    
+                    # Write to a temporary file to avoid command line escaping issues
+                    temp_file = Path("temp_interactive_test.py")
+                    temp_file.write_text(temp_script, encoding='utf-8')
+                    
+                    try:
+                        exec_cmd = [sys.executable, str(temp_file)]
+                        print("Running test directly for better interactive display...")
+                        result = subprocess.run(exec_cmd, cwd=Path(__file__).parent)
+                        return result.returncode
+                    finally:
+                        # Clean up temp file
+                        if temp_file.exists():
+                            temp_file.unlink()
+                    
+                except Exception as e:
+                    print(f"Direct execution failed: {e}, falling back to pytest...")
+        
+        cmd.extend(pytest_args)
+        
+        # Run the tests with environment variables passed through
         print(f"Command: {' '.join(cmd)}")
-        result = subprocess.run(cmd, cwd=Path(__file__).parent)
+        env = os.environ.copy()  # Copy current environment
+        result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
         return result.returncode
 
 if __name__ == '__main__':

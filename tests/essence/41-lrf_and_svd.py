@@ -4,7 +4,7 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plots
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -83,7 +83,7 @@ def test_001_def_plot_multiple_component_data():
         return M
     
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plots
 def test_002_plot_multiple_component_data():
     global M
     rgs = (35, 32)
@@ -104,7 +104,7 @@ def test_003_svd():
     print(M.shape, M_.shape, np.linalg.norm(M - M_), s_, scales)
 
 @pytest.mark.order(4)
-@configure_for_test
+@control_matplotlib_plots
 def test_004_def_plot_any_lrf():
     global plot_any_lrf
     def plot_any_lrf(A, positive=False, view=None):
@@ -143,6 +143,6 @@ def test_004_def_plot_any_lrf():
         plt.show()
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plots
 def test_005_plot_any_lrf():
     plot_any_lrf(np.random.uniform(size=(2,2)), view=(-15, 15))

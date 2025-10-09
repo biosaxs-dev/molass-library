@@ -4,14 +4,14 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plots
 
 # Global variables to share state between ordered tests
 ssd = None
 corrected_ssd = None
 
 @pytest.mark.order(1)
-@configure_for_test
+@control_matplotlib_plots
 def test_001_plot_compact():
     from molass import get_version
     assert get_version() >= '0.2.0', "This tutorial requires molass version 0.2.0 or higher."
@@ -23,7 +23,7 @@ def test_001_plot_compact():
     trimmed_ssd.plot_compact(baseline=True);
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plots
 def test_002_corrected_copy():
     global corrected_ssd
     corrected_ssd = trimmed_ssd.corrected_copy()
@@ -36,13 +36,13 @@ def test_003_set_baseline_method():
     ssd.set_baseline_method('integral')
 
 @pytest.mark.order(4)
-@configure_for_test
+@control_matplotlib_plots
 def test_004_set_baseline_method_uvdiff():
     trimmed_ssd.set_baseline_method(('linear', 'uvdiff'))
     trimmed_ssd.plot_compact(baseline=True);
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plots
 def test_005_corrected_copy():
     global corrected_ssd
     corrected_ssd = trimmed_ssd.corrected_copy()
@@ -55,13 +55,13 @@ def test_006_get_baseline_method():
     assert methods == ('linear', 'uvdiff'), "Unexpected baseline methods"
 
 @pytest.mark.order(7)
-@configure_for_test
+@control_matplotlib_plots
 def test_007_set_baseline_method_integral():
     trimmed_ssd.set_baseline_method('integral')
     trimmed_ssd.plot_compact(baseline=True);
 
 @pytest.mark.order(8)
-@configure_for_test
+@control_matplotlib_plots
 def test_008_corrected_copy_integral():
     global corrected_ssd
     corrected_ssd = trimmed_ssd.corrected_copy()
