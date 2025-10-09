@@ -6,7 +6,7 @@ Requires: pip install pytest-order
 import pytest
 import warnings
 import os
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plot
 
 # Suppress matplotlib non-interactive backend warnings in batch mode
 if os.environ.get('MOLASS_ENABLE_PLOTS', 'false').lower() == 'false':
@@ -24,7 +24,7 @@ def show_or_close_plot():
 ssd = None
 
 @pytest.mark.order(1)
-@configure_for_test
+@control_matplotlib_plot
 def test_001_plot_3d():
     from molass import get_version
     assert get_version() >= '0.2.0', "This tutorial requires molass version 0.2.0 or higher."
@@ -35,17 +35,17 @@ def test_001_plot_3d():
     ssd.plot_3d(title="3D Plot of Sample1");
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plot
 def test_002_plot_compact():
     ssd.plot_compact(title="Compact Plot of Sample1");
 
 @pytest.mark.order(3)
-@configure_for_test 
+@control_matplotlib_plot 
 def test_003_plot_3d_section_lines():
     ssd.plot_3d(title="Section Lines where the 2D Plots Intersect", with_2d_section_lines=True);
 
 @pytest.mark.order(4)
-@configure_for_test
+@control_matplotlib_plot
 def test_004_plot_xr_curve():
     import matplotlib.pyplot as plt
     global xr_icurve
@@ -57,7 +57,7 @@ def test_004_plot_xr_curve():
     show_or_close_plot()
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plot
 def test_005_plot_uv_curve():
     import matplotlib.pyplot as plt
     global uv_icurve
@@ -69,7 +69,7 @@ def test_005_plot_uv_curve():
     show_or_close_plot()
 
 @pytest.mark.order(6)
-@configure_for_test
+@control_matplotlib_plot
 def test_006_plot_two_axes():
     import matplotlib.pyplot as plt
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,5))

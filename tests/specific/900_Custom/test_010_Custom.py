@@ -24,4 +24,4 @@ def test_020_load_xr():
 def test_030_plot():
     from molass.DataObjects import SecSaxsData as SSD
     ssd = SSD(TUTORIAL_DATA)
-    ssd.plot_compact(debug=True)
+    ssd.plot_compact(debug=is_interactive())

@@ -5,10 +5,10 @@ Requires: pip install pytest-order
 
 import numpy as np
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@configure_for_test
+@control_matplotlib_plot
 def test_001_plot_compact():
     from molass import get_version
     assert get_version() >= '0.6.0', "This tutorial requires molass version 0.6.0 or higher."
@@ -23,7 +23,7 @@ def test_001_plot_compact():
     corrected_ssd.plot_compact();
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plot
 def test_002_run_denss():
     global rgcurve
     rgcurve = corrected_ssd.xr.compute_rgcurve()
@@ -35,19 +35,19 @@ species1_proportions = np.ones(num_trails) * 3
 species2_proportions = np.linspace(1, 3, num_trails)
 
 @pytest.mark.order(3)
-@configure_for_test
+@control_matplotlib_plot
 def test_003_binary_proportions():
     global proportions
     proportions = np.array([species1_proportions, species2_proportions]).T
     print("Current proportions:", proportions)
 
 @pytest.mark.order(4)
-@configure_for_test
+@control_matplotlib_plot
 def test_004_plot_varied_decompositions():
     corrected_ssd.plot_varied_decompositions(proportions, rgcurve=rgcurve, best=3)
 
 @pytest.mark.order(5)
-@configure_for_test
+@control_matplotlib_plot
 def test_005_tertiary_proportions():
     import numpy as np
     global proportions
@@ -56,6 +56,6 @@ def test_005_tertiary_proportions():
     print("Current proportions:", proportions)
 
 @pytest.mark.order(6)
-@configure_for_test
+@control_matplotlib_plot
 def test_006_plot_varied_decompositions():
     corrected_ssd.plot_varied_decompositions(proportions, rgcurve=rgcurve, best=3)

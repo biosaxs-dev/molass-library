@@ -1,13 +1,12 @@
 """
-    test DenssTools
+    test DensitySpace with different Shapes
 """
-import sys
-sys.path.insert(0, r'D:\Github\molass-library')
-sys.path.insert(0, r'D:\Github\molass-legacy')
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 import matplotlib.pyplot as plt
+from molass.Testing import control_matplotlib_plot
 
+@control_matplotlib_plot
 def test_01_sphere():
     from molass.Shapes import Sphere
     from molass.DensitySpace import VoxelSpace
@@ -17,6 +16,7 @@ def test_01_sphere():
     space.plot_as_dots()
     plt.show()
 
+@control_matplotlib_plot
 def test_02_ellipsoid():
     from molass.Shapes import Ellipsoid
     from molass.DensitySpace import VoxelSpace

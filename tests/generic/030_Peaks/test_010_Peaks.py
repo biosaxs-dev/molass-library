@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings
-from molass.Testing import show_or_save, configure_for_test
+from molass.Testing import show_or_save, control_matplotlib_plot
 
 local_settings = get_local_settings()
 DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
 
-@configure_for_test
+@control_matplotlib_plot
 def test_010_Kosugi3a():
     from molass.DataObjects import SecSaxsData as SSD
     path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")

@@ -4,10 +4,10 @@ Requires: pip install pytest-order
 """
 
 import pytest
-from molass.Testing import configure_for_test
+from molass.Testing import control_matplotlib_plot
 
 @pytest.mark.order(1)
-@configure_for_test
+@control_matplotlib_plot
 def test_001_plot_components():
     from molass import get_version
     assert get_version() >= '0.6.3', "This tutorial requires molass version 0.6.3 or higher."
@@ -23,7 +23,7 @@ def test_001_plot_components():
 output_folder = "temp"
 
 @pytest.mark.order(2)
-@configure_for_test
+@control_matplotlib_plot
 def test_002_run_denss():
     import warnings
     from molass.SAXS.DenssTools import run_denss
@@ -36,7 +36,7 @@ def test_002_run_denss():
         run_denss(jcurve_array, output_folder=output_folder)
 
 @pytest.mark.order(3)
-@configure_for_test
+@control_matplotlib_plot
 def test_003_show_mrc():
     import matplotlib.pyplot as plt
     from molass.SAXS.MrcViewer import show_mrc
