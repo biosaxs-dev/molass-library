@@ -1,0 +1,25 @@
+
+1. pull origin in GitHub/denss
+
+2. python update-denss.py
+
+3. python update-custom-codes.py
+
+4. do manually
+
+    check bin-temp and saxstats-temp
+    replace bin, saxstats
+
+    check DenssUtils-temp.py, DmaxEstimation-temp.py
+    replace  DenssUtils.py, DmaxEstimation.py
+
+-------------------------------------------
+
+bin/denss.fit_data.py   # 
+bin/denss.pdb2mrc.py    # 
+
+saxstats/denssopts.py   # 
+saxstats/saxstats.py    # 
+
+./DenssUtils.py         # 
+./DmaxEstimation.py     # estimate_dmax: return D, sasrec, [r, Pfilt, Pargmax, D_idx]

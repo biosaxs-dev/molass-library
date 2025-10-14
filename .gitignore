@@ -1,0 +1,43 @@
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore the evironment file which defines PYTHONPATH for local execution
+.env
+
+# Ignore Python cache files
+**/__pycache__/**
+
+# Ignore the Sphinx build directory
+docs/_build/
+docs/source/**
+
+<<<<<<< HEAD
+docs/source/**
+
+# Ignore pytest related files
+.pytest_cache/
+.coverage
+htmlcov
+=======
+# Ignore pytest related files
+.pytest_cache/
+.coverage
+htmlcov
+
+# Ignore the run_denss results
+**/temp/**
+
+*.xlsx
+
+**/atsas-results/**
+**/report_folder/**
+<<<<<<< HEAD
+>>>>>>> master
+=======
+
+# DENSS update temporary scripts
+**/temp-scripts/**
+**/previous-scripts/**
+>>>>>>> master
