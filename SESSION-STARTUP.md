@@ -4,68 +4,52 @@
 
 ---
 
-## 🚀 **EVERY SESSION STARTS THE SAME WAY**
+## 🚀 **THE MAGIC PHRASE**
 
-### **Step 1: Initialize Copilot (REQUIRED)**
-Say exactly this:
+Every session starts with:
 > **"Please read COPILOT-INIT.md to initialize"**
 
-**What happens:**
-- ✅ Copilot detects who you are (Takahashi/Shimizu)
-- ✅ Loads current project context
-- ✅ Adjusts communication style for your skill level
-- ✅ References latest status and priorities
-
-### **Step 2: Continue with your work**
-After initialization, you can:
-- Ask questions about the project
-- Work on assigned tasks
-- Request help with responses
-- Update status files
+**What this does:**
+- 🎯 Copilot automatically detects who you are
+- 📋 Loads current project status
+- 🗣️ Adjusts communication style for your skills
+- ✅ Ready for collaboration!
 
 ---
 
-## 👥 **For Each Team Member**
+## 💬 **What to Say After Initialization**
 
 ### **Takahashi (Programmer)**
-**After initialization, typical interactions:**
-- "What technical issues need attention?"
-- "Help me analyze this code for a reviewer response"
-- "Let's work on the GitHub Actions problem"
+- "What technical work needs attention?"
+- "Help me analyze this code issue"
+- "Let's work on the repository setup"
 
 ### **Shimizu (Domain Expert)**
-**After initialization, typical interactions:**
 - "What scientific questions need responses?"
-- "Help me explain the SEC-SAXS methodology"
-- "Review this draft for scientific accuracy"
+- "Help me explain the methodology"
+- "Review this content for accuracy"
 
 ---
 
-## 🎯 **Why This Manual Trigger is Needed**
+## 🔄 **Common Workflow Examples**
 
-**Current limitation:** GitHub Copilot doesn't have automatic initialization like `.vimrc`
-**Our solution:** Manual trigger ensures consistent context loading
-**Future:** When Copilot adds `.copilotrc` support, we can make this automatic
-
----
-
-## 📋 **Common Session Patterns**
-
-### **New JOSS Review Comments Received**
+### **Starting Review Work**
 1. "Please read COPILOT-INIT.md to initialize"
-2. "I received new reviewer comments, let's analyze them"
-3. Work on responses together
+2. "I received new reviewer comments, let's work on them"
 
-### **Checking Project Status**
-1. "Please read COPILOT-INIT.md to initialize"  
-2. "What's the current status of our JOSS review?"
-3. Review progress and next steps
-
-### **Collaborative Work Session**
+### **Checking Status**
 1. "Please read COPILOT-INIT.md to initialize"
-2. "Shimizu and I want to work on responses together"
-3. Coordinate skill-based task distribution
+2. "What's our current progress?"
+
+### **Collaborative Session**
+1. "Please read COPILOT-INIT.md to initialize"
+2. "Shimizu and I are working together today"
 
 ---
 
-**Remember: The magic phrase is "Please read COPILOT-INIT.md to initialize"** 🪄
+## 💡 **Tips**
+- **Always start with the magic phrase** - it makes everything work smoothly
+- **One phrase does everything** - no need to explain who you are
+- **Works for both team members** - Takahashi and Shimizu
+
+**🪄 Magic phrase: "Please read COPILOT-INIT.md to initialize"**

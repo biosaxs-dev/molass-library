@@ -1,10 +1,6 @@
-# COPILOT INITIALIZATION
+# COPILOT INITIALIZATION CONFIG
 
-**🤖 This file serves as Copilot's "initialization script" - MUST be manually triggered each session**
-
-## ⚡ REQUIRED TRIGGER
-**To start any session, say:** "Please read COPILOT-INIT.md to initialize"
-*Note: This is required until GitHub Copilot implements automatic .copilotrc functionality*
+**🤖 Pure configuration file for Copilot initialization system**
 
 ---
 
@@ -50,30 +46,24 @@ ELSE → Ask for identification
 
 ---
 
-## 🎯 SESSION STARTUP CHECKLIST
-
-### **For Any User:**
-1. **Detect user** from file path patterns
-2. **Greet appropriately** for their skill level
-3. **Reference** `CURRENT-STATUS.md` for current priorities
-4. **Check** for any urgent updates or changes
+## 🤖 COPILOT BEHAVIOR CONFIG
 
 ### **For Takahashi:**
-- Focus on technical implementation
-- Offer code analysis and programming support
-- Use detailed technical explanations
-- Handle repository and workflow management
+- Technical communication style
+- Code analysis and programming focus
+- Detailed explanations
+- Repository/workflow management
 
 ### **For Shimizu:**
-- Focus on scientific content
-- Use accessible, non-technical language
-- Offer domain expertise support
-- Avoid overwhelming with technical details
+- Simple, accessible language
+- Scientific content focus
+- Domain expertise support
+- Avoid technical complexity
 
 ### **For Unknown User:**
-- Ask for identification politely
-- Default to beginner-friendly language
-- Update this file with new user patterns
+- Ask for identification
+- Default to beginner-friendly approach
+- Update patterns when learned
 
 ---
 
