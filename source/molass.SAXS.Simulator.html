@@ -536,7 +536,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -552,6 +554,19 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.SaxsInfo"><code class="docutils literal notranslate"><span class="pre">SaxsInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.SaxsInfo.get_curve"><code class="docutils literal notranslate"><span class="pre">SaxsInfo.get_curve()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.compute_saxs"><code class="docutils literal notranslate"><span class="pre">compute_saxs()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.draw_saxs"><code class="docutils literal notranslate"><span class="pre">draw_saxs()</span></code></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -561,8 +576,73 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="saxs-simulator">
-<h1>SAXS.Simulator<a class="headerlink" href="#saxs-simulator" title="Link to this heading">#</a></h1>
+  <section id="module-molass.SAXS.Simulator">
+<span id="saxs-simulator"></span><h1>SAXS.Simulator<a class="headerlink" href="#module-molass.SAXS.Simulator" title="Link to this heading">#</a></h1>
+<p># This module contains the SAXS simulator class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="molass.SAXS.Simulator.SaxsInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SaxsInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">electron_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ft_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Simulator.SaxsInfo" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to represent the SAXS information.</p>
+<p>Initialize the SAXS information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>electron_density</strong> (<em>np.ndarray</em>) – The electron density information.</p></li>
+<li><p><strong>ft_image</strong> (<em>np.ndarray</em>) – The Fourier transform image.</p></li>
+<li><p><strong>detector_info</strong> (<em>np.ndarray</em>) – The detector information.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.SAXS.Simulator.SaxsInfo.get_curve">
+<span class="sig-name descname"><span class="pre">get_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Simulator.SaxsInfo.get_curve" title="Link to this definition">#</a></dt>
+<dd><p>Get the SAXS scattering curve from the detector information.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Simulator.compute_saxs">
+<span class="sig-name descname"><span class="pre">compute_saxs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_denss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Simulator.compute_saxs" title="Link to this definition">#</a></dt>
+<dd><p>Compute SAXS data from a given electron density map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>np.ndarray</em>) – The 3D electron density map.</p></li>
+<li><p><strong>q</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The q values at which to compute the SAXS intensity. If None, a default range will be used.</p></li>
+<li><p><strong>dmax</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum dimension of the particle in Angstroms. If None, it will be estimated
+from the electron density map.</p></li>
+<li><p><strong>use_denss</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use DENSS-like approach for computation.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the SaxsInfo class containing the computed SAXS data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.SAXS.Simulator.SaxsInfo" title="molass.SAXS.Simulator.SaxsInfo">SaxsInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.SAXS.Simulator.draw_saxs">
+<span class="sig-name descname"><span class="pre">draw_saxs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">saxs_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SAXS.Simulator.draw_saxs" title="Link to this definition">#</a></dt>
+<dd><p>Draw a shape in the electron density space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shape_condition</strong> (<em>np.ndarray</em>) – A boolean array representing the shape to be drawn.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The figure containing the drawn shape.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.10.7)">matplotlib.figure.Figure</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -600,6 +680,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.SaxsInfo"><code class="docutils literal notranslate"><span class="pre">SaxsInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.SaxsInfo.get_curve"><code class="docutils literal notranslate"><span class="pre">SaxsInfo.get_curve()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.compute_saxs"><code class="docutils literal notranslate"><span class="pre">compute_saxs()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SAXS.Simulator.draw_saxs"><code class="docutils literal notranslate"><span class="pre">draw_saxs()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

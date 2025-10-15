@@ -47,6 +47,8 @@
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Trimming" href="molass.Trimming.html" />
+    <link rel="prev" title="Testing" href="molass.Testing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -156,7 +158,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Baseline.html">Baseline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
@@ -383,6 +385,10 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SurveyUtils.UvPickvalue.html">SurveyUtils.UvPickvalue</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Testing.html">Testing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Testing.PlotControl</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Trimming.html">Trimming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Trimming.TrimmingInfo.html">Trimming.TrimmingInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Trimming.TrimmingUtils.html">Trimming.TrimmingUtils</a></li>
@@ -556,12 +562,15 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController"><code class="docutils literal notranslate"><span class="pre">PlotController</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.show_or_save"><code class="docutils literal notranslate"><span class="pre">PlotController.show_or_save()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.is_interactive"><code class="docutils literal notranslate"><span class="pre">PlotController.is_interactive()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.configure_for_test"><code class="docutils literal notranslate"><span class="pre">PlotController.configure_for_test()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">PlotController.control_matplotlib_plot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">PlotController.suppress_numerical_warnings()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.show_or_save"><code class="docutils literal notranslate"><span class="pre">show_or_save()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.is_interactive"><code class="docutils literal notranslate"><span class="pre">is_interactive()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">control_matplotlib_plot()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.configure_for_test"><code class="docutils literal notranslate"><span class="pre">configure_for_test()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">suppress_numerical_warnings()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -596,7 +605,7 @@ This module was suggested by Copilot to manage plot behavior during tests.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Name for the saved plot file</p></li>
-<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.10.6)"><em>matplotlib.figure.Figure</em></a><em>, </em><em>optional</em>) – Figure to save (uses current figure if None)</p></li>
+<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.10.7)"><em>matplotlib.figure.Figure</em></a><em>, </em><em>optional</em>) – Figure to save (uses current figure if None)</p></li>
 </ul>
 </dd>
 </dl>
@@ -609,16 +618,29 @@ This module was suggested by Copilot to manage plot behavior during tests.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="molass.Testing.PlotControl.PlotController.configure_for_test">
-<span class="sig-name descname"><span class="pre">configure_for_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.PlotController.configure_for_test" title="Link to this definition">#</a></dt>
-<dd><p>Decorator to configure a test function for plot control.</p>
+<dt class="sig sig-object py" id="molass.Testing.PlotControl.PlotController.control_matplotlib_plot">
+<span class="sig-name descname"><span class="pre">control_matplotlib_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.PlotController.control_matplotlib_plot" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to control matplotlib behavior for test functions.</p>
 <p>Usage:
-&#64;plot_controller.configure_for_test
+&#64;plot_controller.control_matplotlib_plot
 def test_my_function():</p>
 <blockquote>
 <div><p># Your test code with plots
 plt.plot([1, 2, 3])
 plot_controller.show_or_save(“test_my_function”)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Testing.PlotControl.PlotController.suppress_numerical_warnings">
+<span class="sig-name descname"><span class="pre">suppress_numerical_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.PlotController.suppress_numerical_warnings" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to suppress numerical computation warnings.</p>
+<p>Usage:
+&#64;plot_controller.suppress_numerical_warnings
+def test_my_function():</p>
+<blockquote>
+<div><p># Your test code that might generate numerical warnings
+pass</p>
 </div></blockquote>
 </dd></dl>
 
@@ -637,9 +659,21 @@ plot_controller.show_or_save(“test_my_function”)</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="molass.Testing.PlotControl.control_matplotlib_plot">
+<span class="sig-name descname"><span class="pre">control_matplotlib_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.control_matplotlib_plot" title="Link to this definition">#</a></dt>
+<dd><p>Decorator for test functions with matplotlib plots.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="molass.Testing.PlotControl.configure_for_test">
 <span class="sig-name descname"><span class="pre">configure_for_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.configure_for_test" title="Link to this definition">#</a></dt>
-<dd><p>Decorator for test functions with plots.</p>
+<dd><p>Deprecated: Use control_matplotlib_plot instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.Testing.PlotControl.suppress_numerical_warnings">
+<span class="sig-name descname"><span class="pre">suppress_numerical_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Testing.PlotControl.suppress_numerical_warnings" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to suppress numerical computation warnings.</p>
 </dd></dl>
 
 </section>
@@ -655,6 +689,24 @@ plot_controller.show_or_save(“test_my_function”)</p>
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="molass.Testing.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Testing</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="molass.Trimming.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Trimming</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -674,12 +726,15 @@ plot_controller.show_or_save(“test_my_function”)</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController"><code class="docutils literal notranslate"><span class="pre">PlotController</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.show_or_save"><code class="docutils literal notranslate"><span class="pre">PlotController.show_or_save()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.is_interactive"><code class="docutils literal notranslate"><span class="pre">PlotController.is_interactive()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.configure_for_test"><code class="docutils literal notranslate"><span class="pre">PlotController.configure_for_test()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">PlotController.control_matplotlib_plot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.PlotController.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">PlotController.suppress_numerical_warnings()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.show_or_save"><code class="docutils literal notranslate"><span class="pre">show_or_save()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.is_interactive"><code class="docutils literal notranslate"><span class="pre">is_interactive()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">control_matplotlib_plot()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.configure_for_test"><code class="docutils literal notranslate"><span class="pre">configure_for_test()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Testing.PlotControl.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">suppress_numerical_warnings()</span></code></a></li>
 </ul>
   </nav></div>
 

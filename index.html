@@ -585,14 +585,14 @@ document.write(`
 <p>This document describes each function of the library.</p>
 <p>For more structural information, see also:</p>
 <ul class="simple">
-<li><p><strong>Tutorial:</strong> <a class="reference external" href="https://molass-saxs.github.io/molass-tutorial">https://molass-saxs.github.io/molass-tutorial</a> on practical usage, for beginners</p></li>
-<li><p><strong>Essence:</strong> <a class="reference external" href="https://molass-saxs.github.io/molass-essence">https://molass-saxs.github.io/molass-essence</a> on theory, for researchers</p></li>
-<li><p><strong>Technical Report:</strong> <a class="reference external" href="https://freesemt.github.io/molass-technical/">https://freesemt.github.io/molass-technical/</a> on technical details, for advanced users</p></li>
-<li><p><strong>Legacy Reference:</strong> <a class="reference external" href="https://freesemt.github.io/molass-legacy/">https://freesemt.github.io/molass-legacy/</a> for function reference of the GUI application version, the predecessor.</p></li>
+<li><p><strong>Tutorial:</strong> <a class="reference external" href="https://biosaxs-dev.github.io/molass-tutorial">https://biosaxs-dev.github.io/molass-tutorial</a> on practical usage, for beginners</p></li>
+<li><p><strong>Essence:</strong> <a class="reference external" href="https://biosaxs-dev.github.io/molass-essence">https://biosaxs-dev.github.io/molass-essence</a> on theory, for researchers</p></li>
+<li><p><strong>Technical Report:</strong> <a class="reference external" href="https://biosaxs-dev.github.io/molass-technical/">https://biosaxs-dev.github.io/molass-technical/</a> on technical details, for advanced users</p></li>
+<li><p><strong>Legacy Reference:</strong> <a class="reference external" href="https://biosaxs-dev.github.io/molass-legacy/">https://biosaxs-dev.github.io/molass-legacy/</a> for function reference of the GUI application version, the predecessor.</p></li>
 </ul>
 <p>To join the community, see also:</p>
 <ul class="simple">
-<li><p><strong>Handbook:</strong> <a class="reference external" href="https://molass-saxs.github.io/molass-develop">https://molass-saxs.github.io/molass-develop</a> on maintenance, for developers.</p></li>
+<li><p><strong>Handbook:</strong> <a class="reference external" href="https://biosaxs-dev.github.io/molass-develop">https://biosaxs-dev.github.io/molass-develop</a> on maintenance, for developers.</p></li>
 </ul>
 <section id="module-molass">
 <span id="module-functions"></span><h2>Module Functions<a class="headerlink" href="#module-molass" title="Link to this heading">#</a></h2>
@@ -1627,12 +1627,23 @@ this version.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.demo"><code class="docutils literal notranslate"><span class="pre">demo()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="source/molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SAXS.FourierIllust.html">SAXS.FourierIllust</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.FourierIllust.html#molass.SAXS.FourierIllust.plot_saxs_illust"><code class="docutils literal notranslate"><span class="pre">plot_saxs_illust()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SAXS.MrcViewer.html">SAXS.MrcViewer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.MrcViewer.html#molass.SAXS.MrcViewer.show_mrc"><code class="docutils literal notranslate"><span class="pre">show_mrc()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="source/molass.SAXS.Simulator.html">SAXS.Simulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SAXS.Simulator.html">SAXS.Simulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo"><code class="docutils literal notranslate"><span class="pre">SaxsInfo</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.SaxsInfo.get_curve"><code class="docutils literal notranslate"><span class="pre">SaxsInfo.get_curve()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.compute_saxs"><code class="docutils literal notranslate"><span class="pre">compute_saxs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SAXS.Simulator.html#molass.SAXS.Simulator.draw_saxs"><code class="docutils literal notranslate"><span class="pre">draw_saxs()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1936,18 +1947,23 @@ this version.</p>
 <li class="toctree-l1"><a class="reference internal" href="source/molass.Testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.show_or_save"><code class="docutils literal notranslate"><span class="pre">show_or_save()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.is_interactive"><code class="docutils literal notranslate"><span class="pre">is_interactive()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">control_matplotlib_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">suppress_numerical_warnings()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.configure_for_test"><code class="docutils literal notranslate"><span class="pre">configure_for_test()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Testing.PlotControl.html">Testing.PlotControl</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController"><code class="docutils literal notranslate"><span class="pre">PlotController</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.show_or_save"><code class="docutils literal notranslate"><span class="pre">PlotController.show_or_save()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.is_interactive"><code class="docutils literal notranslate"><span class="pre">PlotController.is_interactive()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.configure_for_test"><code class="docutils literal notranslate"><span class="pre">PlotController.configure_for_test()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">PlotController.control_matplotlib_plot()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">PlotController.suppress_numerical_warnings()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.show_or_save"><code class="docutils literal notranslate"><span class="pre">show_or_save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.is_interactive"><code class="docutils literal notranslate"><span class="pre">is_interactive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">control_matplotlib_plot()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.configure_for_test"><code class="docutils literal notranslate"><span class="pre">configure_for_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">suppress_numerical_warnings()</span></code></a></li>
 </ul>
 </li>
 </ul>
