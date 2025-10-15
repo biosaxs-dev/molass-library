@@ -34,7 +34,7 @@ For more information, see:
 
 - **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial — on practical usage, for beginners
 - **Essence:** https://biosaxs-dev.github.io/molass-essence — on theory, for researchers
-- **Technical Report:** https://freesemt.github.io/molass-technical — on technical details, for advanced users
+- **Technical Report:** https://biosaxs-dev.github.io/molass-technical — on technical details, for advanced users
 - **Reference:** https://biosaxs-dev.github.io/molass-library — on function reference, for coding
 - **Legacy Repository:** https://github.com/freesemt/molass-legacy — for legacy code
 

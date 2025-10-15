@@ -14,8 +14,8 @@ For more structural information, see also:
 
 - **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial on practical usage, for beginners
 - **Essence:** https://biosaxs-dev.github.io/molass-essence on theory, for researchers
-- **Technical Report:** https://freesemt.github.io/molass-technical/ on technical details, for advanced users
-- **Legacy Reference:** https://freesemt.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
+- **Technical Report:** https://biosaxs-dev.github.io/molass-technical/ on technical details, for advanced users
+- **Legacy Reference:** https://biosaxs-dev.github.io/molass-legacy/ for function reference of the GUI application version, the predecessor.
 
 To join the community, see also:
 
