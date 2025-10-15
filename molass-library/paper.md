@@ -81,6 +81,7 @@ The optimal solution in the least-squares sense is given by:
 $$ P = M \cdot C^{+} \qquad (2) $$
 
 where $C^{+}$ denotes the Moore-Penrose pseudoinverse [@Penrose_1955; @Penrose_1956]. This approach enables robust separation of components, even in the presence of overlapping peaks, provided suitable constraints are applied.
+Moreover, it is possible to separate interparticle interference effects by adding a corresponding row vector based on the quadratic approximation, which is required for the analysis of high-concentration samples.
 
 ![Illustration of decomposition using simulated data](docs/_static/simulated_data.png)
 
