@@ -50,6 +50,13 @@
 - **Ask questions instead of guessing**
 - **It gets easier with practice**
 
+## 📝 JOSS REVIEW TIPS
+
+- **Use SIMPLE-RESPONSE-PLAN.md** to divide up reviewer comments
+- **Takahashi = Technical stuff, Shimizu = Science stuff**
+- **Always say thanks to reviewers**
+- **Show what files you changed**
+
 ---
 
 ## 🤖 USER IDENTIFICATION

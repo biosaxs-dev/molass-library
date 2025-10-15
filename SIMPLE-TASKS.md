@@ -17,9 +17,11 @@
 
 ### 📋 NEXT (When Review Starts)
 - [ ] **Copy reviewer comments** into `review-discussions/reviewer-comments/` folder
-- [ ] **Read through all comments** and understand what they want
-- [ ] **Divide up the work** between team members
-- [ ] **Start writing responses** to each comment
+- [ ] **Use SIMPLE-RESPONSE-PLAN.md** to divide up the work
+- [ ] **Takahashi**: Handle technical comments
+- [ ] **Shimizu**: Handle scientific comments  
+- [ ] **Both**: Work on writing and examples together
+- [ ] **Update progress** in SIMPLE-RESPONSE-PLAN.md as you go
 
 ---
 

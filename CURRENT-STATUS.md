@@ -14,6 +14,7 @@
 1. **Wait for JOSS reviewer comments** (not yet received)
 2. **Get the collaborator set up** with this repository
 3. **Start working on responses** once we get reviewer feedback
+4. **Prepare for JOSS review patterns** (based on analysis of similar papers)
 
 ---
 

@@ -2,6 +2,8 @@
 
 **Use this template to capture and organize reviewer feedback**
 
+*📝 For beginners: Just copy this template for each reviewer and fill in the blanks*
+
 ---
 
 ## Review Information
@@ -43,22 +45,22 @@
 **Analysis**:
 - **Type**: [Technical/Editorial/Conceptual/Documentation]
 - **Priority**: [High/Medium/Low]
-- **Complexity**: [Simple/Moderate/Complex]
-- **Estimated Effort**: [Hours/Days]
+- **Who should handle**: [Takahashi/Shimizu/Both]
+- **Estimated Effort**: [Quick/Medium/Long]
 
-**Response Strategy**:
-- [How we plan to address this]
+**Response Plan**:
+- [Simple plan for how to address this]
 
-**Assigned To**: [Team member]
-**Status**: [Not Started/In Progress/Complete]
+**Assigned To**: [Takahashi/Shimizu]
+**Status**: [📋 Not Started/🔄 Working on it/✅ Done]
 
 ---
 
-## Summary
+## Simple Summary
 - **Total Comments**: [Number]
-- **High Priority**: [Number]
-- **Technical Changes Required**: [Yes/No]
-- **Estimated Total Effort**: [Time estimate]
+- **For Takahashi** (Technical): [Number]
+- **For Shimizu** (Scientific): [Number]
+- **Need to work together**: [Number]
 - **Response Deadline**: [Date]
 
 ---
