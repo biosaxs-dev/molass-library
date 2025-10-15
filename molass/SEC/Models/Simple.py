@@ -46,7 +46,7 @@ def egh(x, H, tR, sigma, tau):
     """
     The exponential-Gaussian hybrid (EGH) function.
 
-    See also: `Exponential-Gaussian Hybrid <https://molass-saxs.github.io/molass-essence/chapters/20/egh.html>`_.
+    See also: `Exponential-Gaussian Hybrid <https://biosaxs-dev.github.io/molass-essence/chapters/20/egh.html>`_.
 
     Parameters
     ----------
