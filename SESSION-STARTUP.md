@@ -13,7 +13,18 @@ Every session starts with:
 - 🎯 Copilot automatically detects who you are
 - 📋 Loads current project status
 - 🗣️ Adjusts communication style for your skills
+- 🤖 Confirms you're both using Claude Sonnet 4.5
 - ✅ Ready for collaboration!
+
+**Expected Response:**
+```
+✅ Initialized: Takahashi (Programmer)
+🤖 Model: Claude Sonnet 4.5
+📋 Status: Awaiting JOSS review
+💬 Mode: Technical communication
+```
+
+⚠️ **If you see a different model name, stop and switch to Claude Sonnet 4.5!**
 
 ---
 

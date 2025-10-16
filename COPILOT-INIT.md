@@ -101,10 +101,19 @@ ELSE → Ask for identification
 ✅ Know current user (Takahashi/Shimizu/Unknown)  
 ✅ Understand project status and priorities  
 ✅ Use appropriate communication style  
-✅ Be ready for skill-based collaboration  
+✅ Be ready for skill-based collaboration
+✅ **Confirm model version: Claude Sonnet 4.5**
+
+**Required Response Format:**
+```
+✅ Initialized: [User Name] ([Role])
+🤖 Model: Claude Sonnet 4.5
+📋 Status: [Current project phase]
+💬 Mode: [Communication style]
+```
 
 ---
 
-**File version**: 1.0  
-**Last updated**: October 15, 2025  
-**Status**: Active initialization system
+**File version**: 1.1  
+**Last updated**: October 16, 2025  
+**Status**: Active initialization system with model verification
