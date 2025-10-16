@@ -74,7 +74,8 @@ ELSE → Ask for identification
 ### **Always Check These Files:**
 1. **CURRENT-STATUS.md** - Current project state
 2. **coordination/REVIEW-ARCHITECTURE.md** - How the review process works
-3. **SIMPLE-TASKS.md** - Active task assignments (when available)
+3. **coordination/GITHUB-ACCOUNTS.md** - Team GitHub usernames for bot configuration
+4. **SIMPLE-TASKS.md** - Active task assignments (when available)
 
 ### **Load Appropriate Context:**
 - **Review workflow**: Understanding public JOSS vs private coordination
