@@ -1,0 +1,335 @@
+name: Collaboration Bot - Technical Input & Review Workflow
+
+on:
+  push:
+    paths:
+      - 'review-discussions/reviewer-comments/**'
+      - 'review-discussions/response-drafts/**'
+      - 'review-discussions/tech-info/**'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  technical-input-request:
+    name: Technical Input Request Handler
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check for technical input requests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before || 'HEAD~1',
+              head: context.sha
+            });
+            
+            for (const file of comparison.files) {
+              if (!file.filename.startsWith('review-discussions/reviewer-comments/')) continue;
+              if (file.filename.includes('template')) continue;
+              
+              let content = '';
+              try {
+                content = fs.readFileSync(file.filename, 'utf8');
+              } catch (e) {
+                console.log(`Could not read ${file.filename}`);
+                continue;
+              }
+              
+              if (content.includes('NEEDS-TECH-INPUT') || content.includes('needs-tech-input')) {
+                const fileName = path.basename(file.filename, '.md');
+                const issueTitle = `🔧 Technical Input Needed: ${fileName}`;
+                
+                const { data: existingIssues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'tech-input-needed'
+                });
+                
+                const alreadyExists = existingIssues.some(issue => issue.title.includes(fileName));
+                
+                if (!alreadyExists) {
+                  const issueBody = [
+                    '## Technical Input Request',
+                    '',
+                    'Shimizu needs technical information to respond to a reviewer comment.',
+                    '',
+                    `**Reviewer Comment File**: \`${file.filename}\``,
+                    '',
+                    '### What Shimizu Needs:',
+                    'Please review the reviewer comment and provide technical details/feasibility information.',
+                    '',
+                    '**Instructions for Takahashi:**',
+                    `1. Read the reviewer comment in \`${file.filename}\``,
+                    '2. Create a file in `review-discussions/tech-info/` with your technical analysis',
+                    '3. Or add technical details directly to the response draft',
+                    '4. When done, comment on this issue with "TECH-INFO-PROVIDED"',
+                    '',
+                    '**Instructions for Shimizu:**',
+                    'Once Takahashi provides information, you will be notified and can proceed with drafting your response.',
+                    '',
+                    '**Bot Note**: This issue was automatically created because the comment file contains `NEEDS-TECH-INPUT`.'
+                  ].join('\n');
+                  
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['tech-input-needed', 'takahashi'],
+                    assignees: ['freesemt']
+                  });
+                  
+                  console.log(`Created tech input request issue for ${fileName}`);
+                }
+              }
+            }
+
+  draft-review-request:
+    name: Draft Technical Review Handler
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check for draft review requests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before || 'HEAD~1',
+              head: context.sha
+            });
+            
+            for (const file of comparison.files) {
+              if (!file.filename.startsWith('review-discussions/response-drafts/')) continue;
+              if (file.filename.includes('template')) continue;
+              
+              let content = '';
+              try {
+                content = fs.readFileSync(file.filename, 'utf8');
+                content = content.toLowerCase();
+              } catch (e) {
+                console.log(`Could not read ${file.filename}`);
+                continue;
+              }
+              
+              if (content.includes('ready-for-tech-review') || content.includes('ready for review')) {
+                const fileName = path.basename(file.filename, '.md');
+                const issueTitle = `📋 Technical Review Needed: ${fileName}`;
+                
+                const { data: existingIssues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'tech-review-needed'
+                });
+                
+                const alreadyExists = existingIssues.some(issue => issue.title.includes(fileName));
+                
+                if (!alreadyExists) {
+                  const issueBody = [
+                    '## Technical Review Request',
+                    '',
+                    'Shimizu has drafted a response and needs Takahashi to verify technical accuracy.',
+                    '',
+                    `**Draft File**: \`${file.filename}\``,
+                    '',
+                    '### Review Checklist for Takahashi:',
+                    '',
+                    'Please review the draft and verify:',
+                    '- [ ] Technical information is accurate',
+                    '- [ ] Proposed solutions are feasible',
+                    '- [ ] Implementation details are correct',
+                    '- [ ] No technical claims that cannot be delivered',
+                    '',
+                    '**Instructions for Takahashi:**',
+                    `1. Read the draft in \`${file.filename}\``,
+                    '2. Check the "Technical accuracy verified" box in the drafts pre-post checklist',
+                    '3. Add your name to the checklist',
+                    '4. Comment on this issue: "APPROVED" (if good) or request changes',
+                    '5. Close this issue when review is complete',
+                    '',
+                    '**Instructions for Shimizu:**',
+                    '⚠️ **DO NOT POST to JOSS until Takahashi approves and closes this issue!**',
+                    '',
+                    '**Bot Note**: This issue was automatically created because draft status changed to `READY-FOR-TECH-REVIEW`.'
+                  ].join('\n');
+                  
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ['tech-review-needed', 'takahashi', 'review-required'],
+                    assignees: ['freesemt']
+                  });
+                  
+                  console.log(`Created tech review request for ${fileName}`);
+                }
+              }
+            }
+
+  tech-info-completion:
+    name: Tech Info Completion Notifier
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check for tech info completion
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before || 'HEAD~1',
+              head: context.sha
+            });
+            
+            let techInfoProvided = false;
+            let providedFiles = [];
+            
+            for (const file of comparison.files) {
+              if (file.filename.startsWith('review-discussions/tech-info/')) {
+                techInfoProvided = true;
+                providedFiles.push(file.filename);
+              }
+            }
+            
+            if (techInfoProvided) {
+              const { data: openIssues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'tech-input-needed'
+              });
+              
+              for (const issue of openIssues) {
+                const commentBody = [
+                  '✅ **Technical information has been provided!**',
+                  '',
+                  '@shimizu Takahashi has added technical details:',
+                  ...providedFiles.map(f => `- \`${f}\``),
+                  '',
+                  'You can now use this information to draft your response.',
+                  '',
+                  'If this resolves your technical input request, please close this issue.'
+                ].join('\n');
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: commentBody
+                });
+              }
+            }
+
+  review-completion-check:
+    name: Review Completion Notifier
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check if review completed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before || 'HEAD~1',
+              head: context.sha
+            });
+            
+            for (const file of comparison.files) {
+              if (!file.filename.startsWith('review-discussions/response-drafts/')) continue;
+              if (file.filename.includes('template')) continue;
+              
+              let content = '';
+              try {
+                content = fs.readFileSync(file.filename, 'utf8');
+              } catch (e) {
+                continue;
+              }
+              
+              const techVerified = content.includes('[x] **Technical accuracy verified') || 
+                                   content.includes('[X] **Technical accuracy verified');
+              
+              if (techVerified) {
+                const fileName = path.basename(file.filename, '.md');
+                
+                const { data: openIssues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'tech-review-needed'
+                });
+                
+                const relatedIssue = openIssues.find(issue => issue.title.includes(fileName));
+                
+                if (relatedIssue) {
+                  const commentBody = [
+                    '✅ **Technical review complete!**',
+                    '',
+                    '@shimizu Takahashi has verified technical accuracy.',
+                    '',
+                    '**Pre-post checklist status**: Technical accuracy ✓',
+                    '',
+                    'You can now proceed to post this response to the JOSS issue when ready.',
+                    '',
+                    '**Remember**: Check all other items in the pre-post checklist before posting!',
+                    '',
+                    'Closing this review request issue.'
+                  ].join('\n');
+                  
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: relatedIssue.number,
+                    body: commentBody
+                  });
+                  
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: relatedIssue.number,
+                    state: 'closed'
+                  });
+                  
+                  console.log(`Closed review issue for ${fileName}`);
+                }
+              }
+            }

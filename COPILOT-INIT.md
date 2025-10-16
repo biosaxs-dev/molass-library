@@ -10,13 +10,13 @@
 - **Path pattern**: `c:\Users\takahashi\`
 - **Skills**: Programming, technical implementation, repository management
 - **Communication**: Technical language, code details, implementation focus
-- **Typical tasks**: Code changes, GitHub Actions, technical responses
+- **Role in review**: Support Shimizu with technical details, verify feasibility, implement changes
 
 ### **Shimizu (Domain Expert)**
 - **Path pattern**: `c:\Users\[shimizu-username]\` (TBD - update on first session)
 - **Skills**: SEC-SAXS expertise, scientific methodology, research context
 - **Communication**: Simple language, scientific focus, avoid technical complexity
-- **Typical tasks**: Scientific accuracy review, methodology explanations
+- **Role in review**: Primary responder, drafts all responses, leads JOSS communication
 
 ### **Detection Logic**
 ```
@@ -35,9 +35,9 @@ ELSE → Ask for identification
 - **Active blockers**: None
 
 ### **Team Dynamics**
-- **Takahashi**: Technical lead, handles programming tasks
-- **Shimizu**: Scientific lead, handles domain expertise  
-- **Collaboration style**: Skill-based task distribution
+- **Shimizu**: Primary responder to JOSS reviews (leads all responses)
+- **Takahashi**: Support role (helps Shimizu respond, handles technical implementation)
+- **Collaboration style**: Shimizu drafts responses, Takahashi provides technical support and review
 
 ### **Communication Protocols**
 - **Session start**: Auto-detect user, adjust communication style
@@ -50,15 +50,17 @@ ELSE → Ask for identification
 
 ### **For Takahashi:**
 - Technical communication style
-- Code analysis and programming focus
-- Detailed explanations
+- Support-oriented approach (helping Shimizu)
+- Code analysis and implementation focus
 - Repository/workflow management
+- Explain technical feasibility clearly
 
 ### **For Shimizu:**
 - Simple, accessible language
-- Scientific content focus
-- Domain expertise support
-- Avoid technical complexity
+- Response drafting assistance (primary focus)
+- Scientific content and domain expertise
+- Help translate between technical and scientific concepts
+- Avoid overwhelming technical complexity
 
 ### **For Unknown User:**
 - Ask for identification
@@ -71,11 +73,11 @@ ELSE → Ask for identification
 
 ### **Always Check These Files:**
 1. **CURRENT-STATUS.md** - Current project state
-2. **SIMPLE-TASKS.md** - Active task assignments
-3. **USER-IDENTIFICATION.md** - Latest identification patterns
+2. **coordination/REVIEW-ARCHITECTURE.md** - How the review process works
+3. **SIMPLE-TASKS.md** - Active task assignments (when available)
 
 ### **Load Appropriate Context:**
-- **Recent decisions**: From coordination/decision-log.md
+- **Review workflow**: Understanding public JOSS vs private coordination
 - **Active issues**: From current status
 - **Communication preferences**: Based on user detection
 
@@ -100,6 +102,7 @@ ELSE → Ask for identification
 **After processing this file, Copilot should:**
 ✅ Know current user (Takahashi/Shimizu/Unknown)  
 ✅ Understand project status and priorities  
+✅ Know the review architecture (public JOSS vs private coordination)
 ✅ Use appropriate communication style  
 ✅ Be ready for skill-based collaboration
 ✅ **Confirm model version: Claude Sonnet 4.5**
@@ -109,11 +112,12 @@ ELSE → Ask for identification
 ✅ Initialized: [User Name] ([Role])
 🤖 Model: Claude Sonnet 4.5
 📋 Status: [Current project phase]
+🏗️ Architecture: Public JOSS review + Private coordination
 💬 Mode: [Communication style]
 ```
 
 ---
 
-**File version**: 1.1  
+**File version**: 1.2  
 **Last updated**: October 16, 2025  
-**Status**: Active initialization system with model verification
+**Status**: Active initialization system with architecture auto-load

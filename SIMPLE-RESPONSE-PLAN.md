@@ -6,22 +6,25 @@
 
 ## 🎯 **Basic Rules (Keep It Simple!)**
 
-### **Takahashi handles:**
-- Installation problems
-- Code issues  
-- Technical documentation
-- GitHub/repository stuff
+### **Primary Approach:**
+**Shimizu leads and drafts all responses** (to both technical and scientific comments)
 
-### **Shimizu handles:**
-- Scientific accuracy
-- Methodology explanations
-- Research context
-- Literature references
+### **Takahashi's support role:**
+- Provide technical details when Shimizu asks
+- Review drafts for technical accuracy/feasibility
+- Implement code/documentation changes
+- Post directly only when purely technical implementation details needed
+
+### **Shimizu's lead role:**
+- Draft all responses (scientific AND technical)
+- Ask Takahashi for technical information
+- Decide overall response strategy
+- Post most responses to JOSS issue
 
 ### **Work together on:**
-- Overall paper writing
-- Examples and usage
-- Big picture responses
+- Reviewing all drafts before posting
+- Overall response strategy
+- Big picture decisions
 
 ---
 
@@ -30,13 +33,18 @@
 *Just copy this section for each reviewer*
 
 ### **Reviewer 1 Responses**
-- [ ] **Comment 1**: [Brief description] - **Assigned to**: [Name] - **Status**: [📋/🔄/✅]
-- [ ] **Comment 2**: [Brief description] - **Assigned to**: [Name] - **Status**: [📋/🔄/✅]
-- [ ] **Comment 3**: [Brief description] - **Assigned to**: [Name] - **Status**: [📋/🔄/✅]
+- [ ] **Comment 1**: [Brief description] - **Assigned**: [Name] - **Status**: [📋/🔄/✅] - **Draft**: [Link to draft file]
+- [ ] **Comment 2**: [Brief description] - **Assigned**: [Name] - **Status**: [📋/🔄/✅] - **Draft**: [Link to draft file]
+- [ ] **Comment 3**: [Brief description] - **Assigned**: [Name] - **Status**: [📋/🔄/✅] - **Draft**: [Link to draft file]
 
 ### **Reviewer 2 Responses**
-- [ ] **Comment 1**: [Brief description] - **Assigned to**: [Name] - **Status**: [📋/🔄/✅]
-- [ ] **Comment 2**: [Brief description] - **Assigned to**: [Name] - **Status**: [📋/🔄/✅]
+- [ ] **Comment 1**: [Brief description] - **Assigned**: [Name] - **Status**: [📋/🔄/✅] - **Draft**: [Link to draft file]
+- [ ] **Comment 2**: [Brief description] - **Assigned**: [Name] - **Status**: [📋/🔄/✅] - **Draft**: [Link to draft file]
+
+**Status Key:**
+- 📋 = Not started
+- 🔄 = Draft in progress or review needed
+- ✅ = Posted to JOSS issue
 
 ---
 
@@ -47,12 +55,28 @@
 - Say "thank you" to reviewers
 - Show what you changed (mention file names)
 - Ask for help if stuck
+- Use the response draft template
+- Get partner approval before posting
 
 ❌ **DON'T:**
 - Write long complicated responses  
 - Argue with reviewers
 - Forget to update this tracking file
 - Work on the same thing at the same time
+- Post to JOSS without both reviewing
+- Skip archiving posted responses
+
+---
+
+## 🔄 **Workflow Quick Reference**
+
+1. **New comments arrive** → Use `COMMENT-CAPTURE-WORKFLOW.md`
+2. **Assign & track** → Update this file
+3. **Draft response** → Use `response-drafts/template-response-draft.md`
+4. **Both review** → Check all items in draft template
+5. **Post to JOSS** → Copy-paste approved draft
+6. **Archive** → Save copy in `posted-responses/`
+7. **Update status** → Mark ✅ in this file
 
 ---
 
