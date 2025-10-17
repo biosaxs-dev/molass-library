@@ -12,27 +12,41 @@
 - Repository structure ready
 - GitHub Actions bot deployed
 
+### **Important: Use Agent Mode**
+In VS Code Copilot Chat:
+- Click the mode selector (top of chat)
+- Choose **"Agent"** (not "Ask Copilot")
+- Agent mode lets Copilot work autonomously for you
+
 **You're all set!**
 
 ---
 
 ## 💬 **Every Time You Work: The 3-Step Loop**
 
-### **STEP 1: Start Copilot**
-Open VS Code and say:
+### **STEP 1: Start Copilot Agent**
+1. Open VS Code
+2. **Make sure Agent mode is selected** (check mode selector at top of chat)
+3. Say:
 ```
 Please read COPILOT-INIT.md to initialize
 ```
-Copilot will recognize you as Takahashi and load the right context.
+Copilot Agent will recognize you as Takahashi and autonomously load the right context.
 
-### **STEP 2: Check Status**
-Look at `CURRENT-STATUS.md` to see:
-- What's happening now
-- What you need to do
-- What Shimizu is working on
+### **STEP 2: Tell Agent Your Goal**
+Simply state what you want to accomplish:
+- "I need to provide technical info for the Python version question"
+- "Help me review Shimizu's draft about baseline methodology"
+- "What's my current status?"
 
-### **STEP 3: Do Your Work**
-Follow the workflow below based on what's needed.
+Agent will automatically check status, read relevant files, and gather context.
+
+### **STEP 3: Review Agent's Work**
+Agent will autonomously create/edit files and manage markers. You should:
+- Check the files Agent created/edited
+- Verify technical accuracy
+- Ask for changes if needed
+- Approve when satisfied
 
 ---
 
@@ -53,18 +67,18 @@ Follow the workflow below based on what's needed.
 **What you do:**
 1. **Check GitHub Issues** (you'll get notified)
 2. **Read the reviewer comment** (link in the issue)
-3. **Provide technical information**:
+3. **Say to Copilot Agent:**
+
+```
+Help me provide technical info for [issue topic]
+```
+
+4. **Copilot Agent will autonomously:**
    - Create a file in `review-discussions/tech-info/`
-   - Answer Shimizu's questions
-   - Include code examples, file locations, or technical details
-4. **Say to Copilot:**
-
-```
-Copilot, I've provided technical info for [issue topic]
-```
-
-5. **Remove** `NEEDS-TECH-INPUT` marker from the comment file
-6. **Close** the GitHub issue
+   - Format your technical explanation
+   - Remove `NEEDS-TECH-INPUT` marker from comment file
+5. **Review Agent's work** and approve
+6. **Close** the GitHub issue manually
 
 **What happens next:**
 - Shimizu uses your info to draft a response
@@ -85,14 +99,16 @@ Copilot, I've provided technical info for [issue topic]
 4. **Provide feedback**:
    - Add comments directly in the draft file
    - Or create a review file in `review-discussions/tech-info/`
-5. **If approved**, say to Copilot:
+5. **If approved**, say to Copilot Agent:
 
 ```
 This draft is approved and ready to post
 ```
 
-6. **Remove** `READY-FOR-TECH-REVIEW` marker
-7. **Close** the GitHub issue
+6. **Copilot Agent will autonomously:**
+   - Remove `READY-FOR-TECH-REVIEW` marker
+   - Update draft status
+7. **Close** the GitHub issue manually
 
 **What happens next:**
 - Shimizu posts the approved response to JOSS
@@ -371,5 +387,6 @@ Help me suggest a better response.
 
 ---
 
-**Last updated**: October 16, 2025  
+**Last updated**: October 17, 2025  
+**Mode**: Agent mode (autonomous assistance)  
 **Questions?** Ask Copilot or contact Shimizu

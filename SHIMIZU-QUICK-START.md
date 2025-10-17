@@ -16,27 +16,41 @@ Change `shimizu` to match YOUR actual Windows username folder.
 ### **Step 2: Choose Your Model**
 Use **Claude Sonnet 4.5** (same as Takahashi for consistency)
 
+### **Step 3: Select Agent Mode**
+In VS Code Copilot Chat:
+- Click the mode selector (top of chat)
+- Choose **"Agent"** (not "Ask Copilot")
+- Agent mode lets Copilot work autonomously for you
+
 **That's it for setup!**
 
 ---
 
 ## 💬 **Every Time You Work: The 3-Step Loop**
 
-### **STEP 1: Start Copilot**
-Open VS Code and say:
+### **STEP 1: Start Copilot Agent**
+1. Open VS Code
+2. **Make sure Agent mode is selected** (check mode selector at top of chat)
+3. Say:
 ```
 Please read COPILOT-INIT.md to initialize
 ```
-Copilot will recognize you as Shimizu and load the right context.
+Copilot Agent will recognize you as Shimizu and autonomously load the right context.
 
-### **STEP 2: Check Status**
-Look at `CURRENT-STATUS.md` to see:
-- What's happening now
-- What you need to do
-- What Takahashi is working on
+### **STEP 2: Tell Agent Your Goal**
+Simply state what you want to accomplish:
+- "I have a new reviewer comment to capture"
+- "Help me draft a response to the Python version question"
+- "What's my current status?"
 
-### **STEP 3: Do Your Work**
-Follow the workflow below based on the review phase.
+Agent will automatically check status and gather context.
+
+### **STEP 3: Review Agent's Work**
+Agent will autonomously create/edit files. You should:
+- Check the files Agent created
+- Verify content is correct
+- Ask for changes if needed
+- Approve when satisfied
 
 ---
 
@@ -78,7 +92,10 @@ Copilot, please capture this reviewer comment:
 Copilot, please help me draft a response to [describe the comment]
 ```
 
-3. Copilot will create a draft file for you
+3. **Copilot Agent will autonomously:**
+   - Create a draft file for you
+   - Format it properly
+   - Add `READY-FOR-TECH-REVIEW` marker (if you request review)
 4. Review the draft, edit if needed
 5. When ready, say:
 
@@ -86,9 +103,8 @@ Copilot, please help me draft a response to [describe the comment]
 This draft is ready for Takahashi to review
 ```
 
-6. Add marker: `READY-FOR-TECH-REVIEW` to your draft file
-
 **What happens automatically:**
+- Agent adds the marker to your draft
 - Bot creates GitHub issue asking Takahashi to review
 
 ### **Phase 4: Wait for Takahashi's Review**
@@ -146,7 +162,7 @@ Copilot, help me draft a response to [describe the issue]
 ```
 This draft is ready for Takahashi to review
 ```
-Then add `READY-FOR-TECH-REVIEW` to the draft file.
+Agent will automatically add the `READY-FOR-TECH-REVIEW` marker for you.
 
 ### **Situation 5: I Posted the Response**
 👉 Say:
@@ -279,5 +295,6 @@ Something is wrong. Please help me understand what happened.
 
 ---
 
-**Last updated**: October 16, 2025  
+**Last updated**: October 17, 2025  
+**Mode**: Agent mode (autonomous assistance)  
 **Questions?** Ask Copilot or contact Takahashi

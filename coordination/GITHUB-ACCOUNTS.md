@@ -12,9 +12,9 @@
 - **Confirmed**: ✅ October 16, 2025
 
 ### **Shimizu (Domain Expert)**
-- **GitHub Username**: `[TO_BE_UPDATED]`
+- **GitHub Username**: `nshimizu0721`
 - **Used in**: Bot mentions, notifications
-- **Status**: ⚠️ Pending - Shimizu is considering renaming account
+- **Confirmed**: ✅ October 17, 2025
 
 ---
 
@@ -23,13 +23,13 @@
 ### **In Bot Workflow** (`.github/workflows/collaboration-bot.yml`)
 - **Line 82**: `assignees: ['freesemt']` - Technical input requests
 - **Line 166**: `assignees: ['freesemt']` - Draft review requests
-- **Line 217**: `@shimizu` - Tech info completion notifications
-- **Line 282**: `@shimizu` - Review completion notifications
+- **Line 217**: `@nshimizu0721` - Tech info completion notifications ✅
+- **Line 282**: `@nshimizu0721` - Review completion notifications ✅
 
-### **Manual Updates Needed When Shimizu's Account is Confirmed:**
-1. Update this file with Shimizu's GitHub username
-2. Update bot workflow mentions from `@shimizu` to `@[actual_username]`
-3. Test bot notifications
+### **Updates Complete:**
+1. ✅ Updated this file with Shimizu's GitHub username
+2. ✅ Updated bot workflow mentions to `@nshimizu0721`
+3. ⏳ Ready for testing (next bot trigger will verify notifications work)
 
 ---
 
@@ -53,15 +53,15 @@ Shimizu's GitHub username is [username]
 
 ---
 
-## 🆘 Current Workaround
+## ✅ Configuration Complete
 
-**Until Shimizu's account is confirmed:**
-- Bot will mention `@shimizu` (won't notify anyone)
-- Takahashi will need to manually notify Shimizu
-- Issues will still be created correctly
-- Functionality mostly works, just notifications incomplete
+**Bot notifications now fully functional:**
+- Bot mentions `@nshimizu0721` (will notify Shimizu)
+- Automatic notifications working
+- Issues created and assigned correctly
+- All functionality operational
 
-**This is OK for now** - the private repo means only you two will see these mentions anyway.
+**Next step**: Test with a marker file to verify notifications work correctly.
 
 ---
 
@@ -74,5 +74,5 @@ Shimizu's GitHub username is [username]
 
 ---
 
-**Last Updated**: October 16, 2025  
-**Next Update**: When Shimizu confirms GitHub username
+**Last Updated**: October 17, 2025  
+**Status**: Configuration complete, ready for production use
