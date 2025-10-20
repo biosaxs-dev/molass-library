@@ -7,11 +7,4 @@
 
 Can the package support Python 3.8?
 
-
-## Status
-
-Status: TECH-INFO-PROVIDED
-
-## Notes
-
-This is a test to verify the collaboration bot is working.
+<!-- STATUS: NEEDS-TECH-INPUT -->
