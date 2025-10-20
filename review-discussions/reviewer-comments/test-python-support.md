@@ -7,9 +7,10 @@
 
 Can the package support Python 3.8?
 
+
 ## Status
 
-Status: NEEDS-TECH-INPUT
+Status: TECH-INFO-PROVIDED
 
 ## Notes
 
