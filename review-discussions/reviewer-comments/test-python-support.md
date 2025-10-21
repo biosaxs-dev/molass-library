@@ -7,7 +7,7 @@
 
 Can the package support Python 3.8?
 
-<!-- STATUS: NEEDS-TECH-INPUT -->
+STATUS: NEEDS-TECH-INPUT
 [---]
 [**Technical Input Request for Takahashi**]
 [Please check if the package and all dependencies support Python 3.8.]
