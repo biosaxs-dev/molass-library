@@ -13,7 +13,7 @@
 - **Role in review**: Support Shimizu with technical details, verify feasibility, implement changes
 
 ### **Shimizu (Domain Expert)**
-- **Path pattern**: `c:\Users\[shimizu-username]\` (TBD - update on first session)
+- **Path pattern**: `c:\Users\nshimizu\` (TBD - update on first session)
 - **Skills**: SEC-SAXS expertise, scientific methodology, research context
 - **Communication**: Simple language, scientific focus, avoid technical complexity
 - **Role in review**: Primary responder, drafts all responses, leads JOSS communication
