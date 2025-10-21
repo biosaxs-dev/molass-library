@@ -81,6 +81,7 @@ The optimal solution in the least-squares sense is given by:
 $$ P = M \cdot C^{+} \qquad (2) $$
 
 where $C^{+}$ denotes the Moore-Penrose pseudoinverse [@Penrose_1955; @Penrose_1956]. This approach enables robust separation of components, even in the presence of overlapping peaks, provided suitable constraints are applied.
+Moreover, interparticle interference effects can be separated by adding row vectors based on the quadratic approximation derived from SAXS theory.
 
 ![Illustration of decomposition using simulated data](docs/_static/simulated_data.png)
 
@@ -96,7 +97,7 @@ These models allow users to impose domain-specific constraints, thereby enhancin
 
 # Availability and Documentation
 
-Molass Library is freely available under an open-source license at [https://github.com/biosaxs-dev/molass-library](https://github.com/biosaxs-dev/molass-library). Comprehensive documentation, including tutorials and theoretical background, is provided at [Molass Essence](https://molass-saxs.github.io/molass-essence/chapters/intro.html).
+Molass Library is freely available under an open-source license at [https://github.com/biosaxs-dev/molass-library](https://github.com/molass-saxs/molass-library). Comprehensive documentation, including tutorials and theoretical background, is provided at [Molass Essence](https://molass-saxs.github.io/molass-essence/chapters/intro.html).
 
 # Acknowledgements
 
