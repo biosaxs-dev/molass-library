@@ -97,7 +97,7 @@ These models allow users to impose domain-specific constraints, thereby enhancin
 
 # Availability and Documentation
 
-Molass Library is freely available under an open-source license at [https://github.com/biosaxs-dev/molass-library](https://github.com/molass-saxs/molass-library). Comprehensive documentation, including tutorials and theoretical background, is provided at [Molass Essence](https://molass-saxs.github.io/molass-essence/chapters/intro.html).
+Molass Library is freely available under an open-source license at [https://github.com/biosaxs-dev/molass-library](https://github.com/biosaxs-dev/molass-library). Comprehensive documentation, including tutorials and theoretical background, is provided at [Molass Essence](https://biosaxs-dev.github.io/molass-essence/chapters/intro.html).
 
 # Acknowledgements
 
