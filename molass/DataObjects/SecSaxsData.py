@@ -686,5 +686,5 @@ class SecSaxsData:
             import molass.Decompose.VaryUtils
             reload(molass.Decompose.VaryUtils)
         from molass.Decompose.VaryUtils import _plot_varied_decompositions_impl
-        x, y = self.xr.get_icurve().get_xy()
-        return _plot_varied_decompositions_impl(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)
+        xr_icurve = self.xr.get_icurve()
+        return _plot_varied_decompositions_impl(xr_icurve, proportions, rgcurve=rgcurve, best=best, debug=debug)
