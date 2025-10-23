@@ -2,25 +2,38 @@
 
 Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html), a tool for the analysis of SEC-SAXS experiment data currently hosted at [Photon Factory](https://www2.kek.jp/imss/pf/eng/) and [SPring-8](http://www.spring8.or.jp/en/), Japan.
 
-To install this package, use pip as follows.
+## Tested Platforms
+
+- Python 3.12 on Windows 11
+- Python 3.9 on Ubuntu 22.04.4 LTS (WSL2)
+
+## Installation
+
+To install this package, use pip as follows:
 
 ```
 pip install -U molass
 ```
 
-For more information, see:
+## Documentation
 
-- **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial — on practical usage, for beginners
-- **Essence:** https://biosaxs-dev.github.io/molass-essence — on theory, for researchers
-- **Technical Report:** https://biosaxs-dev.github.io/molass-technical — on technical details, for advanced users
-- **Reference:** https://biosaxs-dev.github.io/molass-library — on function reference, for coding
-- **Legacy Repository:** https://github.com/biosaxs-dev/molass-legacy — for legacy code
+- **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial — practical usage, for beginners
+- **Essence:** https://biosaxs-dev.github.io/molass-essence — theory, for researchers
+- **Technical Report:** https://biosaxs-dev.github.io/molass-technical — technical details, for advanced users
+- **Reference:** https://biosaxs-dev.github.io/molass-library — function reference, for coding
+- **Legacy Repository:** https://github.com/biosaxs-dev/molass-legacy — legacy code
 
-To join the community, see also:
+## Community
 
-- **Handbook:** https://biosaxs-dev.github.io/molass-develop on maintenance, for developers.
+To join the community, see:
+
+- **Handbook:** https://biosaxs-dev.github.io/molass-develop — maintenance, for developers
+
+## Optional Features
 
 Additional installation for optional features:
+
+**Excel reporting (Windows only):**
 
 If you want to use Excel reporting features (Windows only) for backward compatibility, install with the `excel` extra:
 
@@ -43,5 +56,3 @@ You can also combine extras as needed:
 ```
 pip install -U molass[excel,testing]
 ```
-
-<br>
