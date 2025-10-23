@@ -29,6 +29,13 @@ To join the community, see:
 
 - **Handbook:** https://biosaxs-dev.github.io/molass-develop — maintenance, for developers
 
+## Copilot Usage
+
+Before starting a chat session with this repository, please use the following magic phrase to ensure Copilot follows project rules:
+For details on Copilot rules and usage, see `Copilot/copilot-guidelines.md`.
+
+> “Please follow the Copilot design rules in this project for all advice and responses.”
+
 ## Optional Features
 
 **Excel reporting (Windows only):**
