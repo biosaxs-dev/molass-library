@@ -31,8 +31,6 @@ To join the community, see:
 
 ## Optional Features
 
-Additional installation for optional features:
-
 **Excel reporting (Windows only):**
 
 If you want to use Excel reporting features (Windows only) for backward compatibility, install with the `excel` extra:
