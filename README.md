@@ -5,7 +5,7 @@ Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html),
 ## Tested Platforms
 
 - Python 3.12 on Windows 11
-- Python 3.9 on Ubuntu 22.04.4 LTS (WSL2)
+- Python 3.12 on Ubuntu 22.04.4 LTS (WSL2)
 
 ## Installation
 
