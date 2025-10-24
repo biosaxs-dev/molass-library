@@ -59,7 +59,7 @@ testing = [
 ]
 
 [project.urls]
-Repository = "https://github.com/molass-saxs/molass-library"
+Repository = "https://github.com/biosaxs-dev/molass-library"
 
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "*_test.py", "*.py"]
