@@ -27,11 +27,14 @@ In VS Code Copilot Chat:
 ### **STEP 1: Start Copilot Agent**
 1. Open VS Code
 2. **Make sure Agent mode is selected** (check mode selector at top of chat)
+
 3. Say:
 ```
 Please read COPILOT-INIT.md to initialize
 ```
 Copilot Agent will recognize you as Takahashi and autonomously load the right context.
+
+**New!** After initialization, Copilot will automatically check and summarize all open GitHub Issues for you. Always review this summary before starting your work.
 
 ### **STEP 2: Tell Agent Your Goal**
 Simply state what you want to accomplish:

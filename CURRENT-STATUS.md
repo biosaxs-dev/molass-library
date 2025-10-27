@@ -12,7 +12,7 @@
 
 ## 📝 What Needs To Be Done?
 1. **Wait for JOSS reviewer comments** (not yet received)
-2. **Shimizu setup**: Update username in `COPILOT-INIT.md` and read `SHIMIZU-QUICK-START.md` 📘
+2. **Shimizu setup**: ✅ Done (username updated in `COPILOT-INIT.md` and read `SHIMIZU-QUICK-START.md`)
 3. **Start working on responses** once we get reviewer feedback
 4. **Clean up test files** (optional): Remove `test-python-support.md` and close test GitHub issue
 
@@ -20,7 +20,7 @@
 
 ## 👥 Who's Doing What?
 - **Takahashi** (Programmer): Repository setup ✅ Done
-- **Shimizu** (Domain Expert): Not yet started (waiting for setup)
+- **Shimizu** (Domain Expert): Repository setup ✅ Done
 - **Copilot** (Programming Assistant): Helping with setup ✅ Done
 
 ---
