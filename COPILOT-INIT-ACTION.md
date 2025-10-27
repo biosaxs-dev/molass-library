@@ -1,3 +1,16 @@
+---
+
+## 🛎️ Monitoring the JOSS Review Issue for Actionable Comments
+
+Copilot should regularly monitor the JOSS review issue for new reviewer or editor comments that require action from the authors (such as requests for clarification, documentation changes, bug fixes, or additional information).
+
+If such a comment appears and there is no corresponding internal issue in this repository:
+
+- Copilot will alert Shimizu (and/or Takahashi) that a new actionable comment has been posted in the JOSS review thread.
+- Copilot will recommend creating a new internal GitHub Issue to track and coordinate the response.
+- Copilot may draft the issue content, summarizing the reviewer/editor request for easy tracking and assignment.
+
+This ensures that all reviewer and editor requests are tracked internally and nothing is missed during the review process.
 # COPILOT INIT ACTION WORKFLOW
 
 This document defines the unified initialization steps and expected Copilot behaviors for every session in the molass-review repository.
