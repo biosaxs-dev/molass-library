@@ -1,3 +1,10 @@
+---
+
+## 📌 When the JOSS Review Issue is Created
+
+As soon as the official JOSS review issue URL is available, please add it to the “JOSS Review Issue (External)” section in CURRENT-STATUS.md. 
+
+**Note:** The URL should only be recorded in CURRENT-STATUS.md to keep our workflow clear and avoid confusion. Everyone will refer to that single location for the active review discussion link.
 # 🎯 SHIMIZU'S QUICK START GUIDE
 
 **Your simple guide to handling JOSS review responses with Copilot**
@@ -38,7 +45,7 @@ Please read COPILOT-INIT.md to initialize
 ```
 Copilot Agent will recognize you as Shimizu and autonomously load the right context.
 
-**New!** After initialization, Copilot will automatically check and summarize all open GitHub Issues for you. Always review this summary before starting your work.
+**Note:** For a complete description of what Copilot will do after initialization (including issue checks and JOSS review URL display), see [COPILOT-INIT-ACTION.md](COPILOT-INIT-ACTION.md). Always review this summary before starting your work.
 
 ### **STEP 2: Tell Agent Your Goal**
 Simply state what you want to accomplish:
