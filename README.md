@@ -34,8 +34,8 @@ Especially for testing, see the first two sections in
 
 ## Copilot Usage
 
-Before starting a chat session with this repository, please use the following magic phrase to ensure Copilot follows project rules:
-For details on Copilot rules and usage, see `Copilot/copilot-guidelines.md`.
+Before starting a Copilot chat session with this repository, please use the following magic phrase to ensure Copilot follows project rules:
+For details on Copilot rules and usage, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/master/Copilot/copilot-guidelines.md).
 
 > “Please follow the Copilot guidelines in this project for all advice and responses.”
 
