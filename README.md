@@ -29,6 +29,9 @@ To join the community, see:
 
 - **Handbook:** https://biosaxs-dev.github.io/molass-develop — maintenance, for developers
 
+Especially for testing, see the first two sections in
+- **Testing:** https://biosaxs-dev.github.io/molass-develop/chapters/06/testing.html
+
 ## Copilot Usage
 
 Before starting a chat session with this repository, please use the following magic phrase to ensure Copilot follows project rules:
