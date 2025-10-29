@@ -1,8 +1,34 @@
 """
 run_tests.py
-Helper script for running tests with different plot configurations.
-This script was suggested by Copilot to simplify test execution.
+
+Helper script for running tests with different plot configurations and robust coverage support.
+
+Coverage Workaround and Best Practice:
+--------------------------------------
+To ensure reliable code coverage collection—including subprocesses and interactive/temporary scripts—this script uses the official 'coverage' tool directly:
+
+- When '--coverage' is specified, all test invocations use:
+      coverage run -m pytest ...
+  instead of pytest-cov or pytest --cov.
+
+- After tests complete, the script runs:
+      coverage combine
+      coverage html
+  to merge all coverage data files (including those from subprocesses) and generate the HTML report.
+
+- For subprocesses that execute dynamically generated scripts (e.g., interactive mode), explicit coverage start/stop code is injected automatically.
+
+This approach is robust and works on both Windows and Linux/Ubuntu, avoiding known issues with pytest-cov and subprocess coverage.
+
+Note:
+-----
+On Windows, coverage for subprocesses and dynamically generated scripts may not be collected correctly without this workaround.
+Using pytest-cov alone is often insufficient for full coverage in multi-process or interactive scenarios on Windows.
+Always use this script's workflow for reliable results.
+
+For more details, see the Copilot folder or project documentation.
 """
+
 import os
 import sys
 import subprocess
@@ -14,7 +40,7 @@ def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     os.environ['MOLASS_SAVE_PLOTS'] = 'true' if save_plots else 'false'
     os.environ['MOLASS_PLOT_DIR'] = str(plot_dir)
 
-def run_tests(test_path=None, mode='batch', order_range=None):
+def run_tests(test_path=None, mode='batch', order_range=None, coverage=False):
     """
     Run tests with specified plot mode.
     
@@ -46,6 +72,10 @@ def run_tests(test_path=None, mode='batch', order_range=None):
     else:
         raise ValueError(f"Unknown mode: {mode}")
     
+    # If coverage is enabled, set COVERAGE_PROCESS_START for subprocesses
+    if coverage:
+        os.environ['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+
     # Handle directory vs file differently to preserve order
     if test_path and Path(test_path).is_dir():
         # For directories, run each file individually to preserve order within files
@@ -82,10 +112,20 @@ def run_tests(test_path=None, mode='batch', order_range=None):
                 abs_test_path=abs_test_path
             )
 
+            # Inject explicit coverage start/stop if coverage is enabled
+            if coverage:
+                coverage_header = (
+                    "import coverage\n"
+                    "cov = coverage.Coverage(data_file='.coverage.child', auto_data=True)\n"
+                    "cov.start()\n"
+                )
+                coverage_footer = ("\ncov.stop()\ncov.save()\n")
+                temp_script = coverage_header + temp_script + coverage_footer
+
             # Write to a temporary file to avoid command line escaping issues
             temp_file = Path(f"temp_interactive_test_{test_file.stem}.py")
             temp_file.write_text(temp_script, encoding='utf-8')
-            
+
             # Run the temporary script
             try:
                 exec_cmd = [sys.executable, str(temp_file)]
@@ -94,7 +134,7 @@ def run_tests(test_path=None, mode='batch', order_range=None):
             finally:
                 # Clean up temp file
                 if temp_file.exists():
-                    temp_file.unlink()            
+                    temp_file.unlink()
 
         for test_file in test_files:
             print(f"\n{'='*60}")
@@ -104,25 +144,28 @@ def run_tests(test_path=None, mode='batch', order_range=None):
             # Use direct execution for interactive mode to avoid pytest GUI issues
             if mode == 'interactive':
                 print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
-                
                 try:
                     prepare_and_run_temp_script()
+                    result = subprocess.CompletedProcess(args=[], returncode=0)  # Assume success if no exception
                 except Exception as e:
                     print(f"Direct execution failed: {e}, falling back to pytest...")
-                    # Fall back to pytest
                     pytest_args = ['-v', '--tb=short', '-s', '--capture=no', '--tb=line']
-                    cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+                    if coverage:
+                        cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', str(test_file)] + pytest_args
+                    else:
+                        cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
                     print(f"Command: {' '.join(cmd)}")
                     env = os.environ.copy()
                     result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
             else:
-                # Use pytest for non-interactive modes
                 pytest_args = ['-v', '--tb=short', '-s']
-                cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+                if coverage:
+                    cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', str(test_file)] + pytest_args
+                else:
+                    cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
                 print(f"Command: {' '.join(cmd)}")
                 env = os.environ.copy()  # Copy current environment
                 result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
-            
             if result.returncode != 0:
                 total_failures += 1
                 print(f"❌ {test_file.name} FAILED")
@@ -135,44 +178,34 @@ def run_tests(test_path=None, mode='batch', order_range=None):
         return total_failures
     else:
         # For single files or default, run normally
-        cmd = [sys.executable, '-m', 'pytest']
-        
+        if coverage:
+            cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest']
+        else:
+            cmd = [sys.executable, '-m', 'pytest']
         if test_path:
             cmd.append(test_path)
         else:
             cmd.extend(['tests/'])
-        
         # Add order range filtering if specified
         if order_range:
             start, end = order_range
             test_patterns = []
             for i in range(start, end + 1):
                 test_patterns.append(f"test_{i:03d}")
-            # Use pytest's -k option with 'and' logic for partial matching
-            k_expression = ' or '.join([f"'{pattern}' in test_name" for pattern in test_patterns])
-            # Simpler approach: just use the test name prefixes
             k_expression = ' or '.join(test_patterns)
             cmd.extend(['-k', k_expression])
             print(f"Running tests with orders {start} to {end}")
-        
-        # Add useful pytest options
-        pytest_args = ['-v', '--tb=short', '-s']  # -s shows print output
-        
-        # For interactive mode, add additional options to help with GUI display
+        pytest_args = ['-v', '--tb=short', '-s']
         if mode == 'interactive':
             pytest_args.extend(['--capture=no', '--tb=line'])
-            
-            # Special handling for single file interactive mode to avoid pytest issues
             if test_path and Path(test_path).is_file():
                 print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
                 try:
                     prepare_and_run_temp_script()
+                    return 0
                 except Exception as e:
                     print(f"Direct execution failed: {e}, falling back to pytest...")
-        
         cmd.extend(pytest_args)
-        
-        # Run the tests with environment variables passed through
         print(f"Command: {' '.join(cmd)}")
         env = os.environ.copy()  # Copy current environment
         result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
@@ -180,17 +213,19 @@ def run_tests(test_path=None, mode='batch', order_range=None):
 
 if __name__ == '__main__':
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Run molass tests with plot control')
-    parser.add_argument('--mode', choices=['batch', 'save', 'interactive', 'both'], 
-                       default='batch', help='Plot display mode')
+    parser.add_argument('--mode', choices=['batch', 'save', 'interactive', 'both'],
+                        default='batch', help='Plot display mode')
     parser.add_argument('--test', help='Specific test file or directory to run')
     parser.add_argument('--range', help='Range of test orders to run, e.g., "1-3" or "2-5"')
-    parser.add_argument('--plot-dir', default='test_plots', 
-                       help='Directory for saved plots')
-    
+    parser.add_argument('--plot-dir', default='test_plots',
+                        help='Directory for saved plots')
+    parser.add_argument('--coverage', action='store_true',
+                        help='Enable coverage reporting with pytest-cov')
+
     args = parser.parse_args()
-    
+
     # Parse range argument
     order_range = None
     if args.range:
@@ -200,14 +235,24 @@ if __name__ == '__main__':
         except ValueError:
             print(f"Error: Invalid range format '{args.range}'. Use format like '1-3'")
             sys.exit(1)
-    
+
     # Set plot directory
     os.environ['MOLASS_PLOT_DIR'] = args.plot_dir
-    
-    exit_code = run_tests(args.test, args.mode, order_range)
-    
+
+    exit_code = run_tests(args.test, args.mode, order_range, coverage=args.coverage)
+
+    # If coverage was enabled, combine and generate HTML report
+    if args.coverage:
+        try:
+            print("Combining coverage data and generating HTML report...")
+            subprocess.run([sys.executable, '-m', 'coverage', 'combine'], check=True)
+            subprocess.run([sys.executable, '-m', 'coverage', 'html'], check=True)
+            print("Coverage HTML report generated at htmlcov/index.html")
+        except Exception as e:
+            print(f"Warning: coverage combine/html failed: {e}")
+
     if args.mode in ['save', 'both'] and Path(args.plot_dir).exists():
         plot_count = len(list(Path(args.plot_dir).glob('*.png')))
         print(f"\n{plot_count} plots saved to {args.plot_dir}/")
-    
+
     sys.exit(exit_code)

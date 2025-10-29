@@ -76,3 +76,9 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore:.*non-interactive.*:UserWarning",
 ]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["molass"]
+concurrency = ["multiprocessing"]
