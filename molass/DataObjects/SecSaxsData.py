@@ -22,6 +22,7 @@ class SecSaxsData:
         The UV data object.
     trimmed : bool
         Indicates whether the data has been trimmed.
+        This attribute is used to avoid minor redundant trimming operations which may cause inconsistency from the algorithmic reasons.
     mapping : MappingInfo or None
         The mapping information between XR and UV data.
     beamline_info : BeamlineInfo or None
