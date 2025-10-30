@@ -34,7 +34,11 @@ def load_xr(folder_path):
             datafiles.append(path)
         except Exception as e:
             print(f"Error loading {path}: {e}")
-    xr_array = np.array(input_list)
+    try:
+        xr_array = np.array(input_list)
+    except Exception as e:
+        print(f"Error converting input list to array: {e}")
+        raise e
     return xr_array, datafiles
 
 def xr_remove_bubbles(xr_array, logger=None, debug=False):
