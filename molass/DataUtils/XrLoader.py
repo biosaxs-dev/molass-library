@@ -29,8 +29,11 @@ def load_xr(folder_path):
     input_list = []
     datafiles = []
     for path in sorted(glob(folder_path + "/*.dat")):
-        input_list.append(np.loadtxt(path))
-        datafiles.append(path)
+        try:
+            input_list.append(np.loadtxt(path))
+            datafiles.append(path)
+        except Exception as e:
+            print(f"Error loading {path}: {e}")
     xr_array = np.array(input_list)
     return xr_array, datafiles
 

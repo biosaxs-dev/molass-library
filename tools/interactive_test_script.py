@@ -3,11 +3,18 @@ import sys
 import importlib.util
 sys.path.insert(0, '.')     # Ensure current directory is in sys.path
 
+
+# Support node id: test_file.py::test_func
 if len(sys.argv) < 2:
-    print("Usage: python interactive_test_script.py <test_file.py>")
+    print("Usage: python interactive_test_script.py <test_file.py>[::test_func]")
     sys.exit(1)
 
-abs_test_path = os.path.abspath(sys.argv[1])
+node_id = sys.argv[1]
+if '::' in node_id:
+    file_part, func_part = node_id.split('::', 1)
+else:
+    file_part, func_part = node_id, None
+abs_test_path = os.path.abspath(file_part)
 
 # Set environment variables (optional: could be passed from parent)
 os.environ.setdefault('MOLASS_ENABLE_PLOTS', 'true')
@@ -31,6 +38,7 @@ except Exception as e:
     traceback.print_exc()
     test_module = None
 
+
 # Find all test functions (including decorated ones)
 test_functions = []
 if test_module:
@@ -45,6 +53,15 @@ else:
 
 # Sort test functions by name for predictable order
 test_functions.sort(key=lambda x: x[0])
+
+if func_part:
+    # Only run the specified function (exact match)
+    selected = [(name, func) for name, func in test_functions if name == func_part]
+    if not selected:
+        print(f"No test function named '{func_part}' found in module.")
+    else:
+        print(f"Running only test function: {func_part}")
+    test_functions = selected
 
 print(f"Found {len(test_functions)} test functions: {[name for name, func in test_functions]}")
 

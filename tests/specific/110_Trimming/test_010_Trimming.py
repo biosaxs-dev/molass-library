@@ -17,6 +17,7 @@ def run_if_data_available(filename):
     import matplotlib.pyplot as plt
     from molass.DataObjects import SecSaxsData as SSD
     filepath = os.path.join(DATA_ROOT_FOLDER, filename)
+    print(f"Checking for data file: {filepath}")
     if not os.path.exists(filepath):
         print(f"Data file {filepath} not found. Skipping test.")
         return False
@@ -31,6 +32,12 @@ def run_if_data_available(filename):
 @control_matplotlib_plot
 def test_010_20160628():
     run_if_data_available('20160628')
+
+@control_matplotlib_plot
+def test_020_20180605_Backsub3():
+    # This dataset has illegal lines that cause loading errors
+    # Illegal files are now skipped in XrLoader.py
+    run_if_data_available(r'20180605/Backsub3')
 
 if __name__ == "__main__":
     test_010_20160628()

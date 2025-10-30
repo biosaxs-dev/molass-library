@@ -40,23 +40,29 @@ def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     os.environ['MOLASS_SAVE_PLOTS'] = 'true' if save_plots else 'false'
     os.environ['MOLASS_PLOT_DIR'] = str(plot_dir)
 
-def run_interactive_script(test_file, coverage):
+def run_interactive_script(test_file, coverage, function=None):
     env = os.environ.copy()
     script_path = Path(__file__).parent / 'tools' / 'interactive_test_script.py'
     abs_test_path = str(test_file.resolve())
+    script_arg = abs_test_path
+    if function:
+        script_arg += f"::{function}"
     if coverage:
-        cmd = [sys.executable, '-m', 'coverage', 'run', str(script_path), abs_test_path]
+        cmd = [sys.executable, '-m', 'coverage', 'run', str(script_path), script_arg]
     else:
-        cmd = [sys.executable, str(script_path), abs_test_path]
+        cmd = [sys.executable, str(script_path), script_arg]
     print(f"Running interactive test script: {' '.join(cmd)}")
     result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
 
-def run_single_test_file(test_file, mode, coverage):
+def run_single_test_file(test_file, mode, coverage, function=None):
     env = os.environ.copy()
+    node_id = str(test_file)
+    if function:
+        node_id += f"::{function}"
     if mode == 'interactive':
         print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
         try:
-            run_interactive_script(test_file, coverage)
+            run_interactive_script(test_file, coverage, function=function)
             result = subprocess.CompletedProcess(args=[], returncode=0)  # Assume success if no exception
         except Exception as e:
             import traceback
@@ -65,22 +71,22 @@ def run_single_test_file(test_file, mode, coverage):
             print("Falling back to pytest...")
             pytest_args = ['-v', '--tb=short', '-s', '--capture=no', '--tb=line']
             if coverage:
-                cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', str(test_file)] + pytest_args
+                cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', node_id] + pytest_args
             else:
-                cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+                cmd = [sys.executable, '-m', 'pytest', node_id] + pytest_args
             print(f"Command: {' '.join(cmd)}")
             result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
     else:
         pytest_args = ['-v', '--tb=short', '-s']
         if coverage:
-            cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', str(test_file)] + pytest_args
+            cmd = [sys.executable, '-m', 'coverage', 'run', '-m', 'pytest', node_id] + pytest_args
         else:
-            cmd = [sys.executable, '-m', 'pytest', str(test_file)] + pytest_args
+            cmd = [sys.executable, '-m', 'pytest', node_id] + pytest_args
         print(f"Command: {' '.join(cmd)}")
         result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
     return result.returncode
 
-def run_tests(test_path=None, mode='batch', order_range=None, coverage=False):
+def run_tests(test_path=None, mode='batch', order_range=None, coverage=False, function=None):
     """Unified test runner for single files and directories."""
     # Set environment variables for plot control based on mode
     if mode == 'batch':
@@ -139,14 +145,23 @@ def run_tests(test_path=None, mode='batch', order_range=None, coverage=False):
     total_failures = 0
     for test_file in test_files:
         print(f"\n{'='*60}")
-        print(f"Running {test_file.name}")
+        if function:
+            print(f"Running {test_file.name}::{function}")
+        else:
+            print(f"Running {test_file.name}")
         print('='*60)
-        rc = run_single_test_file(test_file, mode, coverage)
+        rc = run_single_test_file(test_file, mode, coverage, function=function)
         if rc != 0:
             total_failures += 1
-            print(f"❌ {test_file.name} FAILED")
+            if function:
+                print(f"❌ {test_file.name}::{function} FAILED")
+            else:
+                print(f"❌ {test_file.name} FAILED")
         else:
-            print(f"✅ {test_file.name} PASSED")
+            if function:
+                print(f"✅ {test_file.name}::{function} PASSED")
+            else:
+                print(f"✅ {test_file.name} PASSED")
     print(f"\n{'='*60}")
     print(f"Summary: {len(test_files) - total_failures}/{len(test_files)} files passed")
     print('='*60)
@@ -164,6 +179,7 @@ if __name__ == '__main__':
                         help='Directory for saved plots')
     parser.add_argument('--coverage', action='store_true',
                         help='Enable coverage reporting with pytest-cov')
+    parser.add_argument('--function', help='Run only a specific test function (e.g. test_func or TestClass::test_method)')
 
     args = parser.parse_args()
 
@@ -180,7 +196,7 @@ if __name__ == '__main__':
     # Set plot directory
     os.environ['MOLASS_PLOT_DIR'] = args.plot_dir
 
-    exit_code = run_tests(args.test, args.mode, order_range, coverage=args.coverage)
+    exit_code = run_tests(args.test, args.mode, order_range, coverage=args.coverage, function=args.function)
 
     # If coverage was enabled, combine and generate HTML report
     if args.coverage:
