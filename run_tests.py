@@ -40,42 +40,23 @@ def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     os.environ['MOLASS_SAVE_PLOTS'] = 'true' if save_plots else 'false'
     os.environ['MOLASS_PLOT_DIR'] = str(plot_dir)
 
-def prepare_and_run_temp_script(test_file, coverage):
+def run_interactive_script(test_file, coverage):
     env = os.environ.copy()
+    script_path = Path(__file__).parent / 'tools' / 'interactive_test_script.py'
     abs_test_path = str(test_file.resolve())
-    template_path = Path(__file__).parent / 'tools' / 'interactive_test_template.py'
-    with open(template_path, 'r', encoding='utf-8') as f:
-        template_code = f.read()
-    temp_script = template_code.format(
-        MOLASS_ENABLE_PLOTS=env.get("MOLASS_ENABLE_PLOTS", "false"),
-        MOLASS_SAVE_PLOTS=env.get("MOLASS_SAVE_PLOTS", "false"),
-        MOLASS_PLOT_DIR=env.get("MOLASS_PLOT_DIR", "test_plots"),
-        abs_test_path=abs_test_path
-    )
     if coverage:
-        coverage_header = (
-            "import coverage\n"
-            "cov = coverage.Coverage(data_file='.coverage.child', auto_data=True)\n"
-            "cov.start()\n"
-        )
-        coverage_footer = ("\ncov.stop()\ncov.save()\n")
-        temp_script = coverage_header + temp_script + coverage_footer
-    temp_file = Path(f"temp_interactive_test_{test_file.stem}.py")
-    temp_file.write_text(temp_script, encoding='utf-8')
-    try:
-        exec_cmd = [sys.executable, str(temp_file)]
-        print("Running test directly for better interactive display...")
-        result = subprocess.run(exec_cmd, cwd=Path(__file__).parent, env=env)
-    finally:
-        if temp_file.exists():
-            temp_file.unlink()
+        cmd = [sys.executable, '-m', 'coverage', 'run', str(script_path), abs_test_path]
+    else:
+        cmd = [sys.executable, str(script_path), abs_test_path]
+    print(f"Running interactive test script: {' '.join(cmd)}")
+    result = subprocess.run(cmd, cwd=Path(__file__).parent, env=env)
 
 def run_single_test_file(test_file, mode, coverage):
     env = os.environ.copy()
     if mode == 'interactive':
         print("Interactive mode detected - trying direct execution to avoid pytest GUI issues...")
         try:
-            prepare_and_run_temp_script(test_file, coverage)
+            run_interactive_script(test_file, coverage)
             result = subprocess.CompletedProcess(args=[], returncode=0)  # Assume success if no exception
         except Exception as e:
             import traceback
