@@ -1,12 +1,9 @@
 """
     test DenssTools
 """
-import sys
-sys.path.insert(0, r'D:\Github\molass-library')
-sys.path.insert(0, r'D:\Github\molass-legacy')
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
-from molass_data import TUTORIAL_DATA
+from molass_data import SAMPLE1
 
 import pytest
 from molass.DataObjects import SecSaxsData as SSD
@@ -14,7 +11,7 @@ from molass.DataObjects import SecSaxsData as SSD
 @pytest.fixture(scope="module")
 def ssd_instance():
     print("Fixture executed")
-    return SSD(TUTORIAL_DATA)
+    return SSD(SAMPLE1)
 
 def test_01_constructor(ssd_instance):
     assert ssd_instance is not None, "SSD object should not be None"
@@ -31,5 +28,5 @@ def test_02_exec_denss(ssd_instance):
 if __name__ == "__main__":
     # path = '::'.join([__file__, 'test_02_exec_denss'])
     # pytest.main([path, '-v', '--tb=short'])
-    ssd = SSD(TUTORIAL_DATA)
+    ssd = SSD(SAMPLE1)
     test_02_exec_denss(ssd)

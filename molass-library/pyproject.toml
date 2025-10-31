@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.7.1"
+version = "0.7.2"
 
 dependencies = [
   "numpy",
@@ -12,7 +12,7 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-  "molass_legacy>=0.3.0",
+  "molass_legacy>=0.3.2",
   "statsmodels",
   "scikit-learn",
   "toml",
@@ -76,3 +76,9 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore:.*non-interactive.*:UserWarning",
 ]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["molass"]
+concurrency = ["multiprocessing"]
