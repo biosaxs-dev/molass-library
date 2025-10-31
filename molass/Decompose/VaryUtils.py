@@ -5,15 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from molass.SEC.Models.Simple import egh
 
-def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None, debug=False):
+def _plot_varied_decompositions_impl(icurve, proportions, rgcurve=None, best=None, debug=False):
     """
     Plot varied decompositions of the data (x, y) based on different proportions.
     Parameters
     ----------
-    x : array-like
-        The x values of the data.
-    y : array-like
-        The y values of the data.
+    icurve : ICurve
+        The intensity elution curve to be decomposed.
     proportions : array-like
         A 2D array where each row represents a set of proportions for the components.
     rgcurve : RGCurve or None, optional
@@ -39,7 +37,7 @@ def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None,
     for props in proportions:
         props_ = props/np.sum(props)
         normalized_proportions.append(props_)
-        result = decompose_proportionally(x, y, props_)
+        result = decompose_proportionally(icurve, props_)
         values.append(result.fun)
         results.append(result)
     bottom = np.zeros(num_trials)
@@ -49,6 +47,8 @@ def _plot_varied_decompositions_impl(x, y, proportions, rgcurve=None, best=None,
        lowest_indices = np.argpartition(values, best-1)[:best]
 
     fig1, axes = plt.subplots(nrows=2, ncols=4, figsize=(20, 8), sharex=True)
+
+    x, y = icurve.get_xy()
 
     for i, ax in enumerate(axes.flat):
         if i < num_trials:

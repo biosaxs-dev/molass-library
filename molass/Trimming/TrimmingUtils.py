@@ -1,7 +1,5 @@
 """
     Trimming.TrimmingUtils.py
-
-    Copyright (c) 2025, SAXS Team, KEK-PF
 """
 import numpy as np
 from molass.Global.Options import get_molass_options
@@ -90,6 +88,11 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
     TrimmingInfo
         The trimming information with slices and mapping.
     """
+    if flowchange is None:
+        flowchange = get_molass_options('flowchange')
+    if debug:
+        print("make_trimming_impl called with jranges=", jranges, " flowchange=", flowchange, " mapping=", mapping, " debug=", debug)
+        
     if jranges is None:
         # xr_slices
         if ssd.xr is None or ssd.trimmed:
@@ -134,9 +137,14 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
                 from molass.FlowChange.Possibility import possibly_has_flowchange_points
                 flowchange = possibly_has_flowchange_points(ssd)
 
+            if debug:
+                print("Determined flowchange=", flowchange)
+
             if flowchange:
                 (i, j), judge_info = ssd.uv.get_flowchange_points()
                 start, stop = make_and_slicepair((start, stop), (i, j), judge_info)
+                if debug:
+                    print("Flowchange points applied: ", (i, j), " -> ", (start, stop), " judge_info=", judge_info)
 
             uv_jslice = slice(start, stop)
 

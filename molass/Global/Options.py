@@ -8,7 +8,7 @@ GLOBAL_OPTIONS = dict(
     developer_mode = False,
 )
 
-def set_molass_options(mapped_trimming=True, flowchange=False, deveoloper_mode=False, **kwargs):
+def set_molass_options(**kwargs):
     """Set global options for molass.
 
     Parameters
