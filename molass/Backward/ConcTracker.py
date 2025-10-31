@@ -131,9 +131,14 @@ class ConcTracker:
             self.logger.info(f'Plotting concentration from {start} to {stop} with shape {c_matrix.shape} and conc_dependence={conc_dependence}')
             ax = axes[conc_dependence - 1]
             x_ = x[start:stop]
-            num_rows_to_plot = c_matrix.shape[0] if conc_dependence == 1 else c_matrix.shape[0]//2
-            for i in range(num_rows_to_plot):
-                ax.plot(x_, c_matrix[i,:], label=f'Component {i+1}')
+            for i in range(c_matrix.shape[0]):
+                if conc_dependence == 1:
+                    i_ = i
+                else:
+                    i_, r = divmod(i, conc_dependence)
+                    if r != 0:
+                        continue
+                ax.plot(x_, c_matrix[i,:], label=f'Component {i_+1}')
 
         for ax in axes: 
             ax.legend()
