@@ -36,9 +36,13 @@ def load_xr(folder_path):
             print(f"Error loading {path}: {e}")
     try:
         xr_array = np.array(input_list)
-    except Exception as e:
+    except ValueError as e:
         print(f"Error converting input list to array: {e}")
-        raise e
+        from molass_legacy.SerialAnalyzer.SerialDataUtils import convert_to_the_least_shape
+        xr_array = np.array(convert_to_the_least_shape(input_list)[0])
+        print(f"Converted to least shape array with shape {xr_array.shape}")
+    except Exception:
+        raise
     return xr_array, datafiles
 
 def xr_remove_bubbles(xr_array, logger=None, debug=False):

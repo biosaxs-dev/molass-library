@@ -26,13 +26,22 @@ On Windows, coverage for subprocesses and dynamically generated scripts may not 
 Using pytest-cov alone is often insufficient for full coverage in multi-process or interactive scenarios on Windows.
 Always use this script's workflow for reliable results.
 
-For more details, see the Copilot folder or project documentation.
+For more details, see the project documentation at https://biosaxs-dev.github.io/molass-develop/chapters/06/testing.html.
 """
 
 import os
 import sys
 import subprocess
 from pathlib import Path
+
+# --- Ensure sys.path respects pythonpath from pyproject.toml ---
+
+# --- Use shared utility to set sys.path from pyproject.toml pythonpath ---
+from tools.pyproject_utils import get_pythonpath_from_pyproject
+for abs_p in reversed(get_pythonpath_from_pyproject()):
+    if abs_p not in sys.path:
+        sys.path.insert(0, abs_p)
+print(f"sys.path: {sys.path}")
 
 def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     """Set environment variables for plot control."""
@@ -47,6 +56,13 @@ def run_interactive_script(test_file, coverage, function=None):
     script_arg = abs_test_path
     if function:
         script_arg += f"::{function}"
+    # --- Add pythonpath from pyproject.toml to PYTHONPATH using shared utility ---
+    from tools.pyproject_utils import get_pythonpath_from_pyproject
+    pythonpath_entries = get_pythonpath_from_pyproject()
+    orig_pythonpath = env.get('PYTHONPATH', '')
+    combined_pythonpath = os.pathsep.join(pythonpath_entries + ([orig_pythonpath] if orig_pythonpath else []))
+    if combined_pythonpath:
+        env['PYTHONPATH'] = combined_pythonpath
     if coverage:
         cmd = [sys.executable, '-m', 'coverage', 'run', str(script_path), script_arg]
     else:

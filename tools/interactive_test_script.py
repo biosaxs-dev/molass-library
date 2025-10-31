@@ -1,6 +1,19 @@
+
 import os
 import sys
 import importlib.util
+# --- Prepend pythonpath from PYTHONPATH env if set, or from pyproject.toml ---
+from tools.pyproject_utils import get_pythonpath_from_pyproject
+pythonpath_env = os.environ.get('PYTHONPATH', '')
+if pythonpath_env:
+    for p in reversed(pythonpath_env.split(os.pathsep)):
+        if p and p not in sys.path:
+            sys.path.insert(0, p)
+else:
+    # Fallback: use pyproject.toml if present (for direct runs)
+    for abs_p in reversed(get_pythonpath_from_pyproject()):
+        if abs_p not in sys.path:
+            sys.path.insert(0, abs_p)
 sys.path.insert(0, '.')     # Ensure current directory is in sys.path
 
 
