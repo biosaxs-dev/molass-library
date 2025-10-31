@@ -47,45 +47,32 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     assert np.all(proportions >= 0), "All proportions must be non-negative."
     assert np.sum(proportions) > 0, "Sum of proportions must be positive."
     proportions = proportions/np.sum(proportions)
-    xr_icurve = ssd.xr.get_icurve()
-    xr_ccurves = create_decomposition_from_params(xr_icurve, num_components, proportions, **kwargs)
-    uv_icurve = ssd.uv.get_icurve()
-    uv_ccurves = create_decomposition_from_params(uv_icurve, num_components, proportions, **kwargs)
-    return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves
 
-def create_decomposition_from_params(icurve, num_components, proportions, **kwargs):
-    """
-    Create a decomposition from the given parameters.
-
-    Parameters
-    ----------
-    icurve : ICurve
-        The input curve to decompose.
-    num_components : int
-        The number of components to decompose into.
-    proportions : list of float
-        The proportions for each component.
-    debug : bool, optional
-        If True, enables debug mode with additional output.
-        Default is False.
-
-    Returns
-    -------
-    list of ComponentCurve
-        The list of component curves.
-    """
     debug = kwargs.get('debug', False)
     if debug:
         import molass.Decompose.Proportional
         reload(molass.Decompose.Proportional)
+        import molass.Decompose.Partner
+        reload(molass.Decompose.Partner)
     from molass.Decompose.Proportional import decompose_proportionally
-
+    from molass.Decompose.Partner import decompose_from_partner
     from molass.LowRank.ComponentCurve import ComponentCurve
-    
-    x, y = icurve.get_xy()
-    result = decompose_proportionally(x, y, proportions, debug=debug)
 
-    ret_curves = []
-    for params in result.x.reshape((num_components, 4)):
-        ret_curves.append(ComponentCurve(x, params))
-    return ret_curves
+    def get_curves_from_params(result_params, icurve):
+        ret_curves = []
+        for params in result_params.reshape((num_components, 4)):
+            ret_curves.append(ComponentCurve(icurve.x, params))
+        return ret_curves
+
+    # Create XR curves
+    xr_icurve = ssd.xr.get_icurve()
+    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug)
+    xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
+
+    # Create UV curves
+    uv_icurve = ssd.uv.get_icurve()
+    mapping = ssd.get_mapping()
+    uv_result = decompose_from_partner(uv_icurve, mapping, xr_result.x, debug=debug)
+    uv_ccurves = get_curves_from_params(uv_result['x'], uv_icurve)
+
+    return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves

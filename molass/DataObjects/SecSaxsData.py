@@ -22,6 +22,7 @@ class SecSaxsData:
         The UV data object.
     trimmed : bool
         Indicates whether the data has been trimmed.
+        This attribute is used to avoid minor redundant trimming operations which may cause inconsistency from the algorithmic reasons.
     mapping : MappingInfo or None
         The mapping information between XR and UV data.
     beamline_info : BeamlineInfo or None
@@ -686,5 +687,5 @@ class SecSaxsData:
             import molass.Decompose.VaryUtils
             reload(molass.Decompose.VaryUtils)
         from molass.Decompose.VaryUtils import _plot_varied_decompositions_impl
-        x, y = self.xr.get_icurve().get_xy()
-        return _plot_varied_decompositions_impl(x, y, proportions, rgcurve=rgcurve, best=best, debug=debug)
+        xr_icurve = self.xr.get_icurve()
+        return _plot_varied_decompositions_impl(xr_icurve, proportions, rgcurve=rgcurve, best=best, debug=debug)

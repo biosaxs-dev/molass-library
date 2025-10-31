@@ -133,18 +133,16 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(x, y, proportions, debug=False):
+def decompose_proportionally(icurve, proportions, debug=False):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
 
     Parameters
     ----------
-    x : array-like
-        The x values of the data.
-    y : array-like
-        The y values of the data.
-        proportions : array-like
+    icurve : ICurve
+        The intensity elution curve to be decomposed.
+    proportions : array-like
         The proportions for each component. Should sum to 1.
     debug : bool, optional
         If True, enable debug mode to visualize the decomposition process.
@@ -155,6 +153,9 @@ def decompose_proportionally(x, y, proportions, debug=False):
     result : OptimizeResult
         The result of the optimization containing the optimized parameters.            
     """
+
+    x, y = icurve.get_xy()
+
     if debug:
         import matplotlib.pyplot as plt
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 5))
