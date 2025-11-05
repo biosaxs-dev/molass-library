@@ -41,7 +41,7 @@ from tools.pyproject_utils import get_pythonpath_from_pyproject
 for abs_p in reversed(get_pythonpath_from_pyproject()):
     if abs_p not in sys.path:
         sys.path.insert(0, abs_p)
-print(f"sys.path: {sys.path}")
+# print(f"sys.path: {sys.path}")
 
 def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     """Set environment variables for plot control."""

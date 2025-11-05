@@ -565,6 +565,40 @@ class SecSaxsData:
 
         return make_decomposition_impl(self, num_components, **kwargs)
 
+    def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
+        """ssd.rigorous_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
+
+        Performs a rigorous decomposition of the SEC-SAXS data.
+
+        Parameters
+        ----------
+        num_components : int, optional
+            Specifies the number of components which also implies the SVD rank
+            used to denoise the matrix data.
+
+        proportions : list of float, optional
+            Specifies the proportions to be used for XR data.
+
+        ranks : list of int, optional
+            Specifies the ranks to be used for XR data.
+
+        num_plates : int, optional
+            Specifies the number of theoretical plates to be used for the optimization constraint.
+
+        Returns
+        -------
+        decomposition : Decomposition
+            A Decomposition object which contains the decomposition result.
+        """
+        
+        debug = kwargs.get('debug', False)
+        if debug:
+            import molass.LowRank.RigorousImplement
+            reload(molass.LowRank.RigorousImplement)
+        from molass.LowRank.RigorousImplement import make_rigorous_decomposition_impl
+
+        return make_rigorous_decomposition_impl(self, num_components, **kwargs)
+
     def inspect_ip_effect(self, debug=False):
         """ssd.inspect_ip_effect()
         Inspects the inter-particle effect of the SEC-SAXS data.

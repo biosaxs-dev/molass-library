@@ -403,4 +403,26 @@ class Decomposition:
         from molass.SEC.ModelFactory import create_model
         model = create_model(model_name, debug=debug)
         return model.optimize_decomposition(self, debug=debug)
+    
+    def rigorous_decomposition(self, rgcurve, debug=False):
+        """
+        Perform a rigorous decomposition.
 
+        Parameters
+        ----------
+        rgcurve : Curve
+            The Rg curve to use for the decomposition.
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        result : Decomposition
+            A new Decomposition object after rigorous decomposition.
+        """
+        if debug:
+            import molass.LowRank.RigorousImplement
+            reload(molass.LowRank.RigorousImplement)
+        from molass.LowRank.RigorousImplement import make_rigorous_decomposition_impl
+
+        return make_rigorous_decomposition_impl(self, rgcurve, debug=debug)

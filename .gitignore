@@ -16,7 +16,7 @@ docs/source/**
 # Ignore pytest related files
 .pytest_cache/
 .coverage*
-htmlcov/
+htmlcov*
 
 # Ignore the run_denss results
 **/temp/**

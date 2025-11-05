@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.7.2"
+version = "0.7.3"
 
 dependencies = [
   "numpy",
-  "scipy<1.16.0",
+  "scipy",
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
@@ -26,7 +26,7 @@ dependencies = [
   "mrcfile",
 ]
 
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9,<3.14"
 
 authors = [
   {name = "Molass Community"},
