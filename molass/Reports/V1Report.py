@@ -109,6 +109,12 @@ def make_v1report(ssd, **kwargs):
     if platform.system() != "Windows":
         raise RuntimeError("V1 report generation is only supported on Windows.")
 
+    # Check openpyxl version
+    import openpyxl
+    from packaging.version import Version
+    if Version(openpyxl.__version__) >= Version("3.1.4"):
+        raise RuntimeError(f"openpyxl version {openpyxl.__version__} is not supported. Please use a version < 3.1.4.")
+
     from molass_legacy.Env.EnvInfo import get_global_env_info
     from molass.PackageUtils.PyWin32Utils import check_pywin32_postinstall
     if not check_pywin32_postinstall():
