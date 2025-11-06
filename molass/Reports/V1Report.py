@@ -104,6 +104,13 @@ def make_v1report(ssd, **kwargs):
     Returns
     -------
     None
+
+    References
+    ----------
+    This function relies on the openpyxl library for Excel file manipulation.
+
+    Known Issues:
+     - openpyxl versions >= 3.1.4 have compatibility issues with pywin32. See https://github.com/biosaxs-dev/molass-legacy/issues/2
     """
     import platform
     if platform.system() != "Windows":
