@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
@@ -584,6 +584,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_decomposition()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.rigorous_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.rigorous_decomposition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.inspect_ip_effect()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>
@@ -1070,6 +1071,29 @@ used to denoise the matrix data.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.rigorous_decomposition">
+<span class="sig-name descname"><span class="pre">rigorous_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_plates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.rigorous_decomposition" title="Link to this definition">#</a></dt>
+<dd><p>Performs a rigorous decomposition of the SEC-SAXS data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
+used to denoise the matrix data.</p></li>
+<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
+<li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
+<li><p><strong>num_plates</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>decomposition</strong> – A Decomposition object which contains the decomposition result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect">
 <span class="sig-name descname"><span class="pre">inspect_ip_effect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect" title="Link to this definition">#</a></dt>
 <dd><p>Inspects the inter-particle effect of the SEC-SAXS data.</p>
@@ -1245,6 +1269,7 @@ axes: Axes</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_decomposition()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.rigorous_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.rigorous_decomposition()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.inspect_ip_effect()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>

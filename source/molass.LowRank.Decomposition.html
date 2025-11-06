@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
@@ -589,6 +589,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.rigorous_decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition.rigorous_decomposition()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1022,6 +1023,26 @@ This method allows the user to set different ranks for each component.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.rigorous_decomposition">
+<span class="sig-name descname"><span class="pre">rigorous_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.rigorous_decomposition" title="Link to this definition">#</a></dt>
+<dd><p>Perform a rigorous decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The Rg curve to use for the decomposition.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – A new Decomposition object after rigorous decomposition.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1100,6 +1121,7 @@ This method allows the user to set different ranks for each component.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.rigorous_decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition.rigorous_decomposition()</span></code></a></li>
 </ul>
 </li>
 </ul>

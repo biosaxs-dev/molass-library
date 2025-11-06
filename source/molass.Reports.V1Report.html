@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
@@ -700,6 +700,14 @@ This function generates the V1 analysis report and saves it to an Excel file.</p
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>This function relies on the openpyxl library for Excel file manipulation.</p>
+<dl class="simple">
+<dt>Known Issues:</dt><dd><ul class="simple">
+<li><p>openpyxl versions &gt;= 3.1.4 have compatibility issues with pywin32. See <a class="github reference external" href="https://github.com/biosaxs-dev/molass-legacy/issues/2">biosaxs-dev/molass-legacy#2</a></p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
