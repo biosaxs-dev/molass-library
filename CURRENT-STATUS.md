@@ -1,62 +1,38 @@
 # CURRENT STATUS
 
-**📅 Last Updated: October 16, 2025**  
-**👤 Updated By: Takahashi**
+
+**📅 Last Updated: November 17, 2025**  
+**👤 Updated By: Copilot (Takahashi session)**
 
 ---
 
 
 ## 🎯 What's Happening Now?
-**Review collaboration system is complete! Waiting for JOSS review to begin.**
+**JOSS review has started. Tracking reviewer/editor comments and internal issues.**
 
----
-
+**📅 Last Updated: November 17, 2025**  
+**👤 Updated By: Copilot (Takahashi session)**
 ## 🔗 JOSS Review Issue (External)
 Once the JOSS review starts, the official review will take place at a GitHub issue in the JOSS repository. Track the link here:
 
-**JOSS Review Issue URL:** [JOSS review issue URL](https://github.com/openjournals/joss-reviews/issues/9424)
 
+**JOSS Review Issue URL:** [https://github.com/openjournals/joss-reviews/issues/9424](https://github.com/openjournals/joss-reviews/issues/9424)
+**JOSS review in progress. Tracking reviewer/editor comments and internal issues.**
 _When the review issue is created, paste the URL above for easy access during the review process._
 
 ---
 
-## 📝 What Needs To Be Done?
-1. **Wait for JOSS reviewer comments** (not yet received)
-2. **Shimizu setup**: ✅ Done (username updated in `COPILOT-INIT.md` and read `SHIMIZU-QUICK-START.md`)
-3. **Start working on responses** once we get reviewer feedback
-4. **Clean up test files** (optional): Remove `test-python-support.md` and close test GitHub issue
-
+**JOSS Review Issue URL:** [https://github.com/openjournals/joss-reviews/issues/9424](https://github.com/openjournals/joss-reviews/issues/9424)
 ---
 
 ## 👥 Who's Doing What?
 - **Takahashi** (Programmer): Repository setup ✅ Done
-- **Shimizu** (Domain Expert): Repository setup ✅ Done
-- **Copilot** (Programming Assistant): Helping with setup ✅ Done
+1. **Track and respond to reviewer/editor comments in the JOSS review issue**
+2. **Summarize and address all open internal GitHub Issues** (see below)
+
+## 📋 Open Internal GitHub Issues (as of Nov 17, 2025)
+
+1. [Required Reply: Differences from the time of BPPB publication](https://github.com/biosaxs-dev/molass-review/issues/7)
 
 ---
-
-## 🚨 Any Problems?
-**No problems right now!** Everything is ready and waiting for the review to start.
-
----
-
-## 💭 What I Did This Session
-- Validated Claude Sonnet 4.5 model compatibility ✅
-- Created complete architecture documentation (REVIEW-ARCHITECTURE.md) ✅
-- Built and tested collaboration bot (GitHub Actions) ✅
-- Created GitHub labels for workflow automation ✅
-- Created SHIMIZU-QUICK-START.md guide 📘 **NEW!**
-- Explored URL-based comment capture (limited by tool, using manual copy-paste instead)
-
----
-
-## 🔄 What's Next?
-**Next person should:**
-1. Read this file
-2. Check if JOSS review has started
-3. If yes, put reviewer comments in `review-discussions/reviewer-comments/` folder
-4. Update this file with what you did
-
----
-
-**🎯 Keep it simple! Don't overthink it!**
+5. [Email from JOSS editorial robot.](https://github.com/biosaxs-dev/molass-review/issues/3)

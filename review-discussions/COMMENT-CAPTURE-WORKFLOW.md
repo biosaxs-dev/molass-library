@@ -33,7 +33,7 @@ When reviewer comments appear on the JOSS issue:
 
 ### **Step 1: Navigate to JOSS Issue**
 Your JOSS review will be at:
-`https://github.com/openjournals/joss-reviews/issues/[YOUR-NUMBER]`
+`https://github.com/openjournals/joss-reviews/issues/9424`
 
 (You'll get this URL when JOSS review begins)
 

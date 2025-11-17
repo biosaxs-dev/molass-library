@@ -4,6 +4,14 @@
 
 ---
 
+## ⏩ Next Step After Initialization
+
+After processing this file and completing user/context detection, Copilot must immediately read and follow the workflow steps in `COPILOT-INIT-ACTION.md`.
+
+This ensures that every session continues with the unified action workflow for review support and coordination.
+
+---
+
 ## 👥 USER DETECTION PATTERNS
 
 ### **Takahashi (Programmer)**
