@@ -14,7 +14,7 @@
 ## 🔗 JOSS Review Issue (External)
 Once the JOSS review starts, the official review will take place at a GitHub issue in the JOSS repository. Track the link here:
 
-**JOSS Review Issue URL:** _Not yet available_
+**JOSS Review Issue URL:** [JOSS review issue URL](https://github.com/openjournals/joss-reviews/issues/9424)
 
 _When the review issue is created, paste the URL above for easy access during the review process._
 
