@@ -5,7 +5,7 @@ import numpy as np
 from scipy.optimize import minimize
 from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf, DEFUALT_TIMESCALE
 
-def optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs):
+def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, **kwargs):
     """ Optimize the SDM decomposition.
 
     Parameters
@@ -14,6 +14,8 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs):
         The decomposition to optimize.
     env_params : tuple
         The environmental parameters (N, T, me, mp, N0, t0, poresize).
+    model_params : dict, optional
+        The parameters for the SDM model.
     kwargs : dict
         Additional parameters for the optimization process.
 
@@ -35,29 +37,44 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, **kwargs):
     N, T, me, mp, N0, t0, poresize = env_params
     rgv = np.asarray(decomposition.get_rgs())
 
-    def objective_function(params):
+    if model_params is None:
+        timescale = DEFUALT_TIMESCALE
+    else:
+        timescale = model_params.get('timescale', DEFUALT_TIMESCALE)
+
+    def objective_function(params, return_cy_list=False):
         N_, T_, x0_, tI_, N0_ = params[0:5]
         rgv_ = params[5:5+num_components]
-        rhov = rgv/poresize
+        rhov = rgv_/poresize
         rhov[rhov > 1] = 1.0  # limit rhov to 1.0
         scales_ = params[5+num_components:5+2*num_components]
         cy_list = []
         for rho, scale in zip(rhov, scales_):
             ni = N_*(1 - rho)**me
             ti = T_*(1 - rho)**mp
-            cy = scale * dispersive_monopore_pdf(x - tI_, ni, ti, N0_, x0_ - tI_, timescale=DEFUALT_TIMESCALE)
+            cy = scale * dispersive_monopore_pdf(x - tI_, ni, ti, N0_, x0_ - tI_, timescale=timescale)
             cy_list.append(cy)
+        if return_cy_list:
+            return cy_list
         ty = np.sum(cy_list, axis=0)
         error = np.sum((y - ty)**2)
         return error
 
     initial_guess = [N, T, t0, t0, N0]
     initial_guess += list(rgv)
-    initial_guess += [1.0]*num_components
+    area = np.sum(y)
+    print("area=", area)
+    initial_guess += [area]*num_components
+    cy_list = objective_function(initial_guess, return_cy_list=True)
+
     bounds = [(100, 5000), (1e-3, 5), (t0 - 1000, t0 + 1000), (t0 - 1000, t0 + 1000), (500, 50000)]
     bounds += [(rg*0.5, rg*1.5) for rg in rgv]
     bounds += [(1e-3, 10.0) for _ in range(num_components)]
-    result = minimize(objective_function, initial_guess, bounds=bounds)
+    if model_params is None:
+        method = None
+    else:
+        method = model_params.get('method', 'Nelder-Mead')
+    result = minimize(objective_function, initial_guess, bounds=bounds, method=method)
 
     if debug:
         print("Optimization success:", result.success)
