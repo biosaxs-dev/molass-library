@@ -62,11 +62,18 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
 
     initial_guess = [N, T, t0, t0, N0]
     initial_guess += list(rgv)
-    area = np.sum(y)
-    print("area=", area)
-    initial_guess += [area]*num_components
-    cy_list = objective_function(initial_guess, return_cy_list=True)
 
+    # Estimate initial scales
+    area = np.sum(y)
+    initial_guess += [area]*num_components
+    initial_scales = initial_guess[-num_components:]
+    cy_list = objective_function(initial_guess, return_cy_list=True)
+    for i, cy in enumerate(cy_list):
+        k = np.argmax(cy)
+        scale = initial_scales[i]*y[k]/cy[k]
+        initial_guess[5+num_components + i] = scale
+
+    # Set bounds for the parameters
     bounds = [(100, 5000), (1e-3, 5), (t0 - 1000, t0 + 1000), (t0 - 1000, t0 + 1000), (500, 50000)]
     bounds += [(rg*0.5, rg*1.5) for rg in rgv]
     bounds += [(1e-3, 10.0) for _ in range(num_components)]

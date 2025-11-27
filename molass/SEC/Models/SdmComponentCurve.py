@@ -65,6 +65,8 @@ class SdmComponentCurve(ComponentCurve):
         """
         N, T, me, mp, x0, tI, N0, poresize, timescale = column.get_params()
         self.x = x
+        self.moment = None
+        self.model = 'sdm'
         self.tI = tI
         self._x = x - tI
         rho = rg/poresize
@@ -95,18 +97,6 @@ class SdmComponentCurve(ComponentCurve):
         else:
             _x = x - self.tI
         return self.scale * dispersive_monopore_pdf(_x, *self.params)
-
-    def get_xy(self):
-        """
-        Returns the x and y values as a tuple.
-
-        Returns
-        -------
-        tuple
-            A tuple containing the x values and the corresponding y values.
-        """
-        x = self.x
-        return x, self.get_y()
     
     def get_peak_top_x(self):
         """

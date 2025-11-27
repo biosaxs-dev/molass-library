@@ -30,6 +30,7 @@ class ComponentCurve:
         self.x = x
         self.params = np.asarray(params)
         self.moment = None
+        self.model = 'egh'  # default model
 
     def get_y(self):
         """
@@ -52,7 +53,7 @@ class ComponentCurve:
             The x and y values of the component curve.
         """
         x = self.x
-        return x, egh(x, *self.params)
+        return x, self.get_y()
 
     def get_moment(self):
         """
