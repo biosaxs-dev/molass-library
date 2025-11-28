@@ -27,7 +27,6 @@ def create_axes(fig, row_titles=["UV", "XR"]):
         axes.append(axis_row)
     return np.array(axes)
 
-
 def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
     if title is not None:
         ax.set_title(title)
@@ -76,9 +75,8 @@ def make_guinier_plot(ax, qv, xr_components, title=None):
 
     sg_list = []
     for i, xr_component in enumerate(xr_components):
-        data = xr_component.get_jcurve_array()
-        pv = data[:,1]
-        sg = SimpleGuinier(data)
+        sg = xr_component.get_guinier_object()
+        pv = sg.y_
         sg_list.append(sg)
         try:
             start = sg.guinier_start

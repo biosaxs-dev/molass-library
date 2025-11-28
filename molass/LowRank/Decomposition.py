@@ -85,6 +85,8 @@ class Decomposition:
         self.mapped_curve = mapped_curve
         self.paired_ranges = paired_ranges
 
+        self.guinier_objects = None
+
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
         """
         Create a new Decomposition with new component curves.
@@ -113,6 +115,31 @@ class Decomposition:
             The number of components in the decomposition.
         """
         return self.num_components
+
+    def get_guinier_objects(self, debug=False):
+        """
+        Get the list of Guinier objects for the XR components.
+
+        Returns
+        -------
+        list of Guinier
+            The list of Guinier objects for each XR component.
+        """
+        if self.guinier_objects is None:
+            xr_components = self.get_xr_components(debug=debug)
+            self.guinier_objects = [c.get_guinier_object() for c in xr_components]
+        return self.guinier_objects
+
+    def get_rgs(self):
+        """
+        Get the list of Rg values for the XR components.
+
+        Returns
+        -------
+        list of float
+            The list of Rg values for each XR component.
+        """
+        return [sv.Rg for sv in self.get_guinier_objects()]
 
     def plot_components(self, **kwargs):
         """decomposition.plot_components(title=None, **kwargs)
@@ -407,7 +434,60 @@ class Decomposition:
         model = create_model(model_name, debug=debug)
         return model.optimize_decomposition(self, model_params=model_params, debug=debug)
     
-    def rigorous_decomposition(self, rgcurve, debug=False):
+    def make_rigorous_initparams(self, base_curves, debug=False):
+        """
+        Make initial parameters for rigorous optimization.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, enable debug mode.
+
+        Returns
+        -------
+        np.ndarray
+            The initial parameters for rigorous optimization.
+        """
+        if debug:
+            from importlib import reload
+            import molass.Rigorous.EghParams
+            reload(molass.Rigorous.EghParams)
+        from molass.Rigorous.EghParams import make_egh_initparams
+
+        # XR initial parameters
+        xr_params = []
+        for ccurve in self.xr_ccurves:
+            xr_params.append(ccurve.get_params())
+        xr_params = np.array(xr_params)
+        # XR baseline parameters
+        xr_baseparams = base_curves[0].get_params()
+
+        # Rg parameters
+        rg_params = self.get_rgs()
+
+        # Mapping parameters
+        a, b = self.ssd.get_mapping()
+
+        # UV initial parameters
+        uv_params = []
+        for uv_ccurve, xr_ccurve in zip(self.uv_ccurves, self.xr_ccurves):
+            uv_params.append(uv_ccurve.get_params()[0]/xr_ccurve.get_params()[0])
+
+        # UV baseline parameters
+        uv_baseparams = base_curves[1].get_params()
+
+        # SecCol parameters
+        x = self.ssd.xr_icurve.x
+        init_mappable_range = (x[0], x[-1])
+
+        # SecCol parameters
+        from molass_legacy.SecTheory.SecEstimator import guess_initial_secparams
+        Npc, rp, tI, t0, P, m = guess_initial_secparams(xr_params, rg_params)
+        seccol_params = np.array([Npc, rp, tI, t0, P, m])
+
+        return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, uv_params, uv_baseparams, init_mappable_range, seccol_params])
+
+    def optimize_rigorously(self, rgcurve=None, debug=False):
         """
         Perform a rigorous decomposition.
 
@@ -424,8 +504,11 @@ class Decomposition:
             A new Decomposition object after rigorous decomposition.
         """
         if debug:
-            import molass.LowRank.RigorousImplement
-            reload(molass.LowRank.RigorousImplement)
-        from molass.LowRank.RigorousImplement import make_rigorous_decomposition_impl
+            import molass.Rigorous.RigorousImplement
+            reload(molass.Rigorous.RigorousImplement)
+        from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
+
+        if rgcurve is None:
+            rgcurve = self.ssd.xr.compute_rgcurve()
 
         return make_rigorous_decomposition_impl(self, rgcurve, debug=debug)

@@ -5,6 +5,7 @@
 import os
 import numpy as np
 from tqdm import tqdm
+# from tqdm import tqdm_notebook as tqdm
 
 ADD_ALL_RESULTS = True
 

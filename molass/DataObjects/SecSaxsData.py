@@ -593,9 +593,9 @@ class SecSaxsData:
         
         debug = kwargs.get('debug', False)
         if debug:
-            import molass.LowRank.RigorousImplement
-            reload(molass.LowRank.RigorousImplement)
-        from molass.LowRank.RigorousImplement import make_rigorous_decomposition_impl
+            import molass.Rigorous.RigorousImplement
+            reload(molass.Rigorous.RigorousImplement)
+        from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
         return make_rigorous_decomposition_impl(self, num_components, **kwargs)
 
@@ -723,3 +723,18 @@ class SecSaxsData:
         from molass.Decompose.VaryUtils import _plot_varied_decompositions_impl
         xr_icurve = self.xr.get_icurve()
         return _plot_varied_decompositions_impl(xr_icurve, proportions, rgcurve=rgcurve, best=best, debug=debug)
+    
+    def get_spectral_vectors(self):
+        """ssd.get_spectral_vectors()
+        Returns the spectral vectors for XR and UV data.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        spectral_vectors : list of np.ndarray
+            A list of two numpy arrays which contain the spectral vectors for XR and UV data.
+        """
+        return [self.xr.qv, self.uv.wv]
