@@ -143,10 +143,10 @@ def plot_components_impl(decomposition, **kwargs):
     ax2 = axes[1,0]
 
     # UV Elution Curve
-    plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="Elution Curves", ylabel="Absorbance")
+    plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
 
     # XR Elution Curve
-    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, ylabel="Scattering Intensity", **kwargs)
+    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges
     pairedranges = kwargs.get('pairedranges', None)
@@ -170,15 +170,11 @@ def plot_components_impl(decomposition, **kwargs):
                         )
                     ax.add_patch(p)              
 
+    # UV Absorbance Curves
     ax3 = axes[0,1]
-    ax4 = axes[1,1]
-    ax4.set_yscale('log')
-    ax3.set_title("Spectral Curves")
-
+    ax3.set_title("UV Absorbance Curves")
     ax3.set_xlabel("Wavelength [nm]")
     ax3.set_ylabel("Absorbance")
-
-    # UV Absorbance Curves
     wv = decomposition.uv.wv
     uv_matrices = decomposition.get_uv_matrices(debug=debug)
     M, C, P = uv_matrices[0:3]
@@ -187,6 +183,9 @@ def plot_components_impl(decomposition, **kwargs):
     ax3.legend()
 
     # XR Scattering Curves
+    ax4 = axes[1,1]
+    ax4.set_title("XR Scattering Curves")
+    ax4.set_yscale('log')
     ax4.set_xlabel(r"Q $[\AA^{-1}]$")
     ax4.set_ylabel(r"$\log_{10}(I)$")
 
@@ -201,10 +200,10 @@ def plot_components_impl(decomposition, **kwargs):
     ax6 = axes[1,2]
 
     # Guinier Plot
-    sg_list = make_guinier_plot(ax5, qv, decomposition.get_xr_components(), title="XR Guinier/Kratky Plots")
+    sg_list = make_guinier_plot(ax5, qv, decomposition.get_xr_components(), title="XR Guinier Plot")
 
     # Kratky Plot
-    make_kratky_plot(ax6, qv, P, sg_list)
+    make_kratky_plot(ax6, qv, P, sg_list, title="XR Kratky Plot")
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=1.5)
