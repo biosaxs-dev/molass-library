@@ -23,13 +23,18 @@ def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
     dsets = ((xr_curve, D), rg_curve, (uv_curve, U))
     return OptDataSets(None, None, dsets=dsets, E=E)
 
-def make_base_curves_from_decomposition(decomposition, debug=False):
-    from molass_legacy.Baseline.LinearBaseline import LinearBaseline
+def make_basecurves_from_decomposition(decomposition, debug=False):
+    if debug:
+        import molass.Bridge.SdProxy
+        reload(molass.Bridge.SdProxy)
+        import molass.Bridge.LegacyBaselines
+        reload(molass.Bridge.LegacyBaselines)
+    from molass.Bridge.SdProxy import SdProxy
+    from molass.Bridge.LegacyBaselines import make_basecurves_from_sd
     ssd = decomposition.ssd
-    x, y = decomposition.xr_icurve.get_xy()
-    xr_baseline = DummyBasecurve(x)
-    uv_baseline = DummyBasecurve(x)
-    return (xr_baseline, uv_baseline)
+    sd = SdProxy(ssd)
+    baseline_type = 1
+    return make_basecurves_from_sd(sd, baseline_type, debug=debug)
 
 def construct_legacy_optimizer(dsets, base_curves, spectral_vectors, num_components=3, model="EGH", method="BH", debug=False):
     from molass_legacy.Optimizer.OptimizerUtils import get_function_code
@@ -45,6 +50,40 @@ def construct_legacy_optimizer(dsets, base_curves, spectral_vectors, num_compone
         wvector=spectral_vectors[1],
         )
     return optimizer
+
+def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
+    # XR initial parameters
+    xr_params = []
+    for ccurve in decomposition.xr_ccurves:
+        xr_params.append(ccurve.get_params())
+    xr_params = np.array(xr_params)
+    # XR baseline parameters
+    xr_baseparams = baseparams[1]
+
+    # Rg parameters
+    rg_params = decomposition.get_rgs()
+
+    # Mapping parameters
+    a, b = decomposition.ssd.get_mapping()
+
+    # UV initial parameters
+    uv_params = []
+    for uv_ccurve, xr_ccurve in zip(decomposition.uv_ccurves, decomposition.xr_ccurves):
+        uv_params.append(uv_ccurve.get_params()[0]/xr_ccurve.get_params()[0])
+
+    # UV baseline parameters
+    uv_baseparams = baseparams[0]
+
+    # SecCol parameters
+    x = decomposition.ssd.xr.get_icurve().x
+    init_mappable_range = (x[0], x[-1])
+
+    # SecCol parameters
+    from molass_legacy.SecTheory.SecEstimator import guess_initial_secparams
+    Npc, rp, tI, t0, P, m = guess_initial_secparams(xr_params, rg_params)
+    seccol_params = np.array([Npc, rp, tI, t0, P, m])
+
+    return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, uv_params, uv_baseparams, init_mappable_range, seccol_params])
 
 def make_rigorous_decomposition_impl(decomposition, rgcurve, method="BH", debug=False):
     """
