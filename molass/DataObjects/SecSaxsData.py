@@ -42,6 +42,7 @@ class SecSaxsData:
 
     def __init__(self, folder=None, object_list=None, uv_only=False, xr_only=False,
                  trimmed=False,
+                 trimming=None,
                  remove_bubbles=False,
                  beamline_info=None,
                  mapping=None,
@@ -141,6 +142,7 @@ class SecSaxsData:
         self.xr = xr_data
         self.uv = uv_data
         self.trimmed = trimmed
+        self.trimming = trimming
         self.mapping = mapping
         self.beamline_info = beamline_info
         if time_initialized is None:
@@ -304,7 +306,7 @@ class SecSaxsData:
             trim = self.make_trimming(**kwargs)
         return plot_trimming_impl(self, trim, baseline=baseline, title=title, **kwargs)
 
-    def copy(self, xr_slices=None, uv_slices=None, trimmed=False, mapping=None, datafiles=None):
+    def copy(self, xr_slices=None, uv_slices=None, trimmed=False, trimming=None, mapping=None, datafiles=None):
         """ssd.copy(xr_slices=None, uv_slices=None)
         
         Returns a deep copy of this object.
@@ -346,7 +348,8 @@ class SecSaxsData:
         else:
             uv_data = self.uv.copy(slices=uv_slices)
             
-        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, beamline_info=self.beamline_info, mapping=mapping, 
+        return SecSaxsData(object_list=[xr_data, uv_data], trimmed=trimmed, trimming=trimming,
+                           beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
     def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
@@ -372,7 +375,9 @@ class SecSaxsData:
             trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
         else:
             assert jranges is None, "jranges must be None if trimming is specified."
-        result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices, trimmed=True, mapping=mapping,
+        result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
+                           trimmed=True, trimming=trimming,
+                           mapping=mapping,
                            datafiles=self.datafiles)
         result.time_required = time() - start_time
         result.time_required_total = self.time_required_total + result.time_required
@@ -453,7 +458,7 @@ class SecSaxsData:
             A deep copy of the SSD object with the baseline correction applied.
         """
         start_time = time()
-        ssd_copy = self.copy(trimmed=self.trimmed, datafiles=self.datafiles)
+        ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
         baseline = ssd_copy.xr.get_baseline2d(debug=debug)
         ssd_copy.xr.M -= baseline

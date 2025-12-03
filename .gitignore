@@ -29,3 +29,5 @@ htmlcov*
 # DENSS update temporary scripts
 **/temp-scripts/**
 **/previous-scripts/**
+
+temp_analysis/

@@ -7,4 +7,4 @@ def make_basecurves_from_sd(sd, baseline_type, debug=False):
     
     ret = get_curve_xy_impl(sd, baseline_type=baseline_type, return_details=True, debug=debug)
     details = ret[-1]
-    return details.baselines, details.baseline_params
+    return details.baseline_objects, details.baseline_params

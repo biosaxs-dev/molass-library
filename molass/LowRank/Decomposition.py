@@ -454,7 +454,7 @@ class Decomposition:
         from molass.Rigorous.RigorousImplement import make_rigorous_initparams_impl
         return make_rigorous_initparams_impl(self, baseparams, debug=debug)
 
-    def optimize_rigorously(self, rgcurve=None, debug=False):
+    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, niter=20, debug=False):
         """
         Perform a rigorous decomposition.
 
@@ -478,4 +478,4 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, niter=niter, debug=debug)
