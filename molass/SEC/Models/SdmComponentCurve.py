@@ -63,6 +63,8 @@ class SdmComponentCurve(ComponentCurve):
         scale : float
             The scaling factor.
         """
+        self.column = column
+        self.rg = rg
         N, T, me, mp, x0, tI, N0, poresize, timescale = column.get_params()
         self.x = x
         self.moment = None

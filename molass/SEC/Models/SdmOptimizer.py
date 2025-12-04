@@ -49,10 +49,12 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         rhov[rhov > 1] = 1.0  # limit rhov to 1.0
         scales_ = params[5+num_components:5+2*num_components]
         cy_list = []
+        x_ = x - tI_
+        t0 = x0_ - tI_
         for rho, scale in zip(rhov, scales_):
             ni = N_*(1 - rho)**me
             ti = T_*(1 - rho)**mp
-            cy = scale * dispersive_monopore_pdf(x - tI_, ni, ti, N0_, x0_ - tI_, timescale=timescale)
+            cy = scale * dispersive_monopore_pdf(x_, ni, ti, N0_, t0, timescale=timescale)
             cy_list.append(cy)
         if return_cy_list:
             return cy_list

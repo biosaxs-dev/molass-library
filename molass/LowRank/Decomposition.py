@@ -86,6 +86,7 @@ class Decomposition:
         self.paired_ranges = paired_ranges
 
         self.guinier_objects = None
+        self.model = xr_ccurves[0].model
 
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
         """
@@ -241,30 +242,6 @@ class Decomposition:
             ret_components.append(XrComponent(icurve_array, jcurve_array, ccurve))
 
         return ret_components
-
-    def get_guinier_objects(self):
-        """
-        Get the list of Guinier objects for the XR components.
-
-        Returns
-        -------
-        list of Guinier
-            The list of Guinier objects for each XR component.
-        """
-        xr_components = self.get_xr_components()
-        return [c.get_guinier_object() for c in xr_components]
-    
-    def get_rgs(self):
-        """
-        Get the list of Rg values for the XR components.
-
-        Returns
-        -------
-        list of float
-            The list of Rg values for each XR component.
-        """
-        xr_components = self.get_xr_components()
-        return [c.compute_rg() for c in xr_components]
 
     def get_uv_matrices(self, debug=False):
         """
@@ -448,13 +425,28 @@ class Decomposition:
         np.ndarray
             The initial parameters for rigorous optimization.
         """
-        if debug:
-            import molass.Rigorous.RigorousImplement
-            reload(molass.Rigorous.RigorousImplement)
-        from molass.Rigorous.RigorousImplement import make_rigorous_initparams_impl
-        return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        if self.model == 'egh':
+            if debug:
+                import molass.Rigorous.RigorousEghParams
+                reload(molass.Rigorous.RigorousEghParams)
+            from molass.Rigorous.RigorousEghParams import make_rigorous_initparams_impl
+            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        elif self.model == 'sdm':
+            if debug:
+                import molass.Rigorous.RigorousSdmParams
+                reload(molass.Rigorous.RigorousSdmParams)
+            from molass.Rigorous.RigorousSdmParams import make_rigorous_initparams_impl
+            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        elif self.model == 'edm':
+            if debug:
+                import molass.Rigorous.RigorousEdmParams
+                reload(molass.Rigorous.RigorousEdmParams)
+            from molass.Rigorous.RigorousEdmParams import make_rigorous_initparams_impl
+            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        else:
+            raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 
-    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, niter=20, debug=False):
+    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20, debug=False):
         """
         Perform a rigorous decomposition.
 
@@ -462,6 +454,12 @@ class Decomposition:
         ----------
         rgcurve : Curve
             The Rg curve to use for the decomposition.
+        analysis_folder : str, optional
+            The folder to save analysis results.
+        method : str, optional
+            The method to use for rigorous optimization. Default is 'BH'.
+        niter : int, optional
+            The number of iterations for the optimization. Default is 20.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -478,4 +476,4 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, niter=niter, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, debug=debug)
