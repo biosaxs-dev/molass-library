@@ -23,7 +23,7 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     # UV initial parameters
     uv_params = []
     for uv_ccurve in decomposition.uv_ccurves:
-        uv_params.append(uv_ccurve.get_params()[0])
+        uv_params.append(uv_ccurve.scale)
 
     # UV baseline parameters
     uv_baseparams = baseparams[0]
@@ -33,11 +33,5 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     init_mappable_range = (x[0], x[-1])
 
     # SecCol parameters
-    if debug:
-        import molass_legacy.SecTheory.SecEstimator
-        reload(molass_legacy.SecTheory.SecEstimator)
-    from molass_legacy.SecTheory.SecEstimator import guess_initial_secparams
-    Npc, rp, tI, t0, P, m = guess_initial_secparams(xr_params, rg_params, poresize=70)
-    seccol_params = np.array([Npc, rp, tI, t0, P, m])
-
-    return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, (a, b), uv_params, uv_baseparams, init_mappable_range, seccol_params])
+    Tz = np.average(xr_params[:,0])     # not used
+    return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, (a, b), uv_params, uv_baseparams, init_mappable_range, [Tz]])
