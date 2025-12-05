@@ -30,4 +30,4 @@ htmlcov*
 **/temp-scripts/**
 **/previous-scripts/**
 
-temp_analysis/
+temp_analysis*/
