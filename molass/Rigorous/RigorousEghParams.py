@@ -22,8 +22,9 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
 
     # UV initial parameters
     uv_params = []
-    for uv_ccurve in decomposition.uv_ccurves:
-        uv_params.append(uv_ccurve.get_params()[0])
+    for k, uv_ccurve in enumerate(decomposition.uv_ccurves):
+        xr_h = xr_params[k,0]
+        uv_params.append(uv_ccurve.get_params()[0] * xr_h)
 
     # UV baseline parameters
     uv_baseparams = baseparams[0]

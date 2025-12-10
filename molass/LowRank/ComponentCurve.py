@@ -32,16 +32,23 @@ class ComponentCurve:
         self.moment = None
         self.model = 'egh'  # default model
 
-    def get_y(self):
+    def get_y(self, x=None):
         """
         Returns the y-values of the component curve.
+
+        Parameters
+        ----------
+        x : array-like or None, optional
+            The x-values to compute the y-values for. If None, uses the object's x-values.
 
         Returns
         -------
         array-like
             The y-values of the component curve.    
         """
-        return egh(self.x, *self.params)
+        if x is None:
+            x = self.x  
+        return egh(x, *self.params)
 
     def get_xy(self):
         """

@@ -82,3 +82,19 @@ class UvComponentCurve(ComponentCurve):
             The x value at the peak top.
         """
         raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+    
+    def get_params(self):
+        """
+        Returns the parameters of the UV component curve.
+
+        Returns
+        -------
+        array-like
+            The parameters of the UV component curve.
+        """
+        xr_params = self.xr_ccurve.get_params()
+        a, b = self.mapping
+        return np.array([self.scale, 
+                         a * xr_params[1] + b,
+                         a * xr_params[2],
+                         a * xr_params[3]])

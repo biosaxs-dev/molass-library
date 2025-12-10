@@ -63,4 +63,4 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    return RunInfo(optimizer=optimizer, dsets=dsets, init_params=init_params)
+    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets, init_params=init_params)

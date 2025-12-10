@@ -27,7 +27,7 @@ def create_axes(fig, row_titles=["UV", "XR"]):
         axes.append(axis_row)
     return np.array(axes)
 
-def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
+def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=None, **kwargs):
     if title is not None:
         ax.set_title(title)
     ax.set_xlabel("Frames")
@@ -46,7 +46,6 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, **kwargs):
     ax.plot(x, ty, color='red', alpha=0.3, label="component total")
     ax.legend()
 
-    rgcurve = kwargs.get('rgcurve', None)
     colorbar = kwargs.get('colorbar', False)
     if rgcurve is None:
         axt = None
@@ -146,7 +145,8 @@ def plot_components_impl(decomposition, **kwargs):
     plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
 
     # XR Elution Curve
-    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, title="XR Elution Curves", ylabel="Scattering Intensity")
+    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
+                             title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges
     pairedranges = kwargs.get('pairedranges', None)
