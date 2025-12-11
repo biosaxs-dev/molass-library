@@ -12,7 +12,7 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-  "molass_legacy>=0.4.0",
+  "molass_legacy>=0.4.3",
   "statsmodels",
   "scikit-learn",
   "toml",

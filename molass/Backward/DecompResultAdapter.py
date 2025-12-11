@@ -62,7 +62,7 @@ def adapted_decomp_result(decomposition, ssd, mapped_curve, debug=False):
 
     uv_peaks = []
     for comp in decomposition.get_uv_components():
-        uv_params = comp.ccurve.get_params()
+        uv_params = comp.ccurve.get_inv_mapped_params()
         uv_peaks.append(uv_params)
 
     # uv_scale = max_y_uv/max_y

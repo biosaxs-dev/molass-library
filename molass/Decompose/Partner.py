@@ -26,6 +26,11 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
         The guessed initial parameters for the egh function: (height, mean, std, tau).
     """
     from molass.SEC.Models.Simple import egh
+    if debug:
+        print("Decompose.Partner.decompose_from_partner: reload modules for debug")
+        from importlib import reload
+        import molass.SEC.Models.UvComponentCurve
+        reload(molass.SEC.Models.UvComponentCurve)
     from molass.SEC.Models.UvComponentCurve import UvComponentCurve
     from molass.Mapping.Mapping import Mapping
 
