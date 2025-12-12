@@ -31,3 +31,7 @@ htmlcov*
 **/previous-scripts/**
 
 temp_analysis*/
+
+*.png
+
+*.pdf
