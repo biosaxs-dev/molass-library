@@ -25,7 +25,7 @@ dependencies = [
   "mrcfile",
 ]
 
-requires-python = ">=3.9,<3.14"
+requires-python = ">=3.12,<3.14"
 
 authors = [
   {name = "Molass Community"},
