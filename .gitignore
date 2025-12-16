@@ -13,18 +13,10 @@ dist/
 docs/_build/
 docs/source/**
 
-<<<<<<< HEAD
-docs/source/**
-
-# Ignore pytest related files
-.pytest_cache/
-.coverage
-htmlcov
-=======
 # Ignore pytest related files
 .pytest_cache/
 .coverage*
-htmlcov/
+htmlcov*
 
 # Ignore the run_denss results
 **/temp/**
@@ -33,11 +25,14 @@ htmlcov/
 
 **/atsas-results/**
 **/report_folder/**
-<<<<<<< HEAD
->>>>>>> master
-=======
 
 # DENSS update temporary scripts
 **/temp-scripts/**
 **/previous-scripts/**
->>>>>>> master
+
+temp_analysis*/
+
+*.png
+
+*.pdf
+*.txt

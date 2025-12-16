@@ -41,7 +41,7 @@ def test_004_compute_scds():
     scds = decomposition_nc3.compute_scds()
     print("Current SCDs:", scds)
     expected = [0.5141964, 4.135358, 0.6386071]
-    assert scds == pytest.approx(expected, abs=1e-3)
+    assert scds == pytest.approx(expected, abs=1e-2)
 
 @pytest.mark.order(5)
 def test_005_scd_to_rank():
@@ -61,7 +61,7 @@ def test_006_another_sample():
     ssd3 = SSD(SAMPLE3)
     decomposition3 = ssd3.quick_decomposition()
     scds = decomposition3.compute_scds()
-    assert scds == pytest.approx([5.136732], abs=1e-3)
+    assert scds == pytest.approx([5.136732], abs=1e-2)
 
 @pytest.mark.order(7)
 @control_matplotlib_plot

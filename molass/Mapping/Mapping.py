@@ -11,3 +11,7 @@ class Mapping:
     
     def inv(self, y):
         return (y - self.b) / self.a
+
+    def __iter__(self):
+        """Allow unpacking of Mapping to (a, b)."""
+        return iter((self.a, self.b))

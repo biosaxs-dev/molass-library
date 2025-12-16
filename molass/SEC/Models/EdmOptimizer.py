@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from molass_legacy.Models.RateTheory.EDM import edm_impl
-from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf, DEFUALT_TIMESCALE
 
 def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
     """ Optimize the EDM decomposition.

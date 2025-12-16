@@ -24,7 +24,7 @@ class TrimmingInfo:
     mapping : MappingInfo or None
         The mapping information between XR and UV data.
     """
-    def __init__(self, xr_slices=None, uv_slices=None, mapping=None):
+    def __init__(self, xr_slices=None, uv_slices=None, mapping=None, legacy_info=None):
         """
         Initializes the TrimmingInfo object with the given parameters.
         
@@ -43,8 +43,9 @@ class TrimmingInfo:
         self.xr_slices = xr_slices
         self.uv_slices = uv_slices
         self.mapping = mapping
+        self.legacy_info = legacy_info
 
-    def copy(self, xr_slices=None, uv_slices=None, mapping=None):
+    def copy(self, xr_slices=None, uv_slices=None, mapping=None, legacy_info=None):
         """
         Returns a new TrimmingInfo object with specified xr_slices, uv_slices, and mapping.
         If any of the parameters are None, it uses the current object's attributes.
@@ -55,7 +56,9 @@ class TrimmingInfo:
             uv_slices = self.uv_slices
         if mapping is None:
             mapping = self.mapping
-        return TrimmingInfo(xr_slices=xr_slices, uv_slices=uv_slices, mapping=mapping)
+        if legacy_info is None:
+            legacy_info = self.legacy_info
+        return TrimmingInfo(xr_slices=xr_slices, uv_slices=uv_slices, mapping=mapping, legacy_info=legacy_info)
 
     def get_trimmed_mapping(self, xr_slices=None, uv_slices=None):
         """
@@ -102,3 +105,10 @@ class TrimmingInfo:
     
     def __str__(self):
         return self.__repr__()
+    
+    def update_legacy_settings(self):
+        """Export the TrimmingInfo to legacy settings."""
+        from molass_legacy._MOLASS.SerialSettings import set_setting
+        assert self.legacy_info is not None, "No legacy_info available to update legacy settings."
+        set_setting('xr_restrict_list', self.legacy_info['xr_restrict_list'])
+        set_setting('uv_restrict_list', self.legacy_info['uv_restrict_list'])

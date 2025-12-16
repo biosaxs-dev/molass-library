@@ -1,24 +1,13 @@
 #!/usr/bin/env python
 #
 #    core.py
-#    SAXStats
 #    A collection of python functions useful for solution scattering
 #
 #    Tested using Anaconda / Python 2.7, 3.7
 #
 #    Author: Thomas D. Grant
 #    Email:  <tdgrant@buffalo.edu>
-#    Alt Email:  <tgrant@hwi.buffalo.edu>
 #    Copyright 2017 - Present The Research Foundation for SUNY
-#
-#    Additional authors:
-#    Nhan D. Nguyen
-#    Jesse Hopkins
-#    Andrew Bruno
-#    Esther Gallmeier
-#    Sarah Chamberlain
-#    Stephen Moore
-#    Jitendra Singh
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -512,403 +501,252 @@ def running_mean(x, N):
     return np.convolve(x, np.ones(N) / N, mode='same')
 
 
-def loadOutFile(filename):
-    """Loads a GNOM .out file and returns q, Ireg, sqrt(Ireg), and a
-    dictionary of miscellaneous results from GNOM. Taken from the BioXTAS
-    RAW software package, used with permission under the GPL license."""
+def _locate_data_offset(file_lines):
+    """Finds the first non-comment, non-empty line."""
+    header_line_count = 0
+    for idx, current_line in enumerate(file_lines):
+        clean_line = current_line.strip()
+        if clean_line.startswith('#') or not clean_line:
+            header_line_count = idx + 1
+        else:
+            # This is the first data line
+            break
+    return header_line_count
 
-    five_col_fit = re.compile(
-        r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s*$')
-    three_col_fit = re.compile(r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s*$')
-    two_col_fit = re.compile(r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s*$')
 
-    results_fit = re.compile(
-        r'\s*Current\s+\d*[.]\d*[+eE-]*\d*\s+\d*[.]\d*[+eE-]*\d*\s+\d*[.]\d*[+eE-]*\d*\s+\d*[.]\d*[+eE-]*\d*\s+\d*[.]\d*[+eE-]*\d*\s+\d*[.]\d*[+eE-]*\d*\s*\d*[.]?\d*[+eE-]*\d*\s*$')
+def _parse_denss_header(header_lines):
+    """Parses DENSS '# key = value' or '# key : value' headers simply."""
+    results_dict = {}
+    for line in header_lines:
+        if not line.startswith('#'):
+            continue
 
-    te_fit = re.compile(r'\s*Total\s+[Ee]stimate\s*:\s+\d*[.]\d+\s*\(?[A-Za-z\s]+\)?\s*$')
-    te_num_fit = re.compile(r'\d*[.]\d+')
-    te_quality_fit = re.compile(r'[Aa][A-Za-z\s]+\)?\s*$')
+        clean_line = line.lstrip('# ').strip()
 
-    p_rg_fit = re.compile(r'\s*Real\s+space\s*\:?\s*Rg\:?\s*\=?\s*\d*[.]\d+[+eE-]*\d*\s*\+-\s*\d*[.]\d+[+eE-]*\d*')
-    q_rg_fit = re.compile(r'\s*Reciprocal\s+space\s*\:?\s*Rg\:?\s*\=?\s*\d*[.]\d+[+eE-]*\d*\s*')
+        separator = None
+        if '=' in clean_line:
+            separator = '='
+        elif ':' in clean_line:
+            separator = ':'
 
-    p_i0_fit = re.compile(
-        r'\s*Real\s+space\s*\:?[A-Za-z0-9\s\.,+-=]*\(0\)\:?\s*\=?\s*\d*[.]\d+[+eE-]*\d*\s*\+-\s*\d*[.]\d+[+eE-]*\d*')
-    q_i0_fit = re.compile(r'\s*Reciprocal\s+space\s*\:?[A-Za-z0-9\s\.,+-=]*\(0\)\:?\s*\=?\s*\d*[.]\d+[+eE-]*\d*\s*')
+        if separator:
+            # Split only on the first separator found
+            parts = clean_line.split(separator, 1)
+            if len(parts) == 2:
+                key = parts[0].strip()
 
-    qfull = []
-    qshort = []
-    Jexp = []
-    Jerr = []
-    Jreg = []
-    Ireg = []
+                # Split the value part and check if it's non-empty
+                value_tokens = parts[1].strip().split()
 
-    R = []
-    P = []
-    Perr = []
+                if value_tokens:  # Only proceed if we have a value
+                    try:
+                        # Take the first token (e.g., "1.35000e+02" from "1.35000e+02 +- ...")
+                        value = float(value_tokens[0])
+                        results_dict[key] = value
+                    except (ValueError, IndexError):
+                        # Not a float, skip it
+                        pass
 
-    outfile = []
-
-    # In case it returns NaN for either value, and they don't get picked up in the regular expression
-    q_rg = None  # Reciprocal space Rg
-    q_i0 = None  # Reciprocal space I0
-
-    with open(filename, errors='ignore') as f:
-        for line in f:
-            twocol_match = two_col_fit.match(line)
-            threecol_match = three_col_fit.match(line)
-            fivecol_match = five_col_fit.match(line)
-            results_match = results_fit.match(line)
-            te_match = te_fit.match(line)
-            p_rg_match = p_rg_fit.match(line)
-            q_rg_match = q_rg_fit.match(line)
-            p_i0_match = p_i0_fit.match(line)
-            q_i0_match = q_i0_fit.match(line)
-
-            outfile.append(line)
-
-            if twocol_match:
-                # print line
-                found = twocol_match.group().split()
-
-                qfull.append(float(found[0]))
-                Ireg.append(float(found[1]))
-
-            elif threecol_match:
-                # print line
-                found = threecol_match.group().split()
-
-                R.append(float(found[0]))
-                P.append(float(found[1]))
-                Perr.append(float(found[2]))
-
-            elif fivecol_match:
-                # print line
-                found = fivecol_match.group().split()
-
-                qfull.append(float(found[0]))
-                qshort.append(float(found[0]))
-                Jexp.append(float(found[1]))
-                Jerr.append(float(found[2]))
-                Jreg.append(float(found[3]))
-                Ireg.append(float(found[4]))
-
-            elif results_match:
-                found = results_match.group().split()
-                Actual_DISCRP = float(found[1])
-                Actual_OSCILL = float(found[2])
-                Actual_STABIL = float(found[3])
-                Actual_SYSDEV = float(found[4])
-                Actual_POSITV = float(found[5])
-                Actual_VALCEN = float(found[6])
-
-                if len(found) == 8:
-                    Actual_SMOOTH = float(found[7])
-                else:
-                    Actual_SMOOTH = -1
-
-            elif te_match:
-                te_num_search = te_num_fit.search(line)
-                te_quality_search = te_quality_fit.search(line)
-
-                TE_out = float(te_num_search.group().strip())
-                quality = te_quality_search.group().strip().rstrip(')').strip()
-
-            if p_rg_match:
-                found = p_rg_match.group().split()
-                try:
-                    rg = float(found[-3])
-                except:
-                    rg = float(found[-2])
-                try:
-                    rger = float(found[-1])
-                except:
-                    rger = float(found[-1].strip('+-'))
-
-            elif q_rg_match:
-                found = q_rg_match.group().split()
-                q_rg = float(found[-1])
-
-            if p_i0_match:
-                found = p_i0_match.group().split()
-                i0 = float(found[-3])
-                i0er = float(found[-1])
-
-            elif q_i0_match:
-                found = q_i0_match.group().split()
-                q_i0 = float(found[-1])
-
-    name = os.path.basename(filename)
-
-    chisq = np.sum(np.square(np.array(Jexp) - np.array(Jreg)) / np.square(Jerr)) / (
-            len(Jexp) - 1)  # DOF normalied chi squared
-
-    results = {'dmax': R[-1],  # Dmax
-               'TE': TE_out,  # Total estimate
-               'rg': rg,  # Real space Rg
-               'rger': rger,  # Real space rg error
-               'i0': i0,  # Real space I0
-               'i0er': i0er,  # Real space I0 error
-               'q_rg': q_rg,  # Reciprocal space Rg
-               'q_i0': q_i0,  # Reciprocal space I0
-               'quality': quality,  # Quality of GNOM out file
-               'discrp': Actual_DISCRP,
-               # DISCRIP, kind of chi squared (normalized by number of points, with a regularization parameter thing thrown in)
-               'oscil': Actual_OSCILL,  # Oscillation of solution
-               'stabil': Actual_STABIL,  # Stability of solution
-               'sysdev': Actual_SYSDEV,  # Systematic deviation of solution
-               'positv': Actual_POSITV,  # Relative norm of the positive part of P(r)
-               'valcen': Actual_VALCEN,  # Validity of the chosen interval in real space
-               'smooth': Actual_SMOOTH,
-               # Smoothness of the chosen interval? -1 indicates no real value, for versions of GNOM < 5.0 (ATSAS <2.8)
-               'filename': name,  # GNOM filename
-               'algorithm': 'GNOM',  # Lets us know what algorithm was used to find the IFT
-               'chisq': chisq  # Actual chi squared value
-               }
-
-    # Jreg and Jerr are the raw data on the qfull axis
-    Jerr = np.array(Jerr)
-    prepend = np.zeros((len(Ireg) - len(Jerr)))
-    prepend += np.mean(Jerr[:10])
-    Jerr = np.concatenate((prepend, Jerr))
-    Jreg = np.array(Jreg)
-    Jreg = np.concatenate((prepend * 0, Jreg))
-    Jexp = np.array(Jexp)
-    Jexp = np.concatenate((prepend * 0, Jexp))
-
-    return np.array(qfull), Jexp, Jerr, np.array(Ireg), results
+    return results_dict
 
 
 def loadDatFile(filename):
-    ''' Loads a Primus .dat format file. Taken from the BioXTAS RAW software package,
-    used with permission under the GPL license.'''
+    """
+    Loads a 3-column (q, I, err) or 4-column FoXS (q, I, I_model, err) .dat file.
+    """
+    q_list, i_list, err_list, model_list = [], [], [], []
+    results_dict = {}
+    is_foxs_format = False
 
-    iq_pattern = re.compile(r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s*')
+    with open(filename, 'r', errors='ignore') as f:
+        all_lines = f.readlines()
 
-    i = []
-    q = []
-    err = []
+    # Check for FoXS fit in comments (FoXS files contain 'model_intensity')
+    for current_line in all_lines[:10]:  # Check first 10 lines
+        if current_line.startswith('#') and 'model_intensity' in current_line:
+            is_foxs_format = True
+            break
 
-    with open(filename, errors='ignore') as f:
-        lines = f.readlines()
+    data_offset = _locate_data_offset(all_lines)
 
-    comment = ''
-    line = lines[0]
-    j = 0
-    while line.split() and line.split()[0].strip()[0] == '#':
-        comment = comment + line
-        j = j + 1
-        line = lines[j]
-
-    fileHeader = {'comment': comment}
-    parameters = {'filename': os.path.split(filename)[1],
-                  'counters': fileHeader}
-
-    if comment.find('model_intensity') > -1:
-        # FoXS file with a fit! has four data columns
-        is_foxs_fit = True
-        imodel = []
-    else:
-        is_foxs_fit = False
-
-    for line in lines:
-        iq_match = iq_pattern.match(line)
-
-        if iq_match:
-            if not is_foxs_fit:
-                found = iq_match.group().split()
-                q.append(float(found[0]))
-                i.append(float(found[1]))
-                err.append(float(found[2]))
-            else:
-                found = line.split()
-                q.append(float(found[0]))
-                i.append(float(found[1]))
-                imodel.append(float(found[2]))
-                err.append(float(found[3]))
-
-    i = np.array(i)
-    q = np.array(q)
-    err = np.array(err)
-
-    if is_foxs_fit:
-        i = np.array(imodel)
-
-    # Check to see if there is any header from RAW, and if so get that.
-    header = []
-    for j in range(len(lines)):
-        if '### HEADER:' in lines[j]:
-            header = lines[j + 1:]
-
-    hdict = None
-    results = {}
-
-    if len(header) > 0:
-        hdr_str = ''
-        for each_line in header:
-            hdr_str = hdr_str + each_line
+    for current_line in all_lines[data_offset:]:
+        tokens = current_line.split()
         try:
-            hdict = dict(json.loads(hdr_str))
-        except Exception:
-            hdict = {}
+            if not is_foxs_format and len(tokens) >= 3:
+                q_list.append(float(tokens[0]))
+                i_list.append(float(tokens[1]))
+                err_list.append(float(tokens[2]))
+            elif is_foxs_format and len(tokens) >= 4:
+                q_list.append(float(tokens[0]))
+                i_list.append(float(tokens[1]))  # Experimental I
+                model_list.append(float(tokens[2]))  # Model I
+                err_list.append(float(tokens[3]))  # Experimental err
+        except (ValueError, IndexError):
+            # Skip lines that are not valid data
+            continue
 
-    if hdict:
-        for each in hdict.keys():
-            if each != 'filename':
-                results[each] = hdict[each]
+    q = np.array(q_list)
+    err = np.array(err_list)
 
-    if 'analysis' in results:
-        if 'GNOM' in results['analysis']:
-            results = results['analysis']['GNOM']
+    # If FoXS, return the model. Otherwise, return the data.
+    if is_foxs_format:
+        i = np.array(model_list)
+    else:
+        i = np.array(i_list)
 
-    return q, i, err, i, results
+    return q, i, err, i, results_dict
 
 
 def loadFitFile(filename):
-    ''' Loads a four column .fit format file (q, I, err, fit). Taken from the BioXTAS RAW software package,
-    used with permission under the GPL license.'''
+    """
+    Loads a 4-column (q, I, err, fit) .fit file and its DENSS header.
+    """
+    q_list, i_list, err_list, fit_list = [], [], [], []
 
-    iq_pattern = re.compile(r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s*')
+    with open(filename, 'r', errors='ignore') as f:
+        all_lines = f.readlines()
 
-    i = []
-    q = []
-    err = []
+    data_offset = _locate_data_offset(all_lines)
+    header_lines = all_lines[:data_offset]
+    data_lines = all_lines[data_offset:]
 
-    with open(filename, errors='ignore') as f:
-        lines = f.readlines()
+    # Parse the header for Dmax and other keys
+    results = _parse_denss_header(header_lines)
 
-    comment = ''
-    line = lines[0]
-    j = 0
-    while line.split() and line.split()[0].strip()[0] == '#':
-        comment = comment + line
-        j = j + 1
-        line = lines[j]
-
-    fileHeader = {'comment': comment}
-    parameters = {'filename': os.path.split(filename)[1],
-                  'counters': fileHeader}
-
-    imodel = []
-
-    for line in lines:
-        iq_match = iq_pattern.match(line)
-
-        if iq_match:
-            found = line.split()
-            q.append(float(found[0]))
-            i.append(float(found[1]))
-            err.append(float(found[2]))
-            imodel.append(float(found[3]))
-
-    i = np.array(i)
-    q = np.array(q)
-    err = np.array(err)
-    ifit = np.array(imodel)
-
-    # grab some header info if available
-    header = []
-    for j in range(len(lines)):
-        # If this is a _fit.dat or .fit file from DENSS, grab the header values beginning with hashtag #.
-        if '# Parameter Values:' in lines[j]:
-            header = lines[j + 1:j + 9]
-
-    hdict = None
-    results = {}
-
-    if len(header) > 0:
-        hdr_str = '{'
-        for each_line in header:
-            line = each_line.split()
-            hdr_str = hdr_str + "\"" + line[1] + "\"" + ":" + line[3] + ","
-        hdr_str = hdr_str.rstrip(',') + "}"
-        hdr_str = re.sub(r'\bnan\b', 'NaN', hdr_str)
+    for current_line in data_lines:
+        tokens = current_line.split()
         try:
-            hdict = dict(json.loads(hdr_str))
-        except Exception:
-            hdict = {}
+            if len(tokens) >= 4:
+                q_list.append(float(tokens[0]))
+                i_list.append(float(tokens[1]))
+                err_list.append(float(tokens[2]))
+                fit_list.append(float(tokens[3]))
+        except (ValueError, IndexError):
+            continue
 
-    if hdict:
-        for each in hdict.keys():
-            if each != 'filename':
-                results[each] = hdict[each]
-
-    if 'analysis' in results:
-        if 'GNOM' in results['analysis']:
-            results = results['analysis']['GNOM']
+    # Final arrays for return
+    q = np.array(q_list)
+    i = np.array(i_list)
+    err = np.array(err_list)
+    ifit = np.array(fit_list)
 
     return q, i, err, ifit, results
 
 
 def loadOldFitFile(filename):
-    ''' Loads a old denss _fit.dat format file. Taken from the BioXTAS RAW software package,
-    used with permission under the GPL license.'''
+    """
+    Loads a 3-column (q, I, err) old _fit.dat file and its DENSS header.
+    """
+    q_list, i_list, err_list = [], [], []
 
-    iq_pattern = re.compile(r'\s*\d*[.]\d*[+eE-]*\d+\s+-?\d*[.]\d*[+eE-]*\d+\s+\d*[.]\d*[+eE-]*\d+\s*')
+    with open(filename, 'r', errors='ignore') as f:
+        all_lines = f.readlines()
 
-    i = []
-    q = []
-    err = []
+    data_offset = _locate_data_offset(all_lines)
+    header_lines = all_lines[:data_offset]
+    data_lines = all_lines[data_offset:]
 
-    with open(filename, errors='ignore') as f:
-        lines = f.readlines()
+    # Parse the header for Dmax and other keys
+    results = _parse_denss_header(header_lines)
 
-    comment = ''
-    line = lines[0]
-    j = 0
-    while line.split() and line.split()[0].strip()[0] == '#':
-        comment = comment + line
-        j = j + 1
-        line = lines[j]
-
-    fileHeader = {'comment': comment}
-    parameters = {'filename': os.path.split(filename)[1],
-                  'counters': fileHeader}
-
-    for line in lines:
-        iq_match = iq_pattern.match(line)
-
-        if iq_match:
-            found = iq_match.group().split()
-            q.append(float(found[0]))
-            i.append(float(found[1]))
-            err.append(float(found[2]))
-
-    i = np.array(i)
-    q = np.array(q)
-    err = np.array(err)
-
-    # If this is a _fit.dat file from DENSS, grab the header values.
-    header = []
-    for j in range(len(lines)):
-        if '# Parameter Values:' in lines[j]:
-            header = lines[j + 1:j + 9]
-
-    hdict = None
-    results = {}
-
-    if len(header) > 0:
-        hdr_str = '{'
-        for each_line in header:
-            line = each_line.split()
-            hdr_str = hdr_str + "\"" + line[1] + "\"" + ":" + line[3] + ","
-        hdr_str = hdr_str.rstrip(',') + "}"
+    for current_line in data_lines:
+        tokens = current_line.split()
         try:
-            hdict = dict(json.loads(hdr_str))
-        except Exception:
-            hdict = {}
+            if len(tokens) >= 3:
+                q_list.append(float(tokens[0]))
+                i_list.append(float(tokens[1]))
+                err_list.append(float(tokens[2]))
+        except (ValueError, IndexError):
+            continue
 
-    if hdict:
-        for each in hdict.keys():
-            if each != 'filename':
-                results[each] = hdict[each]
+    # Final arrays for return
+    q = np.array(q_list)
+    i = np.array(i_list)
+    err = np.array(err_list)
 
-    if 'analysis' in results:
-        if 'GNOM' in results['analysis']:
-            results = results['analysis']['GNOM']
-
-    # just return i for ifit to be consistent with other functions' output
     return q, i, err, i, results
+
+
+def loadOutFile(filename):
+    """
+    Loads a GNOM .out file, focusing on data and Dmax.
+    """
+
+    q_col, exp_col, err_col, fit_col = [], [], [], []
+
+    # Initialize results dict with None defaults
+    results = {
+        'dmax': None, 'TE': None, 'rg': None, 'rger': None, 'i0': None,
+        'i0er': None, 'q_rg': None, 'q_i0': None, 'quality': None,
+        'discrp': None, 'oscil': None, 'stabil': None, 'sysdev': None,
+        'positv': None, 'valcen': None, 'smooth': -1.0,
+        'filename': os.path.basename(filename),
+        'algorithm': 'GNOM', 'chisq': None
+    }
+
+    parsing_scat_data = False
+
+    with open(filename, 'r', errors='ignore') as f:
+        for line_text in f:
+
+            # --- Find Dmax ---
+            # Look for Dmax in both GNOM 4 and 5 formats
+            if "Real space range" in line_text or "Maximum characteristic size" in line_text:
+                try:
+                    results['dmax'] = float(line_text.split()[-1])
+                except (ValueError, IndexError):
+                    pass  # Failed to parse
+
+            # --- Find Data Table Headers ---
+            #
+            # Check for all column names,
+            # which is robust to whitespace and works for both GNOM 4 and 5.
+            if (all(col_name in line_text for col_name in ["S", "J EXP", "ERROR", "J REG", "I REG"])):
+                parsing_scat_data = True
+                continue
+
+            #
+            # Stop parsing at the start of the next section
+            if "Distance distribution function" in line_text or "Real Space Data" in line_text:
+                parsing_scat_data = False
+                continue
+
+            # --- Parse Data Tables ---
+            if parsing_scat_data:
+                tokens = line_text.split()
+                try:
+                    # 5-column block (main data)
+                    if len(tokens) == 5:
+                        q_col.append(float(tokens[0]))
+                        exp_col.append(float(tokens[1]))
+                        err_col.append(float(tokens[2]))
+                        fit_col.append(float(tokens[4]))  # 'I REG' is the 5th col
+
+                    # 2-column block (extrapolated data in older GNOM files)
+                    elif len(tokens) == 2:
+                        q_col.append(float(tokens[0]))
+                        fit_col.append(float(tokens[1]))
+                except (ValueError, IndexError):
+                    continue
+
+    # --- Post-processing: Pad Jexp and Jerr ---
+    padding_length = len(fit_col) - len(err_col)
+
+    if padding_length > 0:
+        exp_padded = np.concatenate((np.zeros(padding_length), exp_col))
+        default_err = np.mean(err_col[:10]) if len(err_col) > 0 else 1.0
+        err_padded = np.concatenate((np.full(padding_length, default_err), err_col))
+    else:
+        exp_padded = np.array(exp_col)
+        err_padded = np.array(err_col)
+
+    # Return the 4 data arrays and the results dict
+    q = np.array(q_col)
+    Ireg = np.array(fit_col)
+    Jexp = exp_padded
+    Jerr = err_padded
+
+    return q, Jexp, Jerr, Ireg, results
 
 
 def loadProfile(fname, units="a"):
@@ -1074,10 +912,12 @@ def estimate_dmax(Iq, dmax=None, clean_up=True):
         # next, dmax is roughly 3.5*rg for most particles
         # so calculate P(r) using a larger dmax, say twice as large, so 7*rg
         D = 7 * rg
+        dmax_given = False
     else:
         # allow user to give an initial estimate of Dmax
         # multiply by 2 to allow for enough large r values
         D = 2 * dmax
+        dmax_given = True
     # create a calculated q range for Sasrec for low q out to q=0
     qmin = np.min(q)
     dq = (q.max() - q.min()) / (q.size - 1)
@@ -1089,13 +929,14 @@ def estimate_dmax(Iq, dmax=None, clean_up=True):
     # but the sasrec rg should be more accurate, even with a screwed up guinier estimate
     # so run it again, but this time with the Dmax = 7*sasrec.rg
     # only do this if rg is significantly different
-    if np.abs(sasrec.rg - rg) > 0.2 * sasrec.rg:
-        sasrec = Sasrec(Iq[:nq // 2], D=7 * sasrec.rg, qc=None, alpha=0.0, extrapolate=False)
+    if not dmax_given:  # rg only exists if Dmax was not given initially
+        if np.abs(sasrec.rg - rg) > 0.2 * sasrec.rg:
+            sasrec = Sasrec(Iq[:nq // 2], D=7 * sasrec.rg, qc=None, alpha=0.0, extrapolate=False)
     # lets test a bunch of different dmax's on a logarithmic spacing
     # then see where chi2 is minimal. that at least gives us a good ball park of Dmax
     # the main problem is that we don't know the scale even remotely, or the units,
     # so we need to check many orders of magnitude
-    Ds = np.logspace(.1, np.log10(2 * 7 * rg), 10)
+    Ds = np.logspace(.1, np.log10(2 * 7 * sasrec.rg), 10)
     chi2 = np.zeros(len(Ds))
     for i in range(len(Ds)):
         sasrec = Sasrec(Iq[:nq // 2], D=Ds[i], qc=None, alpha=0.0, extrapolate=False)
@@ -1959,9 +1800,12 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
                delimiter=" ", fmt="%s", header='Chi2 Rg SupportVolume')
 
     my_logger.info('Number of steps: %i', j)
-    my_logger.info('Final Chi2: %.3e', chi[-1])
-    my_logger.info('Final Rg: %s', np.round(rg[-1],3))
-    my_logger.info('Final Support Volume: %3.3f', supportV[-1])
+    my_logger.info('Final Chi2: %.3e', chi[final_step])
+    final_rg = rg[final_step]
+    if np.isclose(final_rg.imag, 0):
+        final_rg = final_rg.real
+    my_logger.info('Final Rg: %s', np.round(final_rg,3))
+    my_logger.info('Final Support Volume: %3.3f', supportV[final_step])
     my_logger.info('Mean Density (all voxels): %3.5f', np.mean(rho))
     my_logger.info('Std. Dev. of Density (all voxels): %3.5f', np.std(rho))
     my_logger.info('RMSD of Density (all voxels): %3.5f', np.sqrt(np.mean(np.square(rho))))
@@ -2170,11 +2014,15 @@ def euler_grid_search(refrho, movrho, topn=1, abort_event=None):
 
     for i in range(topn):
         T = [alpha[best_pt[0][i]], beta[best_pt[0][i]], gamma[best_pt[0][i]], 0, 0, 0]
-        movrhos[i] = transform_rho(movrho, T=T)
-        # now that the top five rotations are calculated, move each one back
-        # to the same center of mass as the original refrho, i.e. by -refrhoshift
-        # movrhos[i] = ndimage.interpolation.shift(movrhos[i],-refshift,order=3,mode='wrap')
-        movrhos[i] = np.roll(np.roll(np.roll(movrho, -refshift[0], axis=0), -refshift[1], axis=1), -refshift[2], axis=2)
+
+        # 1. Apply the rotation to the CENTERED map
+        rotated_movrhocen = transform_rho(movrhocen, T=T)
+
+        # 2. Define the shift to match the original reference map
+        shift = -refshift
+
+        # 3. Apply that shift to the ROTATED map and store it
+        movrhos[i] = np.roll(np.roll(np.roll(rotated_movrhocen, shift[0], axis=0), shift[1], axis=1), shift[2], axis=2)
 
         if abort_event is not None:
             if abort_event.is_set():
@@ -2191,7 +2039,7 @@ def largest_indices(a, n):
     return np.unravel_index(indices, a.shape)
 
 
-def coarse_then_fine_alignment(refrho, movrho, coarse=True, topn=1,
+def coarse_then_fine_alignment(refrho, movrho, coarse=True, topn=1, thorough=True,
                                abort_event=None):
     """Course alignment followed by fine alignment.
         Select the topn candidates from the grid search
@@ -2209,7 +2057,7 @@ def coarse_then_fine_alignment(refrho, movrho, coarse=True, topn=1,
             return None, None
 
     for i in range(movrhos.shape[0]):
-        movrhos[i], scores[i] = minimize_rho(refrho, movrhos[i])
+        movrhos[i], scores[i] = minimize_rho(refrho, movrhos[i], thorough=thorough)
 
         if abort_event is not None:
             if abort_event.is_set():
@@ -2222,11 +2070,13 @@ def coarse_then_fine_alignment(refrho, movrho, coarse=True, topn=1,
     return movrho, score
 
 
-def minimize_rho(refrho, movrho, T=np.zeros(6)):
+def minimize_rho(refrho, movrho, T=np.zeros(6), thorough=True, low_pass_filter=True):
     """Optimize superposition of electron density maps. Move movrho to refrho."""
     bounds = np.zeros(12).reshape(6, 2)
-    bounds[:3, 0] = -20 * np.pi
-    bounds[:3, 1] = 20 * np.pi
+    # Set bounds for +/- 10 degrees
+    angle_bound = np.deg2rad(10)
+    bounds[:3, 0] = -angle_bound
+    bounds[:3, 1] = angle_bound
     bounds[3:, 0] = -5
     bounds[3:, 1] = 5
     save_movrho = np.copy(movrho)
@@ -2238,18 +2088,35 @@ def minimize_rho(refrho, movrho, T=np.zeros(6)):
     movrho, movshift = center_rho_roll(movrho, return_shift=True)
 
     # for alignment only, run a low-pass filter to remove noise
-    sigma = 1.0
-    refrho2 = ndimage.gaussian_filter(refrho, sigma=sigma, mode='wrap')
-    movrho2 = ndimage.gaussian_filter(movrho, sigma=sigma, mode='wrap')
+    if low_pass_filter:
+        sigma = 1.0
+        refrho2 = ndimage.gaussian_filter(refrho, sigma=sigma, mode='wrap')
+        movrho2 = ndimage.gaussian_filter(movrho, sigma=sigma, mode='wrap')
+    else:
+        refrho2 = np.copy(refrho)
+        movrho2 = np.copy(movrho)
     n = refrho2.shape[0]
+
     # to speed it up crop out the solvent
     b, e = (int(n / 4), int(3 * n / 4))
     refrho3 = refrho2[b:e, b:e, b:e]
     movrho3 = movrho2[b:e, b:e, b:e]
-    result = optimize.fmin_l_bfgs_b(minimize_rho_score, T, factr=0.1,
-                                    maxiter=100, maxfun=200, epsilon=0.05,
-                                    args=(refrho3, movrho3), approx_grad=True)
-    Topt = result[0]
+
+    if thorough:
+        # 'Nelder-Mead' (gradient-free) is slower
+        # but better at navigating noisy landscapes.
+        result = optimize.minimize(minimize_rho_score, T,
+                                   method='Nelder-Mead',
+                                   args=(refrho3, movrho3))
+        Topt = result.x  # .x instead of [0]
+    else:
+        # Faster, gradient-based method
+        result = optimize.fmin_l_bfgs_b(minimize_rho_score, T, factr=1e7,
+                                        maxiter=100, maxfun=200, epsilon=0.05,
+                                        args=(refrho3, movrho3), approx_grad=True,
+                                        bounds=bounds)
+        Topt = result[0]
+
     newrho = transform_rho(movrho, Topt)
     rscc = real_space_correlation_coefficient(newrho, refrho)
     # now move newrho back by -refshift
@@ -2458,7 +2325,7 @@ def generate_enantiomers(rho):
     return enans
 
 
-def align(refrho, movrho, coarse=True, abort_event=None):
+def align(refrho, movrho, coarse=True, thorough=True, abort_event=None):
     """ Align second electron density map to the first."""
     if abort_event is not None:
         if abort_event.is_set():
@@ -2467,7 +2334,15 @@ def align(refrho, movrho, coarse=True, abort_event=None):
     try:
         sleep(1)
         ne_rho = np.sum((movrho))
-        movrho, score = coarse_then_fine_alignment(refrho=refrho, movrho=movrho, coarse=coarse, topn=1,
+        if thorough:
+            # for a thorough alignment, test several coarse alignments
+            # this doesn't seem to help much, and just slows it down a lot, so let's keep it to 1
+            topn = 1
+        else:
+            topn = 1
+
+        movrho, score = coarse_then_fine_alignment(refrho=refrho, movrho=movrho, coarse=coarse, topn=topn,
+                                                   thorough=thorough,
                                                    abort_event=abort_event)
 
         if movrho is not None:
@@ -2480,36 +2355,48 @@ def align(refrho, movrho, coarse=True, abort_event=None):
         pass
 
 
-def select_best_enantiomer(refrho, rho, abort_event=None):
-    """ Generate, align and select the enantiomer that best fits the reference map."""
-    # translate refrho to center in case not already centered
-    # just use roll to approximate translation to avoid interpolation, since
-    # fine adjustments and interpolation will happen during alignment step
+def select_best_enantiomer(refrho, rho, thorough=True, abort_event=None, return_aligned=False):
+    """
+    Generate, align and select the enantiomer that best fits the reference map.
 
+    By default (return_aligned=False), returns the UN-ALIGNED, centered
+    original or flipped map to preserve a single-interpolation pipeline.
+
+    If return_aligned=True, it will return the ALIGNED (interpolated) map.
+    """
     try:
         sleep(1)
+        # Center the reference map
         c_refrho = center_rho_roll(refrho)
-        # center rho in case it is not centered. use roll to get approximate location
-        # and avoid interpolation
+
+        # Center the map to be tested
         c_rho = center_rho_roll(rho)
-        # generate an array of the enantiomers
+
+        # Generate both hands (original_centered, flipped_centered)
         enans = generate_enantiomers(c_rho)
-        # allow for abort
+
         if abort_event is not None:
             if abort_event.is_set():
                 return None, None
 
-        # align each enantiomer and store the aligned maps and scores in results list
-        results = [align(c_refrho, enan, abort_event=abort_event) for enan in enans]
+        # Align both hands to the centered reference
+        # results = [ (aligned_original, score_original), (aligned_flipped, score_flipped) ]
+        results = [align(c_refrho, enan, thorough=thorough, abort_event=abort_event) for enan in enans]
 
-        # now select the best enantiomer
-        # rather than return the aligned and therefore interpolated enantiomer,
-        # instead just return the original enantiomer, flipped from the original map
-        # then no interpolation has taken place. So just dont overwrite enans essentially.
-        # enans = np.array([results[k][0] for k in range(len(results))])
+        # Find the index of the best-scoring hand
         enans_scores = np.array([results[k][1] for k in range(len(results))])
         best_i = np.argmax(enans_scores)
-        best_enan, best_score = enans[best_i], enans_scores[best_i]
+
+        # --- Keyword-based fix ---
+        if return_aligned:
+            # Return the ALIGNED (interpolated) map and its score
+            # Used by iterative_average for its internal loops
+            best_enan, best_score = results[best_i][0], results[best_i][1]
+        else:
+            # Return the UN-ALIGNED map (from the 'enans' list) and its score
+            # This is the default behavior, preserving the original map data
+            best_enan, best_score = enans[best_i], enans_scores[best_i]
+
         return best_enan, best_score
 
     except KeyboardInterrupt:
@@ -2517,8 +2404,8 @@ def select_best_enantiomer(refrho, rho, abort_event=None):
         pass
 
 
-def select_best_enantiomers(rhos, refrho=None, cores=1, avg_queue=None,
-                            abort_event=None, single_proc=False):
+def select_best_enantiomers(rhos, refrho=None, cores=1, thorough=True, avg_queue=None,
+                            abort_event=None, single_proc=False, return_aligned=False): # Added 'return_aligned'
     """ Select the best enantiomer from each map in the set (or a single map).
         refrho should not be binary averaged from the original
         denss maps, since that would likely lose handedness.
@@ -2532,7 +2419,8 @@ def select_best_enantiomers(rhos, refrho=None, cores=1, avg_queue=None,
     if not single_proc:
         pool = multiprocessing.Pool(cores)
         try:
-            mapfunc = partial(select_best_enantiomer, refrho)
+            # Pass the new 'return_aligned' keyword to the parallel function
+            mapfunc = partial(select_best_enantiomer, refrho, thorough=thorough, return_aligned=return_aligned)
             results = pool.map(mapfunc, rhos)
             pool.close()
             pool.join()
@@ -2543,7 +2431,8 @@ def select_best_enantiomers(rhos, refrho=None, cores=1, avg_queue=None,
             raise
 
     else:
-        results = [select_best_enantiomer(refrho=refrho, rho=rho, abort_event=abort_event) for rho in rhos]
+        # Pass the new 'return_aligned' keyword to the list comprehension
+        results = [select_best_enantiomer(refrho=refrho, rho=rho, thorough=thorough, abort_event=abort_event, return_aligned=return_aligned) for rho in rhos]
 
     best_enans = np.array([results[k][0] for k in range(len(results))])
     best_scores = np.array([results[k][1] for k in range(len(results))])
@@ -2551,7 +2440,7 @@ def select_best_enantiomers(rhos, refrho=None, cores=1, avg_queue=None,
     return best_enans, best_scores
 
 
-def align_multiple(refrho, rhos, cores=1, abort_event=None, single_proc=False):
+def align_multiple(refrho, rhos, cores=1, thorough=True, abort_event=None, single_proc=False):
     """ Align multiple (or a single) maps to the reference."""
     if rhos.ndim == 3:
         rhos = rhos[np.newaxis, ...]
@@ -2573,7 +2462,7 @@ def align_multiple(refrho, rhos, cores=1, abort_event=None, single_proc=False):
     if not single_proc:
         pool = multiprocessing.Pool(cores)
         try:
-            mapfunc = partial(align, refrho)
+            mapfunc = partial(align, refrho, thorough=thorough)
             results = pool.map(mapfunc, rhos)
             pool.close()
             pool.join()
@@ -2583,7 +2472,7 @@ def align_multiple(refrho, rhos, cores=1, abort_event=None, single_proc=False):
             sys.exit(1)
             raise
     else:
-        results = [align(refrho, rho, abort_event=abort_event) for rho in rhos]
+        results = [align(refrho, rho, thorough=thorough, abort_event=abort_event) for rho in rhos]
 
     rhos = np.array([results[i][0] for i in range(len(results))])
     scores = np.array([results[i][1] for i in range(len(results))])
@@ -2591,9 +2480,9 @@ def align_multiple(refrho, rhos, cores=1, abort_event=None, single_proc=False):
     return rhos, scores
 
 
-def average_two(rho1, rho2, abort_event=None):
+def average_two(rho1, rho2, thorough=True, abort_event=None):
     """ Align two electron density maps and return the average."""
-    rho2, score = align(rho1, rho2, abort_event=abort_event)
+    rho2, score = align(rho1, rho2, thorough=thorough, abort_event=abort_event)
     average_rho = (rho1 + rho2) / 2
     return average_rho
 
@@ -2602,16 +2491,16 @@ def multi_average_two(niter, **kwargs):
     """ Wrapper script for averaging two maps for multiprocessing."""
     try:
         sleep(1)
-        return average_two(kwargs['rho1'][niter], kwargs['rho2'][niter], abort_event=kwargs['abort_event'])
+        return average_two(kwargs['rho1'][niter], kwargs['rho2'][niter], thorough=kwargs['thorough'], abort_event=kwargs['abort_event'])
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
         pass
 
 
-def average_pairs(rhos, cores=1, abort_event=None, single_proc=False):
+def average_pairs(rhos, cores=1, thorough=True, abort_event=None, single_proc=False):
     """ Average pairs of electron density maps, second half to first half."""
     # create even/odd pairs, odds are the references
-    rho_args = {'rho1': rhos[::2], 'rho2': rhos[1::2], 'abort_event': abort_event}
+    rho_args = {'rho1': rhos[::2], 'rho2': rhos[1::2], 'thorough': thorough, 'abort_event': abort_event}
 
     if not single_proc:
         pool = multiprocessing.Pool(cores)
@@ -2632,7 +2521,7 @@ def average_pairs(rhos, cores=1, abort_event=None, single_proc=False):
     return np.array(average_rhos)
 
 
-def binary_average(rhos, cores=1, abort_event=None, single_proc=False):
+def binary_average(rhos, cores=1, thorough=True, abort_event=None, single_proc=False):
     """ Generate a reference electron density map using binary averaging."""
     twos = 2 ** np.arange(20)
     nmaps = np.max(twos[twos <= rhos.shape[0]])
@@ -2641,10 +2530,117 @@ def binary_average(rhos, cores=1, abort_event=None, single_proc=False):
     levels = int(np.log2(nmaps)) - 1
     rhos = rhos[:nmaps]
     for level in range(levels):
-        rhos = average_pairs(rhos, cores, abort_event=abort_event,
+        rhos = average_pairs(rhos, cores, thorough=thorough, abort_event=abort_event,
                              single_proc=single_proc)
     refrho = center_rho_roll(rhos[0])
     return refrho
+
+
+def iterative_average(rhos, cycles=5, cores=1, thorough=True, abort_event=None, single_proc=False, my_logger=None,
+                      enan=False, refrho_start=None):
+    """
+    Generate a reference map using iterative alignment and averaging.
+
+    This is an unbiased method where all maps are aligned to a common
+    reference, which is then re-calculated by averaging all aligned maps.
+    This process is repeated for a number of cycles.
+
+    Args:
+        rhos (np.ndarray): The stack of N maps (N, x, y, z) to be averaged.
+        cycles (int): The number of refinement cycles to perform.
+        cores (int): Number of cores for multiprocessing.
+        thorough (bool): Flag for thorough alignment (passed to align_multiple).
+        abort_event (multiprocessing.Event): Event to abort processing.
+        single_proc (bool): Flag to force single-process execution.
+        my_logger (logging.Logger): Optional logger for status updates.
+        enan (bool): If True, perform enantiomer selection (select_best_enantiomers)
+                     in each cycle. If False (default), just perform
+                     alignment (align_multiple).
+        refrho_start (np.ndarray): Optional starting reference map. If None,
+                                   the first map in rhos is used.
+    """
+    def log_info(message):
+        """Helper to print or log information."""
+        if my_logger:
+            my_logger.info(message)
+        else:
+            print(message)
+
+    if rhos.shape[0] < 2:
+        log_info("Only one map found. Returning centered map.")
+        # Return all three values for consistent output
+        return center_rho_roll(rhos[0]), rhos, np.array([1.0])
+
+    # Make a pristine copy of the original maps to align from at each step
+    original_rhos = np.copy(rhos)
+    num_maps = original_rhos.shape[0]
+
+    # Select an Initial Reference (Ref 0)
+    if refrho_start is not None:
+        current_reference = center_rho_roll(refrho_start)
+        log_info(f"Starting iterative averaging with {num_maps} maps for {cycles} cycles (using provided reference).")
+    else:
+        current_reference = center_rho_roll(original_rhos[0])
+        log_info(f"Starting iterative averaging with {num_maps} maps for {cycles} cycles (using map 0 as initial ref).")
+
+    # Define these variables *before* the loop
+    # so we can access the final set after the loop finishes.
+    aligned_maps = None
+    scores = None
+
+    # Start the Iteration Loop
+    for cycle in range(cycles):
+        log_info(f"--- Iteration Cycle {cycle + 1} / {cycles} ---")
+
+        if abort_event is not None and abort_event.is_set():
+            log_info("Abort event detected. Stopping averaging.")
+            return None, None, None
+
+        # Align all N *original* maps to the *current* reference
+        # This block calls one of two parallel-processing functions
+        # based on whether enantiomer selection is requested.
+
+        if enan:
+            log_info("Selecting best enantiomers against current reference...")
+            # This function aligns each map AND its flip, keeping the best
+            # We set return_aligned=True so we get ALIGNED maps to average.
+            # This interpolation is OK, as it only affects the *next* reference.
+            aligned_maps, scores = select_best_enantiomers(
+                rhos=np.copy(original_rhos),  # Always align the originals
+                refrho=current_reference,
+                cores=cores,
+                thorough=thorough,
+                abort_event=abort_event,
+                single_proc=single_proc,
+                return_aligned=True  # <-- Get ALIGNED maps for internal averaging
+            )
+        else:
+            log_info("Aligning maps to current reference...")
+            # This function aligns all maps to the reference
+            aligned_maps, scores = align_multiple(
+                current_reference,
+                np.copy(original_rhos),  # Always align the originals
+                cores=cores,
+                thorough=thorough,
+                abort_event=abort_event,
+                single_proc=single_proc
+            )
+
+        if aligned_maps is None:
+            log_info("Alignment was aborted.")
+            return None, None, None
+
+        # Average all N aligned maps to create the *next* reference
+        next_reference = np.mean(aligned_maps, axis=0)
+
+        # Center the new reference to prevent translational drift
+        current_reference = center_rho_roll(next_reference)
+
+    log_info("Iterative averaging complete.")
+
+    # Return the final converged reference, AND the last set of
+    # aligned maps and scores that created it.
+    return current_reference, aligned_maps, scores
 
 
 def calc_fsc(rho1, rho2, side):
@@ -2843,20 +2839,21 @@ class Sasrec(object):
         self.Ierr = np.hstack((self.Ierr, Ierre))
         self.qc = np.hstack((self.qc, qce))
 
-    def optimize_alpha(self):
+    def optimize_alpha(self, quiet=False):
         """Scan alpha values to find optimal alpha"""
         ideal_chi2 = self.calc_chi2()
         al = []
         chi2 = []
-        # here, alphas are actually the exponents, since the range can
-        # vary from 10^-20 upwards of 10^20. This should cover nearly all likely values
-        alphas = np.arange(-30, 30., 2)
+        #here, alphas are actually the exponents, since the range can
+        #vary from 10^-20 upwards of 10^20. This should cover nearly all likely values
+        alphas = np.arange(-30,30.,2)
         i = 0
         nalphas = len(alphas)
         for alpha in alphas:
             i += 1
-            sys.stdout.write("\rScanning alphas... {:.0%} complete".format(i * 1. / nalphas))
-            sys.stdout.flush()
+            if not quiet:
+                sys.stdout.write("\rScanning alphas... {:.0%} complete".format(i*1./nalphas))
+                sys.stdout.flush()
             try:
                 self.alpha = 10. ** alpha
                 # self.update()
@@ -3654,7 +3651,7 @@ class PDB(object):
             # also correct for limited voxel size
             self.unique_volume[i] = minigrid.sum() * dV * correction
 
-    def lookup_unique_volume(self):
+    def lookup_unique_volume(self, quiet=False):
         self.unique_volume = np.zeros(self.natoms)
         for i in range(self.natoms):
             notfound = False
@@ -3666,8 +3663,9 @@ class PDB(object):
             else:
                 notfound = True
             if notfound:
-                print("%s:%s not found in volumes dictionary. Calculating unique volume." % (
-                self.resname[i], self.atomname[i]))
+                if not quiet:
+                    print("%s:%s not found in volumes dictionary. Calculating unique volume." % (
+                    self.resname[i], self.atomname[i]))
                 # print("Setting volume to ALA:CA.")
                 # self.unique_volume[i] = atomic_volumes['ALA']['CA']
                 self.calculate_unique_volume(atomidx=[i])
