@@ -174,7 +174,18 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
         print("uv_islice:", uv_islice)
         print("uv_jslice:", uv_jslice)
 
-    return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping)
+    from molass_legacy.Trimming.TrimmingInfo import TrimmingInfo as LegacyTrimmingInfo
+    def to_legacy(slice_, size):
+        start = 0 if slice_ is None else 0 if slice_.start is None else slice_.start
+        stop = size if slice_ is None else size if slice_.stop is None else slice_.stop
+        return LegacyTrimmingInfo(1, start, stop, size)
+
+    legacy_info = {
+        "xr_restrict_list": [to_legacy(xr_jslice, len(ssd.xr.jv)), to_legacy(xr_islice, len(ssd.xr.iv))],
+        "uv_restrict_list": [to_legacy(uv_jslice, len(ssd.uv.jv)), to_legacy(uv_islice, len(ssd.uv.iv))],
+    }
+
+    return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping, legacy_info=legacy_info)
 
 def slice_to_values(vec, slice_):
     """ Convert a slice to its start and stop values in the given vector. 

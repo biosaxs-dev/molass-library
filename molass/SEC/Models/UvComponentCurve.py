@@ -82,3 +82,27 @@ class UvComponentCurve(ComponentCurve):
             The x value at the peak top.
         """
         raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+
+    def get_scale(self):
+        """
+        Returns the scaling factor of the UV component curve.
+        
+        Returns
+        -------
+        float
+            The scaling factor of the component curve.
+        """
+        return self.scale * self.xr_ccurve.get_params()[0]
+
+    def get_inv_mapped_params(self):
+        """
+        Returns the inverse mapped parameters of the UV component curve.
+
+        Returns
+        -------
+        array-like
+            The inverse mapped parameters of the UV component curve.
+        """
+        xr_params = self.xr_ccurve.get_params().copy()
+        xr_params[0] *= self.scale  # scale the height only. no need to scale tR, sigma, tau
+        return xr_params

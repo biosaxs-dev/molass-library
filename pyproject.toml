@@ -4,21 +4,20 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.7.2"
+version = "0.7.5"
 
 dependencies = [
   "numpy",
-  "scipy<1.16.0",
+  "scipy",
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-  "molass_legacy>=0.3.2",
+  "molass_legacy>=0.4.3",
   "statsmodels",
   "scikit-learn",
   "toml",
   "psutil",
   "seaborn",
-  "openpyxl",
   "numba",
   "numba",
   "ruptures",
@@ -26,7 +25,7 @@ dependencies = [
   "mrcfile",
 ]
 
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9,<3.14"
 
 authors = [
   {name = "Molass Community"},

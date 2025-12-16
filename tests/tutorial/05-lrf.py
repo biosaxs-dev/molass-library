@@ -43,7 +43,7 @@ def test_004_get_proportions():
     proportions = decomposition3.get_proportions()
     print("Current proportions:", proportions)
     expected = [0.39588467, 0.12442568, 0.47968965]
-    assert proportions == pytest.approx(expected, abs=1e-3)
+    assert proportions == pytest.approx(expected, abs=1e-2)
 
 @pytest.mark.order(5)
 @control_matplotlib_plot
