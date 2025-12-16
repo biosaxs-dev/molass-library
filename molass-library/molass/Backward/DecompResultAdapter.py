@@ -60,15 +60,10 @@ def adapted_decomp_result(decomposition, ssd, mapped_curve, debug=False):
 
     opt_recs = make_xr_opt_recs_adapted(model, fx, y, xr_peaks)
 
-    mapping = ssd.get_mapping()
-    a = mapping.slope
-    b = mapping.intercept
-    a_ = 1/a
-    b_ = -b/a
     uv_peaks = []
     for comp in decomposition.get_uv_components():
-        h, m, s, t = comp.ccurve.params
-        uv_peaks.append(np.array((h, m*a_+b_, s*a_, t)))
+        uv_params = comp.ccurve.get_inv_mapped_params()
+        uv_peaks.append(uv_params)
 
     # uv_scale = max_y_uv/max_y
     uv_scale = 1

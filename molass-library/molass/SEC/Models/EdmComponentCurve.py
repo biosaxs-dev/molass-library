@@ -60,6 +60,8 @@ class EdmComponentCurve(ComponentCurve):
         """
         self.x = x
         self.params = params
+        self.moment = None
+        self.model = 'edm'
     
     def get_y(self, x=None):
         """
@@ -78,18 +80,6 @@ class EdmComponentCurve(ComponentCurve):
         if x is None:
             x = self.x
         return edm_impl(x, *self.params)
-
-    def get_xy(self):
-        """
-        Returns the x and y values as a tuple.
-
-        Returns
-        -------
-        tuple
-            A tuple containing the x values and the corresponding y values.
-        """
-        x = self.x
-        return x, self.get_y()
     
     def get_peak_top_x(self):
         """

@@ -23,3 +23,5 @@ saxstats/saxstats.py    #
 
 ./DenssUtils.py         # 
 ./DmaxEstimation.py     # estimate_dmax: return D, sasrec, [r, Pfilt, Pargmax, D_idx]
+
+5. test DmaxEstimation.py with molass gui in molass_legacy

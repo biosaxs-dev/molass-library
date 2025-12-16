@@ -140,3 +140,13 @@ class NullFlowChange:
             Empty arrays and a full slice.
         """
         return np.array([]), np.array([]), slice(None, None)
+    
+    def get_mapped_flow_changes(self):
+        """Gets the mapped flow changes.
+
+        Returns
+        -------
+        None, None
+            Indicates no mapped flow changes.
+        """
+        return None, None

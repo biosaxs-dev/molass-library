@@ -40,11 +40,13 @@ def adjust_components_consistently(mapping, xr_icurve, xr_ccurves, uv_icurve, uv
     new_ccurves : list of ComponentCurve
         The adjusted UV component curves.
     """
-    from molass.LowRank.ComponentCurve import ComponentCurve
     debug = kwargs.get('debug', False)
     if debug:
         print("adjust_components_consistently entry: mapping=", mapping)
         _debug_plot("adjust_components_consistently entry", xr_icurve, xr_ccurves, uv_icurve, uv_ccurves)
+
+    from molass.SEC.Models.UvComponentCurve import UvComponentCurve
+    from molass.Mapping.Mapping import Mapping
 
     slope = mapping.slope
     intercept = mapping.intercept
@@ -67,10 +69,10 @@ def adjust_components_consistently(mapping, xr_icurve, xr_ccurves, uv_icurve, uv
     res = minimize(adjust_objective, init_scales, method='Nelder-Mead')
 
     uv_x = uv_icurve.x
+    mapping_ = Mapping(slope, intercept)    # task: make clear the difference between mapping and mapping_
     new_ccurves = []
     for xr_c, scale in zip(xr_ccurves, res.x):
-        h, m, s, t = xr_c.params
-        ccurve = ComponentCurve(uv_x, [h*scale, m*slope+intercept, s*slope, t*slope])
+        ccurve = UvComponentCurve(uv_x, mapping_, xr_c, scale)
         new_ccurves.append(ccurve)
     
     if debug:
