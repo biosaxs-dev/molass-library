@@ -8,9 +8,7 @@ from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
 from molass.Testing import control_matplotlib_plot, is_interactive
 
-# @pytest.fixture(scope="module")
 def corrected_ssd_instance_():
-    print("Fixture executed")
     ssd = SSD(SAMPLE1)
     trimmed_ssd = ssd.trimmed_copy()
     corrected_copy = trimmed_ssd.corrected_copy()

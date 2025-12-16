@@ -1,19 +1,16 @@
 """
     update-denss.py
 
-    Copyright (c) 2022-2023, SAXS Team, KEK-PF
+    Copyright (c) 2022-2025, SAXS Team, KEK-PF
 """
 import sys
 import os
 from shutil import copy
 import diff_match_patch as dmp_module
 
-try:
-    GIT_REPOSITORY = r"D:\Github\denss"
-    assert os.path.exists(GIT_REPOSITORY)
-except:
-    GIT_REPOSITORY = r"E:\Github\denss"
-    assert os.path.exists(GIT_REPOSITORY)
+this_dir = os.path.dirname(os.path.abspath( __file__ ))
+GIT_REPOSITORY = os.path.join(this_dir, "..", "..", "..", "..", r"denss")
+assert os.path.exists(GIT_REPOSITORY)
 
 denss_scripts = os.path.join(GIT_REPOSITORY, r"denss\scripts")
 denss_lib = os.path.join(GIT_REPOSITORY, "denss")
@@ -34,14 +31,14 @@ from molass_legacy.KekLib.DiffUtils import file2string, string2file
 dmp = dmp_module.diff_match_patch()
 dmp.Match_Distance = 5000
 
-# bin
-old_bin = "bin"
+# scripts
+old_scripts = "scripts"
 
 for file in ["denss_fit_data.py", "denss_pdb2mrc.py"]:
     orig_file = file.replace(".py", "-orig.py")
 
-    old_src = file2string(os.path.join(old_bin, orig_file))
-    mod_src = file2string(os.path.join(old_bin, file))
+    old_src = file2string(os.path.join(old_scripts, orig_file))
+    mod_src = file2string(os.path.join(old_scripts, file))
 
     patches = dmp.patch_make(old_src, mod_src)
     print(dmp.patch_toText(patches))

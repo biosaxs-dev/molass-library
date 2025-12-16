@@ -25,7 +25,13 @@ class CurveProxy:
     def __init__(self, x, y, peak_info):
         self.x = x
         self.y = y
-        self.spline = UnivariateSpline(x, y, s=0, ext=3)
+        try:
+            self.spline = UnivariateSpline(x, y, s=0, ext=3)
+        except Exception:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning("Failed to create spline for CurveProxy: len(x)=%d, len(y)=%d", len(x), len(y))
+            raise
         self.peak_info = peak_info
 
 class PreRecogProxy:

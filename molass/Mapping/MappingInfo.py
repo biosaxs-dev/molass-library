@@ -43,6 +43,10 @@ class MappingInfo:
     
     def __str__(self):
         return self.__repr__()
+    
+    def __iter__(self):
+        """Allow unpacking of MappingInfo to (slope, intercept)."""
+        return iter((self.slope, self.intercept))
 
     def get_mapped_x(self, xr_x):
         """Map XR x-values to UV x-values using the linear mapping.

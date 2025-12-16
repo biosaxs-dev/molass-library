@@ -41,7 +41,7 @@ from tools.pyproject_utils import get_pythonpath_from_pyproject
 for abs_p in reversed(get_pythonpath_from_pyproject()):
     if abs_p not in sys.path:
         sys.path.insert(0, abs_p)
-print(f"sys.path: {sys.path}")
+# print(f"sys.path: {sys.path}")
 
 def set_env_vars(enable_plots=False, save_plots=False, plot_dir="test_plots"):
     """Set environment variables for plot control."""
@@ -182,6 +182,28 @@ def run_tests(test_path=None, mode='batch', order_range=None, coverage=False, fu
     print(f"Summary: {len(test_files) - total_failures}/{len(test_files)} files passed")
     print('='*60)
     return total_failures
+
+# Check for required packages
+REQUIRED_PACKAGES = [
+    "pytest",
+    "pytest_cov",
+    "pytest_env",
+    "pytest_order",
+    "molass_data",
+]
+
+missing = []
+for pkg in REQUIRED_PACKAGES:
+    try:
+        __import__(pkg.replace("-", "_"))
+    except ImportError:
+        missing.append(pkg)
+
+if missing:
+    print(f"\nERROR: The following required packages are missing: {', '.join(missing)}")
+    print("Please install them with:")
+    print(f"    pip install {' '.join(missing)}")
+    sys.exit(1)
 
 if __name__ == '__main__':
     import argparse

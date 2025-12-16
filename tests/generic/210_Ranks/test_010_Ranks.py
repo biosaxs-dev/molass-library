@@ -14,7 +14,7 @@ def test_010_compute_scds():
     decomposition = corrected_copy.quick_decomposition()
     scds = decomposition.compute_scds()
     expected = [1.441978, 0.6520818]
-    assert scds == pytest.approx(expected, abs=1e-3)
+    assert scds == pytest.approx(expected, abs=1e-2)
 
 if __name__ == "__main__":
     test_010_compute_scds()

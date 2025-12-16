@@ -72,7 +72,6 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     # Create UV curves
     uv_icurve = ssd.uv.get_icurve()
     mapping = ssd.get_mapping()
-    uv_result = decompose_from_partner(uv_icurve, mapping, xr_result.x, debug=debug)
-    uv_ccurves = get_curves_from_params(uv_result['x'], uv_icurve)
+    uv_ccurves = decompose_from_partner(uv_icurve, mapping, xr_ccurves, debug=debug)
 
     return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves

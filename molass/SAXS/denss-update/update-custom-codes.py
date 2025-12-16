@@ -1,21 +1,18 @@
 """
     update-custom-codes.py
 
-    Copyright (c) 2022-2023, SAXS Team, KEK-PF
+    Copyright (c) 2022-2025, SAXS Team, KEK-PF
 """
 import sys
 import os
 from shutil import copy
 import diff_match_patch as dmp_module
 
-try:
-    GIT_REPOSITORY = r"D:\Github\denss"
-    assert os.path.exists(GIT_REPOSITORY)
-except:
-    GIT_REPOSITORY = r"E:\Github\denss"
-    assert os.path.exists(GIT_REPOSITORY)
+this_dir = os.path.dirname(os.path.abspath( __file__ ))
+GIT_REPOSITORY = os.path.join(this_dir, "..", "..", "..", "..", r"denss")
+assert os.path.exists(GIT_REPOSITORY)
 
-git_bin = os.path.join(GIT_REPOSITORY, "bin")
+git_bin = os.path.join(GIT_REPOSITORY, r"denss\scriptsbin")
 git_lib = os.path.join(GIT_REPOSITORY, "saxstats")
 
 this_dir = os.path.dirname(os.path.abspath( __file__ ))
