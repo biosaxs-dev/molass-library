@@ -12,7 +12,7 @@ plt.rcParams['animation.embed_limit'] = 512     # https://stackoverflow.com/ques
 from .ColumnElements import Particle
 from .ColumnStructure import plot_column_structure
 
-def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, return_init=False, fig_check=False, blit=False, use_tqdm=True, large_only=False, debug=False):
+def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, return_init=False, fig_check=False, blit=False, use_tqdm=True, large_only=False, debug=False, track_statistics=False):
     """
     Create an animation of particles moving through a column structure.
     
@@ -38,11 +38,15 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
         If True, only animate the largest particles. Default is False.
     debug : bool, optional
         If True, enable debug mode with additional output. Default is False.
+    track_statistics : bool, optional
+        If True, track adsorption statistics for theoretical verification. Default is False.
 
     Returns
     -------
     anim : matplotlib.animation.FuncAnimation
         The animation object.
+    stats : dict, optional
+        If track_statistics=True, also return statistics dictionary with adsorption data.
     """
     ymin, ymax = 0, 1
     xmin, xmax = 0.35, 0.65
@@ -165,6 +169,13 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     pxv = init_pxv.copy()
     pyv = init_pyv.copy()
 
+    # Statistics tracking for Lévy process verification
+    if track_statistics:
+        adsorption_start_frames = -np.ones(num_particles, dtype=int)  # Frame when adsorption started
+        adsorption_durations_list = [[] for _ in range(num_particles)]  # List of durations for each particle
+        adsorption_counts = np.zeros(num_particles, dtype=int)  # Total number of adsorptions
+        total_adsorbed_time = np.zeros(num_particles, dtype=float)  # Sum of all adsorption times
+
     def touchable_indeces(inmobile_states, last_pxv, last_pyv, debug=False):
         indeces = []
         bounce_scales = []
@@ -214,10 +225,15 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
 
     cancel_debug = False
 
-    def compute_next_positions(debug=False):
+    def compute_next_positions(debug=False, frame_number=None):
         nonlocal pxv, pyv, cancel_debug
         if debug:
             print("(2) inmobile_states=", ''.join(map(lambda b: '%d' % b, inmobile_states)))
+        
+        # Track state before update for statistics
+        if track_statistics and frame_number is not None:
+            prev_inmobile_states = inmobile_states.copy()
+        
         last_pxv = pxv.copy()
         last_pyv = pyv.copy()
         dxv, dyv = np.random.normal(0, delta, (2,num_particles))
@@ -253,6 +269,24 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
 
         exceed_top = pxv > ymax
         pyv[exceed_top] += -2*dyv[exceed_top]
+        
+        # Track adsorption/desorption events
+        if track_statistics and frame_number is not None:
+            for k in range(num_particles):
+                # Adsorption event: mobile (True) → adsorbed (False)
+                if prev_inmobile_states[k] and not inmobile_states[k]:
+                    adsorption_start_frames[k] = frame_number
+                    adsorption_counts[k] += 1
+                
+                # Desorption event: adsorbed (False) → mobile (True)
+                elif not prev_inmobile_states[k] and inmobile_states[k]:
+                    if adsorption_start_frames[k] >= 0:
+                        duration_frames = frame_number - adsorption_start_frames[k]
+                        duration_time = duration_frames * delta  # Convert to time units
+                        adsorption_durations_list[k].append(duration_time)
+                        total_adsorbed_time[k] += duration_time
+                        adsorption_start_frames[k] = -1
+        
         if debug and not cancel_debug:
             print("ret=", ret)
             with plt.Dp():
@@ -372,7 +406,10 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
             # pause = True
             pass
         if not pause:
-            compute_next_positions()
+            if track_statistics:
+                compute_next_positions(frame_number=i)
+            else:
+                compute_next_positions()
             compute_histogram_data(i)
             suptitle_text.set_text(suptitle_fmt % i)
             for k, p in enumerate(particles):
@@ -400,6 +437,22 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     anim = FuncAnimation(fig, animate, init_func=init,
                             frames=frames, interval=interval, blit=blit)
 
+    if track_statistics:
+        # Compile statistics for return
+        stats = {
+            'adsorption_durations_list': adsorption_durations_list,  # List[List[float]]
+            'adsorption_counts': adsorption_counts,  # Array of # adsorptions per particle
+            'total_adsorbed_time': total_adsorbed_time,  # Array of total time per particle
+            'ptype_indeces': ptype_indeces,  # Particle type assignments
+            'large_indeces': large_indeces,  # Indices of large particles
+            'middle_indeces': middle_indeces,  # Indices of medium particles
+            'small_indeces': small_indeces,  # Indices of small particles
+            'delta': delta,  # Time per frame
+            'num_frames': num_frames,  # Total frames
+            'seed': seed,  # Random seed used
+        }
+        return anim, stats
+    
     if close_plot:
         plt.close() # Close the figure to prevent it from displaying in a static form
 
