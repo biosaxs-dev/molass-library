@@ -382,6 +382,135 @@ def compare_characteristic_functions(stats, particle_type=None):
     print(f"Mean squared error: {mse:.6f}")
 
 
+def test_independence(stats, particle_type=None, alpha=0.05):
+    """
+    Test independence between adsorption count (r_M) and total adsorbed time (t_S).
+    
+    For a true Compound Poisson Process, r_M and t_S should be independent.
+    This tests whether the simulation violates this critical assumption.
+    
+    Parameters
+    ----------
+    stats : dict
+        Statistics from animation
+    particle_type : int, optional
+        0=large, 1=medium, 2=small. If None, test all particles.
+    alpha : float
+        Significance level for correlation test
+    
+    Returns
+    -------
+    result : dict
+        Test results with correlation coefficient and p-value
+    """
+    print("\n" + "="*70)
+    print("TEST 4: Independence of r_M and t_S (CPP Assumption)")
+    print("="*70)
+    
+    # Select particles
+    if particle_type is not None:
+        type_names = ['Large (green)', 'Medium (blue)', 'Small (red)']
+        type_keys = ['large_indeces', 'middle_indeces', 'small_indeces']
+        particle_indeces = stats[type_keys[particle_type]]
+        print(f"Testing {type_names[particle_type]} particles only")
+    else:
+        particle_indeces = np.arange(len(stats['ptype_indeces']))
+        print("Testing all particles combined")
+    
+    # Get data
+    r_M = stats['adsorption_counts'][particle_indeces]
+    t_S = stats['total_adsorbed_time'][particle_indeces]
+    
+    # Filter out particles with no adsorptions
+    valid = r_M > 0
+    r_M_valid = r_M[valid]
+    t_S_valid = t_S[valid]
+    
+    print(f"Number of particles: {len(particle_indeces)}")
+    print(f"Particles with adsorptions: {len(r_M_valid)}")
+    
+    if len(r_M_valid) < 3:
+        print("WARNING: Too few particles with adsorptions for correlation test!")
+        return None
+    
+    # Pearson correlation
+    corr_coef, p_value = sp_stats.pearsonr(r_M_valid, t_S_valid)
+    
+    print(f"\nPearson Correlation:")
+    print(f"  r_M vs t_S: ρ = {corr_coef:.4f}")
+    print(f"  p-value: {p_value:.4f}")
+    
+    if p_value > alpha:
+        print(f"  ✓ PASS: Cannot reject independence (p > {alpha})")
+        print(f"  → r_M and t_S appear independent (CPP assumption holds)")
+    else:
+        print(f"  ✗ FAIL: Reject independence (p ≤ {alpha})")
+        if corr_coef > 0:
+            print(f"  → Positive correlation: More adsorptions → longer total time")
+        else:
+            print(f"  → Negative correlation: More adsorptions → shorter total time")
+    
+    # Spearman correlation (robust to nonlinearity)
+    spearman_corr, spearman_p = sp_stats.spearmanr(r_M_valid, t_S_valid)
+    print(f"\nSpearman Rank Correlation (robust):")
+    print(f"  ρ_s = {spearman_corr:.4f}, p = {spearman_p:.4f}")
+    
+    # Plot scatter
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Scatter plot
+    ax1.scatter(r_M_valid, t_S_valid, alpha=0.5, s=20, color='steelblue')
+    
+    # Add regression line if significant
+    if p_value < alpha:
+        z = np.polyfit(r_M_valid, t_S_valid, 1)
+        p = np.poly1d(z)
+        x_line = np.array([r_M_valid.min(), r_M_valid.max()])
+        ax1.plot(x_line, p(x_line), "r--", linewidth=2, 
+                label=f'Linear fit (ρ={corr_coef:.3f})')
+        ax1.legend()
+    
+    ax1.set_xlabel('Adsorption Count (r_M)')
+    ax1.set_ylabel('Total Adsorbed Time (t_S)')
+    ax1.set_title(f'Independence Test\nρ = {corr_coef:.4f}, p = {p_value:.4f}')
+    ax1.grid(True, alpha=0.3)
+    
+    # Conditional distributions: t_S | r_M
+    unique_r_M = np.unique(r_M_valid)
+    if len(unique_r_M) <= 10:  # Only if we have reasonable number of bins
+        for r in unique_r_M[:5]:  # Plot first 5 for clarity
+            mask = r_M_valid == r
+            if mask.sum() >= 3:
+                ax2.hist(t_S_valid[mask], bins=15, alpha=0.5, 
+                        label=f'r_M = {int(r)}', density=True)
+        
+        ax2.set_xlabel('Total Adsorbed Time (t_S)')
+        ax2.set_ylabel('Density')
+        ax2.set_title('Distribution of t_S conditioned on r_M')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+    else:
+        # Hexbin plot for many unique values
+        hexbin = ax2.hexbin(r_M_valid, t_S_valid, gridsize=20, cmap='Blues', mincnt=1)
+        ax2.set_xlabel('Adsorption Count (r_M)')
+        ax2.set_ylabel('Total Adsorbed Time (t_S)')
+        ax2.set_title('Density (hexbin)')
+        plt.colorbar(hexbin, ax=ax2, label='Count')
+    
+    plt.tight_layout()
+    plt.savefig(molass_path / 'study' / 'independence_test.png', dpi=150)
+    print(f"\nPlot saved to: study/independence_test.png")
+    
+    return {
+        'corr_coef': corr_coef,
+        'p_value': p_value,
+        'spearman_corr': spearman_corr,
+        'spearman_p': spearman_p,
+        'passed': p_value > alpha,
+        'n_particles': len(r_M_valid)
+    }
+
+
 def main(test_mode='separate'):
     """
     Run all verification tests.
@@ -413,7 +542,7 @@ def main(test_mode='separate'):
         print("SEPARATE MODE (Each species tested individually - correct for SEC)")
         print("="*70)
         
-        results_by_type = {'exp': [], 'pois': []}
+        results_by_type = {'exp': [], 'pois': [], 'indep': []}
         
         # Test each particle type separately
         for ptype in range(3):
@@ -423,33 +552,40 @@ def main(test_mode='separate'):
             
             result_exp = test_exponential_egress(stats, particle_type=ptype)
             result_pois = test_poisson_ingress(stats, particle_type=ptype)
+            result_indep = test_independence(stats, particle_type=ptype)
             compare_characteristic_functions(stats, particle_type=ptype)
             
             results_by_type['exp'].append(result_exp)
             results_by_type['pois'].append(result_pois)
+            results_by_type['indep'].append(result_indep)
         
         # Summary comparison
         print("\n" + "="*70)
         print("SUMMARY BY PARTICLE TYPE")
         print("="*70)
-        print(f"{'Type':<15} {'n̄ (adsorptions)':<20} {'τ̄ (residence)':<20} {'Exp Test':<15} {'Poisson Test':<15}")
-        print("-" * 70)
+        print(f"{'Type':<15} {'n̄ (adsorptions)':<20} {'τ̄ (residence)':<20} {'Exp Test':<15} {'Poisson Test':<15} {'Independence':<15}")
+        print("-" * 105)
         
         for ptype in range(3):
             exp_res = results_by_type['exp'][ptype]
             pois_res = results_by_type['pois'][ptype]
+            indep_res = results_by_type['indep'][ptype]
             
-            if exp_res and pois_res:
+            if exp_res and pois_res and indep_res:
                 exp_status = "✓ PASS" if exp_res['passed'] else "✗ FAIL"
                 pois_status = "✓ PASS" if pois_res['passed'] else "✗ FAIL"
+                indep_status = "✓ PASS" if indep_res['passed'] else f"✗ FAIL (ρ={indep_res['corr_coef']:.3f})"
                 
                 print(f"{type_names[ptype]:<15} {pois_res['n_bar']:<20.4f} {exp_res['tau_bar']:<20.6f} "
-                      f"{exp_status:<15} {pois_status:<15}")
+                      f"{exp_status:<15} {pois_status:<15} {indep_status:<15}")
         
         print("\nInterpretation:")
         print("- Large particles: Excluded from most pores → low n̄")
         print("- Small particles: Enter all pores → high n̄")
         print("- This is SIZE EXCLUSION CHROMATOGRAPHY in action!")
+        print("\nIndependence test:")
+        print("- If r_M and t_S are correlated → CPP assumption violated")
+        print("- Possible causes: size exclusion, temporal constraints, spatial coupling")
     
     print("\nAll plots saved to study/ directory.")
     plt.show()

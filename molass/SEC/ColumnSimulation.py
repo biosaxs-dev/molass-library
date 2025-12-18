@@ -52,7 +52,7 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     xmin, xmax = 0.35, 0.65
 
     num_pores = 16
-    rs = 0.04
+    rs = 0.0381  # Adjusted to match 3D sphere packing fraction ~0.64 (was 0.04 → 70% packing)
 
     if seed is not None:
         np.random.seed(seed)
