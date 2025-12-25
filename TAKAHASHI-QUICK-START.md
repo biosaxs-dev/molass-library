@@ -32,9 +32,12 @@ In VS Code Copilot Chat:
 ```
 Please read COPILOT-INIT.md to initialize
 ```
-Copilot Agent will recognize you as Takahashi and autonomously load the right context.
+Copilot Agent will recognize you as Takahashi and autonomously:
+- **Sync molass-library** with the latest changes from joss-paper branch
+- **Check JOSS review issue** for new comments or status changes
+- Load the right context for your session
 
-**Note:** For a complete description of what Copilot will do after initialization (including issue checks and JOSS review URL display), see [COPILOT-INIT-ACTION.md](COPILOT-INIT-ACTION.md). Always review this summary before starting your work.
+**Note:** For a complete description of what Copilot will do after initialization (including automatic synchronization, issue checks, and JOSS review URL display), see [COPILOT-INIT-ACTION.md](COPILOT-INIT-ACTION.md). Always review this summary before starting your work.
 
 ### **STEP 2: Tell Agent Your Goal**
 Simply state what you want to accomplish:
