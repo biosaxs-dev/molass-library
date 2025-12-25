@@ -16,11 +16,12 @@ Copilot will recognize the user and load the correct context.
 
 ## 📝 What Copilot Does at Initialization
 
-1. **Synchronizes molass-library Subtree (Automated)**
-   - Copilot checks if the molass-library subtree needs updating from the joss-paper branch
-   - Uses: `git fetch molass-upstream` and `git subtree pull --prefix=molass-library molass-upstream joss-paper --squash`
-   - Reports if updates are available or if the subtree is already up-to-date
-   - **This ensures you always work with the latest version of the library**
+1. **Synchronizes molass-library Subtree (Takahashi Only)**
+   - **For Takahashi**: Copilot checks if the molass-library subtree needs updating from the joss-paper branch
+     - Uses: `git fetch molass-upstream` and `git subtree pull --prefix=molass-library molass-upstream joss-paper --squash`
+     - Reports if updates are available or if the subtree is already up-to-date
+     - **This ensures Takahashi always works with the latest version of the library**
+   - **For Shimizu**: This step is skipped (Shimizu doesn't need to manage the subtree)
 
 2. **Summarizes all open internal GitHub Issues**
    - Copilot will check and summarize all open issues in this repository.
