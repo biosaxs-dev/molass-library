@@ -33,6 +33,7 @@ htmlcov*
 temp_analysis*/
 
 *.png
+*.gif
 
 *.pdf
 *.txt
