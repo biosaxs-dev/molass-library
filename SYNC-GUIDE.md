@@ -42,21 +42,11 @@ Copilot will:
 
 ## 🛠️ Manual Synchronization (If Needed)
 
-### Option 1: PowerShell Script (Recommended)
+### Option 1: Direct Git Commands (Always Works) ⭐
+
+This is the most reliable method and works on all systems:
 
 ```powershell
-# Dry run (preview only)
-.\scripts\sync-molass-library.ps1 -DryRun
-
-# Actual sync
-.\scripts\sync-molass-library.ps1
-```
-
-**Note**: If you get an execution policy error, use Option 2 instead.
-
-### Option 2: Direct Git Commands
-
-```bash
 # Fetch latest changes
 git fetch molass-upstream
 
@@ -66,6 +56,45 @@ git log HEAD..molass-upstream/joss-paper --oneline
 # Pull updates
 git subtree pull --prefix=molass-library molass-upstream joss-paper --squash
 ```
+
+**Recommended**: Use these commands directly. They're simple and always work.
+
+### Option 2: PowerShell Script (Optional Convenience)
+
+The script provides nice formatting and error checking, but requires PowerShell execution policy setup:
+
+```powershell
+# Dry run (preview only)
+.\scripts\sync-molass-library.ps1 -DryRun
+
+# Actual sync
+.\scripts\sync-molass-library.ps1
+```
+
+**⚠️ PowerShell Execution Policy Issue**
+
+If you get an error like:
+```
+このシステムではスクリプトの実行が無効になっているため...
+(Script execution is disabled on this system...)
+```
+
+You have 3 choices:
+
+**A) Use Option 1 instead** (easiest - just use git commands)
+
+**B) Enable execution policy** (one-time setup):
+```powershell
+# Requires administrator rights
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**C) Bypass policy for this script only**:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-molass-library.ps1
+```
+
+**Note**: Copilot's automatic sync uses git commands directly (Option 1), so it's not affected by execution policy.
 
 ---
 
@@ -188,13 +217,29 @@ git remote add molass-upstream https://github.com/biosaxs-dev/molass-library.git
 
 ### Problem: PowerShell script won't run
 
-**Error**: "execution of scripts is disabled"
+**Error**: "このシステムではスクリプトの実行が無効になっている" or "execution of scripts is disabled"
 
-**Solution**: Use direct git commands (Option 2) or enable scripts:
+**Why**: Windows PowerShell execution policy blocks `.ps1` scripts by default for security.
+
+**Solutions** (pick one):
+
+**1. Use git commands directly** (easiest, always works):
 ```powershell
-# One-time: Allow scripts for current user (requires admin)
+git fetch molass-upstream
+git subtree pull --prefix=molass-library molass-upstream joss-paper --squash
+```
+
+**2. Enable execution policy** (one-time, requires admin):
+```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+
+**3. Bypass for this script only**:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-molass-library.ps1
+```
+
+**Important**: The script is optional. Copilot's automatic sync uses git commands directly and is not affected by this issue.
 
 ---
 
