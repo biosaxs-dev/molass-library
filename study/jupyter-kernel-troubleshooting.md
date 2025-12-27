@@ -136,6 +136,13 @@ Then:
 3. Select the one showing your Python path (e.g., `C:\Program Files\Python313\python.exe`)
 4. Click "Allow" when prompted
 
+**Note for VS Code Insiders:** If Python kernels don't appear in the initial picker:
+1. First select any available kernel (e.g., a conda environment) to start Jupyter
+2. Click the kernel name in the top-right corner
+3. Select "Select Another Kernel..."
+4. Choose "Existing Jupyter Server..."
+5. Your Python kernel should now appear in the list
+
 ---
 
 ## Optional: Configure VS Code to Prefer Specific Python
