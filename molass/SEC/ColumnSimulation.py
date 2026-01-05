@@ -12,7 +12,7 @@ plt.rcParams['animation.embed_limit'] = 512     # https://stackoverflow.com/ques
 from .ColumnElements import Particle
 from .ColumnStructure import plot_column_structure
 
-def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, return_init=False, fig_check=False, blit=False, use_tqdm=True, large_only=False, debug=False, track_statistics=False, track_particle_id=None):
+def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, return_init=False, fig_check=False, blit=False, use_tqdm=True, large_only=False, debug=False, track_statistics=False, track_particle_id=None, num_pores=16):
     """
     Create an animation of particles moving through a column structure.
     
@@ -43,6 +43,11 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     track_particle_id : int, optional
         If provided, track the full trajectory of this specific particle (0-indexed).
         Stores position, state, and cumulative adsorbed time at each frame.
+    num_pores : int, optional
+        Number of pores per grain (determines sector angle = 2π/num_pores). Default is 16.
+        Use this to test geometric effects on residence time distribution:
+        - More pores → smaller sector angle → more wall collisions → potentially smaller k
+        - Fewer pores → larger sector angle → easier exit access → potentially larger k
 
     Returns
     -------
@@ -54,7 +59,9 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     ymin, ymax = 0, 1
     xmin, xmax = 0.35, 0.65
 
-    num_pores = 16
+    # num_pores parameter now passed from function argument (default: 16)
+    # Sector angle = 360°/num_pores
+    # Example: num_pores=4 → 90° sectors, num_pores=32 → 11.25° sectors
     rs = 0.0381  # Adjusted to match 3D sphere packing fraction ~0.64 (was 0.04 → 70% packing)
 
     if seed is not None:
@@ -515,6 +522,9 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
         stats['delta'] = delta  # Time per frame
         stats['num_frames'] = num_frames  # Total frames
         stats['seed'] = seed  # Random seed used
+        stats['num_pores'] = num_pores  # Number of pores per grain (geometry parameter)
+        stats['unit_angle_deg'] = 360.0 / num_pores  # Unit angle (pore + wall combined)
+        stats['pore_sector_angle_deg'] = 180.0 / num_pores  # Actual pore sector angle (accessible region)
         
         return anim, stats
     
