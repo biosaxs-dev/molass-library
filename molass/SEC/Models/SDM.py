@@ -45,7 +45,10 @@ class SDM:
         env_params = estimate_sdm_column_params(decomposition, **kwargs)
         model_params = kwargs.pop('model_params', None)
         new_xr_ccurves = optimize_sdm_xr_decomposition(decomposition, env_params, model_params=model_params, **kwargs)
-        new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+        if decomposition.uv is None:
+            new_uv_ccurves = None
+        else:
+            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if debug:

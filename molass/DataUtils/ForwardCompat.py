@@ -132,12 +132,18 @@ def convert_to_trimmed_prerecog(pre_recog, uv_restrict_list, xr_restrict_list, r
     
     fc = pre_recog.flowchange
 
-    uv_slice = uv_restrict_list[0].get_slice()
+    def get_slice_from_restrict_list(restrict_list):
+        if len(restrict_list) == 0 or restrict_list[0] is None:
+            return slice(None)
+        else:
+            return restrict_list[0].get_slice()
+
+    uv_slice = get_slice_from_restrict_list(uv_restrict_list)
     trimmed_uv_curves = []
     for k, curve in enumerate([fc.a_curve, fc.a_curve2]):
         trimmed_uv_curves.append(get_trimmed_curve(curve, uv_slice, renumber=renumber, convert_peak_info=k == 0))
 
-    xr_slice = xr_restrict_list[0].get_slice()
+    xr_slice = get_slice_from_restrict_list(xr_restrict_list)
     old_cs = pre_recog.cs
     trimmed_xr_curve = get_trimmed_curve(old_cs.x_curve, xr_slice, renumber=renumber)
 

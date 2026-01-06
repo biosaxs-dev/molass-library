@@ -26,6 +26,12 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
         reload(molass.LowRank.Decomposition)
     from molass.LowRank.Decomposition import Decomposition
 
+    if uv_ccurves is None:
+        # temporary work-around for the case without UV data
+        from molass.SEC.Models.UvComponentCurve import UvComponentCurve
+        mapping = ssd.get_mapping()
+        uv_ccurves = [UvComponentCurve(xr_ccurve.x, mapping, xr_ccurve, 1) for xr_ccurve in xr_ccurves]
+
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 def make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs):

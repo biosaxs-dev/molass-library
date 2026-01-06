@@ -67,7 +67,10 @@ class Decomposition:
         kwargs : dict, optional
             Additional keyword arguments (not used).
         """
-        assert len(xr_ccurves) == len(uv_ccurves)
+        if uv_ccurves is None:
+            pass
+        else:
+            assert len(xr_ccurves) == len(uv_ccurves)  
         self.num_components = len(xr_ccurves)
         self.ssd = ssd
 

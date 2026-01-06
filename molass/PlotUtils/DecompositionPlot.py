@@ -142,7 +142,8 @@ def plot_components_impl(decomposition, **kwargs):
     ax2 = axes[1,0]
 
     # UV Elution Curve
-    plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
+    if decomposition.uv is not None:
+        plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
 
     # XR Elution Curve
     axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
@@ -171,16 +172,17 @@ def plot_components_impl(decomposition, **kwargs):
                     ax.add_patch(p)              
 
     # UV Absorbance Curves
-    ax3 = axes[0,1]
-    ax3.set_title("UV Absorbance Curves")
-    ax3.set_xlabel("Wavelength [nm]")
-    ax3.set_ylabel("Absorbance")
-    wv = decomposition.uv.wv
-    uv_matrices = decomposition.get_uv_matrices(debug=debug)
-    M, C, P = uv_matrices[0:3]
-    for i, pv in enumerate(P.T):
-        ax3.plot(wv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
-    ax3.legend()
+    if decomposition.uv is not None:
+        ax3 = axes[0,1]
+        ax3.set_title("UV Absorbance Curves")
+        ax3.set_xlabel("Wavelength [nm]")
+        ax3.set_ylabel("Absorbance")
+        wv = decomposition.uv.wv
+        uv_matrices = decomposition.get_uv_matrices(debug=debug)
+        M, C, P = uv_matrices[0:3]
+        for i, pv in enumerate(P.T):
+            ax3.plot(wv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
+        ax3.legend()
 
     # XR Scattering Curves
     ax4 = axes[1,1]

@@ -514,7 +514,10 @@ class SecSaxsData:
             If the mapping information is not available, returns None.
         """
         if self.mapping is None:
-            self.estimate_mapping()
+            if self.uv is None:
+                self.mapping = (1, 0)  # identity mapping for XR-only data
+            else:
+                self.estimate_mapping()
         return self.mapping
 
     def get_concfactor(self):
@@ -742,4 +745,31 @@ class SecSaxsData:
         spectral_vectors : list of np.ndarray
             A list of two numpy arrays which contain the spectral vectors for XR and UV data.
         """
-        return [self.xr.qv, self.uv.wv]
+        if self.uv is None:
+            # temporary work-around for the case without UV data
+            return [self.xr.qv, self.xr.qv]
+        else:
+            return [self.xr.qv, self.uv.wv]
+    
+    def export_to_folder(self, folder, debug=False):
+        """ssd.export_to_folder(folder, debug=False)
+
+        Exports the data to a specified folder.
+
+        Parameters
+        ----------
+        folder : str
+            Specifies the folder path where the data will be exported.
+
+        debug : bool, optional
+            If True, enables debug mode for more verbose output.
+
+        Returns
+        -------
+        None
+        """
+        if debug:
+            import molass.DataUtils.ExportSsd
+            reload(molass.DataUtils.ExportSsd)
+        from molass.DataUtils.ExportSsd import export_ssd_to_folder_impl
+        export_ssd_to_folder_impl(self, folder=folder, debug=debug)
