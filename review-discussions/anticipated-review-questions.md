@@ -19,11 +19,19 @@
 ### Q1.1: Coverage of SEC-SAXS Workflow
 **Question**: The paper states that Molass Library implements steps 3-7 of the 8-step SEC-SAXS workflow. Why were steps 1-2 and 8 excluded? Could these be integrated in the future?
 
+**Answer**: The exclusions resulted from historical reasons. Molass Library is a rewite of MOLASS (the GUI-style predecessor), which was conceived to supplement the poorly cared parts of the tool chain. Expecially,
+- for steps 1-2, we already had SAngler;
+- for step 8, established ATSAS tools existed and DENSS joined later.
+
+In the near future, we have no integration plan with our tight budget for those excluded steps.
+
 ### Q1.2: Comparison with Existing Tools
 **Question**: The paper mentions ATSAS and BioXTAS RAW as alternatives. Can you provide a more detailed comparison of features, particularly:
 - What specific functionality does Molass Library provide that these tools lack?
 - In what scenarios would a user choose Molass Library over these established tools?
 - Are there any benchmark comparisons available?
+
+**Answer**: 
 
 ### Q1.3: Low-Rank Factorization Implementation
 **Question**: The paper describes low-rank factorization as a "central feature." How does your implementation compare to standard matrix factorization methods in scipy or scikit-learn? What makes your approach specialized for SEC-SAXS?
@@ -36,8 +44,8 @@
 ## 2. Installation & Dependencies
 
 ### Q2.1: Python Version Support
-**Question**: The pyproject.toml specifies `requires-python = ">=3.9,<3.13"`. 
-- Why is Python 3.13 excluded?
+**Question**: The pyproject.toml specifies `requires-python = ">=3.12,<3.14"`. 
+- Why is Python 3.14 excluded?
 - Is Python 3.8 support planned (it's still widely used)?
 - Are there specific dependency constraints preventing broader support?
 
