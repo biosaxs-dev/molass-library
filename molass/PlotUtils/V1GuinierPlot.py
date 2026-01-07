@@ -40,5 +40,5 @@ def set_limits_from_interval(ax, qq, logy, interval):
         ax.set_xlim(extend(1.5, 'left', 0.2, gxmin, gxmax))
         ax.set_ylim(extend(2.0, 'top', 0.5, gymin, gymax))
     except Exception as exc:
-        from KekLib.ExceptionTracebacker import log_exception
+        from molass_legacy.KekLib.ExceptionTracebacker import log_exception
         log_exception(None, "failed to set limits: (gxmin, gxmax)=(%s, %s), (gymin, gymax)=(%s, %s)" % (str(gxmin), str(gxmax), str(gymin), str(gymax)))

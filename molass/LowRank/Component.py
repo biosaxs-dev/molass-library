@@ -275,6 +275,54 @@ class XrComponent(Component):
             return sg
         else:
             return sg.Rg
+        
+    def plot_guinier(self, ax=None, debug=False):
+        """
+        Plot the Guinier plot of the component.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes or None, optional
+            The axes to plot on. If None, a new figure and axes are created.
+        debug : bool, optional
+            If True, print debug information. Default is False.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            The axes with the Guinier plot.
+        """
+        sg = self.get_guinier_object()
+        if debug:
+            from importlib import reload
+            import molass.PlotUtils.GuinierPlot
+            reload(molass.PlotUtils.GuinierPlot)
+        from molass.PlotUtils.GuinierPlot import guinier_plot_impl
+        return guinier_plot_impl(sg, ax, debug=debug)
+    
+    def inspect_guinier(self, debug=False):
+        """
+        Inspect the Guinier plot of the component in a new figure.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, print debug information. Default is False.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The figure with the Guinier plot.
+        matplotlib.axes.Axes
+            The axes with the Guinier plot.
+        """
+        sg = self.get_guinier_object()
+        if debug:
+            from importlib import reload
+            import molass.PlotUtils.GuinierPlot
+            reload(molass.PlotUtils.GuinierPlot)
+        from molass.PlotUtils.GuinierPlot import inspect_guinier_plot
+        return inspect_guinier_plot(sg, debug=debug)
 class UvComponent(Component):
     """
     A class to represent a UV component.

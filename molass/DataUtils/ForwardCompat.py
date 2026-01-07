@@ -133,7 +133,7 @@ def convert_to_trimmed_prerecog(pre_recog, uv_restrict_list, xr_restrict_list, r
     fc = pre_recog.flowchange
 
     def get_slice_from_restrict_list(restrict_list):
-        if len(restrict_list) == 0 or restrict_list[0] is None:
+        if restrict_list is None or len(restrict_list) == 0 or restrict_list[0] is None:
             return slice(None)
         else:
             return restrict_list[0].get_slice()

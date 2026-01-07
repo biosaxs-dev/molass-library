@@ -43,7 +43,10 @@ def construct_decomposition_from_results(run_info, **kwargs):
 
     ssd = run_info.ssd
     xr_icurve = ssd.xr.get_icurve()
-    uv_icurve = ssd.uv.get_icurve()
+    if ssd.has_uv():
+        uv_icurve = ssd.uv.get_icurve()
+    else:
+        uv_icurve = None
 
     params = get_params(job_result_folder)
     optimizer = run_info.optimizer
@@ -63,7 +66,10 @@ def construct_decomposition_from_results(run_info, **kwargs):
     # uv_ccurves
     uv_params = separated_params[4]
     uv_ccurves = []
-    x = uv_icurve.x
+    if uv_icurve is None:
+        x = xr_icurve.x
+    else:
+        x = uv_icurve.x
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
         xr_h = xr_ccurve.get_params()[0]
         uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale/xr_h))

@@ -152,6 +152,38 @@ class SecSaxsData:
         self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
+    def has_xr(self):
+        """ssd.has_xr()
+
+        Returns whether the XR data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_xr : bool
+            True if the XR data is available, False otherwise.
+        """
+        return self.xr is not None
+
+    def has_uv(self):
+        """ssd.has_uv()
+
+        Returns whether the UV data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_uv : bool
+            True if the UV data is available, False otherwise.
+        """
+        return self.uv is not None
+
     def plot_3d(self, **kwargs):
         """ssd.plot_3d(title=None, view_init=None, view_arrows=False, with_2d_section_lines=False, **kwargs)
 
