@@ -698,7 +698,7 @@ class SecSaxsData:
             return self.beamline_info.name
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
-        """ssd.export(folder, prefix=None)
+        """ssd.export(folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=Fals)
 
         Exports the data to a file.
 
@@ -782,26 +782,3 @@ class SecSaxsData:
             return [self.xr.qv, self.xr.qv]
         else:
             return [self.xr.qv, self.uv.wv]
-    
-    def export_to_folder(self, folder, debug=False):
-        """ssd.export_to_folder(folder, debug=False)
-
-        Exports the data to a specified folder.
-
-        Parameters
-        ----------
-        folder : str
-            Specifies the folder path where the data will be exported.
-
-        debug : bool, optional
-            If True, enables debug mode for more verbose output.
-
-        Returns
-        -------
-        None
-        """
-        if debug:
-            import molass.DataUtils.ExportSsd
-            reload(molass.DataUtils.ExportSsd)
-        from molass.DataUtils.ExportSsd import export_ssd_to_folder_impl
-        export_ssd_to_folder_impl(self, folder=folder, debug=debug)

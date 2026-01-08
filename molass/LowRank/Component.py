@@ -276,7 +276,7 @@ class XrComponent(Component):
         else:
             return sg.Rg
         
-    def plot_guinier(self, ax=None, debug=False):
+    def plot_guinier(self, axes=None, debug=False):
         """
         Plot the Guinier plot of the component.
 
@@ -298,7 +298,7 @@ class XrComponent(Component):
             import molass.PlotUtils.GuinierPlot
             reload(molass.PlotUtils.GuinierPlot)
         from molass.PlotUtils.GuinierPlot import guinier_plot_impl
-        return guinier_plot_impl(sg, ax, debug=debug)
+        return guinier_plot_impl(sg, axes=axes, debug=debug)
     
     def inspect_guinier(self, debug=False):
         """
