@@ -13,3 +13,7 @@ Submodules
    :maxdepth: 4
 
    molass.Bridge.V2Result
+   molass.Bridge.LegacyBaselines
+   molass.Bridge.LegacyRgCurve
+   molass.Bridge.OptimizerInput
+   molass.Bridge.SdProxy

@@ -17,9 +17,12 @@ Submodules
    molass.SEC.Models.EdmEstimator
    molass.SEC.Models.EdmEstimatorImpl
    molass.SEC.Models.EdmOptimizer
+   molass.SEC.Models.GEC
+   molass.SEC.Models.LognormalPore
    molass.SEC.Models.SDM
    molass.SEC.Models.SdmComponentCurve
    molass.SEC.Models.SdmEstimator
+   molass.SEC.Models.SdmMonoPore
    molass.SEC.Models.SdmOptimizer
    molass.SEC.Models.Simple
    molass.SEC.Models.UvComponentCurve

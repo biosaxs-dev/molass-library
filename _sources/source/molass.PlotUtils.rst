@@ -16,6 +16,7 @@ Submodules
    molass.PlotUtils.Arrow3D
    molass.PlotUtils.Comparison
    molass.PlotUtils.DecompositionPlot
+   molass.PlotUtils.GuinierPlot
    molass.PlotUtils.MatrixPlot
    molass.PlotUtils.PlotResult
    molass.PlotUtils.SecSaxsDataPlot
