@@ -50,7 +50,7 @@ def guinier_plot_impl(sg, axes=None, debug=False):
     else:
         start = sg.guinier_start
         stop = sg.guinier_stop
-    guinier_plot_general(q, sg.y_, sg.e_, (start, stop), (start, stop), axes=axes, debug=debug)
+    guinier_plot_general(q, sg.y_, sg.e_, (start, stop), (0, len(q)//8), axes=axes, debug=debug)
 
 def inspect_guinier_plot(sg, debug=False):
     if debug:
@@ -72,10 +72,10 @@ def inspect_guinier_plot(sg, debug=False):
     from molass.Guinier.SimpleFallback import SimpleFallback, compute_rg
     sgf = SimpleFallback(data)
     sgf.estimate()
-    print(f"Fallback Guinier Rg: {sgf.result['Rg']}, q_start: {sgf.result['q_start']}, q_end: {sgf.result['q_end']}, q_rg_max: {sgf.result['q_rg_max']}, n_points: {sgf.result['n_points']}")
+    print(f"Fallback Guinier Rg: {sgf.result['Rg']}, q_start: {sgf.result['q_start']}, q_stop: {sgf.result['q_stop']}, q_rg_max: {sgf.result['q_rg_max']}, n_points: {sgf.result['n_points']}")
     if debug:
         sgf.plot()
-    guinier_region = (sgf.result['q_start'], sgf.result['q_end'])
+    guinier_region = (sgf.result['q_start'], sgf.result['q_stop'])
     plot_region = (0, data.shape[0]//8)
     if debug:
         guinier_plot_general(*data.T, guinier_region, plot_region, debug=debug)

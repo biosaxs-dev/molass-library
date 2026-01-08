@@ -53,6 +53,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # make init_params
     init_params = decomposition.make_rigorous_initparams(baseparams)
     optimizer.prepare_for_optimization(init_params)
+    optimizer.set_xr_only(not decomposition.ssd.has_uv())
     
     # run optimization
     from molass_legacy.Optimizer.Scripting import run_optimizer

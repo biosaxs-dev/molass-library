@@ -257,8 +257,9 @@ class XrComponent(Component):
             The SimpleGuinier object.
         """
         if self.sg is None:
-            from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
-            self.sg = SimpleGuinier(self.get_jcurve_array())
+            # from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+            from molass.Guinier.RgEstimator import RgEstimator
+            self.sg = RgEstimator(self.get_jcurve_array())
         return self.sg
 
     def compute_rg(self, return_object=False):

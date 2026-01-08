@@ -198,7 +198,7 @@ def estimate_rg_simply(data, rg_range=None, min_num_points=5, q_rg_limit=1.3, in
         'Rg': Rg_final,
         'I0': I0,
         'q_start': best_q_start,
-        'q_end': q_end_refined - 1,
+        'q_stop': q_end_refined,
         'q_min': q_final.min(),
         'q_max': q_final.max(),
         'n_points': len(q_final),
