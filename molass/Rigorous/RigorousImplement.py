@@ -47,13 +47,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     model = decomposition.xr_ccurves[0].model
     num_components = decomposition.num_components
     optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, debug=debug)
+    optimizer.set_xr_only(not decomposition.ssd.has_uv())
 
     from molass_legacy.Optimizer.Scripting import set_optimizer_settings
     set_optimizer_settings(num_components=num_components, model=model, method=method)
     # make init_params
     init_params = decomposition.make_rigorous_initparams(baseparams)
     optimizer.prepare_for_optimization(init_params)
-    optimizer.set_xr_only(not decomposition.ssd.has_uv())
     
     # run optimization
     from molass_legacy.Optimizer.Scripting import run_optimizer
