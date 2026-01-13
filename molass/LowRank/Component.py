@@ -52,7 +52,7 @@ class Component:
         self.icurve_array = icurve_array
         self.jcurve_array = jcurve_array
         x, y = self.icurve_array
-        self.peak_index = np.argmax(y)
+        self.peak_index = int(np.argmax(y))     # to avoid np.int64()
         self.icurve = None
         self.jcurve = None
         self.area = None

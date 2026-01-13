@@ -2728,6 +2728,12 @@ def create_lowq(q):
 
 class Sasrec(object):
     def __init__(self, Iq, D, qc=None, r=None, nr=None, alpha=0.0, ne=2, extrapolate=True):
+        debug = False
+        if debug:
+            import logging
+            self.logger = logging.getLogger(__name__)
+        else:
+            self.logger = None
         self.Iq = Iq
         self.q = Iq[:, 0]
         self.I = Iq[:, 1]
@@ -2800,6 +2806,8 @@ class Sasrec(object):
         self.rg = self.Ish2rg()
         self.E = self.Et()
         self.rgerr = self.rgerrf()
+        if self.logger is not None:
+            self.logger.info("Radius of gyration (Rg): %.3f +/- %.3f Å" % (self.rg, self.rgerr))
         self.avgr = self.Ish2avgr()
         self.avgrerr = self.avgrerrf()
         self.Q = self.Ish2Q()
@@ -2942,6 +2950,9 @@ class Sasrec(object):
         qmax = 8. / self.rg
         if np.isnan(qmax):
             qmax = 8. / (self.D / 3.5)
+        qmax = max(0.1, qmax)       # temporary fix to avoid too low qmax values 
+        if self.logger is not None:
+            self.logger.info("Estimating Porod volume with oversmoothing factor %.1e and qmax = %.3f A^-1" % (oversmoothing, qmax))
         Iq = np.vstack((self.q, self.I, self.Ierr)).T
         sasrec4vp = Sasrec(Iq[self.q < qmax], self.D, alpha=self.alpha * oversmoothing, extrapolate=self.extrapolation)
         self.Q = sasrec4vp.Q

@@ -56,9 +56,10 @@ class SDM:
             from molass.PlotUtils.DecompositionPlot import plot_elution_curve            
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
             fig.suptitle('Optimization Debug Plots')
-            plot_elution_curve(axes[0, 0], decomposition.uv_icurve, decomposition.uv_ccurves, title="EGH Elution Curves for UV", ylabel="Absorbance")
-            plot_elution_curve(axes[0, 1], decomposition.xr_icurve, decomposition.xr_ccurves, title="EGH Elution Curves for XR", ylabel="Scattering Intensity")
-            plot_elution_curve(axes[1, 0], sdm_decomposition.uv_icurve, sdm_decomposition.uv_ccurves, title="SDM Elution Curves for UV", ylabel="Absorbance")
+            if decomposition.uv is not None:
+                plot_elution_curve(axes[0, 0], decomposition.uv_icurve, decomposition.uv_ccurves, title="EGH Elution Curves for UV", ylabel="Absorbance")
+                plot_elution_curve(axes[1, 0], sdm_decomposition.uv_icurve, sdm_decomposition.uv_ccurves, title="SDM Elution Curves for UV", ylabel="Absorbance")
+            plot_elution_curve(axes[0, 1], decomposition.xr_icurve, decomposition.xr_ccurves, title="EGH Elution Curves for XR", ylabel="Scattering Intensity")    
             plot_elution_curve(axes[1, 1], sdm_decomposition.xr_icurve, sdm_decomposition.xr_ccurves, title="SDM Elution Curves for XR", ylabel="Scattering Intensity")
             fig.tight_layout()
         return sdm_decomposition

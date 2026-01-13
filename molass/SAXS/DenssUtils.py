@@ -59,7 +59,6 @@ def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2,
     work_info : Struct
         A structure containing additional information about the fitting process.
     """
-    Iq = np.vstack( [q, a, e] ).T
 
     # task: update this construction automatically from bin\denss.fit_data.py
     args = Struct(
@@ -72,7 +71,7 @@ def fit_data_impl(q, a, e, file=None, D=None, alpha=None, max_alpha=None, nes=2,
         nes = nes,
         n1 = None,
         n2 = None,
-        ignore_errors = True,
+        ignore_errors = False,
         q = None,
         qmax = None,
         nq = None,
