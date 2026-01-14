@@ -58,10 +58,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # run optimization
     from molass_legacy.Optimizer.Scripting import run_optimizer
     x_shifts = dsets.get_x_shifts()
-    run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts)
+    monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts)
 
     if debug:
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets, init_params=init_params)
+    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets, init_params=init_params, monitor=monitor)
