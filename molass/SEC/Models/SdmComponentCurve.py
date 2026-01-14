@@ -110,3 +110,14 @@ class SdmComponentCurve(ComponentCurve):
             Peak top x calculation is not implemented for SDM model.
         """
         raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+    
+    def get_scale_param(self):
+        """
+        Returns the scale parameter.
+
+        Returns
+        -------
+        float
+            The scale parameter.
+        """
+        return self.scale

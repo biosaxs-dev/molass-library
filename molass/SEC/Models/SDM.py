@@ -39,17 +39,21 @@ class SDM:
             import molass.SEC.Models.UvOptimizer
             reload(molass.SEC.Models.UvOptimizer)
         from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
-        from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
+        from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition, adjust_rg_and_poresize
         from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
         env_params = estimate_sdm_column_params(decomposition, **kwargs)
         model_params = kwargs.pop('model_params', None)
         new_xr_ccurves = optimize_sdm_xr_decomposition(decomposition, env_params, model_params=model_params, **kwargs)
         if decomposition.uv is None:
-            new_uv_ccurves = None
+            from molass.Decompose.XrOnlyUtils import make_dummy_uv_ccurves
+            new_uv_ccurves = make_dummy_uv_ccurves(decomposition.ssd, new_xr_ccurves)
         else:
             new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
+
+        rgcurve = kwargs.pop('rgcurve', None)
+        adjust_rg_and_poresize(sdm_decomposition, rgcurve=rgcurve)
 
         if debug:
             import matplotlib.pyplot as plt

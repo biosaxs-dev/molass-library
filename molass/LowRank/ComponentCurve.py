@@ -98,3 +98,14 @@ class ComponentCurve:
             The x value at the peak top.
         """
         return self.params[1]   # peak position in EGH model, note that this in valid only for EGH model
+    
+    def get_scale_param(self):
+        """
+        Returns the scale parameter.
+
+        Returns
+        -------
+        float
+            The scale parameter.
+        """
+        return self.params[0]   # scale in EGH model

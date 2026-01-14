@@ -382,7 +382,7 @@ class Decomposition:
         scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
         return peak_top_xes, scd_colors
     
-    def optimize_with_model(self, model_name, model_params=None, debug=False):
+    def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False):
         """
         Optimize the decomposition with a model.
 
@@ -395,6 +395,9 @@ class Decomposition:
 
             - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
             - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+
+        rgcurve : Curve, optional
+            The Rg curve to use for the optimization.
 
         model_params : dict, optional
             The parameters for the model.
@@ -412,7 +415,7 @@ class Decomposition:
             reload(molass.SEC.ModelFactory)
         from molass.SEC.ModelFactory import create_model
         model = create_model(model_name, debug=debug)
-        return model.optimize_decomposition(self, model_params=model_params, debug=debug)
+        return model.optimize_decomposition(self, rgcurve=rgcurve, model_params=model_params, debug=debug)
     
     def make_rigorous_initparams(self, baseparams, debug=False):
         """

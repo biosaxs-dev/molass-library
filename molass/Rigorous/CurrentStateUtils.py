@@ -5,7 +5,6 @@ import os
 from molass_legacy._MOLASS.SerialSettings import get_setting
 from molass_legacy.Optimizer.Scripting import get_params
 from molass.LowRank.Decomposition import Decomposition
-from molass.LowRank.ComponentCurve import ComponentCurve
 from molass.SEC.Models.UvComponentCurve import UvComponentCurve
 from molass.Mapping.Mapping import Mapping
 
@@ -53,11 +52,11 @@ def construct_decomposition_from_results(run_info, **kwargs):
     separated_params = optimizer.split_params_simple(params)
 
     # xr_ccurves
-    xr_params = separated_params[0]
-    xr_ccurves = []
-    x = xr_icurve.x
-    for p in xr_params:
-        xr_ccurves.append(ComponentCurve(x, p))
+    from importlib import reload
+    import molass.Rigorous.ComponentUtils
+    reload(molass.Rigorous.ComponentUtils)
+    from .ComponentUtils import get_xr_ccurves
+    xr_ccurves = get_xr_ccurves(optimizer, xr_icurve, separated_params)
 
     # mapping
     a, b = separated_params[3]
@@ -71,6 +70,6 @@ def construct_decomposition_from_results(run_info, **kwargs):
     else:
         x = uv_icurve.x
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        xr_h = xr_ccurve.get_params()[0]
+        xr_h = xr_ccurve.get_scale_param()
         uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale/xr_h))
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
