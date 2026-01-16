@@ -214,4 +214,4 @@ def plot_components_impl(decomposition, **kwargs):
         plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
-    return PlotResult(fig, (ax1, ax2, axt))
+    return PlotResult(fig, axes, axt=axt)
