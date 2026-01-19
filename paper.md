@@ -54,6 +54,14 @@ Analysis of SEC-SAXS data is inherently multi-step and complex. A typical workfl
 
 Molass Library currently implements steps 3–7. For steps 1 and 2, users may employ SAngler [@Shimizu:2016] or device-specific software, while for step 8, DENSS [@Grant:2018] is recommended. Although alternative tools exist, such as the proprietary program suite ATSAS [@Manalastas-Cantos:ge5081] and the open-source program BioXTAS RAW [@Hopkins:jl5075], Molass Library distinguishes itself by providing an open, scriptable, and modular platform. This design empowers researchers to flexibly tailor and extend their analysis pipelines within the Python ecosystem, thereby enhancing both reproducibility and adaptability.
 
+# Software Design
+
+Molass Library was designed to address a specific sustainability challenge: the primary developer is retiring within one year, with no confirmed successor. Rather than contributing to existing GUI-based tools like ATSAS or BioXTAS RAW, we chose to build a Python-first, Jupyter-centric solution optimized for AI-assisted maintenance and researcher extensibility. This design philosophy prioritizes explicit, readable code over graphical interfaces, enabling future researchers to leverage AI coding assistants for maintenance and extension. The architecture emphasizes modularity and clear separation of concerns: elution curve models (EGH, SDM, EDM) are isolated as parametric functions; low-rank factorization uses standard linear algebra (Moore-Penrose pseudoinverse); and visualization is decoupled from computation. By integrating established packages (NumPy, SciPy, pybaselines, ruptures) rather than reimplementing core functionality, we reduce custom code volume and enhance long-term viability. This approach explicitly optimizes for scenarios where AI tools—rather than human experts—must interpret, debug, and extend the codebase.
+
+# Research Impact Statement
+
+Molass Library has demonstrated credible research significance through its predecessor's track record [@Yonezawa:2023] and its positioning against documented limitations of alternative approaches. While CHROMIXS explicitly defers analysis of overlapping chromatographic peaks to "other methods" [@Panjkovich:2018], and EFAMIX quantifies failure thresholds (signal-to-noise ratio ≥10³ required for three-component separation; peak asymmetry parameter τ≤2; baseline width separation ≥2× for reliable decomposition) [@Konarev:2021], Molass Library addresses these scenarios through explicit parametric modeling of elution curves. REGALS employs a two-stage approach combining EFA with L1 regularization [@Meisburger:mf5050], inheriting EFA's fundamental limitations in overlapping peak scenarios. A forthcoming comparative publication will quantify the trade-offs between explicit parametric approaches (Molass) and implicit regularization-based methods (REGALS), providing empirical benchmarks for the community. The library's design for AI-assisted maintenance also represents a forward-looking contribution to research software sustainability in an era of limited human expertise.
+
 # Notable package dependencies
 
 Molass Library is built on robust scientific Python libraries, including NumPy, SciPy, and Matplotlib. It further integrates:
@@ -98,6 +106,16 @@ These models allow users to impose domain-specific constraints, thereby enhancin
 # Availability and Documentation
 
 Molass Library is freely available under an open-source license at [https://github.com/biosaxs-dev/molass-library](https://github.com/biosaxs-dev/molass-library). Comprehensive documentation, including tutorials and theoretical background, is provided at [Molass Essence](https://biosaxs-dev.github.io/molass-essence/chapters/intro.html).
+
+# AI usage disclosure
+
+Generative AI tools (GitHub Copilot, Claude 3.5 Sonnet, ChatGPT-4) were used for the following aspects of this submission:
+
+* **Paper text**: AI assistance was limited to improving English grammar, sentence structure, and clarity. All technical content, design decisions, and scientific claims were authored by the human authors.
+* **Code generation**: Small, common code portions (e.g., standard NumPy array operations, Matplotlib plotting boilerplate) were AI-generated. All core algorithms, elution curve models, and scientific logic were designed and implemented by the human authors.
+* **Documentation**: Significant portions of the tutorial notebooks and API documentation were initially drafted with AI assistance, then extensively reviewed, corrected, and refined by the human authors to ensure technical accuracy and pedagogical effectiveness.
+
+All AI-generated content was reviewed, validated, and edited by the human authors, who made all core design decisions and remain fully responsible for the accuracy and integrity of this submission.
 
 # Acknowledgements
 
