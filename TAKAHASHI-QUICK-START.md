@@ -227,11 +227,18 @@ You are the **technical expert supporting Shimizu's responses**.
 - Feasibility assessments
 - Technical accuracy review
 - Actual code/doc changes
+- **Technical paper sections** (Software Design, AI disclosure, implementation details)
 
-**You DON'T**:
-- Draft most responses (Shimizu does this)
-- Post to JOSS (Shimizu does this)
-- Make final decisions on response strategy (Shimizu leads)
+**Shimizu provides**:
+- Scientific paper sections (Statement of Need, Research Impact)
+- Response drafting for reviewer scientific questions
+- Final posting to JOSS review thread
+
+**Division of labor**:
+- **Paper technical content**: You draft, Shimizu reviews
+- **Paper scientific content**: Shimizu drafts, you review for accuracy
+- **Review responses**: Shimizu drafts, you provide technical input/review
+- **JOSS posting**: Always Shimizu (unified voice)
 
 **Why this approach?**
 - Shimizu understands scientific context better
@@ -393,6 +400,6 @@ Help me suggest a better response.
 
 ---
 
-**Last updated**: October 17, 2025  
+**Last updated**: January 21, 2026  
 **Mode**: Agent mode (autonomous assistance)  
 **Questions?** Ask Copilot or contact Shimizu

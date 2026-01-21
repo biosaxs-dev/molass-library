@@ -4,7 +4,21 @@ This document defines the unified initialization steps and expected Copilot beha
 
 ---
 
-## 🚦 Initialization: The Magic Phrase
+## � **Critical Context for Copilot**
+
+**GitHub Account Mapping** (verify BEFORE analyzing any issues):
+- `freesemt` = Takahashi (programmer)
+- `nshimizu0721` = Shimizu (domain expert)
+
+**Work Division**:
+- **Technical paper sections** (Software Design, AI disclosure) → Takahashi drafts, Shimizu reviews
+- **Scientific paper sections** (Statement of Need, Research Impact) → Shimizu drafts, Takahashi reviews
+- **Review responses** → Shimizu leads drafting, Takahashi provides technical support
+- **JOSS posting** → Always Shimizu (unified voice)
+
+---
+
+## �🚦 Initialization: The Magic Phrase
 
 Start every session by saying:
 ```

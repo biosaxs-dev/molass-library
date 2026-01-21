@@ -28,10 +28,17 @@ This ensures that every session continues with the unified action workflow for r
 
 ### **Detection Logic**
 ```
-IF path contains "takahashi" → User: Takahashi, Style: Technical
-ELSE IF path contains "[shimizu-pattern]" → User: Shimizu, Style: Scientific
+IF path contains "takahashi" → User: Takahashi (GitHub: freesemt), Style: Technical
+ELSE IF path contains "[shimizu-pattern]" → User: Shimizu (GitHub: nshimizu0721), Style: Scientific
 ELSE → Ask for identification
 ```
+
+### **GitHub Account Mapping (Critical for Issue Analysis)**
+**ALWAYS cross-reference when analyzing GitHub issues/comments:**
+- `freesemt` = Takahashi (programmer)
+- `nshimizu0721` = Shimizu (domain expert)
+
+See `coordination/GITHUB-ACCOUNTS.md` for authoritative mapping.
 
 ---
 
