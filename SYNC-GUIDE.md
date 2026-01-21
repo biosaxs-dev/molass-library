@@ -171,17 +171,52 @@ After initialization, Copilot reports:
 
 ## 📝 When to Push Changes Back to molass-library
 
+### **⚠️ CRITICAL: Understanding the Subtree Mapping**
+
+```
+molass-review (main branch) / molass-library folder
+    = SUBTREE from
+original molass-library (joss-paper branch)
+```
+
+**This means**: When you edit files in `molass-library/` (like `paper.md`), you're editing the **main branch of molass-review**, NOT a separate joss-paper branch!
+
+### **Correct Workflow for Pushing Changes:**
+
 If you make changes in `molass-library/` that should go back to the source repo:
 
 ```bash
-# Option 1: Push subtree changes back to upstream
+# 1. Make sure you're on the main branch of molass-review
+git checkout main
+
+# 2. Edit files in molass-library/ as normal
+# (e.g., molass-library/paper.md)
+
+# 3. Commit your changes to molass-review
+git add molass-library/paper.md
+git commit -m "Update paper.md: [describe changes]"
+
+# 4. Push subtree changes to upstream joss-paper branch
 git subtree push --prefix=molass-library molass-upstream joss-paper
 
-# Option 2: Work directly in the molass-library repo
-# (Navigate to separate clone of biosaxs-dev/molass-library)
+# 5. Push to molass-review repository
+git push origin main
 ```
 
-**Best Practice**: For significant development work, use a separate clone of molass-library. Use the subtree here for reference and small fixes.
+### **❌ Common Mistakes to AVOID:**
+
+1. **DON'T** create a `joss-paper` branch in molass-review
+2. **DON'T** try to `cd molass-library/` and treat it as a separate git repository
+3. **DON'T** try to push from inside the `molass-library/` folder directly
+
+### **✅ Correct Approach:**
+
+- Always work from the **molass-review main branch**
+- Edit files in `molass-library/` as part of this repository
+- Use `git subtree push` to sync changes to upstream
+- The subtree system handles the branch mapping automatically
+
+**Best Practice**: For paper edits (paper.md, paper.bib), use this subtree workflow. For significant code development, you may also work directly in a separate clone of molass-library.
 
 ---
 
