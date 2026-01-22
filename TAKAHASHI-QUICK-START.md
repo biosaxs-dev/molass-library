@@ -32,6 +32,9 @@ In VS Code Copilot Chat:
 ```
 Please read COPILOT-INIT.md to initialize
 ```
+
+**Note**: You'll need to click "Allow" about 3-4 times. Copilot will explain each action before requesting permission, so you always know what you're approving!
+
 Copilot Agent will recognize you as Takahashi and autonomously:
 - **Sync molass-library** with the latest changes from joss-paper branch
 - **Check JOSS review issue** for new comments or status changes

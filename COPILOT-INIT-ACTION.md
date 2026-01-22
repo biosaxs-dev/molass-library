@@ -30,6 +30,29 @@ Copilot will recognize the user and load the correct context.
 
 ## 📝 What Copilot Does at Initialization
 
+**Note**: Copilot batches operations together to minimize "Allow" button clicks!
+
+**Best Practice**: Before each "Allow" prompt, Copilot will explain:
+- 📋 **What** it's about to do
+- 🎯 **Why** it needs to do it
+- 📂 **Which files/resources** will be accessed
+
+This helps you make informed decisions and stay engaged with each approval.
+
+### **Phase 1: Read All Context (Single Batch)**
+**What you'll see**: "Loading workspace context and user configuration..."
+
+Files to be read:
+- COPILOT-INIT.md
+- USER-IDENTIFICATION.md
+- CURRENT-STATUS.md
+- coordination/GITHUB-ACCOUNTS.md
+- coordination/REVIEW-ARCHITECTURE.md
+- User's quick-start guide
+
+### **Phase 2: Repository Sync (Takahashi Only)**
+**What you'll see**: "Syncing molass-library from joss-paper branch..."
+
 1. **Synchronizes molass-library Subtree (Takahashi Only)**
    - **For Takahashi**: Copilot checks if the molass-library subtree needs updating from the joss-paper branch
      - Uses: `git fetch molass-upstream` and `git subtree pull --prefix=molass-library molass-upstream joss-paper --squash`
@@ -37,31 +60,68 @@ Copilot will recognize the user and load the correct context.
      - **This ensures Takahashi always works with the latest version of the library**
    - **For Shimizu**: This step is skipped (Shimizu doesn't need to manage the subtree)
 
+### **Phase 3: External Status Checks (Single Batch)**
+**What you'll see**: "Checking GitHub issues and JOSS review status..."
+
+Copilot performs these checks together:
+
 2. **Summarizes all open internal GitHub Issues**
-   - Copilot will check and summarize all open issues in this repository.
-   - Always review this summary before starting your work.
+   - Checks and summarizes all open issues in this repository
+   - Always review this summary before starting your work
 
 3. **Displays the JOSS Review Issue URL (if available)**
-   - If the JOSS review issue URL is set in CURRENT-STATUS.md, Copilot will display it for quick access to the official review thread.
+   - If the JOSS review issue URL is set in CURRENT-STATUS.md, displays it for quick access
 
 4. **Checks Current JOSS Review Status (Automated)**
-   - Copilot will fetch the current status from the JOSS papers page and the review issue
-   - Reports the current phase: PRE-REVIEW, REVIEW PENDING, UNDER REVIEW, or PUBLISHED
+   - Fetches current status from JOSS papers page and review issue
+   - Reports current phase: PRE-REVIEW, REVIEW PENDING, UNDER REVIEW, or PUBLISHED
    - Identifies if editor and/or reviewers have been assigned
-   - Shows the date of last activity on the JOSS review issue
-   - **This happens automatically at every initialization to keep you informed**
+   - Shows date of last activity on JOSS review issue
 
 5. **Monitors the JOSS Review Issue for Actionable Comments**
-    - Copilot checks the JOSS review issue for new reviewer or editor comments that require action from the authors (such as requests for clarification, documentation changes, bug fixes, or additional information).
-    - If such a comment appears and there is no corresponding internal issue in this repository:
-       - Copilot will alert Shimizu (and/or Takahashi) that a new actionable comment has been posted in the JOSS review thread.
-       - Copilot will recommend creating a new internal GitHub Issue to track and coordinate the response.
-       - Copilot may draft the issue content, summarizing the reviewer/editor request for easy tracking and assignment.
-    - This ensures that all reviewer and editor requests are tracked internally and nothing is missed during the review process.
+    - Checks JOSS review issue for new reviewer or editor comments requiring action
+    - If actionable comment found with no corresponding internal issue:
+       - Alerts Shimizu (and/or Takahashi) about the new comment
+       - Recommends creating internal GitHub Issue to track response
+       - May draft issue content summarizing the reviewer/editor request
+    - Ensures all reviewer and editor requests are tracked internally
+
+### **Phase 4: Update Status (If Needed)**
+**What you'll see**: "Updating CURRENT-STATUS.md with latest review information..."
 
 6. **Updates CURRENT-STATUS.md if Status Changed**
-   - If the JOSS review status has changed since the last update, Copilot will automatically update CURRENT-STATUS.md
-   - This keeps the coordination repository in sync with the actual JOSS review progress
+   - If JOSS review status changed since last update, automatically updates CURRENT-STATUS.md
+   - Keeps coordination repository in sync with actual JOSS review progress
+
+---
+
+## 💡 **Example: What You'll Actually See**
+
+When you say "Please read COPILOT-INIT.md to initialize", here's what happens:
+
+```
+Copilot: "📋 Loading workspace context and user configuration..."
+         (reads 6 config files)
+You:     [Click "Allow"] ← You know it's reading config
+
+Copilot: "🔄 Syncing molass-library from joss-paper branch..."
+         (runs git commands)
+You:     [Click "Allow"] ← You know it's syncing code
+
+Copilot: "🔍 Checking GitHub issues and JOSS review status..."
+         (makes API calls to GitHub + JOSS)
+You:     [Click "Allow"] ← You know it's checking external status
+
+Copilot: "✏️ Updating CURRENT-STATUS.md with latest review information..."
+         (writes status file if changed)
+You:     [Click "Allow"] ← You know it's updating local file
+```
+
+**Result**: 
+- Typically requires only **3-4 "Allow" clicks** instead of 6+
+- Each click is **informed** (you know what you're approving)
+- Maintains **attention** (clear context for each decision)
+- Prevents **click fatigue** (fewer but meaningful prompts)
 
 ---
 
