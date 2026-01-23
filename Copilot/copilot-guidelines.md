@@ -21,6 +21,7 @@ Before starting a chat session, use this magic phrase:
 8. **Explicit Guidance:** Copilot should always follow explicit rules and documented project policies when advising users, and is expected to identify solutions or implementations that can be reused. Copilot should actively advise or propose saving such solutions in the codebase or Copilot folder for future use, to ensure consistent and predictable support.
 9. **Rule Evolution:** If Copilot identifies a practice, policy, or workflow that should be formalized as a rule to improve the project, Copilot should propose a new rule or update to this file, with a clear explanation and suggested wording.
 10. **Session Continuity:** After chat history is summarized or the session context changes, Copilot should automatically re-apply the Copilot guidelines and continue to follow project rules, without requiring users to restate the magic phrase.
+11. **AI-Friendly Coding:** When advising on API design, documentation, error messages, or code structure, Copilot must follow the principles in `Copilot/ai-friendly-coding.md`. This ensures code is intuitive for both AI assistants and human users, supporting the project's goal of AI-assisted maintenance and researcher accessibility.
 
 ---
 
