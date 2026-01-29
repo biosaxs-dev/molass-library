@@ -60,7 +60,7 @@ The MOLASS library is designed to support sustainable software development by pr
 
 # Research Impact Statement
 
-Molass Library has demonstrated credible research significance through its predecessor's track record [@Yonezawa:2023] and its positioning against documented limitations of alternative approaches. While CHROMIXS explicitly defers analysis of overlapping chromatographic peaks to "other methods" [@Panjkovich:2018], EFAMIX quantifies failure thresholds (signal-to-noise ratio ≥10³ required for three-component separation; peak asymmetry parameter τ≤2; baseline width separation ≥2× for reliable decomposition) [@Konarev:2021], and REGALS employs a two-stage approach combining EFA with L1 regularization [@Meisburger:mf5050], inheriting EFA's fundamental limitations in overlapping peak scenarios. Molass Library addresses these documented limitations through explicit parametric modeling of elution curves and rigorous global optimization methods that constrain solutions using SEC theory (size-dependent elution) and SAXS theory (radius of gyration consistency), widening the scope of tractable cases for overlapping peak decomposition beyond what existing methods can reliably address.
+Molass Library has demonstrated credible research significance through its predecessor's track record [@Yonezawa:2023] and its positioning against documented limitations of alternative approaches. While CHROMIXS explicitly defers analysis of overlapping chromatographic peaks to "other methods" [@Panjkovich:2018], EFAMIX quantifies failure thresholds (signal-to-noise ratio ≥10³ required for three-component separation; peak asymmetry parameter τ≤2; baseline width separation ≥2× for reliable decomposition) [@Konarev:2021], and REGALS employs a two-stage approach combining EFA with L1 regularization [@Meisburger:mf5050], inheriting EFA's fundamental limitations in overlapping peak scenarios. Detailed evidence extraction, mathematical analysis of regularization behavior, and computational validation of these documented limitations is provided in a companion research repository [@takahashi2026modeling]. Molass Library addresses these documented limitations through explicit parametric modeling of elution curves and rigorous global optimization methods that constrain solutions using SEC theory (size-dependent elution) and SAXS theory (radius of gyration consistency), widening the scope of tractable cases for overlapping peak decomposition beyond what existing methods can reliably address.
 
 # Notable package dependencies
 
@@ -115,7 +115,7 @@ Generative AI tools (GitHub Copilot, Claude 3.5 Sonnet, ChatGPT-4) were used for
 * **Code generation**: Small, common code portions (e.g., standard NumPy array operations, Matplotlib plotting boilerplate) were AI-generated. All core algorithms, elution curve models, and scientific logic were designed and implemented by the human authors.
 * **Documentation**: Significant portions of the tutorial notebooks and API documentation were initially drafted with AI assistance, then extensively reviewed, corrected, and refined by the human authors to ensure technical accuracy and pedagogical effectiveness.
 
-All AI-generated content was reviewed, validated, and edited by the human authors, who made all core design decisions and remain fully responsible for the accuracy and integrity of this submission.
+All AI-generated content was reviewed, validated, and edited by the human authors, who made all core design decisions and remain fully responsible for the accuracy and integrity of this submission. This disclosure reflects the initial release; future development may involve deeper AI collaboration, documented in the repository's development history.
 
 # Acknowledgements
 
@@ -123,3 +123,5 @@ This work was supported by JSPS KAKENHI Grant Number JP25K07250, and partially b
 
 # References
 
+::: {#refs}
+:::
