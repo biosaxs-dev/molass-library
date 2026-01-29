@@ -7,3 +7,5 @@ reference_papers/
 *.html
 *.png
 *.txt
+
+.vscode/
