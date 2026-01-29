@@ -78,6 +78,8 @@ A central feature of Molass Library is its implementation of **low rank factoriz
 
 $$ M = P \cdot C \qquad (1) $$
 
+Roughly speaking, in practice methods find P and C that minimize ||M - PC||² (plus regularization terms) rather than achieving exact equality.
+
 where:
 
 * $M$: measured data matrix
