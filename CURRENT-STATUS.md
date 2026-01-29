@@ -1,13 +1,13 @@
 # CURRENT STATUS
 
-**📅 Last Updated: December 19, 2025**  
+**📅 Last Updated: January 29, 2026**  
 **👤 Updated By: Copilot (Takahashi session)**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Waiting for Editor Assignment)
+## 🎯 Current Phase: PRE-REVIEW (Updating Paper for New JOSS Requirements)
 
-**Status**: Paper submitted and in queue - **No active review yet**
+**Status**: Responding to JOSS policy change - **Updating paper format before review can proceed**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -16,13 +16,15 @@
 - ✅ **Nov 17, 2025**: Shimizu provided detailed response
 - ✅ **Nov 18, 2025**: Shimizu fixed DOI formatting issues
 - ✅ **Nov 19, 2025**: Shimizu suggested 5 relevant JOSS papers as reviewer candidates
-- ⏳ **Currently**: Waiting for editor assignment
+- 🔔 **Jan 20, 2026**: JOSS announced policy change requiring new paper sections
+- 🔄 **Jan 19-29, 2026**: Team working on adding required sections (Issue #8)
+- ⏳ **Currently**: Finalizing paper updates, preparing to notify JOSS
 
 ### What This Means:
-- **Editor**: Not yet assigned
+- **Editor**: Not yet assigned (waiting for paper update)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet
-- **Next Step**: Wait for editor to be assigned, then reviewers
+- **Review Status**: Has NOT started yet (blocked on paper update)
+- **Next Step**: Complete paper updates, notify JOSS, then wait for editor assignment
 
 ---
 
@@ -41,19 +43,25 @@
 - ✅ Responded to EiC's pre-review questions
 - ✅ Fixed DOI formatting issues
 - ✅ Suggested relevant reviewer candidates
-- ⏳ Waiting for editor/reviewer assignment
+- 🔄 Reviewing paper updates with Takahashi (Issue #8)
+- ⏳ Will notify JOSS when updates complete
 
 ### **Takahashi** (Technical Support):
 - ✅ Repository setup complete
-- ⏳ On standby for technical questions when review starts
+- 🔄 Drafted Software Design section (Issue #8)
+- 🔄 Drafted Research Impact Statement (Issue #8)
+- 🔄 Added AI Usage Disclosure (Issue #8)
+- ⏳ Awaiting Shimizu's final approval to respond to JOSS
 
 ---
 
-## 📋 Open Internal GitHub Issues (Tracking Pre-Review Activity)
+## 📋 Open Internal GitHub Issues (Active Work)
 
-**Active Issues**: 4 open issues tracking pre-review discussion and preparation
+**Active Issues**: 1 open issue tracking paper update work
 
-1. [Similar JOSS papers for the reviewers](https://github.com/biosaxs-dev/molass-review/issues/6) - Discussion about reviewer candidates
-2. [DOI tag issues from editorialbot](https://github.com/biosaxs-dev/molass-review/issues/5) - Fixed ✅
-3. [Required Reply: Differences from the time of BPPB publication](https://github.com/biosaxs-dev/molass-review/issues/7) - Addressed in response ✅
-4. [Current status on Nov 17](https://github.com/biosaxs-dev/molass-review/issues/4) - Status tracking
+1. [Response to the JOSS policy change](https://github.com/biosaxs-dev/molass-review/issues/8) - **ACTIVE**: Adding required sections to paper.md
+   - Software Design section ✅ (pending Shimizu's final review)
+   - Research Impact Statement ✅ (pending Shimizu's final review)
+   - AI Usage Disclosure ✅ (pending Shimizu's final review)
+   - **Status**: Takahashi completed draft revisions per Shimizu's feedback on Jan 21
+   - **Next**: Shimizu to approve and respond to JOSS issue
