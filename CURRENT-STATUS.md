@@ -1,7 +1,7 @@
 # CURRENT STATUS
 
-**📅 Last Updated: January 29, 2026**  
-**👤 Updated By: Copilot (Takahashi session)**
+**📅 Last Updated: February 2, 2026**  
+**👤 Updated By: Takahashi**
 
 ---
 
@@ -18,13 +18,14 @@
 - ✅ **Nov 19, 2025**: Shimizu suggested 5 relevant JOSS papers as reviewer candidates
 - 🔔 **Jan 20, 2026**: JOSS announced policy change requiring new paper sections
 - 🔄 **Jan 19-29, 2026**: Team working on adding required sections (Issue #8)
-- ⏳ **Currently**: Finalizing paper updates, preparing to notify JOSS
+- ✅ **Feb 2, 2026**: Removed references to private companion repository from paper
+- ⏳ **Currently**: Paper updates complete, preparing to notify JOSS
 
 ### What This Means:
-- **Editor**: Not yet assigned (waiting for paper update)
+- **Editor**: Not yet assigned (waiting for paper update confirmation)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet (blocked on paper update)
-- **Next Step**: Complete paper updates, notify JOSS, then wait for editor assignment
+- **Review Status**: Has NOT started yet (blocked on paper update notification)
+- **Next Step**: Shimizu to review latest changes and notify JOSS that paper has been updated
 
 ---
 
@@ -43,14 +44,15 @@
 - ✅ Responded to EiC's pre-review questions
 - ✅ Fixed DOI formatting issues
 - ✅ Suggested relevant reviewer candidates
-- 🔄 Reviewing paper updates with Takahashi (Issue #8)
-- ⏳ Will notify JOSS when updates complete
+- ⏳ Reviewing paper updates from Takahashi (Issue #8 - updated Feb 2, 2026)
+- ⏳ Will notify JOSS when updates are approved
 
 ### **Takahashi** (Technical Support):
 - ✅ Repository setup complete
-- 🔄 Drafted Software Design section (Issue #8)
-- 🔄 Drafted Research Impact Statement (Issue #8)
-- 🔄 Added AI Usage Disclosure (Issue #8)
+- ✅ Drafted Software Design section (Issue #8)
+- ✅ Drafted Research Impact Statement (Issue #8)
+- ✅ Added AI Usage Disclosure (Issue #8)
+- ✅ Removed private repository references from paper (Feb 2, 2026)
 - ⏳ Awaiting Shimizu's final approval to respond to JOSS
 
 ---
@@ -60,8 +62,9 @@
 **Active Issues**: 1 open issue tracking paper update work
 
 1. [Response to the JOSS policy change](https://github.com/biosaxs-dev/molass-review/issues/8) - **ACTIVE**: Adding required sections to paper.md
-   - Software Design section ✅ (pending Shimizu's final review)
-   - Research Impact Statement ✅ (pending Shimizu's final review)
-   - AI Usage Disclosure ✅ (pending Shimizu's final review)
-   - **Status**: Takahashi completed draft revisions per Shimizu's feedback on Jan 21
-   - **Next**: Shimizu to approve and respond to JOSS issue
+   - Software Design section ✅ 
+   - Research Impact Statement ✅ 
+   - AI Usage Disclosure ✅
+   - **Recent Update (Feb 2, 2026)**: Removed references to private companion repository to comply with JOSS accessibility requirements
+   - **Status**: Paper sections complete, pushed to joss-paper branch
+   - **Next**: Shimizu to review and approve final version, then respond to JOSS issue
