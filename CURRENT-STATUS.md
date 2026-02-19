@@ -1,13 +1,13 @@
 # CURRENT STATUS
 
-**📅 Last Updated: February 16, 2026**  
-**👤 Updated By: Takahashi**
+**📅 Last Updated: February 19, 2026**  
+**👤 Updated By: Copilot (auto-updated at session init)**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Awaiting Final Paper Approval)
+## 🎯 Current Phase: PRE-REVIEW (Paper Updated, Awaiting Editor Assignment)
 
-**Status**: Paper sections complete with Shimizu's improvements - **Ready for final review and JOSS notification**
+**Status**: Shimizu notified JOSS on Feb 17 that paper revisions are complete - **Waiting for arfon's assessment and editor assignment**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -21,14 +21,16 @@
 - ✅ **Feb 2, 2026**: Removed references to private companion repository from paper
 - ✅ **Feb 16, 2026**: Shimizu updated Research Impact Statement with new evidence (Jiang 2023, Furukawa 2025)
 - ✅ **Feb 16, 2026**: Verified new citations - both papers legitimately used MOLASS
-- ⏳ **Currently**: Paper updates complete (192 words Research Impact Statement), awaiting Shimizu's final approval to notify JOSS
+- 🔔 **Feb 16, 2026**: `arfon` (JOSS EiC) sent friendly reminder to update paper
+- ✅ **Feb 17, 2026**: Shimizu replied to `arfon` confirming all revisions are complete and requesting review
+- ⏳ **Currently**: Awaiting arfon's assessment of updated paper and editor assignment
 
 ### What This Means:
-- **Editor**: Not yet assigned (waiting for paper update notification)
+- **Editor**: Not yet assigned (arfon reviewing updated paper now)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet (JOSS waiting for authors to confirm updates complete)
-- **Last JOSS Activity**: January 20, 2026 (policy change announcement)
-- **Next Step**: Shimizu to give final approval and notify JOSS that paper has been updated per new requirements
+- **Review Status**: Has NOT started yet (JOSS reviewing updated paper)
+- **Last JOSS Activity**: February 17, 2026 (Shimizu confirmed paper updates complete)
+- **Next Step**: Wait for arfon's response and editor assignment; be ready to address any further requests
 
 ---
 
