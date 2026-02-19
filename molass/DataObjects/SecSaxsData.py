@@ -576,6 +576,8 @@ class SecSaxsData:
 
         Performs a quick decomposition of the SEC-SAXS data.
 
+        See also: `Nontrivial Decomposition <https://biosaxs-dev.github.io/molass-tutorial/chapters/10/nontrivial.html>`_
+
         Parameters
         ----------
         num_components : int, optional
@@ -583,7 +585,21 @@ class SecSaxsData:
             used to denoise the matrix data.
 
         proportions : list of float, optional
-            Specifies the proportions to be used for XR data.
+            Specifies the approximate area ratios of the elution peaks.
+            The values do not need to be normalized; for example,
+            ``[1, 1]``, ``[0.5, 0.5]``, and ``[3, 3]`` all produce the same result
+            because they are normalized internally.
+
+            When this option is given, a **proportional decomposition** algorithm
+            is used instead of the default peak-recognition algorithm.
+            The proportional algorithm divides the total elution curve by cumulative area
+            according to the given ratios, and fits an EGH model to each slice independently.
+            This provides better initialization for cases with highly overlapping peaks,
+            where the default algorithm may produce unstable results.
+
+            The exact ratios do not need to be known precisely;
+            even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
+            is usually sufficient.
 
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
