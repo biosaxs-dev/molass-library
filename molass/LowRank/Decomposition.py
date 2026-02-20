@@ -89,6 +89,7 @@ class Decomposition:
         self.paired_ranges = paired_ranges
 
         self.guinier_objects = None
+        self.bounded_lrf_info = None
         self.model = xr_ccurves[0].model
 
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
@@ -212,7 +213,50 @@ class Decomposition:
         from molass.LowRank.LowRankInfo import compute_lowrank_matrices
 
         xr = self.xr
-        return compute_lowrank_matrices(xr.M, self.xr_ccurves, xr.E, self.xr_ranks, debug=debug)
+
+        # Step 1: naïve factorization (compute_lowrank_matrices unchanged)
+        M_, C_, P_, Pe = compute_lowrank_matrices(
+            xr.M, self.xr_ccurves, xr.E, self.xr_ranks, debug=debug)
+
+        # Step 2: apply bounded LRF if any component is rank-2
+        ranks = self.xr_ranks or [1] * self.num_components
+        has_rank2 = any(r == 2 for r in ranks)
+
+        if has_rank2:
+            from molass.Guinier.RgEstimator import RgEstimator
+
+            # Step 2a: pre-populate guinier_objects from naïve P
+            if self.guinier_objects is None:
+                guinier_objects = []
+                for i in range(self.num_components):
+                    jcurve_array = np.array([xr.qv, P_[:, i], Pe[:, i]]).T
+                    guinier_objects.append(RgEstimator(jcurve_array))
+                self.guinier_objects = guinier_objects
+
+            # Step 2b: reconstruct full C and P (including c² rows/B columns)
+            cy_list = [c.get_xy()[1] for c in self.xr_ccurves]
+            for k, r in enumerate(ranks):
+                if r > 1:
+                    cy_list.append(cy_list[k] ** r)
+            C_full = np.array(cy_list)
+            P_full = M_ @ np.linalg.pinv(C_full)
+
+            # Step 2c: apply bounded LRF
+            if debug:
+                from importlib import reload
+                import molass.LowRank.BoundedLrf
+                reload(molass.LowRank.BoundedLrf)
+            from molass.LowRank.BoundedLrf import apply_bounded_lrf
+            P_, bounded_info = apply_bounded_lrf(
+                xr.qv, P_full, C_full, ranks, self.guinier_objects)
+            self.bounded_lrf_info = bounded_info
+
+            # Step 2d: re-propagate error for corrected P
+            if xr.E is not None:
+                from molass.LowRank.ErrorPropagate import compute_propagated_error
+                Pe = compute_propagated_error(M_, P_, xr.E)
+
+        return M_, C_, P_, Pe
 
     def get_xr_components(self, debug=False):
         """
