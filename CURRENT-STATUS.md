@@ -1,6 +1,6 @@
 # CURRENT STATUS
 
-**📅 Last Updated: February 19, 2026**  
+**📅 Last Updated: February 20, 2026**  
 **👤 Updated By: Copilot (auto-updated at session init)**
 
 ---
@@ -63,29 +63,3 @@
 - ✅ Reviewed Shimizu's improved Research Impact Statement (192 words, well within limit)
 - ✅ Verified new paper citations (Jiang 2023, Furukawa 2025) - both used MOLASS for SEC-SAXS analysis
 - ⏳ Identified PR #7 (joss-paper→master) - awaiting clarification from Shimizu
-
----
-
-## 📋 Open Internal GitHub Issues (Active Work)
-
-**Active Issues**: 1 open issue tracking paper update work
-
-1. [Response to the JOSS policy change](https://github.com/biosaxs-dev/molass-review/issues/8) - **NEARLY COMPLETE**: Adding required sections to paper.md
-   - Software Design section ✅ 
-   - Research Impact Statement ✅ (Updated Feb 16 by Shimizu with stronger evidence)
-   - AI Usage Disclosure ✅
-   - **Recent Updates**:
-     - Feb 2, 2026: Removed references to private companion repository
-     - Feb 16, 2026: Shimizu improved Research Impact Statement (192 words)
-     - Feb 16, 2026: Added Jiang 2023 & Furukawa 2025 citations (both verified)
-   - **Status**: Paper sections complete and improved, synced to joss-paper branch
-   - **Next**: Shimizu final approval, then respond to JOSS issue #9424
-
----
-
-## 🔍 Items Needing Attention
-
-1. **PR #7 in molass-library**: joss-paper→master merge (created by Shimizu)
-   - **Status**: Open, no description provided
-   - **Assessment**: Likely accidental; typically paper merged to master after JOSS acceptance
-   - **Action**: Takahashi to discuss with Shimizu (Feb 16, 2026)
