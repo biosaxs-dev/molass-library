@@ -1,13 +1,13 @@
 # CURRENT STATUS
 
-**📅 Last Updated: February 2, 2026**  
-**👤 Updated By: Takahashi**
+**📅 Last Updated: March 2, 2026**  
+**👤 Updated By: Copilot (auto-sync at session start)**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Updating Paper for New JOSS Requirements)
+## 🎯 Current Phase: PRE-REVIEW (Awaiting JOSS Assessment of Updated Paper)
 
-**Status**: Responding to JOSS policy change - **Updating paper format before review can proceed**
+**Status**: Paper updates submitted to JOSS - **Awaiting arfon's evaluation of updated paper format**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -19,13 +19,15 @@
 - 🔔 **Jan 20, 2026**: JOSS announced policy change requiring new paper sections
 - 🔄 **Jan 19-29, 2026**: Team working on adding required sections (Issue #8)
 - ✅ **Feb 2, 2026**: Removed references to private companion repository from paper
-- ⏳ **Currently**: Paper updates complete, preparing to notify JOSS
+- 🔔 **~Feb 16, 2026**: arfon sent friendly reminder to complete paper updates
+- ✅ **~Feb 16, 2026**: Shimizu replied to JOSS confirming updates are complete and requesting review
+- ⏳ **Currently**: Awaiting arfon's review/assessment of updated paper
 
 ### What This Means:
-- **Editor**: Not yet assigned (waiting for paper update confirmation)
+- **Editor**: Not yet assigned (pending arfon's scope assessment)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet (blocked on paper update notification)
-- **Next Step**: Shimizu to review latest changes and notify JOSS that paper has been updated
+- **Review Status**: Has NOT started yet (waiting for arfon to assess updated paper)
+- **Next Step**: Wait for arfon's response — if scope is accepted, editor assignment follows
 
 ---
 
@@ -44,8 +46,9 @@
 - ✅ Responded to EiC's pre-review questions
 - ✅ Fixed DOI formatting issues
 - ✅ Suggested relevant reviewer candidates
-- ⏳ Reviewing paper updates from Takahashi (Issue #8 - updated Feb 2, 2026)
-- ⏳ Will notify JOSS when updates are approved
+- ✅ Reviewed paper updates from Takahashi (Issue #8)
+- ✅ Notified JOSS (~Feb 16, 2026) that paper has been updated
+- ⏳ Awaiting arfon's scope assessment and next steps
 
 ### **Takahashi** (Technical Support):
 - ✅ Repository setup complete
@@ -53,7 +56,7 @@
 - ✅ Drafted Research Impact Statement (Issue #8)
 - ✅ Added AI Usage Disclosure (Issue #8)
 - ✅ Removed private repository references from paper (Feb 2, 2026)
-- ⏳ Awaiting Shimizu's final approval to respond to JOSS
+- ⏳ Standby — no action needed until JOSS proceeds
 
 ---
 
