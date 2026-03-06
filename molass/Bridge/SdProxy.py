@@ -9,9 +9,14 @@ from molass_legacy.SecSaxs.ElCurve import ElCurve
 
 class AbsorbanceProxy:
     def __init__(self, ssd):
-        uv = ssd.uv
+        if ssd.uv is None:
+            # temporary work-around for the case without UV data 
+            uv = ssd.xr
+            self.wl_vector = uv.qv
+        else:
+            uv = ssd.uv
+            self.wl_vector = uv.wv
         self.data = uv.M
-        self.wl_vector = uv.wv
         self.icurve = uv.get_icurve()
         self.a_curve = ElutionCurve(self.icurve.y)
         self.a_vector = self.icurve.y
@@ -32,10 +37,15 @@ class SdProxy:
         self.xray_curve = None
         self.uv_curve = None
         self.absorbance = AbsorbanceProxy(ssd)
-        self.conc_array = ssd.uv.M
+        if ssd.uv is None:
+            # temporary work-around for the case without UV data
+            self.conc_array = ssd.xr.M
+            self.lvector = ssd.xr.qv
+        else:
+            self.conc_array = ssd.uv.M
+            self.lvector = ssd.uv.wv
         self.xr_index = bisect_right(ssd.xr.qv, PICKAT)
         self.xray_index = self.xr_index
-        self.lvector = ssd.uv.wv
         self.mtd_elution = None
     
     def get_copy(self, pre_recog=None):
@@ -64,12 +74,20 @@ class SdProxy:
 
     def get_uv_curve(self):
         if self.uv_curve is None:
-            self.uv_curve = EcurveProxy(self.ssd.uv.get_icurve())
+            if self.ssd.uv is None:
+                # temporary work-around for the case without UV data
+                self.uv_curve = self.get_xr_curve()
+            else:
+                self.uv_curve = EcurveProxy(self.ssd.uv.get_icurve())
         return self.uv_curve
 
     def get_uv_data_separate_ly(self):
-        uv = self.ssd.uv
-        U = uv.M
-        wv = uv.wv
-        uv_curve = self.get_uv_curve()
+        if self.ssd.uv is None:
+            # temporary work-around for the case without UV data
+            U, _, wv, uv_curve = self.get_xr_data_separate_ly()
+        else:
+            uv = self.ssd.uv
+            U = uv.M
+            wv = uv.wv
+            uv_curve = self.get_uv_curve()
         return U, None, wv, uv_curve

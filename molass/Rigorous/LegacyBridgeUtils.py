@@ -16,8 +16,13 @@ def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
     xr_curve = ElCurve(*decomposition.xr_icurve.get_xy())
     D = ssd.xr.M
     E = ssd.xr.E
-    uv_curve = ElCurve(*decomposition.uv_icurve.get_xy())
-    U = ssd.uv.M
+    if decomposition.uv is None:
+        # temporary work-around for the case without UV data
+        uv_curve = xr_curve
+        U = D.copy()
+    else:
+        uv_curve = ElCurve(*decomposition.uv_icurve.get_xy())
+        U = ssd.uv.M
     dsets = ((xr_curve, D), LegacyRgCurve(xr_curve, rg_curve), (uv_curve, U))
     return OptDataSets(None, None, dsets=dsets, E=E)
 
@@ -30,9 +35,10 @@ def make_basecurves_from_decomposition(decomposition, debug=False):
     from molass.Bridge.SdProxy import SdProxy
     from molass.Bridge.LegacyBaselines import make_basecurves_from_sd
     ssd = decomposition.ssd
+    xr_only = not ssd.has_uv()
     sd = SdProxy(ssd)
     baseline_type = 1
-    return make_basecurves_from_sd(sd, baseline_type, debug=debug)
+    return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
 def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", debug=False):
     from molass_legacy.Optimizer.OptimizerUtils import get_function_code
@@ -88,6 +94,18 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, debug
         os.makedirs(optimizer_folder)
     if not os.path.exists(rg_folder):
         os.makedirs(rg_folder)
+
+    temp_in_folder = os.path.abspath(os.path.join(analysis_folder, "temp_in_folder"))
+    in_folder = get_setting('in_folder')
+    if in_folder is None:
+        in_folder = temp_in_folder
+        print(f"Exporting SecSaxsData to temporary folder: {in_folder}")
+        set_setting('in_folder', in_folder)
+        if not os.path.exists(in_folder):
+            os.makedirs(in_folder)
+    if os.path.exists(temp_in_folder):
+        assert in_folder == temp_in_folder
+        decomposition.ssd.export(temp_in_folder)
 
     # make datasets and basecurves
     from molass_legacy.RgProcess.RgCurve import check_rg_folder

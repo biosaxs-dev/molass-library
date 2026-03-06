@@ -7,6 +7,10 @@
 from importlib import reload
 import numpy as np
 from scipy.optimize import minimize
+# recognize_peaks lives in molass-legacy (cross-repo dependency).
+# Algorithm: greedy sequential subtraction — fit tallest peak via argmax,
+# subtract model, repeat on residual. Fragile when peaks merge at high overlap.
+# See molass-legacy/molass_legacy/QuickAnalysis/ModeledPeaks.py for implementation.
 from molass_legacy.QuickAnalysis.ModeledPeaks import recognize_peaks
 from molass.SEC.Models.Simple import egh
 
@@ -129,6 +133,10 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
 
     decompargs = kwargs.pop('decompargs', None)
     if decompargs is None:
+        # Default path: sequential peak recognition.
+        # Known limitation: at high overlap (≥19%), the first peak absorbs
+        # signal from both components, giving bad initialization for the optimizer.
+        # Consider using the proportions path (via QuickImplement) for such cases.
         peak_list = recognize_peaks(x, sy, num_peaks=num_components, exact_num_peaks=num_components, correct=False)
     else:
         if debug:

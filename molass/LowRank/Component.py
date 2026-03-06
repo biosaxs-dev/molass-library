@@ -52,7 +52,7 @@ class Component:
         self.icurve_array = icurve_array
         self.jcurve_array = jcurve_array
         x, y = self.icurve_array
-        self.peak_index = np.argmax(y)
+        self.peak_index = int(np.argmax(y))     # to avoid np.int64()
         self.icurve = None
         self.jcurve = None
         self.area = None
@@ -257,8 +257,9 @@ class XrComponent(Component):
             The SimpleGuinier object.
         """
         if self.sg is None:
-            from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
-            self.sg = SimpleGuinier(self.get_jcurve_array())
+            # from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+            from molass.Guinier.RgEstimator import RgEstimator
+            self.sg = RgEstimator(self.get_jcurve_array())
         return self.sg
 
     def compute_rg(self, return_object=False):
@@ -275,6 +276,54 @@ class XrComponent(Component):
             return sg
         else:
             return sg.Rg
+        
+    def plot_guinier(self, axes=None, debug=False):
+        """
+        Plot the Guinier plot of the component.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes or None, optional
+            The axes to plot on. If None, a new figure and axes are created.
+        debug : bool, optional
+            If True, print debug information. Default is False.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            The axes with the Guinier plot.
+        """
+        sg = self.get_guinier_object()
+        if debug:
+            from importlib import reload
+            import molass.PlotUtils.GuinierPlot
+            reload(molass.PlotUtils.GuinierPlot)
+        from molass.PlotUtils.GuinierPlot import guinier_plot_impl
+        return guinier_plot_impl(sg, axes=axes, debug=debug)
+    
+    def inspect_guinier(self, debug=False):
+        """
+        Inspect the Guinier plot of the component in a new figure.
+
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, print debug information. Default is False.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The figure with the Guinier plot.
+        matplotlib.axes.Axes
+            The axes with the Guinier plot.
+        """
+        sg = self.get_guinier_object()
+        if debug:
+            from importlib import reload
+            import molass.PlotUtils.GuinierPlot
+            reload(molass.PlotUtils.GuinierPlot)
+        from molass.PlotUtils.GuinierPlot import inspect_guinier_plot
+        return inspect_guinier_plot(sg, debug=debug)
 class UvComponent(Component):
     """
     A class to represent a UV component.
