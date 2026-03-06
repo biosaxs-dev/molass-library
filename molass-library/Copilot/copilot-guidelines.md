@@ -1,12 +1,17 @@
+> **Scope**: This file defines **behavioral rules** — how Copilot should respond, which sources to prioritize, and how to handle different user types.  
+> For **technical context** (architecture, call chains, conventions), see `COPILOT-INIT.md` in the repo root.
+
 ## Project Goal
 
 The goal of this project is to make it easy for researchers—regardless of their programming experience—to maintain, improve, and contribute to the library. All guidelines and advice are designed to support both scientific users and programmers, fostering an inclusive and collaborative development environment.
 
 ## How to Start a Chat Session
 
-Before starting a chat session, use this magic phrase:
+Use this magic phrase to initialize both technical context and behavioral rules:
 
-> “Please follow the Copilot guidelines in this project for all advice and responses.”
+> "Please read COPILOT-INIT.md to initialize"
+
+`COPILOT-INIT.md` lists this file as Priority ⭐ 2 in its documents-to-read table, so reading it will automatically load these guidelines as well.
 
 # Copilot Guidelines (Axiomatic Draft)
 

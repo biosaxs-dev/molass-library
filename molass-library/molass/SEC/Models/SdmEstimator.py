@@ -67,7 +67,7 @@ def estimate_sdm_column_params(decomposition, **kwargs):
         print("Objective function value:", result.fun)
         x, y = decomposition.xr_icurve.get_xy()
         modeled_moments = objective_function(result.x, return_moments=True)
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8,5))
         ax.plot(x, y, label='Initial Curve')
         for i, ccurve in enumerate(decomposition.xr_ccurves):
             mean, var = moment_list[i]

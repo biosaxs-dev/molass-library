@@ -83,3 +83,5 @@ def get_version(toml_only=False):
     This docstring was improved in collaboration with GitHub Copilot.
     """
     return Version(_get_version_impl(toml_only, __file__, __package__))
+
+from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
