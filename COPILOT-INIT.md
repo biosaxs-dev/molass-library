@@ -1,13 +1,13 @@
-<!-- AI Context Standard: v0.1 -->
+<!-- AI Context Standard: v0.5 - Adopted: 2026-02-19 - Updated: 2026-03-06 -->
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  
 **Created**: February 19, 2026  
 **Magic phrase**: **"Please read COPILOT-INIT.md to initialize"**
 
-> **Note**: This file follows the AI Context Standard (v0.1). It provides **technical context** (architecture, call chains, conventions).  
+> **Note**: This file follows the AI Context Standard (v0.5). It provides **technical context** (architecture, call chains, conventions).  
 > For **behavioral rules** (response style, user types, source priorities), see `Copilot/copilot-guidelines.md` (loaded automatically as Priority ⭐ 2 below).  
-> For current research status and task history, see `modeling-vs-model_free/PROJECT_STATUS.md`.
+> For current development status and task history, see `PROJECT_STATUS.md` (in this repo).
 
 ---
 

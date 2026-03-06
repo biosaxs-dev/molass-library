@@ -8,7 +8,7 @@ from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
-    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug',
+    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
 }
 
 def create_axes(fig, row_titles=["UV", "XR"]):
@@ -130,13 +130,20 @@ def make_kratky_plot(ax, qv, P, sg_list, title=None):
 def plot_components_impl(decomposition, **kwargs):
     debug = kwargs.get('debug', False)
 
+    fig = kwargs.get('fig', None)
+    axes = kwargs.get('axes', None)
 
-    fig = plt.figure(figsize=(16, 8))
+    if fig is None:
+        fig = plt.figure(figsize=(16, 8))
+
+    if axes is None:
+        axes = create_axes(fig)
+    else:
+        axes = np.asarray(axes)
+
     title = kwargs.get('title', None)
     if title is not None:
         fig.suptitle(title)
-
-    axes = create_axes(fig)
 
     ax1 = axes[0,0]
     ax2 = axes[1,0]
