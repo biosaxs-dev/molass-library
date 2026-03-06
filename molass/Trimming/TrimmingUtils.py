@@ -180,9 +180,15 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
         stop = size if slice_ is None else size if slice_.stop is None else slice_.stop
         return LegacyTrimmingInfo(1, start, stop, size)
 
+    def to_legacy_slice_list(data, islice, jslice):
+        if data is None:
+            return None
+        else:
+            return [to_legacy(jslice, len(data.jv)), to_legacy(islice, len(data.iv))]
+
     legacy_info = {
-        "xr_restrict_list": [to_legacy(xr_jslice, len(ssd.xr.jv)), to_legacy(xr_islice, len(ssd.xr.iv))],
-        "uv_restrict_list": [to_legacy(uv_jslice, len(ssd.uv.jv)), to_legacy(uv_islice, len(ssd.uv.iv))],
+        "xr_restrict_list": to_legacy_slice_list(ssd.xr, xr_islice, xr_jslice),
+        "uv_restrict_list": to_legacy_slice_list(ssd.uv, uv_islice, uv_jslice),
     }
 
     return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping, legacy_info=legacy_info)

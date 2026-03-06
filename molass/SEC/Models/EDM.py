@@ -44,7 +44,10 @@ class EDM:
 
         init_params = estimate_edm_init_params(decomposition, **kwargs)
         new_xr_ccurves = optimize_edm_xr_decomposition(decomposition, init_params, **kwargs)
-        new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+        if decomposition.uv is None:
+            new_uv_ccurves = None
+        else:
+            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
         edm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if debug:

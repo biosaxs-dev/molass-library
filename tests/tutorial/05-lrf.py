@@ -91,3 +91,73 @@ def test_010_quick_decomposition_rank_1():
 def test_011_quick_decomposition_rank_2():
     decomposition31.update_xr_ranks(ranks=[2]) 
     plot6 = decomposition31.plot_components(title="SAMPLE3 as rank 2")
+
+@pytest.mark.order(12)
+def test_012_align_decompositions():
+    """align_decompositions() returns a common q-grid and interpolated P matrices."""
+    import numpy as np
+    import molass
+    from molass_data import SAMPLE1, SAMPLE2
+    from molass.DataObjects import SecSaxsData as SSD
+
+    d1 = SSD(SAMPLE1).trimmed_copy().corrected_copy().quick_decomposition()
+    d2 = SSD(SAMPLE2).trimmed_copy().corrected_copy().quick_decomposition()
+
+    q_common, P1, P2 = molass.align_decompositions(d1, d2, n=300, normalize=True)
+
+    # q_common has the requested length and is strictly increasing
+    assert len(q_common) == 300
+    assert np.all(np.diff(q_common) > 0)
+
+    # P matrices are on the same q-grid (same number of rows)
+    assert P1.shape[0] == 300
+    assert P2.shape[0] == 300
+
+    # normalize=True → each column peaks at 1
+    assert np.allclose(P1.max(axis=0), 1.0)
+    assert np.allclose(P2.max(axis=0), 1.0)
+
+    # get_P_at gives same result as align_decompositions for one decomposition
+    P1_direct = d1.get_P_at(q_common, normalize=True)
+    assert np.allclose(P1, P1_direct)
+
+    print(f"q_common: [{q_common[0]:.4f}, {q_common[-1]:.4f}] Å⁻¹  ({len(q_common)} pts)")
+    print(f"P1 shape: {P1.shape},  P2 shape: {P2.shape}")
+
+@pytest.mark.order(13)
+def test_013_component_quality_scores():
+    """component_quality_scores() and is_component_reliable() detect spurious components."""
+    import math
+    from molass_data import SAMPLE1
+    from molass.DataObjects import SecSaxsData as SSD
+
+    ssd = SSD(SAMPLE1).trimmed_copy().corrected_copy()
+
+    # Natural decomposition (2 components): both should be reliable
+    d2 = ssd.quick_decomposition(num_components=2)
+    scores2 = d2.component_quality_scores()
+    print(f"SAMPLE1 2-component scores: {scores2}")
+    assert len(scores2) == 2
+    assert all(isinstance(s, float) for s in scores2)
+    assert all(d2.is_component_reliable(i) for i in range(2)), \
+        f"All natural components should be reliable, got scores: {scores2}"
+
+    # Forced 3-component decomposition: the extra component should score lower
+    d3 = ssd.quick_decomposition(num_components=3)
+    scores3 = d3.component_quality_scores()
+    print(f"SAMPLE1 3-component (forced) scores: {scores3}")
+    assert len(scores3) == 3
+    # At least one component should score lower than in the natural decomposition
+    assert min(scores3) < min(scores2), \
+        f"Forced extra component should lower minimum score: {scores3} vs {scores2}"
+
+    # nan Rg always causes score = 0
+    from unittest.mock import MagicMock, patch
+    from molass.LowRank.ComponentReliability import component_quality_scores as cqs
+    stub_decomp = MagicMock()
+    stub_decomp.get_rgs.return_value = [15.0, float('nan')]
+    stub_decomp.get_proportions.return_value = [0.6, 0.4]
+    scores_nan = cqs(stub_decomp)
+    assert scores_nan[1] == 0.0, "nan Rg must give score 0.0"
+    assert not math.isnan(scores_nan[0]), "Valid Rg must give a numeric score"
+    print(f"nan-Rg mock scores: {scores_nan}")

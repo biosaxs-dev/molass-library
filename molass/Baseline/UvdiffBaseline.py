@@ -5,11 +5,27 @@ from molass.Baseline.UvBaseline import estimate_uvbaseline_params
 from molass.Baseline.LpmBaseline import compute_lpm_baseline
 
 def get_uvdiff_baseline_info(uv_data, pickat=400):
-    """
-    Get the parameters and baseline for UVDIFF baseline fitting.
+    """Get the parameters and baseline for UVDIFF baseline fitting.
 
     Note that, in 2D cases, this function is called only once instead of every
     call to the baseline computation.
+
+    Parameters
+    ----------
+    uv_data : UvData
+        The UvData object containing the data for baseline estimation.
+    pickat : int, optional
+        The index at which to pick the second curve for UVDIFF baseline estimation.
+        Default is 400.
+        
+    Returns
+    -------
+    params : dict
+        A dictionary containing the estimated parameters for the UVDIFF baseline.
+    dy : array-like
+        The difference between the two curves used for baseline estimation.
+    uvdiff_baseline : array-like
+        The estimated UVDIFF baseline.
     """
     c1 = uv_data.get_icurve()
     c2 = uv_data.get_icurve(pickat=pickat)

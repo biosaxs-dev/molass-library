@@ -43,18 +43,22 @@ Submodules
    source/molass.DensitySpace
    source/molass.Except
    source/molass.FlowChange
+   source/molass.Geometric
    source/molass.Global
    source/molass.Guinier
    source/molass.InterParticle
    source/molass.Legacy
    source/molass.Local
+   source/molass.Logging
    source/molass.LowRank
    source/molass.Mapping
+   source/molass.MathUtils
    source/molass.PackageUtils
    source/molass.Peaks
    source/molass.PlotUtils
    source/molass.Progress
    source/molass.Reports
+   source/molass.Rigorous
    source/molass.SAXS
    source/molass.SAXS.Models
    source/molass.ScipyUtils

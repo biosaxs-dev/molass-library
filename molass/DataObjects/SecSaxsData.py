@@ -152,6 +152,38 @@ class SecSaxsData:
         self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
 
+    def has_xr(self):
+        """ssd.has_xr()
+
+        Returns whether the XR data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_xr : bool
+            True if the XR data is available, False otherwise.
+        """
+        return self.xr is not None
+
+    def has_uv(self):
+        """ssd.has_uv()
+
+        Returns whether the UV data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_uv : bool
+            True if the UV data is available, False otherwise.
+        """
+        return self.uv is not None
+
     def plot_3d(self, **kwargs):
         """ssd.plot_3d(title=None, view_init=None, view_arrows=False, with_2d_section_lines=False, **kwargs)
 
@@ -514,7 +546,10 @@ class SecSaxsData:
             If the mapping information is not available, returns None.
         """
         if self.mapping is None:
-            self.estimate_mapping()
+            if self.uv is None:
+                self.mapping = (1, 0)  # identity mapping for XR-only data
+            else:
+                self.estimate_mapping()
         return self.mapping
 
     def get_concfactor(self):
@@ -541,6 +576,8 @@ class SecSaxsData:
 
         Performs a quick decomposition of the SEC-SAXS data.
 
+        See also: `Nontrivial Decomposition <https://biosaxs-dev.github.io/molass-tutorial/chapters/10/nontrivial.html>`_
+
         Parameters
         ----------
         num_components : int, optional
@@ -548,7 +585,21 @@ class SecSaxsData:
             used to denoise the matrix data.
 
         proportions : list of float, optional
-            Specifies the proportions to be used for XR data.
+            Specifies the approximate area ratios of the elution peaks.
+            The values do not need to be normalized; for example,
+            ``[1, 1]``, ``[0.5, 0.5]``, and ``[3, 3]`` all produce the same result
+            because they are normalized internally.
+
+            When this option is given, a **proportional decomposition** algorithm
+            is used instead of the default peak-recognition algorithm.
+            The proportional algorithm divides the total elution curve by cumulative area
+            according to the given ratios, and fits an EGH model to each slice independently.
+            This provides better initialization for cases with highly overlapping peaks,
+            where the default algorithm may produce unstable results.
+
+            The exact ratios do not need to be known precisely;
+            even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
+            is usually sufficient.
 
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
@@ -663,7 +714,7 @@ class SecSaxsData:
             return self.beamline_info.name
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
-        """ssd.export(folder, prefix=None)
+        """ssd.export(folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=Fals)
 
         Exports the data to a file.
 
@@ -742,4 +793,8 @@ class SecSaxsData:
         spectral_vectors : list of np.ndarray
             A list of two numpy arrays which contain the spectral vectors for XR and UV data.
         """
-        return [self.xr.qv, self.uv.wv]
+        if self.uv is None:
+            # temporary work-around for the case without UV data
+            return [self.xr.qv, self.xr.qv]
+        else:
+            return [self.xr.qv, self.uv.wv]

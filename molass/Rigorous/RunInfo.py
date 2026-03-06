@@ -3,11 +3,12 @@ Rigorous.RunInfo.py
 """
 
 class RunInfo:
-    def __init__(self, ssd, optimizer, dsets, init_params):
+    def __init__(self, ssd, optimizer, dsets, init_params, monitor=None):
         self.ssd = ssd
         self.optimizer = optimizer
         self.dsets = dsets
         self.init_params = init_params
+        self.monitor = monitor
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)

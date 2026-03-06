@@ -8,7 +8,7 @@ from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
-    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug',
+    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
 }
 
 def create_axes(fig, row_titles=["UV", "XR"]):
@@ -130,19 +130,27 @@ def make_kratky_plot(ax, qv, P, sg_list, title=None):
 def plot_components_impl(decomposition, **kwargs):
     debug = kwargs.get('debug', False)
 
+    fig = kwargs.get('fig', None)
+    axes = kwargs.get('axes', None)
 
-    fig = plt.figure(figsize=(16, 8))
+    if fig is None:
+        fig = plt.figure(figsize=(16, 8))
+
+    if axes is None:
+        axes = create_axes(fig)
+    else:
+        axes = np.asarray(axes)
+
     title = kwargs.get('title', None)
     if title is not None:
         fig.suptitle(title)
-
-    axes = create_axes(fig)
 
     ax1 = axes[0,0]
     ax2 = axes[1,0]
 
     # UV Elution Curve
-    plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
+    if decomposition.uv is not None:
+        plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
 
     # XR Elution Curve
     axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
@@ -171,16 +179,17 @@ def plot_components_impl(decomposition, **kwargs):
                     ax.add_patch(p)              
 
     # UV Absorbance Curves
-    ax3 = axes[0,1]
-    ax3.set_title("UV Absorbance Curves")
-    ax3.set_xlabel("Wavelength [nm]")
-    ax3.set_ylabel("Absorbance")
-    wv = decomposition.uv.wv
-    uv_matrices = decomposition.get_uv_matrices(debug=debug)
-    M, C, P = uv_matrices[0:3]
-    for i, pv in enumerate(P.T):
-        ax3.plot(wv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
-    ax3.legend()
+    if decomposition.uv is not None:
+        ax3 = axes[0,1]
+        ax3.set_title("UV Absorbance Curves")
+        ax3.set_xlabel("Wavelength [nm]")
+        ax3.set_ylabel("Absorbance")
+        wv = decomposition.uv.wv
+        uv_matrices = decomposition.get_uv_matrices(debug=debug)
+        M, C, P = uv_matrices[0:3]
+        for i, pv in enumerate(P.T):
+            ax3.plot(wv, pv, ":", color='C%d'%(i), label="component-%d" % (i+1))
+        ax3.legend()
 
     # XR Scattering Curves
     ax4 = axes[1,1]
@@ -212,4 +221,4 @@ def plot_components_impl(decomposition, **kwargs):
         plt.show()
 
     from molass.PlotUtils.PlotResult import PlotResult
-    return PlotResult(fig, (ax1, ax2, axt))
+    return PlotResult(fig, axes, axt=axt)

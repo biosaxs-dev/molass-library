@@ -3,6 +3,7 @@ LowRank.QuickImplement
 """
 import numpy as np
 from importlib import reload
+from molass.Decompose.XrOnlyUtils import make_dummy_uv_ccurves
 
 def make_decomposition_impl(ssd, num_components=None, **kwargs):    
     debug = kwargs.get('debug', False)
@@ -25,6 +26,9 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
         import molass.LowRank.Decomposition
         reload(molass.LowRank.Decomposition)
     from molass.LowRank.Decomposition import Decomposition
+
+    if uv_ccurves is None:
+        uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
 
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
@@ -70,8 +74,12 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
 
     # Create UV curves
-    uv_icurve = ssd.uv.get_icurve()
-    mapping = ssd.get_mapping()
-    uv_ccurves = decompose_from_partner(uv_icurve, mapping, xr_ccurves, debug=debug)
+    if ssd.has_uv():
+        uv_icurve = ssd.uv.get_icurve()
+        mapping = ssd.get_mapping()
+        uv_ccurves = decompose_from_partner(uv_icurve, mapping, xr_ccurves, debug=debug)
+    else:
+        uv_icurve = None
+        uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
 
     return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves
