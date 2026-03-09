@@ -48,6 +48,7 @@ class SecSaxsData:
                  mapping=None,
                  time_initialized=None,
                  datafiles=None,
+                 uv_pickat=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
         
@@ -82,6 +83,10 @@ class SecSaxsData:
         datafiles : list of str, optional
             If specified, the list of data files used for the analysis.
             If it is None, the data files will be set to the list of files loaded from the folder.
+        uv_pickat : float, optional
+            The wavelength (nm) at which to extract the UV elution profile.
+            Defaults to 280 nm when None. Use 290 for samples like ATP or MY
+            where the UV signal is measured at 290 nm.
         debug : bool, optional
             If True, enables debug mode for more verbose output.
 
@@ -141,6 +146,8 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
+        if uv_pickat is not None and self.uv is not None:
+            self.uv.pickat = uv_pickat
         self.trimmed = trimmed
         self.trimming = trimming
         self.mapping = mapping
