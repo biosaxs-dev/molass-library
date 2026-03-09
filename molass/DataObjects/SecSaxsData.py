@@ -384,8 +384,8 @@ class SecSaxsData:
                            beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
-    def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
-        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None)
 
         Parameters
         ----------
@@ -396,6 +396,8 @@ class SecSaxsData:
         mapping : MappingInfo, optional
             If specified, the mapping information will be used for the copy.
             It must be provided if `jranges` is specified.
+        nsigmas : int or float, optional
+            If specified, passed to make_trimming() to control the σ-window width.
 
         Returns
         -------
@@ -404,9 +406,13 @@ class SecSaxsData:
         """
         start_time = time()
         if trimming is None:
-            trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
+            if nsigmas is not None:
+                trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+            else:
+                trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
         else:
             assert jranges is None, "jranges must be None if trimming is specified."
+            assert nsigmas is None, "nsigmas must be None if trimming is specified."
         result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
                            trimmed=True, trimming=trimming,
                            mapping=mapping,

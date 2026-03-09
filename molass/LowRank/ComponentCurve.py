@@ -32,6 +32,11 @@ class ComponentCurve:
         self.moment = None
         self.model = 'egh'  # default model
 
+    @property
+    def y(self):
+        """The y-values of the component curve evaluated at self.x."""
+        return self.get_y(self.x)
+
     def get_y(self, x=None):
         """
         Returns the y-values of the component curve.
