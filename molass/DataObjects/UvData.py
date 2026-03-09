@@ -15,7 +15,16 @@ class UvData(SsMatrixData):
     Attributes
     ----------
     wv : array-like
-        The wavelength values corresponding to the spectral axis (iv).
+        The wavelength values corresponding to the spectral axis (iv). Alias: ``wavelengths``.
+    wavelengths : array-like (property)
+        Human-readable alias for ``iv`` / ``wv`` — the wavelength axis (nm).
+    frames : array-like (property)
+        Human-readable alias for ``jv`` — the frame (time) axis.
+
+    Notes
+    -----
+    Matrix ``M`` has shape ``(len(wavelengths), len(frames))``:
+    rows index wavelength, columns index frame number.
 
     """
     def __init__(self, iv, jv, M, E, **kwargs):
@@ -37,6 +46,16 @@ class UvData(SsMatrixData):
         super().__init__(iv, jv, M, E, **kwargs)
         self.wv = iv
         self.pickat = PICKAT
+
+    @property
+    def wavelengths(self):
+        """Wavelength axis in nm (alias for ``iv`` / ``wv``)."""
+        return self.iv
+
+    @property
+    def frames(self):
+        """Frame (time) axis (alias for ``jv``)."""
+        return self.jv
 
     def copy(self, slices=None):
         result = super().copy(slices=slices)

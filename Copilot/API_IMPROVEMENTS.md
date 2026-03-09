@@ -128,6 +128,21 @@ Once the fixes above are implemented:
 
 1. **Bump version** (0.8.2 → 0.8.3 or appropriate) before releasing, so that downstream experiment notebooks can record which molass version produced each result. This is important for reproducibility — `molass-researcher` experiment logs reference molass by version.
 
+---
+
+## GitHub Issue Status
+
+GitHub issue numbers for AI-friendliness fixes. Detailed proposals are in the sections above; the running tracker (completed + pending with issue numbers) is in `/memories/molass_library_workflow.md`.
+
+| # | GitHub Issue | Title | Status |
+|---|-------------|-------|--------|
+| — | [#15](https://github.com/biosaxs-dev/molass-library/issues/15) | Add `wavelengths` and `frames` aliases to `UvData` | ✅ Done |
+| 1 | pending | `get_rgs()` returns `None` silently | ⏳ Pending |
+| 2 | pending | `plot_components()` not axis-injectable | ⏳ Pending |
+| 3 | pending | No q-grid alignment utility | ⏳ Pending |
+| 4 | pending | No component reliability indicator | ⏳ Pending |
+| 5 | pending | Missing shape/unit docstrings | ⏳ Pending |
+
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` currently contains manual workarounds for issues #1 and #3:
    - `None` guard on `get_rgs()` results (issue #1)
    - Manual q-grid interpolation before `pearsonr` (issue #3)
