@@ -3,9 +3,24 @@
     which is maked of Rg values computed from scattering curves.
 """
 import os
+import inspect
+import functools
 import numpy as np
 from tqdm import tqdm
 # from tqdm import tqdm_notebook as tqdm
+
+# Workaround: scipy.stats._axis_nan_policy_wrapper calls inspect.getfullargspec
+# on every linregress call. In Python 3.13 this is very slow. Cache it.
+_orig_getfullargspec = inspect.getfullargspec
+_getfullargspec_cache = {}
+
+@functools.wraps(_orig_getfullargspec)
+def _cached_getfullargspec(func):
+    if func not in _getfullargspec_cache:
+        _getfullargspec_cache[func] = _orig_getfullargspec(func)
+    return _getfullargspec_cache[func]
+
+inspect.getfullargspec = _cached_getfullargspec
 
 ADD_ALL_RESULTS = True
 
