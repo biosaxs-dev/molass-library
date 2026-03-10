@@ -57,6 +57,18 @@ class UvData(SsMatrixData):
         """Frame (time) axis (alias for ``jv``)."""
         return self.jv
 
+    @property
+    def wavelength_range(self):
+        """Wavelength coverage as ``(min, max)`` in nm."""
+        return (self.wavelengths.min(), self.wavelengths.max())
+
+    def __repr__(self):
+        wl_min, wl_max = self.wavelength_range
+        return (
+            f"UvData: M shape (wavelengths={len(self.wavelengths)}, frames={len(self.frames)})"
+            f"  wv range {wl_min:.0f}-{wl_max:.0f} nm"
+        )
+
     def copy(self, slices=None):
         result = super().copy(slices=slices)
         result.pickat = self.pickat

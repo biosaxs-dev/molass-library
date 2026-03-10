@@ -18,6 +18,8 @@ class SsMatrixData:
         The values of the second variable (e.g., time or wavelength).
     M : 2D array-like
         The 2D matrix of intensity values.
+    data : 2D array-like (property)
+        Human-readable alias for ``M`` — the core intensity matrix.
     E : 2D array-like or None
         The 2D matrix of error values. It can be None if errors are not available
     moment : Moment or None
@@ -37,6 +39,16 @@ class SsMatrixData:
         self.E = E      # may be None
         self.moment = moment
         self.baseline_method = baseline_method
+
+    @property
+    def data(self):
+        """The 2D intensity matrix (alias for ``M``, following numpy/pandas/xarray convention)."""
+        return self.M
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}: M shape (iv={len(self.iv)}, jv={len(self.jv)})"
+        )
 
     def copy(self, slices=None):
         """Return a copy of the SsMatrixData object.

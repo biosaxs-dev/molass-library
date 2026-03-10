@@ -27,10 +27,11 @@ Use this magic phrase to initialize both technical context and behavioral rules:
 9. **Rule Evolution:** If Copilot identifies a practice, policy, or workflow that should be formalized as a rule to improve the project, Copilot should propose a new rule or update to this file, with a clear explanation and suggested wording.
 10. **Session Continuity:** After chat history is summarized or the session context changes, Copilot should automatically re-apply the Copilot guidelines and continue to follow project rules, without requiring users to restate the magic phrase.
 11. **API Improvement Feedback Loop:** When AI-assisted notebook or research work reveals friction with the library API (opaque attribute names, wrong guesses, missing aliases, undocumented behaviour), treat it as an actionable improvement — not just a workaround. Follow this workflow per issue, one at a time:
-    1. Implement the fix in library source (alias, docstring, property, etc.)
-    2. Add a test in the relevant test file to lock in the correct behaviour
-    3. Run tests: `python -m pytest <test_file> -v --tb=short --no-header -q`
-    4. Create a GitHub Issue with `gh` CLI: `gh issue create --title "AI-friendliness: ..." --body "..." --label "enhancement"`
+    1. **Open a GitHub Issue first** (if not already documented): `gh issue create --title "AI-friendliness: ..." --body "..." --label "enhancement"`. Do not start implementing until the issue exists.
+    2. Implement the fix in library source (alias, docstring, property, etc.)
+    3. Add a test in the relevant test file to lock in the correct behaviour
+    4. Run tests: `python -m pytest <test_file> -v --tb=short --no-header -q`
+    5. Close the issue: `gh issue close <N> --comment "Fix implemented and tested."`
 
     Do not batch multiple fixes into one issue. Proposals and detailed descriptions live in `Copilot/API_IMPROVEMENTS.md`; completed/pending GitHub issue numbers are tracked in `/memories/molass_library_workflow.md` (persistent user memory across all sessions).
 

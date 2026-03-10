@@ -26,6 +26,31 @@ def test_02_uv_friendly_aliases():
     assert uv.M.shape == (len(uv.wavelengths), len(uv.frames)), \
         "M shape should be (wavelengths, frames)"
 
+def test_04_ssd_data_alias():
+    xr = ssd_instance.xr
+    uv = ssd_instance.uv
+    import numpy as np
+    # .data should be identical to .M for both XrData and UvData
+    assert np.array_equal(xr.data, xr.M), "xr.data should equal xr.M"
+    assert np.array_equal(uv.data, uv.M), "uv.data should equal uv.M"
+
+def test_05_repr():
+    xr = ssd_instance.xr
+    uv = ssd_instance.uv
+    xr_repr = repr(xr)
+    uv_repr = repr(uv)
+    # repr should contain class name and shape info
+    assert "iv=" in xr_repr and "jv=" in xr_repr, f"xr repr missing shape info: {xr_repr}"
+    assert "wavelengths=" in uv_repr and "frames=" in uv_repr, f"uv repr missing shape info: {uv_repr}"
+    assert "nm" in uv_repr, f"uv repr should include wavelength range in nm: {uv_repr}"
+
+def test_06_wavelength_range():
+    uv = ssd_instance.uv
+    wl_min, wl_max = uv.wavelength_range
+    assert wl_min < wl_max, "wavelength_range min should be less than max"
+    assert wl_min == uv.wavelengths.min(), "wavelength_range min should match wavelengths.min()"
+    assert wl_max == uv.wavelengths.max(), "wavelength_range max should match wavelengths.max()"
+
 def test_03_plot_3d():
     plot_result = ssd_instance.plot_3d()
     assert plot_result is not None, "Plot result should not be None"
