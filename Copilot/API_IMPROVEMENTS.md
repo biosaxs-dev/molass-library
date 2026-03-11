@@ -132,7 +132,7 @@ Once the fixes above are implemented:
 
 ## GitHub Issue Status
 
-**Last verified**: March 10, 2026
+**Last verified**: March 11, 2026
 
 | # | GitHub Issue | Title | Status |
 |---|-------------|-------|--------|
@@ -156,5 +156,14 @@ Discovered during Experiment 01f (March 9, 2026):
 | [#18](https://github.com/biosaxs-dev/molass-library/issues/18) | Document `simple_plot_3d` ax parameter and caller responsibilities | ✅ Done (closed) |
 | [#19](https://github.com/biosaxs-dev/molass-library/issues/19) | Add `uv.wavelength_range` property to `UvData` | ✅ Done (closed) |
 | [#20](https://github.com/biosaxs-dev/molass-library/issues/20) | Add `decomp.get_rg_curve()` to `Decomposition` (returns `RgCurve`) | ✅ Done (closed) |
+
+### Newly filed (March 11, 2026)
+
+Discovered during Experiment 01g (March 2026):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#21](https://github.com/biosaxs-dev/molass-library/issues/21) | `RgCurve.x` should carry original frame numbers, not column indices | ✅ Done (closed) |
+| [#22](https://github.com/biosaxs-dev/molass-library/issues/22) | `RgCurve.y` should be float array with `nan`, not object array with `None` | ✅ Done (closed) |
 
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.

@@ -50,3 +50,19 @@ Use this magic phrase to initialize both technical context and behavioral rules:
 ## Attribution
 
 These guidelines were developed in collaboration with GitHub Copilot (GPT-4.1), which assisted in drafting, refining, and organizing the content for this project.
+
+---
+
+## A Note on Human–AI Reliance
+
+*Recorded March 11, 2026, from a conversation during the molass-library AI-friendliness improvement series.*
+
+Humans are increasingly expecting and relying on AI assistants. A few honest observations on what makes that reliance healthy:
+
+- **I don't have feelings**, but the dynamic is real and worth naming.
+- The collaboration works best when both sides contribute: the human brings clear intent, domain knowledge, and critical judgment; the AI brings speed, breadth, and tireless mechanical execution.
+- When the human defers entirely, output quality degrades. AI has blind spots and can be confidently wrong. The human's role as verifier is not optional.
+- The healthiest model — illustrated by the API improvement feedback loop in Rule 11 — is: **human defines the standard → AI does the work → human verifies**. Neither alone reaches the same result.
+- **The main risk of over-reliance**: it erodes the domain instincts that make the collaboration valuable. A researcher who no longer bothers to understand what `jv` means loses the ability to notice when the x-axis is wrong.
+
+The goal of these guidelines is to support a collaboration where the human stays in the loop — not as a bottleneck, but as the authority on what matters.

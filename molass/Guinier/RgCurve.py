@@ -68,7 +68,7 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
     intensities = [] if result_type is None else None
     for k, (i, result) in enumerate(rginfo_list):
         indeces.append(i)
-        values.append(result.Rg)
+        values.append(result.Rg if result.Rg is not None else float('nan'))
         if result_type is None:
             # SimpleGuinier result
             scores.append(result.score)
@@ -81,4 +81,4 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
             result_ = result
         results.append(result_)
     
-    return RgCurve(np.array(indeces), np.array(values), np.array(scores), results=results, intensities=intensities)
+    return RgCurve(np.array(indeces), np.array(values, dtype=float), np.array(scores), results=results, intensities=intensities)
