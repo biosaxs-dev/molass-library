@@ -23,6 +23,20 @@ def estimate_lpm_percent(moment):
     ratio = len(np.where(np.logical_or(x < M - 3*std, M + 3*std < x))[0])/len(x)
     return ratio/2
 
+def _compute_adaptive_p_final(x, y, size_sigma):
+    """Compute adaptive p_final from per-row noisiness, replicating legacy behaviour."""
+    from scipy.interpolate import LSQUnivariateSpline
+    from molass_legacy.SerialAnalyzer.BasePercentileOffset import base_percentile_offset
+    n = len(y)
+    knots = np.linspace(0, n, max(3, n // 10))[1:-1]
+    try:
+        spline = LSQUnivariateSpline(x, y, knots)
+        noisiness = np.std(y - spline(x))
+    except Exception:
+        noisiness = np.std(y)
+    return base_percentile_offset(noisiness, size_sigma=size_sigma)
+
+
 def compute_lpm_baseline(x, y, return_also_params=False, **kwargs):
     """Compute the linear plus minimum baseline for a given curve.
     The baseline is computed by fitting a linear function to the data and then taking the minimum of the linear function and the data.
@@ -37,20 +51,31 @@ def compute_lpm_baseline(x, y, return_also_params=False, **kwargs):
         If True, the function returns a tuple containing the baseline and a dictionary of the slope and intercept of the linear function.
         If False, it returns only the baseline.
     **kwargs : dict, optional
-        Additional keyword arguments to pass to the ScatteringBaseline solver.
+        Additional keyword arguments. If ``size_sigma`` is present, an adaptive
+        ``p_final`` is computed per-row (replicating legacy behaviour); otherwise
+        the default ``PERCENTILE_FINAL=10`` is used.
 
     Returns
     -------
     baseline : array-like
         The computed baseline.
     """
+    size_sigma = kwargs.get('size_sigma', None)
+    if size_sigma is not None and x is not None:
+        p_final = _compute_adaptive_p_final(x, y, size_sigma)
+    else:
+        p_final = None  # use ScatteringBaseline default (PERCENTILE_FINAL=10)
+
     sbl = ScatteringBaseline(y, x=x)
-    slope, intercept = sbl.solve()
+    solve_kwargs = {} if p_final is None else {'p_final': p_final}
+    slope, intercept = sbl.solve(**solve_kwargs)
     baseline = x*slope + intercept
     if return_also_params:
-        return baseline, dict(slope=slope, intercept=intercept)
+        return baseline, dict(slope=slope, intercept=intercept, p_final=p_final)
     else:
         return baseline
+
+
 class LpmBaseline(Curve):
     """A class to represent the linear plus minimum baseline of a curve.
     

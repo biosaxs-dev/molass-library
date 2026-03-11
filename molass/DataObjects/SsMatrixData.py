@@ -148,7 +148,10 @@ class SsMatrixData:
         debug = kwargs.get('debug', False)
         counter = [0, 0, 0] if debug else None
         if self.baseline_method in ['linear', 'uvdiff', 'integral']:
-            default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter)
+            from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
+            _ecurve = _EBC(self.M.sum(axis=0))
+            _size_sigma = _ecurve.compute_size_sigma()
+            default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
             if self.baseline_method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
