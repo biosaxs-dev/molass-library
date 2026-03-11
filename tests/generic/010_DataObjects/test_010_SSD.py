@@ -83,3 +83,29 @@ def test_08_get_baseline2d_no_stdout(capsys):
     captured = capsys.readouterr()
     assert captured.out == "", \
         f"get_baseline2d() should not print to stdout, got: {captured.out!r}"
+
+
+def test_09_bufmask_baseline():
+    """'bufmask' method returns a baseline with positive_ratio lower than 'linear' — issue #24."""
+    import numpy as np
+
+    def _positive_ratio_mean(M):
+        """Mean fraction of positive intensities across all frames, simple unweighted."""
+        return np.mean(M > 0)
+
+    trimmed = ssd_instance.trimmed_copy()
+
+    # linear baseline (adaptive p_final)
+    trimmed.xr.baseline_method = 'linear'
+    b_linear = trimmed.xr.get_baseline2d()
+    ratio_linear = _positive_ratio_mean(trimmed.xr.M - b_linear)
+
+    # bufmask baseline
+    trimmed.xr.baseline_method = 'bufmask'
+    b_bufmask = trimmed.xr.get_baseline2d()
+    ratio_bufmask = _positive_ratio_mean(trimmed.xr.M - b_bufmask)
+
+    assert b_bufmask.shape == trimmed.xr.M.shape, \
+        "bufmask baseline shape should match M"
+    assert ratio_bufmask < ratio_linear, \
+        f"bufmask positive_ratio ({ratio_bufmask:.3f}) should be lower than linear ({ratio_linear:.3f})"

@@ -43,7 +43,7 @@ def individual_axes_impl(self, data, axes, method, method_kwargs, baseline_func)
     from functools import partial
     from pybaselines.two_d.optimizers import _check_scalar, _update_params
 
-    assert method in ['linear', 'uvdiff', 'integral']
+    assert method in ['linear', 'uvdiff', 'integral', 'bufmask']
 
     axes, scalar_axes = _check_scalar(axes, 2, fill_scalar=False, dtype=int)
     if scalar_axes:
@@ -125,10 +125,23 @@ def _integral_individual_axes_impl(self, data, axes, method, method_kwargs, debu
 
     return individual_axes_impl(self, data, axes, method, method_kwargs, _integral_baseline_func)
 
+def _bufmask_individual_axes_impl(self, data, axes, method, method_kwargs, debug=False):
+    """
+    Adapter for buffer-mask linear polyfit baseline fitting.
+    Expects 'buffer_mask' in method_kwargs, pre-computed from the summed elution.
+    """
+    from molass.Baseline.BufmaskBaseline import compute_bufmask_baseline
+    def _bufmask_baseline_func(data, **kwargs):
+        x = kwargs.get('jv', None)
+        return compute_bufmask_baseline(x, data, return_also_params=True, **kwargs)
+
+    return individual_axes_impl(self, data, axes, method, method_kwargs, _bufmask_baseline_func)
+
 CUSTOM_IMPL_DICT = {
     'linear': _lpm_individual_axes_impl,
     'uvdiff': _uvdiff_individual_axes_impl,
-    'integral': _integral_individual_axes_impl
+    'integral': _integral_individual_axes_impl,
+    'bufmask': _bufmask_individual_axes_impl,
 }
 
 class Baseline2D(_Baseline2D):
