@@ -58,3 +58,28 @@ def test_03_plot_3d():
     assert plot_result is not None, "Plot result should not be None"
     plot_result = ssd_instance.plot_3d(xr_only=True)
     assert plot_result is not None, "Plot result should not be None"
+
+def test_07_rgcurve_y_is_float_nan():
+    """RgCurve.y must be a float array with nan for failed fits — issue #22."""
+    import numpy as np
+    trimmed   = ssd_instance.trimmed_copy()
+    corrected = trimmed.corrected_copy()
+    rgcurve   = corrected.xr.compute_rgcurve()
+    # y must be a float array, not an object array
+    assert rgcurve.y.dtype == float, \
+        f"RgCurve.y should be float dtype, got {rgcurve.y.dtype}"
+    # failed fits must be nan, not None
+    assert None not in rgcurve.y, \
+        "RgCurve.y should not contain None (use nan instead)"
+    # at least some frames should have valid Rg
+    assert np.any(np.isfinite(rgcurve.y) & (rgcurve.y > 0)), \
+        "RgCurve.y should contain at least some valid positive Rg values"
+
+
+def test_08_get_baseline2d_no_stdout(capsys):
+    """get_baseline2d() must not print diagnostic messages to stdout — issue #23."""
+    trimmed = ssd_instance.trimmed_copy()
+    trimmed.xr.get_baseline2d()
+    captured = capsys.readouterr()
+    assert captured.out == "", \
+        f"get_baseline2d() should not print to stdout, got: {captured.out!r}"
