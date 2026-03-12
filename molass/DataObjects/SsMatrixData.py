@@ -157,11 +157,13 @@ class SsMatrixData:
             if self.baseline_method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
-        elif self.baseline_method == 'bufmask':
-            from molass.Baseline.BufmaskBaseline import BUFMASK_THRESHOLD
-            _threshold = kwargs.get('threshold', BUFMASK_THRESHOLD)
+        elif self.baseline_method == 'buffit':
+            from molass.Baseline.BuffitBaseline import _otsu_threshold
             _elution_sum = self.M.sum(axis=0)
             _elution_norm = _elution_sum / _elution_sum.max()
+            _threshold = kwargs.get('threshold', None)
+            if _threshold is None:
+                _threshold = _otsu_threshold(_elution_norm)   # adaptive (Otsu)
             _buffer_mask = _elution_norm < _threshold
             default_kwargs = dict(jv=self.jv, buffer_mask=_buffer_mask)
         else:

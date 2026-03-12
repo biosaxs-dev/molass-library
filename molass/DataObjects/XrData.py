@@ -17,6 +17,10 @@ class XrData(SsMatrixData):
     ----------
     qv : array-like
         The q-values corresponding to the angular axis.
+    baseline_method : str
+        Default is ``'buffit'`` (Otsu-adaptive buffer-frame polyfit),
+        which outperforms ``'linear'`` on all tested SEC-SAXS datasets.
+        Can be overridden by passing ``baseline_method=...`` to the constructor.
     """
     def __init__(self, iv, jv, M, E, **kwargs):
         """Initialize the XrData object.
@@ -34,6 +38,7 @@ class XrData(SsMatrixData):
         kwargs : dict, optional
             Additional keyword arguments to pass to the SsMatrixData constructor.
         """
+        kwargs.setdefault('baseline_method', 'buffit')
         super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
 

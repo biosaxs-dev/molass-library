@@ -85,8 +85,8 @@ def test_08_get_baseline2d_no_stdout(capsys):
         f"get_baseline2d() should not print to stdout, got: {captured.out!r}"
 
 
-def test_09_bufmask_baseline():
-    """'bufmask' method returns a baseline with positive_ratio lower than 'linear' — issue #24."""
+def test_09_buffit_baseline():
+    """'buffit' method returns a baseline with positive_ratio lower than 'linear' — issue #24."""
     import numpy as np
 
     def _positive_ratio_mean(M):
@@ -100,12 +100,37 @@ def test_09_bufmask_baseline():
     b_linear = trimmed.xr.get_baseline2d()
     ratio_linear = _positive_ratio_mean(trimmed.xr.M - b_linear)
 
-    # bufmask baseline
-    trimmed.xr.baseline_method = 'bufmask'
-    b_bufmask = trimmed.xr.get_baseline2d()
-    ratio_bufmask = _positive_ratio_mean(trimmed.xr.M - b_bufmask)
+    # buffit baseline
+    trimmed.xr.baseline_method = 'buffit'
+    b_buffit = trimmed.xr.get_baseline2d()
+    ratio_buffit = _positive_ratio_mean(trimmed.xr.M - b_buffit)
 
-    assert b_bufmask.shape == trimmed.xr.M.shape, \
-        "bufmask baseline shape should match M"
-    assert ratio_bufmask < ratio_linear, \
-        f"bufmask positive_ratio ({ratio_bufmask:.3f}) should be lower than linear ({ratio_linear:.3f})"
+    assert b_buffit.shape == trimmed.xr.M.shape, \
+        "buffit baseline shape should match M"
+    assert ratio_buffit < ratio_linear, \
+        f"buffit positive_ratio ({ratio_buffit:.3f}) should be lower than linear ({ratio_linear:.3f})"
+
+
+def test_10_buffit_otsu():
+    """Otsu adaptive threshold (default) is at least as good as fixed threshold=0.10 — issue #25."""
+    import numpy as np
+    from molass.Baseline.BuffitBaseline import BUFFIT_THRESHOLD
+
+    def _positive_ratio_mean(M):
+        return np.mean(M > 0)
+
+    trimmed = ssd_instance.trimmed_copy()
+    trimmed.xr.baseline_method = 'buffit'
+
+    # Otsu (default: threshold=None)
+    b_otsu = trimmed.xr.get_baseline2d()
+    ratio_otsu = _positive_ratio_mean(trimmed.xr.M - b_otsu)
+
+    # Fixed threshold=0.10
+    b_fixed = trimmed.xr.get_baseline2d(threshold=BUFFIT_THRESHOLD)
+    ratio_fixed = _positive_ratio_mean(trimmed.xr.M - b_fixed)
+
+    assert b_otsu.shape == trimmed.xr.M.shape, \
+        "Otsu buffit baseline shape should match M"
+    assert ratio_otsu <= ratio_fixed + 0.01, \
+        f"Otsu positive_ratio ({ratio_otsu:.3f}) should be no worse than fixed ({ratio_fixed:.3f})"
