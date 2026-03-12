@@ -14,7 +14,7 @@ corrected_ssd = None
 @control_matplotlib_plot
 def test_001_plot_compact():
     from molass import requires
-    requires('0.8.5')
+    requires('0.8.4')
     from molass_data import SAMPLE2
     from molass.DataObjects import SecSaxsData as SSD
     global ssd, trimmed_ssd
