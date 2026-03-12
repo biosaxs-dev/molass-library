@@ -28,10 +28,12 @@ def _compute_adaptive_p_final(x, y, size_sigma):
     from scipy.interpolate import LSQUnivariateSpline
     from molass_legacy.SerialAnalyzer.BasePercentileOffset import base_percentile_offset
     n = len(y)
-    knots = np.linspace(0, n, max(3, n // 10))[1:-1]
+    knots = np.linspace(x[0], x[-1], max(3, n // 10) + 2)[1:-1]
     try:
         spline = LSQUnivariateSpline(x, y, knots)
         noisiness = np.std(y - spline(x))
+        signal_scale = max(np.abs(y).max(), 1e-12)
+        noisiness = noisiness / signal_scale  # relative noisiness, matching table calibration
     except Exception:
         noisiness = np.std(y)
     return base_percentile_offset(noisiness, size_sigma=size_sigma)
