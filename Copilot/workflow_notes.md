@@ -38,6 +38,7 @@ When fixing AI-friendliness issues, follow this pattern per issue:
 - #24: `'buffit'` baseline method — buffer-frame polyfit with Otsu adaptive threshold; `positive_ratio` 0.496–0.522 (nearest to ideal 0.5) on all 7 tested datasets
 - #25: Replaced fixed `BUFFIT_THRESHOLD=0.10` with Otsu adaptive threshold in `BuffitBaseline.py`
 - #26: Made `'buffit'` the default `baseline_method` for `XrData` (v0.8.5)
+- #27: Add `molass.requires(version)` helper for version guard in notebooks/tests; updated all 10 tutorial tests and data_correction.ipynb
 
 ### Issues pending (filed, not yet implemented)
-- #27: Add `molass.requires(version)` helper for version guard in notebooks/tests
+- (none)
