@@ -84,4 +84,34 @@ def get_version(toml_only=False):
     """
     return Version(_get_version_impl(toml_only, __file__, __package__))
 
+def requires(version):
+    """
+    Assert that the installed molass version meets a minimum requirement.
+
+    Use this at the top of notebooks or tutorial tests instead of a raw
+    ``assert get_version() >= '...'`` to make the version dependency
+    explicit and easily discoverable.
+
+    Parameters
+    ----------
+    version : str
+        Minimum required version string, e.g. ``'0.8.5'``.
+
+    Raises
+    ------
+    ImportError
+        If the installed molass version is older than *version*.
+
+    Examples
+    --------
+    >>> from molass import requires
+    >>> requires('0.8.5')
+    """
+    current = get_version()
+    if not (current >= version):
+        raise ImportError(
+            f"This code requires molass >= {version}, but {current} is installed. "
+            f"Please upgrade: pip install --upgrade molass"
+        )
+
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
