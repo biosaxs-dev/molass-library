@@ -45,6 +45,24 @@ class SsMatrixData:
         """The 2D intensity matrix (alias for ``M``, following numpy/pandas/xarray convention)."""
         return self.M
 
+    @property
+    def q_values(self):
+        """Row-axis values (alias for ``iv``), typically scattering vector q."""
+        return self.iv
+
+    @q_values.setter
+    def q_values(self, value):
+        self.iv = value
+
+    @property
+    def frame_indices(self):
+        """Column-axis values (alias for ``jv``), typically frame numbers."""
+        return self.jv
+
+    @frame_indices.setter
+    def frame_indices(self, value):
+        self.jv = value
+
     def __repr__(self):
         return (
             f"{self.__class__.__name__}: M shape (iv={len(self.iv)}, jv={len(self.jv)})"
@@ -177,3 +195,26 @@ class SsMatrixData:
             if counter is not None:
                 print(f"Baseline fitting completed with {counter} iterations.")  
         return baseline.T
+
+    def get_bpo_ideal(self):
+        """Get the dataset-relative ideal positive_ratio for baseline evaluation.
+
+        Computes noisiness and size_sigma from the total elution curve, then
+        looks up the expected positive_ratio under a perfect baseline using the
+        BPO (Base Percentile Offset) table.
+
+        Returns
+        -------
+        bpo_ideal : float
+            The expected positive_ratio in [0, 1]. For example, 0.9530 for the
+            MY dataset (narrow peak, size_sigma ~ 3.68).
+        """
+        import io, contextlib
+        from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
+        from molass_legacy.SerialAnalyzer.BasePercentileOffset import base_percentile_offset
+        with contextlib.redirect_stdout(io.StringIO()):
+            _ecurve = _EBC(self.M.sum(axis=0))
+            _noisiness = _ecurve.compute_noisiness()
+            _size_sigma = _ecurve.compute_size_sigma()
+        bpo_val = base_percentile_offset(_noisiness, size_sigma=_size_sigma)
+        return (100.0 - bpo_val) / 100.0

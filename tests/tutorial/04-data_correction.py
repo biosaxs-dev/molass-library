@@ -14,7 +14,7 @@ corrected_ssd = None
 @control_matplotlib_plot
 def test_001_plot_compact():
     from molass import requires
-    requires('0.8.4')
+    requires('0.8.5')
     from molass_data import SAMPLE2
     from molass.DataObjects import SecSaxsData as SSD
     global ssd, trimmed_ssd
@@ -31,16 +31,14 @@ def test_002_corrected_copy():
 
 @pytest.mark.order(3)
 def test_003_set_baseline_method():
-    ssd.set_baseline_method('buffit')             # default for X-ray (v0.8.5+)
-    ssd.set_baseline_method('linear')             # simpler global linear fit
-    ssd.set_baseline_method(('buffit', 'uvdiff')) # recommended: buffit for X-ray, uvdiff for UV
-    ssd.set_baseline_method(('linear', 'uvdiff'))
+    ssd.set_baseline_method('linear')             # default linear fit
+    ssd.set_baseline_method(('linear', 'uvdiff')) # recommended: linear for X-ray, uvdiff for UV
     ssd.set_baseline_method('integral')
 
 @pytest.mark.order(4)
 @control_matplotlib_plot
 def test_004_set_baseline_method_uvdiff():
-    trimmed_ssd.set_baseline_method(('buffit', 'uvdiff'))
+    trimmed_ssd.set_baseline_method(('linear', 'uvdiff'))
     trimmed_ssd.plot_compact(baseline=True);
 
 @pytest.mark.order(5)
@@ -54,7 +52,7 @@ def test_005_corrected_copy():
 def test_006_get_baseline_method():
     methods = corrected_ssd.get_baseline_method()
     print("Current baseline methods:", methods)
-    assert methods == ('buffit', 'uvdiff'), "Unexpected baseline methods"
+    assert methods == ('linear', 'uvdiff'), "Unexpected baseline methods"
 
 @pytest.mark.order(7)
 @control_matplotlib_plot

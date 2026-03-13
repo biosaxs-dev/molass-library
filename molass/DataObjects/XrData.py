@@ -38,7 +38,7 @@ class XrData(SsMatrixData):
         kwargs : dict, optional
             Additional keyword arguments to pass to the SsMatrixData constructor.
         """
-        kwargs.setdefault('baseline_method', 'buffit')
+        kwargs.setdefault('baseline_method', 'linear')
         super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
 

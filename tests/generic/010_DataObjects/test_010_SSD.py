@@ -134,3 +134,52 @@ def test_10_buffit_otsu():
         "Otsu buffit baseline shape should match M"
     assert ratio_otsu <= ratio_fixed + 0.01, \
         f"Otsu positive_ratio ({ratio_otsu:.3f}) should be no worse than fixed ({ratio_fixed:.3f})"
+
+
+def test_11_q_values_frame_indices_aliases():
+    """SsMatrixData.q_values and .frame_indices are aliases for iv and jv — issue #28."""
+    import numpy as np
+    xr = ssd_instance.xr
+    # read aliases
+    assert np.array_equal(xr.q_values, xr.iv), "q_values should equal iv"
+    assert np.array_equal(xr.frame_indices, xr.jv), "frame_indices should equal jv"
+    # setter: modify via alias, check original
+    orig_iv = xr.iv.copy()
+    xr.q_values = orig_iv * 2
+    assert np.array_equal(xr.iv, orig_iv * 2), "setting q_values should update iv"
+    xr.q_values = orig_iv  # restore
+
+
+def test_12_get_bpo_ideal():
+    """SsMatrixData.get_bpo_ideal() returns dataset-relative ideal positive_ratio — issue #29."""
+    xr = ssd_instance.xr
+    bpo_ideal = xr.get_bpo_ideal()
+    assert isinstance(bpo_ideal, float), f"bpo_ideal should be float, got {type(bpo_ideal)}"
+    assert 0 < bpo_ideal < 1, f"bpo_ideal should be in (0, 1), got {bpo_ideal}"
+    # SAMPLE1 is a well-behaved dataset; bpo_ideal should be well above 0.5
+    assert bpo_ideal > 0.5, f"SAMPLE1 bpo_ideal should be > 0.5, got {bpo_ideal}"
+
+
+def test_13_lpm_baseline_mask():
+    """compute_lpm_baseline supports mask parameter for frame exclusion — issue #30."""
+    import numpy as np
+    from molass.Baseline.LpmBaseline import compute_lpm_baseline
+    xr = ssd_instance.xr
+    x = xr.jv.astype(float)
+    y = xr.M[0, :]  # first q-row
+
+    # Without mask
+    bl_full, params_full = compute_lpm_baseline(x, y, return_also_params=True)
+    assert bl_full.shape == x.shape, "baseline should have same shape as x"
+
+    # With mask: exclude middle 20% of frames
+    n = len(x)
+    mask = np.ones(n, dtype=bool)
+    mask[n//3 : 2*n//3] = False
+    bl_masked, params_masked = compute_lpm_baseline(x, y, return_also_params=True, mask=mask)
+
+    # Masked baseline still covers ALL frames
+    assert bl_masked.shape == x.shape, "masked baseline should have same shape as x"
+    # Slopes should differ (different fitting data)
+    assert params_full['slope'] != params_masked['slope'], \
+        "masked and unmasked slopes should differ when peak region is excluded"

@@ -37,8 +37,8 @@
     Buffit  (Otsu, default)         0.496 – 0.522  ← recommended
     Ideal (perfect baseline)        ~0.5
 
-    Otsu wins all 7 tested datasets and is the default from v0.8.5
-    (``XrData.baseline_method`` defaults to ``'buffit'``).
+    Otsu wins all 7 tested datasets.
+    This method can be activated via ``ssd.set_baseline_method('buffit')``.
 
     References
     ----------

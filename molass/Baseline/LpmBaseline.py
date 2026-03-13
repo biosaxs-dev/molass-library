@@ -53,22 +53,36 @@ def compute_lpm_baseline(x, y, return_also_params=False, **kwargs):
         If True, the function returns a tuple containing the baseline and a dictionary of the slope and intercept of the linear function.
         If False, it returns only the baseline.
     **kwargs : dict, optional
-        Additional keyword arguments. If ``size_sigma`` is present, an adaptive
-        ``p_final`` is computed per-row (replicating legacy behaviour); otherwise
-        the default ``PERCENTILE_FINAL=10`` is used.
+        Additional keyword arguments.
+
+        - ``size_sigma`` : float — if present, an adaptive ``p_final`` is
+          computed per-row (replicating legacy behaviour); otherwise the
+          default ``PERCENTILE_FINAL=10`` is used.
+        - ``mask`` : array-like of bool — if present, only the elements where
+          ``mask`` is True are used for fitting.  The returned baseline is
+          evaluated at **all** ``x`` positions.
 
     Returns
     -------
     baseline : array-like
         The computed baseline.
     """
+    mask = kwargs.get('mask', None)
+
+    if mask is not None:
+        x_fit = x[mask]
+        y_fit = y[mask]
+    else:
+        x_fit = x
+        y_fit = y
+
     size_sigma = kwargs.get('size_sigma', None)
-    if size_sigma is not None and x is not None:
-        p_final = _compute_adaptive_p_final(x, y, size_sigma)
+    if size_sigma is not None and x_fit is not None:
+        p_final = _compute_adaptive_p_final(x_fit, y_fit, size_sigma)
     else:
         p_final = None  # use ScatteringBaseline default (PERCENTILE_FINAL=10)
 
-    sbl = ScatteringBaseline(y, x=x)
+    sbl = ScatteringBaseline(y_fit, x=x_fit)
     solve_kwargs = {} if p_final is None else {'p_final': p_final}
     slope, intercept = sbl.solve(**solve_kwargs)
     baseline = x*slope + intercept
