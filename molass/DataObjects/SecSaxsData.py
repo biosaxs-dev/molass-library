@@ -585,11 +585,19 @@ class SecSaxsData:
             return self.beamline_info.get_concfactor()
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
+        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 
         Performs a quick decomposition of the SEC-SAXS data.
 
         See also: `Nontrivial Decomposition <https://biosaxs-dev.github.io/molass-tutorial/chapters/10/nontrivial.html>`_
+
+        Three decomposition algorithms are available, selected by keyword:
+
+        1. **Default** (no extra keywords) — greedy peak-recognition.
+        2. **Proportional** (``proportions``) — area-ratio slicing.
+        3. **Positioned** (``xr_peakpositions``) — peaks pinned to specified frame positions.
+
+        ``proportions`` and ``xr_peakpositions`` are mutually exclusive.
 
         Parameters
         ----------
@@ -614,11 +622,35 @@ class SecSaxsData:
             even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
             is usually sufficient.
 
+        xr_peakpositions : list of float, optional
+            Specifies the frame positions where peaks should be pinned.
+            Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
+            with a strong position constraint. ``num_components`` is inferred
+            from the length if not provided.
+
+            Mutually exclusive with ``proportions``.
+
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
 
         num_plates : int, optional
             Specifies the number of theoretical plates to be used for the optimization constraint.
+
+        tau_limit : float, optional
+            Maximum allowed ratio ``|tau| / sigma`` for positioned decomposition.
+            Default 0.6.
+
+        max_sigma : float, optional
+            Maximum allowed Gaussian width (sigma) for positioned decomposition.
+            Default 80.
+
+        min_sigma : float, optional
+            Minimum allowed Gaussian width (sigma) for positioned decomposition.
+            Default 5.
+
+        debug : bool, optional
+            If True, reload internal modules and show diagnostic plots.
+            Default False.
 
         Returns
         -------

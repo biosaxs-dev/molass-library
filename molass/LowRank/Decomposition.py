@@ -110,6 +110,16 @@ class Decomposition:
         """
         return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
 
+    @property
+    def xr_components(self):
+        """Alias for ``xr_ccurves`` — the XR component curves."""
+        return self.xr_ccurves
+
+    @property
+    def uv_components(self):
+        """Alias for ``uv_ccurves`` — the UV component curves."""
+        return self.uv_ccurves
+
     def get_num_components(self):
         """
         Get the number of components.

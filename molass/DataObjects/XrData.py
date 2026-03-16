@@ -203,6 +203,51 @@ class XrData(SsMatrixData):
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
 
+    def detect_peaks(self, prominence=0.005, distance=20, window_length=31, polyorder=3):
+        """xr.detect_peaks()
+
+        Detect peaks in the total XR elution curve using Savitzky-Golay
+        smoothing followed by scipy ``find_peaks``.
+
+        The returned list can be passed directly to
+        ``ssd.quick_decomposition(xr_peakpositions=peaks)``.
+
+        Parameters
+        ----------
+        prominence : float, optional
+            Minimum prominence as a fraction of the smoothed curve maximum.
+            Default 0.005 (0.5 %).
+        distance : int, optional
+            Minimum number of frames between adjacent peaks. Default 20.
+        window_length : int, optional
+            Savitzky-Golay filter window length (must be odd). Default 31.
+        polyorder : int, optional
+            Savitzky-Golay filter polynomial order. Default 3.
+
+        Returns
+        -------
+        list of int
+            Frame numbers of detected peaks, sorted by frame number.
+
+        Examples
+        --------
+        >>> peaks = ssd.xr.detect_peaks()
+        >>> decomp = ssd.quick_decomposition(xr_peakpositions=peaks)
+        """
+        from scipy.signal import savgol_filter, find_peaks
+        frames = self.jv
+        total_elution = self.M.sum(axis=0)
+        wl = min(window_length, len(total_elution))
+        if wl % 2 == 0:
+            wl -= 1
+        if wl < polyorder + 2:
+            # not enough data to smooth — return raw peak search
+            smooth = total_elution
+        else:
+            smooth = savgol_filter(total_elution, window_length=wl, polyorder=polyorder)
+        peaks_idx, _ = find_peaks(smooth, prominence=smooth.max() * prominence, distance=distance)
+        return [int(frames[i]) for i in peaks_idx]
+
     def get_jcurve_array(self, j=None, peak=None):
         """xr.get_jcurve_array(j=None, peak=None)
 
