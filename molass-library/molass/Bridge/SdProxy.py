@@ -25,7 +25,9 @@ class EcurveProxy(ElCurve):
     def __init__(self, curve):
         x = curve.x
         y = curve.y
-        super().__init__(x, y)
+        # Use 0-based ElutionCurve to avoid frame-number / array-index mismatch
+        v1 = ElutionCurve(y)
+        super().__init__(x, y, v1_curve=v1)
         self.height = np.max(y)
 
 class SdProxy:

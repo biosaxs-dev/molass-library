@@ -8,8 +8,8 @@ from molass.Testing import control_matplotlib_plot
 @pytest.mark.order(1)
 @control_matplotlib_plot
 def test_001_quick_decomposition():
-    from molass import get_version
-    assert get_version() >= '0.7.5', "this notebook requires molass v0.7.5 or higher."
+    from molass import requires
+    requires('0.7.5')
     from molass_data import SAMPLE4
     from molass.DataObjects import SecSaxsData as SSD
     global decomposition, rgcurve

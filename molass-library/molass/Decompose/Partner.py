@@ -48,20 +48,6 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
  
     initial_params = np.array(initial_params)
 
-    if debug:
-        import matplotlib.pyplot as plt
-        x, y = icurve.get_xy()
-        fig, axes = plt.subplots(ncols=2, figsize=(12,5))
-        fig.suptitle("Decompose from Partner")
-        for title, ax, params in [("Initial Parameters", axes[0], initial_params),
-                                  ("Optimized Parameters", axes[1], temp_params)]:
-            ax.set_title(title)
-            ax.plot(x, y, color='gray', alpha=0.5)
-            for params in initial_params:
-                ax.plot(x, egh(x, *params), linestyle=':')
-        fig.tight_layout()
-        plt.show()
-
     temp_params = initial_params.copy()
 
     x, y = icurve.get_xy()
@@ -74,6 +60,19 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
 
     result = minimize(objective, initial_params[:,0].ravel())
     temp_params[:,0] = result.x
+
+    if debug:
+        import matplotlib.pyplot as plt
+        fig, axes = plt.subplots(ncols=2, figsize=(12,5))
+        fig.suptitle("Decompose from Partner")
+        for title, ax, plot_params in [("Initial Parameters", axes[0], initial_params),
+                                       ("Optimized Parameters", axes[1], temp_params)]:
+            ax.set_title(title)
+            ax.plot(x, y, color='gray', alpha=0.5)
+            for p in plot_params:
+                ax.plot(x, egh(x, *p), linestyle=':')
+        fig.tight_layout()
+        plt.show()
 
     # uv_ccurves
     mapping_ = Mapping(a, b)    # task: make clear the difference between mapping and mapping_
