@@ -12,8 +12,8 @@ ssd = None
 @pytest.mark.order(1)
 @control_matplotlib_plot
 def test_001_plot_3d():
-    from molass import get_version
-    assert get_version() >= '0.2.0', "This tutorial requires molass version 0.2.0 or higher."
+    from molass import requires
+    requires('0.2.0')
     from molass_data import SAMPLE2
     from molass.DataObjects import SecSaxsData as SSD
     global ssd

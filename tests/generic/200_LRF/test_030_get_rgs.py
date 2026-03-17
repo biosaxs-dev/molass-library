@@ -57,3 +57,25 @@ def test_030_get_rgs_all_valid():
     rgs = decomp.get_rgs()
 
     assert rgs == pytest.approx([10.0, 20.0])
+
+
+def test_040_get_rg_curve_returns_rgcurve():
+    """get_rg_curve() must return an RgCurve with .x, .y, .scores attributes."""
+    from molass_data import SAMPLE1
+    from molass.DataObjects import SecSaxsData as SSD
+    from molass.Guinier.RgCurve import RgCurve
+    import numpy as np
+
+    ssd = SSD(SAMPLE1)
+    decomp = ssd.quick_decomposition()
+    rgcurve = decomp.get_rg_curve()
+
+    assert isinstance(rgcurve, RgCurve), f"Expected RgCurve, got {type(rgcurve)}"
+    assert len(rgcurve.x) > 0, "RgCurve.x should be non-empty"
+    assert len(rgcurve.y) == len(rgcurve.x), "RgCurve.x and .y must have equal length"
+    assert len(rgcurve.scores) == len(rgcurve.x), "RgCurve.scores must match .x length"
+    # Rg values: None for failed fits, float (possibly negative) for attempted fits.
+    # With ADD_ALL_RESULTS=True, every frame is included.
+    # At least some frames should have a non-None result.
+    valid_rgs = [v for v in rgcurve.y if v is not None]
+    assert len(valid_rgs) > 0, "At least some Rg values should be non-None"

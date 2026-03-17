@@ -18,6 +18,8 @@ class SsMatrixData:
         The values of the second variable (e.g., time or wavelength).
     M : 2D array-like
         The 2D matrix of intensity values.
+    data : 2D array-like (property)
+        Human-readable alias for ``M`` — the core intensity matrix.
     E : 2D array-like or None
         The 2D matrix of error values. It can be None if errors are not available
     moment : Moment or None
@@ -37,6 +39,34 @@ class SsMatrixData:
         self.E = E      # may be None
         self.moment = moment
         self.baseline_method = baseline_method
+
+    @property
+    def data(self):
+        """The 2D intensity matrix (alias for ``M``, following numpy/pandas/xarray convention)."""
+        return self.M
+
+    @property
+    def q_values(self):
+        """Row-axis values (alias for ``iv``), typically scattering vector q."""
+        return self.iv
+
+    @q_values.setter
+    def q_values(self, value):
+        self.iv = value
+
+    @property
+    def frame_indices(self):
+        """Column-axis values (alias for ``jv``), typically frame numbers."""
+        return self.jv
+
+    @frame_indices.setter
+    def frame_indices(self, value):
+        self.jv = value
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}: M shape (iv={len(self.iv)}, jv={len(self.jv)})"
+        )
 
     def copy(self, slices=None):
         """Return a copy of the SsMatrixData object.
@@ -136,10 +166,24 @@ class SsMatrixData:
         debug = kwargs.get('debug', False)
         counter = [0, 0, 0] if debug else None
         if self.baseline_method in ['linear', 'uvdiff', 'integral']:
-            default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter)
+            import io, contextlib
+            from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
+            with contextlib.redirect_stdout(io.StringIO()):
+                _ecurve = _EBC(self.M.sum(axis=0))
+                _size_sigma = _ecurve.compute_size_sigma()
+            default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
             if self.baseline_method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
+        elif self.baseline_method == 'buffit':
+            from molass.Baseline.BuffitBaseline import _otsu_threshold
+            _elution_sum = self.M.sum(axis=0)
+            _elution_norm = _elution_sum / _elution_sum.max()
+            _threshold = kwargs.get('threshold', None)
+            if _threshold is None:
+                _threshold = _otsu_threshold(_elution_norm)   # adaptive (Otsu)
+            _buffer_mask = _elution_norm < _threshold
+            default_kwargs = dict(jv=self.jv, buffer_mask=_buffer_mask)
         else:
             default_kwargs = {}
         method_kwargs = kwargs.get('method_kwargs', default_kwargs)
@@ -151,3 +195,26 @@ class SsMatrixData:
             if counter is not None:
                 print(f"Baseline fitting completed with {counter} iterations.")  
         return baseline.T
+
+    def get_bpo_ideal(self):
+        """Get the dataset-relative ideal positive_ratio for baseline evaluation.
+
+        Computes noisiness and size_sigma from the total elution curve, then
+        looks up the expected positive_ratio under a perfect baseline using the
+        BPO (Base Percentile Offset) table.
+
+        Returns
+        -------
+        bpo_ideal : float
+            The expected positive_ratio in [0, 1]. For example, 0.9530 for the
+            MY dataset (narrow peak, size_sigma ~ 3.68).
+        """
+        import io, contextlib
+        from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
+        from molass_legacy.SerialAnalyzer.BasePercentileOffset import base_percentile_offset
+        with contextlib.redirect_stdout(io.StringIO()):
+            _ecurve = _EBC(self.M.sum(axis=0))
+            _noisiness = _ecurve.compute_noisiness()
+            _size_sigma = _ecurve.compute_size_sigma()
+        bpo_val = base_percentile_offset(_noisiness, size_sigma=_size_sigma)
+        return (100.0 - bpo_val) / 100.0

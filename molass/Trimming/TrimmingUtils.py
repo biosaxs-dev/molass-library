@@ -166,7 +166,8 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
         uv_jslice = slice(bisect_right(ssd.uv.jv, jranges[1][0]),
                           bisect_right(ssd.uv.jv, jranges[1][1]))
         
-        assert mapping is not None, "Mapping must be provided when jranges is specified"
+        if mapping is None:
+            mapping = ssd.get_mapping()
 
     if debug:
         print("xr_islice:", xr_islice)

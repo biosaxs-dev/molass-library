@@ -128,8 +128,42 @@ Once the fixes above are implemented:
 
 1. **Bump version** (0.8.2 → 0.8.3 or appropriate) before releasing, so that downstream experiment notebooks can record which molass version produced each result. This is important for reproducibility — `molass-researcher` experiment logs reference molass by version.
 
-2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` currently contains manual workarounds for issues #1 and #3:
-   - `None` guard on `get_rgs()` results (issue #1)
-   - Manual q-grid interpolation before `pearsonr` (issue #3)
+---
 
-   Once the library fixes are in place, revisit `01c` and replace the workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.
+## GitHub Issue Status
+
+**Last verified**: March 11, 2026
+
+| # | GitHub Issue | Title | Status |
+|---|-------------|-------|--------|
+| — | [#15](https://github.com/biosaxs-dev/molass-library/issues/15) | Add `wavelengths` and `frames` aliases to `UvData` | ✅ Done (closed) |
+| 1 | [#8](https://github.com/biosaxs-dev/molass-library/issues/8) | `get_rgs()` returns `None` silently | ✅ Done (closed) |
+| 2 | [#9](https://github.com/biosaxs-dev/molass-library/issues/9) | `plot_components()` not axis-injectable | ✅ Done (closed) |
+| 3 | [#10](https://github.com/biosaxs-dev/molass-library/issues/10) | No q-grid alignment utility | ✅ Done (closed) |
+| 4 | [#11](https://github.com/biosaxs-dev/molass-library/issues/11) | No component reliability indicator | ✅ Done (closed) |
+| 5 | [#12](https://github.com/biosaxs-dev/molass-library/issues/12) | Missing shape/unit docstrings | ✅ Done (closed) |
+| — | [#13](https://github.com/biosaxs-dev/molass-library/issues/13) | ComponentCurve.y, trimmed_copy(nsigmas=), auto-mapping (v0.8.4) | ✅ Done (closed) |
+| — | [#14](https://github.com/biosaxs-dev/molass-library/issues/14) | SecSaxsData non-standard data support | ✅ Done (closed) |
+
+### Newly filed (March 10, 2026)
+
+Discovered during Experiment 01f (March 9, 2026):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#16](https://github.com/biosaxs-dev/molass-library/issues/16) | `.data` alias for `.M` in `SsMatrixData` | ✅ Done (closed) |
+| [#17](https://github.com/biosaxs-dev/molass-library/issues/17) | Informative `__repr__` for `SsMatrixData` and `UvData` | ✅ Done (closed) |
+| [#18](https://github.com/biosaxs-dev/molass-library/issues/18) | Document `simple_plot_3d` ax parameter and caller responsibilities | ✅ Done (closed) |
+| [#19](https://github.com/biosaxs-dev/molass-library/issues/19) | Add `uv.wavelength_range` property to `UvData` | ✅ Done (closed) |
+| [#20](https://github.com/biosaxs-dev/molass-library/issues/20) | Add `decomp.get_rg_curve()` to `Decomposition` (returns `RgCurve`) | ✅ Done (closed) |
+
+### Newly filed (March 11, 2026)
+
+Discovered during Experiment 01g (March 2026):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#21](https://github.com/biosaxs-dev/molass-library/issues/21) | `RgCurve.x` should carry original frame numbers, not column indices | ✅ Done (closed) |
+| [#22](https://github.com/biosaxs-dev/molass-library/issues/22) | `RgCurve.y` should be float array with `nan`, not object array with `None` | ✅ Done (closed) |
+
+2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.

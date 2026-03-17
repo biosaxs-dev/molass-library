@@ -22,9 +22,13 @@ class LegacyRgCurve(RgCurve):
         self.x = x = ecurve.x
         self.y = y = ecurve.y
         rg_values = np.ones(len(x)) * np.nan
-        rg_values[rgcurve.indeces] = rgcurve.rgvalues
         rg_qualities = np.ones(len(x)) * np.nan
-        rg_qualities[rgcurve.indeces] = rgcurve.scores
+        # Convert absolute frame indices to 0-based relative indices
+        frame_offset = int(x[0])
+        rel_indices = rgcurve.indeces - frame_offset
+        mask = (rel_indices >= 0) & (rel_indices < len(x))
+        rg_values[rel_indices[mask]] = rgcurve.rgvalues[mask]
+        rg_qualities[rel_indices[mask]] = rgcurve.scores[mask]
         slices, states = make_availability_slices(y, ecurve.max_y)
         self.slices = slices
         self.states = states

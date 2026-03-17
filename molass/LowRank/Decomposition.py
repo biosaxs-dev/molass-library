@@ -110,6 +110,16 @@ class Decomposition:
         """
         return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
 
+    @property
+    def xr_components(self):
+        """Alias for ``xr_ccurves`` — the XR component curves."""
+        return self.xr_ccurves
+
+    @property
+    def uv_components(self):
+        """Alias for ``uv_ccurves`` — the UV component curves."""
+        return self.uv_ccurves
+
     def get_num_components(self):
         """
         Get the number of components.
@@ -159,6 +169,41 @@ class Decomposition:
         """
         return [sv.Rg if sv.Rg is not None else float('nan')
                 for sv in self.get_guinier_objects()]
+
+    def get_rg_curve(self):
+        """Compute the per-frame Rg curve from the raw XR data.
+
+        Runs a Guinier fit on every elution frame independently and returns
+        the results as an ``RgCurve`` object.  This is useful for assessing
+        whether a peak is a pure single-component species (flat Rg vs. frame)
+        or a heterogeneous mixture (varying Rg).
+
+        .. note::
+            This can be slow for large datasets because it fits one Guinier
+            region per frame.
+
+        Returns
+        -------
+        rgcurve : molass.Guinier.RgCurve.RgCurve
+            An ``RgCurve`` with attributes:
+
+            - ``.x`` — frame indices (integer array)
+            - ``.y`` — Rg values in Å; ``NaN`` where Guinier fit failed
+            - ``.scores`` — Guinier fit quality scores (0–1)
+
+        Examples
+        --------
+        ::
+
+            rgcurve = decomp.get_rg_curve()
+            import matplotlib.pyplot as plt
+            plt.plot(rgcurve.x, rgcurve.y, '.')
+            plt.xlabel("Frame")
+            plt.ylabel("Rg (Å)")
+            plt.title("Rg vs. elution frame")
+            plt.show()
+        """
+        return self.xr.compute_rgcurve()
 
     def get_P_at(self, q_target, normalize=False):
         """Return the XR scattering matrix P interpolated onto *q_target*.
