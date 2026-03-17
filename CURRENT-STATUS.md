@@ -1,14 +1,14 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 13, 2026**  
+**📅 Last Updated: March 18, 2026**  
 **👤 Updated By: Copilot (auto-updated at session init)**  
-**✅ Status verified: No change since Feb 17, 2026 — still awaiting arfon's assessment and editor assignment**
+**🔔 Status changed: Handling editor zhubonan invited by Kevin-Mattheus-Moerman — review process starting soon**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Paper Updated, Awaiting Editor Assignment)
+## 🎯 Current Phase: PRE-REVIEW → REVIEW (Handling Editor Invited)
 
-**Status**: Shimizu notified JOSS on Feb 17 that paper revisions are complete - **Waiting for arfon's assessment and editor assignment**
+**Status**: Kevin-Mattheus-Moerman (Managing EiC) invited `zhubonan` as handling editor on March 18 - **Review process expected to start soon**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -24,14 +24,15 @@
 - ✅ **Feb 16, 2026**: Verified new citations - both papers legitimately used MOLASS
 - 🔔 **Feb 16, 2026**: `arfon` (JOSS EiC) sent friendly reminder to update paper
 - ✅ **Feb 17, 2026**: Shimizu replied to `arfon` confirming all revisions are complete and requesting review
-- ⏳ **Currently**: Awaiting arfon's assessment of updated paper and editor assignment
+- ✅ **March 18, 2026**: Kevin-Mattheus-Moerman invited `zhubonan` as handling editor
+- ⏳ **Currently**: Waiting for `zhubonan` to accept editor role and assign reviewers
 
 ### What This Means:
-- **Editor**: Not yet assigned (arfon reviewing updated paper now)
+- **Editor**: `zhubonan` invited (pending acceptance)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet (JOSS reviewing updated paper)
-- **Last JOSS Activity**: February 17, 2026 (Shimizu confirmed paper updates complete)
-- **Next Step**: Wait for arfon's response and editor assignment; be ready to address any further requests
+- **Review Status**: Not yet started — waiting for zhubonan to accept and assign reviewers
+- **Last JOSS Activity**: March 18, 2026 (Kevin-Mattheus-Moerman invited zhubonan as editor)
+- **Next Step**: Wait for zhubonan to accept editor role and open the main review issue; be ready to respond to reviewer comments promptly (2-week response target per JOSS policy)
 
 ---
 
