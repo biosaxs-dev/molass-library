@@ -5,15 +5,27 @@ import os
 import numpy as np
 from importlib import reload
 
+def _make_elcurve(x, y):
+    """Create ElCurve with 0-based ElutionCurve to avoid index/frame-number mismatch.
+
+    The legacy ElutionCurve.get_peak_boundaries() uses peak_top_x values as
+    array indices. When x contains frame numbers (e.g. 673–1212), peak_top_x
+    values like 836 exceed the array length (540) and produce empty slices.
+    Fix: build ElutionCurve with default 0-based x, then wrap in ElCurve.
+    """
+    from molass_legacy.SecSaxs.ElCurve import ElCurve
+    from molass_legacy.SerialAnalyzer.ElutionCurve import ElutionCurve
+    v1 = ElutionCurve(y)          # 0-based x → peak indices stay in-bounds
+    return ElCurve(x, y, v1_curve=v1)
+
 def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
     from molass_legacy.Optimizer.OptDataSets import OptDataSets
-    from molass_legacy.SecSaxs.ElCurve import ElCurve
     if debug:
         import molass.Bridge.LegacyRgCurve
         reload(molass.Bridge.LegacyRgCurve)
     from molass.Bridge.LegacyRgCurve import LegacyRgCurve
     ssd = decomposition.ssd
-    xr_curve = ElCurve(*decomposition.xr_icurve.get_xy())
+    xr_curve = _make_elcurve(*decomposition.xr_icurve.get_xy())
     D = ssd.xr.M
     E = ssd.xr.E
     if decomposition.uv is None:
@@ -21,7 +33,7 @@ def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
         uv_curve = xr_curve
         U = D.copy()
     else:
-        uv_curve = ElCurve(*decomposition.uv_icurve.get_xy())
+        uv_curve = _make_elcurve(*decomposition.uv_icurve.get_xy())
         U = ssd.uv.M
     dsets = ((xr_curve, D), LegacyRgCurve(xr_curve, rg_curve), (uv_curve, U))
     return OptDataSets(None, None, dsets=dsets, E=E)

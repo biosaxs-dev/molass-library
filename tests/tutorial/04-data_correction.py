@@ -13,8 +13,8 @@ corrected_ssd = None
 @pytest.mark.order(1)
 @control_matplotlib_plot
 def test_001_plot_compact():
-    from molass import get_version
-    assert get_version() >= '0.2.0', "This tutorial requires molass version 0.2.0 or higher."
+    from molass import requires
+    requires('0.8.5')
     from molass_data import SAMPLE2
     from molass.DataObjects import SecSaxsData as SSD
     global ssd, trimmed_ssd
@@ -31,8 +31,8 @@ def test_002_corrected_copy():
 
 @pytest.mark.order(3)
 def test_003_set_baseline_method():
-    ssd.set_baseline_method('linear')    # default setting
-    ssd.set_baseline_method(('linear', 'uvdiff'))
+    ssd.set_baseline_method('linear')             # default linear fit
+    ssd.set_baseline_method(('linear', 'uvdiff')) # recommended: linear for X-ray, uvdiff for UV
     ssd.set_baseline_method('integral')
 
 @pytest.mark.order(4)

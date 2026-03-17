@@ -15,7 +15,16 @@ class UvData(SsMatrixData):
     Attributes
     ----------
     wv : array-like
-        The wavelength values corresponding to the spectral axis (iv).
+        The wavelength values corresponding to the spectral axis (iv). Alias: ``wavelengths``.
+    wavelengths : array-like (property)
+        Human-readable alias for ``iv`` / ``wv`` — the wavelength axis (nm).
+    frames : array-like (property)
+        Human-readable alias for ``jv`` — the frame (time) axis.
+
+    Notes
+    -----
+    Matrix ``M`` has shape ``(len(wavelengths), len(frames))``:
+    rows index wavelength, columns index frame number.
 
     """
     def __init__(self, iv, jv, M, E, **kwargs):
@@ -36,6 +45,34 @@ class UvData(SsMatrixData):
         """
         super().__init__(iv, jv, M, E, **kwargs)
         self.wv = iv
+        self.pickat = PICKAT
+
+    @property
+    def wavelengths(self):
+        """Wavelength axis in nm (alias for ``iv`` / ``wv``)."""
+        return self.iv
+
+    @property
+    def frames(self):
+        """Frame (time) axis (alias for ``jv``)."""
+        return self.jv
+
+    @property
+    def wavelength_range(self):
+        """Wavelength coverage as ``(min, max)`` in nm."""
+        return (self.wavelengths.min(), self.wavelengths.max())
+
+    def __repr__(self):
+        wl_min, wl_max = self.wavelength_range
+        return (
+            f"UvData: M shape (wavelengths={len(self.wavelengths)}, frames={len(self.frames)})"
+            f"  wv range {wl_min:.0f}-{wl_max:.0f} nm"
+        )
+
+    def copy(self, slices=None):
+        result = super().copy(slices=slices)
+        result.pickat = self.pickat
+        return result
 
     def get_ipickvalues(self):
         """Get the default pickvalues for i-curves.
@@ -46,7 +83,7 @@ class UvData(SsMatrixData):
         """
         return PICKVALUES
 
-    def get_icurve(self, pickat=PICKAT):
+    def get_icurve(self, pickat=None):
         """uv_data.get_icurve(pickat=280)
         
         Returns an i-curve from the UV matrix data.
@@ -54,16 +91,20 @@ class UvData(SsMatrixData):
         Parameters
         ----------
         pickat : float, optional
-            Specifies the value in ssd.qv where to pick an i-curve.
+            Specifies the wavelength (nm) at which to pick an i-curve.
             The i-curve will be made from self.M[i,:] where
             the picking index i will be determined to satisfy
-                self.wv[i-1] <= pickat < self.vec.wv[i]
+                self.wv[i-1] <= pickat < self.wv[i]
             according to bisect_right.
+            If None, uses self.pickat (default 280 nm, or the value set
+            via SSD(uv_pickat=...)).
 
         Examples
         --------
         >>> curve = uv_data.get_icurve()
         """
+        if pickat is None:
+            pickat = self.pickat
         return super().get_icurve(pickat)
 
     def get_flowchange_points(self, pickvalues=PICKVALUES, return_also_curves=False):

@@ -67,7 +67,7 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     xslices = []
     start = 0
     for x_ in xp[:-1]:
-        stop = int(round(x_))
+        stop = int(np.searchsorted(x, x_))
         xslices.append(slice(start, stop))
         start = stop
     stop = None

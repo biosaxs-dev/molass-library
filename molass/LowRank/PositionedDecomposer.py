@@ -38,12 +38,22 @@ def decompose_icurve_positioned(x, y, decompargs, **kwargs):
         raise ValueError("No peak positions specified.")
     tau_limit = decompargs.get('tau_limit', 0.6)
     max_sigma = decompargs.get('max_sigma', 17)
+    min_sigma = decompargs.get('min_sigma', 5)
     spline = UnivariateSpline(x, y, s=0, ext=3)
+
+    # Estimate initial sigma from half-distance to nearest neighbor
+    sorted_px = np.sort(peakpositions)
     init_params_list = []
     for k, px in enumerate(peakpositions):
-        print([k], px)
-        h = spline(px)
-        init_params_list.append((h, px, 20, 0))
+        h = float(spline(px))
+        idx = np.searchsorted(sorted_px, px)
+        neighbors = []
+        if idx > 0:
+            neighbors.append(sorted_px[idx] - sorted_px[idx - 1])
+        if idx < len(sorted_px) - 1:
+            neighbors.append(sorted_px[idx + 1] - sorted_px[idx])
+        sigma_est = max(min_sigma, min(neighbors) / 3) if neighbors else 20
+        init_params_list.append((h, px, sigma_est, 0))
     
     shape = (len(peakpositions), 4)
 
@@ -54,11 +64,12 @@ def decompose_icurve_positioned(x, y, decompargs, **kwargs):
         tau_penalty = 0
         sig_penalty = 0
         for k, (h, m, s, t) in enumerate(p.reshape(shape)):
-            cy = egh(x, h, m, s, t)
+            abs_s = abs(s) + 1e-6  # enforce positive sigma
+            cy = egh(x, h, m, abs_s, t)
             dev_penalty += (m - peakpositions[k])**2
-            min_penalty += min(0, h - 0.02)**2
-            tau_penalty += max(0, t/s - tau_limit)**2
-            sig_penalty += max(0, s - max_sigma)**2
+            min_penalty += min(0, h)**2
+            tau_penalty += max(0, abs(t)/abs_s - tau_limit)**2
+            sig_penalty += max(0, abs_s - max_sigma)**2 + max(0, min_sigma - abs_s)**2
             cy_list.append(cy)
         ty = np.sum(cy_list, axis=0)
         if debug:
@@ -71,10 +82,13 @@ def decompose_icurve_positioned(x, y, decompargs, **kwargs):
             plt.show()
         return np.sum((ty - y)**2) + 1000 * (dev_penalty + min_penalty + tau_penalty + sig_penalty)
 
-    res = minimize(fit_func, np.array(init_params_list).flatten(), method='Nelder-Mead')
+    res = minimize(fit_func, np.array(init_params_list).flatten(), method='Nelder-Mead',
+                   options={'maxiter': 10000 * len(peakpositions), 'xatol': 1e-6, 'fatol': 1e-8})
     if debug:
         fit_func(res.x, debug=True)
 
-    return res.x.reshape(shape)
+    result = res.x.reshape(shape)
+    result[:, 2] = np.abs(result[:, 2]) + 1e-6  # ensure positive sigma
+    return result
 
 

@@ -1,4 +1,4 @@
-<!-- AI Context Standard: v0.5 - Adopted: 2026-02-19 - Updated: 2026-03-06 -->
+<!-- AI Context Standard: v0.5 - Adopted: 2026-02-19 - Updated: 2026-03-12 -->
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  
@@ -17,10 +17,11 @@
 |----------|------|---------|
 | ⭐ 1 | `README.md` | Project overview & entry points |
 | ⭐ 2 | `Copilot/copilot-guidelines.md` | Project policies and user-type rules |
-| 3 | `pyproject.toml` | Package version, dependencies, test config |
-| 4 | `tests/tutorial/01-quick_start.py` | Canonical usage example (start here for API) |
-| 5 | `tests/tutorial/05-lrf.py` | Low-rank factorization (LRF) tutorial |
-| 6 | `tests/tutorial/11-rigorous_optimization.py` | Rigorous optimization tutorial |
+| ⭐ 3 | `Copilot/workflow_notes.md` | AI workflow notes: issue patterns, terminal tips, issue history |
+| 4 | `pyproject.toml` | Package version, dependencies, test config |
+| 5 | `tests/tutorial/01-quick_start.py` | Canonical usage example (start here for API) |
+| 6 | `tests/tutorial/05-lrf.py` | Low-rank factorization (LRF) tutorial |
+| 7 | `tests/tutorial/11-rigorous_optimization.py` | Rigorous optimization tutorial |
 
 ---
 

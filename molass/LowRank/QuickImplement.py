@@ -13,14 +13,24 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
     from molass.LowRank.CoupledAdjuster import make_component_curves
 
     proportions = kwargs.pop('proportions', None)
-    if proportions is None:
-        xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves(ssd, num_components, **kwargs)
-    else:
+    xr_peakpositions = kwargs.pop('xr_peakpositions', None)
+    if proportions is not None and xr_peakpositions is not None:
+        raise ValueError("Cannot specify both 'proportions' and 'xr_peakpositions'.")
+
+    if xr_peakpositions is not None:
+        if num_components is None:
+            num_components = len(xr_peakpositions)
+        else:
+            assert num_components == len(xr_peakpositions), "num_components must equal len(xr_peakpositions)."
+        xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves_with_positions(ssd, num_components, xr_peakpositions, **kwargs)
+    elif proportions is not None:
         if num_components is None:
             num_components = len(proportions)
         else:
             assert num_components == len(proportions), "num_components must be equal to the length of proportions."
         xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs)
+    else:
+        xr_icurve, xr_ccurves, uv_icurve, uv_ccurves = make_component_curves(ssd, num_components, **kwargs)
 
     if debug:
         import molass.LowRank.Decomposition
@@ -72,6 +82,53 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     xr_icurve = ssd.xr.get_icurve()
     xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug)
     xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
+
+    # Create UV curves
+    if ssd.has_uv():
+        uv_icurve = ssd.uv.get_icurve()
+        mapping = ssd.get_mapping()
+        uv_ccurves = decompose_from_partner(uv_icurve, mapping, xr_ccurves, debug=debug)
+    else:
+        uv_icurve = None
+        uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
+
+    return xr_icurve, xr_ccurves, uv_icurve, uv_ccurves
+
+def make_component_curves_with_positions(ssd, num_components, xr_peakpositions, **kwargs):
+    """
+    Make component curves with peak positions pinned to specified frame numbers.
+
+    Parameters
+    ----------
+    ssd : SecSaxsData
+        The SecSaxsData object containing the data.
+    num_components : int
+        The number of components to decompose into.
+    xr_peakpositions : list of float
+        The frame positions for each peak.
+    """
+    debug = kwargs.get('debug', False)
+    if debug:
+        import molass.LowRank.PositionedDecomposer
+        reload(molass.LowRank.PositionedDecomposer)
+        import molass.Decompose.Partner
+        reload(molass.Decompose.Partner)
+    from molass.LowRank.PositionedDecomposer import decompose_icurve_positioned
+    from molass.Decompose.Partner import decompose_from_partner
+    from molass.LowRank.ComponentCurve import ComponentCurve
+
+    decompargs = {
+        'peakpositions': list(xr_peakpositions),
+        'tau_limit': kwargs.pop('tau_limit', 0.6),
+        'max_sigma': kwargs.pop('max_sigma', 80),
+        'min_sigma': kwargs.pop('min_sigma', 5),
+    }
+
+    # Create XR curves
+    xr_icurve = ssd.xr.get_icurve()
+    x, y = xr_icurve.get_xy()
+    params = decompose_icurve_positioned(x, y, decompargs, debug=debug)
+    xr_ccurves = [ComponentCurve(xr_icurve.x, params[i]) for i in range(num_components)]
 
     # Create UV curves
     if ssd.has_uv():
