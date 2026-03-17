@@ -91,7 +91,7 @@ The optimal solution in the least-squares sense is given by:
 $$ P = M \cdot C^{+} \qquad (2) $$
 
 where $C^{+}$ denotes the Moore-Penrose pseudoinverse [@Penrose_1955; @Penrose_1956]. This approach enables robust separation of components, even in the presence of overlapping peaks, provided suitable constraints are applied.
-Moreover, interparticle interference effects can be separated by adding row vectors based on the quadratic approximation derived from SAXS theory.
+Moreover, when interparticle interference is significant, the second-order virial approximation of the structure factor yields $I(q,c) \approx cA(q) + c^{2}B(q)$, which maps naturally onto Eq. (1) by augmenting $C$ with an additional $c^{2}$ row vector per affected component.
 
 ![Illustration of decomposition using simulated data](docs/_static/simulated_data.png)
 
@@ -111,13 +111,14 @@ Molass Library is freely available under an open-source license at [https://gith
 
 # AI usage disclosure
 
-Generative AI tools (GitHub Copilot, Claude 3.5 Sonnet, ChatGPT-4) were used for the following aspects of this submission:
+Generative AI tools (GitHub Copilot with Claude Sonnet 4, Claude Opus 4, and earlier models including Claude 3.5 Sonnet and ChatGPT-4) were used for the following aspects of this submission:
 
-* **Paper text**: AI assistance was limited to improving English grammar, sentence structure, and clarity. All technical content, design decisions, and scientific claims were authored by the human authors.
-* **Code generation**: Small, common code portions (e.g., standard NumPy array operations, Matplotlib plotting boilerplate) were AI-generated. All core algorithms, elution curve models, and scientific logic were designed and implemented by the human authors.
-* **Documentation**: Significant portions of the tutorial notebooks and API documentation were initially drafted with AI assistance, then extensively reviewed, corrected, and refined by the human authors to ensure technical accuracy and pedagogical effectiveness.
+* **Paper text**: AI assistance was used to improve English grammar, sentence structure, and clarity. All technical content, design decisions, and scientific claims were authored by the human authors.
+* **Code generation**: AI contributed to implementing routine code (e.g., standard NumPy operations, Matplotlib boilerplate) as well as targeted bug fixes and API improvements identified through AI-driven usability testing. All core algorithms, elution curve models, and scientific logic were designed and directed by the human authors.
+* **Documentation**: Significant portions of the tutorial notebooks and API documentation were initially drafted with AI assistance, then reviewed, corrected, and refined by the human authors.
+* **AI-friendliness improvement cycle**: As described in the Software Design section, AI agents were used as systematic testers of the library's API. Usability issues discovered during AI-driven analysis sessions were logged as GitHub Issues and resolved iteratively, improving API discoverability and error reporting.
 
-All AI-generated content was reviewed, validated, and edited by the human authors, who made all core design decisions and remain fully responsible for the accuracy and integrity of this submission. This disclosure reflects the initial release; future development may involve deeper AI collaboration, documented in the repository's development history.
+All AI-generated content was reviewed, validated, and edited by the human authors, who made all core design decisions and remain fully responsible for the accuracy and integrity of this submission. The development history, including all AI-assisted changes, is recorded in the repository's Git log and GitHub Issues.
 
 # Acknowledgements
 
