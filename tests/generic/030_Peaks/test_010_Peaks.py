@@ -2,6 +2,7 @@
     test Peaks
 """
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
@@ -30,3 +31,44 @@ def test_010_Kosugi3a():
 
     fig.tight_layout()
     show_or_save("test_010_Kosugi3a", fig)
+
+@control_matplotlib_plot
+def test_020_detect_peaks_return_properties():
+    """Issue #36: detect_peaks(return_properties=True) returns prominences."""
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")
+    ssd = SSD(path)
+
+    # Default call — returns list of int (backward-compatible)
+    peaks = ssd.xr.detect_peaks()
+    assert isinstance(peaks, list)
+    assert all(isinstance(p, int) for p in peaks)
+    assert len(peaks) > 0
+
+    # With return_properties=True — returns (list, dict)
+    peaks2, props = ssd.xr.detect_peaks(return_properties=True)
+    assert peaks2 == peaks, "Peak positions must match regardless of return_properties"
+    assert 'prominences' in props
+    assert 'peak_heights' in props
+    assert len(props['prominences']) == len(peaks)
+    assert len(props['peak_heights']) == len(peaks)
+    assert np.all(props['prominences'] > 0), "All prominences must be positive"
+
+@control_matplotlib_plot
+def test_030_plot_peaks():
+    """Issue #37: XrData.plot_peaks() standalone and axis-injectable."""
+    from molass.DataObjects import SecSaxsData as SSD
+    path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")
+    ssd = SSD(path)
+
+    # Standalone
+    fig, ax = ssd.xr.plot_peaks()
+    assert fig is not None
+    assert ax is not None
+    show_or_save("test_030_plot_peaks_standalone", fig)
+
+    # Axis-injectable
+    fig2, ax2 = plt.subplots(figsize=(10, 4))
+    fig_ret, ax_ret = ssd.xr.plot_peaks(ax=ax2)
+    assert ax_ret is ax2, "Should plot on the provided axes"
+    show_or_save("test_030_plot_peaks_injected", fig2)
