@@ -223,3 +223,26 @@ def test_16_get_bpo_ideal_snr():
     assert bpo_snr > 0.5, f"SAMPLE1 bpo_ideal (snr) should be > 0.5, got {bpo_snr}"
     # SNR-weighted bpo_ideal is typically NOT the same as uniform
     assert bpo_snr != bpo_uni, "SNR and uniform bpo_ideal should differ"
+
+
+def test_17_get_ideal_positive_ratio_alias():
+    """get_ideal_positive_ratio() is an alias for get_bpo_ideal() -- issue #40."""
+    xr = ssd_instance.trimmed_copy().xr
+    assert xr.get_ideal_positive_ratio() == xr.get_bpo_ideal()
+    assert xr.get_ideal_positive_ratio(weighting='uniform') == xr.get_bpo_ideal(weighting='uniform')
+
+
+def test_18_evaluate_baseline():
+    """evaluate_baseline() returns namedtuple with positive_ratio, ideal, delta -- issue #39."""
+    xr = ssd_instance.trimmed_copy().xr
+    bl = xr.get_baseline2d()
+    result = xr.evaluate_baseline(bl)
+    assert hasattr(result, 'positive_ratio')
+    assert hasattr(result, 'ideal')
+    assert hasattr(result, 'delta')
+    assert result.delta == abs(result.positive_ratio - result.ideal)
+    assert 0 < result.positive_ratio < 1
+    assert 0 < result.ideal < 1
+    # Should match individual calls
+    assert result.positive_ratio == xr.get_positive_ratio(bl)
+    assert result.ideal == xr.get_bpo_ideal()

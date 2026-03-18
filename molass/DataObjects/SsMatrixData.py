@@ -291,3 +291,31 @@ class SsMatrixData:
         if weights.sum() == 0:
             return float(np.mean(bpo_per_row))
         return float(np.average(bpo_per_row, weights=weights))
+
+    def get_ideal_positive_ratio(self, weighting='snr'):
+        """Expected positive_ratio for a perfect baseline, given this dataset's noise and peak geometry.
+
+        Alias for ``get_bpo_ideal()`` with a self-documenting name.
+        """
+        return self.get_bpo_ideal(weighting=weighting)
+
+    def evaluate_baseline(self, baseline, weighting='snr'):
+        """Evaluate baseline quality in a single call.
+
+        Parameters
+        ----------
+        baseline : ndarray
+            2D baseline array with the same shape as self.M.
+        weighting : {'snr', 'uniform'}
+
+        Returns
+        -------
+        result : BaselineEvaluation
+            Namedtuple with fields ``positive_ratio``, ``ideal``, ``delta``.
+        """
+        from collections import namedtuple
+        BaselineEvaluation = namedtuple('BaselineEvaluation',
+                                        ['positive_ratio', 'ideal', 'delta'])
+        pr = self.get_positive_ratio(baseline, weighting=weighting)
+        ideal = self.get_bpo_ideal(weighting=weighting)
+        return BaselineEvaluation(pr, ideal, abs(pr - ideal))
