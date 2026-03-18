@@ -152,6 +152,10 @@ class SsMatrixData:
 
         Parameters
         ----------
+        method : str, optional
+            Baseline method to use. If given, overrides the instance's
+            ``baseline_method`` for this call only. Valid values are
+            ``'buffit'``, ``'linear'``, ``'uvdiff'``, ``'integral'``.
         method_kwargs : dict, optional
             Additional keyword arguments to pass to the baseline fitting method.
         debug : bool, optional
@@ -165,17 +169,18 @@ class SsMatrixData:
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
         counter = [0, 0, 0] if debug else None
-        if self.baseline_method in ['linear', 'uvdiff', 'integral']:
+        method = kwargs.get('method', self.baseline_method)
+        if method in ['linear', 'uvdiff', 'integral']:
             import io, contextlib
             from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
             with contextlib.redirect_stdout(io.StringIO()):
                 _ecurve = _EBC(self.M.sum(axis=0))
                 _size_sigma = _ecurve.compute_size_sigma()
             default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
-            if self.baseline_method == 'uvdiff':
+            if method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
-        elif self.baseline_method == 'buffit':
+        elif method == 'buffit':
             from molass.Baseline.BuffitBaseline import _otsu_threshold
             _elution_sum = self.M.sum(axis=0)
             _elution_norm = _elution_sum / _elution_sum.max()
@@ -189,7 +194,7 @@ class SsMatrixData:
         method_kwargs = kwargs.get('method_kwargs', default_kwargs)
         baseline_fitter = Baseline2D(self.jv, self.iv)
         baseline, params_not_used = baseline_fitter.individual_axes(
-            self.M.T, axes=0, method=self.baseline_method, method_kwargs=method_kwargs
+            self.M.T, axes=0, method=method, method_kwargs=method_kwargs
         )
         if debug:
             if counter is not None:
