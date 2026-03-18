@@ -196,25 +196,98 @@ class SsMatrixData:
                 print(f"Baseline fitting completed with {counter} iterations.")  
         return baseline.T
 
-    def get_bpo_ideal(self):
+    def get_snr_weights(self):
+        """Per-q-row signal-to-noise ratio weights.
+
+        Returns
+        -------
+        weights : ndarray, shape (n_q,)
+            w_i = mean(I_i) / sigma_noise_i, clipped to >= 0.
+        """
+        mean_I = np.mean(self.M, axis=1)
+        if self.E is not None:
+            sigma = np.mean(self.E, axis=1)
+            sigma = np.maximum(sigma, 1e-30)
+        else:
+            sigma = np.std(np.diff(self.M.astype(float), axis=1), axis=1) / np.sqrt(2)
+            sigma = np.maximum(sigma, 1e-30)
+        return np.maximum(mean_I / sigma, 0)
+
+    def get_positive_ratio(self, baseline, weighting='snr'):
+        """Fraction of non-negative residual elements, optionally SNR-weighted.
+
+        Parameters
+        ----------
+        baseline : ndarray
+            2D baseline array with the same shape as self.M.
+        weighting : {'snr', 'uniform'}
+            'snr' (default) weights each q-row by its SNR so that
+            informative low-q rows dominate over noisy high-q rows.
+
+        Returns
+        -------
+        positive_ratio : float
+        """
+        residual = self.M - baseline
+        per_row = np.mean(residual >= 0, axis=1)
+        if weighting == 'uniform':
+            return float(np.mean(per_row))
+        weights = self.get_snr_weights()
+        if weights.sum() == 0:
+            return float(np.mean(per_row))
+        return float(np.average(per_row, weights=weights))
+
+    def get_bpo_ideal(self, weighting='snr'):
         """Get the dataset-relative ideal positive_ratio for baseline evaluation.
 
-        Computes noisiness and size_sigma from the total elution curve, then
-        looks up the expected positive_ratio under a perfect baseline using the
-        BPO (Base Percentile Offset) table.
+        With ``weighting='snr'`` (default), computes per-q-row noisiness,
+        looks up per-row ideal from the BPO table, and aggregates with SNR
+        weights.  With ``weighting='uniform'``, uses the original single
+        global noisiness.
+
+        Parameters
+        ----------
+        weighting : {'snr', 'uniform'}
 
         Returns
         -------
         bpo_ideal : float
-            The expected positive_ratio in [0, 1]. For example, 0.9530 for the
-            MY dataset (narrow peak, size_sigma ~ 3.68).
+            The expected positive_ratio in [0, 1].
         """
         import io, contextlib
         from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
         from molass_legacy.SerialAnalyzer.BasePercentileOffset import base_percentile_offset
+        from scipy.interpolate import LSQUnivariateSpline
+
         with contextlib.redirect_stdout(io.StringIO()):
-            _ecurve = _EBC(self.M.sum(axis=0))
-            _noisiness = _ecurve.compute_noisiness()
+            _ecurve = _EBC(self.M.sum(axis=0).astype(float))
             _size_sigma = _ecurve.compute_size_sigma()
-        bpo_val = base_percentile_offset(_noisiness, size_sigma=_size_sigma)
-        return (100.0 - bpo_val) / 100.0
+
+        if weighting == 'uniform':
+            with contextlib.redirect_stdout(io.StringIO()):
+                _noisiness = _ecurve.compute_noisiness()
+            bpo_val = base_percentile_offset(_noisiness, size_sigma=_size_sigma)
+            return (100.0 - bpo_val) / 100.0
+
+        # Per-row noisiness → per-row bpo_ideal → SNR-weighted aggregate
+        n_q, n_frames = self.M.shape
+        x = np.arange(n_frames, dtype=float)
+        n_knots = max(3, n_frames // 10) + 2
+        knots = np.linspace(x[0], x[-1], n_knots)[1:-1]
+
+        bpo_per_row = np.empty(n_q)
+        for i in range(n_q):
+            y = self.M[i, :].astype(float)
+            scale = max(np.abs(y).max(), 1e-12)
+            try:
+                spline = LSQUnivariateSpline(x, y, knots)
+                noisiness = np.std(y - spline(x)) / scale
+            except Exception:
+                noisiness = np.std(y) / scale
+            bpo_val = base_percentile_offset(noisiness, size_sigma=_size_sigma)
+            bpo_per_row[i] = (100.0 - bpo_val) / 100.0
+
+        weights = self.get_snr_weights()
+        if weights.sum() == 0:
+            return float(np.mean(bpo_per_row))
+        return float(np.average(bpo_per_row, weights=weights))
