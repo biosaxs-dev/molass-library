@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -691,16 +698,26 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.iv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.iv</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.jv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.jv</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.M"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.M</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.data"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#id0"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.q_values"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.q_values</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.frame_indices</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.copy"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.copy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_icurve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_jcurve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_recognition_curve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_moment()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_baseline_method()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline_method()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_snr_weights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_positive_ratio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_bpo_ideal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_ideal_positive_ratio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.evaluate_baseline()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -708,6 +725,14 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="molass.DataObjects.UvData.html">DataObjects.UvData</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wv"><code class="docutils literal notranslate"><span class="pre">UvData.wv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.uv_pickat"><code class="docutils literal notranslate"><span class="pre">UvData.uv_pickat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#id0"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#id1"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelength_range"><code class="docutils literal notranslate"><span class="pre">UvData.wavelength_range</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.copy"><code class="docutils literal notranslate"><span class="pre">UvData.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">UvData.get_recognition_curve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_ipickvalues"><code class="docutils literal notranslate"><span class="pre">UvData.get_ipickvalues()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_icurve"><code class="docutils literal notranslate"><span class="pre">UvData.get_icurve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_flowchange_points"><code class="docutils literal notranslate"><span class="pre">UvData.get_flowchange_points()</span></code></a></li>
@@ -720,12 +745,18 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="molass.DataObjects.XrData.html">DataObjects.XrData</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.baseline_method"><code class="docutils literal notranslate"><span class="pre">XrData.baseline_method</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.xr_pickat"><code class="docutils literal notranslate"><span class="pre">XrData.xr_pickat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.copy"><code class="docutils literal notranslate"><span class="pre">XrData.copy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_ipickvalue"><code class="docutils literal notranslate"><span class="pre">XrData.get_ipickvalue()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_icurve"><code class="docutils literal notranslate"><span class="pre">XrData.get_icurve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">XrData.get_recognition_curve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_usable_qrange"><code class="docutils literal notranslate"><span class="pre">XrData.get_usable_qrange()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_ibaseline"><code class="docutils literal notranslate"><span class="pre">XrData.get_ibaseline()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.compute_rgcurve"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.compute_rgcurve_atsas"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve_atsas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.detect_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.detect_peaks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.plot_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.plot_peaks()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_jcurve_array"><code class="docutils literal notranslate"><span class="pre">XrData.get_jcurve_array()</span></code></a></li>
 </ul>
 </li>

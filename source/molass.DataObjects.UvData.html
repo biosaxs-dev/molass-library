@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -599,6 +606,14 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wv"><code class="docutils literal notranslate"><span class="pre">UvData.wv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.uv_pickat"><code class="docutils literal notranslate"><span class="pre">UvData.uv_pickat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelength_range"><code class="docutils literal notranslate"><span class="pre">UvData.wavelength_range</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.copy"><code class="docutils literal notranslate"><span class="pre">UvData.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">UvData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_ipickvalues"><code class="docutils literal notranslate"><span class="pre">UvData.get_ipickvalues()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_icurve"><code class="docutils literal notranslate"><span class="pre">UvData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_flowchange_points"><code class="docutils literal notranslate"><span class="pre">UvData.get_flowchange_points()</span></code></a></li>
@@ -629,7 +644,7 @@ Inherits from SsMatrixData.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.wv">
 <span class="sig-name descname"><span class="pre">wv</span></span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.wv" title="Link to this definition">#</a></dt>
-<dd><p>The wavelength values corresponding to the spectral axis (iv).</p>
+<dd><p>The wavelength values corresponding to the spectral axis (iv). Alias: <code class="docutils literal notranslate"><span class="pre">wavelengths</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array-like</p>
@@ -637,6 +652,31 @@ Inherits from SsMatrixData.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.wavelengths">
+<span class="sig-name descname"><span class="pre">wavelengths</span></span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.wavelengths" title="Link to this definition">#</a></dt>
+<dd><p>Human-readable alias for <code class="docutils literal notranslate"><span class="pre">iv</span></code> / <code class="docutils literal notranslate"><span class="pre">wv</span></code> — the wavelength axis (nm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like (property)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.frames">
+<span class="sig-name descname"><span class="pre">frames</span></span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.frames" title="Link to this definition">#</a></dt>
+<dd><p>Human-readable alias for <code class="docutils literal notranslate"><span class="pre">jv</span></code> — the frame (time) axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array-like (property)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>Matrix <code class="docutils literal notranslate"><span class="pre">M</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(len(wavelengths),</span> <span class="pre">len(frames))</span></code>:
+rows index wavelength, columns index frame number.</p>
 <p>Initialize the UvData object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -649,6 +689,59 @@ Inherits from SsMatrixData.</p>
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.uv_pickat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uv_pickat</span></span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.uv_pickat" title="Link to this definition">#</a></dt>
+<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">pickat</span></code> — the default wavelength (nm) for i-curve extraction.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wavelengths</span></span><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd><p>Wavelength axis in nm (alias for <code class="docutils literal notranslate"><span class="pre">iv</span></code> / <code class="docutils literal notranslate"><span class="pre">wv</span></code>).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id1">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frames</span></span><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dd><p>Frame (time) axis (alias for <code class="docutils literal notranslate"><span class="pre">jv</span></code>).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.wavelength_range">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wavelength_range</span></span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.wavelength_range" title="Link to this definition">#</a></dt>
+<dd><p>Wavelength coverage as <code class="docutils literal notranslate"><span class="pre">(min,</span> <span class="pre">max)</span></code> in nm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.copy" title="Link to this definition">#</a></dt>
+<dd><p>Return a copy of the SsMatrixData object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slices</strong> (<em>tuple</em><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.get_recognition_curve">
+<span class="sig-name descname"><span class="pre">get_recognition_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.get_recognition_curve" title="Link to this definition">#</a></dt>
+<dd><p>Return the elution curve at <code class="docutils literal notranslate"><span class="pre">self.pickat</span></code> wavelength (default 280 nm,
+or the value set via <code class="docutils literal notranslate"><span class="pre">SSD(uv_pickat=...)</span></code>).</p>
+<p>Unlike XR where <code class="docutils literal notranslate"><span class="pre">M.sum(axis=0)</span></code> is a useful alternative, UV sum
+across all wavelengths is dominated by noise from non-absorbing
+channels and is not appropriate for peak/buffer classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The recognition elution curve at the selected wavelength.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.get_ipickvalues">
 <span class="sig-name descname"><span class="pre">get_ipickvalues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.get_ipickvalues" title="Link to this definition">#</a></dt>
@@ -663,13 +756,15 @@ Inherits from SsMatrixData.</p>
 <dd><p>Returns an i-curve from the UV matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Specifies the value in ssd.qv where to pick an i-curve.
+<dd class="field-odd"><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Specifies the wavelength (nm) at which to pick an i-curve.
 The i-curve will be made from self.M[i,:] where
 the picking index i will be determined to satisfy</p>
 <blockquote>
-<div><p>self.wv[i-1] &lt;= pickat &lt; self.vec.wv[i]</p>
+<div><p>self.wv[i-1] &lt;= pickat &lt; self.wv[i]</p>
 </div></blockquote>
-<p>according to bisect_right.</p>
+<p>according to bisect_right.
+If None, uses self.pickat (default 280 nm, or the value set
+via SSD(uv_pickat=…)).</p>
 </p>
 </dd>
 </dl>
@@ -719,13 +814,14 @@ unusable UV data regions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.UvData.UvData.get_ibaseline">
-<span class="sig-name descname"><span class="pre">get_ibaseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.get_ibaseline" title="Link to this definition">#</a></dt>
-<dd><p>uv.get_uv_ibaseline(pickvalue=0.02)</p>
-<p>Returns a baseline i-curve from the UV matrix data.</p>
+<span class="sig-name descname"><span class="pre">get_ibaseline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.UvData.UvData.get_ibaseline" title="Link to this definition">#</a></dt>
+<dd><p>Returns a baseline i-curve from the UV matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pickvalue</strong> (<em>float</em><em>, </em><em>optional</em>) – See uv.get_icurve().</p></li>
+<li><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – Wavelength (nm) at which to pick the i-curve for baseline fitting.
+If None, uses self.pickat (default 280 nm, or the value set
+via SSD(uv_pickat=…)).</p></li>
 <li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The baseline method to use. If None, the method set in
 self.baseline_method will be used.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
@@ -799,6 +895,14 @@ These will be merged with the default_kwargs defined above.</p></li>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wv"><code class="docutils literal notranslate"><span class="pre">UvData.wv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.uv_pickat"><code class="docutils literal notranslate"><span class="pre">UvData.uv_pickat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelength_range"><code class="docutils literal notranslate"><span class="pre">UvData.wavelength_range</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.copy"><code class="docutils literal notranslate"><span class="pre">UvData.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">UvData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_ipickvalues"><code class="docutils literal notranslate"><span class="pre">UvData.get_ipickvalues()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_icurve"><code class="docutils literal notranslate"><span class="pre">UvData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.get_flowchange_points"><code class="docutils literal notranslate"><span class="pre">UvData.get_flowchange_points()</span></code></a></li>

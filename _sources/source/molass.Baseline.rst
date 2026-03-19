@@ -15,6 +15,7 @@ Submodules
    molass.Baseline.Baseline2D
    molass.Baseline.BaselineUtils
    molass.Baseline.Basesurface
+   molass.Baseline.BuffitBaseline
    molass.Baseline.IntegralBaseline
    molass.Baseline.LpmBaseline
    molass.Baseline.SimpleBaseline

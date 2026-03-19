@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -647,7 +654,16 @@ The baseline is computed by fitting a linear function to the data and then takin
 <li><p><strong>y</strong> (<em>array-like</em>) – The y-coordinates of the curve.</p></li>
 <li><p><strong>return_also_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function returns a tuple containing the baseline and a dictionary of the slope and intercept of the linear function.
 If False, it returns only the baseline.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the ScatteringBaseline solver.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Additional keyword arguments.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">size_sigma</span></code> : float — if present, an adaptive <code class="docutils literal notranslate"><span class="pre">p_final</span></code> is
+computed per-row (replicating legacy behaviour); otherwise the
+default <code class="docutils literal notranslate"><span class="pre">PERCENTILE_FINAL=10</span></code> is used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mask</span></code> : array-like of bool — if present, only the elements where
+<code class="docutils literal notranslate"><span class="pre">mask</span></code> is True are used for fitting.  The returned baseline is
+evaluated at <strong>all</strong> <code class="docutils literal notranslate"><span class="pre">x</span></code> positions.</p></li>
+</ul>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

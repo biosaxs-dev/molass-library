@@ -162,6 +162,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -204,6 +205,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -240,6 +242,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -258,8 +261,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -329,6 +335,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -603,17 +610,23 @@ document.write(`
 </li>
       <li><a href="source/molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.add_center_plane">add_center_plane() (in module molass.DensitySpace.VoxelSpace)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Progress.ProgessUtils.html#molass.Progress.ProgessUtils.ProgressSet.add_unit">add_unit() (ProgressSet method)</a>
 </li>
       <li><a href="source/molass.LowRank.ConsistentAdjuster.html#molass.LowRank.ConsistentAdjuster.adjust_components_consistently">adjust_components_consistently() (in module molass.LowRank.ConsistentAdjuster)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.adjust_rg_and_poresize">adjust_rg_and_poresize() (in module molass.SEC.Models.SdmOptimizer)</a>
+</li>
+      <li><a href="source/molass.LowRank.AlignDecompositions.html#molass.LowRank.AlignDecompositions.align_decompositions">align_decompositions() (in module molass.LowRank.AlignDecompositions)</a>
 </li>
       <li><a href="source/molass.PlotUtils.TwinAxesUtils.html#molass.PlotUtils.TwinAxesUtils.align_zero_y">align_zero_y() (in module molass.PlotUtils.TwinAxesUtils)</a>
 </li>
       <li><a href="source/molass.Progress.ProgessUtils.html#molass.Progress.ProgessUtils.ProgressUnit.all_done">all_done() (ProgressUnit method)</a>
 </li>
       <li><a href="source/molass.PlotUtils.Annotation3D.html#molass.PlotUtils.Annotation3D.Annotation3D">Annotation3D (class in molass.PlotUtils.Annotation3D)</a>
+</li>
+      <li><a href="source/molass.LowRank.BoundedLrf.html#molass.LowRank.BoundedLrf.apply_bounded_lrf">apply_bounded_lrf() (in module molass.LowRank.BoundedLrf)</a>
 </li>
       <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.Component.area">area (Component attribute)</a>
 </li>
@@ -634,7 +647,11 @@ document.write(`
       <li><a href="source/molass.Baseline.Baseline2D.html#molass.Baseline.Baseline2D.Baseline2D">Baseline2D (class in molass.Baseline.Baseline2D)</a>
 </li>
       <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method">baseline_method (SsMatrixData attribute)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.baseline_method">(XrData attribute)</a>
 </li>
+      </ul></li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.beamline_info">beamline_info (SecSaxsData attribute)</a>
 </li>
   </ul></td>
@@ -687,6 +704,8 @@ document.write(`
 </li>
       <li><a href="source/molass.PlotUtils.PlotResult.html#molass.PlotUtils.PlotResult.PlotResult.close">close() (PlotResult method)</a>
 </li>
+      <li><a href="source/molass.LowRank.BoundedLrf.html#molass.LowRank.BoundedLrf.coerce_bounds">coerce_bounds() (in module molass.LowRank.BoundedLrf)</a>
+</li>
       <li><a href="source/molass.Mapping.PeakMatcher.html#molass.Mapping.PeakMatcher.combination_pairs">combination_pairs() (in module molass.Mapping.PeakMatcher)</a>
 </li>
       <li><a href="source/molass.PlotUtils.Comparison.html#molass.PlotUtils.Comparison.comparison_plot">comparison_plot() (in module molass.PlotUtils.Comparison)</a>
@@ -699,6 +718,12 @@ document.write(`
 </li>
       <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.Component">Component (class in molass.LowRank.Component)</a>
 </li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.component_quality_scores">component_quality_scores() (Decomposition method)</a>
+
+      <ul>
+        <li><a href="source/molass.LowRank.ComponentReliability.html#molass.LowRank.ComponentReliability.component_quality_scores">(in module molass.LowRank.ComponentReliability)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve">ComponentCurve (class in molass.LowRank.ComponentCurve)</a>
 </li>
       <li><a href="source/molass.PlotUtils.MatrixPlot.html#molass.PlotUtils.MatrixPlot.compute_3d_xyz">compute_3d_xyz() (in module molass.PlotUtils.MatrixPlot)</a>
@@ -710,6 +735,8 @@ document.write(`
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.compute_bounce_vector">compute_bounce_vector() (SolidGrain method)</a>
 </li>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_boundary_walls">compute_boundary_walls() (in module molass.SEC.StationaryMove)</a>
+</li>
+      <li><a href="source/molass.Baseline.BuffitBaseline.html#molass.Baseline.BuffitBaseline.compute_buffit_baseline">compute_buffit_baseline() (in module molass.Baseline.BuffitBaseline)</a>
 </li>
       <li><a href="source/molass.Baseline.UvDiffEffect.html#molass.Baseline.UvDiffEffect.compute_dfef_curve">compute_dfef_curve() (in module molass.Baseline.UvDiffEffect)</a>
 </li>
@@ -753,6 +780,8 @@ document.write(`
 </li>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_reflected_point">compute_reflected_point() (in module molass.SEC.StationaryMove)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Guinier.SimpleFallback.html#molass.Guinier.SimpleFallback.compute_rg">compute_rg() (in module molass.Guinier.SimpleFallback)</a>
 
       <ul>
@@ -761,8 +790,6 @@ document.write(`
         <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.XrComponent.compute_rg">(XrComponent method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.DensitySpace.VoxelSpace.html#molass.DensitySpace.VoxelSpace.compute_rg_impl">compute_rg_impl() (in module molass.DensitySpace.VoxelSpace)</a>
 </li>
       <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.compute_rgcurve">compute_rgcurve() (XrData method)</a>
@@ -828,6 +855,10 @@ document.write(`
 </li>
         <li><a href="source/molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo.copy">(TrimmingInfo method)</a>
 </li>
+        <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.copy">(UvData method)</a>
+</li>
+        <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.copy">(XrData method)</a>
+</li>
       </ul></li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.copy_with_new_components">copy_with_new_components() (Decomposition method)</a>
 </li>
@@ -876,7 +907,13 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Guinier.SimpleFallback.html#molass.Guinier.SimpleFallback.SimpleFallback.data">data (SimpleFallback attribute)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.data">(SsMatrixData attribute)</a>
 </li>
+        <li><a href="source/molass.DataObjects.SsMatrixData.html#id0">(SsMatrixData property)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.datafiles">datafiles (SecSaxsData attribute)</a>
 </li>
       <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.debug_plot">debug_plot() (in module molass.Decompose.Proportional)</a>
@@ -905,10 +942,12 @@ document.write(`
 </li>
       <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.demo">demo() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
-      <li><a href="source/molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.DenssDetector">DenssDetector (class in molass.SAXS.DenssDetector)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.SAXS.DenssDetector.html#molass.SAXS.DenssDetector.DenssDetector">DenssDetector (class in molass.SAXS.DenssDetector)</a>
+</li>
+      <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.detect_peaks">detect_peaks() (XrData method)</a>
+</li>
       <li><a href="source/molass.SAXS.DenssTools.html#molass.SAXS.DenssTools.DetectorInfo">DetectorInfo (class in molass.SAXS.DenssTools)</a>
 
       <ul>
@@ -993,15 +1032,17 @@ document.write(`
 </li>
       <li><a href="source/molass.Guinier.SimpleFallback.html#molass.Guinier.SimpleFallback.SimpleFallback.estimate">estimate() (SimpleFallback method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Baseline.SimpleBaseline.html#molass.Baseline.SimpleBaseline.estimate_baseline_params">estimate_baseline_params() (in module molass.Baseline.SimpleBaseline)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.estimate_dmax">estimate_dmax() (in module molass.SAXS.DmaxEstimation)</a>
 </li>
       <li><a href="source/molass.SEC.Models.EdmEstimator.html#molass.SEC.Models.EdmEstimator.estimate_edm_init_params">estimate_edm_init_params() (in module molass.SEC.Models.EdmEstimator)</a>
 </li>
       <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.estimate_initial_params">estimate_initial_params() (in module molass.Decompose.Proportional)</a>
+</li>
+      <li><a href="source/molass.LowRank.BoundedLrf.html#molass.LowRank.BoundedLrf.estimate_KL">estimate_KL() (in module molass.LowRank.BoundedLrf)</a>
 </li>
       <li><a href="source/molass.Baseline.LpmBaseline.html#molass.Baseline.LpmBaseline.estimate_lpm_percent">estimate_lpm_percent() (in module molass.Baseline.LpmBaseline)</a>
 </li>
@@ -1020,6 +1061,8 @@ document.write(`
       <li><a href="source/molass.Baseline.UvBaseline.html#molass.Baseline.UvBaseline.estimate_uvbaseline_params">estimate_uvbaseline_params() (in module molass.Baseline.UvBaseline)</a>
 </li>
       <li><a href="source/molass.Baseline.UvDiffEffect.html#molass.Baseline.UvDiffEffect.estimate_uvdiffeffect_params">estimate_uvdiffeffect_params() (in module molass.Baseline.UvDiffEffect)</a>
+</li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline">evaluate_baseline() (SsMatrixData method)</a>
 </li>
       <li><a href="source/molass.Mapping.PeakMatcher.html#molass.Mapping.PeakMatcher.evaluate_matching">evaluate_matching() (in module molass.Mapping.PeakMatcher)</a>
 </li>
@@ -1057,12 +1100,12 @@ document.write(`
 </li>
       <li><a href="source/molass.DataUtils.ForwardCompat.html#molass.DataUtils.ForwardCompat.PreRecogProxy.flowchange">flowchange (PreRecogProxy attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChange.html#molass.FlowChange.FlowChange.flowchange_exclude_slice">flowchange_exclude_slice() (in module molass.FlowChange.FlowChange)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChange.html#molass.FlowChange.FlowChange.flowchange_exclude_slice_impl">flowchange_exclude_slice_impl() (in module molass.FlowChange.FlowChange)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChangeLikely.html#molass.FlowChange.FlowChangeLikely.flowchange_likelihood">flowchange_likelihood() (in module molass.FlowChange.FlowChangeLikely)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChangeInfo.html#molass.FlowChange.FlowChangeInfo.FlowChangeInfo">FlowChangeInfo (class in molass.FlowChange.FlowChangeInfo)</a>
@@ -1073,6 +1116,16 @@ document.write(`
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.folder">folder (V2Result attribute)</a>
 </li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices">frame_indices (SsMatrixData property)</a>
+</li>
+      <li><a href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve.frames">frames (RgCurve property)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.frames">(UvData attribute)</a>
+</li>
+        <li><a href="source/molass.DataObjects.UvData.html#id1">(UvData property)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1119,6 +1172,8 @@ document.write(`
 </li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_best_params">get_best_params() (V2Result method)</a>
 </li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal">get_bpo_ideal() (SsMatrixData method)</a>
+</li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_cd_color_info">get_cd_color_info() (Decomposition method)</a>
 </li>
       <li><a href="source/molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.BeamlineInfo.get_concfactor">get_concfactor() (BeamlineInfo method)</a>
@@ -1159,6 +1214,10 @@ document.write(`
 </li>
       <li><a href="source/molass.Bridge.OptimizerInput.html#molass.Bridge.OptimizerInput.OptimizerInput.get_dsets">get_dsets() (OptimizerInput method)</a>
 </li>
+      <li><a href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_edm_xr_ccurves">get_edm_xr_ccurves() (in module molass.Rigorous.ComponentUtils)</a>
+</li>
+      <li><a href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_egh_xr_ccurves">get_egh_xr_ccurves() (in module molass.Rigorous.ComponentUtils)</a>
+</li>
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_entry_including">get_entry_including() (SolidGrain method)</a>
 </li>
       <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_flowchange_points">get_flowchange_points() (UvData method)</a>
@@ -1189,6 +1248,8 @@ document.write(`
         <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_icurve">(XrData method)</a>
 </li>
       </ul></li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio">get_ideal_positive_ratio() (SsMatrixData method)</a>
+</li>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_init_params">get_init_params() (V2Result method)</a>
 </li>
       <li><a href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.SdProxy.get_intensity_array_top">get_intensity_array_top() (SdProxy method)</a>
@@ -1255,14 +1316,14 @@ document.write(`
         <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment">(SsMatrixData method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.get_next_position_impl">get_next_position_impl() (in module molass.SEC.StationaryMove)</a>
 </li>
       <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.get_nsigma_points">get_nsigma_points() (Moment method)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_num_components">get_num_components() (Decomposition method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh">get_num_components_assumming_egh() (in module molass.Bridge.V2Result)</a>
 </li>
       <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.get_num_major_peaks">get_num_major_peaks() (Curve method)</a>
@@ -1271,6 +1332,12 @@ document.write(`
 </li>
       <li><a href="source/molass.SAXS.DenssUtils.html#molass.SAXS.DenssUtils.get_outfolder">get_outfolder() (in module molass.SAXS.DenssUtils)</a>
 </li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_P_at">get_P_at() (Decomposition method)</a>
+
+      <ul>
+        <li><a href="source/molass.LowRank.AlignDecompositions.html#molass.LowRank.AlignDecompositions.get_P_at">(in module molass.LowRank.AlignDecompositions)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_pairedranges">get_pairedranges() (Decomposition method)</a>
 </li>
       <li><a href="source/molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve.get_params">get_params() (ComponentCurve method)</a>
@@ -1299,6 +1366,8 @@ document.write(`
 </li>
       <li><a href="source/molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.SolidGrain.get_point_from_angle">get_point_from_angle() (SolidGrain method)</a>
 </li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio">get_positive_ratio() (SsMatrixData method)</a>
+</li>
       <li><a href="source/molass.Legacy.BackCompatUtils.html#molass.Legacy.BackCompatUtils.ElutioCurvProxy.get_primarypeak_i">get_primarypeak_i() (ElutioCurvProxy method)</a>
 </li>
       <li><a href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.get_proportional_slices">get_proportional_slices() (in module molass.Decompose.Proportional)</a>
@@ -1309,21 +1378,41 @@ document.write(`
 </li>
       <li><a href="source/molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange.get_real_flow_changes">get_real_flow_changes() (NullFlowChange method)</a>
 </li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve">get_recognition_curve() (SsMatrixData method)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.get_recognition_curve">(UvData method)</a>
+</li>
+        <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.get_recognition_curve">(XrData method)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.Shapes.Ellipsoid.html#molass.Shapes.Ellipsoid.Ellipsoid.get_rg">get_rg() (Ellipsoid method)</a>
 
       <ul>
         <li><a href="source/molass.Shapes.Sphere.html#molass.Shapes.Sphere.Sphere.get_rg">(Sphere method)</a>
 </li>
       </ul></li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_rg_curve">get_rg_curve() (Decomposition method)</a>
+</li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_rgs">get_rgs() (Decomposition method)</a>
 </li>
       <li><a href="source/molass.FlowChange.FlowChangeLikely.html#molass.FlowChange.FlowChangeLikely.get_safeslice">get_safeslice() (in module molass.FlowChange.FlowChangeLikely)</a>
 </li>
       <li><a href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve.get_scale">get_scale() (UvComponentCurve method)</a>
 </li>
+      <li><a href="source/molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve.get_scale_param">get_scale_param() (ComponentCurve method)</a>
+
+      <ul>
+        <li><a href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve.get_scale_param">(SdmComponentCurve method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_sdm_xr_ccurves">get_sdm_xr_ccurves() (in module molass.Rigorous.ComponentUtils)</a>
+</li>
       <li><a href="source/molass.Geometric.Linesegment.html#molass.Geometric.Linesegment.get_segments">get_segments() (in module molass.Geometric.Linesegment)</a>
 </li>
       <li><a href="source/molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange.get_similarity">get_similarity() (NullFlowChange method)</a>
+</li>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights">get_snr_weights() (SsMatrixData method)</a>
 </li>
       <li><a href="source/molass.Bridge.OptimizerInput.html#molass.Bridge.OptimizerInput.OptimizerInput.get_spectral_vectors">get_spectral_vectors() (OptimizerInput method)</a>
 
@@ -1380,6 +1469,8 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="source/molass.Baseline.BaselineUtils.html#molass.Baseline.BaselineUtils.get_xr_baseline_func">get_xr_baseline_func() (in module molass.Baseline.BaselineUtils)</a>
+</li>
+      <li><a href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_xr_ccurves">get_xr_ccurves() (in module molass.Rigorous.ComponentUtils)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_xr_components">get_xr_components() (Decomposition method)</a>
 </li>
@@ -1493,10 +1584,10 @@ document.write(`
         <li><a href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.init_params">(V2Result attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.XrComponent.inspect_guinier">inspect_guinier() (XrComponent method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.PlotUtils.GuinierPlot.html#molass.PlotUtils.GuinierPlot.inspect_guinier_plot">inspect_guinier_plot() (in module molass.PlotUtils.GuinierPlot)</a>
 </li>
       <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect">inspect_ip_effect() (SecSaxsData method)</a>
@@ -1517,6 +1608,12 @@ document.write(`
 </li>
       <li><a href="source/molass.InterParticle.IpEffectInspect.html#molass.InterParticle.IpEffectInspect.IpEffectInfo">IpEffectInfo (class in molass.InterParticle.IpEffectInspect)</a>
 </li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.is_component_reliable">is_component_reliable() (Decomposition method)</a>
+
+      <ul>
+        <li><a href="source/molass.LowRank.ComponentReliability.html#molass.LowRank.ComponentReliability.is_component_reliable">(in module molass.LowRank.ComponentReliability)</a>
+</li>
+      </ul></li>
       <li><a href="source/molass.Stats.Moment.html#molass.Stats.Moment.Moment.is_in_nsigma">is_in_nsigma() (Moment method)</a>
 </li>
       <li><a href="source/molass.Testing.html#molass.Testing.is_interactive">is_interactive() (in module molass.Testing)</a>
@@ -1629,11 +1726,17 @@ document.write(`
 </li>
       <li><a href="source/molass.LowRank.CoupledAdjuster.html#molass.LowRank.CoupledAdjuster.make_component_curves">make_component_curves() (in module molass.LowRank.CoupledAdjuster)</a>
 </li>
+      <li><a href="source/molass.LowRank.QuickImplement.html#molass.LowRank.QuickImplement.make_component_curves_with_positions">make_component_curves_with_positions() (in module molass.LowRank.QuickImplement)</a>
+</li>
       <li><a href="source/molass.LowRank.QuickImplement.html#molass.LowRank.QuickImplement.make_component_curves_with_proportions">make_component_curves_with_proportions() (in module molass.LowRank.QuickImplement)</a>
 </li>
       <li><a href="source/molass.LowRank.QuickImplement.html#molass.LowRank.QuickImplement.make_decomposition_impl">make_decomposition_impl() (in module molass.LowRank.QuickImplement)</a>
 </li>
       <li><a href="source/molass.Rigorous.LegacyBridgeUtils.html#molass.Rigorous.LegacyBridgeUtils.make_dsets_from_decomposition">make_dsets_from_decomposition() (in module molass.Rigorous.LegacyBridgeUtils)</a>
+</li>
+      <li><a href="source/molass.Decompose.XrOnlyUtils.html#molass.Decompose.XrOnlyUtils.make_dummy_uv_ccurves">make_dummy_uv_ccurves() (in module molass.Decompose.XrOnlyUtils)</a>
+</li>
+      <li><a href="source/molass.Bridge.LegacyBaselines.html#molass.Bridge.LegacyBaselines.make_equivalent_uv_baseparams">make_equivalent_uv_baseparams() (in module molass.Bridge.LegacyBaselines)</a>
 </li>
       <li><a href="source/molass.PlotUtils.DecompositionPlot.html#molass.PlotUtils.DecompositionPlot.make_guinier_plot">make_guinier_plot() (in module molass.PlotUtils.DecompositionPlot)</a>
 </li>
@@ -1719,6 +1822,8 @@ document.write(`
 </li>
         <li><a href="source/molass.Baseline.Basesurface.html#module-molass.Baseline.Basesurface">molass.Baseline.Basesurface</a>
 </li>
+        <li><a href="source/molass.Baseline.BuffitBaseline.html#module-molass.Baseline.BuffitBaseline">molass.Baseline.BuffitBaseline</a>
+</li>
         <li><a href="source/molass.Baseline.IntegralBaseline.html#module-molass.Baseline.IntegralBaseline">molass.Baseline.IntegralBaseline</a>
 </li>
         <li><a href="source/molass.Baseline.LpmBaseline.html#module-molass.Baseline.LpmBaseline">molass.Baseline.LpmBaseline</a>
@@ -1793,6 +1898,8 @@ document.write(`
 </li>
         <li><a href="source/molass.Decompose.VaryUtils.html#module-molass.Decompose.VaryUtils">molass.Decompose.VaryUtils</a>
 </li>
+        <li><a href="source/molass.Decompose.XrOnlyUtils.html#module-molass.Decompose.XrOnlyUtils">molass.Decompose.XrOnlyUtils</a>
+</li>
         <li><a href="source/molass.DensitySpace.html#module-molass.DensitySpace">molass.DensitySpace</a>
 </li>
         <li><a href="source/molass.DensitySpace.Densities.html#module-molass.DensitySpace.Densities">molass.DensitySpace.Densities</a>
@@ -1841,6 +1948,8 @@ document.write(`
 </li>
         <li><a href="source/molass.Guinier.RgCurveUtils.html#module-molass.Guinier.RgCurveUtils">molass.Guinier.RgCurveUtils</a>
 </li>
+        <li><a href="source/molass.Guinier.RgEstimator.html#module-molass.Guinier.RgEstimator">molass.Guinier.RgEstimator</a>
+</li>
         <li><a href="source/molass.Guinier.SimpleFallback.html#module-molass.Guinier.SimpleFallback">molass.Guinier.SimpleFallback</a>
 </li>
         <li><a href="source/molass.InterParticle.html#module-molass.InterParticle">molass.InterParticle</a>
@@ -1861,9 +1970,15 @@ document.write(`
 </li>
         <li><a href="source/molass.LowRank.html#module-molass.LowRank">molass.LowRank</a>
 </li>
+        <li><a href="source/molass.LowRank.AlignDecompositions.html#module-molass.LowRank.AlignDecompositions">molass.LowRank.AlignDecompositions</a>
+</li>
+        <li><a href="source/molass.LowRank.BoundedLrf.html#module-molass.LowRank.BoundedLrf">molass.LowRank.BoundedLrf</a>
+</li>
         <li><a href="source/molass.LowRank.Component.html#module-molass.LowRank.Component">molass.LowRank.Component</a>
 </li>
         <li><a href="source/molass.LowRank.ComponentCurve.html#module-molass.LowRank.ComponentCurve">molass.LowRank.ComponentCurve</a>
+</li>
+        <li><a href="source/molass.LowRank.ComponentReliability.html#module-molass.LowRank.ComponentReliability">molass.LowRank.ComponentReliability</a>
 </li>
         <li><a href="source/molass.LowRank.ConsistentAdjuster.html#module-molass.LowRank.ConsistentAdjuster">molass.LowRank.ConsistentAdjuster</a>
 </li>
@@ -1970,6 +2085,8 @@ document.write(`
         <li><a href="source/molass.Reports.V1SummaryReport.html#module-molass.Reports.V1SummaryReport">molass.Reports.V1SummaryReport</a>
 </li>
         <li><a href="source/molass.Rigorous.html#module-molass.Rigorous">molass.Rigorous</a>
+</li>
+        <li><a href="source/molass.Rigorous.ComponentUtils.html#module-molass.Rigorous.ComponentUtils">molass.Rigorous.ComponentUtils</a>
 </li>
         <li><a href="source/molass.Rigorous.CurrentStateUtils.html#module-molass.Rigorous.CurrentStateUtils">molass.Rigorous.CurrentStateUtils</a>
 </li>
@@ -2123,6 +2240,13 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.Baseline.Basesurface.html#module-molass.Baseline.Basesurface">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.Baseline.BuffitBaseline
+
+      <ul>
+        <li><a href="source/molass.Baseline.BuffitBaseline.html#module-molass.Baseline.BuffitBaseline">module</a>
 </li>
       </ul></li>
       <li>
@@ -2387,6 +2511,13 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    molass.Decompose.XrOnlyUtils
+
+      <ul>
+        <li><a href="source/molass.Decompose.XrOnlyUtils.html#module-molass.Decompose.XrOnlyUtils">module</a>
+</li>
+      </ul></li>
+      <li>
     molass.DensitySpace
 
       <ul>
@@ -2555,6 +2686,13 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    molass.Guinier.RgEstimator
+
+      <ul>
+        <li><a href="source/molass.Guinier.RgEstimator.html#module-molass.Guinier.RgEstimator">module</a>
+</li>
+      </ul></li>
+      <li>
     molass.Guinier.SimpleFallback
 
       <ul>
@@ -2625,6 +2763,20 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    molass.LowRank.AlignDecompositions
+
+      <ul>
+        <li><a href="source/molass.LowRank.AlignDecompositions.html#module-molass.LowRank.AlignDecompositions">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.LowRank.BoundedLrf
+
+      <ul>
+        <li><a href="source/molass.LowRank.BoundedLrf.html#module-molass.LowRank.BoundedLrf">module</a>
+</li>
+      </ul></li>
+      <li>
     molass.LowRank.Component
 
       <ul>
@@ -2636,6 +2788,13 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.LowRank.ComponentCurve.html#module-molass.LowRank.ComponentCurve">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.LowRank.ComponentReliability
+
+      <ul>
+        <li><a href="source/molass.LowRank.ComponentReliability.html#module-molass.LowRank.ComponentReliability">module</a>
 </li>
       </ul></li>
       <li>
@@ -3007,6 +3166,13 @@ document.write(`
 
       <ul>
         <li><a href="source/molass.Rigorous.html#module-molass.Rigorous">module</a>
+</li>
+      </ul></li>
+      <li>
+    molass.Rigorous.ComponentUtils
+
+      <ul>
+        <li><a href="source/molass.Rigorous.ComponentUtils.html#module-molass.Rigorous.ComponentUtils">module</a>
 </li>
       </ul></li>
       <li>
@@ -3568,13 +3734,15 @@ document.write(`
 </li>
       <li><a href="source/molass.PlotUtils.DecompositionPlot.html#molass.PlotUtils.DecompositionPlot.plot_elution_curve">plot_elution_curve() (in module molass.PlotUtils.DecompositionPlot)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.FlowChange.FlowChangeParams.html#molass.FlowChange.FlowChangeParams.plot_flowchange">plot_flowchange() (in module molass.FlowChange.FlowChangeParams)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.LowRank.Component.html#molass.LowRank.Component.XrComponent.plot_guinier">plot_guinier() (XrComponent method)</a>
 </li>
       <li><a href="source/molass.SAXS.DmaxEstimation.html#molass.SAXS.DmaxEstimation.plot_input">plot_input() (in module molass.SAXS.DmaxEstimation)</a>
+</li>
+      <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.plot_peaks">plot_peaks() (XrData method)</a>
 </li>
       <li><a href="source/molass.SAXS.FourierIllust.html#molass.SAXS.FourierIllust.plot_saxs_illust">plot_saxs_illust() (in module molass.SAXS.FourierIllust)</a>
 </li>
@@ -3634,6 +3802,8 @@ document.write(`
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.q_values">q_values (SsMatrixData property)</a>
+</li>
       <li><a href="source/molass.Progress.ProgessUtils.html#molass.Progress.ProgessUtils.ProgressSet.queue_">queue_ (ProgressSet attribute)</a>
 
       <ul>
@@ -3674,6 +3844,8 @@ document.write(`
 </li>
       <li><a href="source/molass.DataUtils.Outliers.html#molass.DataUtils.Outliers.remove_outliers">remove_outliers() (in module molass.DataUtils.Outliers)</a>
 </li>
+      <li><a href="index.html#molass.requires">requires() (in module molass)</a>, <a href="source/molass.html#molass.requires">[1]</a>
+</li>
       <li><a href="source/molass.FlowChange.FlowChangeJudge.html#molass.FlowChange.FlowChangeJudge.FlowChangeJudge.restore_params">restore_params() (FlowChangeJudge method)</a>
 </li>
       <li><a href="source/molass.Geometric.LinesegmentUtils.html#molass.Geometric.LinesegmentUtils.restore_segments">restore_segments() (in module molass.Geometric.LinesegmentUtils)</a>
@@ -3695,6 +3867,8 @@ document.write(`
       <li><a href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve">RgCurve (class in molass.Guinier.RgCurve)</a>
 </li>
       <li><a href="source/molass.Reports.V1Report.html#molass.Reports.V1Report.PreProcessing.rgcurves">rgcurves (PreProcessing attribute)</a>
+</li>
+      <li><a href="source/molass.Guinier.RgEstimator.html#molass.Guinier.RgEstimator.RgEstimator">RgEstimator (class in molass.Guinier.RgEstimator)</a>
 </li>
       <li><a href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve.rgvalues">rgvalues (RgCurve attribute)</a>
 </li>
@@ -3936,6 +4110,8 @@ document.write(`
       </ul></li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.uv_ccurves">uv_ccurves (Decomposition attribute)</a>
 </li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.uv_components">uv_components (Decomposition property)</a>
+</li>
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.uv_curve">uv_curve (MappingInfo attribute)</a>
 </li>
   </ul></td>
@@ -3945,6 +4121,8 @@ document.write(`
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.uv_moment">uv_moment (MappingInfo attribute)</a>
 </li>
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.uv_peaks">uv_peaks (MappingInfo attribute)</a>
+</li>
+      <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.uv_pickat">uv_pickat (UvData property)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.uv_ranks">uv_ranks (Decomposition attribute)</a>
 </li>
@@ -3984,6 +4162,14 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.DataUtils.FolderWalker.html#molass.DataUtils.FolderWalker.walk_folders">walk_folders() (in module molass.DataUtils.FolderWalker)</a>
 </li>
+      <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelength_range">wavelength_range (UvData property)</a>
+</li>
+      <li><a href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelengths">wavelengths (UvData attribute)</a>
+
+      <ul>
+        <li><a href="source/molass.DataObjects.UvData.html#id0">(UvData property)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.Reports.Controller.html#molass.Reports.Controller.Controller.work_folder">work_folder (Controller attribute)</a>
@@ -4026,17 +4212,19 @@ document.write(`
         <li><a href="source/molass.FlowChange.NullFlowChange.html#molass.FlowChange.NullFlowChange.NullFlowChange.x_curve">(NullFlowChange attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.xr">xr (Decomposition attribute)</a>
 
       <ul>
         <li><a href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.xr">(SecSaxsData attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve.xr_ccurve">xr_ccurve (UvComponentCurve attribute)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.xr_ccurves">xr_ccurves (Decomposition attribute)</a>
+</li>
+      <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.xr_components">xr_components (Decomposition property)</a>
 </li>
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.xr_curve">xr_curve (MappingInfo attribute)</a>
 </li>
@@ -4045,6 +4233,8 @@ document.write(`
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.xr_moment">xr_moment (MappingInfo attribute)</a>
 </li>
       <li><a href="source/molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo.xr_peaks">xr_peaks (MappingInfo attribute)</a>
+</li>
+      <li><a href="source/molass.DataObjects.XrData.html#molass.DataObjects.XrData.XrData.xr_pickat">xr_pickat (XrData property)</a>
 </li>
       <li><a href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.xr_ranks">xr_ranks (Decomposition attribute)</a>
 </li>
@@ -4062,9 +4252,11 @@ document.write(`
 <h2 id="Y">Y</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.y">y (Curve attribute)</a>
+      <li><a href="source/molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve.y">y (ComponentCurve property)</a>
 
       <ul>
+        <li><a href="source/molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve.y">(Curve attribute)</a>
+</li>
         <li><a href="source/molass.DataUtils.ForwardCompat.html#molass.DataUtils.ForwardCompat.CurveProxy.y">(CurveProxy attribute)</a>
 </li>
         <li><a href="source/molass.Legacy.BackCompatUtils.html#molass.Legacy.BackCompatUtils.ElutioCurvProxy.y">(ElutioCurvProxy attribute)</a>

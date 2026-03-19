@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -599,6 +606,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_decomposition_impl"><code class="docutils literal notranslate"><span class="pre">make_decomposition_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_component_curves_with_proportions"><code class="docutils literal notranslate"><span class="pre">make_component_curves_with_proportions()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_component_curves_with_positions"><code class="docutils literal notranslate"><span class="pre">make_component_curves_with_positions()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -628,6 +636,21 @@ document.write(`
 <li><p><strong>ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a>) – The SecSaxsData object containing the data.</p></li>
 <li><p><strong>num_components</strong> (<em>int</em>) – The number of components to decompose into.</p></li>
 <li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – The proportions for each component.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="molass.LowRank.QuickImplement.make_component_curves_with_positions">
+<span class="sig-name descname"><span class="pre">make_component_curves_with_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peakpositions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.QuickImplement.make_component_curves_with_positions" title="Link to this definition">#</a></dt>
+<dd><p>Make component curves with peak positions pinned to specified frame numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a>) – The SecSaxsData object containing the data.</p></li>
+<li><p><strong>num_components</strong> (<em>int</em>) – The number of components to decompose into.</p></li>
+<li><p><strong>xr_peakpositions</strong> (<em>list</em><em> of </em><em>float</em>) – The frame positions for each peak.</p></li>
 </ul>
 </dd>
 </dl>
@@ -682,6 +705,7 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_decomposition_impl"><code class="docutils literal notranslate"><span class="pre">make_decomposition_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_component_curves_with_proportions"><code class="docutils literal notranslate"><span class="pre">make_component_curves_with_proportions()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.QuickImplement.make_component_curves_with_positions"><code class="docutils literal notranslate"><span class="pre">make_component_curves_with_positions()</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   molass.Rigorous.ComponentUtils
    molass.Rigorous.CurrentStateUtils
    molass.Rigorous.LegacyBridgeUtils
    molass.Rigorous.RigorousEdmParams

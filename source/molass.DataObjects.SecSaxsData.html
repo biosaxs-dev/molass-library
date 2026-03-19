@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -648,7 +655,7 @@ document.write(`
 <p>DataObjects.SecSacsData.py</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SecSaxsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_bubbles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beamline_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_initialized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SecSaxsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_bubbles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beamline_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_initialized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a SEC-SAXS data object.
 It contains a pair of <a class="reference internal" href="molass.DataObjects.XrData.html#module-molass.DataObjects.XrData" title="molass.DataObjects.XrData"><code class="xref py py-class docutils literal notranslate"><span class="pre">XrData</span></code></a> and <a class="reference internal" href="molass.DataObjects.UvData.html#module-molass.DataObjects.UvData" title="molass.DataObjects.UvData"><code class="xref py py-class docutils literal notranslate"><span class="pre">UvData</span></code></a> objects.
@@ -786,6 +793,11 @@ to suppress unnecessary data access.</p></li>
 If it is None, the time will be set to the time taken for initialization.</p></li>
 <li><p><strong>datafiles</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – If specified, the list of data files used for the analysis.
 If it is None, the data files will be set to the list of files loaded from the folder.</p></li>
+<li><p><strong>uv_pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – The wavelength (nm) at which to extract the UV elution profile.
+Defaults to 280 nm when None. Use 290 for samples like ATP or MY
+where the UV signal is measured at 290 nm.</p></li>
+<li><p><strong>xr_pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – The q-value (Å⁻¹) at which to extract the XR elution profile.
+Defaults to 0.02 when None.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
 </ul>
 </dd>
@@ -986,7 +998,7 @@ of elements uvM and wv.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy">
-<span class="sig-name descname"><span class="pre">trimmed_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">trimmed_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsigmas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -994,6 +1006,7 @@ of elements uvM and wv.</p></li>
 <li><p><strong>jranges</strong> (<em>tuple</em><em> of </em><em>(</em><em>double</em><em>, </em><em>double</em><em>)</em><em>, </em><em>optional</em>) – The temporal ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].</p></li>
 <li><p><strong>mapping</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a><em>, </em><em>optional</em>) – If specified, the mapping information will be used for the copy.
 It must be provided if <cite>jranges</cite> is specified.</p></li>
+<li><p><strong>nsigmas</strong> (<em>int</em><em> or </em><em>float</em><em>, </em><em>optional</em>) – If specified, passed to make_trimming() to control the σ-window width.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1123,16 +1136,51 @@ If the beamline information is not available, returns None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition">
-<span class="sig-name descname"><span class="pre">quick_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_plates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">quick_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_peakpositions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_plates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition" title="Link to this definition">#</a></dt>
 <dd><p>Performs a quick decomposition of the SEC-SAXS data.</p>
+<p>See also: <a class="reference external" href="https://biosaxs-dev.github.io/molass-tutorial/chapters/10/nontrivial.html">Nontrivial Decomposition</a></p>
+<p>Three decomposition algorithms are available, selected by keyword:</p>
+<ol class="arabic simple">
+<li><p><strong>Default</strong> (no extra keywords) — greedy peak-recognition.</p></li>
+<li><p><strong>Proportional</strong> (<code class="docutils literal notranslate"><span class="pre">proportions</span></code>) — area-ratio slicing.</p></li>
+<li><p><strong>Positioned</strong> (<code class="docutils literal notranslate"><span class="pre">xr_peakpositions</span></code>) — peaks pinned to specified frame positions.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">proportions</span></code> and <code class="docutils literal notranslate"><span class="pre">xr_peakpositions</span></code> are mutually exclusive.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
 used to denoise the matrix data.</p></li>
-<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
+<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – <p>Specifies the approximate area ratios of the elution peaks.
+The values do not need to be normalized; for example,
+<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">1]</span></code>, <code class="docutils literal notranslate"><span class="pre">[0.5,</span> <span class="pre">0.5]</span></code>, and <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">3]</span></code> all produce the same result
+because they are normalized internally.</p>
+<p>When this option is given, a <strong>proportional decomposition</strong> algorithm
+is used instead of the default peak-recognition algorithm.
+The proportional algorithm divides the total elution curve by cumulative area
+according to the given ratios, and fits an EGH model to each slice independently.
+This provides better initialization for cases with highly overlapping peaks,
+where the default algorithm may produce unstable results.</p>
+<p>The exact ratios do not need to be known precisely;
+even a rough estimate (e.g., <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">1]</span></code> when the true ratio is <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">1]</span></code>)
+is usually sufficient.</p>
+</p></li>
+<li><p><strong>xr_peakpositions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – <p>Specifies the frame positions where peaks should be pinned.
+Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
+with a strong position constraint. <code class="docutils literal notranslate"><span class="pre">num_components</span></code> is inferred
+from the length if not provided.</p>
+<p>Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">proportions</span></code>.</p>
+</p></li>
 <li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
 <li><p><strong>num_plates</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
+<li><p><strong>tau_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum allowed ratio <code class="docutils literal notranslate"><span class="pre">|tau|</span> <span class="pre">/</span> <span class="pre">sigma</span></code> for positioned decomposition.
+Default 0.6.</p></li>
+<li><p><strong>max_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum allowed Gaussian width (sigma) for positioned decomposition.
+Default 80.</p></li>
+<li><p><strong>min_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum allowed Gaussian width (sigma) for positioned decomposition.
+Default 5.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reload internal modules and show diagnostic plots.
+Default False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -14,4 +14,5 @@ Submodules
 
    molass.Guinier.RgCurve
    molass.Guinier.RgCurveUtils
+   molass.Guinier.RgEstimator
    molass.Guinier.SimpleFallback

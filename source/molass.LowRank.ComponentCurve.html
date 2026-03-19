@@ -47,7 +47,7 @@
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="LowRank.ConsistentAdjuster" href="molass.LowRank.ConsistentAdjuster.html" />
+    <link rel="next" title="LowRank.ComponentReliability" href="molass.LowRank.ComponentReliability.html" />
     <link rel="prev" title="LowRank.Component" href="molass.LowRank.Component.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -601,11 +608,13 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.x</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_moment()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_params()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_peak_top_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_scale_param"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_scale_param()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -627,6 +636,15 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ComponentCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent a component curve.</p>
+<p>This object stores the <em>elution-curve</em> EGH parameters (H, tR, sigma, tau)
+and can evaluate the model curve, but it does <strong>not</strong> hold scattering
+profiles and therefore cannot compute Rg directly.</p>
+<p>To obtain Rg values, use one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">decomp.get_rgs()</span></code> — list of Rg for all components.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decomp.get_xr_components()</span></code> — returns <code class="docutils literal notranslate"><span class="pre">XrComponent</span></code> objects,
+each of which has <code class="docutils literal notranslate"><span class="pre">get_guinier_object()</span></code> for full Guinier-fit results.</p></li>
+</ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.x">
 <span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.x" title="Link to this definition">#</a></dt>
@@ -641,7 +659,7 @@ document.write(`
 <dl class="py attribute">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.params">
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.params" title="Link to this definition">#</a></dt>
-<dd><p>The parameters of the component curve.</p>
+<dd><p>The EGH parameters <code class="docutils literal notranslate"><span class="pre">[H,</span> <span class="pre">tR,</span> <span class="pre">sigma,</span> <span class="pre">tau]</span></code> of the component curve.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array-like</p>
@@ -669,6 +687,12 @@ document.write(`
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.y">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.y" title="Link to this definition">#</a></dt>
+<dd><p>The y-values of the component curve evaluated at self.x.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_y">
 <span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y" title="Link to this definition">#</a></dt>
@@ -742,6 +766,20 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.ComponentCurve.ComponentCurve.get_scale_param">
+<span class="sig-name descname"><span class="pre">get_scale_param</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_scale_param" title="Link to this definition">#</a></dt>
+<dd><p>Returns the scale parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The scale parameter.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -767,11 +805,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="molass.LowRank.ConsistentAdjuster.html"
+       href="molass.LowRank.ComponentReliability.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">LowRank.ConsistentAdjuster</p>
+        <p class="prev-next-title">LowRank.ComponentReliability</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -795,11 +833,13 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.x</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.moment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_y()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_xy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_moment"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_moment()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_params"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_params()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_peak_top_x()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.ComponentCurve.ComponentCurve.get_scale_param"><code class="docutils literal notranslate"><span class="pre">ComponentCurve.get_scale_param()</span></code></a></li>
 </ul>
 </li>
 </ul>

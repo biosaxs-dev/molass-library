@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -599,12 +606,18 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.baseline_method"><code class="docutils literal notranslate"><span class="pre">XrData.baseline_method</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.xr_pickat"><code class="docutils literal notranslate"><span class="pre">XrData.xr_pickat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.copy"><code class="docutils literal notranslate"><span class="pre">XrData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ipickvalue"><code class="docutils literal notranslate"><span class="pre">XrData.get_ipickvalue()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_icurve"><code class="docutils literal notranslate"><span class="pre">XrData.get_icurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">XrData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_usable_qrange"><code class="docutils literal notranslate"><span class="pre">XrData.get_usable_qrange()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ibaseline"><code class="docutils literal notranslate"><span class="pre">XrData.get_ibaseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve_atsas"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve_atsas()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.detect_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.detect_peaks()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.plot_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.plot_peaks()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_jcurve_array"><code class="docutils literal notranslate"><span class="pre">XrData.get_jcurve_array()</span></code></a></li>
 </ul>
 </li>
@@ -639,6 +652,18 @@ Inherits from SsMatrixData and adds XR-specific functionality.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.baseline_method">
+<span class="sig-name descname"><span class="pre">baseline_method</span></span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.baseline_method" title="Link to this definition">#</a></dt>
+<dd><p>Default is <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>.
+Can be overridden by passing <code class="docutils literal notranslate"><span class="pre">baseline_method=...</span></code> to the constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p>Initialize the XrData object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -651,6 +676,23 @@ Inherits from SsMatrixData and adds XR-specific functionality.</p>
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.xr_pickat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xr_pickat</span></span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.xr_pickat" title="Link to this definition">#</a></dt>
+<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">pickat</span></code> — the default q-value for i-curve extraction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.copy" title="Link to this definition">#</a></dt>
+<dd><p>Return a copy of the SsMatrixData object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slices</strong> (<em>tuple</em><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_ipickvalue">
 <span class="sig-name descname"><span class="pre">get_ipickvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_ipickvalue" title="Link to this definition">#</a></dt>
@@ -671,7 +713,9 @@ the picking index i will be determined to satisfy</p>
 <blockquote>
 <div><p>self.qv[i-1] &lt;= pickat &lt; self.qv[i]</p>
 </div></blockquote>
-<p>according to bisect_right.</p>
+<p>according to bisect_right.
+If None, uses self.pickat (default 0.02, or the value set
+via SSD(xr_pickat=…)).</p>
 </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -686,6 +730,36 @@ the picking index i will be determined to satisfy</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">get_icurve</span><span class="p">(</span><span class="n">pickat</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_recognition_curve">
+<span class="sig-name descname"><span class="pre">get_recognition_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_recognition_curve" title="Link to this definition">#</a></dt>
+<dd><p>Return the elution curve used for peak detection and buffer-frame
+classification, honouring the <code class="docutils literal notranslate"><span class="pre">'elution_recognition'</span></code> global option.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'icurve'</span></code> (default) — single row at q≈0.02, same as
+<a class="reference internal" href="#molass.DataObjects.XrData.XrData.get_icurve" title="molass.DataObjects.XrData.XrData.get_icurve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_icurve()</span></code></a>.  High S/N in the Guinier regime; preserves
+the existing behaviour unchanged.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'sum'</span></code> — sum of the (already-trimmed) matrix over all q-rows.
+Exposes q-dependent baseline drift that is invisible at q≈0.02
+(e.g. MY-type datasets).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The recognition elution curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">molass</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_molass_options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">set_molass_options</span><span class="p">(</span><span class="n">elution_recognition</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">get_recognition_curve</span><span class="p">()</span>   <span class="c1"># now returns M.sum(axis=0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">set_molass_options</span><span class="p">(</span><span class="n">elution_recognition</span><span class="o">=</span><span class="s1">&#39;icurve&#39;</span><span class="p">)</span>  <span class="c1"># restore default</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -715,12 +789,14 @@ unusable XR data regions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.get_ibaseline">
-<span class="sig-name descname"><span class="pre">get_ibaseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pickvalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_ibaseline" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_ibaseline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.get_ibaseline" title="Link to this definition">#</a></dt>
 <dd><p>Returns a baseline i-curve from the XR matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pickvalue</strong> (<em>float</em><em>, </em><em>optional</em>) – See ssd.get_xr_icurve().</p></li>
+<li><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – q-value at which to pick the i-curve for baseline fitting.
+If None, uses self.pickat (default 0.02, or the value set
+via SSD(xr_pickat=…)).</p></li>
 <li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The baseline method to be used. If None, the method set in the object will be
 used.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline computation function.
@@ -768,6 +844,66 @@ This curve can be subtracted from the original i-curve to obtain a background-su
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>An <a class="reference internal" href="molass.Guinier.RgCurve.html#module-molass.Guinier.RgCurve" title="molass.Guinier.RgCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">RgCurve</span></code></a> object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.detect_peaks">
+<span class="sig-name descname"><span class="pre">detect_peaks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.detect_peaks" title="Link to this definition">#</a></dt>
+<dd><p>Detect peaks in the total XR elution curve using Savitzky-Golay
+smoothing followed by scipy <code class="docutils literal notranslate"><span class="pre">find_peaks</span></code>.</p>
+<p>The returned list can be passed directly to
+<code class="docutils literal notranslate"><span class="pre">ssd.quick_decomposition(xr_peakpositions=peaks)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prominence</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum prominence as a fraction of the smoothed curve maximum.
+Default 0.005 (0.5 %).</p></li>
+<li><p><strong>distance</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum number of frames between adjacent peaks. Default 20.</p></li>
+<li><p><strong>window_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Savitzky-Golay filter window length (must be odd). Default 31.</p></li>
+<li><p><strong>polyorder</strong> (<em>int</em><em>, </em><em>optional</em>) – Savitzky-Golay filter polynomial order. Default 3.</p></li>
+<li><p><strong>return_properties</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return a tuple <code class="docutils literal notranslate"><span class="pre">(peaks,</span> <span class="pre">properties)</span></code> where
+<em>properties</em> is a dict containing <code class="docutils literal notranslate"><span class="pre">'prominences'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'peak_heights'</span></code> arrays.  Default False (backward-compatible).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>list of int</em> – Frame numbers of detected peaks, sorted by frame number.
+Returned alone when <code class="docutils literal notranslate"><span class="pre">return_properties=False</span></code>.</p></li>
+<li><p><em>tuple of (list of int, dict)</em> – <code class="docutils literal notranslate"><span class="pre">(peaks,</span> <span class="pre">properties)</span></code> when <code class="docutils literal notranslate"><span class="pre">return_properties=True</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">peaks</span> <span class="o">=</span> <span class="n">ssd</span><span class="o">.</span><span class="n">xr</span><span class="o">.</span><span class="n">detect_peaks</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decomp</span> <span class="o">=</span> <span class="n">ssd</span><span class="o">.</span><span class="n">quick_decomposition</span><span class="p">(</span><span class="n">xr_peakpositions</span><span class="o">=</span><span class="n">peaks</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">peaks</span><span class="p">,</span> <span class="n">props</span> <span class="o">=</span> <span class="n">ssd</span><span class="o">.</span><span class="n">xr</span><span class="o">.</span><span class="n">detect_peaks</span><span class="p">(</span><span class="n">return_properties</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;prominences&#39;</span><span class="p">]</span>   <span class="c1"># array of peak prominences</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.XrData.XrData.plot_peaks">
+<span class="sig-name descname"><span class="pre">plot_peaks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.XrData.XrData.plot_peaks" title="Link to this definition">#</a></dt>
+<dd><p>Visualize detected peaks on the total XR elution curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>matplotlib Axes</em><em>, </em><em>optional</em>) – If provided, plot on this axes.  Otherwise create a new figure.</p></li>
+<li><p><strong>prominence</strong> – Forwarded to <a class="reference internal" href="#molass.DataObjects.XrData.XrData.detect_peaks" title="molass.DataObjects.XrData.XrData.detect_peaks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detect_peaks()</span></code></a>.</p></li>
+<li><p><strong>distance</strong> – Forwarded to <a class="reference internal" href="#molass.DataObjects.XrData.XrData.detect_peaks" title="molass.DataObjects.XrData.XrData.detect_peaks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detect_peaks()</span></code></a>.</p></li>
+<li><p><strong>window_length</strong> – Forwarded to <a class="reference internal" href="#molass.DataObjects.XrData.XrData.detect_peaks" title="molass.DataObjects.XrData.XrData.detect_peaks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detect_peaks()</span></code></a>.</p></li>
+<li><p><strong>polyorder</strong> – Forwarded to <a class="reference internal" href="#molass.DataObjects.XrData.XrData.detect_peaks" title="molass.DataObjects.XrData.XrData.detect_peaks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detect_peaks()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of (Figure, Axes)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -846,12 +982,18 @@ The index of the peak in the i-curve to use. If None, the first peak is used.</p
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.baseline_method"><code class="docutils literal notranslate"><span class="pre">XrData.baseline_method</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.xr_pickat"><code class="docutils literal notranslate"><span class="pre">XrData.xr_pickat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.copy"><code class="docutils literal notranslate"><span class="pre">XrData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ipickvalue"><code class="docutils literal notranslate"><span class="pre">XrData.get_ipickvalue()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_icurve"><code class="docutils literal notranslate"><span class="pre">XrData.get_icurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">XrData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_usable_qrange"><code class="docutils literal notranslate"><span class="pre">XrData.get_usable_qrange()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_ibaseline"><code class="docutils literal notranslate"><span class="pre">XrData.get_ibaseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.compute_rgcurve_atsas"><code class="docutils literal notranslate"><span class="pre">XrData.compute_rgcurve_atsas()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.detect_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.detect_peaks()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.plot_peaks"><code class="docutils literal notranslate"><span class="pre">XrData.plot_peaks()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.get_jcurve_array"><code class="docutils literal notranslate"><span class="pre">XrData.get_jcurve_array()</span></code></a></li>
 </ul>
 </li>

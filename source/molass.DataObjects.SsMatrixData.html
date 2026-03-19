@@ -163,6 +163,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Baseline2D.html">Baseline.Baseline2D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BaselineUtils.html">Baseline.BaselineUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.Basesurface.html">Baseline.Basesurface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Baseline.BuffitBaseline.html">Baseline.BuffitBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.IntegralBaseline.html">Baseline.IntegralBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.LpmBaseline.html">Baseline.LpmBaseline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Baseline.SimpleBaseline.html">Baseline.SimpleBaseline</a></li>
@@ -205,6 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DensitySpace.html">DensitySpace</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -241,6 +243,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.SimpleFallback.html">Guinier.SimpleFallback</a></li>
 </ul>
 </details></li>
@@ -259,8 +262,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.LowRank.html">LowRank</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.AlignDecompositions.html">LowRank.AlignDecompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.BoundedLrf.html">LowRank.BoundedLrf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Component.html">LowRank.Component</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentCurve.html">LowRank.ComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ComponentReliability.html">LowRank.ComponentReliability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ConsistentAdjuster.html">LowRank.ConsistentAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CoupledAdjuster.html">LowRank.CoupledAdjuster</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.CurveDecomposer.html">LowRank.CurveDecomposer</a></li>
@@ -330,6 +336,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
@@ -601,16 +608,26 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.iv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.iv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.jv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.jv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.M"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.data"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.q_values"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.q_values</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.frame_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_jcurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_moment()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_baseline_method()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline_method()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline2d()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_snr_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_positive_ratio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_bpo_ideal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_ideal_positive_ratio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.evaluate_baseline()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -669,6 +686,17 @@ of the second variable (jv).</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.data" title="Link to this definition">#</a></dt>
+<dd><p>Human-readable alias for <code class="docutils literal notranslate"><span class="pre">M</span></code> — the core intensity matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array-like (property)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.E">
 <span class="sig-name descname"><span class="pre">E</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E" title="Link to this definition">#</a></dt>
 <dd><p>The 2D matrix of error values. It can be None if errors are not available</p>
@@ -702,6 +730,24 @@ of the second variable (jv).</p>
 </dd></dl>
 
 <p>Initialize the SsMatrixData object.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dd><p>The 2D intensity matrix (alias for <code class="docutils literal notranslate"><span class="pre">M</span></code>, following numpy/pandas/xarray convention).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.q_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q_values</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.q_values" title="Link to this definition">#</a></dt>
+<dd><p>Row-axis values (alias for <code class="docutils literal notranslate"><span class="pre">iv</span></code>), typically scattering vector q.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_indices</span></span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices" title="Link to this definition">#</a></dt>
+<dd><p>Column-axis values (alias for <code class="docutils literal notranslate"><span class="pre">jv</span></code>), typically frame numbers.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy" title="Link to this definition">#</a></dt>
@@ -747,6 +793,23 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve">
+<span class="sig-name descname"><span class="pre">get_recognition_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve" title="Link to this definition">#</a></dt>
+<dd><p>Return the elution curve used for peak detection and buffer-frame
+classification.  The base implementation always returns the sum over
+all rows (<code class="docutils literal notranslate"><span class="pre">M.sum(axis=0)</span></code>).  <code class="xref py py-class docutils literal notranslate"><span class="pre">XrData</span></code> overrides this to
+honour the <code class="docutils literal notranslate"><span class="pre">'elution_recognition'</span></code> global option.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The recognition elution curve.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve">Curve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_moment">
 <span class="sig-name descname"><span class="pre">get_moment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment" title="Link to this definition">#</a></dt>
 <dd><p>Get the moment of the matrix data along the iv axis.</p>
@@ -779,6 +842,9 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Baseline method to use. If given, overrides the instance’s
+<code class="docutils literal notranslate"><span class="pre">baseline_method</span></code> for this call only. Valid values are
+<code class="docutils literal notranslate"><span class="pre">'buffit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>, <code class="docutils literal notranslate"><span class="pre">'uvdiff'</span></code>, <code class="docutils literal notranslate"><span class="pre">'integral'</span></code>.</p></li>
 <li><p><strong>method_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline fitting method.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
 </ul>
@@ -788,6 +854,89 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights">
+<span class="sig-name descname"><span class="pre">get_snr_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights" title="Link to this definition">#</a></dt>
+<dd><p>Per-q-row signal-to-noise ratio weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>weights</strong> – w_i = mean(I_i) / sigma_noise_i, clipped to &gt;= 0.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray, shape (n_q,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio">
+<span class="sig-name descname"><span class="pre">get_positive_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'snr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio" title="Link to this definition">#</a></dt>
+<dd><p>Fraction of non-negative residual elements, optionally SNR-weighted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>baseline</strong> (<em>ndarray</em>) – 2D baseline array with the same shape as self.M.</p></li>
+<li><p><strong>weighting</strong> (<em>{'snr'</em><em>, </em><em>'uniform'}</em>) – ‘snr’ (default) weights each q-row by its SNR so that
+informative low-q rows dominate over noisy high-q rows.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>positive_ratio</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal">
+<span class="sig-name descname"><span class="pre">get_bpo_ideal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'snr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal" title="Link to this definition">#</a></dt>
+<dd><p>Get the dataset-relative ideal positive_ratio for baseline evaluation.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">weighting='snr'</span></code> (default), computes per-q-row noisiness,
+looks up per-row ideal from the BPO table, and aggregates with SNR
+weights.  With <code class="docutils literal notranslate"><span class="pre">weighting='uniform'</span></code>, uses the original single
+global noisiness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>weighting</strong> (<em>{'snr'</em><em>, </em><em>'uniform'}</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bpo_ideal</strong> – The expected positive_ratio in [0, 1].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio">
+<span class="sig-name descname"><span class="pre">get_ideal_positive_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'snr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio" title="Link to this definition">#</a></dt>
+<dd><p>Expected positive_ratio for a perfect baseline, given this dataset’s noise and peak geometry.</p>
+<p>Alias for <code class="docutils literal notranslate"><span class="pre">get_bpo_ideal()</span></code> with a self-documenting name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline">
+<span class="sig-name descname"><span class="pre">evaluate_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'snr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate baseline quality in a single call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>baseline</strong> (<em>ndarray</em>) – 2D baseline array with the same shape as self.M.</p></li>
+<li><p><strong>weighting</strong> (<em>{'snr'</em><em>, </em><em>'uniform'}</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – Namedtuple with fields <code class="docutils literal notranslate"><span class="pre">positive_ratio</span></code>, <code class="docutils literal notranslate"><span class="pre">ideal</span></code>, <code class="docutils literal notranslate"><span class="pre">delta</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>BaselineEvaluation</p>
 </dd>
 </dl>
 </dd></dl>
@@ -845,16 +994,26 @@ The j-curve will be made from ssd.xrM[:,j].</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.iv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.iv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.jv"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.jv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.M"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.data"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.q_values"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.q_values</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.frame_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.copy"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_icurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_icurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_jcurve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_jcurve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_recognition_curve"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_recognition_curve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_moment()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_baseline_method()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline_method()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline2d()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_snr_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_positive_ratio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_bpo_ideal"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_bpo_ideal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.get_ideal_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_ideal_positive_ratio()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SsMatrixData.SsMatrixData.evaluate_baseline"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.evaluate_baseline()</span></code></a></li>
 </ul>
 </li>
 </ul>

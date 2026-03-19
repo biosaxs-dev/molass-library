@@ -12,8 +12,11 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   molass.LowRank.AlignDecompositions
+   molass.LowRank.BoundedLrf
    molass.LowRank.Component
    molass.LowRank.ComponentCurve
+   molass.LowRank.ComponentReliability
    molass.LowRank.ConsistentAdjuster
    molass.LowRank.CoupledAdjuster
    molass.LowRank.CurveDecomposer
