@@ -18,8 +18,7 @@ class XrData(SsMatrixData):
     qv : array-like
         The q-values corresponding to the angular axis.
     baseline_method : str
-        Default is ``'buffit'`` (Otsu-adaptive buffer-frame polyfit),
-        which outperforms ``'linear'`` on all tested SEC-SAXS datasets.
+        Default is ``'linear'``.
         Can be overridden by passing ``baseline_method=...`` to the constructor.
     """
     def __init__(self, iv, jv, M, E, **kwargs):
@@ -41,6 +40,21 @@ class XrData(SsMatrixData):
         kwargs.setdefault('baseline_method', 'linear')
         super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
+        self.pickat = PICKAT
+
+    @property
+    def xr_pickat(self):
+        """Alias for ``pickat`` — the default q-value for i-curve extraction."""
+        return self.pickat
+
+    @xr_pickat.setter
+    def xr_pickat(self, value):
+        self.pickat = value
+
+    def copy(self, slices=None):
+        result = super().copy(slices=slices)
+        result.pickat = self.pickat
+        return result
 
     def get_ipickvalue(self):
         """Get the default pickvalue for i-curves.
@@ -49,9 +63,9 @@ class XrData(SsMatrixData):
         float
             The default pickvalue for i-curves.
         """
-        return PICKAT
+        return self.pickat
 
-    def get_icurve(self, pickat=PICKAT):
+    def get_icurve(self, pickat=None):
         """xr.get_icurve(pickat=0.02)
         
         Returns an i-curve from the XR matrix data.
@@ -64,6 +78,8 @@ class XrData(SsMatrixData):
             the picking index i will be determined to satisfy
                 self.qv[i-1] <= pickat < self.qv[i]
             according to bisect_right.
+            If None, uses self.pickat (default 0.02, or the value set
+            via SSD(xr_pickat=...)).
         
         Returns
         -------
@@ -76,7 +92,42 @@ class XrData(SsMatrixData):
 
         >>> curve = xr.get_icurve(pickat=0.02)
         """
+        if pickat is None:
+            pickat = self.pickat
         return super().get_icurve(pickat)
+
+    def get_recognition_curve(self):
+        """xr.get_recognition_curve()
+
+        Return the elution curve used for peak detection and buffer-frame
+        classification, honouring the ``'elution_recognition'`` global option.
+
+        - ``'icurve'`` (default) — single row at q\u22480.02, same as
+          :meth:`get_icurve`.  High S/N in the Guinier regime; preserves
+          the existing behaviour unchanged.
+        - ``'sum'`` — sum of the (already-trimmed) matrix over all q-rows.
+          Exposes q-dependent baseline drift that is invisible at q\u22480.02
+          (e.g. MY-type datasets).
+
+        Returns
+        -------
+        Curve
+            The recognition elution curve.
+
+        Examples
+        --------
+        >>> from molass import set_molass_options
+        >>> set_molass_options(elution_recognition='sum')
+        >>> curve = xr.get_recognition_curve()   # now returns M.sum(axis=0)
+        >>> set_molass_options(elution_recognition='icurve')  # restore default
+        """
+        from molass.Global.Options import get_molass_options
+        mode = get_molass_options('elution_recognition')
+        if mode == 'icurve':
+            return self.get_icurve()
+        else:  # 'sum'
+            from molass.DataObjects.Curve import Curve
+            return Curve(self.jv, self.M.sum(axis=0))
 
     def get_usable_qrange(self, **kwargs):
         """xr.get_usable_qrange()
@@ -105,15 +156,17 @@ class XrData(SsMatrixData):
         from molass.Trimming.UsableQrange import get_usable_qrange_impl
         return get_usable_qrange_impl(self, **kwargs)
 
-    def get_ibaseline(self, pickat=PICKAT, method=None, **kwargs):
-        """xr.get_ibaseline(pickvalue=0.02)
+    def get_ibaseline(self, pickat=None, method=None, **kwargs):
+        """xr.get_ibaseline()
         
         Returns a baseline i-curve from the XR matrix data.
 
         Parameters
         ----------
-        pickvalue : float, optional
-            See ssd.get_xr_icurve().
+        pickat : float, optional
+            q-value at which to pick the i-curve for baseline fitting.
+            If None, uses self.pickat (default 0.02, or the value set
+            via SSD(xr_pickat=...)).
 
         method : str, optional
             The baseline method to be used. If None, the method set in the object will be
@@ -247,7 +300,7 @@ class XrData(SsMatrixData):
         """
         from scipy.signal import savgol_filter, find_peaks
         frames = self.jv
-        total_elution = self.M.sum(axis=0)
+        total_elution = self.get_recognition_curve().y
         wl = min(window_length, len(total_elution))
         if wl % 2 == 0:
             wl -= 1

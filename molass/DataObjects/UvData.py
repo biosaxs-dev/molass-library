@@ -48,6 +48,15 @@ class UvData(SsMatrixData):
         self.pickat = PICKAT
 
     @property
+    def uv_pickat(self):
+        """Alias for ``pickat`` — the default wavelength (nm) for i-curve extraction."""
+        return self.pickat
+
+    @uv_pickat.setter
+    def uv_pickat(self, value):
+        self.pickat = value
+
+    @property
     def wavelengths(self):
         """Wavelength axis in nm (alias for ``iv`` / ``wv``)."""
         return self.iv
@@ -73,6 +82,23 @@ class UvData(SsMatrixData):
         result = super().copy(slices=slices)
         result.pickat = self.pickat
         return result
+
+    def get_recognition_curve(self):
+        """uv.get_recognition_curve()
+
+        Return the elution curve at ``self.pickat`` wavelength (default 280 nm,
+        or the value set via ``SSD(uv_pickat=...)``).
+
+        Unlike XR where ``M.sum(axis=0)`` is a useful alternative, UV sum
+        across all wavelengths is dominated by noise from non-absorbing
+        channels and is not appropriate for peak/buffer classification.
+
+        Returns
+        -------
+        Curve
+            The recognition elution curve at the selected wavelength.
+        """
+        return self.get_icurve()
 
     def get_ipickvalues(self):
         """Get the default pickvalues for i-curves.
@@ -156,15 +182,17 @@ class UvData(SsMatrixData):
         from molass.Trimming.UsableWrange import get_usable_wrange_impl
         return get_usable_wrange_impl(self)
 
-    def get_ibaseline(self, pickat=PICKAT, method=None, **kwargs):
-        """uv.get_uv_ibaseline(pickvalue=0.02)
+    def get_ibaseline(self, pickat=None, method=None, **kwargs):
+        """uv.get_ibaseline()
         
         Returns a baseline i-curve from the UV matrix data.
 
         Parameters
         ----------
-        pickvalue : float, optional
-            See uv.get_icurve().
+        pickat : float, optional
+            Wavelength (nm) at which to pick the i-curve for baseline fitting.
+            If None, uses self.pickat (default 280 nm, or the value set
+            via SSD(uv_pickat=...)).
 
         method : str, optional
             The baseline method to use. If None, the method set in

@@ -125,6 +125,22 @@ class SsMatrixData:
         """
         return create_jcurve(self.iv, self.M, j)
 
+    def get_recognition_curve(self):
+        """md.get_recognition_curve()
+
+        Return the elution curve used for peak detection and buffer-frame
+        classification.  The base implementation always returns the sum over
+        all rows (``M.sum(axis=0)``).  :class:`XrData` overrides this to
+        honour the ``'elution_recognition'`` global option.
+
+        Returns
+        -------
+        Curve
+            The recognition elution curve.
+        """
+        from molass.DataObjects.Curve import Curve
+        return Curve(self.jv, self.M.sum(axis=0))
+
     def get_moment(self):
         """Get the moment of the matrix data along the iv axis.
 
@@ -174,7 +190,7 @@ class SsMatrixData:
             import io, contextlib
             from molass_legacy.SerialAnalyzer.ElutionBaseCurve import ElutionBaseCurve as _EBC
             with contextlib.redirect_stdout(io.StringIO()):
-                _ecurve = _EBC(self.M.sum(axis=0))
+                _ecurve = _EBC(self.get_recognition_curve().y)
                 _size_sigma = _ecurve.compute_size_sigma()
             default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
             if method == 'uvdiff':
@@ -182,7 +198,7 @@ class SsMatrixData:
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)
         elif method == 'buffit':
             from molass.Baseline.BuffitBaseline import _otsu_threshold
-            _elution_sum = self.M.sum(axis=0)
+            _elution_sum = self.get_recognition_curve().y
             _elution_norm = _elution_sum / _elution_sum.max()
             _threshold = kwargs.get('threshold', None)
             if _threshold is None:
@@ -265,7 +281,7 @@ class SsMatrixData:
         from scipy.interpolate import LSQUnivariateSpline
 
         with contextlib.redirect_stdout(io.StringIO()):
-            _ecurve = _EBC(self.M.sum(axis=0).astype(float))
+            _ecurve = _EBC(self.get_recognition_curve().y.astype(float))
             _size_sigma = _ecurve.compute_size_sigma()
 
         if weighting == 'uniform':

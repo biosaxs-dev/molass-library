@@ -34,11 +34,12 @@
     Buffit  (threshold = 0.10)      0.578          (single dataset)
     Buffit  (fixed 10%, all 7)      0.529 – 0.600
     arpls                           0.552 – 0.590
-    Buffit  (Otsu, default)         0.496 – 0.522  ← recommended
+    Buffit  (Otsu, recommended)     0.496 – 0.522  ← recommended
     Ideal (perfect baseline)        ~0.5
 
     Otsu wins all 7 tested datasets.
-    This method can be activated via ``ssd.set_baseline_method('buffit')``.
+    Note: XrData default baseline is ``'linear'``; activate buffit via
+    ``ssd.set_baseline_method('buffit')`` or ``xr.get_baseline2d(method='buffit')``.
 
     References
     ----------
