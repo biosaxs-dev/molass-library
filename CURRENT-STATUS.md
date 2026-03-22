@@ -1,13 +1,14 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 2, 2026**  
-**👤 Updated By: Copilot (auto-sync at session start)**
+**📅 Last Updated: March 18, 2026**  
+**👤 Updated By: Copilot (auto-updated at session init)**  
+**🔔 Status changed: Handling editor zhubonan invited by Kevin-Mattheus-Moerman — review process starting soon**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Awaiting JOSS Assessment of Updated Paper)
+## 🎯 Current Phase: PRE-REVIEW → REVIEW (Handling Editor Invited)
 
-**Status**: Paper updates submitted to JOSS - **Awaiting arfon's evaluation of updated paper format**
+**Status**: Kevin-Mattheus-Moerman (Managing EiC) invited `zhubonan` as handling editor on March 18 - **Review process expected to start soon**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -19,15 +20,19 @@
 - 🔔 **Jan 20, 2026**: JOSS announced policy change requiring new paper sections
 - 🔄 **Jan 19-29, 2026**: Team working on adding required sections (Issue #8)
 - ✅ **Feb 2, 2026**: Removed references to private companion repository from paper
-- 🔔 **~Feb 16, 2026**: arfon sent friendly reminder to complete paper updates
-- ✅ **~Feb 16, 2026**: Shimizu replied to JOSS confirming updates are complete and requesting review
-- ⏳ **Currently**: Awaiting arfon's review/assessment of updated paper
+- ✅ **Feb 16, 2026**: Shimizu updated Research Impact Statement with new evidence (Jiang 2023, Furukawa 2025)
+- ✅ **Feb 16, 2026**: Verified new citations - both papers legitimately used MOLASS
+- 🔔 **Feb 16, 2026**: `arfon` (JOSS EiC) sent friendly reminder to update paper
+- ✅ **Feb 17, 2026**: Shimizu replied to `arfon` confirming all revisions are complete and requesting review
+- ✅ **March 18, 2026**: Kevin-Mattheus-Moerman invited `zhubonan` as handling editor
+- ⏳ **Currently**: Waiting for `zhubonan` to accept editor role and assign reviewers
 
 ### What This Means:
-- **Editor**: Not yet assigned (pending arfon's scope assessment)
+- **Editor**: `zhubonan` invited (pending acceptance)
 - **Reviewers**: Not yet assigned
-- **Review Status**: Has NOT started yet (waiting for arfon to assess updated paper)
-- **Next Step**: Wait for arfon's response — if scope is accepted, editor assignment follows
+- **Review Status**: Not yet started — waiting for zhubonan to accept and assign reviewers
+- **Last JOSS Activity**: March 18, 2026 (Kevin-Mattheus-Moerman invited zhubonan as editor)
+- **Next Step**: Wait for zhubonan to accept editor role and open the main review issue; be ready to respond to reviewer comments promptly (2-week response target per JOSS policy)
 
 ---
 
@@ -46,28 +51,17 @@
 - ✅ Responded to EiC's pre-review questions
 - ✅ Fixed DOI formatting issues
 - ✅ Suggested relevant reviewer candidates
-- ✅ Reviewed paper updates from Takahashi (Issue #8)
-- ✅ Notified JOSS (~Feb 16, 2026) that paper has been updated
-- ⏳ Awaiting arfon's scope assessment and next steps
+- ✅ Updated Research Impact Statement with stronger evidence (Feb 16, 2026)
+- ✅ Added citations: Jiang 2023, Furukawa 2025 (both verified as legitimate MOLASS usage)
+- ⏳ Final approval pending, then will notify JOSS
 
 ### **Takahashi** (Technical Support):
 - ✅ Repository setup complete
 - ✅ Drafted Software Design section (Issue #8)
-- ✅ Drafted Research Impact Statement (Issue #8)
+- ✅ Drafted initial Research Impact Statement (Issue #8)
 - ✅ Added AI Usage Disclosure (Issue #8)
 - ✅ Removed private repository references from paper (Feb 2, 2026)
-- ⏳ Standby — no action needed until JOSS proceeds
-
----
-
-## 📋 Open Internal GitHub Issues (Active Work)
-
-**Active Issues**: 1 open issue tracking paper update work
-
-1. [Response to the JOSS policy change](https://github.com/biosaxs-dev/molass-review/issues/8) - **ACTIVE**: Adding required sections to paper.md
-   - Software Design section ✅ 
-   - Research Impact Statement ✅ 
-   - AI Usage Disclosure ✅
-   - **Recent Update (Feb 2, 2026)**: Removed references to private companion repository to comply with JOSS accessibility requirements
-   - **Status**: Paper sections complete, pushed to joss-paper branch
-   - **Next**: Shimizu to review and approve final version, then respond to JOSS issue
+- ✅ Synced molass-library subtree with latest joss-paper updates (Feb 16, 2026)
+- ✅ Reviewed Shimizu's improved Research Impact Statement (192 words, well within limit)
+- ✅ Verified new paper citations (Jiang 2023, Furukawa 2025) - both used MOLASS for SEC-SAXS analysis
+- ⏳ Identified PR #7 (joss-paper→master) - awaiting clarification from Shimizu

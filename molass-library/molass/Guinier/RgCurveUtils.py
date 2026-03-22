@@ -3,9 +3,24 @@
     which is maked of Rg values computed from scattering curves.
 """
 import os
+import inspect
+import functools
 import numpy as np
 from tqdm import tqdm
 # from tqdm import tqdm_notebook as tqdm
+
+# Workaround: scipy.stats._axis_nan_policy_wrapper calls inspect.getfullargspec
+# on every linregress call. In Python 3.13 this is very slow. Cache it.
+_orig_getfullargspec = inspect.getfullargspec
+_getfullargspec_cache = {}
+
+@functools.wraps(_orig_getfullargspec)
+def _cached_getfullargspec(func):
+    if func not in _getfullargspec_cache:
+        _getfullargspec_cache[func] = _orig_getfullargspec(func)
+    return _getfullargspec_cache[func]
+
+inspect.getfullargspec = _cached_getfullargspec
 
 ADD_ALL_RESULTS = True
 
@@ -28,12 +43,13 @@ def compute_rgcurve_info(xrdata):
     qv = xrdata.qv
     xrM = xrdata.M
     xrE = xrdata.E
+    jv = xrdata.jv  # original frame numbers (may differ from 0..N after trimming)
     rginfo_list = []
     for j in tqdm(range(xrM.shape[1])):
         sg = SimpleGuinier(np.array([qv, xrM[:,j], xrE[:,j]]).T)
         if sg.Rg is not None or ADD_ALL_RESULTS:
             # rginfo_list.append((j, sg.Rg, sg.score))
-            rginfo_list.append((j, sg))
+            rginfo_list.append((int(jv[j]), sg))
     return rginfo_list
 
 def compute_rgcurve_info_atsas(xrdata):
@@ -63,10 +79,11 @@ def compute_rgcurve_info_atsas(xrdata):
     qv = xrdata.qv
     xrM = xrdata.M
     xrE = xrdata.E
+    jv = xrdata.jv  # original frame numbers (may differ from 0..N after trimming)
     rginfo_list = []
     for j in tqdm(range(xrM.shape[1])):
         orig_result, eval_result = runner.run_from_array(np.array([qv, xrM[:,j], xrE[:,j]]).T)
         if orig_result is not None and orig_result.Rg is not None or ADD_ALL_RESULTS:
             # rginfo_list.append((j, orig_result.Rg, orig_result.Quality))
-            rginfo_list.append((j, orig_result))
+            rginfo_list.append((int(jv[j]), orig_result))
     return rginfo_list

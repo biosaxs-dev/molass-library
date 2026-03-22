@@ -48,6 +48,7 @@ class SecSaxsData:
                  mapping=None,
                  time_initialized=None,
                  datafiles=None,
+                 uv_pickat=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
         
@@ -82,6 +83,10 @@ class SecSaxsData:
         datafiles : list of str, optional
             If specified, the list of data files used for the analysis.
             If it is None, the data files will be set to the list of files loaded from the folder.
+        uv_pickat : float, optional
+            The wavelength (nm) at which to extract the UV elution profile.
+            Defaults to 280 nm when None. Use 290 for samples like ATP or MY
+            where the UV signal is measured at 290 nm.
         debug : bool, optional
             If True, enables debug mode for more verbose output.
 
@@ -141,6 +146,8 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
+        if uv_pickat is not None and self.uv is not None:
+            self.uv.pickat = uv_pickat
         self.trimmed = trimmed
         self.trimming = trimming
         self.mapping = mapping
@@ -151,6 +158,38 @@ class SecSaxsData:
             self.time_initialized = time_initialized
         self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
+
+    def has_xr(self):
+        """ssd.has_xr()
+
+        Returns whether the XR data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_xr : bool
+            True if the XR data is available, False otherwise.
+        """
+        return self.xr is not None
+
+    def has_uv(self):
+        """ssd.has_uv()
+
+        Returns whether the UV data is available.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        has_uv : bool
+            True if the UV data is available, False otherwise.
+        """
+        return self.uv is not None
 
     def plot_3d(self, **kwargs):
         """ssd.plot_3d(title=None, view_init=None, view_arrows=False, with_2d_section_lines=False, **kwargs)
@@ -352,8 +391,8 @@ class SecSaxsData:
                            beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
-    def trimmed_copy(self, trimming=None, jranges=None, mapping=None):
-        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None)
 
         Parameters
         ----------
@@ -364,6 +403,8 @@ class SecSaxsData:
         mapping : MappingInfo, optional
             If specified, the mapping information will be used for the copy.
             It must be provided if `jranges` is specified.
+        nsigmas : int or float, optional
+            If specified, passed to make_trimming() to control the σ-window width.
 
         Returns
         -------
@@ -372,9 +413,13 @@ class SecSaxsData:
         """
         start_time = time()
         if trimming is None:
-            trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
+            if nsigmas is not None:
+                trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+            else:
+                trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
         else:
             assert jranges is None, "jranges must be None if trimming is specified."
+            assert nsigmas is None, "nsigmas must be None if trimming is specified."
         result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
                            trimmed=True, trimming=trimming,
                            mapping=mapping,
@@ -514,7 +559,10 @@ class SecSaxsData:
             If the mapping information is not available, returns None.
         """
         if self.mapping is None:
-            self.estimate_mapping()
+            if self.uv is None:
+                self.mapping = (1, 0)  # identity mapping for XR-only data
+            else:
+                self.estimate_mapping()
         return self.mapping
 
     def get_concfactor(self):
@@ -537,9 +585,19 @@ class SecSaxsData:
             return self.beamline_info.get_concfactor()
     
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
+        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 
         Performs a quick decomposition of the SEC-SAXS data.
+
+        See also: `Nontrivial Decomposition <https://biosaxs-dev.github.io/molass-tutorial/chapters/10/nontrivial.html>`_
+
+        Three decomposition algorithms are available, selected by keyword:
+
+        1. **Default** (no extra keywords) — greedy peak-recognition.
+        2. **Proportional** (``proportions``) — area-ratio slicing.
+        3. **Positioned** (``xr_peakpositions``) — peaks pinned to specified frame positions.
+
+        ``proportions`` and ``xr_peakpositions`` are mutually exclusive.
 
         Parameters
         ----------
@@ -548,13 +606,51 @@ class SecSaxsData:
             used to denoise the matrix data.
 
         proportions : list of float, optional
-            Specifies the proportions to be used for XR data.
+            Specifies the approximate area ratios of the elution peaks.
+            The values do not need to be normalized; for example,
+            ``[1, 1]``, ``[0.5, 0.5]``, and ``[3, 3]`` all produce the same result
+            because they are normalized internally.
+
+            When this option is given, a **proportional decomposition** algorithm
+            is used instead of the default peak-recognition algorithm.
+            The proportional algorithm divides the total elution curve by cumulative area
+            according to the given ratios, and fits an EGH model to each slice independently.
+            This provides better initialization for cases with highly overlapping peaks,
+            where the default algorithm may produce unstable results.
+
+            The exact ratios do not need to be known precisely;
+            even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
+            is usually sufficient.
+
+        xr_peakpositions : list of float, optional
+            Specifies the frame positions where peaks should be pinned.
+            Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
+            with a strong position constraint. ``num_components`` is inferred
+            from the length if not provided.
+
+            Mutually exclusive with ``proportions``.
 
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
 
         num_plates : int, optional
             Specifies the number of theoretical plates to be used for the optimization constraint.
+
+        tau_limit : float, optional
+            Maximum allowed ratio ``|tau| / sigma`` for positioned decomposition.
+            Default 0.6.
+
+        max_sigma : float, optional
+            Maximum allowed Gaussian width (sigma) for positioned decomposition.
+            Default 80.
+
+        min_sigma : float, optional
+            Minimum allowed Gaussian width (sigma) for positioned decomposition.
+            Default 5.
+
+        debug : bool, optional
+            If True, reload internal modules and show diagnostic plots.
+            Default False.
 
         Returns
         -------
@@ -663,7 +759,7 @@ class SecSaxsData:
             return self.beamline_info.name
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
-        """ssd.export(folder, prefix=None)
+        """ssd.export(folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=Fals)
 
         Exports the data to a file.
 
@@ -742,4 +838,8 @@ class SecSaxsData:
         spectral_vectors : list of np.ndarray
             A list of two numpy arrays which contain the spectral vectors for XR and UV data.
         """
-        return [self.xr.qv, self.uv.wv]
+        if self.uv is None:
+            # temporary work-around for the case without UV data
+            return [self.xr.qv, self.xr.qv]
+        else:
+            return [self.xr.qv, self.uv.wv]

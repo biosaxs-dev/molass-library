@@ -54,6 +54,9 @@ def make_component_curves(ssd, num_components, **kwargs):
     kwargs['qv'] = ssd.xr.qv
     xr_ccurves = decompose_icurve_impl(xr_icurve, num_components, peakpositions=xr_peakpositions, **kwargs)
 
+    if ssd.uv is None:
+        return xr_icurve, xr_ccurves, None, None
+    
     uv_icurve = ssd.uv.get_icurve()
 
     smooth_uv = kwargs.get('smooth_uv', False)

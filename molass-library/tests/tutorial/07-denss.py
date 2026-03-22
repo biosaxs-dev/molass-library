@@ -9,8 +9,8 @@ from molass.Testing import control_matplotlib_plot
 @pytest.mark.order(1)
 @control_matplotlib_plot
 def test_001_plot_components():
-    from molass import get_version
-    assert get_version() >= '0.6.3', "This tutorial requires molass version 0.6.3 or higher."
+    from molass import requires
+    requires('0.6.3')
     from molass_data import SAMPLE1
     from molass.DataObjects import SecSaxsData as SSD
     global decomposition

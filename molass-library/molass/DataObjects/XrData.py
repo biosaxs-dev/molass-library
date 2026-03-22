@@ -17,6 +17,10 @@ class XrData(SsMatrixData):
     ----------
     qv : array-like
         The q-values corresponding to the angular axis.
+    baseline_method : str
+        Default is ``'buffit'`` (Otsu-adaptive buffer-frame polyfit),
+        which outperforms ``'linear'`` on all tested SEC-SAXS datasets.
+        Can be overridden by passing ``baseline_method=...`` to the constructor.
     """
     def __init__(self, iv, jv, M, E, **kwargs):
         """Initialize the XrData object.
@@ -34,6 +38,7 @@ class XrData(SsMatrixData):
         kwargs : dict, optional
             Additional keyword arguments to pass to the SsMatrixData constructor.
         """
+        kwargs.setdefault('baseline_method', 'linear')
         super().__init__(iv, jv, M, E, **kwargs)
         self.qv = iv
 
@@ -197,6 +202,138 @@ class XrData(SsMatrixData):
                 reload(molass.Guinier.RgCurve)
             from molass.Guinier.RgCurve import construct_rgcurve_from_list
             return construct_rgcurve_from_list(rginfo, result_type='atsas')
+
+    def detect_peaks(self, prominence=0.005, distance=20, window_length=31,
+                     polyorder=3, return_properties=False):
+        """xr.detect_peaks()
+
+        Detect peaks in the total XR elution curve using Savitzky-Golay
+        smoothing followed by scipy ``find_peaks``.
+
+        The returned list can be passed directly to
+        ``ssd.quick_decomposition(xr_peakpositions=peaks)``.
+
+        Parameters
+        ----------
+        prominence : float, optional
+            Minimum prominence as a fraction of the smoothed curve maximum.
+            Default 0.005 (0.5 %).
+        distance : int, optional
+            Minimum number of frames between adjacent peaks. Default 20.
+        window_length : int, optional
+            Savitzky-Golay filter window length (must be odd). Default 31.
+        polyorder : int, optional
+            Savitzky-Golay filter polynomial order. Default 3.
+        return_properties : bool, optional
+            If True, return a tuple ``(peaks, properties)`` where
+            *properties* is a dict containing ``'prominences'`` and
+            ``'peak_heights'`` arrays.  Default False (backward-compatible).
+
+        Returns
+        -------
+        list of int
+            Frame numbers of detected peaks, sorted by frame number.
+            Returned alone when ``return_properties=False``.
+        tuple of (list of int, dict)
+            ``(peaks, properties)`` when ``return_properties=True``.
+
+        Examples
+        --------
+        >>> peaks = ssd.xr.detect_peaks()
+        >>> decomp = ssd.quick_decomposition(xr_peakpositions=peaks)
+
+        >>> peaks, props = ssd.xr.detect_peaks(return_properties=True)
+        >>> props['prominences']   # array of peak prominences
+        """
+        from scipy.signal import savgol_filter, find_peaks
+        frames = self.jv
+        total_elution = self.M.sum(axis=0)
+        wl = min(window_length, len(total_elution))
+        if wl % 2 == 0:
+            wl -= 1
+        if wl < polyorder + 2:
+            smooth = total_elution
+        else:
+            smooth = savgol_filter(total_elution, window_length=wl, polyorder=polyorder)
+        peaks_idx, props = find_peaks(smooth, prominence=smooth.max() * prominence, distance=distance)
+        peak_frames = [int(frames[i]) for i in peaks_idx]
+        if return_properties:
+            out_props = {
+                'prominences': props['prominences'],
+                'peak_heights': smooth[peaks_idx],
+            }
+            return peak_frames, out_props
+        return peak_frames
+
+    def plot_peaks(self, ax=None, prominence=0.005, distance=20,
+                   window_length=31, polyorder=3):
+        """xr.plot_peaks()
+
+        Visualize detected peaks on the total XR elution curve.
+
+        Parameters
+        ----------
+        ax : matplotlib Axes, optional
+            If provided, plot on this axes.  Otherwise create a new figure.
+        prominence, distance, window_length, polyorder :
+            Forwarded to :meth:`detect_peaks`.
+
+        Returns
+        -------
+        tuple of (Figure, Axes)
+        """
+        import matplotlib.pyplot as plt
+
+        peaks, props = self.detect_peaks(
+            prominence=prominence, distance=distance,
+            window_length=window_length, polyorder=polyorder,
+            return_properties=True,
+        )
+
+        frames = self.jv
+        total_elution = self.M.sum(axis=0)
+        wl = min(window_length, len(total_elution))
+        if wl % 2 == 0:
+            wl -= 1
+        if wl < polyorder + 2:
+            smooth = total_elution
+        else:
+            from scipy.signal import savgol_filter
+            smooth = savgol_filter(total_elution, window_length=wl, polyorder=polyorder)
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(12, 4))
+        else:
+            fig = ax.get_figure()
+
+        import numpy as np
+        ax.plot(frames, total_elution, 'gray', alpha=0.4, label='raw elution')
+        ax.plot(frames, smooth, 'b-', lw=1.5, label='smoothed')
+        for i, pk in enumerate(peaks):
+            prom = props['prominences'][i]
+            idx = np.searchsorted(frames, pk)
+            ax.axvline(pk, color='red', ls=':', alpha=0.7)
+            ax.annotate(f'{pk}\n(prom={prom:.2f})',
+                        (pk, smooth[min(idx, len(smooth) - 1)]),
+                        textcoords='offset points', xytext=(5, 10),
+                        fontsize=7, color='red')
+        ax.set_xlabel('Frame')
+        ax.set_ylabel('Total XR intensity')
+        ax.set_title(f'detect_peaks(): {len(peaks)} peaks found')
+        ax.legend()
+        # Add headroom so annotations on the tallest peak don't overlap the title
+        ylo, yhi = ax.get_ylim()
+        ax.set_ylim(ylo, yhi + (yhi - ylo) * 0.15)
+        # Brief explanation of "prominence"
+        ax.text(0.01, 0.97,
+                'prominence = how much a peak\n'
+                'stands out above the deeper of\n'
+                'the two valleys on either side',
+                transform=ax.transAxes, fontsize=6.5,
+                verticalalignment='top', color='gray',
+                fontstyle='italic')
+        fig.tight_layout()
+        return fig, ax
 
     def get_jcurve_array(self, j=None, peak=None):
         """xr.get_jcurve_array(j=None, peak=None)

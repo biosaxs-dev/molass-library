@@ -8,12 +8,22 @@ class ComponentCurve:
     """
     A class to represent a component curve.
 
+    This object stores the *elution-curve* EGH parameters (H, tR, sigma, tau)
+    and can evaluate the model curve, but it does **not** hold scattering
+    profiles and therefore cannot compute Rg directly.
+
+    To obtain Rg values, use one of:
+
+    - ``decomp.get_rgs()`` — list of Rg for all components.
+    - ``decomp.get_xr_components()`` — returns ``XrComponent`` objects,
+      each of which has ``get_guinier_object()`` for full Guinier-fit results.
+
     Attributes
     ----------
     x : array-like
         The x-values of the component curve.
     params : array-like
-        The parameters of the component curve.
+        The EGH parameters ``[H, tR, sigma, tau]`` of the component curve.
     moment : Moment or None
         The moment of the component curve. Computed on demand. If None, it has not been computed yet.
     """
@@ -31,6 +41,11 @@ class ComponentCurve:
         self.params = np.asarray(params)
         self.moment = None
         self.model = 'egh'  # default model
+
+    @property
+    def y(self):
+        """The y-values of the component curve evaluated at self.x."""
+        return self.get_y(self.x)
 
     def get_y(self, x=None):
         """
@@ -98,3 +113,14 @@ class ComponentCurve:
             The x value at the peak top.
         """
         return self.params[1]   # peak position in EGH model, note that this in valid only for EGH model
+    
+    def get_scale_param(self):
+        """
+        Returns the scale parameter.
+
+        Returns
+        -------
+        float
+            The scale parameter.
+        """
+        return self.params[0]   # scale in EGH model
