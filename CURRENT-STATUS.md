@@ -1,14 +1,14 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 18, 2026**  
+**📅 Last Updated: March 23, 2026**  
 **👤 Updated By: Copilot (auto-updated at session init)**  
-**🔔 Status changed: Handling editor zhubonan invited by Kevin-Mattheus-Moerman — review process starting soon**
+**🔔 Status changed: Editor zhubonan accepted and is requesting reviewer suggestions**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW → REVIEW (Handling Editor Invited)
+## 🎯 Current Phase: PRE-REVIEW (Editor Assigned — Awaiting Reviewer Suggestions)
 
-**Status**: Kevin-Mattheus-Moerman (Managing EiC) invited `zhubonan` as handling editor on March 18 - **Review process expected to start soon**
+**Status**: `zhubonan` accepted editor role (~March 20) and is asking Shimizu to suggest reviewers — **Action required from Shimizu!**
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -25,14 +25,16 @@
 - 🔔 **Feb 16, 2026**: `arfon` (JOSS EiC) sent friendly reminder to update paper
 - ✅ **Feb 17, 2026**: Shimizu replied to `arfon` confirming all revisions are complete and requesting review
 - ✅ **March 18, 2026**: Kevin-Mattheus-Moerman invited `zhubonan` as handling editor
-- ⏳ **Currently**: Waiting for `zhubonan` to accept editor role and assign reviewers
+- ✅ **~March 20, 2026**: `zhubonan` accepted editor role and assigned himself
+- 🔔 **~March 20, 2026**: `zhubonan` asked Shimizu to suggest potential reviewers
+- ⏳ **Currently**: Shimizu needs to respond to zhubonan with reviewer suggestions
 
 ### What This Means:
-- **Editor**: `zhubonan` invited (pending acceptance)
-- **Reviewers**: Not yet assigned
-- **Review Status**: Not yet started — waiting for zhubonan to accept and assign reviewers
-- **Last JOSS Activity**: March 18, 2026 (Kevin-Mattheus-Moerman invited zhubonan as editor)
-- **Next Step**: Wait for zhubonan to accept editor role and open the main review issue; be ready to respond to reviewer comments promptly (2-week response target per JOSS policy)
+- **Editor**: `zhubonan` (assigned and active)
+- **Reviewers**: Not yet assigned — zhubonan waiting for Shimizu's suggestions
+- **Review Status**: PRE-REVIEW — editor active, awaiting reviewer assignment
+- **Last JOSS Activity**: ~March 20, 2026 (zhubonan self-assigned as editor and asked for reviewer suggestions)
+- **⚠️ Next Step**: **Shimizu must reply to zhubonan in the JOSS pre-review issue with suggested reviewer names/contact info** (without using @mentions)
 
 ---
 
