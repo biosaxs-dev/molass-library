@@ -5,7 +5,7 @@
 
 Thank you for taking on the role of handling editor, @zhubonan. I am happy to suggest some potential reviewers.
 
-I previously posted a list of candidates on November 19, 2025 — please see that comment here: [link to Nov 19 comment]
+I previously posted a list of candidates on November 19, 2025 — please see that comment here: [link to Nov 19 comment](https://github.com/openjournals/joss-reviews/issues/9424#issuecomment-3550560725)
 
 In addition, I have identified the following four candidates who have experience directly relevant to molass (SEC-SAXS chromatography and scattering data analysis):
 
