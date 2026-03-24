@@ -112,6 +112,8 @@ def plot_3d_impl(ssd, xr_only=False, uv_only=False, **kwargs):
 def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.TrimmingPlot import ij_from_slice
     from molass.PlotUtils.TwinAxesUtils import align_zero_y
+    from molass.Global.Options import get_molass_options
+    from molass.DataObjects.Curve import Curve
 
     debug = kwargs.get('debug', False)
 
@@ -122,8 +124,17 @@ def plot_compact_impl(ssd, **kwargs):
 
     trim = ssd.make_trimming()
     mapping = ssd.get_mapping()
-    xr_curve = mapping.xr_curve
     uv_curve = mapping.uv_curve
+
+    # Use the recognition curve for XR elution display (consistent with baseline)
+    recognition = get_molass_options('elution_recognition')
+    if recognition == 'sum':
+        xr_curve = ssd.xr.get_recognition_curve()
+        xr_label = "XR Elution (sum)"
+    else:
+        xr_curve = mapping.xr_curve
+        xr_label = "XR Elution at Q=0.02"
+
     x = xr_curve.x
     mp_curve = mapping.get_mapped_curve(xr_curve, uv_curve, inverse_range=True, debug=debug)
     xr_max_x, xr_max_y = xr_curve.get_max_xy()
@@ -135,14 +146,23 @@ def plot_compact_impl(ssd, **kwargs):
 
     # Plot the UV and XR elution curves
     ax1 = fig.add_subplot(gs[:, 0])
-    ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label="XR Elution at Q=0.02")
+    ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label=xr_label)
     axt = ax1.twinx()
     axt.grid(False)
-    axt.plot(mp_curve.x, mp_curve.y, linestyle=":", color="C0", label="mapped UV Elution at wavelength=280")
+    uv_wl = ssd.uv.pickat
+    axt.plot(mp_curve.x, mp_curve.y, linestyle=":", color="C0", label=f"mapped UV Elution at wavelength={uv_wl}")
 
     if baseline:
         uv_baseline = ssd.uv.get_ibaseline(debug=False)
-        xr_baseline = ssd.xr.get_ibaseline(debug=False)
+        if recognition == 'sum':
+            # Compute 1D baseline for the recognition curve (fast)
+            from molass.Baseline.BaselineUtils import get_xr_baseline_func
+            method = ssd.xr.get_baseline_method()
+            compute_bl = get_xr_baseline_func(method)
+            bl_y = compute_bl(xr_curve.x, xr_curve.y, moment=ssd.xr.get_moment())
+            xr_baseline = Curve(xr_curve.x, bl_y, type='i')
+        else:
+            xr_baseline = ssd.xr.get_ibaseline(debug=False)
         mp_baseline = mapping.get_mapped_curve(xr_baseline, uv_baseline, inverse_range=True, debug=False)
         ax1.plot(xr_baseline.x, xr_baseline.y, color='red', label="XR Baseline")
         axt.plot(mp_baseline.x, mp_baseline.y, ls=':', color='red', label="UV Baseline")
