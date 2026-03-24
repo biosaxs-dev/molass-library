@@ -8,6 +8,8 @@
 > For **behavioral rules** (response style, user types, source priorities), see `Copilot/copilot-guidelines.md` (Priority ⭐ 2 below).  
 > For current development status and task history, see `PROJECT_STATUS.md` (in this repo).
 
+> **On every session start**: Read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) to get the current task and recent context before responding.
+
 ---
 
 ## 📚 Documents to Read
