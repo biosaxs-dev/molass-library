@@ -6,6 +6,7 @@ GLOBAL_OPTIONS = dict(
     mapped_trimming = True,
     flowchange = False,
     developer_mode = False,
+    elution_recognition = 'icurve',
 )
 
 def set_molass_options(**kwargs):
@@ -25,6 +26,12 @@ def set_molass_options(**kwargs):
         - Otherwise, flow change will not be considered.
     developer_mode : bool, optional
         Whether to enable developer mode. Default is False.
+    elution_recognition : str, optional
+        Which elution curve to use for peak detection and buffer-frame
+        classification.  Default is ``'icurve'`` (single row at q≈0.02,
+        current behaviour).  Set to ``'sum'`` to use the sum over all
+        (trimmed) q-rows, which is more robust when baseline drift is
+        q-dependent (e.g. MY-type datasets).
     kwargs : dict
         Other options to set.
     """
@@ -47,6 +54,8 @@ def get_molass_options(*args):
         - 'mapped_trimming': Whether to perform mapped trimming.
         - 'flowchange': Whether to consider flow change.
         - 'developer_mode': Whether to enable developer mode.
+        - 'elution_recognition': Which elution curve to use for recognition
+          (``'icurve'`` or ``'sum'``).
     Returns
     -------
     dict

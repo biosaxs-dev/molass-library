@@ -53,7 +53,7 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
         axt = ax.twinx()
         axt.set_ylabel("$R_g$")
         cm = plt.get_cmap('YlGn')
-        x_ = x[rgcurve.indeces]
+        x_ = rgcurve.frames
         axt.grid(False)
         sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm)
         

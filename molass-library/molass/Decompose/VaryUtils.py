@@ -71,7 +71,7 @@ def _plot_varied_decompositions_impl(icurve, proportions, rgcurve=None, best=Non
                 axt = ax.twinx()
                 axt.set_ylabel("$R_g$")
                 cm = plt.get_cmap('YlGn')
-                x_ = x[rgcurve.indeces]
+                x_ = rgcurve.frames
                 axt.grid(False)
                 sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm)
 
