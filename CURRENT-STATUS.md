@@ -1,14 +1,14 @@
 # CURRENT STATUS
 
 **📅 Last Updated: March 24, 2026**  
-**👤 Updated By: Copilot (auto-updated at session init)**  
-**🔔 Status changed: Shimizu replied to zhubonan pointing to previous reviewer list**
+**👤 Updated By: Takahashi (session)**  
+**🔔 Status changed: Supplementary reviewer suggestions drafted (6 candidates consolidated)**
 
 ---
 
 ## 🎯 Current Phase: PRE-REVIEW (Editor Assigned — Awaiting Reviewer Assignment)
 
-**Status**: Shimizu replied to `zhubonan` on March 23 pointing to the previously suggested reviewer list. Now waiting for `zhubonan` to contact and assign reviewers.
+**Status**: Shimizu replied to `zhubonan` on March 23 with initial reviewer suggestions. Takahashi has since conducted a systematic 7-paper JOSS review survey and prepared a consolidated supplementary post (`reviewer-suggestions-supplementary.md`) for Shimizu to post — listing all 6 top candidates (4 original + 2 newly identified: `elena-pascal`, `bdice`). Awaiting Shimizu's review and posting.
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -28,14 +28,15 @@
 - ✅ **~March 20, 2026**: `zhubonan` accepted editor role and assigned himself
 - ✅ **~March 20, 2026**: `zhubonan` asked Shimizu to suggest potential reviewers
 - ✅ **March 23, 2026**: Shimizu replied to `zhubonan` pointing to the previous reviewer suggestions (Nov 19 comment)
-- ⏳ **Currently**: Waiting for `zhubonan` to contact suggested reviewers and assign them
+- ✅ **March 24, 2026**: Takahashi conducted systematic 7-paper JOSS review survey; identified `elena-pascal` and `bdice` as strong new candidates; drafted consolidated supplementary post (6 candidates) for Shimizu to review and post
+- ⏳ **Currently**: Shimizu to review and post `reviewer-suggestions-supplementary.md` to JOSS issue #9424
 
 ### What This Means:
 - **Editor**: `zhubonan` (assigned and active)
 - **Reviewers**: Not yet assigned — zhubonan reviewing Shimizu's suggestions
-- **Review Status**: PRE-REVIEW — editor has reviewer suggestions, awaiting assignment
+- **Review Status**: PRE-REVIEW — editor has initial reviewer suggestions; supplementary consolidated list being prepared
 - **Last JOSS Activity**: March 23, 2026 (Shimizu replied to zhubonan with reviewer suggestions)
-- **⏳ Next Step**: Wait for `zhubonan` to assign reviewers. No action required from team right now.
+- **⏳ Next Step**: Shimizu posts supplementary consolidated reviewer list; then wait for `zhubonan` to assign reviewers.
 
 ---
 
