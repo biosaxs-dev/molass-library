@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
 **Last Updated**: March 24, 2026  
-**Current version**: 0.8.7
+**Current version**: 0.8.8
 
 > **Conventions and architecture**: See [COPILOT-INIT.md](COPILOT-INIT.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,7 +11,7 @@
 
 ## 🎯 Current Task
 
-Working on: **API improvements complete** — all issues (#46–#49) filed and fixed in v0.8.7  
+Working on: **API improvements complete** — issues #46–#50 filed and fixed in v0.8.8  
 Next: Continue negative-peak baseline research (Experiment 08c)  
 See: [experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb](../molass-researcher/experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb)
 

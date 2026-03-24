@@ -103,6 +103,49 @@ def test_040_endpoint_fraction_differs_from_lpm():
     np.testing.assert_array_equal(bl_standard, bl_default)
 
 
+def test_050_allow_negative_peaks_stored_state():
+    """allow_negative_peaks=True stored on object must give same result as endpoint_fraction=0.15.
+
+    Verifies issue #50: set_allow_negative_peaks() stores state, get_baseline2d()
+    honours it, and copy() propagates it.
+    """
+    import numpy as np
+    from molass.DataObjects.SsMatrixData import SsMatrixData
+
+    rng = np.random.default_rng(42)
+    n_q, n_frames = 10, 200
+    frames = np.arange(n_frames, dtype=float)
+    true_bl = 0.005 * frames + 1.0
+    peak = 2.0 * np.exp(-0.5 * ((frames - 80) / 8) ** 2)
+    neg_dip = -0.6 * np.exp(-0.5 * ((frames - 130) / 6) ** 2)
+    M = np.tile(true_bl + peak + neg_dip, (n_q, 1)) + rng.normal(0, 0.01, (n_q, n_frames))
+    q = np.linspace(0.01, 0.3, n_q)
+
+    # Explicit endpoint_fraction kwarg
+    ssd = SsMatrixData(M, q, frames)
+    bl_explicit = ssd.get_baseline2d(method='linear', endpoint_fraction=0.15)
+
+    # Via set_allow_negative_peaks() — should give identical result
+    ssd.set_allow_negative_peaks()
+    assert ssd.allow_negative_peaks is True
+    bl_via_flag = ssd.get_baseline2d(method='linear')
+    np.testing.assert_array_almost_equal(bl_via_flag, bl_explicit,
+        err_msg="allow_negative_peaks=True must produce same baseline as endpoint_fraction=0.15")
+
+    # copy() must propagate the flag
+    ssd_copy = ssd.copy()
+    assert ssd_copy.allow_negative_peaks is True, "copy() must propagate allow_negative_peaks"
+    bl_copy = ssd_copy.get_baseline2d(method='linear')
+    np.testing.assert_array_almost_equal(bl_copy, bl_explicit,
+        err_msg="copied object must produce same endpoint baseline")
+
+    # Default (flag=False) must NOT use endpoint method
+    ssd_default = SsMatrixData(M, q, frames)
+    bl_default = ssd_default.get_baseline2d(method='linear')
+    assert not np.allclose(bl_default, bl_explicit), \
+        "default (allow_negative_peaks=False) must not equal endpoint baseline"
+
+
 if __name__ == "__main__":
     # test_010_OA_Ald_default()
     # test_020_OA_Ald_uvdiff()

@@ -26,10 +26,15 @@ class SsMatrixData:
         The moment of the data along the iv axis. It can be None if not computed.
     baseline_method : str
         The method used for baseline correction. Default is 'linear'.
+    allow_negative_peaks : bool
+        If True, the endpoint-anchored LPM baseline is used automatically
+        (equivalent to ``endpoint_fraction=0.15``) to avoid contamination
+        from physically real negative-peak frames.  Default False.
     """
     def __init__(self, M, iv, jv, E=None,
                  moment=None,
-                 baseline_method='linear'):
+                 baseline_method='linear',
+                 allow_negative_peaks=False):
         """Initialize the SsMatrixData object.
 
         Parameters
@@ -52,6 +57,7 @@ class SsMatrixData:
         self.E = E      # may be None
         self.moment = moment
         self.baseline_method = baseline_method
+        self.allow_negative_peaks = allow_negative_peaks
 
     @property
     def data(self):
@@ -102,6 +108,7 @@ class SsMatrixData:
                             Ecopy,
                             moment=None,  # note that moment is not copied
                             baseline_method=self.baseline_method,
+                            allow_negative_peaks=self.allow_negative_peaks,
                             )
 
     def get_icurve(self, pickat):
@@ -176,6 +183,28 @@ class SsMatrixData:
         """Get the baseline method for this data object."""
         return self.baseline_method
 
+    def set_allow_negative_peaks(self, value=True):
+        """Declare that this dataset contains physically real negative peaks.
+
+        When True, ``get_baseline2d()`` automatically uses the
+        endpoint-anchored LPM (``endpoint_fraction=0.15``) instead of the
+        standard bottom-percentile anchor, which would be contaminated by
+        negative-peak frames.
+
+        This flag is propagated by ``copy()`` and ``corrected_copy()``, so
+        the typical workflow is::
+
+            ssd.set_allow_negative_peaks()
+            ssd.plot_compact(baseline=True)   # inspect endpoint-anchored baseline
+            corrected = ssd.corrected_copy()  # applies it — no extra args needed
+
+        Parameters
+        ----------
+        value : bool, optional
+            Default True.
+        """
+        self.allow_negative_peaks = value
+
     def get_baseline2d(self, **kwargs):
         """Get the 2D baseline for the matrix data using the specified method.
 
@@ -205,7 +234,9 @@ class SsMatrixData:
         Examples
         --------
         >>> bl = xr.get_baseline2d()                        # standard LPM
-        >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # opt-in for negative-peak datasets
+        >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # one-off override
+        >>> xr.set_allow_negative_peaks()                   # preferred: store as state
+        >>> bl = xr.get_baseline2d()                        # endpoint-anchored automatically
         """
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
@@ -219,6 +250,8 @@ class SsMatrixData:
                 _size_sigma = _ecurve.compute_size_sigma()
             default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
             endpoint_fraction = kwargs.get('endpoint_fraction', None)
+            if endpoint_fraction is None and self.allow_negative_peaks:
+                endpoint_fraction = 0.15
             if endpoint_fraction is not None:
                 default_kwargs['endpoint_fraction'] = endpoint_fraction
             if method == 'uvdiff':
