@@ -183,3 +183,66 @@ def test_13_lpm_baseline_mask():
     # Slopes should differ (different fitting data)
     assert params_full['slope'] != params_masked['slope'], \
         "masked and unmasked slopes should differ when peak region is excluded"
+
+
+def test_14_get_snr_weights():
+    """get_snr_weights() returns per-q-row SNR array — issue #38."""
+    import numpy as np
+    xr = ssd_instance.trimmed_copy().xr
+    w = xr.get_snr_weights()
+    assert w.shape == (len(xr.iv),), f"shape should be (n_q,), got {w.shape}"
+    assert (w >= 0).all(), "weights must be non-negative"
+    assert w.sum() > 0, "weights should not all be zero"
+    # Low-q rows should generally have higher SNR than high-q rows
+    n_q = len(w)
+    assert w[:n_q // 4].mean() > w[-n_q // 4:].mean(), \
+        "low-q SNR should exceed high-q SNR on average"
+
+
+def test_15_get_positive_ratio():
+    """get_positive_ratio() returns SNR-weighted positive_ratio — issue #38."""
+    import numpy as np
+    xr = ssd_instance.trimmed_copy().xr
+    bl = xr.get_baseline2d()
+
+    pr_snr = xr.get_positive_ratio(bl)                     # default = 'snr'
+    pr_uni = xr.get_positive_ratio(bl, weighting='uniform')
+    assert 0 < pr_snr < 1, f"positive_ratio (snr) should be in (0,1), got {pr_snr}"
+    assert 0 < pr_uni < 1, f"positive_ratio (uni) should be in (0,1), got {pr_uni}"
+    # SNR and uniform should generally differ
+    assert pr_snr != pr_uni, "SNR-weighted and uniform should produce different values"
+
+
+def test_16_get_bpo_ideal_snr():
+    """get_bpo_ideal() defaults to SNR-weighted, and accepts 'uniform' — issue #38."""
+    xr = ssd_instance.trimmed_copy().xr
+    bpo_snr = xr.get_bpo_ideal()                           # default = 'snr'
+    bpo_uni = xr.get_bpo_ideal(weighting='uniform')
+    assert 0 < bpo_snr < 1, f"bpo_ideal (snr) should be in (0,1), got {bpo_snr}"
+    assert 0 < bpo_uni < 1, f"bpo_ideal (uni) should be in (0,1), got {bpo_uni}"
+    assert bpo_snr > 0.5, f"SAMPLE1 bpo_ideal (snr) should be > 0.5, got {bpo_snr}"
+    # SNR-weighted bpo_ideal is typically NOT the same as uniform
+    assert bpo_snr != bpo_uni, "SNR and uniform bpo_ideal should differ"
+
+
+def test_17_get_ideal_positive_ratio_alias():
+    """get_ideal_positive_ratio() is an alias for get_bpo_ideal() -- issue #40."""
+    xr = ssd_instance.trimmed_copy().xr
+    assert xr.get_ideal_positive_ratio() == xr.get_bpo_ideal()
+    assert xr.get_ideal_positive_ratio(weighting='uniform') == xr.get_bpo_ideal(weighting='uniform')
+
+
+def test_18_evaluate_baseline():
+    """evaluate_baseline() returns namedtuple with positive_ratio, ideal, delta -- issue #39."""
+    xr = ssd_instance.trimmed_copy().xr
+    bl = xr.get_baseline2d()
+    result = xr.evaluate_baseline(bl)
+    assert hasattr(result, 'positive_ratio')
+    assert hasattr(result, 'ideal')
+    assert hasattr(result, 'delta')
+    assert result.delta == abs(result.positive_ratio - result.ideal)
+    assert 0 < result.positive_ratio < 1
+    assert 0 < result.ideal < 1
+    # Should match individual calls
+    assert result.positive_ratio == xr.get_positive_ratio(bl)
+    assert result.ideal == xr.get_bpo_ideal()

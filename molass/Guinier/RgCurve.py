@@ -40,6 +40,12 @@ class RgCurve(Curve):
         self.results = results  # either, molass results or atsas results
         self.intensities = intensities  # only for molass results, None for atsas results
 
+    @property
+    def frames(self):
+        """Frame numbers (alias for ``indeces``). These are actual frame
+        numbers, not positional array indices."""
+        return self.indeces
+
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
     """

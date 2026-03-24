@@ -49,6 +49,7 @@ class SecSaxsData:
                  time_initialized=None,
                  datafiles=None,
                  uv_pickat=None,
+                 xr_pickat=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
         
@@ -87,6 +88,9 @@ class SecSaxsData:
             The wavelength (nm) at which to extract the UV elution profile.
             Defaults to 280 nm when None. Use 290 for samples like ATP or MY
             where the UV signal is measured at 290 nm.
+        xr_pickat : float, optional
+            The q-value (Å⁻¹) at which to extract the XR elution profile.
+            Defaults to 0.02 when None.
         debug : bool, optional
             If True, enables debug mode for more verbose output.
 
@@ -135,19 +139,21 @@ class SecSaxsData:
                 xr_data = None
             else:
                 from molass.DataObjects.XrData import XrData
-                xr_data = XrData(qv, None, xrM, xrE)
+                xr_data = XrData(xrM, qv, None, xrE)
             self.xr_data = xr_data
 
             if uvM is None:
                 uv_data = None
             else:
                 from molass.DataObjects.UvData import UvData
-                uv_data = UvData(wv, None, uvM, uvE)
+                uv_data = UvData(uvM, wv, None, uvE)
     
         self.xr = xr_data
         self.uv = uv_data
         if uv_pickat is not None and self.uv is not None:
             self.uv.pickat = uv_pickat
+        if xr_pickat is not None and self.xr is not None:
+            self.xr.pickat = xr_pickat
         self.trimmed = trimmed
         self.trimming = trimming
         self.mapping = mapping
@@ -486,7 +492,7 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
-    def corrected_copy(self, debug=False):
+    def corrected_copy(self, debug=False, **baseline_kwargs):
         """ssd.corrected_copy()
         
         Returns a deep copy of this object which has been corrected
@@ -496,20 +502,30 @@ class SecSaxsData:
         ----------
         debug : bool, optional
             If True, enables debug mode for more verbose output.
+        **baseline_kwargs :
+            Additional keyword arguments forwarded to :meth:`get_baseline2d`
+            for both XR and UV.  For example, pass ``endpoint_fraction=0.15``
+            to use the endpoint-anchored baseline for datasets with real
+            negative peaks.
 
         Returns
         -------
         SecSaxsData
             A deep copy of the SSD object with the baseline correction applied.
+
+        Examples
+        --------
+        >>> corrected = ssd.corrected_copy()                          # standard LPM
+        >>> corrected = ssd.corrected_copy(endpoint_fraction=0.15)   # for negative-peak datasets
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
-        baseline = ssd_copy.xr.get_baseline2d(debug=debug)
+        baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
         ssd_copy.xr.M -= baseline
 
         if ssd_copy.uv is not None:
-            baseline = ssd_copy.uv.get_baseline2d(debug=debug)
+            baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
             ssd_copy.uv.M -= baseline
 
         ssd_copy.time_required = time() - start_time
