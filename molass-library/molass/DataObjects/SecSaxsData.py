@@ -135,14 +135,14 @@ class SecSaxsData:
                 xr_data = None
             else:
                 from molass.DataObjects.XrData import XrData
-                xr_data = XrData(qv, None, xrM, xrE)
+                xr_data = XrData(xrM, qv, None, xrE)
             self.xr_data = xr_data
 
             if uvM is None:
                 uv_data = None
             else:
                 from molass.DataObjects.UvData import UvData
-                uv_data = UvData(wv, None, uvM, uvE)
+                uv_data = UvData(uvM, wv, None, uvE)
     
         self.xr = xr_data
         self.uv = uv_data
