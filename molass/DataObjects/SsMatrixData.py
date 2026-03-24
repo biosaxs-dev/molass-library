@@ -27,15 +27,28 @@ class SsMatrixData:
     baseline_method : str
         The method used for baseline correction. Default is 'linear'.
     """
-    def __init__(self, iv, jv, M, E,
+    def __init__(self, M, iv, jv, E=None,
                  moment=None,
                  baseline_method='linear'):
-        """Initialize the SsMatrixData object."""
+        """Initialize the SsMatrixData object.
+
+        Parameters
+        ----------
+        M : 2D array-like, shape (len(iv), len(jv))
+            The 2D intensity matrix.  Row axis = iv, column axis = jv.
+        iv : array-like
+            Row-axis values (e.g. q-values for XR, wavelengths for UV).
+        jv : array-like or None
+            Column-axis values (frame numbers).  If None, defaults to
+            ``np.arange(M.shape[1])``.
+        E : 2D array-like or None, optional
+            Error matrix with the same shape as M.  Default None.
+        """
+        self.M = M
         self.iv = iv
         if jv is None:
             jv = np.arange(M.shape[1])
         self.jv = jv
-        self.M = M
         self.E = E      # may be None
         self.moment = moment
         self.baseline_method = baseline_method
@@ -83,9 +96,9 @@ class SsMatrixData:
             islice, jslice = slices
         Ecopy = None if self.E is None else self.E[islice,jslice].copy()
         return self.__class__(  # __class__ is used to ensure that the correct subclass is instantiated
+                            self.M[islice,jslice].copy(),
                             self.iv[islice].copy(),
                             self.jv[jslice].copy(),
-                            self.M[islice,jslice].copy(),
                             Ecopy,
                             moment=None,  # note that moment is not copied
                             baseline_method=self.baseline_method,
@@ -172,6 +185,13 @@ class SsMatrixData:
             Baseline method to use. If given, overrides the instance's
             ``baseline_method`` for this call only. Valid values are
             ``'buffit'``, ``'linear'``, ``'uvdiff'``, ``'integral'``.
+        endpoint_fraction : float, optional
+            Only used when ``method='linear'``.  If given and > 0, switches
+            the LPM anchor from the bottom-25th-percentile frames to the
+            leading and trailing ``k = max(2, int(endpoint_fraction * n))``
+            frames.  Use this for datasets with physically real negative peaks
+            (where the standard LPM anchor would be contaminated by those
+            frames).  Default ``None`` — standard LPM unchanged.
         method_kwargs : dict, optional
             Additional keyword arguments to pass to the baseline fitting method.
         debug : bool, optional
@@ -181,6 +201,11 @@ class SsMatrixData:
         -------
         baseline : ndarray
             The 2D baseline array with the same shape as self.M.
+
+        Examples
+        --------
+        >>> bl = xr.get_baseline2d()                        # standard LPM
+        >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # opt-in for negative-peak datasets
         """
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
@@ -193,6 +218,9 @@ class SsMatrixData:
                 _ecurve = _EBC(self.get_recognition_curve().y)
                 _size_sigma = _ecurve.compute_size_sigma()
             default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
+            endpoint_fraction = kwargs.get('endpoint_fraction', None)
+            if endpoint_fraction is not None:
+                default_kwargs['endpoint_fraction'] = endpoint_fraction
             if method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)

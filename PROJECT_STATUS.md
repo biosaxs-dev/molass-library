@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
-**Last Updated**: March 6, 2026  
-**Current version**: 0.8.3
+**Last Updated**: March 24, 2026  
+**Current version**: 0.8.7
 
 > **Conventions and architecture**: See [COPILOT-INIT.md](COPILOT-INIT.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,15 +11,26 @@
 
 ## 🎯 Current Task
 
-Working on: **API improvements complete** — all 5 issues (#8–#12) filed and fixed in v0.8.3  
-Next: Bump notebook in `molass-researcher` to use new API (`align_decompositions`, `component_quality_scores`)  
-See: [Copilot/API_IMPROVEMENTS.md](Copilot/API_IMPROVEMENTS.md)
+Working on: **API improvements complete** — all issues (#46–#49) filed and fixed in v0.8.7  
+Next: Continue negative-peak baseline research (Experiment 08c)  
+See: [experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb](../molass-researcher/experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb)
 
 ---
 
 ## 🎯 Recent Work
 
-### March 6, 2026 — API improvements complete (v0.8.3)
+### March 24, 2026 — Negative-peak baseline + AI-friendliness improvements (v0.8.4–0.8.7)
+
+Issues #46–#49 implemented and closed.
+
+| Issue | Fix |
+|-------|-----|
+| #46 `get_baseline2d(endpoint_fraction=...)` | `LpmBaseline.py`, `SsMatrixData.py` — opt-in endpoint-anchored LPM for negative-peak datasets |
+| #47 `E` optional in constructors | `SsMatrixData`, `XrData`, `UvData` — `E=None` default |
+| #48 `corrected_copy()` forwards `**baseline_kwargs` | `SecSaxsData.py` — passes `endpoint_fraction` etc. through |
+| #49 Reorder args to `(M, iv, jv, E=None)` | `SsMatrixData`, `XrData`, `UvData` — data matrix first (breaking change) |
+
+---
 
 All 5 issues (#8–#12) implemented and closed.
 

@@ -21,24 +21,24 @@ class XrData(SsMatrixData):
         Default is ``'linear'``.
         Can be overridden by passing ``baseline_method=...`` to the constructor.
     """
-    def __init__(self, iv, jv, M, E, **kwargs):
+    def __init__(self, M, iv, jv, E=None, **kwargs):
         """Initialize the XrData object.
 
         Parameters
         ----------
-        iv : array-like
-            The q-values corresponding to the angular axis.
-        jv : array-like
-            The values corresponding to the temporal axis.
-        M : 2D array-like
+        M : 2D array-like, shape (len(iv), len(jv))
             The 2D matrix of intensity values.
-        E : 2D array-like or None
-            The 2D matrix of error values. It can be None if errors are not available
+        iv : array-like
+            The q-values corresponding to the angular (row) axis.
+        jv : array-like or None
+            The values corresponding to the temporal (column) axis.
+        E : 2D array-like or None, optional
+            The 2D matrix of error values. Default None.
         kwargs : dict, optional
             Additional keyword arguments to pass to the SsMatrixData constructor.
         """
         kwargs.setdefault('baseline_method', 'linear')
-        super().__init__(iv, jv, M, E, **kwargs)
+        super().__init__(M, iv, jv, E, **kwargs)
         self.qv = iv
         self.pickat = PICKAT
 

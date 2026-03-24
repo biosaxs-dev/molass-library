@@ -2,6 +2,7 @@
     Baseline.LpmBaseline.py
 """
 import numpy as np
+from scipy import stats
 from molass.DataObjects.Curve import Curve
 from molass_legacy.Baseline.ScatteringBaseline import ScatteringBaseline
 
@@ -61,12 +62,34 @@ def compute_lpm_baseline(x, y, return_also_params=False, **kwargs):
         - ``mask`` : array-like of bool — if present, only the elements where
           ``mask`` is True are used for fitting.  The returned baseline is
           evaluated at **all** ``x`` positions.
+        - ``endpoint_fraction`` : float — if present and > 0, switches to
+          **endpoint-anchored** mode: the anchor set is the leading and
+          trailing ``k = max(2, int(endpoint_fraction * n))`` frames.
+          Intended for datasets with physically real negative peaks where the
+          standard low-percentile anchor would be contaminated.  The standard
+          LPM path is taken when this is ``None`` (default).
 
     Returns
     -------
     baseline : array-like
         The computed baseline.
     """
+    endpoint_fraction = kwargs.get('endpoint_fraction', None)
+    if endpoint_fraction is not None and endpoint_fraction > 0:
+        x = np.asarray(x, dtype=float)
+        y = np.asarray(y, dtype=float)
+        n = len(x)
+        k = max(2, int(endpoint_fraction * n))
+        ep_mask = np.zeros(n, dtype=bool)
+        ep_mask[:k] = True
+        ep_mask[-k:] = True
+        slope, intercept, *_ = stats.linregress(x[ep_mask], y[ep_mask])
+        baseline = slope * x + intercept
+        if return_also_params:
+            return baseline, dict(slope=slope, intercept=intercept, p_final=None,
+                                  endpoint_fraction=endpoint_fraction)
+        return baseline
+
     mask = kwargs.get('mask', None)
 
     if mask is not None:
