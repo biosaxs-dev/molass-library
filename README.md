@@ -18,6 +18,7 @@ pip install -U molass
 
 ## Documentation
 
+- **Beginner Onboarding:** https://github.com/biosaxs-dev/molass-beginner — Agent-mode first-run guide, for first-time users
 - **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial — practical usage, for beginners
 - **Essence:** https://biosaxs-dev.github.io/molass-essence — theory, for researchers
 - **Technical Report:** https://biosaxs-dev.github.io/molass-technical — technical details, for advanced users
