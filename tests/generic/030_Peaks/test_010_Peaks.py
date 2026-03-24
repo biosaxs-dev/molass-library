@@ -54,6 +54,34 @@ def test_020_detect_peaks_return_properties():
     assert len(props['peak_heights']) == len(peaks)
     assert np.all(props['prominences'] > 0), "All prominences must be positive"
 
+def test_040_get_recognition_curve():
+    """Issue #41: get_recognition_curve() respects elution_recognition option."""
+    from molass.DataObjects import SecSaxsData as SSD
+    from molass.Global.Options import set_molass_options, get_molass_options
+    from molass.DataObjects.Curve import Curve
+    path = os.path.join(DATA_ROOT_FOLDER, "20161119", "Kosugi3a_BackSub")
+    ssd = SSD(path)
+
+    # Default: 'icurve' — should match get_icurve() values
+    assert get_molass_options('elution_recognition') == 'icurve'
+    rc_icurve = ssd.xr.get_recognition_curve()
+    assert isinstance(rc_icurve, Curve)
+    np.testing.assert_array_equal(rc_icurve.y, ssd.xr.get_icurve().y)
+
+    # Switch to 'sum' — should match M.sum(axis=0)
+    set_molass_options(elution_recognition='sum')
+    rc_sum = ssd.xr.get_recognition_curve()
+    assert isinstance(rc_sum, Curve)
+    np.testing.assert_array_almost_equal(rc_sum.y, ssd.xr.M.sum(axis=0))
+
+    # detect_peaks() result should differ between modes when data has q-dependent characteristics
+    peaks_sum = ssd.xr.detect_peaks()
+    set_molass_options(elution_recognition='icurve')
+    peaks_icurve = ssd.xr.detect_peaks()
+    # Both must return valid non-empty lists; exact equality is dataset-dependent
+    assert isinstance(peaks_sum, list) and len(peaks_sum) > 0
+    assert isinstance(peaks_icurve, list) and len(peaks_icurve) > 0
+
 @control_matplotlib_plot
 def test_030_plot_peaks():
     """Issue #37: XrData.plot_peaks() standalone and axis-injectable."""
