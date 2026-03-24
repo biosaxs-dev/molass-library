@@ -1,14 +1,14 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 24, 2026**  
+**📅 Last Updated: March 25, 2026**  
 **👤 Updated By: Takahashi (session)**  
-**🔔 Status changed: Supplementary reviewer suggestions drafted (6 candidates consolidated)**
+**🔔 Status changed: Shimizu posted consolidated reviewer list to JOSS; awaiting zhubonan to assign reviewers**
 
 ---
 
 ## 🎯 Current Phase: PRE-REVIEW (Editor Assigned — Awaiting Reviewer Assignment)
 
-**Status**: Shimizu replied to `zhubonan` on March 23 with initial reviewer suggestions. Takahashi has since conducted a systematic 7-paper JOSS review survey and prepared a consolidated supplementary post (`reviewer-suggestions-supplementary.md`) for Shimizu to post — listing all 6 top candidates (4 original + 2 newly identified: `elena-pascal`, `bdice`). Awaiting Shimizu's review and posting.
+**Status**: Shimizu posted the consolidated 6-candidate reviewer list to the JOSS issue on March 24 (includes `KedoKudo`, `florian-huber`, `Adafede`, `lazear`, `elena-pascal`, `bdice`). Now waiting for editor `zhubonan` to review the suggestions and assign reviewers.
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -28,15 +28,16 @@
 - ✅ **~March 20, 2026**: `zhubonan` accepted editor role and assigned himself
 - ✅ **~March 20, 2026**: `zhubonan` asked Shimizu to suggest potential reviewers
 - ✅ **March 23, 2026**: Shimizu replied to `zhubonan` pointing to the previous reviewer suggestions (Nov 19 comment)
-- ✅ **March 24, 2026**: Takahashi conducted systematic 7-paper JOSS review survey; identified `elena-pascal` and `bdice` as strong new candidates; drafted consolidated supplementary post (6 candidates) for Shimizu to review and post
-- ⏳ **Currently**: Shimizu to review and post `reviewer-suggestions-supplementary.md` to JOSS issue #9424
+- ✅ **March 24, 2026**: Takahashi conducted systematic 7-paper JOSS review survey; identified `elena-pascal` and `bdice` as strong new candidates; drafted consolidated supplementary post (6 candidates)
+- ✅ **March 24, 2026**: Shimizu posted consolidated reviewer list (6 candidates: `KedoKudo`, `florian-huber`, `Adafede`, `lazear`, `elena-pascal`, `bdice`) to JOSS issue #9424
+- ⏳ **Currently**: Waiting for `zhubonan` to review suggestions and assign reviewers
 
 ### What This Means:
 - **Editor**: `zhubonan` (assigned and active)
 - **Reviewers**: Not yet assigned — zhubonan reviewing Shimizu's suggestions
-- **Review Status**: PRE-REVIEW — editor has initial reviewer suggestions; supplementary consolidated list being prepared
-- **Last JOSS Activity**: March 23, 2026 (Shimizu replied to zhubonan with reviewer suggestions)
-- **⏳ Next Step**: Shimizu posts supplementary consolidated reviewer list; then wait for `zhubonan` to assign reviewers.
+- **Review Status**: PRE-REVIEW — consolidated 6-candidate reviewer list posted by Shimizu; editor reviewing
+  - **Last JOSS Activity**: March 24, 2026 (Shimizu posted consolidated reviewer list)
+  - **⏳ Next Step**: Wait for `zhubonan` to assign reviewers from the submitted list.
 
 ---
 
@@ -68,4 +69,5 @@
 - ✅ Synced molass-library subtree with latest joss-paper updates (Feb 16, 2026)
 - ✅ Reviewed Shimizu's improved Research Impact Statement (192 words, well within limit)
 - ✅ Verified new paper citations (Jiang 2023, Furukawa 2025) - both used MOLASS for SEC-SAXS analysis
+- ✅ Drafted consolidated 6-candidate reviewer list; Shimizu posted it to JOSS on March 24
 - ⏳ Identified PR #7 (joss-paper→master) - awaiting clarification from Shimizu
