@@ -5,7 +5,7 @@
 
 ---
 
-Following further research into JOSS review history, I would like to consolidate my reviewer suggestions into a single list for convenience. These are the candidates I consider most suitable, including those I mentioned previously:
+Following further research into JOSS review history, I would like to consolidate my reviewer suggestions into a single list for convenience. The candidates below were selected primarily for their expertise in chromatographic separation and scattering data analysis, but a few were also included with software API design quality in mind, as molass places particular emphasis on a clean, accessible Python interface for scientific users. These are the candidates I consider most suitable, including those I mentioned previously:
 
 - **[KedoKudo](https://github.com/KedoKudo)** (Chen Zhang) — Computational Scientist at Oak Ridge National Laboratory; focuses on scientific software for neutron/X-ray scattering data reduction and analysis, and AI-assisted scientific workflows. Reviewed a GPU-accelerated small-angle scattering Python package for JOSS ([review #6024](https://github.com/openjournals/joss-reviews/issues/6024)).
 
