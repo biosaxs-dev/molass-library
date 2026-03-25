@@ -1,9 +1,9 @@
 # Project Status — molass-library
 
-**Last Updated**: March 24, 2026  
+**Last Updated**: March 25, 2026  
 **Current version**: 0.8.8
 
-> **Conventions and architecture**: See [COPILOT-INIT.md](COPILOT-INIT.md)  
+> **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
 > **This document**: Tracks current development task and chronological history
 
@@ -18,6 +18,13 @@ See: [experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb](../mol
 ---
 
 ## 🎯 Recent Work
+
+### March 25, 2026 — AI Context Standard v0.8 compliance
+
+- Updated `.github/copilot-instructions.md` to AI Context Standard v0.8
+- Created `.github/prompts/init.prompt.md` (`alwaysApply: true`) for automatic session initialization
+- Added `.github/vscode-version.txt` (gitignored); updated ecosystem table (molass-essence, molass-technical now have context files)
+- Applied across all 10 repos in the molass workspace
 
 ### March 24, 2026 — Negative-peak baseline + AI-friendliness improvements (v0.8.4–0.8.7)
 

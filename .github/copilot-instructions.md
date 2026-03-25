@@ -1,10 +1,10 @@
-<!-- AI Context Standard: v0.7 - Adopted: 2026-03-24 -->
+<!-- AI Context Standard v0.8 - Adopted: 2026-03-25 -->
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  
 **Created**: February 19, 2026
 
-> **Note**: This file follows the AI Context Standard (v0.7). It provides **technical context** (architecture, call chains, conventions).  
+> **Note**: This file follows the AI Context Standard (v0.8). It provides **technical context** (architecture, call chains, conventions).  
 > For **behavioral rules** (response style, user types, source priorities), see `Copilot/copilot-guidelines.md` (Priority ⭐ 2 below).  
 > For current development status and task history, see `PROJECT_STATUS.md` (in this repo).
 
@@ -267,10 +267,10 @@ molass-library/
 | `molass-library` | Main library (this repo) | Python / Sphinx | `.github/copilot-instructions.md` ← this file |
 | `molass-legacy` | Legacy GUI predecessor; required runtime dep | Python / Sphinx | `.github/copilot-instructions.md` |
 | `modeling-vs-model_free` | Research: P0+–P6+ criteria, evaluation, roadmap | Markdown / Notebooks | `.github/copilot-instructions.md` |
-| `molass-tutorial` | Usage documentation (Jupyter Book) | MyST Markdown | `COPILOT_CONTEXT.md` (root) |
-| `molass-essence` | Theory documentation (Jupyter Book) | MyST Markdown | — |
-| `molass-technical` | Technical report (Jupyter Book) | MyST Markdown | — |
-| `molass-develop` | Developer/contributor handbook (Jupyter Book) | MyST Markdown | `COPILOT_CONTEXT.md` (in `chapters/`) |
+| `molass-tutorial` | Usage documentation (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-essence` | Theory documentation (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-technical` | Technical report (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-develop` | Developer/contributor handbook (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
 | `molass-beginner` | Beginner onboarding (Agent mode) | Markdown | `.github/copilot-instructions.md` |
 
 **Related (not doc repos)**:
@@ -318,6 +318,7 @@ GitHub/
 | Feb 19, 2026 | P1+ diagnosis: traced full decomposition call chain (default vs proportions paths); identified root cause of overlap failure (greedy `recognize_peaks` + single Nelder-Mead); confirmed `proportions` option as effective workaround (std≤0.02 vs 0.27, robust to 3:1 mismatch); improved `quick_decomposition()` docstring and tutorial pages |
 | Feb 19, 2026 | AI-readability pass: added inline comments at `recognize_peaks` import and call site in `CurveDecomposer.py` (algorithm summary, failure mode, cross-repo pointer); noted `randomize`/`global_opt` as unused fix levers in this file; created entry point for AI navigating `recognize_peaks` and other legacy code |
 | Mar 24, 2026 | Migrated to `.github/copilot-instructions.md` (AI Context Standard v0.7) |
+| Mar 25, 2026 | Updated to AI Context Standard v0.8; added `init.prompt.md` and `vscode-version.txt`; refreshed ecosystem table |
 
 **Principle**: *Never leave this codebase harder to navigate than you found it. Update this file after each work session with new findings.*
 
