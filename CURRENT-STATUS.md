@@ -1,8 +1,8 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 25, 2026**  
+**📅 Last Updated: March 26, 2026**  
 **👤 Updated By: Takahashi (session)**  
-**🔔 Status changed: Shimizu posted consolidated reviewer list to JOSS; awaiting zhubonan to assign reviewers**
+**🔔 Status changed: Updated molass-library default branch from master to main**
 
 ---
 
@@ -70,4 +70,5 @@
 - ✅ Reviewed Shimizu's improved Research Impact Statement (192 words, well within limit)
 - ✅ Verified new paper citations (Jiang 2023, Furukawa 2025) - both used MOLASS for SEC-SAXS analysis
 - ✅ Drafted consolidated 6-candidate reviewer list; Shimizu posted it to JOSS on March 24
-- ⏳ Identified PR #7 (joss-paper→master) - awaiting clarification from Shimizu
+- ⏳ Identified PR #7 (joss-paper→main) - awaiting clarification from Shimizu
+- ✅ **March 26, 2026**: Updated molass-library default branch references: `master` → `main` (README.md URL, CURRENT-STATUS.md)

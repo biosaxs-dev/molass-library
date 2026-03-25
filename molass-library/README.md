@@ -40,7 +40,7 @@ Before starting a Copilot chat session with this repository, use the following m
 
 > "Please read COPILOT-INIT.md to initialize"
 
-For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/master/Copilot/copilot-guidelines.md).
+For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/main/Copilot/copilot-guidelines.md).
 
 ## Optional Features
 
