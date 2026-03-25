@@ -27,14 +27,19 @@ class SsMatrixData:
     baseline_method : str
         The method used for baseline correction. Default is 'linear'.
     allow_negative_peaks : bool
-        If True, the endpoint-anchored LPM baseline is used automatically
-        (equivalent to ``endpoint_fraction=0.15``) to avoid contamination
-        from physically real negative-peak frames.  Default False.
+        If True, frames in the negative-peak region are excluded from LPM's
+        anchor pool before baseline fitting, preventing contamination from
+        physically real negative-peak frames.  Default False.
+    negative_peak_mask : array-like of bool, slice, or None
+        Explicit mask of frames to exclude from LPM fitting when
+        ``allow_negative_peaks=True``.  If None (default), the mask is
+        derived automatically from the recognition curve (frames where y < 0).
     """
     def __init__(self, M, iv, jv, E=None,
                  moment=None,
                  baseline_method='linear',
-                 allow_negative_peaks=False):
+                 allow_negative_peaks=False,
+                 negative_peak_mask=None):
         """Initialize the SsMatrixData object.
 
         Parameters
@@ -58,6 +63,7 @@ class SsMatrixData:
         self.moment = moment
         self.baseline_method = baseline_method
         self.allow_negative_peaks = allow_negative_peaks
+        self.negative_peak_mask = negative_peak_mask  # None = auto-detect from recognition curve
 
     @property
     def data(self):
@@ -109,6 +115,7 @@ class SsMatrixData:
                             moment=None,  # note that moment is not copied
                             baseline_method=self.baseline_method,
                             allow_negative_peaks=self.allow_negative_peaks,
+                            negative_peak_mask=self.negative_peak_mask,
                             )
 
     def get_icurve(self, pickat):
@@ -183,27 +190,39 @@ class SsMatrixData:
         """Get the baseline method for this data object."""
         return self.baseline_method
 
-    def set_allow_negative_peaks(self, value=True):
+    def set_allow_negative_peaks(self, value=True, mask=None):
         """Declare that this dataset contains physically real negative peaks.
 
-        When True, ``get_baseline2d()`` automatically uses the
-        endpoint-anchored LPM (``endpoint_fraction=0.15``) instead of the
-        standard bottom-percentile anchor, which would be contaminated by
-        negative-peak frames.
-
-        This flag is propagated by ``copy()`` and ``corrected_copy()``, so
-        the typical workflow is::
-
-            ssd.set_allow_negative_peaks()
-            ssd.plot_compact(baseline=True)   # inspect endpoint-anchored baseline
-            corrected = ssd.corrected_copy()  # applies it — no extra args needed
+        When True, ``get_baseline2d()`` excludes negative-peak frames from
+        LPM's anchor pool before baseline fitting.  LPM itself is unchanged;
+        only the frame set it operates on is filtered.
 
         Parameters
         ----------
         value : bool, optional
             Default True.
+        mask : array-like of bool, slice, or None, optional
+            Explicit mask of frames to exclude (True = exclude).  If None
+            (default), the mask is derived automatically at fitting time from
+            the recognition curve (frames where y < 0).  Use a manual mask
+            when the negative-peak region is known from domain knowledge
+            (e.g. ``mask=slice(1200, 1350)``).  When a ``slice`` is given,
+            start and stop are interpreted as **frame numbers** (values in
+            ``jv``), not array indices.
+
+        Notes
+        -----
+        Both ``allow_negative_peaks`` and ``negative_peak_mask`` are
+        propagated by ``copy()`` and ``corrected_copy()``, so the typical
+        workflow is::
+
+            ssd.set_allow_negative_peaks()            # auto-detect
+            # or:
+            ssd.set_allow_negative_peaks(mask=slice(1200, 1350))  # manual
+            corrected = ssd.corrected_copy()          # mask applied automatically
         """
         self.allow_negative_peaks = value
+        self.negative_peak_mask = mask
 
     def get_baseline2d(self, **kwargs):
         """Get the 2D baseline for the matrix data using the specified method.
@@ -218,9 +237,10 @@ class SsMatrixData:
             Only used when ``method='linear'``.  If given and > 0, switches
             the LPM anchor from the bottom-25th-percentile frames to the
             leading and trailing ``k = max(2, int(endpoint_fraction * n))``
-            frames.  Use this for datasets with physically real negative peaks
-            (where the standard LPM anchor would be contaminated by those
-            frames).  Default ``None`` — standard LPM unchanged.
+            frames.  Only valid for "easy" datasets where the run starts and
+            ends in clean buffer.  **Not** the recommended approach for
+            negative-peak datasets — use ``set_allow_negative_peaks()``
+            instead.  Default ``None`` — standard LPM unchanged.
         method_kwargs : dict, optional
             Additional keyword arguments to pass to the baseline fitting method.
         debug : bool, optional
@@ -234,9 +254,10 @@ class SsMatrixData:
         Examples
         --------
         >>> bl = xr.get_baseline2d()                        # standard LPM
-        >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # one-off override
-        >>> xr.set_allow_negative_peaks()                   # preferred: store as state
-        >>> bl = xr.get_baseline2d()                        # endpoint-anchored automatically
+        >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # endpoint-anchored (easy datasets only)
+        >>> xr.set_allow_negative_peaks()                   # auto-detect negative frames, mask from LPM
+        >>> bl = xr.get_baseline2d()                        # LPM with negative-peak frames excluded
+        >>> xr.set_allow_negative_peaks(mask=slice(1200, 1350))  # manual region known from observation
         """
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
@@ -250,10 +271,29 @@ class SsMatrixData:
                 _size_sigma = _ecurve.compute_size_sigma()
             default_kwargs = dict(jv=self.jv, ssmatrix=self, counter=counter, size_sigma=_size_sigma)
             endpoint_fraction = kwargs.get('endpoint_fraction', None)
-            if endpoint_fraction is None and self.allow_negative_peaks:
-                endpoint_fraction = 0.15
             if endpoint_fraction is not None:
                 default_kwargs['endpoint_fraction'] = endpoint_fraction
+            elif self.allow_negative_peaks:
+                # Derive exclude mask: frames to remove from LPM's anchor pool.
+                # Use stored mask if provided, else auto-detect from recognition curve.
+                np_mask = self.negative_peak_mask
+                if np_mask is None:
+                    # Auto-detect: frames where the recognition curve is negative
+                    rc_y = self.get_recognition_curve().y
+                    exclude = rc_y < 0
+                elif isinstance(np_mask, slice):
+                    # Interpret start/stop as frame numbers (jv values),
+                    # not array indices.  Convert via searchsorted.
+                    jv = self.jv
+                    i_start = np.searchsorted(jv, np_mask.start) if np_mask.start is not None else None
+                    i_stop  = np.searchsorted(jv, np_mask.stop, side='right') if np_mask.stop is not None else None
+                    exclude = np.zeros(len(jv), dtype=bool)
+                    exclude[slice(i_start, i_stop)] = True
+                else:
+                    exclude = np.asarray(np_mask, dtype=bool)
+                include = ~exclude
+                if include.any():
+                    default_kwargs['mask'] = include
             if method == 'uvdiff':
                 from molass.Baseline.UvdiffBaseline import get_uvdiff_baseline_info
                 default_kwargs['uvdiff_info'] = get_uvdiff_baseline_info(self)

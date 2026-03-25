@@ -492,6 +492,25 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
+    def set_allow_negative_peaks(self, value=True, mask=None):
+        """Declare that this dataset contains physically real negative peaks.
+
+        Delegates to ``self.xr.set_allow_negative_peaks()`` (and ``self.uv``
+        if present).  See :meth:`SsMatrixData.set_allow_negative_peaks` for
+        full documentation.
+
+        Parameters
+        ----------
+        value : bool, optional
+            Default True.
+        mask : array-like of bool, slice, or None, optional
+            Frames to exclude.  When a ``slice`` is given, start/stop are
+            interpreted as frame numbers.
+        """
+        self.xr.set_allow_negative_peaks(value, mask=mask)
+        if self.uv is not None:
+            self.uv.set_allow_negative_peaks(value, mask=mask)
+
     def corrected_copy(self, debug=False, **baseline_kwargs):
         """ssd.corrected_copy()
         
@@ -504,9 +523,7 @@ class SecSaxsData:
             If True, enables debug mode for more verbose output.
         **baseline_kwargs :
             Additional keyword arguments forwarded to :meth:`get_baseline2d`
-            for both XR and UV.  For example, pass ``endpoint_fraction=0.15``
-            to use the endpoint-anchored baseline for datasets with real
-            negative peaks.
+            for both XR and UV.
 
         Returns
         -------
@@ -516,7 +533,8 @@ class SecSaxsData:
         Examples
         --------
         >>> corrected = ssd.corrected_copy()                          # standard LPM
-        >>> corrected = ssd.corrected_copy(endpoint_fraction=0.15)   # for negative-peak datasets
+        >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
+        >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
