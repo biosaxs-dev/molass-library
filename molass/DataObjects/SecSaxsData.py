@@ -698,6 +698,23 @@ class SecSaxsData:
             reload(molass.LowRank.QuickImplement)
         from molass.LowRank.QuickImplement import make_decomposition_impl
 
+        # Guide users toward detect_peaks() when num_components is hardcoded
+        proportions = kwargs.get('proportions', None)
+        xr_peakpositions = kwargs.get('xr_peakpositions', None)
+        if num_components is not None and proportions is None and xr_peakpositions is None:
+            import logging
+            logger = logging.getLogger(__name__)
+            try:
+                detected = self.xr.detect_peaks()
+                if len(detected) != num_components:
+                    logger.info(
+                        "num_components=%d was specified, but detect_peaks() found %d peaks at %s. "
+                        "Consider using xr_peakpositions=ssd.xr.detect_peaks() instead.",
+                        num_components, len(detected), list(detected)
+                    )
+            except Exception:
+                pass  # detect_peaks may fail on edge cases; don't block decomposition
+
         return make_decomposition_impl(self, num_components, **kwargs)
 
     def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
