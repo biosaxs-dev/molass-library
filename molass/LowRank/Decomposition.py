@@ -686,7 +686,8 @@ class Decomposition:
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 
-    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20, debug=False):
+    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
+                            frozen_components=None, free_components=None, debug=False):
         """
         Perform a rigorous decomposition.
 
@@ -700,6 +701,17 @@ class Decomposition:
             The method to use for rigorous optimization. Default is 'BH'.
         niter : int, optional
             The number of iterations for the optimization. Default is 20.
+        frozen_components : list of int, optional
+            0-based indices of protein components to freeze during optimization.
+            Their EGH shape parameters (H, mu, sigma, tau), Rg, and UV scale
+            will be held constant at the values from the initial decomposition.
+            Mutually exclusive with ``free_components``.
+        free_components : list of int, optional
+            0-based indices of protein components to optimize. All other
+            components will be frozen. This is the complement of
+            ``frozen_components`` — use whichever is shorter.
+            E.g., ``free_components=[4]`` to optimize only the main peak.
+            Mutually exclusive with ``frozen_components``.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -708,6 +720,18 @@ class Decomposition:
         result : Decomposition
             A new Decomposition object after rigorous decomposition.
         """
+        if frozen_components is not None and free_components is not None:
+            raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
+
+        if free_components is not None:
+            n_protein = self.num_components  # protein components (excludes baseline)
+            all_indices = set(range(n_protein))
+            free_set = set(free_components)
+            invalid = free_set - all_indices
+            if invalid:
+                raise ValueError(f"free_components {sorted(invalid)} out of range [0, {n_protein})")
+            frozen_components = sorted(all_indices - free_set)
+
         if debug:
             import molass.Rigorous.RigorousImplement
             reload(molass.Rigorous.RigorousImplement)
@@ -716,4 +740,4 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, debug=debug)

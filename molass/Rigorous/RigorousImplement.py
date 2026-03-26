@@ -5,7 +5,7 @@ import os
 import numpy as np
 from importlib import reload
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -15,6 +15,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         The initial decomposition to refine.
     rgcurve : RgComponentCurve
         The Rg component curve to use for refinement.
+    frozen_components : list of int, optional
+        0-based indices of protein components to freeze during optimization.
+        Their EGH shape parameters, Rg, and UV scale will be held constant
+        at the values from the initial decomposition.
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -48,6 +52,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     num_components = decomposition.num_components
     optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, debug=debug)
     optimizer.set_xr_only(not decomposition.ssd.has_uv())
+    if frozen_components is not None:
+        optimizer.set_frozen_components(frozen_components)
 
     from molass_legacy.Optimizer.Scripting import set_optimizer_settings
     set_optimizer_settings(num_components=num_components, model=model, method=method)

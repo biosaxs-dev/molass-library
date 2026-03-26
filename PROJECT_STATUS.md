@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: March 25, 2026  
+**Last Updated**: March 26, 2026  
 **Current version**: 0.8.8
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,13 +11,30 @@
 
 ## 🎯 Current Task
 
-Working on: **API improvements complete** — issues #46–#50 filed and fixed in v0.8.8  
-Next: Continue negative-peak baseline research (Experiment 08c)  
-See: [experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb](../molass-researcher/experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb)
+Working on: **Scaffolded rigorous optimization (per-component freezing)** — initial implementation complete, verified working  
+Next: Evaluate results in detail; consider longer optimization or unfreezing neighboring components  
+See: [experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb](../molass-researcher/experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb)  
+Issue: #57
 
 ---
 
 ## 🎯 Recent Work
+
+### March 26, 2026 — Per-component freezing in rigorous optimization (uncommitted)
+
+Implemented **scaffolded optimization** (Path A): freeze minor components, optimize only the main peak.
+
+**molass-library changes**:
+- `Decomposition.optimize_rigorously(frozen_components=, free_components=)` — AI-friendly complement parameter
+- `RigorousImplement.py` — wires `frozen_components` to optimizer
+- `RunInfo.resume(niter=)` — resume optimization from best params of previous run
+
+**molass-legacy changes**:
+- `BasicOptimizer`: `set_frozen_components()`, `prepare_for_frozen_optimization()`
+- `BackRunner`: saves `frozen_components.txt` to job folder
+- `OptimizerMain`: loads `frozen_components.txt` in subprocess
+- `MplMonitor`: fixed `stop_watching()` inverted logic
+- `GuinierDeviation`: fixed `update_region()` IndexError
 
 ### March 25, 2026 — AI Context Standard v0.8 compliance
 
