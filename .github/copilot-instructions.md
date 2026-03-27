@@ -1,13 +1,14 @@
-<!-- AI Context Standard: v0.5 - Adopted: 2026-02-19 - Updated: 2026-03-12 -->
+<!-- AI Context Standard v0.8 - Adopted: 2026-03-25 -->
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  
-**Created**: February 19, 2026  
-**Magic phrase**: **"Please read COPILOT-INIT.md to initialize"**
+**Created**: February 19, 2026
 
-> **Note**: This file follows the AI Context Standard (v0.5). It provides **technical context** (architecture, call chains, conventions).  
-> For **behavioral rules** (response style, user types, source priorities), see `Copilot/copilot-guidelines.md` (loaded automatically as Priority ⭐ 2 below).  
+> **Note**: This file follows the AI Context Standard (v0.8). It provides **technical context** (architecture, call chains, conventions).  
+> For **behavioral rules** (response style, user types, source priorities), see `Copilot/copilot-guidelines.md` (Priority ⭐ 2 below).  
 > For current development status and task history, see `PROJECT_STATUS.md` (in this repo).
+
+> **On every session start**: Read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) to get the current task and recent context before responding.
 
 ---
 
@@ -214,7 +215,7 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 | P5+ (constrained global search) | `Rigorous/`, EGH/SDM/EDM models |
 | P6+ (Kratky preprocessing) | Not yet implemented — candidate feature |
 
-### 6. Version Convention
+### 7. Version Convention
 
 - Check `pyproject.toml` for current version (e.g., `0.8.2`)
 - `molass/__init__.py::get_version()` reads from `pyproject.toml` during local development, falls back to `importlib.metadata` for installed package
@@ -226,7 +227,8 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 
 ```
 molass-library/
-├── COPILOT-INIT.md          ◄── This file (AI initialization)
+├── .github/
+│   └── copilot-instructions.md  ◄── This file (auto-loaded by GitHub Copilot)
 ├── README.md                ◄── Project entry point
 ├── pyproject.toml           ◄── Version, deps, test config
 ├── run_tests.py             ◄── Test runner
@@ -262,13 +264,14 @@ molass-library/
 
 | Repository | Role | Tool | AI Context File |
 |------------|------|------|----------------|
-| `molass-library` | Main library (this repo) | Python / Sphinx | `COPILOT-INIT.md` ← this file |
-| `molass-legacy` | Legacy GUI predecessor; required runtime dep | Python / Sphinx | — |
-| `modeling-vs-model_free` | Research: P0+–P6+ criteria, evaluation, roadmap | Markdown / Notebooks | `COPILOT-INIT.md` |
-| `molass-tutorial` | Usage documentation (Jupyter Book) | MyST Markdown | `COPILOT_CONTEXT.md` (root) |
-| `molass-essence` | Theory documentation (Jupyter Book) | MyST Markdown | — |
-| `molass-technical` | Technical report (Jupyter Book) | MyST Markdown | — |
-| `molass-develop` | Developer/contributor handbook (Jupyter Book) | MyST Markdown | `COPILOT_CONTEXT.md` (in `chapters/`) |
+| `molass-library` | Main library (this repo) | Python / Sphinx | `.github/copilot-instructions.md` ← this file |
+| `molass-legacy` | Legacy GUI predecessor; required runtime dep | Python / Sphinx | `.github/copilot-instructions.md` |
+| `modeling-vs-model_free` | Research: P0+–P6+ criteria, evaluation, roadmap | Markdown / Notebooks | `.github/copilot-instructions.md` |
+| `molass-tutorial` | Usage documentation (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-essence` | Theory documentation (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-technical` | Technical report (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-develop` | Developer/contributor handbook (Jupyter Book) | MyST Markdown | `.github/copilot-instructions.md` |
+| `molass-beginner` | Beginner onboarding (Agent mode) | Markdown | `.github/copilot-instructions.md` |
 
 **Related (not doc repos)**:
 - `molass-data` — test data package (provides `SAMPLE1`–`SAMPLE4`)
@@ -276,7 +279,7 @@ molass-library/
 
 ### Current VS Code Workspace
 
-`C:\Users\takahashi\GitHub\molass-workspace.code-workspace` opens **all 7 repos** side by side:
+`C:\Users\takahashi\GitHub\molass-workspace.code-workspace` opens **all repos** side by side:
 
 ```
 GitHub/
@@ -286,10 +289,11 @@ GitHub/
 ├── molass-tutorial/         ← Usage documentation (Jupyter Book, MyST Markdown)
 ├── molass-essence/          ← Theory documentation (Jupyter Book, MyST Markdown)
 ├── molass-technical/        ← Technical report (Jupyter Book, MyST Markdown)
-└── molass-develop/          ← Developer handbook (Jupyter Book, MyST Markdown)
+├── molass-develop/          ← Developer handbook (Jupyter Book, MyST Markdown)
+└── molass-beginner/         ← Beginner onboarding (Agent mode)
 ```
 
-**In VS Code multi-root workspace**: All three coding repos are open simultaneously. You can read/edit files in any repo without switching windows. Use absolute paths when referencing across repos.
+**In VS Code multi-root workspace**: All repos are open simultaneously. You can read/edit files in any repo without switching windows. Use absolute paths when referencing across repos.
 
 **Why this matters**: `Rigorous/` in this repo calls into `molass-legacy/` at runtime. The legacy repo directory must be a sibling of this one (see `pythonpath` in `pyproject.toml`).
 
@@ -310,8 +314,12 @@ GitHub/
 
 | Date | What was learned / added |
 |------|--------------------------|
-| Feb 19, 2026 | Initial file created — first visit (architecture survey) || Feb 19, 2026 | P1+ diagnosis: traced full decomposition call chain (default vs proportions paths); identified root cause of overlap failure (greedy `recognize_peaks` + single Nelder-Mead); confirmed `proportions` option as effective workaround (std≤0.02 vs 0.27, robust to 3:1 mismatch); improved `quick_decomposition()` docstring and tutorial pages |
-| Feb 19, 2026 | AI-readability pass: added inline comments at `recognize_peaks` import and call site in `CurveDecomposer.py` (algorithm summary, failure mode, cross-repo pointer); noted `randomize`/`global_opt` as unused fix levers in this file; created `COPILOT-INIT.md` for `molass-legacy` (cross-repo entry point for AI navigating `recognize_peaks` and other legacy code) |
+| Feb 19, 2026 | Initial file created — first visit (architecture survey) |
+| Feb 19, 2026 | P1+ diagnosis: traced full decomposition call chain (default vs proportions paths); identified root cause of overlap failure (greedy `recognize_peaks` + single Nelder-Mead); confirmed `proportions` option as effective workaround (std≤0.02 vs 0.27, robust to 3:1 mismatch); improved `quick_decomposition()` docstring and tutorial pages |
+| Feb 19, 2026 | AI-readability pass: added inline comments at `recognize_peaks` import and call site in `CurveDecomposer.py` (algorithm summary, failure mode, cross-repo pointer); noted `randomize`/`global_opt` as unused fix levers in this file; created entry point for AI navigating `recognize_peaks` and other legacy code |
+| Mar 24, 2026 | Migrated to `.github/copilot-instructions.md` (AI Context Standard v0.7) |
+| Mar 25, 2026 | Updated to AI Context Standard v0.8; added `init.prompt.md` and `vscode-version.txt`; refreshed ecosystem table |
+
 **Principle**: *Never leave this codebase harder to navigate than you found it. Update this file after each work session with new findings.*
 
 ---

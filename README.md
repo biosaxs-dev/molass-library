@@ -36,9 +36,7 @@ Especially for testing, see the first two sections in
 
 ## Copilot Usage
 
-Before starting a Copilot chat session with this repository, use the following magic phrase to load conventions and architecture:
-
-> "Please read COPILOT-INIT.md to initialize"
+Context is auto-loaded from `.github/copilot-instructions.md` when using GitHub Copilot in Agent mode (AI Context Standard v0.7).
 
 For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/master/Copilot/copilot-guidelines.md).
 

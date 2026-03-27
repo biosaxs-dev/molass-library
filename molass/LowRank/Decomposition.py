@@ -686,7 +686,9 @@ class Decomposition:
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 
-    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20, debug=False):
+    def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
+                            frozen_components=None, free_components=None,
+                            clear_jobs=True, debug=False):
         """
         Perform a rigorous decomposition.
 
@@ -695,11 +697,39 @@ class Decomposition:
         rgcurve : Curve
             The Rg curve to use for the decomposition.
         analysis_folder : str, optional
-            The folder to save analysis results.
+            The folder to save analysis results.  Optimization creates
+            the following layout on disk::
+
+                <analysis_folder>/
+                    optimized/
+                        jobs/
+                            000/callback.txt   # job 0
+                            001/callback.txt   # job 1 (e.g. after Resume)
+                            ...
+
+            Each ``callback.txt`` records per-iteration objective values
+            and parameter vectors.  Use ``list_rigorous_jobs()`` to
+            inspect existing jobs, or ``load_rigorous_result()`` to
+            reconstruct a ``Decomposition`` from a completed job.
         method : str, optional
             The method to use for rigorous optimization. Default is 'BH'.
         niter : int, optional
             The number of iterations for the optimization. Default is 20.
+        frozen_components : list of int, optional
+            0-based indices of protein components to freeze during optimization.
+            Their EGH shape parameters (H, mu, sigma, tau), Rg, and UV scale
+            will be held constant at the values from the initial decomposition.
+            Mutually exclusive with ``free_components``.
+        free_components : list of int, optional
+            0-based indices of protein components to optimize. All other
+            components will be frozen. This is the complement of
+            ``frozen_components`` — use whichever is shorter.
+            E.g., ``free_components=[4]`` to optimize only the main peak.
+            Mutually exclusive with ``frozen_components``.
+        clear_jobs : bool, optional
+            If True (default), existing job folders are cleared before starting.
+            Set to False after a kernel restart to preserve previous job results
+            and reconstruct RunInfo without losing optimization history.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -708,6 +738,18 @@ class Decomposition:
         result : Decomposition
             A new Decomposition object after rigorous decomposition.
         """
+        if frozen_components is not None and free_components is not None:
+            raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
+
+        if free_components is not None:
+            n_protein = self.num_components  # protein components (excludes baseline)
+            all_indices = set(range(n_protein))
+            free_set = set(free_components)
+            invalid = free_set - all_indices
+            if invalid:
+                raise ValueError(f"free_components {sorted(invalid)} out of range [0, {n_protein})")
+            frozen_components = sorted(all_indices - free_set)
+
         if debug:
             import molass.Rigorous.RigorousImplement
             reload(molass.Rigorous.RigorousImplement)
@@ -716,4 +758,71 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, clear_jobs=clear_jobs, debug=debug)
+
+    def load_rigorous_result(self, analysis_folder, jobid=None, debug=False):
+        """Load a completed rigorous optimization result from disk.
+
+        This reads saved parameters without launching a new subprocess.
+        Use it to view results from a previous session after a kernel or
+        VS Code restart.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+            See ``optimize_rigorously()`` for the folder layout.
+        jobid : str, optional
+            Specific job id (subfolder name, e.g. ``'001'``).  If None,
+            loads the latest job.  Use ``list_rigorous_jobs()`` to see
+            available jobs.
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Decomposition
+            A new Decomposition with the optimized components.
+
+        Examples
+        --------
+        After kernel restart, re-run data loading and quick decomposition,
+        then::
+
+            result = decomp.load_rigorous_result("temp_analysis_scaffolded")
+            result.plot_components(rgcurve=rgcurve)
+        """
+        if debug:
+            import molass.Rigorous.CurrentStateUtils
+            reload(molass.Rigorous.CurrentStateUtils)
+        from molass.Rigorous.CurrentStateUtils import load_rigorous_result as _load
+        return _load(self, analysis_folder, jobid=jobid, debug=debug)
+
+    @staticmethod
+    def list_rigorous_jobs(analysis_folder):
+        """List completed rigorous optimization jobs on disk.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+
+        Returns
+        -------
+        list of JobInfo
+            Each entry is a ``JobInfo(id, iterations, best_fv, timestamp)``
+            namedtuple.  Sorted by job id.
+
+        Examples
+        --------
+        ::
+
+            jobs = Decomposition.list_rigorous_jobs("temp_analysis_scaffolded")
+            for job in jobs:
+                print(f"Job {job.id}: {job.iterations} iters, best fv={job.best_fv:.4f}")
+
+            # Then load a specific job
+            result = decomp.load_rigorous_result("temp_analysis_scaffolded", jobid=jobs[0].id)
+        """
+        from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs as _list
+        return _list(analysis_folder)
