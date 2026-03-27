@@ -542,14 +542,79 @@ class SecSaxsData:
         baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
         ssd_copy.xr.M -= baseline
 
+        # Interpolate negative-peak frames: replace excluded columns with
+        # per-row linear interpolation between the boundary values so that
+        # the excluded region sits at the local baseline level instead of
+        # being zeroed (which would conflict with the optimizer's own
+        # baseline model).
+        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
+        if exclude is not None and exclude.any():
+            self._interpolate_excluded(ssd_copy.xr.M, exclude)
+
         if ssd_copy.uv is not None:
             baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
             ssd_copy.uv.M -= baseline
 
+            # Interpolate UV frames corresponding to the XR negative-peak region
+            if exclude is not None and exclude.any():
+                mapping = self.get_mapping()
+                if mapping is not None and not isinstance(mapping, tuple):
+                    xr_jv = ssd_copy.xr.jv
+                    uv_jv = ssd_copy.uv.jv
+                    xr_frames_excluded = xr_jv[exclude]
+                    uv_frames_mapped = mapping.slope * xr_frames_excluded + mapping.intercept
+                    uv_lo, uv_hi = uv_frames_mapped.min(), uv_frames_mapped.max()
+                    uv_exclude = (uv_jv >= uv_lo) & (uv_jv <= uv_hi)
+                    if uv_exclude.any():
+                        self._interpolate_excluded(ssd_copy.uv.M, uv_exclude)
+
         ssd_copy.time_required = time() - start_time
         ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
         return ssd_copy
-    
+
+    @staticmethod
+    def _resolve_neg_peak_exclude(xr):
+        """Resolve allow_negative_peaks into a bool exclude mask (or None)."""
+        if not getattr(xr, 'allow_negative_peaks', False):
+            return None
+        np_mask = getattr(xr, 'negative_peak_mask', None)
+        jv = xr.jv
+        if np_mask is None:
+            return xr.get_recognition_curve().y < 0
+        elif isinstance(np_mask, slice):
+            i_start = np.searchsorted(jv, np_mask.start) if np_mask.start is not None else None
+            i_stop  = np.searchsorted(jv, np_mask.stop, side='right') if np_mask.stop is not None else None
+            exclude = np.zeros(len(jv), dtype=bool)
+            exclude[slice(i_start, i_stop)] = True
+            return exclude
+        else:
+            return np.asarray(np_mask, dtype=bool)
+
+    @staticmethod
+    def _interpolate_excluded(M, exclude):
+        """Replace excluded columns with per-row linear interpolation.
+
+        For each row of *M*, the excluded columns are replaced with values
+        linearly interpolated between the last included column before the
+        excluded region and the first included column after it.  If the
+        excluded region touches an edge, the nearest included value is used
+        (constant extrapolation).
+        """
+        idx = np.where(exclude)[0]
+        if len(idx) == 0:
+            return
+        i_lo, i_hi = idx[0], idx[-1]
+        n_cols = M.shape[1]
+        # Boundary values for interpolation
+        val_left = M[:, i_lo - 1] if i_lo > 0 else M[:, i_hi + 1] if i_hi + 1 < n_cols else np.zeros(M.shape[0])
+        val_right = M[:, i_hi + 1] if i_hi + 1 < n_cols else val_left
+        if i_lo == 0:
+            val_left = val_right
+        n_exc = i_hi - i_lo + 1
+        for k, j in enumerate(range(i_lo, i_hi + 1)):
+            t = (k + 1) / (n_exc + 1)
+            M[:, j] = val_left * (1 - t) + val_right * t
+
     def estimate_mapping(self, debug=False):
         """ssd.estimate_mapping()
         Estimates the mapping information between UV and XR data.
