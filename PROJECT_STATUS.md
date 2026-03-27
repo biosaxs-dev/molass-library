@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: March 26, 2026  
+**Last Updated**: March 27, 2026  
 **Current version**: 0.8.8
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,32 +11,31 @@
 
 ## 🎯 Current Task
 
-Working on: **Scaffolded rigorous optimization (per-component freezing)** — initial implementation complete, verified working  
-Next: Evaluate results in detail; consider longer optimization or unfreezing neighboring components  
+Working on: **Evaluate scaffolded rigorous optimization results** — all tooling in place  
+Next: Run longer optimization (niter=50–100), compare Rg and scattering profiles, consider unfreezing neighbors  
 See: [experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb](../molass-researcher/experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb)  
-Issue: #57
+Issues: #57 (frozen components), #58 (folder docs, closed), #59 (list_rigorous_jobs, closed)
 
 ---
 
 ## 🎯 Recent Work
 
-### March 26, 2026 — Per-component freezing in rigorous optimization (uncommitted)
+### March 27, 2026 — Post-optimization tooling (#58, #59)
 
-Implemented **scaffolded optimization** (Path A): freeze minor components, optimize only the main peak.
+**Resume Job button** (molass-legacy MplMonitor.py):
+- Replaced "Skip Job" with functional "Resume Job" button + `trigger_resume()` handler
+- Buttons enabled/disabled based on job state
 
-**molass-library changes**:
-- `Decomposition.optimize_rigorously(frozen_components=, free_components=)` — AI-friendly complement parameter
-- `RigorousImplement.py` — wires `frozen_components` to optimizer
-- `RunInfo.resume(niter=)` — resume optimization from best params of previous run
+**Static result viewer**:
+- `Decomposition.load_rigorous_result(analysis_folder, jobid=)` — loads from callback.txt without subprocess
+- `for_split_only=True` in `construct_legacy_optimizer()` for lightweight parameter splitting
+- `clear_jobs=False` parameter to preserve job history
 
-**molass-legacy changes**:
-- `BasicOptimizer`: `set_frozen_components()`, `prepare_for_frozen_optimization()`
-- `BackRunner`: saves `frozen_components.txt` to job folder
-- `OptimizerMain`: loads `frozen_components.txt` in subprocess
-- `MplMonitor`: fixed `stop_watching()` inverted logic
-- `GuinierDeviation`: fixed `update_region()` IndexError
+**Job inspection utility** (#59):
+- `Decomposition.list_rigorous_jobs(analysis_folder)` → `JobInfo(id, iterations, best_fv, timestamp)`
+- Optimizer folder layout documented in `optimize_rigorously()` docstring (#58)
 
-### March 25, 2026 — AI Context Standard v0.8 compliance
+### March 26, 2026 — Per-component freezing in rigorous optimization
 
 - Updated `.github/copilot-instructions.md` to AI Context Standard v0.8
 - Created `.github/prompts/init.prompt.md` (`alwaysApply: true`) for automatic session initialization
