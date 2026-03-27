@@ -492,6 +492,25 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
+    def set_allow_negative_peaks(self, value=True, mask=None):
+        """Declare that this dataset contains physically real negative peaks.
+
+        Delegates to ``self.xr.set_allow_negative_peaks()`` (and ``self.uv``
+        if present).  See :meth:`SsMatrixData.set_allow_negative_peaks` for
+        full documentation.
+
+        Parameters
+        ----------
+        value : bool, optional
+            Default True.
+        mask : array-like of bool, slice, or None, optional
+            Frames to exclude.  When a ``slice`` is given, start/stop are
+            interpreted as frame numbers.
+        """
+        self.xr.set_allow_negative_peaks(value, mask=mask)
+        if self.uv is not None:
+            self.uv.set_allow_negative_peaks(value, mask=mask)
+
     def corrected_copy(self, debug=False, **baseline_kwargs):
         """ssd.corrected_copy()
         
@@ -504,9 +523,7 @@ class SecSaxsData:
             If True, enables debug mode for more verbose output.
         **baseline_kwargs :
             Additional keyword arguments forwarded to :meth:`get_baseline2d`
-            for both XR and UV.  For example, pass ``endpoint_fraction=0.15``
-            to use the endpoint-anchored baseline for datasets with real
-            negative peaks.
+            for both XR and UV.
 
         Returns
         -------
@@ -516,7 +533,8 @@ class SecSaxsData:
         Examples
         --------
         >>> corrected = ssd.corrected_copy()                          # standard LPM
-        >>> corrected = ssd.corrected_copy(endpoint_fraction=0.15)   # for negative-peak datasets
+        >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
+        >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
@@ -524,14 +542,79 @@ class SecSaxsData:
         baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
         ssd_copy.xr.M -= baseline
 
+        # Interpolate negative-peak frames: replace excluded columns with
+        # per-row linear interpolation between the boundary values so that
+        # the excluded region sits at the local baseline level instead of
+        # being zeroed (which would conflict with the optimizer's own
+        # baseline model).
+        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
+        if exclude is not None and exclude.any():
+            self._interpolate_excluded(ssd_copy.xr.M, exclude)
+
         if ssd_copy.uv is not None:
             baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
             ssd_copy.uv.M -= baseline
 
+            # Interpolate UV frames corresponding to the XR negative-peak region
+            if exclude is not None and exclude.any():
+                mapping = self.get_mapping()
+                if mapping is not None and not isinstance(mapping, tuple):
+                    xr_jv = ssd_copy.xr.jv
+                    uv_jv = ssd_copy.uv.jv
+                    xr_frames_excluded = xr_jv[exclude]
+                    uv_frames_mapped = mapping.slope * xr_frames_excluded + mapping.intercept
+                    uv_lo, uv_hi = uv_frames_mapped.min(), uv_frames_mapped.max()
+                    uv_exclude = (uv_jv >= uv_lo) & (uv_jv <= uv_hi)
+                    if uv_exclude.any():
+                        self._interpolate_excluded(ssd_copy.uv.M, uv_exclude)
+
         ssd_copy.time_required = time() - start_time
         ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
         return ssd_copy
-    
+
+    @staticmethod
+    def _resolve_neg_peak_exclude(xr):
+        """Resolve allow_negative_peaks into a bool exclude mask (or None)."""
+        if not getattr(xr, 'allow_negative_peaks', False):
+            return None
+        np_mask = getattr(xr, 'negative_peak_mask', None)
+        jv = xr.jv
+        if np_mask is None:
+            return xr.get_recognition_curve().y < 0
+        elif isinstance(np_mask, slice):
+            i_start = np.searchsorted(jv, np_mask.start) if np_mask.start is not None else None
+            i_stop  = np.searchsorted(jv, np_mask.stop, side='right') if np_mask.stop is not None else None
+            exclude = np.zeros(len(jv), dtype=bool)
+            exclude[slice(i_start, i_stop)] = True
+            return exclude
+        else:
+            return np.asarray(np_mask, dtype=bool)
+
+    @staticmethod
+    def _interpolate_excluded(M, exclude):
+        """Replace excluded columns with per-row linear interpolation.
+
+        For each row of *M*, the excluded columns are replaced with values
+        linearly interpolated between the last included column before the
+        excluded region and the first included column after it.  If the
+        excluded region touches an edge, the nearest included value is used
+        (constant extrapolation).
+        """
+        idx = np.where(exclude)[0]
+        if len(idx) == 0:
+            return
+        i_lo, i_hi = idx[0], idx[-1]
+        n_cols = M.shape[1]
+        # Boundary values for interpolation
+        val_left = M[:, i_lo - 1] if i_lo > 0 else M[:, i_hi + 1] if i_hi + 1 < n_cols else np.zeros(M.shape[0])
+        val_right = M[:, i_hi + 1] if i_hi + 1 < n_cols else val_left
+        if i_lo == 0:
+            val_left = val_right
+        n_exc = i_hi - i_lo + 1
+        for k, j in enumerate(range(i_lo, i_hi + 1)):
+            t = (k + 1) / (n_exc + 1)
+            M[:, j] = val_left * (1 - t) + val_right * t
+
     def estimate_mapping(self, debug=False):
         """ssd.estimate_mapping()
         Estimates the mapping information between UV and XR data.
@@ -679,6 +762,23 @@ class SecSaxsData:
             import molass.LowRank.QuickImplement
             reload(molass.LowRank.QuickImplement)
         from molass.LowRank.QuickImplement import make_decomposition_impl
+
+        # Guide users toward detect_peaks() when num_components is hardcoded
+        proportions = kwargs.get('proportions', None)
+        xr_peakpositions = kwargs.get('xr_peakpositions', None)
+        if num_components is not None and proportions is None and xr_peakpositions is None:
+            import logging
+            logger = logging.getLogger(__name__)
+            try:
+                detected = self.xr.detect_peaks()
+                if len(detected) != num_components:
+                    logger.info(
+                        "num_components=%d was specified, but detect_peaks() found %d peaks at %s. "
+                        "Consider using xr_peakpositions=ssd.xr.detect_peaks() instead.",
+                        num_components, len(detected), list(detected)
+                    )
+            except Exception:
+                pass  # detect_peaks may fail on edge cases; don't block decomposition
 
         return make_decomposition_impl(self, num_components, **kwargs)
 

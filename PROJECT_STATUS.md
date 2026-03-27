@@ -1,9 +1,9 @@
 # Project Status — molass-library
 
-**Last Updated**: March 24, 2026  
+**Last Updated**: March 27, 2026  
 **Current version**: 0.8.8
 
-> **Conventions and architecture**: See [COPILOT-INIT.md](COPILOT-INIT.md)  
+> **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
 > **This document**: Tracks current development task and chronological history
 
@@ -11,13 +11,36 @@
 
 ## 🎯 Current Task
 
-Working on: **API improvements complete** — issues #46–#50 filed and fixed in v0.8.8  
-Next: Continue negative-peak baseline research (Experiment 08c)  
-See: [experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb](../molass-researcher/experiments/08_negative_peaks/08c_endpoint_anchored_baseline.ipynb)
+Working on: **Evaluate scaffolded rigorous optimization results** — all tooling in place  
+Next: Run longer optimization (niter=50–100), compare Rg and scattering profiles, consider unfreezing neighbors  
+See: [experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb](../molass-researcher/experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb)  
+Issues: #57 (frozen components), #58 (folder docs, closed), #59 (list_rigorous_jobs, closed)
 
 ---
 
 ## 🎯 Recent Work
+
+### March 27, 2026 — Post-optimization tooling (#58, #59)
+
+**Resume Job button** (molass-legacy MplMonitor.py):
+- Replaced "Skip Job" with functional "Resume Job" button + `trigger_resume()` handler
+- Buttons enabled/disabled based on job state
+
+**Static result viewer**:
+- `Decomposition.load_rigorous_result(analysis_folder, jobid=)` — loads from callback.txt without subprocess
+- `for_split_only=True` in `construct_legacy_optimizer()` for lightweight parameter splitting
+- `clear_jobs=False` parameter to preserve job history
+
+**Job inspection utility** (#59):
+- `Decomposition.list_rigorous_jobs(analysis_folder)` → `JobInfo(id, iterations, best_fv, timestamp)`
+- Optimizer folder layout documented in `optimize_rigorously()` docstring (#58)
+
+### March 26, 2026 — Per-component freezing in rigorous optimization
+
+- Updated `.github/copilot-instructions.md` to AI Context Standard v0.8
+- Created `.github/prompts/init.prompt.md` (`alwaysApply: true`) for automatic session initialization
+- Added `.github/vscode-version.txt` (gitignored); updated ecosystem table (molass-essence, molass-technical now have context files)
+- Applied across all 10 repos in the molass workspace
 
 ### March 24, 2026 — Negative-peak baseline + AI-friendliness improvements (v0.8.4–0.8.7)
 

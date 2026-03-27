@@ -7,6 +7,30 @@ from molass.DataObjects.XrData import PICKAT
 from molass_legacy.SerialAnalyzer.ElutionCurve import ElutionCurve
 from molass_legacy.SecSaxs.ElCurve import ElCurve
 
+def _resolve_neg_peak_exclude(xr):
+    """Return a bool array (len = num frames) where True = exclude from LPM anchors.
+
+    Mirrors the same logic as SsMatrixData.get_baseline2d() so that the
+    ScatteringBaseline in the rigorous path skips the same frames that the
+    standard corrected_copy() path skips.
+    """
+    if not getattr(xr, 'allow_negative_peaks', False):
+        return None
+    np_mask = getattr(xr, 'negative_peak_mask', None)
+    jv = xr.jv
+    if np_mask is None:
+        rc_y = xr.get_recognition_curve().y
+        return rc_y < 0
+    elif isinstance(np_mask, slice):
+        i_start = np.searchsorted(jv, np_mask.start) if np_mask.start is not None else None
+        i_stop  = np.searchsorted(jv, np_mask.stop, side='right') if np_mask.stop is not None else None
+        exclude = np.zeros(len(jv), dtype=bool)
+        exclude[slice(i_start, i_stop)] = True
+        return exclude
+    else:
+        return np.asarray(np_mask, dtype=bool)
+
+
 class AbsorbanceProxy:
     def __init__(self, ssd):
         if ssd.uv is None:
@@ -62,7 +86,29 @@ class SdProxy:
 
     def get_xr_curve(self):
         if self.xr_curve is None:
-            self.xr_curve = EcurveProxy(self.ssd.xr.get_icurve())
+            # Use get_recognition_curve() so that the global elution_recognition
+            # option ('icurve' or 'sum') propagates into the legacy baseline
+            # computation.  When 'icurve' (default), this returns get_icurve()
+            # unchanged; when 'sum', it returns M.sum(axis=0).
+            recog = self.ssd.xr.get_recognition_curve()
+            # Normalize to icurve scale: preserves the shape advantage of sum
+            # recognition for LPM while keeping magnitude compatible with the
+            # per-q optimizer (EGH components are at per-q scale).
+            icurve = self.ssd.xr.get_icurve()
+            max_r = np.max(recog.y)
+            max_i = np.max(icurve.y)
+            y = recog.y.copy()
+            if max_r > 0 and max_i > 0 and abs(max_r - max_i) / max_r > 1e-6:
+                y = y * (max_i / max_r)
+            # Propagate allow_negative_peaks: replace excluded frames with max(y)
+            # so ScatteringBaseline's percentile logic treats them as high-signal
+            # (not buffer) and skips them as anchor candidates.
+            exclude = _resolve_neg_peak_exclude(self.ssd.xr)
+            if exclude is not None and exclude.any():
+                y = y.copy()
+                y[exclude] = np.max(y)
+            from molass.DataObjects.Curve import Curve
+            self.xr_curve = EcurveProxy(Curve(recog.x, y))
             self.xray_curve = self.xr_curve
         return self.xr_curve
 
