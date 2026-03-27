@@ -5,7 +5,7 @@ import os
 import numpy as np
 from importlib import reload
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, clear_jobs=True, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -64,7 +64,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # run optimization
     from molass_legacy.Optimizer.Scripting import run_optimizer
     x_shifts = dsets.get_x_shifts()
-    monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts)
+    monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
 
     if debug:
         import molass.Rigorous.RunInfo
