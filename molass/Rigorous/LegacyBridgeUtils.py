@@ -25,7 +25,15 @@ def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
         reload(molass.Bridge.LegacyRgCurve)
     from molass.Bridge.LegacyRgCurve import LegacyRgCurve
     ssd = decomposition.ssd
-    xr_curve = _make_elcurve(*decomposition.xr_icurve.get_xy())
+    # Use the recognition curve (respects elution_recognition='sum' option).
+    # Normalize to icurve scale so the optimizer magnitude stays consistent.
+    recog = ssd.xr.get_recognition_curve()
+    icurve = decomposition.xr_icurve
+    max_r, max_i = np.max(recog.y), np.max(icurve.y)
+    if max_r > 0 and max_i > 0 and abs(max_r - max_i) / max_r > 1e-6:
+        from molass.DataObjects.Curve import Curve
+        recog = Curve(recog.x, recog.y * (max_i / max_r))
+    xr_curve = _make_elcurve(*recog.get_xy())
     D = ssd.xr.M
     E = ssd.xr.E
     if decomposition.uv is None:
@@ -52,7 +60,7 @@ def make_basecurves_from_decomposition(decomposition, debug=False):
     baseline_type = 1
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
-def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", debug=False):
+def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, debug=False):
     from molass_legacy.Optimizer.OptimizerUtils import get_function_code
     from molass_legacy.Optimizer.FuncImporter import import_objective_function
     function_code = get_function_code(model)
@@ -64,6 +72,7 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
         uv_base_curve=baseline_objects[0],
         qvector=spectral_vectors[0],
         wvector=spectral_vectors[1],
+        for_split_only=for_split_only,
         )
 
     # backward compatibility for estimator setting
@@ -109,9 +118,12 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, debug
 
     temp_in_folder = os.path.abspath(os.path.join(analysis_folder, "temp_in_folder"))
     in_folder = get_setting('in_folder')
-    if in_folder is None:
+    # When negative-peak zeroing has been applied, the subprocess must see
+    # the corrected (zeroed) matrices.  Force-export so it loads from
+    # temp_in_folder instead of the original raw folder.
+    needs_export = getattr(decomposition.ssd.xr, 'allow_negative_peaks', False)
+    if in_folder is None or needs_export:
         in_folder = temp_in_folder
-        print(f"Exporting SecSaxsData to temporary folder: {in_folder}")
         set_setting('in_folder', in_folder)
         if not os.path.exists(in_folder):
             os.makedirs(in_folder)
