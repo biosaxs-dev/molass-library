@@ -140,6 +140,11 @@ def plot_components_impl(decomposition, **kwargs):
         axes = create_axes(fig)
     else:
         axes = np.asarray(axes)
+        if axes.ndim != 2 or axes.shape[0] < 2 or axes.shape[1] < 3:
+            raise ValueError(
+                f"axes must be a 2D array with shape (2, 3), got {axes.shape}. "
+                "Use create_axes(fig) or pass axes from plt.subplots(2, 3)."
+            )
 
     title = kwargs.get('title', None)
     if title is not None:
