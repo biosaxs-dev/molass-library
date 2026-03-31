@@ -1,14 +1,14 @@
 # CURRENT STATUS
 
-**📅 Last Updated: March 26, 2026**  
+**📅 Last Updated: March 31, 2026**  
 **👤 Updated By: Takahashi (session)**  
-**🔔 Status changed: Updated molass-library default branch from master to main**
+**🔔 Status changed: Two reviewers accepted — KedoKudo and marshallmcdonnell**
 
 ---
 
-## 🎯 Current Phase: PRE-REVIEW (Editor Assigned — Awaiting Reviewer Assignment)
+## 🎯 Current Phase: PRE-REVIEW (Reviewers Accepting — Formal Assignment Expected Soon)
 
-**Status**: Shimizu posted the consolidated 6-candidate reviewer list to the JOSS issue on March 24 (includes `KedoKudo`, `florian-huber`, `Adafede`, `lazear`, `elena-pascal`, `bdice`). Now waiting for editor `zhubonan` to review the suggestions and assign reviewers.
+**Status**: Editor `zhubonan` invited `AndySAnker`, `KedoKudo`, and `marshallmcdonnell` as potential reviewers on March 30. `AndySAnker` declined. **`KedoKudo` and `marshallmcdonnell` both accepted** the invitation. Formal reviewer assignment and REVIEW issue creation expected soon. Note: `marshallmcdonnell` was selected by the editor independently (not from our suggested list).
 
 ### Timeline:
 - ✅ **Nov 16, 2025**: Paper submitted to JOSS
@@ -30,14 +30,21 @@
 - ✅ **March 23, 2026**: Shimizu replied to `zhubonan` pointing to the previous reviewer suggestions (Nov 19 comment)
 - ✅ **March 24, 2026**: Takahashi conducted systematic 7-paper JOSS review survey; identified `elena-pascal` and `bdice` as strong new candidates; drafted consolidated supplementary post (6 candidates)
 - ✅ **March 24, 2026**: Shimizu posted consolidated reviewer list (6 candidates: `KedoKudo`, `florian-huber`, `Adafede`, `lazear`, `elena-pascal`, `bdice`) to JOSS issue #9424
-- ⏳ **Currently**: Waiting for `zhubonan` to review suggestions and assign reviewers
+- ✅ **March 30, 2026**: Editor `zhubonan` invited `AndySAnker`, `KedoKudo`, and `marshallmcdonnell` as reviewers
+- ✅ **March 30, 2026**: `zhubonan` confirmed invitations sent to Shimizu
+- ❌ **March 30, 2026**: `AndySAnker` declined the review invitation
+- ✅ **March 30, 2026**: `KedoKudo` accepted the review invitation
+- ✅ **March 31, 2026**: `marshallmcdonnell` accepted the review invitation
+- ⏳ **Currently**: Waiting for `zhubonan` to formally assign reviewers and create REVIEW issue
 
 ### What This Means:
 - **Editor**: `zhubonan` (assigned and active)
-- **Reviewers**: Not yet assigned — zhubonan reviewing Shimizu's suggestions
-- **Review Status**: PRE-REVIEW — consolidated 6-candidate reviewer list posted by Shimizu; editor reviewing
-  - **Last JOSS Activity**: March 24, 2026 (Shimizu posted consolidated reviewer list)
-  - **⏳ Next Step**: Wait for `zhubonan` to assign reviewers from the submitted list.
+- **Reviewers**: `KedoKudo` and `marshallmcdonnell` have accepted — formal assignment pending
+  - `KedoKudo` (Chen Zhang) — from our suggested list; expertise in neutron/X-ray scattering at ORNL
+  - `marshallmcdonnell` — editor's independent pick; also at ORNL
+- **Review Status**: PRE-REVIEW — reviewers accepted, awaiting formal assignment
+  - **Last JOSS Activity**: March 31, 2026 (`marshallmcdonnell` accepted)
+  - **⏳ Next Step**: `zhubonan` will formally assign reviewers and open the REVIEW issue. Be ready for review to start.
 
 ---
 
