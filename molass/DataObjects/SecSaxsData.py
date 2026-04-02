@@ -511,7 +511,7 @@ class SecSaxsData:
         if self.uv is not None:
             self.uv.set_allow_negative_peaks(value, mask=mask)
 
-    def corrected_copy(self, debug=False, **baseline_kwargs):
+    def corrected_copy(self, baseline=None, debug=False, **baseline_kwargs):
         """ssd.corrected_copy()
         
         Returns a deep copy of this object which has been corrected
@@ -519,6 +519,12 @@ class SecSaxsData:
         
         Parameters
         ----------
+        baseline : ndarray or None, optional
+            Pre-computed 2D baseline array for XR data (same shape as
+            ``ssd.xr.M``).  When provided, this baseline is used directly
+            instead of computing one via :meth:`get_baseline2d`.
+            **Note**: applies to XR only — the UV baseline is always
+            computed internally.
         debug : bool, optional
             If True, enables debug mode for more verbose output.
         **baseline_kwargs :
@@ -535,12 +541,22 @@ class SecSaxsData:
         >>> corrected = ssd.corrected_copy()                          # standard LPM
         >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
         >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
+        >>> corrected = ssd.corrected_copy(baseline=my_baseline)      # pre-computed XR baseline
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
-        baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
-        ssd_copy.xr.M -= baseline
+        if baseline is not None:
+            import warnings
+            warnings.warn(
+                "Pre-computed baseline applies to XR only; "
+                "UV baseline is computed normally.",
+                stacklevel=2,
+            )
+            ssd_copy.xr.M -= baseline
+        else:
+            baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
+            ssd_copy.xr.M -= baseline
 
         # Interpolate negative-peak frames: replace excluded columns with
         # per-row linear interpolation between the boundary values so that

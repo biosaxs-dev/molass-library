@@ -335,13 +335,15 @@ class SsMatrixData:
             sigma = np.maximum(sigma, 1e-30)
         return np.maximum(mean_I / sigma, 0)
 
-    def get_positive_ratio(self, baseline, weighting='snr'):
+    def get_positive_ratio(self, baseline=None, weighting='snr'):
         """Fraction of non-negative residual elements, optionally SNR-weighted.
 
         Parameters
         ----------
-        baseline : ndarray
+        baseline : ndarray or None
             2D baseline array with the same shape as self.M.
+            If ``None`` (default), the data is assumed already corrected
+            and a zero baseline is used.
         weighting : {'snr', 'uniform'}
             'snr' (default) weights each q-row by its SNR so that
             informative low-q rows dominate over noisy high-q rows.
@@ -350,6 +352,8 @@ class SsMatrixData:
         -------
         positive_ratio : float
         """
+        if baseline is None:
+            baseline = np.zeros_like(self.M)
         residual = self.M - baseline
         per_row = np.mean(residual >= 0, axis=1)
         if weighting == 'uniform':
