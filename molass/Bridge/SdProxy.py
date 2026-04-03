@@ -14,9 +14,9 @@ def _resolve_neg_peak_exclude(xr):
     ScatteringBaseline in the rigorous path skips the same frames that the
     standard corrected_copy() path skips.
     """
-    if not getattr(xr, 'allow_negative_peaks', False):
+    if not getattr(xr, 'has_anomaly_mask', False):
         return None
-    np_mask = getattr(xr, 'negative_peak_mask', None)
+    np_mask = getattr(xr, 'anomaly_mask', None)
     jv = xr.jv
     if np_mask is None:
         rc_y = xr.get_recognition_curve().y

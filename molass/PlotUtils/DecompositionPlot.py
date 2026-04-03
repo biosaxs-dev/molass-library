@@ -35,6 +35,13 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
         ax.set_ylabel(ylabel)
     x, y = icurve.get_xy()
     ax.plot(x, y, color='gray', alpha=0.5, label="data")
+    recognition_curve = kwargs.get('recognition_curve', None)
+    if recognition_curve is not None:
+        rx, ry = recognition_curve.get_xy()
+        max_abs_y = np.max(np.abs(y))
+        max_abs_ry = np.max(np.abs(ry))
+        scale = max_abs_y / max_abs_ry if max_abs_ry > 0 else 1.0
+        ax.plot(rx, ry * scale, color='blue', alpha=0.3, linewidth=0.8, label="recognition (scaled)")
     proportions = kwargs.get('proportions', None)
     cy_list = []
     for i, c in enumerate(ccurves):
@@ -158,7 +165,9 @@ def plot_components_impl(decomposition, **kwargs):
         plot_elution_curve(ax1, decomposition.uv_icurve, decomposition.uv_ccurves, title="UV Elution Curves", ylabel="Absorbance")
 
     # XR Elution Curve
+    recognition_curve = decomposition.ssd.xr.get_recognition_curve()
     axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
+                             recognition_curve=recognition_curve,
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges

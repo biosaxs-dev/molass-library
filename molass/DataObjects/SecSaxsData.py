@@ -492,24 +492,38 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
-    def set_allow_negative_peaks(self, value=True, mask=None):
-        """Declare that this dataset contains physically real negative peaks.
+    def set_anomaly_mask(self, mask=None):
+        """Declare that this dataset contains anomalous frames to exclude from baseline fitting.
 
-        Delegates to ``self.xr.set_allow_negative_peaks()`` (and ``self.uv``
-        if present).  See :meth:`SsMatrixData.set_allow_negative_peaks` for
+        Delegates to ``self.xr.set_anomaly_mask()`` (and ``self.uv``
+        if present).  See :meth:`SsMatrixData.set_anomaly_mask` for
         full documentation.
 
         Parameters
         ----------
-        value : bool, optional
-            Default True.
         mask : array-like of bool, slice, or None, optional
             Frames to exclude.  When a ``slice`` is given, start/stop are
             interpreted as frame numbers.
         """
-        self.xr.set_allow_negative_peaks(value, mask=mask)
+        self.xr.set_anomaly_mask(mask=mask)
         if self.uv is not None:
-            self.uv.set_allow_negative_peaks(value, mask=mask)
+            self.uv.set_anomaly_mask(mask=mask)
+
+    def set_allow_negative_peaks(self, value=True, mask=None):
+        """Deprecated: use ``set_anomaly_mask(mask)`` instead."""
+        import warnings
+        warnings.warn(
+            "set_allow_negative_peaks() is deprecated; use set_anomaly_mask(mask) instead.",
+            DeprecationWarning, stacklevel=2,
+        )
+        if value:
+            self.set_anomaly_mask(mask=mask)
+        else:
+            self.xr.has_anomaly_mask = False
+            self.xr.anomaly_mask = None
+            if self.uv is not None:
+                self.uv.has_anomaly_mask = False
+                self.uv.anomaly_mask = None
 
     def corrected_copy(self, baseline=None, debug=False, **baseline_kwargs):
         """ssd.corrected_copy()
@@ -539,7 +553,7 @@ class SecSaxsData:
         Examples
         --------
         >>> corrected = ssd.corrected_copy()                          # standard LPM
-        >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
+        >>> ssd.set_anomaly_mask()                                    # for negative-peak datasets
         >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
         >>> corrected = ssd.corrected_copy(baseline=my_baseline)      # pre-computed XR baseline
         """
@@ -590,10 +604,10 @@ class SecSaxsData:
 
     @staticmethod
     def _resolve_neg_peak_exclude(xr):
-        """Resolve allow_negative_peaks into a bool exclude mask (or None)."""
-        if not getattr(xr, 'allow_negative_peaks', False):
+        """Resolve anomaly mask into a bool exclude mask (or None)."""
+        if not getattr(xr, 'has_anomaly_mask', False):
             return None
-        np_mask = getattr(xr, 'negative_peak_mask', None)
+        np_mask = getattr(xr, 'anomaly_mask', None)
         jv = xr.jv
         if np_mask is None:
             return xr.get_recognition_curve().y < 0
@@ -763,6 +777,12 @@ class SecSaxsData:
             Minimum allowed Gaussian width (sigma) for positioned decomposition.
             Default 5.
 
+        allow_negative_peaks : bool, optional
+            If True, allow negative peak heights (H < 0) in the EGH model.
+            This enables decomposition of components with negative scattering,
+            such as those arising from buffer composition mismatch.
+            Default False.
+
         debug : bool, optional
             If True, reload internal modules and show diagnostic plots.
             Default False.
@@ -774,6 +794,24 @@ class SecSaxsData:
         """
         
         debug = kwargs.get('debug', False)
+        # Validate kwargs to catch typos early (issue #64)
+        _KNOWN_KWARGS = {
+            'proportions', 'xr_peakpositions', 'debug',
+            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates',
+            'allow_negative_peaks',
+            'ranks', 'randomize', 'seed', 'global_opt',
+            'area_weight', 'sec_constraints', 'data_matrix', 'qv',
+            'curve_model', 'smoothing', 'decompargs', 'peakpositions',
+            'smooth_uv', 'consistent_uv', 'ip_effect_info',
+        }
+        unknown = set(kwargs) - _KNOWN_KWARGS
+        if unknown:
+            import warnings
+            warnings.warn(
+                f"quick_decomposition() received unrecognized keyword arguments: {unknown}. "
+                f"Check for typos. Known kwargs: {sorted(_KNOWN_KWARGS)}",
+                stacklevel=2,
+            )
         if debug:
             import molass.LowRank.QuickImplement
             reload(molass.LowRank.QuickImplement)
