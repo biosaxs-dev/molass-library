@@ -51,7 +51,7 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     proportions = proportions / proportions.sum()
 
     nny = y.copy()
-    nny[nny < 0] = 0   # no negative values
+    nny[nny < 0] = 0   # always clip for cumulative-area slicing (initialization only)
     cy = np.cumsum(nny)
 
     cp = np.cumsum(proportions)*cy[-1]
@@ -74,7 +74,7 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     xslices.append(slice(start, stop))
     return xslices
 
-def estimate_initial_params(x, y, moment):
+def estimate_initial_params(x, y, moment, allow_negative=False):
     """
     Estimate initial parameters for the egh function based on the given data and moment.
 
@@ -86,6 +86,8 @@ def estimate_initial_params(x, y, moment):
         The y values of the data.
     moment : Moment
         The moment object containing statistical information about the data.
+    allow_negative : bool, optional
+        If True, allow negative peak heights. Default is False.
 
     Returns
     -------
@@ -104,7 +106,10 @@ def estimate_initial_params(x, y, moment):
     h = np.max(y)
     initial_params = h, mean, std, 0.0
     max_std = 2 * std
-    bounds = [(0, 2*h), (mean-std, mean+std), (0, max_std), (-std, +std)]
+    if allow_negative:
+        bounds = [(-2*abs(h), 2*abs(h)), (mean-std, mean+std), (0, max_std), (-std, +std)]
+    else:
+        bounds = [(0, 2*h), (mean-std, mean+std), (0, max_std), (-std, +std)]
     result = minimize(objective, x0=initial_params, method='Nelder-Mead', bounds=bounds)
     return result.x
 
@@ -133,7 +138,7 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(icurve, proportions, debug=False):
+def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
@@ -167,7 +172,7 @@ def decompose_proportionally(icurve, proportions, debug=False):
     proportions = np.asarray(proportions)/np.sum(proportions)
     xslices = get_proportional_slices(x, y, proportions, debug_ax=debug_ax)
     moments = [Moment(x[s], y[s]) for s in xslices]
-    initial_params = np.array([estimate_initial_params(x[s], y[s], m) for s, m in zip(xslices, moments)])
+    initial_params = np.array([estimate_initial_params(x[s], y[s], m, allow_negative=allow_negative_peaks) for s, m in zip(xslices, moments)])
     initial_params[:,0] *= 0.8
 
     if debug:
@@ -191,8 +196,13 @@ def decompose_proportionally(icurve, proportions, debug=False):
     bounds = []
     scale_bounds = []
     for i in range(num_components):
-        bounds.append((0, 2*initial_params[i, 0]))
-        scale_bounds.append((0, 2*initial_params[i, 0]))
+        if allow_negative_peaks:
+            h_abs = abs(initial_params[i, 0])
+            bounds.append((-2*h_abs, 2*h_abs))
+            scale_bounds.append((-2*h_abs, 2*h_abs))
+        else:
+            bounds.append((0, 2*initial_params[i, 0]))
+            scale_bounds.append((0, 2*initial_params[i, 0]))
         moment = moments[i]
         mean, std = moment.get_meanstd()
         bounds.append((mean-std, mean+std))

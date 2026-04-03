@@ -80,7 +80,8 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
 
     # Create XR curves
     xr_icurve = ssd.xr.get_icurve()
-    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug)
+    allow_negative = kwargs.get('allow_negative_peaks', False)
+    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug, allow_negative_peaks=allow_negative)
     xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
 
     # Create UV curves
