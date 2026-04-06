@@ -8,6 +8,60 @@ from time import time
 from importlib import reload
 import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
+
+def _baseline_selftest(M, recognition_curve):
+    """Baseline self-test: detect buffer-frame contamination.
+
+    Compares per-q-row negative fraction in the peak region between a
+    buffer-mean-flat baseline (uses Otsu-classified buffer frames) and an
+    endpoint-linear baseline (uses only the first and last frame).
+
+    If using buffer information produces *more* negatives than the simple
+    endpoint reference, the buffer frames are likely contaminated.
+
+    Returns the one-sided Wilcoxon signed-rank p-value, or None if the
+    test cannot be computed (too few q-rows with nonzero difference).
+    """
+    from scipy.stats import wilcoxon
+    from molass.Baseline.BuffitBaseline import _otsu_threshold
+
+    rc_y = recognition_curve.y
+    normalized = (rc_y - rc_y.min()) / (rc_y.max() - rc_y.min() + 1e-30)
+    otsu_thr = _otsu_threshold(normalized)
+    buffer_mask = normalized < otsu_thr
+    peak_mask = ~buffer_mask
+
+    if peak_mask.sum() < 2 or buffer_mask.sum() < 2:
+        return None
+
+    n_q, n_f = M.shape
+
+    # Endpoint-linear baseline (2-point per q-row)
+    bl_endpoint = np.empty_like(M)
+    for i in range(n_q):
+        bl_endpoint[i, :] = np.linspace(M[i, 0], M[i, -1], n_f)
+
+    # Buffer-mean flat baseline
+    buf_mean = M[:, buffer_mask].mean(axis=1)
+    bl_bufmean = buf_mean[:, None] * np.ones((1, n_f))
+
+    # Per-q-row negative-fraction difference
+    peak_cols = np.where(peak_mask)[0]
+    per_q_nf = np.empty(n_q)
+    for i in range(n_q):
+        row_peak_ep = M[i, peak_cols] - bl_endpoint[i, peak_cols]
+        row_peak_bm = M[i, peak_cols] - bl_bufmean[i, peak_cols]
+        nf_ref = np.mean(row_peak_ep < 0)
+        nf_test = np.mean(row_peak_bm < 0)
+        per_q_nf[i] = nf_test - nf_ref
+
+    nonzero = per_q_nf[per_q_nf != 0]
+    if len(nonzero) < 10:
+        return None
+
+    _, p_value = wilcoxon(nonzero, alternative='greater')
+    return float(p_value)
+
 class SecSaxsData:
     """
     A class to represent a SEC-SAXS data object.
@@ -49,6 +103,7 @@ class SecSaxsData:
                  time_initialized=None,
                  datafiles=None,
                  uv_pickat=None,
+                 uv_monitor=None,
                  xr_pickat=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
@@ -88,6 +143,9 @@ class SecSaxsData:
             The wavelength (nm) at which to extract the UV elution profile.
             Defaults to 280 nm when None. Use 290 for samples like ATP or MY
             where the UV signal is measured at 290 nm.
+        uv_monitor : float, optional
+            Alias for ``uv_pickat``. Follows chromatography convention
+            ("monitoring wavelength"). If both are given, ``uv_monitor`` wins.
         xr_pickat : float, optional
             The q-value (Å⁻¹) at which to extract the XR elution profile.
             Defaults to 0.02 when None.
@@ -150,8 +208,9 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
-        if uv_pickat is not None and self.uv is not None:
-            self.uv.pickat = uv_pickat
+        effective_uv_pickat = uv_monitor if uv_monitor is not None else uv_pickat
+        if effective_uv_pickat is not None and self.uv is not None:
+            self.uv.pickat = effective_uv_pickat
         if xr_pickat is not None and self.xr is not None:
             self.xr.pickat = xr_pickat
         self.trimmed = trimmed
@@ -164,6 +223,15 @@ class SecSaxsData:
             self.time_initialized = time_initialized
         self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
+
+    def __repr__(self):
+        parts = []
+        if self.xr is not None:
+            parts.append(f"xr={self.xr.M.shape[1]} frames")
+        if self.uv is not None:
+            parts.append(f"uv={self.uv.M.shape[1]} frames, pickat={self.uv.pickat}")
+        parts.append(f"trimmed={self.trimmed}")
+        return f"SecSaxsData({', '.join(parts)})"
 
     def has_xr(self):
         """ssd.has_xr()
@@ -927,6 +995,119 @@ class SecSaxsData:
             return None
         else:
             return self.beamline_info.name
+
+    def get_data_info(self):
+        """ssd.get_data_info()
+
+        Returns a machine-readable summary of the dataset characteristics.
+        Useful for automated diagnostics: an AI agent can call this to understand
+        the data without reading plots.
+
+        Returns
+        -------
+        info : DataInfo (namedtuple)
+            A namedtuple with the following fields:
+
+            - ``n_xr_frames`` (int or None): Number of XR frames
+            - ``n_uv_frames`` (int or None): Number of UV frames
+            - ``uv_peak_wavelength`` (float or None): Wavelength (nm) of max absorbance at the XR peak frame
+            - ``uv_pickat`` (float or None): Current UV pickat setting (default 280 nm)
+            - ``uv_monitor`` (float or None): Alias for ``uv_pickat`` (monitoring wavelength)
+            - ``xr_peak_frame`` (int or None): Frame index of the XR elution peak
+            - ``is_trimmed`` (bool): Whether the data has been trimmed
+            - ``pickat_mismatch`` (bool): True if uv_peak_wavelength differs from uv_pickat by >5 nm
+            - ``has_negative_xr_regions`` (bool): True if anomalous frames are detected
+              (Tier 1: column-sum neg_depth > 3%, OR Tier 2: baseline self-test p < 0.01),
+              indicating that ``set_anomaly_mask()`` should be called
+            - ``negative_xr_fraction`` (float or None): Fraction of XR frames with negative recognition-curve values
+            - ``baseline_selftest_p`` (float or None): p-value from the baseline self-test
+              (Wilcoxon signed-rank). Low values (< 0.01) indicate buffer-frame contamination.
+              None if XR data is absent.
+
+        Examples
+        --------
+        >>> info = ssd.get_data_info()
+        >>> print(info)
+        >>> if info.pickat_mismatch:
+        ...     print(f"Consider using uv_monitor={info.uv_peak_wavelength:.0f}")
+        >>> if info.has_negative_xr_regions:
+        ...     print("Call ssd.set_anomaly_mask() before corrected_copy()")
+        """
+        from collections import namedtuple
+        DataInfo = namedtuple('DataInfo', [
+            'n_xr_frames', 'n_uv_frames',
+            'uv_peak_wavelength', 'uv_pickat', 'uv_monitor',
+            'xr_peak_frame', 'is_trimmed', 'pickat_mismatch',
+            'has_negative_xr_regions', 'negative_xr_fraction',
+            'baseline_selftest_p',
+        ])
+
+        n_xr_frames = self.xr.M.shape[1] if self.xr is not None else None
+        n_uv_frames = self.uv.M.shape[1] if self.uv is not None else None
+
+        xr_peak_frame = None
+        uv_peak_wl = None
+        uv_pickat = None
+        pickat_mismatch = False
+        has_negative_xr = False
+        negative_xr_frac = None
+        selftest_p = None
+
+        if self.xr is not None:
+            xr_icurve = self.xr.get_recognition_curve()
+            xr_peak_frame = int(xr_icurve.x[np.argmax(xr_icurve.y)])
+            # Anomaly detection: use matrix column-sum (sum over all q-rows).
+            # The single-row icurve has noise-level negatives in all datasets;
+            # the full-sum amplifies real anomalous dips above noise.
+            xr_colsum = self.xr.M.sum(axis=0)
+            neg_depth = abs(xr_colsum.min()) / xr_colsum.max() if xr_colsum.max() > 0 else 0
+            negative_xr_frac = float(np.mean(xr_colsum < 0))
+            has_negative_xr = neg_depth > 0.03  # Tier 1: dip >3% of peak height
+
+            # Tier 2: baseline self-test (catches subtle cases like ATP).
+            # Compare per-q-row negative fraction in peak region:
+            # buffer-mean-flat baseline vs endpoint-linear baseline.
+            # If using buffer info makes things worse, buffer frames are contaminated.
+            selftest_p = _baseline_selftest(self.xr.M, xr_icurve)
+            if not has_negative_xr and selftest_p is not None:
+                has_negative_xr = selftest_p < 0.01
+
+        if self.uv is not None:
+            uv_pickat = self.uv.pickat
+            # Find the wavelength of max absorbance at the XR peak frame
+            if xr_peak_frame is not None:
+                mapping = self.get_mapping()
+                uv_icurve = mapping.uv_curve
+                uv_frame = mapping.get_mapped_index(
+                    xr_peak_frame, xr_icurve.x, uv_icurve.x)
+                spectrum = self.uv.M[:, uv_frame]
+                uv_peak_wl = float(self.uv.wavelengths[np.argmax(spectrum)])
+            else:
+                # No XR data; use UV peak frame directly
+                uv_elution = self.uv.M.sum(axis=0)
+                uv_peak_frame = np.argmax(uv_elution)
+                spectrum = self.uv.M[:, uv_peak_frame]
+                uv_peak_wl = float(self.uv.wavelengths[np.argmax(spectrum)])
+
+            if uv_peak_wl is not None and uv_pickat is not None:
+                # Only flag mismatch when absorbance peak is ABOVE pickat wavelength.
+                # Peak below pickat (e.g., 230 nm peptide bond vs 280 nm pickat) is normal for proteins.
+                # Peak above pickat (e.g., 290 nm nucleotide vs 280 nm) signals a non-standard sample.
+                pickat_mismatch = (uv_peak_wl - uv_pickat) > 5
+
+        return DataInfo(
+            n_xr_frames=n_xr_frames,
+            n_uv_frames=n_uv_frames,
+            uv_peak_wavelength=uv_peak_wl,
+            uv_pickat=uv_pickat,
+            uv_monitor=uv_pickat,
+            xr_peak_frame=xr_peak_frame,
+            is_trimmed=self.trimmed,
+            pickat_mismatch=pickat_mismatch,
+            has_negative_xr_regions=has_negative_xr,
+            negative_xr_fraction=negative_xr_frac,
+            baseline_selftest_p=selftest_p,
+        )
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
         """ssd.export(folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=Fals)

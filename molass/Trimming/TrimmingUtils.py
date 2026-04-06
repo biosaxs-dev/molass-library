@@ -48,7 +48,7 @@ def make_and_slicepair(pair1, pair2, judge_info, debug=False):
     return start, stop
 
 def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None, flowchange=None,
-                            ip_effect_info=None, nsigmas=TRIMMING_NSIGMAS, nguiniers=None,
+                            ip_effect_info=None, nsigmas=None, nguiniers=None,
                             jranges=None, mapping=None,
                             debug=False):
     """ 
@@ -72,8 +72,11 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
         Whether to consider flow change points. If 'auto', determine automatically.
     ip_effect_info : any
         Information for IP effect. (Not used in this function)
-    nsigmas : int
+    nsigmas : int or None
         Number of sigmas for moment calculation.
+        If None, an adaptive default is used: max(TRIMMING_NSIGMAS, n_xr_frames // 75),
+        which widens the trimming window for longer datasets to avoid
+        over-trimming that can cause downstream peak detection failures.
     nguiniers : int or None
         Number of Guinier points to consider. If None, use default.
     jranges : tuple of tuples or None
@@ -88,6 +91,10 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
     TrimmingInfo
         The trimming information with slices and mapping.
     """
+    if nsigmas is None:
+        n_frames = len(ssd.xr.jv) if ssd.xr is not None else 0
+        nsigmas = max(TRIMMING_NSIGMAS, n_frames // 75)
+
     if flowchange is None:
         flowchange = get_molass_options('flowchange')
     if debug:

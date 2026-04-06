@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
-**Last Updated**: March 27, 2026  
-**Current version**: 0.8.8
+**Last Updated**: April 6, 2026  
+**Current version**: 0.9.1
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,16 +11,32 @@
 
 ## 🎯 Current Task
 
-Working on: **Evaluate scaffolded rigorous optimization results** — all tooling in place  
-Next: Run longer optimization (niter=50–100), compare Rg and scattering profiles, consider unfreezing neighbors  
-See: [experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb](../molass-researcher/experiments/08_negative_peaks/08f_scaffolded_rigorous.ipynb)  
-Issues: #57 (frozen components), #58 (folder docs, closed), #59 (list_rigorous_jobs, closed)
+Working on: **EGH peeler (#72) — over-detection on hard cases needs fixing**  
+Next: Improve `egh_peel` for wide-range experimental data (Range/σ > 35) — adaptive threshold or restricted peel window  
+See: `molass/Peaks/EghPeeler.py`, `molass-researcher/experiments/14_component_estimation/14b_hard_cases.ipynb`  
+Issues: #72 (EGH peeler)
 
 ---
 
 ## 🎯 Recent Work
 
-### March 27, 2026 — Post-optimization tooling (#58, #59)
+### April 6, 2026 — EGH peeler implementation (#72) and issue fixes (#68-71)
+
+**EGH Peeler** (`molass/Peaks/EghPeeler.py` — NEW):
+- Sequential EGH peak peeling: fit tallest → subtract → repeat
+- `egh_peel(x, y, num_components=None, min_area_frac=0.02, min_sigma=3.0, debug=False)`
+- Replaces legacy `recognize_peaks` (greedy subtraction) in `CurveDecomposer.py`
+- All 13 tutorial/05-lrf tests pass with new peeler
+- **Known issue**: Over-detects on experimental datasets (Apo→4, ATP→6, MY→8 peaks) due to wide frame range
+
+**Issues fixed**:
+- #68: `detect_peaks()` crash fix
+- #69: `Recognizer.py` improvements
+- #70: Trimming utilities update
+- #71: `SecSaxsData`/`UvData` fixes
+- #72: EGH peeler (GitHub issue created)
+
+**Files changed**: `SecSaxsData.py`, `UvData.py`, `CoupledAdjuster.py`, `CurveDecomposer.py`, `Recognizer.py`, `SecSaxsDataPlot.py`, `TrimmingUtils.py`, `pyproject.toml`, tests
 
 **Resume Job button** (molass-legacy MplMonitor.py):
 - Replaced "Skip Job" with functional "Resume Job" button + `trigger_resume()` handler

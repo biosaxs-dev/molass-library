@@ -216,7 +216,12 @@ def plot_compact_impl(ssd, **kwargs):
     uv_jslice = trim.uv_slices[0]
     i, j = ij_from_slice(uv_jslice)
     ax2.axvspan(*uv_jcurve.x[[i,j]], color='green', alpha=0.1)
-    ax2.axvline(280, color='yellow')  # Assuming 280 nm is the wavelength of interest
+    ax2.axvline(uv_wl, color='yellow')  # pickat wavelength
+    uv_peak_wavelength = float(uv_jcurve.x[np.argmax(uv_jcurve.y)])
+    if (uv_peak_wavelength - uv_wl) > 5:
+        # Peak above pickat signals a non-standard sample (e.g., 290 nm nucleotide)
+        ax2.axvline(uv_peak_wavelength, color='red', linestyle='--', alpha=0.7,
+                    label=f"peak at {uv_peak_wavelength:.0f} nm")
     ax2.set_xlabel("Wavelength (nm)")
     ax2.legend()
 
@@ -241,4 +246,7 @@ def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2, ax3),
                       mapping=mapping, xr_curve=xr_curve, uv_curve=uv_curve, mp_curve=mp_curve,
-                      moment=moment)
+                      moment=moment,
+                      uv_pickat=uv_wl,
+                      uv_peak_wavelength=uv_peak_wavelength,
+                      xr_peak_frame=m)

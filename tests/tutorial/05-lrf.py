@@ -42,7 +42,7 @@ def test_003_quick_decomposition_3_components():
 def test_004_get_proportions():
     proportions = decomposition3.get_proportions()
     print("Current proportions:", proportions)
-    expected = [0.39588467, 0.12442568, 0.47968965]
+    expected = [0.44395829, 0.07063981, 0.4854019]
     assert proportions == pytest.approx(expected, abs=1e-2)
 
 @pytest.mark.order(5)
@@ -83,7 +83,7 @@ def test_009_another_sample():
 @control_matplotlib_plot
 def test_010_quick_decomposition_rank_1():
     global decomposition31
-    decomposition31 = ssd3.quick_decomposition()
+    decomposition31 = ssd3.quick_decomposition(num_components=1)
     plot6 = decomposition31.plot_components(title="Sample3 as rank 1")
 
 @pytest.mark.order(11)
