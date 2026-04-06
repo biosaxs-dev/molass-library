@@ -246,3 +246,42 @@ def test_18_evaluate_baseline():
     # Should match individual calls
     assert result.positive_ratio == xr.get_positive_ratio(bl)
     assert result.ideal == xr.get_bpo_ideal()
+
+
+def test_19_get_positive_ratio_no_baseline():
+    """get_positive_ratio() with baseline=None assumes zero baseline — issue #60."""
+    import numpy as np
+    trimmed = ssd_instance.trimmed_copy()
+    xr = trimmed.xr
+    bl = xr.get_baseline2d()
+
+    # Explicit zero baseline should match baseline=None on corrected data
+    xr_corrected = trimmed.corrected_copy().xr
+    pr_none = xr_corrected.get_positive_ratio()                          # baseline=None
+    pr_zero = xr_corrected.get_positive_ratio(np.zeros_like(xr_corrected.M))
+    assert pr_none == pr_zero, f"None vs zeros mismatch: {pr_none} != {pr_zero}"
+
+    # On uncorrected data, None means zero baseline (i.e., all values treated as residual)
+    pr_raw = xr.get_positive_ratio()
+    assert 0 < pr_raw < 1
+
+
+def test_20_corrected_copy_precomputed_baseline():
+    """corrected_copy(baseline=array) uses pre-computed XR baseline — issue #61."""
+    import warnings
+    import numpy as np
+    trimmed = ssd_instance.trimmed_copy()
+    bl = trimmed.xr.get_baseline2d()
+
+    # Pre-computed baseline should give same XR result as default
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        corrected_pre = trimmed.corrected_copy(baseline=bl)
+        # Should emit a warning about XR-only
+        assert len(w) == 1
+        assert "XR only" in str(w[0].message)
+
+    corrected_std = trimmed.corrected_copy()
+
+    # XR matrices should be equal
+    np.testing.assert_allclose(corrected_pre.xr.M, corrected_std.xr.M, atol=1e-12)

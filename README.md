@@ -38,7 +38,7 @@ Especially for testing, see the first two sections in
 
 Context is auto-loaded from `.github/copilot-instructions.md` when using GitHub Copilot in Agent mode (AI Context Standard v0.7).
 
-For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/main/Copilot/copilot-guidelines.md).
+For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/master/Copilot/copilot-guidelines.md).
 
 ## Optional Features
 
