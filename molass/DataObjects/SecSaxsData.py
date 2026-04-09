@@ -567,15 +567,37 @@ class SecSaxsData:
         if present).  See :meth:`SsMatrixData.set_anomaly_mask` for
         full documentation.
 
+        .. note::
+            For mild anomalies, prefer ``allow_negative_peaks=True`` in
+            ``quick_decomposition()`` instead.  This method excludes frames
+            from the data matrix and can be too aggressive for some datasets.
+            Use ``ssd.xr.get_icurve()`` after calling this to verify the
+            signal is not destroyed.
+
         Parameters
         ----------
         mask : array-like of bool, slice, or None, optional
             Frames to exclude.  When a ``slice`` is given, start/stop are
             interpreted as frame numbers.
         """
+        import numpy as np
+        # Capture pre-mask signal range for safety check
+        pre_range = np.ptp(self.xr.get_icurve().y)
+
         self.xr.set_anomaly_mask(mask=mask)
         if self.uv is not None:
             self.uv.set_anomaly_mask(mask=mask)
+
+        # Safety check: warn if signal was drastically reduced (issue #75)
+        post_range = np.ptp(self.xr.get_icurve().y)
+        if pre_range > 0 and post_range / pre_range < 0.1:
+            import warnings
+            warnings.warn(
+                f"XR signal range dropped by {(1 - post_range/pre_range)*100:.0f}% after anomaly masking "
+                f"({pre_range:.2e} -> {post_range:.2e}). The mask may be too aggressive. "
+                f"Consider using allow_negative_peaks=True in quick_decomposition() instead.",
+                stacklevel=2,
+            )
 
     def set_allow_negative_peaks(self, value=True, mask=None):
         """Deprecated: use ``set_anomaly_mask(mask)`` instead."""

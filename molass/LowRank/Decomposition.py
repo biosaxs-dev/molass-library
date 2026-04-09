@@ -69,8 +69,12 @@ class Decomposition:
         """
         if uv_ccurves is None:
             pass
-        else:
-            assert len(xr_ccurves) == len(uv_ccurves)  
+        elif len(xr_ccurves) != len(uv_ccurves):
+            raise ValueError(
+                f"XR decomposition produced {len(xr_ccurves)} components "
+                f"but UV produced {len(uv_ccurves)}. "
+                f"Check data quality or specify num_components explicitly."
+            )
         self.num_components = len(xr_ccurves)
         self.ssd = ssd
 
@@ -169,6 +173,54 @@ class Decomposition:
         """
         return [sv.Rg if sv.Rg is not None else float('nan')
                 for sv in self.get_guinier_objects()]
+
+    def get_channel_consistency(self):
+        """Check UV/XR proportion consistency across decomposition channels.
+
+        Computes the area fraction of each component in the XR and UV
+        elution curves and reports the maximum absolute difference.
+
+        Returns
+        -------
+        result : ChannelConsistency
+            A namedtuple with fields:
+
+            - ``inconsistency`` (float): max |XR_frac_i - UV_frac_i|
+              across components. 0.0 = perfect agreement, 1.0 = completely
+              different. Values above ~0.1 suggest the decomposition has
+              assigned different proportions to UV and XR channels.
+            - ``xr_fractions`` (list of float): area fraction per XR component
+            - ``uv_fractions`` (list of float): area fraction per UV component
+
+        Examples
+        --------
+        ::
+
+            cc = decomp.get_channel_consistency()
+            print(f"Inconsistency: {cc.inconsistency:.3f}")
+            if cc.inconsistency > 0.1:
+                print("WARNING: UV/XR proportions diverged")
+        """
+        from collections import namedtuple
+        ChannelConsistency = namedtuple('ChannelConsistency',
+                                        ['inconsistency', 'xr_fractions', 'uv_fractions'])
+
+        def _area_fractions(curves):
+            areas = [np.trapezoid(c.y, c.x) for c in curves]
+            total = sum(areas)
+            if total == 0:
+                return [0.0] * len(areas)
+            return [a / total for a in areas]
+
+        xr_frac = _area_fractions(self.xr_ccurves)
+        uv_frac = _area_fractions(self.uv_ccurves)
+        inconsistency = max(abs(x - u) for x, u in zip(xr_frac, uv_frac))
+
+        return ChannelConsistency(
+            inconsistency=inconsistency,
+            xr_fractions=xr_frac,
+            uv_fractions=uv_frac,
+        )
 
     def get_rg_curve(self):
         """Compute the per-frame Rg curve from the raw XR data.
@@ -826,3 +878,63 @@ class Decomposition:
         """
         from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs as _list
         return _list(analysis_folder)
+
+    @staticmethod
+    def has_rigorous_results(analysis_folder):
+        """Check whether any rigorous optimization results are available.
+
+        Lightweight filesystem check — does not parse results.  Use this
+        to poll readiness before calling ``load_rigorous_result()`` or
+        ``list_rigorous_jobs()``.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+
+        Returns
+        -------
+        bool
+            ``True`` if at least one job has a ``callback.txt`` file.
+
+        Examples
+        --------
+        ::
+
+            if Decomposition.has_rigorous_results("temp_analysis"):
+                jobs = Decomposition.list_rigorous_jobs("temp_analysis")
+        """
+        from molass.Rigorous.CurrentStateUtils import has_rigorous_results as _has
+        return _has(analysis_folder)
+
+    @staticmethod
+    def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
+        """Block until rigorous optimization results become available.
+
+        Polls the filesystem until at least one job has written a
+        ``callback.txt``, or the timeout is reached.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+        timeout : float, optional
+            Maximum seconds to wait (default 600). Use ``0`` for no limit.
+        poll_interval : float, optional
+            Seconds between checks (default 5).
+
+        Returns
+        -------
+        bool
+            ``True`` if results appeared, ``False`` if timed out.
+
+        Examples
+        --------
+        ::
+
+            decomp.optimize_rigorously(analysis_folder="temp", ...)
+            if Decomposition.wait_for_rigorous_results("temp"):
+                result = decomp.load_rigorous_result("temp")
+        """
+        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results as _wait
+        return _wait(analysis_folder, timeout=timeout, poll_interval=poll_interval)

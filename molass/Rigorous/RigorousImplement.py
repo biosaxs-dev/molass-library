@@ -5,6 +5,34 @@ import os
 import numpy as np
 from importlib import reload
 
+def _compute_basic_floor(decomposition):
+    """Compute basic property floor values from the quick decomposition.
+
+    These floor values set a lower bound on physical plausibility that the
+    rigorous optimizer must not violate (pipeline monotonicity principle).
+    """
+    floor = {}
+    # P-matrix negativity: measure how negative the quick result's P columns are
+    # (should be near zero for a good quick result)
+    ssd = decomposition.ssd
+    xr_M = ssd.xr.M
+    uv_M = ssd.uv.M if ssd.has_uv() else None
+
+    # Reconstruct P matrices from quick result via pseudoinverse
+    C_xr = np.array([c.y for c in decomposition.xr_ccurves])
+    P_xr = xr_M @ np.linalg.pinv(C_xr)
+    floor["p_neg_norm_xr"] = np.linalg.norm(P_xr[P_xr < 0])
+
+    if uv_M is not None and decomposition.uv_ccurves is not None:
+        C_uv = np.array([c.y for c in decomposition.uv_ccurves])
+        P_uv = uv_M @ np.linalg.pinv(C_uv)
+        floor["p_neg_norm_uv"] = np.linalg.norm(P_uv[P_uv < 0])
+
+    # Note: 1D fitting floor is not yet included because the quick result's
+    # normalized_rmsd values are not directly accessible here. The P-negativity
+    # floor is the most critical constraint for preventing the ATP-like regression.
+    return floor
+
 def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, clear_jobs=True, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
@@ -50,7 +78,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     spectral_vectors = decomposition.ssd.get_spectral_vectors()
     model = decomposition.xr_ccurves[0].model
     num_components = decomposition.num_components
-    optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, debug=debug)
+
+    # Pipeline monotonicity: compute basic property floor from quick result
+    basic_floor = _compute_basic_floor(decomposition)
+
+    optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, debug=debug)
     optimizer.set_xr_only(not decomposition.ssd.has_uv())
     if frozen_components is not None:
         optimizer.set_frozen_components(frozen_components)

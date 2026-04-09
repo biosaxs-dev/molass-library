@@ -166,8 +166,13 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
 
     ssd = decomp.ssd
     rgcurve_for_dsets = ssd.xr.compute_rgcurve()
-    dsets = make_dsets_from_decomposition(decomp, rgcurve_for_dsets, debug=debug)
-    basecurves, _ = make_basecurves_from_decomposition(decomp, debug=debug)
+    import io, warnings
+    from contextlib import redirect_stdout, redirect_stderr
+    with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), \
+         warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        dsets = make_dsets_from_decomposition(decomp, rgcurve_for_dsets, debug=debug)
+        basecurves, _ = make_basecurves_from_decomposition(decomp, debug=debug)
     spectral_vectors = ssd.get_spectral_vectors()
     model = decomp.xr_ccurves[0].model
 
@@ -266,3 +271,87 @@ def list_rigorous_jobs(analysis_folder):
         result.append(JobInfo(id=d, iterations=iterations,
                               best_fv=best_fv, timestamp=timestamp))
     return result
+
+
+def has_rigorous_results(analysis_folder):
+    """Check whether any rigorous optimization results are available.
+
+    This is a lightweight filesystem check — it does not parse results.
+    Use this to poll readiness before calling ``load_rigorous_result()``
+    or ``list_rigorous_jobs()``.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+
+    Returns
+    -------
+    bool
+        ``True`` if at least one job has written a ``callback.txt`` file.
+
+    Examples
+    --------
+    ::
+
+        if decomp.has_rigorous_results("temp_analysis"):
+            result = decomp.load_rigorous_result("temp_analysis")
+    """
+    analysis_folder = os.path.abspath(analysis_folder)
+    jobs_folder = os.path.join(analysis_folder, "optimized", "jobs")
+
+    if not os.path.isdir(jobs_folder):
+        return False
+
+    for d in os.listdir(jobs_folder):
+        job_dir = os.path.join(jobs_folder, d)
+        if os.path.isdir(job_dir) and os.path.exists(os.path.join(job_dir, "callback.txt")):
+            return True
+
+    return False
+
+
+def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
+    """Block until rigorous optimization results become available.
+
+    Polls the filesystem at regular intervals until at least one job
+    has a parseable ``callback.txt`` file, or the timeout is reached.
+
+    Note: this checks ``list_rigorous_jobs()`` (not just file existence)
+    to avoid a race condition where the file is created but not yet written.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+    timeout : float, optional
+        Maximum seconds to wait (default 600 = 10 minutes).
+        Use ``0`` or ``None`` for no timeout.
+    poll_interval : float, optional
+        Seconds between filesystem checks (default 5).
+
+    Returns
+    -------
+    bool
+        ``True`` if results appeared before timeout, ``False`` if timed out.
+
+    Examples
+    --------
+    ::
+
+        decomp.optimize_rigorously(analysis_folder="temp", ...)
+        if Decomposition.wait_for_rigorous_results("temp"):
+            result = decomp.load_rigorous_result("temp")
+        else:
+            print("Timed out waiting for results.")
+    """
+    import time
+
+    elapsed = 0.0
+    while not list_rigorous_jobs(analysis_folder):
+        if timeout and elapsed >= timeout:
+            return False
+        time.sleep(poll_interval)
+        elapsed += poll_interval
+
+    return True

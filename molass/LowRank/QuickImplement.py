@@ -37,6 +37,12 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
         reload(molass.LowRank.Decomposition)
     from molass.LowRank.Decomposition import Decomposition
 
+    if len(xr_ccurves) == 0:
+        raise ValueError(
+            "Auto-detection found 0 components. The data may have insufficient signal. "
+            "Try specifying num_components explicitly."
+        )
+
     if uv_ccurves is None:
         uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
 

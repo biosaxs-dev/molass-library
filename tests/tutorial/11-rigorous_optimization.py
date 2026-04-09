@@ -29,3 +29,19 @@ def test_002_rigorous_optimization():
     current_decomposition = run_info.get_current_decomposition(wait_for_first_results=True)
     current_decomposition.plot_components(title="Rigorous Optimization Result", rgcurve=rgcurve)
     run_info.monitor.terminate()
+
+@pytest.mark.order(3)
+def test_003_has_rigorous_results():
+    from molass.LowRank.Decomposition import Decomposition
+    # After test_002, results exist in temp_analysis_egh
+    assert Decomposition.has_rigorous_results("temp_analysis_egh") is True
+    # Non-existent folder should return False
+    assert Decomposition.has_rigorous_results("nonexistent_folder_xyz") is False
+
+@pytest.mark.order(4)
+def test_004_wait_for_rigorous_results():
+    from molass.LowRank.Decomposition import Decomposition
+    # Already-existing results should return True immediately
+    assert Decomposition.wait_for_rigorous_results("temp_analysis_egh", timeout=1) is True
+    # Non-existent folder should time out and return False
+    assert Decomposition.wait_for_rigorous_results("nonexistent_folder_xyz", timeout=1) is False
