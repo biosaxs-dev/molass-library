@@ -201,7 +201,19 @@ SecSaxsData.quick_decomposition(num_components=2, proportions=[1, 1])
 
 **Cross-repo dependency**: `recognize_peaks` lives in `molass-legacy/molass_legacy/QuickAnalysis/ModeledPeaks.py`, not in molass-library.
 
-### 6. Evaluation Criteria (P0+–P6+)
+### 6. Subprocess Coordinate Contract (Issue #80)
+
+When `optimize_rigorously()` exports data for the legacy subprocess (`needs_export=True`, e.g. anomaly-masked datasets), the following contract applies:
+
+1. **Exported filenames carry original frame numbers** from `ssd.xr.jv` (e.g. `PREFIX_00032.dat`), so the legacy loader sets `start_file_no` correctly.
+2. **Restrict-lists are identity** `(0, N, N)` — no re-trimming; data is already trimmed.
+3. **The subprocess does NOT need** `elution_recognition`, anomaly masks, or original trimming info — all preprocessing is already applied.
+
+**Continuity assumption**: Exported frame numbers are always contiguous (no gaps). This is guaranteed because `trimmed_copy()` takes a contiguous slice of `jv`. The legacy loader relies on this: it constructs `jvector = np.arange(N)` and uses `start_file_no` (from the first filename) as a simple offset. If files had gaps, `jvector` would not reflect actual frame numbers.
+
+**Key files**: `Rigorous/RigorousImplement.py` (`_set_identity_restrict_lists`), `DataUtils/ExportSsd.py`.
+
+### 7. Evaluation Criteria (P0+–P6+)
 
 The research repo defines 7 positive criteria for method evaluation. When improving Molass:
 
@@ -215,7 +227,7 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 | P5+ (constrained global search) | `Rigorous/`, EGH/SDM/EDM models |
 | P6+ (Kratky preprocessing) | Not yet implemented — candidate feature |
 
-### 7. Version Convention
+### 8. Version Convention
 
 - Check `pyproject.toml` for current version (e.g., `0.8.2`)
 - `molass/__init__.py::get_version()` reads from `pyproject.toml` during local development, falls back to `importlib.metadata` for installed package

@@ -11,6 +11,15 @@ ALLOWED_KEYS = {
     'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
 }
 
+def _draw_anomaly_bands(decomposition, xr_ax, uv_ax):
+    """Draw shaded vertical bands on XR and UV elution panels for anomalous frames.
+
+    Delegates to the shared AnomalyBands utility for consistent appearance
+    across plot_compact(), plot_components(), and MplMonitor.
+    """
+    from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
+    draw_anomaly_bands_for_ssd(xr_ax, uv_ax, decomposition.ssd)
+
 def create_axes(fig, row_titles=["UV", "XR"]):
     gs = GridSpec(2,10)
     for i, name in enumerate(row_titles):
@@ -191,6 +200,9 @@ def plot_components_impl(decomposition, **kwargs):
                         alpha = 0.2,
                         )
                     ax.add_patch(p)              
+
+    # Anomaly exclusion bands — show excluded frames as shaded vertical bands
+    _draw_anomaly_bands(decomposition, ax2, ax1)
 
     # UV Absorbance Curves
     if decomposition.uv is not None:

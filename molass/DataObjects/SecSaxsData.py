@@ -662,31 +662,41 @@ class SecSaxsData:
             baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
             ssd_copy.xr.M -= baseline
 
-        # Interpolate negative-peak frames: replace excluded columns with
-        # per-row linear interpolation between the boundary values so that
-        # the excluded region sits at the local baseline level instead of
-        # being zeroed (which would conflict with the optimizer's own
-        # baseline model).
-        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
-        if exclude is not None and exclude.any():
-            self._interpolate_excluded(ssd_copy.xr.M, exclude)
+        # Unified anomaly detection across XR and UV channels.
+        # When set_anomaly_mask() was called, both xr and uv have the flag.
+        # Detect XR anomalies via recognition_curve < 0 on the CORRECTED data.
+        # Note: pre-correction detection was attempted but rejected because
+        # buffer noise in the pre-correction recognition curve produces too
+        # many false positives (e.g. 152/1445 frames for MY), and interpolating
+        # those frames destroys the peak region and UV-XR mapping.
+        # UV auto-detection is NOT done because uv_icurve.y < 0 is normal
+        # for absorbing samples (e.g. 290nm) and would destroy actual signal.
+        # UV is interpolated only for frames mapped from XR-detected anomalies.
+        xr_exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
 
         if ssd_copy.uv is not None:
             baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
             ssd_copy.uv.M -= baseline
 
-            # Interpolate UV frames corresponding to the XR negative-peak region
-            if exclude is not None and exclude.any():
+        # Interpolate XR for XR-detected anomalies
+        if xr_exclude is not None and xr_exclude.any():
+            self._interpolate_excluded(ssd_copy.xr.M, xr_exclude)
+            # Map to UV and interpolate corresponding frames
+            if ssd_copy.uv is not None:
                 mapping = self.get_mapping()
                 if mapping is not None and not isinstance(mapping, tuple):
                     xr_jv = ssd_copy.xr.jv
                     uv_jv = ssd_copy.uv.jv
-                    xr_frames_excluded = xr_jv[exclude]
+                    xr_frames_excluded = xr_jv[xr_exclude]
                     uv_frames_mapped = mapping.slope * xr_frames_excluded + mapping.intercept
                     uv_lo, uv_hi = uv_frames_mapped.min(), uv_frames_mapped.max()
                     uv_exclude = (uv_jv >= uv_lo) & (uv_jv <= uv_hi)
                     if uv_exclude.any():
                         self._interpolate_excluded(ssd_copy.uv.M, uv_exclude)
+
+        # Cache the mask for visualization (plot bands)
+        if xr_exclude is not None:
+            ssd_copy.xr.anomaly_mask = xr_exclude
 
         ssd_copy.time_required = time() - start_time
         ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
@@ -694,7 +704,11 @@ class SecSaxsData:
 
     @staticmethod
     def _resolve_neg_peak_exclude(xr):
-        """Resolve anomaly mask into a bool exclude mask (or None)."""
+        """Resolve anomaly mask into a bool exclude mask (or None).
+
+        When auto-detecting (``anomaly_mask=None``), frames where the
+        recognition curve is negative are flagged.
+        """
         if not getattr(xr, 'has_anomaly_mask', False):
             return None
         np_mask = getattr(xr, 'anomaly_mask', None)

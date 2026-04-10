@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 6, 2026  
+**Last Updated**: April 10, 2026  
 **Current version**: 0.9.1
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,16 +11,61 @@
 
 ## 🎯 Current Task
 
-Working on: **EGH peeler (#72) — over-detection on hard cases needs fixing**  
-Next: Improve `egh_peel` for wide-range experimental data (Range/σ > 35) — adaptive threshold or restricted peel window  
-See: `molass/Peaks/EghPeeler.py`, `molass-researcher/experiments/14_component_estimation/14b_hard_cases.ipynb`  
-Issues: #72 (EGH peeler)
+Working on: **Exp 13 rigorous optimization — Apo results pending** 🔬  
+Next: Check 13b Apo rigorous results, then continue with 13c (ATP) and 13d (MY) rigorous runs.  
+See: `molass-researcher/experiments/13_rigorous_optimization/`
+
+**Pre-correction anomaly detection — rejected and reverted (April 10)**:
+- Attempted: use `self.xr` (pre-correction) in `_resolve_neg_peak_exclude()` instead of `ssd_copy.xr` (post-correction)
+- Result: buffer noise creates 152/1445 false positive frames for MY, destroys peak and UV-XR mapping
+- Also tried: contiguous-run filter (min_run=5) — insufficient, still 152 frames
+- Reverted to post-correction detection (original behavior)
+- Updated comments in `SecSaxsData.py` documenting the rejection
+- SdProxy.py min_run filter also reverted
+- All 23 SSD tests pass
+
+**Uncommitted changes**:
+- `SecSaxsData.py`: corrected_copy() unified anomaly detection + updated comments
+- `RigorousImplement.py`: corrected_ssd parameter
+- `LegacyBridgeUtils.py`: icurve source consistency
+- `DecompositionPlot.py`: anomaly band visualization
 
 ---
 
 ## 🎯 Recent Work
 
-### April 6, 2026 — EGH peeler implementation (#72) and issue fixes (#68-71)
+### April 10, 2026 — Pre-correction anomaly detection rejected
+
+**Attempted**: Change `_resolve_neg_peak_exclude()` to use pre-correction `self.xr` instead of post-correction `ssd_copy.xr`, reasoning that baseline correction absorbs anomalies making post-correction detection ineffective.
+
+**Rejected**: Pre-correction buffer noise produces massive false positives:
+- MY: 218 frames flagged (15%), reduced to 152 with min_run=5 contiguous filter
+- Interpolating 152 frames destroys XR peak (flat from ~350–1350)
+- UV-XR mapping becomes NaN → `plot_compact` crashes
+- Proof: clean SSD without `set_anomaly_mask()` → valid mapping (slope=0.97) → plot works
+
+**Reverted**: Both `SecSaxsData.py` and `SdProxy.py` restored to post-correction detection. Comments updated to document the rejection rationale. All 23 SSD tests pass.
+
+### April 9, 2026 — Anomaly handling: recognition curve fix, unified detection, visualization bands
+
+**Recognition curve consistency** (from prior session):
+- `make_dsets_from_decomposition()` now uses `ssd.xr.get_icurve()` as optimizer's XR fitting target (was recognition curve)
+- UV icurve also from SSD (not decomposition object) for data-state consistency
+
+**Anomaly mask propagation**:
+- `_apply_anomaly_interpolation()` now accepts `corrected_ssd=` to read cached mask (corrected data needed for auto-detection)
+- `corrected_copy()` caches resolved bool mask as `ssd.xr.anomaly_mask` after detection
+
+**Visualization bands** (`_draw_anomaly_bands` in DecompositionPlot.py):
+- Reads cached anomaly mask, draws red axvspan bands on both XR and UV panels
+- UV bands mapped from XR via channel mapping
+
+**UV anomaly detection — FAILED ATTEMPT**:
+- Tried `uv_icurve.y < 0` as UV anomaly criterion
+- For MY at 290nm, this flags the actual absorption peak → interpolation destroys UV signal → `estimate_mapping` can't find peaks → RuntimeError
+- Reverted to XR-only auto-detection. UV interpolation only from XR-mapped frames.
+
+### April 8, 2026 — Exp 13 conformance, subprocess coordinate contract (issue #80, #81)
 
 **EGH Peeler** (`molass/Peaks/EghPeeler.py` — NEW):
 - Sequential EGH peak peeling: fit tallest → subtract → repeat

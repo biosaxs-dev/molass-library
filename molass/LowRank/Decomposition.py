@@ -740,6 +740,7 @@ class Decomposition:
 
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
+                            uncorrected_ssd=None,
                             clear_jobs=True, debug=False):
         """
         Perform a rigorous decomposition.
@@ -778,6 +779,14 @@ class Decomposition:
             ``frozen_components`` — use whichever is shorter.
             E.g., ``free_components=[4]`` to optimize only the main peak.
             Mutually exclusive with ``frozen_components``.
+        uncorrected_ssd : SecSaxsData, optional
+            The trimmed but **not** baseline-corrected SSD.  When provided,
+            the optimizer fits its model (EGH components + linear baseline)
+            directly to this uncorrected data, while using the corrected
+            decomposition for EGH initialization.  This is the recommended
+            two-stage approach: baseline correction helps peak initialization
+            in the quick stage, but the rigorous stage should fit baseline
+            as a free parameter on uncorrected data.
         clear_jobs : bool, optional
             If True (default), existing job folders are cleared before starting.
             Set to False after a kernel restart to preserve previous job results
@@ -810,7 +819,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, clear_jobs=clear_jobs, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, uncorrected_ssd=uncorrected_ssd, clear_jobs=clear_jobs, debug=debug)
 
     def load_rigorous_result(self, analysis_folder, jobid=None, debug=False):
         """Load a completed rigorous optimization result from disk.

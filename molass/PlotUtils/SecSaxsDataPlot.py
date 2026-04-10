@@ -168,6 +168,10 @@ def plot_compact_impl(ssd, **kwargs):
         axt.plot(mp_baseline.x, mp_baseline.y, ls=':', color='red', label="UV Baseline")
         axt.legend(loc="center left")
 
+    # Anomaly exclusion bands — consistent with plot_components() and MplMonitor
+    from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
+    draw_anomaly_bands_for_ssd(ax1, axt, ssd)
+
     align_zero_y(ax1, axt)
 
     ymin, ymax = ax1.get_ylim()

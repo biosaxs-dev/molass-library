@@ -18,22 +18,20 @@ def _make_elcurve(x, y):
     v1 = ElutionCurve(y)          # 0-based x → peak indices stay in-bounds
     return ElCurve(x, y, v1_curve=v1)
 
-def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
+def make_dsets_from_decomposition(decomposition, rg_curve, data_ssd=None, debug=False):
     from molass_legacy.Optimizer.OptDataSets import OptDataSets
     if debug:
         import molass.Bridge.LegacyRgCurve
         reload(molass.Bridge.LegacyRgCurve)
     from molass.Bridge.LegacyRgCurve import LegacyRgCurve
-    ssd = decomposition.ssd
-    # Use the recognition curve (respects elution_recognition='sum' option).
-    # Normalize to icurve scale so the optimizer magnitude stays consistent.
-    recog = ssd.xr.get_recognition_curve()
-    icurve = decomposition.xr_icurve
-    max_r, max_i = np.max(recog.y), np.max(icurve.y)
-    if max_r > 0 and max_i > 0 and abs(max_r - max_i) / max_r > 1e-6:
-        from molass.DataObjects.Curve import Curve
-        recog = Curve(recog.x, recog.y * (max_i / max_r))
-    xr_curve = _make_elcurve(*recog.get_xy())
+    # Use data_ssd for the data matrix if provided (uncorrected data),
+    # but fall back to decomposition.ssd (corrected data) if not.
+    ssd = data_ssd if data_ssd is not None else decomposition.ssd
+    # Use the icurve (single q-row at q≈0.02) for XR_2D_fitting,
+    # consistent with quick_decomposition(). The icurve is the row of M
+    # that the optimizer's elution model should fit to (M = PC).
+    # The recognition curve (sum) is for anomaly detection, not for fitting.
+    xr_curve = _make_elcurve(*ssd.xr.get_icurve().get_xy())
     D = ssd.xr.M
     E = ssd.xr.E
     if decomposition.uv is None:
@@ -41,12 +39,14 @@ def make_dsets_from_decomposition(decomposition, rg_curve, debug=False):
         uv_curve = xr_curve
         U = D.copy()
     else:
-        uv_curve = _make_elcurve(*decomposition.uv_icurve.get_xy())
+        # Use the UV icurve from the same SSD as the matrix, so both
+        # reflect the same data state (uncorrected + anomaly-interpolated).
+        uv_curve = _make_elcurve(*ssd.uv.get_icurve().get_xy())
         U = ssd.uv.M
     dsets = ((xr_curve, D), LegacyRgCurve(xr_curve, rg_curve), (uv_curve, U))
     return OptDataSets(None, None, dsets=dsets, E=E)
 
-def make_basecurves_from_decomposition(decomposition, debug=False):
+def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False):
     if debug:
         import molass.Bridge.SdProxy
         reload(molass.Bridge.SdProxy)
@@ -54,7 +54,8 @@ def make_basecurves_from_decomposition(decomposition, debug=False):
         reload(molass.Bridge.LegacyBaselines)
     from molass.Bridge.SdProxy import SdProxy
     from molass.Bridge.LegacyBaselines import make_basecurves_from_sd
-    ssd = decomposition.ssd
+    # Use data_ssd for baseline fitting if provided (uncorrected data).
+    ssd = data_ssd if data_ssd is not None else decomposition.ssd
     xr_only = not ssd.has_uv()
     sd = SdProxy(ssd)
     baseline_type = 1
@@ -101,7 +102,7 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
     
     return optimizer
 
-def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, debug=False):
+def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_ssd=None, debug=False):
     from molass_legacy._MOLASS.SerialSettings import get_setting, set_setting
     if analysis_folder is None:
         analysis_folder = get_setting('analysis_folder')
@@ -128,18 +129,26 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, debug
         set_setting('in_folder', in_folder)
         if not os.path.exists(in_folder):
             os.makedirs(in_folder)
+    exported = False
     if os.path.exists(temp_in_folder):
-        assert in_folder == temp_in_folder
-        decomposition.ssd.export(temp_in_folder)
+        if in_folder == temp_in_folder:
+            # Export the data SSD (uncorrected if provided, else corrected)
+            export_ssd = data_ssd if data_ssd is not None else decomposition.ssd
+            export_ssd.export(temp_in_folder)
+            exported = True
+        else:
+            # Stale temp_in_folder from a previous run — remove it
+            import shutil
+            shutil.rmtree(temp_in_folder)
 
     # make datasets and basecurves
     from molass_legacy.RgProcess.RgCurve import check_rg_folder
-    dsets = make_dsets_from_decomposition(decomposition, rgcurve, debug=debug)
-    basecurves, baseparams = make_basecurves_from_decomposition(decomposition, debug=False)
+    dsets = make_dsets_from_decomposition(decomposition, rgcurve, data_ssd=data_ssd, debug=debug)
+    basecurves, baseparams = make_basecurves_from_decomposition(decomposition, data_ssd=data_ssd, debug=False)
     rg_folder_ok = check_rg_folder(rg_folder)
     if not rg_folder_ok:
         rgcurve_ = dsets[1]
         rgcurve_.export(rg_folder)
 
-    return dsets, basecurves, baseparams
+    return dsets, basecurves, baseparams, exported
 
