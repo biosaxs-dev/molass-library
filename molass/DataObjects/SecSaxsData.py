@@ -492,26 +492,61 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
+<<<<<<< HEAD
     def set_allow_negative_peaks(self, value=True, mask=None):
         """Declare that this dataset contains physically real negative peaks.
 
         Delegates to ``self.xr.set_allow_negative_peaks()`` (and ``self.uv``
         if present).  See :meth:`SsMatrixData.set_allow_negative_peaks` for
+=======
+    def set_anomaly_mask(self, mask=None):
+        """Declare that this dataset contains anomalous frames to exclude from baseline fitting.
+
+        Delegates to ``self.xr.set_anomaly_mask()`` (and ``self.uv``
+        if present).  See :meth:`SsMatrixData.set_anomaly_mask` for
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         full documentation.
 
         Parameters
         ----------
+<<<<<<< HEAD
         value : bool, optional
             Default True.
+=======
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         mask : array-like of bool, slice, or None, optional
             Frames to exclude.  When a ``slice`` is given, start/stop are
             interpreted as frame numbers.
         """
+<<<<<<< HEAD
         self.xr.set_allow_negative_peaks(value, mask=mask)
         if self.uv is not None:
             self.uv.set_allow_negative_peaks(value, mask=mask)
 
     def corrected_copy(self, debug=False, **baseline_kwargs):
+=======
+        self.xr.set_anomaly_mask(mask=mask)
+        if self.uv is not None:
+            self.uv.set_anomaly_mask(mask=mask)
+
+    def set_allow_negative_peaks(self, value=True, mask=None):
+        """Deprecated: use ``set_anomaly_mask(mask)`` instead."""
+        import warnings
+        warnings.warn(
+            "set_allow_negative_peaks() is deprecated; use set_anomaly_mask(mask) instead.",
+            DeprecationWarning, stacklevel=2,
+        )
+        if value:
+            self.set_anomaly_mask(mask=mask)
+        else:
+            self.xr.has_anomaly_mask = False
+            self.xr.anomaly_mask = None
+            if self.uv is not None:
+                self.uv.has_anomaly_mask = False
+                self.uv.anomaly_mask = None
+
+    def corrected_copy(self, baseline=None, debug=False, **baseline_kwargs):
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         """ssd.corrected_copy()
         
         Returns a deep copy of this object which has been corrected
@@ -519,6 +554,12 @@ class SecSaxsData:
         
         Parameters
         ----------
+        baseline : ndarray or None, optional
+            Pre-computed 2D baseline array for XR data (same shape as
+            ``ssd.xr.M``).  When provided, this baseline is used directly
+            instead of computing one via :meth:`get_baseline2d`.
+            **Note**: applies to XR only — the UV baseline is always
+            computed internally.
         debug : bool, optional
             If True, enables debug mode for more verbose output.
         **baseline_kwargs :
@@ -533,14 +574,38 @@ class SecSaxsData:
         Examples
         --------
         >>> corrected = ssd.corrected_copy()                          # standard LPM
+<<<<<<< HEAD
         >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
         >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
+=======
+        >>> ssd.set_anomaly_mask()                                    # for negative-peak datasets
+        >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
+        >>> corrected = ssd.corrected_copy(baseline=my_baseline)      # pre-computed XR baseline
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         """
         start_time = time()
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
-        baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
-        ssd_copy.xr.M -= baseline
+        if baseline is not None:
+            import warnings
+            warnings.warn(
+                "Pre-computed baseline applies to XR only; "
+                "UV baseline is computed normally.",
+                stacklevel=2,
+            )
+            ssd_copy.xr.M -= baseline
+        else:
+            baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
+            ssd_copy.xr.M -= baseline
+
+        # Interpolate negative-peak frames: replace excluded columns with
+        # per-row linear interpolation between the boundary values so that
+        # the excluded region sits at the local baseline level instead of
+        # being zeroed (which would conflict with the optimizer's own
+        # baseline model).
+        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
+        if exclude is not None and exclude.any():
+            self._interpolate_excluded(ssd_copy.xr.M, exclude)
 
         # Interpolate negative-peak frames: replace excluded columns with
         # per-row linear interpolation between the boundary values so that
@@ -574,10 +639,17 @@ class SecSaxsData:
 
     @staticmethod
     def _resolve_neg_peak_exclude(xr):
+<<<<<<< HEAD
         """Resolve allow_negative_peaks into a bool exclude mask (or None)."""
         if not getattr(xr, 'allow_negative_peaks', False):
             return None
         np_mask = getattr(xr, 'negative_peak_mask', None)
+=======
+        """Resolve anomaly mask into a bool exclude mask (or None)."""
+        if not getattr(xr, 'has_anomaly_mask', False):
+            return None
+        np_mask = getattr(xr, 'anomaly_mask', None)
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         jv = xr.jv
         if np_mask is None:
             return xr.get_recognition_curve().y < 0
@@ -747,6 +819,12 @@ class SecSaxsData:
             Minimum allowed Gaussian width (sigma) for positioned decomposition.
             Default 5.
 
+        allow_negative_peaks : bool, optional
+            If True, allow negative peak heights (H < 0) in the EGH model.
+            This enables decomposition of components with negative scattering,
+            such as those arising from buffer composition mismatch.
+            Default False.
+
         debug : bool, optional
             If True, reload internal modules and show diagnostic plots.
             Default False.
@@ -758,6 +836,24 @@ class SecSaxsData:
         """
         
         debug = kwargs.get('debug', False)
+        # Validate kwargs to catch typos early (issue #64)
+        _KNOWN_KWARGS = {
+            'proportions', 'xr_peakpositions', 'debug',
+            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates',
+            'allow_negative_peaks',
+            'ranks', 'randomize', 'seed', 'global_opt',
+            'area_weight', 'sec_constraints', 'data_matrix', 'qv',
+            'curve_model', 'smoothing', 'decompargs', 'peakpositions',
+            'smooth_uv', 'consistent_uv', 'ip_effect_info',
+        }
+        unknown = set(kwargs) - _KNOWN_KWARGS
+        if unknown:
+            import warnings
+            warnings.warn(
+                f"quick_decomposition() received unrecognized keyword arguments: {unknown}. "
+                f"Check for typos. Known kwargs: {sorted(_KNOWN_KWARGS)}",
+                stacklevel=2,
+            )
         if debug:
             import molass.LowRank.QuickImplement
             reload(molass.LowRank.QuickImplement)

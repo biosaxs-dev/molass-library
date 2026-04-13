@@ -1,4 +1,8 @@
+<<<<<<< HEAD:molass-library/.github/copilot-instructions.md
 <!-- AI Context Standard v0.8 - Adopted: 2026-03-25 -->
+=======
+<!-- AI Context Standard v0.8.9 - Adopted: 2026-04-02 -->
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a:molass-library/COPILOT-INIT.md
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  

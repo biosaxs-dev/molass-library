@@ -132,12 +132,13 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
         sy = y
 
     decompargs = kwargs.pop('decompargs', None)
+    allow_negative = kwargs.get('allow_negative_peaks', False)
     if decompargs is None:
         # Default path: sequential peak recognition.
         # Known limitation: at high overlap (≥19%), the first peak absorbs
         # signal from both components, giving bad initialization for the optimizer.
         # Consider using the proportions path (via QuickImplement) for such cases.
-        peak_list = recognize_peaks(x, sy, num_peaks=num_components, exact_num_peaks=num_components, correct=False)
+        peak_list = recognize_peaks(x, sy, num_peaks=num_components, exact_num_peaks=num_components, correct=False, allow_negative=allow_negative)
     else:
         if debug:
             import molass.LowRank.ProportionalDecomposer
@@ -244,7 +245,11 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
             mean, std = moment.get_meanstd()
 
             init_params = np.array(peak_list)
-            min_height = np.max(init_params[:, 0])*0.05
+            allow_negative = kwargs.get('allow_negative_peaks', False)
+            if allow_negative:
+                min_height = -np.max(np.abs(init_params[:, 0]))*2
+            else:
+                min_height = np.max(init_params[:, 0])*0.05
             max_sigma = std*2
             min_sigma = std*0.1
             num_major_peaks = icurve.get_num_major_peaks()

@@ -1,5 +1,9 @@
 ﻿---
+<<<<<<< HEAD
 agent: ask
+=======
+agent: copilot
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
 description: セッション初期化（PROJECT_STATUS.md の読み込みと確認）
 alwaysApply: true
 ---
@@ -8,11 +12,33 @@ alwaysApply: true
 
 `.github/vscode-version.txt` を読んでください。
 
+<<<<<<< HEAD
 - **バージョン番号が記載されている場合**: そのバージョンを使用してステップ2へ
 - **バージョン番号が未記載またはファイルが存在しない場合**: 以下をユーザーに表示してください：
 
   > ⚠️ **VS Code バージョンの記録をお願いします**  
   > メニュー → **ヘルプ** → **バージョン情報** → 最初の行の番号（例: `1.114.0-insider`）を  
+=======
+- **`Auto-updated by vscode-version-recorder extension` という行がある場合**: 拡張機能が正常動作中です。そのバージョンを使用してステップ2へ。
+- **バージョン番号はあるが上記の行がない場合**: そのバージョンを使用してステップ2へ。その後、以下をユーザーに表示：
+
+  > ⚠️ **vscode-version-recorder 拡張機能が検出されませんでした**
+  > 自動インストールしますか？
+
+  ユーザーが同意した場合：
+
+  ```powershell
+  gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+  ```
+
+  インストール後、**VS Code を再起動**するよう案内してください。
+
+- **バージョン番号が未記載またはファイルが存在しない場合**: 以下をユーザーに表示：
+
+  > ⚠️ **VS Code バージョンの記録をお願いします**  
+  > メニュー → **ヘルプ** → **バージョン情報** → 最初の行の番号（例: `1.115.0-insider`）を  
+>>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
   > `.github/vscode-version.txt` の末尾に追記してください。
 
 ## ステップ2: alwaysApply 対応チェック
