@@ -740,8 +740,9 @@ class Decomposition:
 
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
-                            uncorrected_ssd=None,
-                            clear_jobs=True, debug=False):
+                            trimmed_ssd=None,
+                            clear_jobs=True, debug=False,
+                            **kwargs):
         """
         Perform a rigorous decomposition.
 
@@ -765,7 +766,21 @@ class Decomposition:
             inspect existing jobs, or ``load_rigorous_result()`` to
             reconstruct a ``Decomposition`` from a completed job.
         method : str, optional
-            The method to use for rigorous optimization. Default is 'BH'.
+            The optimization algorithm to use. Default is ``'BH'``.
+
+            Valid values:
+
+            - ``'BH'`` — **Basin-Hopping** (default). Nelder-Mead local
+              minimization with stochastic perturbation between basins.
+              Good general-purpose choice.
+            - ``'NS'`` — **Nested Sampling** (UltraNest). Explores the
+              full parameter space; useful when the objective landscape
+              has multiple well-separated minima.
+            - ``'MCMC'`` — **Markov Chain Monte Carlo** (emcee). Samples
+              the posterior distribution. Good for uncertainty estimation.
+            - ``'SMC'`` — **Sequential Monte Carlo** (PyABC / PyMC).
+              Population-based sampling; can be effective for complex
+              multi-modal landscapes.
         niter : int, optional
             The number of iterations for the optimization. Default is 20.
         frozen_components : list of int, optional
@@ -779,14 +794,19 @@ class Decomposition:
             ``frozen_components`` — use whichever is shorter.
             E.g., ``free_components=[4]`` to optimize only the main peak.
             Mutually exclusive with ``frozen_components``.
-        uncorrected_ssd : SecSaxsData, optional
-            The trimmed but **not** baseline-corrected SSD.  When provided,
-            the optimizer fits its model (EGH components + linear baseline)
-            directly to this uncorrected data, while using the corrected
-            decomposition for EGH initialization.  This is the recommended
-            two-stage approach: baseline correction helps peak initialization
-            in the quick stage, but the rigorous stage should fit baseline
-            as a free parameter on uncorrected data.
+        trimmed_ssd : SecSaxsData, optional
+            The trimmed but **not** baseline-corrected SSD — i.e., the
+            output of ``ssd.trimmed_copy()`` before ``corrected_copy()``.
+            When provided, the optimizer fits its model (EGH components +
+            linear baseline) directly to this data, while using the
+            corrected decomposition for EGH initialization.  This is the
+            recommended two-stage approach: baseline correction helps peak
+            initialization in the quick stage, but the rigorous stage
+            should fit baseline as a free parameter on uncorrected data.
+
+            .. deprecated::
+                The old name ``uncorrected_ssd`` is accepted as an alias
+                but will be removed in a future release.
         clear_jobs : bool, optional
             If True (default), existing job folders are cleared before starting.
             Set to False after a kernel restart to preserve previous job results
@@ -799,8 +819,28 @@ class Decomposition:
         result : Decomposition
             A new Decomposition object after rigorous decomposition.
         """
+        # Backward compatibility: accept old name uncorrected_ssd
+        if 'uncorrected_ssd' in kwargs:
+            import warnings
+            warnings.warn(
+                "uncorrected_ssd is deprecated, use trimmed_ssd instead",
+                DeprecationWarning, stacklevel=2,
+            )
+            if trimmed_ssd is not None:
+                raise ValueError("Cannot specify both trimmed_ssd and uncorrected_ssd")
+            trimmed_ssd = kwargs.pop('uncorrected_ssd')
+        if kwargs:
+            raise TypeError(f"Unexpected keyword arguments: {list(kwargs)}")
+
         if frozen_components is not None and free_components is not None:
             raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
+
+        _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC'}
+        if method not in _VALID_METHODS:
+            raise ValueError(
+                f"Unknown method {method!r}. Valid values: {sorted(_VALID_METHODS)} "
+                f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo)"
+            )
 
         if free_components is not None:
             n_protein = self.num_components  # protein components (excludes baseline)
@@ -819,7 +859,47 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, uncorrected_ssd=uncorrected_ssd, clear_jobs=clear_jobs, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, debug=debug)
+
+    def load_best_rigorous_result(self, analysis_folder, debug=False):
+        """Load the best rigorous optimization result from disk.
+
+        Convenience method that combines ``list_rigorous_jobs()`` and
+        ``load_rigorous_result()`` into a single call: finds the job
+        with the lowest objective function value and reconstructs the
+        ``Decomposition`` from it.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Decomposition
+            A new Decomposition with the best optimized components.
+
+        Raises
+        ------
+        FileNotFoundError
+            If no completed jobs are found.
+
+        Examples
+        --------
+        ::
+
+            result = decomp.load_best_rigorous_result("temp_analysis")
+            result.plot_components()
+        """
+        jobs = self.list_rigorous_jobs(analysis_folder)
+        if not jobs:
+            raise FileNotFoundError(
+                f"No completed jobs found in {analysis_folder}"
+            )
+        best = min(jobs, key=lambda j: j.best_fv)
+        return self.load_rigorous_result(analysis_folder, jobid=best.id, debug=debug)
 
     def load_rigorous_result(self, analysis_folder, jobid=None, debug=False):
         """Load a completed rigorous optimization result from disk.
@@ -947,3 +1027,36 @@ class Decomposition:
         """
         from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results as _wait
         return _wait(analysis_folder, timeout=timeout, poll_interval=poll_interval)
+
+    @staticmethod
+    def plot_convergence(analysis_folder, ax=None, title=None):
+        """Plot and return convergence data across rigorous optimization jobs.
+
+        Shows two subplots: (1) best fv per job, (2) per-job fv trajectory.
+        Returns a ``ConvergenceInfo`` namedtuple for programmatic assessment.
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+        ax : matplotlib Axes or array of Axes, optional
+            If provided, plot into these axes (expects 2).
+        title : str, optional
+            Figure title.
+
+        Returns
+        -------
+        ConvergenceInfo
+            Namedtuple with fields: ``jobs``, ``best_fv``, ``best_job_id``,
+            ``spread``, ``trend`` (``'improving'``/``'worsening'``/``'stable'``),
+            ``n_jobs``.
+
+        Examples
+        --------
+        ::
+
+            info = Decomposition.plot_convergence("temp_analysis")
+            print(f"Best: {info.best_fv:.4f}, trend: {info.trend}")
+        """
+        from molass.Rigorous.CurrentStateUtils import plot_convergence as _plot
+        return _plot(analysis_folder, ax=ax, title=title)

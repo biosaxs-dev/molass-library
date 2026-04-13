@@ -7,6 +7,7 @@ GLOBAL_OPTIONS = dict(
     flowchange = False,
     developer_mode = False,
     elution_recognition = 'icurve',
+    quiet = False,
 )
 
 def set_molass_options(**kwargs):
@@ -32,6 +33,11 @@ def set_molass_options(**kwargs):
         current behaviour).  Set to ``'sum'`` to use the sum over all
         (trimmed) q-rows, which is more robust when baseline drift is
         q-dependent (e.g. MY-type datasets).
+    quiet : bool, optional
+        If True, suppress verbose diagnostic output from internal and
+        legacy code during core API calls (``SSD()``, ``trimmed_copy()``,
+        ``corrected_copy()``, ``quick_decomposition()``,
+        ``optimize_rigorously()``).  Default is False.
     kwargs : dict
         Other options to set.
     """
@@ -56,6 +62,7 @@ def get_molass_options(*args):
         - 'developer_mode': Whether to enable developer mode.
         - 'elution_recognition': Which elution curve to use for recognition
           (``'icurve'`` or ``'sum'``).
+        - 'quiet': Whether to suppress verbose diagnostic output.
     Returns
     -------
     dict

@@ -140,7 +140,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, uncorrected_ssd=None, clear_jobs=True, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -150,14 +150,24 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         The initial decomposition to refine (built on corrected data).
     rgcurve : RgComponentCurve
         The Rg component curve to use for refinement.
+    analysis_folder : str, optional
+        The folder to save analysis results.
+    niter : int, optional
+        Number of iterations. Default 20.
+    method : str, optional
+        Optimization algorithm: ``'BH'`` (Basin-Hopping, default),
+        ``'NS'`` (Nested Sampling / UltraNest), ``'MCMC'`` (emcee),
+        ``'SMC'`` (Sequential Monte Carlo).
     frozen_components : list of int, optional
         0-based indices of protein components to freeze during optimization.
         Their EGH shape parameters, Rg, and UV scale will be held constant
         at the values from the initial decomposition.
-    uncorrected_ssd : SecSaxsData, optional
+    trimmed_ssd : SecSaxsData, optional
         Trimmed but not baseline-corrected SSD.  When provided, the optimizer
         fits against this data (with baseline as a free parameter) instead of
         the corrected data in decomposition.ssd.
+    clear_jobs : bool, optional
+        If True (default), clear existing job folders before starting.
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -174,55 +184,74 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                                                     construct_legacy_optimizer
                                                     )
 
-    # If the uncorrected data has anomaly-masked frames, interpolate them
+    # If the trimmed data has anomaly-masked frames, interpolate them
     # on a copy so the optimizer doesn't try to fit physically anomalous
     # signal.  This mirrors corrected_copy()'s _interpolate_excluded step.
     # The exclude mask is resolved from the *corrected* SSD because
     # auto-detection (recognition_curve.y < 0) only works after baseline
     # subtraction — uncorrected sums remain positive.
-    if uncorrected_ssd is not None:
-        uncorrected_ssd = _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=decomposition.ssd)
+    if trimmed_ssd is not None:
+        trimmed_ssd = _apply_anomaly_interpolation(trimmed_ssd, corrected_ssd=decomposition.ssd)
 
-    dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=uncorrected_ssd, debug=debug)
+    # Suppress verbose legacy output unless debug=True.
+    # The pre-optimization pipeline (folder setup, dataset construction,
+    # baseline fitting, optimizer construction, parameter preparation)
+    # produces many diagnostic prints from molass-legacy internals that
+    # are not actionable for the caller.
+    # Note: always suppresses (not gated by quiet option) because the noise
+    # from the rigorous pipeline is never useful in normal operation.
+    import io, warnings as _warnings
+    from contextlib import redirect_stdout, redirect_stderr, ExitStack
 
-    # Determine which SSD the optimizer actually sees (for settings, floor, etc.)
-    data_ssd = uncorrected_ssd if uncorrected_ssd is not None else decomposition.ssd
+    _stack = ExitStack()
+    if not debug:
+        _stack.enter_context(redirect_stdout(io.StringIO()))
+        _stack.enter_context(redirect_stderr(io.StringIO()))
+        _wctx = _warnings.catch_warnings()
+        _stack.enter_context(_wctx)
+        _warnings.simplefilter("ignore")
 
-    # DataTreatment
-    from molass_legacy.SecSaxs.DataTreatment import DataTreatment
-    trimming = 2
-    correction = 1
-    unified_baseline_type = 1
-    treat = DataTreatment(route="v2", trimming=trimming, correction=correction, unified_baseline_type=unified_baseline_type)
-    treat.save()
-    if exported:
-        # The exported data is already trimmed. Override the restrict_lists
-        # so the subprocess sees identity slices (full range of exported data)
-        # instead of slices referencing the original raw dimensions.
-        _set_identity_restrict_lists(data_ssd)
-    else:
-        decomposition.ssd.trimming.update_legacy_settings()
+    with _stack:
+        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug)
 
-    # construct legacy optimizer
-    spectral_vectors = data_ssd.get_spectral_vectors()
-    model = decomposition.xr_ccurves[0].model
-    num_components = decomposition.num_components
+        # Determine which SSD the optimizer actually sees (for settings, floor, etc.)
+        data_ssd = trimmed_ssd if trimmed_ssd is not None else decomposition.ssd
 
-    # Pipeline monotonicity: compute basic property floor from quick result
-    basic_floor = _compute_basic_floor(decomposition, data_ssd=uncorrected_ssd)
+        # DataTreatment
+        from molass_legacy.SecSaxs.DataTreatment import DataTreatment
+        trimming = 2
+        correction = 1
+        unified_baseline_type = 1
+        treat = DataTreatment(route="v2", trimming=trimming, correction=correction, unified_baseline_type=unified_baseline_type)
+        treat.save()
+        if exported:
+            # The exported data is already trimmed. Override the restrict_lists
+            # so the subprocess sees identity slices (full range of exported data)
+            # instead of slices referencing the original raw dimensions.
+            _set_identity_restrict_lists(data_ssd)
+        else:
+            decomposition.ssd.trimming.update_legacy_settings()
 
-    optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, debug=debug)
-    optimizer.set_xr_only(not data_ssd.has_uv())
-    if frozen_components is not None:
-        optimizer.set_frozen_components(frozen_components)
+        # construct legacy optimizer
+        spectral_vectors = data_ssd.get_spectral_vectors()
+        model = decomposition.xr_ccurves[0].model
+        num_components = decomposition.num_components
 
-    from molass_legacy.Optimizer.Scripting import set_optimizer_settings
-    set_optimizer_settings(num_components=num_components, model=model, method=method)
-    # make init_params
-    init_params = decomposition.make_rigorous_initparams(baseparams)
-    optimizer.prepare_for_optimization(init_params)
-    
-    # run optimization
+        # Pipeline monotonicity: compute basic property floor from quick result
+        basic_floor = _compute_basic_floor(decomposition, data_ssd=trimmed_ssd)
+
+        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, debug=debug)
+        optimizer.set_xr_only(not data_ssd.has_uv())
+        if frozen_components is not None:
+            optimizer.set_frozen_components(frozen_components)
+
+        from molass_legacy.Optimizer.Scripting import set_optimizer_settings
+        set_optimizer_settings(num_components=num_components, model=model, method=method)
+        # make init_params
+        init_params = decomposition.make_rigorous_initparams(baseparams)
+        optimizer.prepare_for_optimization(init_params)
+
+    # run optimization (outside _quiet — subprocess launch message is useful)
     from molass_legacy.Optimizer.Scripting import run_optimizer
     x_shifts = dsets.get_x_shifts()
     monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
@@ -238,4 +267,6 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets, init_params=init_params, monitor=monitor)
+    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+                   init_params=init_params, monitor=monitor,
+                   analysis_folder=analysis_folder, decomposition=decomposition)

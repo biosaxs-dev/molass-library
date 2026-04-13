@@ -160,38 +160,40 @@ class SecSaxsData:
         """
         start_time = time()
         self.logger = logging.getLogger(__name__)
+        from molass.Global.Quiet import suppress_if_quiet
         if folder is None:
             assert object_list is not None
             xr_data, uv_data = object_list
             self.datafiles = datafiles
         else:
             assert object_list is None
-            if uv_only:
-                xrM = None
-                xrE = None
-                qv = None
-            else:
-                if not os.path.isdir(folder):
-                    raise FileNotFoundError(f"Folder {folder} does not exist.")
-                
-                from molass.DataUtils.XrLoader import load_xr_with_options
-                xr_array, datafiles = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
-                xrM = xr_array[:,:,1].T
-                xrE = xr_array[:,:,2].T
-                qv = xr_array[0,:,0]
-                set_setting('in_folder', folder)    # for backward compatibility
-                self.datafiles = datafiles
+            with suppress_if_quiet(debug=debug):
+                if uv_only:
+                    xrM = None
+                    xrE = None
+                    qv = None
+                else:
+                    if not os.path.isdir(folder):
+                        raise FileNotFoundError(f"Folder {folder} does not exist.")
+                    
+                    from molass.DataUtils.XrLoader import load_xr_with_options
+                    xr_array, datafiles = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
+                    xrM = xr_array[:,:,1].T
+                    xrE = xr_array[:,:,2].T
+                    qv = xr_array[0,:,0]
+                    set_setting('in_folder', folder)    # for backward compatibility
+                    self.datafiles = datafiles
 
-            if xr_only:
-                uvM, wv = None, None
-            else:
-                from molass.DataUtils.UvLoader import load_uv
-                from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
-                uvM, wv, conc_file = load_uv(folder, return_also_conc_file=True)
-                beamline_info = get_beamlineinfo_from_settings()
-                set_setting('uv_folder', folder)    # for backward compatibility
-                set_setting('uv_file', conc_file)   # for backward compatibility
-            uvE = None
+                if xr_only:
+                    uvM, wv = None, None
+                else:
+                    from molass.DataUtils.UvLoader import load_uv
+                    from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
+                    uvM, wv, conc_file = load_uv(folder, return_also_conc_file=True)
+                    beamline_info = get_beamlineinfo_from_settings()
+                    set_setting('uv_folder', folder)    # for backward compatibility
+                    set_setting('uv_file', conc_file)   # for backward compatibility
+                uvE = None
  
             if xrM is None:
                 xr_data = None
@@ -486,14 +488,16 @@ class SecSaxsData:
             A trimmed copy of the SSD object with the specified trimming specification applied.
         """
         start_time = time()
-        if trimming is None:
-            if nsigmas is not None:
-                trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+        from molass.Global.Quiet import suppress_if_quiet
+        with suppress_if_quiet():
+            if trimming is None:
+                if nsigmas is not None:
+                    trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+                else:
+                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
             else:
-                trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
-        else:
-            assert jranges is None, "jranges must be None if trimming is specified."
-            assert nsigmas is None, "nsigmas must be None if trimming is specified."
+                assert jranges is None, "jranges must be None if trimming is specified."
+                assert nsigmas is None, "nsigmas must be None if trimming is specified."
         result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
                            trimmed=True, trimming=trimming,
                            mapping=mapping,
@@ -648,35 +652,37 @@ class SecSaxsData:
         >>> corrected = ssd.corrected_copy(baseline=my_baseline)      # pre-computed XR baseline
         """
         start_time = time()
+        from molass.Global.Quiet import suppress_if_quiet
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
-        if baseline is not None:
-            import warnings
-            warnings.warn(
-                "Pre-computed baseline applies to XR only; "
-                "UV baseline is computed normally.",
-                stacklevel=2,
-            )
-            ssd_copy.xr.M -= baseline
-        else:
-            baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
-            ssd_copy.xr.M -= baseline
+        with suppress_if_quiet(debug=debug):
+            if baseline is not None:
+                import warnings
+                warnings.warn(
+                    "Pre-computed baseline applies to XR only; "
+                    "UV baseline is computed normally.",
+                    stacklevel=2,
+                )
+                ssd_copy.xr.M -= baseline
+            else:
+                baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
+                ssd_copy.xr.M -= baseline
 
-        # Unified anomaly detection across XR and UV channels.
-        # When set_anomaly_mask() was called, both xr and uv have the flag.
-        # Detect XR anomalies via recognition_curve < 0 on the CORRECTED data.
-        # Note: pre-correction detection was attempted but rejected because
-        # buffer noise in the pre-correction recognition curve produces too
-        # many false positives (e.g. 152/1445 frames for MY), and interpolating
-        # those frames destroys the peak region and UV-XR mapping.
-        # UV auto-detection is NOT done because uv_icurve.y < 0 is normal
-        # for absorbing samples (e.g. 290nm) and would destroy actual signal.
-        # UV is interpolated only for frames mapped from XR-detected anomalies.
-        xr_exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
+            # Unified anomaly detection across XR and UV channels.
+            # When set_anomaly_mask() was called, both xr and uv have the flag.
+            # Detect XR anomalies via recognition_curve < 0 on the CORRECTED data.
+            # Note: pre-correction detection was attempted but rejected because
+            # buffer noise in the pre-correction recognition curve produces too
+            # many false positives (e.g. 152/1445 frames for MY), and interpolating
+            # those frames destroys the peak region and UV-XR mapping.
+            # UV auto-detection is NOT done because uv_icurve.y < 0 is normal
+            # for absorbing samples (e.g. 290nm) and would destroy actual signal.
+            # UV is interpolated only for frames mapped from XR-detected anomalies.
+            xr_exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
 
-        if ssd_copy.uv is not None:
-            baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
-            ssd_copy.uv.M -= baseline
+            if ssd_copy.uv is not None:
+                baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
+                ssd_copy.uv.M -= baseline
 
         # Interpolate XR for XR-detected anomalies
         if xr_exclude is not None and xr_exclude.any():
@@ -938,7 +944,9 @@ class SecSaxsData:
             except Exception:
                 pass  # detect_peaks may fail on edge cases; don't block decomposition
 
-        return make_decomposition_impl(self, num_components, **kwargs)
+        from molass.Global.Quiet import suppress_if_quiet
+        with suppress_if_quiet(debug=debug):
+            return make_decomposition_impl(self, num_components, **kwargs)
 
     def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.rigorous_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)

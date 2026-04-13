@@ -11,28 +11,32 @@
 
 ## 🎯 Current Task
 
-Working on: **Exp 13 rigorous optimization — Apo results pending** 🔬  
-Next: Check 13b Apo rigorous results, then continue with 13c (ATP) and 13d (MY) rigorous runs.  
+Working on: **Bounds-recentering ratchet investigation complete** 🔬  
+Next: Decide whether to fix optimizer's handling of weakly-constrained params, or accept 1-comp limitation  
 See: `molass-researcher/experiments/13_rigorous_optimization/`
 
-**Pre-correction anomaly detection — rejected and reverted (April 10)**:
-- Attempted: use `self.xr` (pre-correction) in `_resolve_neg_peak_exclude()` instead of `ssd_copy.xr` (post-correction)
-- Result: buffer noise creates 152/1445 false positive frames for MY, destroys peak and UV-XR mapping
-- Also tried: contiguous-run filter (min_run=5) — insufficient, still 152 frames
-- Reverted to post-correction detection (original behavior)
-- Updated comments in `SecSaxsData.py` documenting the rejection
-- SdProxy.py min_run filter also reverted
-- All 23 SSD tests pass
-
-**Uncommitted changes**:
-- `SecSaxsData.py`: corrected_copy() unified anomaly detection + updated comments
-- `RigorousImplement.py`: corrected_ssd parameter
-- `LegacyBridgeUtils.py`: icurve source consistency
-- `DecompositionPlot.py`: anomaly band visualization
+**Completed (April 13)**:
+- `fv_to_sv(fv)` added to `Rigorous/CurrentStateUtils.py`
+- `JobConvergence` and `ConvergenceInfo` namedtuples updated with `best_sv`
+- `plot_convergence()` rewritten with SV y-axis and color-coded bars
+- 8 tests passing in `tests/specific/test_plot_convergence.py`
+- Score breakdown: 3 bottlenecks identified (Guinier_deviation, XR_2D, UV_LRF_residual)
+- **Monotonic SV decline**: bounds-recentering ratchet diagnosed — weakly-constrained auxiliary params drift in 1-comp case", "oldString": "## 🎯 Current Task\n\nWorking on: **Exp 13 rigorous optimization — Apo results pending** 🔬  \nNext: Check 13b Apo rigorous results, then continue with 13c (ATP) and 13d (MY) rigorous runs.  \nSee: `molass-researcher/experiments/13_rigorous_optimization/`\n\n**Pre-correction anomaly detection — rejected and reverted (April 10)**:\n- Attempted: use `self.xr` (pre-correction) in `_resolve_neg_peak_exclude()` instead of `ssd_copy.xr` (post-correction)\n- Result: buffer noise creates 152/1445 false positive frames for MY, destroys peak and UV-XR mapping\n- Also tried: contiguous-run filter (min_run=5) — insufficient, still 152 frames\n- Reverted to post-correction detection (original behavior)\n- Updated comments in `SecSaxsData.py` documenting the rejection\n- SdProxy.py min_run filter also reverted\n- All 23 SSD tests pass\n\n**Uncommitted changes**:\n- `SecSaxsData.py`: corrected_copy() unified anomaly detection + updated comments\n- `RigorousImplement.py`: corrected_ssd parameter\n- `LegacyBridgeUtils.py`: icurve source consistency\n- `DecompositionPlot.py`: anomaly band visualization
 
 ---
 
 ## 🎯 Recent Work
+
+### April 13, 2026 — SV conversion and convergence diagnostics
+
+**`Rigorous/CurrentStateUtils.py`**:
+- `fv_to_sv(fv)`: Converts optimizer fv to Score Visualization value (0–100 scale)
+  - Formula: $SV = -200 / (1 + e^{-1.5 \cdot fv}) + 100$
+  - Maps: fv=-3 → SV≈98, fv=-1 → SV≈64, fv=0 → SV=0
+- `JobConvergence` namedtuple: added `best_sv` field
+- `ConvergenceInfo` namedtuple: added `best_sv` field
+- `plot_convergence()`: rewritten for SV y-axis (0–100), color-coded bars (red <60, orange 60–80, green >80), dashed threshold at SV=80, SV annotation on best bar
+- 8 tests in `tests/specific/test_plot_convergence.py` all passing
 
 ### April 10, 2026 — Pre-correction anomaly detection rejected
 
