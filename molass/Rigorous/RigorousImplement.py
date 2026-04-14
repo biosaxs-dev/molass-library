@@ -140,7 +140,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -240,7 +240,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         # Pipeline monotonicity: compute basic property floor from quick result
         basic_floor = _compute_basic_floor(decomposition, data_ssd=trimmed_ssd)
 
-        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, debug=debug)
+        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, function_code=function_code, debug=debug)
         optimizer.set_xr_only(not data_ssd.has_uv())
         if frozen_components is not None:
             optimizer.set_frozen_components(frozen_components)

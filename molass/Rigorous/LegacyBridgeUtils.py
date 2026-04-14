@@ -61,10 +61,11 @@ def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False
     baseline_type = 1
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
-def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, basic_floor=None, debug=False):
+def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, basic_floor=None, function_code=None, debug=False):
     from molass_legacy.Optimizer.OptimizerUtils import get_function_code
     from molass_legacy.Optimizer.FuncImporter import import_objective_function
-    function_code = get_function_code(model)
+    if function_code is None:
+        function_code = get_function_code(model)
     function_class = import_objective_function(function_code)
     optimizer = function_class(
         dsets,

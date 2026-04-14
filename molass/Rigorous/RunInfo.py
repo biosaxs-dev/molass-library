@@ -160,3 +160,80 @@ class RunInfo:
         return load_rigorous_result(
             decomp, self.analysis_folder, jobid=best.id, debug=debug
         )
+
+    def get_score_breakdown(self, jobid=None, debug=False):
+        """Evaluate the objective function and return individual score components.
+
+        Loads the best (or specified) optimized parameters from disk, runs them
+        through the optimizer's objective function, and returns a dict mapping
+        each score name to its value.
+
+        Parameters
+        ----------
+        jobid : str, optional
+            Specific job id to evaluate. If None, uses the best job
+            (lowest ``best_fv``).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        dict
+            ``{'fv': float, 'scores': {name: value, ...}}`` where ``scores``
+            maps each score/penalty name to its numeric value.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored.
+        FileNotFoundError
+            If no completed jobs are found.
+
+        Examples
+        --------
+        ::
+
+            run_info = decomp.optimize_rigorously(
+                analysis_folder="temp_analysis", niter=30)
+            run_info.wait()
+            breakdown = run_info.get_score_breakdown()
+            for name, val in breakdown['scores'].items():
+                print(f"{name}: {val:.4f}")
+        """
+        import os
+        from molass_legacy.Optimizer.Scripting import get_params
+
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+
+        optimizer_folder = os.path.join(
+            os.path.abspath(self.analysis_folder), "optimized"
+        )
+        jobs_folder = os.path.join(optimizer_folder, "jobs")
+
+        if jobid is None:
+            from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
+            jobs = list_rigorous_jobs(self.analysis_folder)
+            if not jobs:
+                raise FileNotFoundError(
+                    f"No completed jobs found in {self.analysis_folder}"
+                )
+            best = min(jobs, key=lambda j: j.best_fv)
+            jobid = best.id
+
+        job_folder = os.path.join(jobs_folder, jobid)
+        params = get_params(job_folder, debug=debug)
+
+        result = self.optimizer.objective_func(params, return_full=True)
+        fv = result[0]
+        score_array = result[1]
+        names = self.optimizer.get_score_names()
+
+        scores = {}
+        for name, val in zip(names, score_array):
+            scores[name] = float(val)
+
+        return {'fv': float(fv), 'scores': scores}

@@ -27,7 +27,13 @@ def get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params):
     return xr_ccurves
 
 def get_edm_xr_ccurves(optimizer, xr_icurve, separated_params):
-    raise NotImplementedError("EDM XR component curve extraction not implemented yet.")
+    from molass.SEC.Models.EdmComponentCurve import EdmComponentCurve
+    xr_params = separated_params[0]  # shape (num_components, 7): (t0, u, a, b, e, Dz, cinj) per component
+    x = xr_icurve.x
+    xr_ccurves = []
+    for p in xr_params:
+        xr_ccurves.append(EdmComponentCurve(x, p))
+    return xr_ccurves
 
 def get_xr_ccurves(optimizer, xr_icurve, separated_params):
     model_name = optimizer.get_model_name()

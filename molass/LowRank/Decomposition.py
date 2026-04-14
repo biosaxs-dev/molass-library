@@ -741,7 +741,7 @@ class Decomposition:
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
-                            clear_jobs=True, debug=False,
+                            clear_jobs=True, function_code=None, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -859,7 +859,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, debug=False):
         """Load the best rigorous optimization result from disk.
