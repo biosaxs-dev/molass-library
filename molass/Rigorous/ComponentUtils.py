@@ -16,10 +16,25 @@ def get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params):
     from molass.SEC.Models.SdmComponentCurve import SdmColumn, SdmComponentCurve
     xr_params = separated_params[0]
     rg_params = separated_params[2]
-    N, K, x0, poresize, N0, tI = separated_params[-1]
+    sdmcol = separated_params[-1]
+    if len(sdmcol) >= 7:
+        N, K, x0, poresize, N0, tI, k_gamma = sdmcol[:7]
+    else:
+        N, K, x0, poresize, N0, tI = sdmcol
+        k_gamma = 1.0
     T = K/N
     me = mp = 1.5
-    column = SdmColumn([N, T, me, mp, x0, tI, N0, poresize, DEFUALT_TIMESCALE])
+    # Infer pore_dist/rt_dist from function code
+    model_name = optimizer.get_model_name()
+    func_code = getattr(optimizer, 'function_code', None)
+    if func_code == 'G1200':
+        pore_dist, rt_dist = 'mono', 'gamma'
+    elif k_gamma != 1.0:
+        pore_dist, rt_dist = 'mono', 'gamma'
+    else:
+        pore_dist, rt_dist = 'mono', 'exponential'
+    column = SdmColumn([N, T, me, mp, x0, tI, N0, poresize, DEFUALT_TIMESCALE, k_gamma],
+                       pore_dist=pore_dist, rt_dist=rt_dist)
     x = xr_icurve.x
     xr_ccurves = []
     for scale, rg in zip(xr_params, rg_params):

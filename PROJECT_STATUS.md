@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 10, 2026  
+**Last Updated**: April 15, 2026  
 **Current version**: 0.9.1
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,17 +11,42 @@
 
 ## 🎯 Current Task
 
-Working on: **Bounds-recentering ratchet investigation complete** 🔬  
-Next: Decide whether to fix optimizer's handling of weakly-constrained params, or accept 1-comp limitation  
-See: `molass-researcher/experiments/13_rigorous_optimization/`
+Working on: **Two-axis SDM variant system implemented** ✅  
+Next: Re-run 13m notebook (classic SDM/exponential) to verify end-to-end pipeline, compare with SDM-Gamma  
+See: `molass-researcher/experiments/13_rigorous_optimization/13m_sdm_apo_1c.ipynb`
 
-**Completed (April 13)**:
-- `fv_to_sv(fv)` added to `Rigorous/CurrentStateUtils.py`
-- `JobConvergence` and `ConvergenceInfo` namedtuples updated with `best_sv`
-- `plot_convergence()` rewritten with SV y-axis and color-coded bars
-- 8 tests passing in `tests/specific/test_plot_convergence.py`
-- Score breakdown: 3 bottlenecks identified (Guinier_deviation, XR_2D, UV_LRF_residual)
-- **Monotonic SV decline**: bounds-recentering ratchet diagnosed — weakly-constrained auxiliary params drift in 1-comp case", "oldString": "## 🎯 Current Task\n\nWorking on: **Exp 13 rigorous optimization — Apo results pending** 🔬  \nNext: Check 13b Apo rigorous results, then continue with 13c (ATP) and 13d (MY) rigorous runs.  \nSee: `molass-researcher/experiments/13_rigorous_optimization/`\n\n**Pre-correction anomaly detection — rejected and reverted (April 10)**:\n- Attempted: use `self.xr` (pre-correction) in `_resolve_neg_peak_exclude()` instead of `ssd_copy.xr` (post-correction)\n- Result: buffer noise creates 152/1445 false positive frames for MY, destroys peak and UV-XR mapping\n- Also tried: contiguous-run filter (min_run=5) — insufficient, still 152 frames\n- Reverted to post-correction detection (original behavior)\n- Updated comments in `SecSaxsData.py` documenting the rejection\n- SdProxy.py min_run filter also reverted\n- All 23 SSD tests pass\n\n**Uncommitted changes**:\n- `SecSaxsData.py`: corrected_copy() unified anomaly detection + updated comments\n- `RigorousImplement.py`: corrected_ssd parameter\n- `LegacyBridgeUtils.py`: icurve source consistency\n- `DecompositionPlot.py`: anomaly band visualization
+**Completed (April 15)**:
+- Two-axis `pore_dist × rt_dist` system: `SdmColumn`, `SdmComponentCurve`, `SdmOptimizer` updated
+- `FunctionCodeUtils.py` created: `FUNCTION_CODE_MAP` + `detect_function_code()`
+- `RigorousSdmParams.py`: conditional 6/7 element sdmcol_params dispatch
+- `ComponentUtils.py`: load path infers variant from function code
+- Pipeline bug fixed: `FUNCTION_CODE_MAP` ('mono','exponential') → 'G1100' (was None, broke reverse lookup)
+- GitHub issue #91 filed
+
+---
+
+## 🎯 Recent Work
+
+### April 15, 2026 — Two-axis SDM variant system (pore_dist × rt_dist)
+
+**New files**:
+- `molass/Rigorous/FunctionCodeUtils.py`: `FUNCTION_CODE_MAP` dict, `detect_function_code()` — replaces k-sniffing with explicit (pore_dist, rt_dist) → function_code lookup
+
+**Modified files** (molass-library):
+- `SEC/Models/SdmComponentCurve.py`: `SdmColumn` takes pore_dist/rt_dist; `SdmComponentCurve` dispatches PDF
+- `SEC/Models/SdmOptimizer.py`: reads pore_dist/rt_dist from model_params; k bounds fixed for exponential
+- `Rigorous/RigorousSdmParams.py`: 6-element params for exponential (G1100), 7-element for gamma (G1200)
+- `Rigorous/ComponentUtils.py`: infers variant from function code or k value on load
+- `Rigorous/RigorousImplement.py`: uses `detect_function_code()` for auto-detection
+- `Rigorous/CurrentStateUtils.py`: updated for function code propagation
+
+**Modified files** (molass-legacy):
+- `Optimizer/OptimizerUtils.py`: `MODEL_NAME_DICT` G1100→"SDM(exp)", G1200→"SDM(gamma)"
+- `ObjectiveFunctions/G1200.py`: SDM-Gamma objective (7 params including k_gamma)
+- `Optimizer/MplMonitor.py`: minor fixes
+- `ModelParams/SdmParams.py`, `SdmParamsSheet.py`, `SdmPlotUtils.py`: k parameter support
+
+**Bug fixed**: `FUNCTION_CODE_MAP` originally mapped exponential→None, causing `construct_legacy_optimizer` to call `get_function_code("SDM")` which returned None after MODEL_NAME_DICT rename. Fixed by mapping to 'G1100' explicitly.", "oldString": "## 🎯 Current Task\n\nWorking on: **Exp 13 rigorous optimization — Apo results pending** 🔬  \nNext: Check 13b Apo rigorous results, then continue with 13c (ATP) and 13d (MY) rigorous runs.  \nSee: `molass-researcher/experiments/13_rigorous_optimization/`\n\n**Pre-correction anomaly detection — rejected and reverted (April 10)**:\n- Attempted: use `self.xr` (pre-correction) in `_resolve_neg_peak_exclude()` instead of `ssd_copy.xr` (post-correction)\n- Result: buffer noise creates 152/1445 false positive frames for MY, destroys peak and UV-XR mapping\n- Also tried: contiguous-run filter (min_run=5) — insufficient, still 152 frames\n- Reverted to post-correction detection (original behavior)\n- Updated comments in `SecSaxsData.py` documenting the rejection\n- SdProxy.py min_run filter also reverted\n- All 23 SSD tests pass\n\n**Uncommitted changes**:\n- `SecSaxsData.py`: corrected_copy() unified anomaly detection + updated comments\n- `RigorousImplement.py`: corrected_ssd parameter\n- `LegacyBridgeUtils.py`: icurve source consistency\n- `DecompositionPlot.py`: anomaly band visualization
 
 ---
 

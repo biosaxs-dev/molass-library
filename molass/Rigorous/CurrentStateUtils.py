@@ -202,6 +202,8 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
         from importlib import reload
         import molass.Rigorous.LegacyBridgeUtils
         reload(molass.Rigorous.LegacyBridgeUtils)
+        import molass.Rigorous.FunctionCodeUtils
+        reload(molass.Rigorous.FunctionCodeUtils)
     from molass.Rigorous.LegacyBridgeUtils import (
         make_dsets_from_decomposition,
         make_basecurves_from_decomposition,
@@ -220,10 +222,15 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
     spectral_vectors = ssd.get_spectral_vectors()
     model = decomp.xr_ccurves[0].model
 
+    # Auto-select G1200 (SDM-Gamma) when applicable.  See issue #89.
+    from .FunctionCodeUtils import detect_function_code
+    function_code = detect_function_code(decomp)
+
     optimizer = construct_legacy_optimizer(
         dsets, basecurves, spectral_vectors,
         num_components=decomp.num_components,
         model=model,
+        function_code=function_code,
         for_split_only=True,
     )
 

@@ -3,7 +3,11 @@
 
 """
 import numpy as np
-from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf
+from molass.SEC.Models.SdmMonoPore import (
+    sdm_monopore_pdf,
+    sdm_monopore_gamma_pdf,
+    DEFAULT_TIMESCALE,
+)
 from molass.LowRank.ComponentCurve import ComponentCurve
 
 class SdmColumn:
@@ -13,18 +17,32 @@ class SdmColumn:
     Attributes
     ----------
     params : tuple
-        The parameters of the SDM column (N, T, me, mp, x0, tI, N0, poresize, timescale)
+        The parameters of the SDM column (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
+    pore_dist : str
+        Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
+    rt_dist : str
+        Residence-time distribution: ``'exponential'`` or ``'gamma'`` (default).
     """
-    def __init__(self, params):
+    def __init__(self, params, pore_dist='mono', rt_dist='gamma'):
         """
         Initializes the SDM column.
 
         Parameters
         ----------
         params : tuple
-            The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale)
+            The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
+            If k is omitted, defaults to 1.0 (exponential, backward compatible).
+        pore_dist : str, optional
+            Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
+        rt_dist : str, optional
+            Residence-time distribution: ``'exponential'`` or ``'gamma'`` (default).
         """
+        if len(params) == 9:
+            # backward compatible: mono-pore (k=1)
+            params = list(params) + [1.0]
         self.params = params
+        self.pore_dist = pore_dist
+        self.rt_dist = rt_dist
 
     def get_params(self):
         """
@@ -65,7 +83,7 @@ class SdmComponentCurve(ComponentCurve):
         """
         self.column = column
         self.rg = rg
-        N, T, me, mp, x0, tI, N0, poresize, timescale = column.get_params()
+        N, T, me, mp, x0, tI, N0, poresize, timescale, k = column.get_params()
         self.x = x
         self.moment = None
         self.model = 'sdm'
@@ -77,7 +95,13 @@ class SdmComponentCurve(ComponentCurve):
         ni = N*(1 - rho)**me
         ti = T*(1 - rho)**mp
         t0 = x0 - tI
-        self.params = (ni, ti, N0, t0, timescale)
+        if column.rt_dist == 'exponential':
+            self.params = (ni, ti, N0, t0, timescale)
+            self._pdf_func = sdm_monopore_pdf
+        else:
+            theta = ti / k  # Gamma scale: mean = k*theta = ti
+            self.params = (ni, k, theta, N0, t0, timescale)
+            self._pdf_func = sdm_monopore_gamma_pdf
         self.scale = scale
     
     def get_y(self, x=None):
@@ -98,7 +122,7 @@ class SdmComponentCurve(ComponentCurve):
             _x = self._x
         else:
             _x = x - self.tI
-        return self.scale * dispersive_monopore_pdf(_x, *self.params)
+        return self.scale * self._pdf_func(_x, *self.params)
     
     def get_peak_top_x(self):
         """

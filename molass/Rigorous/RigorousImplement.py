@@ -178,6 +178,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     """
     import molass.Rigorous.LegacyBridgeUtils
     reload(molass.Rigorous.LegacyBridgeUtils)
+    import molass.Rigorous.FunctionCodeUtils
+    reload(molass.Rigorous.FunctionCodeUtils)
     from molass.Rigorous.LegacyBridgeUtils import (prepare_rigorous_folders,
                                                     make_dsets_from_decomposition,
                                                     make_basecurves_from_decomposition,
@@ -236,6 +238,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         spectral_vectors = data_ssd.get_spectral_vectors()
         model = decomposition.xr_ccurves[0].model
         num_components = decomposition.num_components
+
+        # Auto-select G1200 (SDM-Gamma) when the decomposition uses a
+        # Gamma-distributed SdmColumn (k != 1.0).  See issue #89.
+        if function_code is None:
+            from .FunctionCodeUtils import detect_function_code
+            function_code = detect_function_code(decomposition)
 
         # Pipeline monotonicity: compute basic property floor from quick result
         basic_floor = _compute_basic_floor(decomposition, data_ssd=trimmed_ssd)
