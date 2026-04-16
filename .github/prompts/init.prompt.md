@@ -11,14 +11,14 @@ alwaysApply: true
 - **`Auto-updated by vscode-version-recorder extension` という行がある場合**: 拡張機能が正常動作中です。そのバージョンを使用してステップ2へ。
 - **バージョン番号はあるが上記の行がない場合**: そのバージョンを使用してステップ2へ。その後、以下をユーザーに表示：
 
-  > ⚠️ **vscode-version-recorder 拡張機能が検出されませんでした**
+  > ⚠️ **ai-context-vscode 拡張機能が検出されませんでした**
   > 自動インストールしますか？
 
   ユーザーが同意した場合：
 
   ```powershell
-  gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+  gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
   ```
 
   インストール後、**VS Code を再起動**するよう案内してください。
