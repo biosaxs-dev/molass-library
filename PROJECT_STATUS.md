@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 15, 2026  
+**Last Updated**: April 16, 2026  
 **Current version**: 0.9.1
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,17 +11,18 @@
 
 ## 🎯 Current Task
 
-Working on: **Two-axis SDM variant system implemented** ✅  
-Next: Re-run 13m notebook (classic SDM/exponential) to verify end-to-end pipeline, compare with SDM-Gamma  
-See: `molass-researcher/experiments/13_rigorous_optimization/13m_sdm_apo_1c.ipynb`
+Working on: **G1300 objective function — SDM(lognormal) rigorous optimization** ✅  
+Next: Check 13r optimization results; compare with EGH and mono-pore SDM(gamma) rigorous fits  
+See: `molass-researcher/experiments/13_rigorous_optimization/13r_sdm_lognormal_apo.ipynb`
 
-**Completed (April 15)**:
-- Two-axis `pore_dist × rt_dist` system: `SdmColumn`, `SdmComponentCurve`, `SdmOptimizer` updated
-- `FunctionCodeUtils.py` created: `FUNCTION_CODE_MAP` + `detect_function_code()`
-- `RigorousSdmParams.py`: conditional 6/7 element sdmcol_params dispatch
-- `ComponentUtils.py`: load path infers variant from function code
-- Pipeline bug fixed: `FUNCTION_CODE_MAP` ('mono','exponential') → 'G1100' (was None, broke reverse lookup)
-- GitHub issue #91 filed
+**Completed (April 16)**:
+- G1300 legacy objective function created (`molass-legacy/ObjectiveFunctions/G1300.py`)
+- `FunctionCodeUtils.py`: activated `('lognormal', 'gamma'): 'G1300'`
+- `RigorousSdmParams.py`: lognormal branch with 8-element sdmcol_params
+- `ComponentUtils.py`: G1300 load path → `SdmColumn(pore_dist='lognormal')`
+- `SdmParams.py`: parameter names for 8-param case
+- `OptimizerUtils.py`: `"G1300": "SDM(lognormal)"` in MODEL_NAME_DICT
+- GitHub issues #93 (speedup) and #94 (G1300) filed and closed
 
 ---
 

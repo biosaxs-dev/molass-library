@@ -18,7 +18,7 @@ alwaysApply: true
 
   ```powershell
   gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
+  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2x"
   ```
 
   インストール後、**VS Code を再起動**するよう案内してください。

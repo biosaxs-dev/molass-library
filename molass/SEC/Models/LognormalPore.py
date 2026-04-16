@@ -244,6 +244,24 @@ def sdm_lognormal_pore_gamma_cf(w, N, T, k, me, mp, mu, sigma, Rg, N0, t0, const
     - Mobile phase dispersion (Brownian component)
     - Size exclusion effects (Ksec with Rg)
     
+    **CF structure**::
+    
+        φ(ω) = exp[Z + Z²/(2*N0)]
+        Z = iω*t0 + ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * ((1 - iω*τ_r)^{-k} - 1) dr
+    
+    **Moment formulas** (from meeting doc 2026-01-19):
+    
+        M1 (mean) = t0 + k * ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * τ_r dr
+    
+        M2~ (variance) = k*(k+1) * ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * τ_r² dr
+                         + M1² / N0
+    
+    where n_r = N * Ksec(Rg, r, me) and τ_r = T * Ksec(Rg, r, mp).
+    
+    The variance has two terms:
+    - Altering-zone term: k*(k+1) * ∫... (pore residence heterogeneity)
+    - Dispersive term: M1² / N0 (mobile phase Brownian broadening)
+    
     For special cases:
     - k=1: Reduces to sdm_lognormal_pore_cf (exponential residence)
     - N0→∞: Reduces to GEC with Gamma residence
@@ -311,3 +329,50 @@ def sdm_lognormal_pore_gamma_pdf(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t
     ... )
     """
     return scale*sdm_lognormal_pore_gamma_pdf_impl(x - t0, N, T, k, me, mp, mu, sigma, Rg, N0, 0)
+
+# ============================================================================
+# Fast Gauss-Legendre Versions (for optimizer use)
+#
+# Replace adaptive quad_vec with fixed Gauss-Legendre quadrature and fully
+# vectorized numpy operations.  Typical speedup: 50-100x per PDF call.
+# ============================================================================
+
+def sdm_lognormal_pore_gamma_cf_fast(w, N, T, k, me, mp, mu, sigma, Rg, N0, t0, n_quad=64):
+    """Vectorized Gauss-Legendre version of sdm_lognormal_pore_gamma_cf."""
+    mode = compute_mode(mu, sigma)
+    stdev = compute_stdev(mu, sigma)
+    max_rg = min(PORESIZE_INTEG_LIMIT, mode + 5*stdev)
+
+    if max_rg <= Rg:
+        Z = 1j * w * t0
+        return np.exp(Z + Z**2 / (2 * N0))
+
+    # Gauss-Legendre nodes/weights mapped to [Rg, max_rg]
+    nodes, weights = np.polynomial.legendre.leggauss(n_quad)
+    half = 0.5 * (max_rg - Rg)
+    mid  = 0.5 * (max_rg + Rg)
+    r  = half * nodes + mid       # (n_quad,)
+    wt = half * weights           # (n_quad,)
+
+    # Integrand components at all quadrature nodes
+    g = lognorm.pdf(r, sigma, scale=np.exp(mu))   # (n_quad,)
+    ratio = np.minimum(1.0, Rg / r)               # (n_quad,)
+    n_pore = N * (1 - ratio)**me                   # (n_quad,)
+    theta  = T * (1 - ratio)**mp                   # (n_quad,)
+
+    # Gamma CF: (1 - iw*theta)^(-k) - 1
+    # Broadcast: w (n_w,1) × theta (1,n_quad) → (n_w, n_quad)
+    gamma_term = (1 - 1j * w[:, None] * theta[None, :])**(-k) - 1
+
+    # Weighted sum over quadrature nodes
+    coeffs = g * n_pore * wt                       # (n_quad,)
+    integrated = gamma_term @ coeffs               # (n_w,)
+
+    Z = integrated + 1j * w * t0
+    return np.exp(Z + Z**2 / (2 * N0))
+
+_sdm_lognormal_pore_gamma_pdf_fast_impl = FftInvPdf(sdm_lognormal_pore_gamma_cf_fast)
+
+def sdm_lognormal_pore_gamma_pdf_fast(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t0):
+    """Fast version of sdm_lognormal_pore_gamma_pdf using Gauss-Legendre quadrature."""
+    return scale * _sdm_lognormal_pore_gamma_pdf_fast_impl(x - t0, N, T, k, me, mp, mu, sigma, Rg, N0, 0)

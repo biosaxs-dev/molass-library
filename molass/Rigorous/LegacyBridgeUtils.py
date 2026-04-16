@@ -62,11 +62,18 @@ def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
 def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, basic_floor=None, function_code=None, debug=False):
-    from molass_legacy.Optimizer.OptimizerUtils import get_function_code
+    from molass_legacy.Optimizer.OptimizerUtils import get_function_code, MODEL_NAME_DICT
     from molass_legacy.Optimizer.FuncImporter import import_objective_function
     if function_code is None:
         function_code = get_function_code(model)
     function_class = import_objective_function(function_code)
+    if function_class is None:
+        supported = sorted(set(MODEL_NAME_DICT.values()))
+        raise NotImplementedError(
+            f"Rigorous optimization does not support model={model!r} "
+            f"(function_code={function_code!r}). "
+            f"Supported models: {supported}"
+        )
     optimizer = function_class(
         dsets,
         num_components + 1,

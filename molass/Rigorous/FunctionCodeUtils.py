@@ -13,7 +13,7 @@ See: https://github.com/biosaxs-dev/molass-library/issues/89
 FUNCTION_CODE_MAP = {
     ('mono', 'exponential'): 'G1100',    # classic SDM
     ('mono', 'gamma'):       'G1200',    # SDM-Gamma
-    # ('lognormal', 'gamma'):  'G1300',  # future: SDM-Lognormal-Gamma
+    ('lognormal', 'gamma'):  'G1300',    # SDM-Lognormal-Gamma
 }
 
 

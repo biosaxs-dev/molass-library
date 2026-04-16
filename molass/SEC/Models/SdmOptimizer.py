@@ -211,6 +211,148 @@ def optimize_sdm_uv_decomposition(decomposition, xr_ccurves, **kwargs):
         new_uv_ccurves.append(ccurve)
     return new_uv_ccurves
 
+
+def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_params=None, **kwargs):
+    """Optimize XR decomposition with SDM lognormal pore distribution.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition to optimize.
+    env_params : tuple
+        The environmental parameters ``(N, T, me, mp, N0, t0, mu, sigma)``.
+    model_params : dict, optional
+        The parameters for the SDM model.
+    kwargs : dict
+        Additional parameters for the optimization process.
+
+    Returns
+    -------
+    new_xr_ccurves : list of SdmComponentCurve
+        The optimized SDM component curves with lognormal pore distribution.
+    """
+    debug = kwargs.get('debug', False)
+    if debug:
+        from importlib import reload
+        import molass.SEC.Models.SdmComponentCurve
+        reload(molass.SEC.Models.SdmComponentCurve)
+    from .SdmComponentCurve import SdmColumn, SdmComponentCurve
+    from molass.SEC.Models.LognormalPore import sdm_lognormal_pore_gamma_pdf_fast
+
+    num_components = decomposition.num_components
+    xr_icurve = decomposition.xr_icurve
+    x, y = xr_icurve.get_xy()
+    N, T, me, mp, N0, t0, mu_init, sigma_init = env_params
+    rgv = np.asarray(decomposition.get_rgs())
+
+    if model_params is None:
+        k_init = 2.0
+        rt_dist = 'gamma'
+    else:
+        k_init = model_params.get('k', 2.0)
+        rt_dist = model_params.get('rt_dist', 'gamma')
+
+    if rt_dist == 'exponential':
+        k_init = 1.0
+
+    # Estimate initial scales
+    scales_init = []
+    for rg in rgv:
+        column = SdmColumn([N, T, me, mp, t0, t0, N0, mu_init, sigma_init, k_init],
+                           pore_dist='lognormal', rt_dist=rt_dist)
+        ccurve = SdmComponentCurve(x, column, rg, scale=1.0)
+        cy = ccurve.get_y()
+        idx = np.argmax(cy)
+        scale = y[idx] / cy[idx] if cy[idx] > 0 else 1.0
+        scales_init.append(scale)
+
+    def objective_function(params):
+        N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = params[0:8]
+        rgv_ = params[8:8 + num_components]
+        scales_ = params[8 + num_components:8 + 2 * num_components]
+
+        if sigma_ < 0.01 or sigma_ > 2.0:
+            return 1e20
+        if mu_ < 1.0 or mu_ > 8.0:
+            return 1e20
+
+        # Rg ordering penalty (Rg should be descending)
+        rg_diff = np.diff(rgv_)
+        non_ordered = np.where(rg_diff > 0)[0]
+        order_penalty = np.sum(rg_diff[non_ordered] ** 2) * 1e3
+
+        x_ = x - tI_
+        t0_ = x0_ - tI_
+        cy_list = []
+        for rg_, scale_ in zip(rgv_, scales_):
+            cy = scale_ * sdm_lognormal_pore_gamma_pdf_fast(
+                x_, 1.0, N_, T_, k_, me, mp, mu_, sigma_, rg_, N0_, t0_
+            )
+            cy_list.append(cy)
+        ty = np.sum(cy_list, axis=0)
+        error = np.sum((y - ty) ** 2) + order_penalty
+        _eval_count[0] += 1
+        n = _eval_count[0]
+        if debug and n % 50 == 0:
+            print(f"  lognormal opt: {n} evals, error={error:.4g}", flush=True)
+        return error
+
+    _eval_count = [0]
+
+    # Initial guess: [N, T, x0, tI, N0, k, mu, sigma, ...Rg, ...scale]
+    initial_guess = [N, T, t0, t0, N0, k_init, mu_init, sigma_init]
+    initial_guess += list(rgv)
+    initial_guess += scales_init
+
+    # Bounds
+    bounds = [
+        (100, 5000),              # N
+        (1e-3, 5),                # T
+        (t0 - 1000, t0 + 1000),  # x0
+        (t0 - 1000, t0 + 1000),  # tI
+        (500, 50000),             # N0
+    ]
+    if rt_dist == 'exponential':
+        bounds += [(0.999, 1.001)]  # k fixed at 1.0
+    else:
+        bounds += [(0.5, 10.0)]     # k free for gamma
+    bounds += [(2.0, 8.0)]          # mu
+    bounds += [(0.01, 2.0)]         # sigma
+    bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]
+    upper_scale = xr_icurve.get_max_y() * 1000
+    bounds += [(1e-3, upper_scale) for _ in range(num_components)]
+
+    method = 'Nelder-Mead'
+    if model_params is not None:
+        method = model_params.get('method', 'Nelder-Mead')
+
+    result = minimize(objective_function, initial_guess, bounds=bounds, method=method)
+
+    if debug:
+        print(f"Lognormal optimization: {_eval_count[0]} evals, success={result.success}")
+        print("N=%g, T=%g, x0=%g, tI=%g, N0=%g, k=%g, mu=%g, sigma=%g" % tuple(result.x[0:8]))
+        print("Rgs:", result.x[8:8 + num_components])
+        print("Scales:", result.x[8 + num_components:8 + 2 * num_components])
+
+    N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = result.x[0:8]
+    rgv_ = result.x[8:8 + num_components]
+    scales_ = result.x[8 + num_components:8 + 2 * num_components]
+
+    column = SdmColumn([N_, T_, me, mp, x0_, tI_, N0_, mu_, sigma_, k_],
+                       pore_dist='lognormal', rt_dist=rt_dist)
+
+    if debug:
+        print("initial_scales:", scales_init)
+        print("optimized scales:", list(scales_))
+        print("optimized k:", k_)
+        print("optimized mu:", mu_, "sigma:", sigma_)
+
+    new_xr_ccurves = []
+    for rg, scale in zip(rgv_, scales_):
+        ccurve = SdmComponentCurve(x, column, rg, scale)
+        new_xr_ccurves.append(ccurve)
+    return new_xr_ccurves
+
 def adjust_rg_and_poresize(sdm_decomposition, rgcurve=None):
     """ Adjust rg and poresize in the decomposition based on the optimized component curves.
     """

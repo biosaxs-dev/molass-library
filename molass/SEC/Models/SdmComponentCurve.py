@@ -17,7 +17,12 @@ class SdmColumn:
     Attributes
     ----------
     params : tuple
-        The parameters of the SDM column (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
+        The parameters of the SDM column.
+
+        - ``pore_dist='mono'``:      ``(N, T, me, mp, x0, tI, N0, poresize, timescale, k)``
+        - ``pore_dist='lognormal'``:  ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)``
+
+        Positions 0–6 and 9 are shared; positions 7–8 differ by pore_dist.
     pore_dist : str
         Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
     rt_dist : str
@@ -30,8 +35,12 @@ class SdmColumn:
         Parameters
         ----------
         params : tuple
-            The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
-            If k is omitted, defaults to 1.0 (exponential, backward compatible).
+            The column parameters:
+
+            - ``pore_dist='mono'``:      ``(N, T, me, mp, x0, tI, N0, poresize, timescale, k)``
+            - ``pore_dist='lognormal'``:  ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)``
+
+            If k is omitted (9 elements), defaults to 1.0 (exponential, backward compatible).
         pore_dist : str, optional
             Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
         rt_dist : str, optional
@@ -83,25 +92,44 @@ class SdmComponentCurve(ComponentCurve):
         """
         self.column = column
         self.rg = rg
-        N, T, me, mp, x0, tI, N0, poresize, timescale, k = column.get_params()
         self.x = x
         self.moment = None
         self.model = 'sdm'
-        self.tI = tI
-        self._x = x - tI
-        rho = rg/poresize
-        if rho > 1.0:
-            rho = 1.0
-        ni = N*(1 - rho)**me
-        ti = T*(1 - rho)**mp
-        t0 = x0 - tI
-        if column.rt_dist == 'exponential':
-            self.params = (ni, ti, N0, t0, timescale)
-            self._pdf_func = sdm_monopore_pdf
+
+        if column.pore_dist == 'lognormal':
+            from molass.SEC.Models.LognormalPore import (
+                sdm_lognormal_pore_pdf,
+                sdm_lognormal_pore_gamma_pdf_fast,
+            )
+            # params: (N, T, me, mp, x0, tI, N0, mu, sigma, k)
+            N, T, me, mp, x0, tI, N0, mu, sigma, k = column.get_params()
+            self.tI = tI
+            self._x = x - tI
+            t0 = x0 - tI
+            if column.rt_dist == 'exponential':
+                self.params = (1.0, N, T, me, mp, mu, sigma, rg, N0, t0)
+                self._pdf_func = sdm_lognormal_pore_pdf
+            else:
+                self.params = (1.0, N, T, k, me, mp, mu, sigma, rg, N0, t0)
+                self._pdf_func = sdm_lognormal_pore_gamma_pdf_fast
         else:
-            theta = ti / k  # Gamma scale: mean = k*theta = ti
-            self.params = (ni, k, theta, N0, t0, timescale)
-            self._pdf_func = sdm_monopore_gamma_pdf
+            # params: (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
+            N, T, me, mp, x0, tI, N0, poresize, timescale, k = column.get_params()
+            self.tI = tI
+            self._x = x - tI
+            rho = rg/poresize
+            if rho > 1.0:
+                rho = 1.0
+            ni = N*(1 - rho)**me
+            ti = T*(1 - rho)**mp
+            t0 = x0 - tI
+            if column.rt_dist == 'exponential':
+                self.params = (ni, ti, N0, t0, timescale)
+                self._pdf_func = sdm_monopore_pdf
+            else:
+                theta = ti / k  # Gamma scale: mean = k*theta = ti
+                self.params = (ni, k, theta, N0, t0, timescale)
+                self._pdf_func = sdm_monopore_gamma_pdf
         self.scale = scale
     
     def get_y(self, x=None):

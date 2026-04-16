@@ -84,3 +84,89 @@ def estimate_sdm_column_params(decomposition, **kwargs):
         plt.show()
     N, T, N0, t0, poresize = result.x
     return N, T, me, mp, N0, t0, poresize
+
+
+def estimate_sdm_lognormal_column_params(decomposition, **kwargs):
+    """
+    Estimate column parameters for SDM with lognormal pore distribution.
+
+    Runs the mono-pore estimator first, then converts poresize to
+    lognormal parameters (mu, sigma).
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The decomposition containing the initial curve and component curves.
+    kwargs : dict
+        Additional parameters for the estimation process.
+
+    Returns
+    -------
+    (N, T, me, mp, N0, t0, mu, sigma) : tuple
+        Estimated parameters for the SDM column with lognormal pore distribution.
+    """
+    N, T, me, mp, N0, t0, poresize = estimate_sdm_column_params(decomposition, **kwargs)
+    mu = np.log(poresize)
+    sigma = 0.3  # initial breadth for optimizer to refine
+    return N, T, me, mp, N0, t0, mu, sigma
+
+
+def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
+    """
+    Estimate lognormal column parameters from converged mono-pore SDM results.
+
+    Converts the mono-pore column parameters to lognormal initial guess by:
+    1. Extracting converged (N, T, x0, tI, N0, k) from the mono-pore result
+    2. Deriving effective poresize from Rg (not the estimator's stored value)
+    3. Setting mu=ln(poresize), sigma=0.3
+    4. Shifting x0/tI to align the lognormal PDF peak with the data peak
+
+    Parameters
+    ----------
+    mono_ccurves : list of SdmComponentCurve
+        Converged mono-pore component curves.
+    xr_icurve : Curve
+        The XR integrated elution curve (data).
+    kwargs : dict
+        Additional parameters (debug, etc.).
+
+    Returns
+    -------
+    (N, T, me, mp, N0, t0_adj, mu, sigma) : tuple
+        Estimated parameters for the lognormal SDM optimizer.
+    """
+    from .SdmComponentCurve import SdmColumn, SdmComponentCurve
+
+    debug = kwargs.get('debug', False)
+    column = mono_ccurves[0].column
+    N, T, me, mp, x0, tI, N0, poresize_stored, timescale, k = column.get_params()
+
+    # The estimator's poresize is not optimized by the mono-pore optimizer.
+    # Derive an effective poresize from the optimized Rg values instead.
+    # In SEC, K_SEC ~ 0.5 corresponds to poresize ~ 2.5 * Rg.
+    rg_max = max(cc.rg for cc in mono_ccurves)
+    effective_poresize = 2.5 * rg_max
+    mu = np.log(effective_poresize)
+    sigma = 0.3
+
+    # Create a test lognormal PDF with the dominant component to find peak position
+    x_data, y_data = xr_icurve.get_xy()
+    rg_dominant = mono_ccurves[0].rg
+    col_test = SdmColumn([N, T, me, mp, x0, tI, N0, mu, sigma, k],
+                         pore_dist='lognormal', rt_dist=column.rt_dist)
+    cc_test = SdmComponentCurve(x_data, col_test, rg_dominant, scale=1.0)
+    cy_test = cc_test.get_y()
+    pdf_peak = x_data[np.argmax(cy_test)]
+    data_peak = x_data[np.argmax(y_data)]
+    shift = data_peak - pdf_peak
+
+    # t0 for the optimizer (sets both x0 and tI to this value initially)
+    t0_adj = x0 + shift
+
+    if debug:
+        print(f"Lognormal from mono-pore: Rg_max={rg_max:.1f}, effective_poresize={effective_poresize:.1f}")
+        print(f"  stored poresize={poresize_stored:.1f} (not used), mu={mu:.4f}")
+        print(f"  PDF peak={pdf_peak:.0f}, data peak={data_peak:.0f}, shift={shift:.0f}")
+        print(f"  x0: {x0:.1f} → {x0 + shift:.1f}, t0_adj={t0_adj:.1f}")
+
+    return N, T, me, mp, N0, t0_adj, mu, sigma
