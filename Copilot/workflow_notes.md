@@ -21,7 +21,7 @@ Notes for AI assistants (Copilot, etc.) working in this repository across multip
 
 Use the correct prefix to categorize issues:
 
-- **`AI-friendliness:`** — API is confusing specifically for an AI (or any caller without deep context): wrong arg order, silent failures, missing defaults, opaque names. Examples: #47, #49, #28.
+- **`AI-friendliness:`** — anything that makes the *working environment* harder to use without deep context. This includes Python APIs (wrong arg order, silent failures, opaque names) AND tools/extensions/conventions (missing tools, undiscoverable capabilities, broken workflows). Examples: #47, #49, #28; ai-context-vscode missing `canBeReferencedInPrompt`.
 - **`Design:`** — workflow/philosophy issues: separation of concerns, consistency with existing patterns, architectural decisions. Example: #50.
 - **`Enhancement:`** / **`Bug:`** — standard feature additions and bug fixes.
 
