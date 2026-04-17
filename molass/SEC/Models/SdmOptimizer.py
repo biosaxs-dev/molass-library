@@ -248,9 +248,11 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     if model_params is None:
         k_init = 2.0
         rt_dist = 'gamma'
+        rg_penalty_weight = 1.0
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
+        rg_penalty_weight = model_params.get('rg_penalty_weight', 1.0)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -265,6 +267,18 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         idx = np.argmax(cy)
         scale = y[idx] / cy[idx] if cy[idx] > 0 else 1.0
         scales_init.append(scale)
+
+    # Compute initial data-fit error for Rg penalty calibration
+    cy_init_list = []
+    for rg, scale in zip(rgv, scales_init):
+        column = SdmColumn([N, T, me, mp, t0, t0, N0, mu_init, sigma_init, k_init],
+                           pore_dist='lognormal', rt_dist=rt_dist)
+        ccurve = SdmComponentCurve(x, column, rg, scale)
+        cy_init_list.append(ccurve.get_y())
+    ty_init = np.sum(cy_init_list, axis=0)
+    initial_error = np.sum((y - ty_init) ** 2)
+    # Rg penalty scale: initial_error means 100% relative deviation costs ~initial_error
+    rg_penalty_scale = rg_penalty_weight * initial_error
 
     def objective_function(params):
         N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = params[0:8]
@@ -290,7 +304,9 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
             )
             cy_list.append(cy)
         ty = np.sum(cy_list, axis=0)
-        error = np.sum((y - ty) ** 2) + order_penalty
+        # Penalize Rg deviation from Guinier values (prevents Rg drift in lognormal model)
+        rg_penalty = rg_penalty_scale * np.sum(((rgv_ - rgv) / rgv) ** 2)
+        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty
         _eval_count[0] += 1
         n = _eval_count[0]
         if debug and n % 50 == 0:
@@ -333,6 +349,8 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         print("N=%g, T=%g, x0=%g, tI=%g, N0=%g, k=%g, mu=%g, sigma=%g" % tuple(result.x[0:8]))
         print("Rgs:", result.x[8:8 + num_components])
         print("Scales:", result.x[8 + num_components:8 + 2 * num_components])
+        print(f"Rg initial (Guinier): {rgv}")
+        print(f"Rg penalty weight: {rg_penalty_weight}, initial_error: {initial_error:.4g}")
 
     N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = result.x[0:8]
     rgv_ = result.x[8:8 + num_components]
