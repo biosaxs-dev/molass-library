@@ -63,6 +63,7 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
     ax.legend()
 
     colorbar = kwargs.get('colorbar', False)
+    reconstructed_rgcurve = kwargs.get('reconstructed_rgcurve', None)
     if rgcurve is None:
         axt = None
     else:
@@ -71,8 +72,15 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
         cm = plt.get_cmap('YlGn')
         x_ = rgcurve.frames
         axt.grid(False)
-        sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm)
+        sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm, label="Rg (data)")
         
+        if reconstructed_rgcurve is not None:
+            rx_ = reconstructed_rgcurve.frames
+            ry_ = reconstructed_rgcurve.rgvalues
+            axt.plot(rx_, ry_, color='red', linewidth=1.5, alpha=0.7, label="Rg (model)")
+
+        axt.legend(fontsize=7, loc='upper right')
+
         if colorbar:
             ax.fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
         ymin, ymax = axt.get_ylim()
@@ -175,7 +183,12 @@ def plot_components_impl(decomposition, **kwargs):
 
     # XR Elution Curve
     recognition_curve = decomposition.ssd.xr.get_recognition_curve()
-    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
+    rgcurve = kwargs.get('rgcurve', None)
+    reconstructed_rgcurve = None
+    if rgcurve is not None:
+        reconstructed_rgcurve = decomposition.compute_reconstructed_rgcurve(debug=debug)
+    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=rgcurve,
+                             reconstructed_rgcurve=reconstructed_rgcurve,
                              recognition_curve=recognition_curve,
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 

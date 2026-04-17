@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
-**Last Updated**: April 16, 2026  
-**Current version**: 0.9.1
+**Last Updated**: April 17, 2026  
+**Current version**: 0.9.2
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,9 +11,13 @@
 
 ## 🎯 Current Task
 
-Working on: **G1300 objective function — SDM(lognormal) rigorous optimization** ✅  
-Next: Check 13r optimization results; compare with EGH and mono-pore SDM(gamma) rigorous fits  
+Working on: **G1300 result loading & score breakdown bugs fixed** ✅  
+Next: Compare SDM-lognormal rigorous result with EGH and mono-pore SDM(gamma)  
 See: `molass-researcher/experiments/13_rigorous_optimization/13r_sdm_lognormal_apo.ipynb`
+
+**Completed (April 17)**:
+- `ComponentUtils.py`: `getattr(optimizer, 'function_code', None)` → `optimizer.get_function_code()` — fixed G1300 load path (#104)
+- `RunInfo.py`: `get_score_breakdown()` temporarily sets `basic_floor=None` to avoid inflated fv (#103)
 
 **Completed (April 16)**:
 - G1300 legacy objective function created (`molass-legacy/ObjectiveFunctions/G1300.py`)

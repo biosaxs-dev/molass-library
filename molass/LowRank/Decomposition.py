@@ -95,6 +95,7 @@ class Decomposition:
         self.guinier_objects = None
         self.bounded_lrf_info = None
         self.model = xr_ccurves[0].model
+        self._optimizer_rgs = kwargs.get('optimizer_rgs', None)
 
     def copy_with_new_components(self, xr_ccurves, uv_ccurves):
         """
@@ -256,6 +257,53 @@ class Decomposition:
             plt.show()
         """
         return self.xr.compute_rgcurve()
+
+    def compute_reconstructed_rgcurve(self, debug=False):
+        """Compute the reconstructed Rg curve as a concentration-weighted average.
+
+        At each frame *j*, the reconstructed Rg is the weighted average of
+        each component's Rg, weighted by the component's elution intensity::
+
+            Rg_recon(j) = Σ_k  [C_k(j) / Σ_k C_k(j)]  ×  Rg_k
+
+        This matches the legacy ``plot_rg_curves`` / ``compute_rg_curves``
+        in ``GuinierTools.RgCurveUtils`` and the ``GuinierDeviation``
+        scoring used by ``optimize_rigorously()``.
+
+        Returns
+        -------
+        rgcurve : molass.Guinier.RgCurve.RgCurve
+            An ``RgCurve`` with the same frame indices as the data.
+        """
+        from molass.Guinier.RgCurve import RgCurve
+
+        # Prefer optimizer's Rg params (from rigorous optimization) over
+        # Guinier-fit Rg.  The optimizer's values are directly optimized to
+        # match the observed Rg curve and are what MplMonitor displays.
+        if self._optimizer_rgs is not None:
+            rg_values = self._optimizer_rgs
+        else:
+            rg_values = self.get_rgs()      # Guinier fit on P vectors
+        jv = self.xr.jv
+
+        # Gather component elution curves (n_components arrays)
+        cy_list = [c.get_xy()[1] for c in self.xr_ccurves]
+        ty = np.sum(cy_list, axis=0)        # total elution curve
+
+        # Concentration-weighted average Rg (matching legacy safe_ratios logic)
+        rg_recon = np.zeros_like(ty)
+        for rg_k, cy_k in zip(rg_values, cy_list):
+            # safe division: where ty is ~0, ratio → 0 (not inf)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                ratio = np.where(np.abs(ty) > 1e-30, cy_k / ty, 0.0)
+            rg_recon += ratio * rg_k
+
+        # Mask low-signal frames as NaN
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rg_recon = np.where(ty > ty.max() * 1e-3, rg_recon, np.nan)
+
+        scores = np.where(np.isnan(rg_recon), 0.0, 1.0)
+        return RgCurve(np.asarray(jv, dtype=int), rg_recon, scores)
 
     def get_P_at(self, q_target, normalize=False):
         """Return the XR scattering matrix P interpolated onto *q_target*.
@@ -816,8 +864,15 @@ class Decomposition:
 
         Returns
         -------
-        result : Decomposition
-            A new Decomposition object after rigorous decomposition.
+        RunInfo
+            A ``RunInfo`` object that tracks the optimization subprocess.
+            Call ``run_info.wait()`` to block until done, then
+            ``run_info.load_best()`` to get the best ``Decomposition``.
+
+        See Also
+        --------
+        RunInfo.get_score_breakdown : Inspect the individual score and
+            penalty components that make up the objective value (fv).
         """
         # Backward compatibility: accept old name uncorrected_ssd
         if 'uncorrected_ssd' in kwargs:
@@ -861,7 +916,7 @@ class Decomposition:
 
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, debug=debug)
 
-    def load_best_rigorous_result(self, analysis_folder, debug=False):
+    def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
 
         Convenience method that combines ``list_rigorous_jobs()`` and
@@ -873,6 +928,9 @@ class Decomposition:
         ----------
         analysis_folder : str
             The same ``analysis_folder`` passed to ``optimize_rigorously()``.
+        rgcurve : RgCurve, optional
+            Pre-computed Rg curve.  Avoids redundant per-frame Guinier
+            fitting when loading results.
         debug : bool, optional
             If True, reload modules from disk.
 
@@ -886,12 +944,20 @@ class Decomposition:
         FileNotFoundError
             If no completed jobs are found.
 
+        See Also
+        --------
+        RunInfo.get_score_breakdown : Inspect the individual score and
+            penalty components that make up the objective value (fv).
+
         Examples
         --------
         ::
 
             result = decomp.load_best_rigorous_result("temp_analysis")
             result.plot_components()
+
+            # Fast: skip redundant Guinier fitting by passing rgcurve
+            result = decomp.load_best_rigorous_result("temp_analysis", rgcurve=rgcurve)
         """
         jobs = self.list_rigorous_jobs(analysis_folder)
         if not jobs:
@@ -899,9 +965,9 @@ class Decomposition:
                 f"No completed jobs found in {analysis_folder}"
             )
         best = min(jobs, key=lambda j: j.best_fv)
-        return self.load_rigorous_result(analysis_folder, jobid=best.id, debug=debug)
+        return self.load_rigorous_result(analysis_folder, jobid=best.id, rgcurve=rgcurve, debug=debug)
 
-    def load_rigorous_result(self, analysis_folder, jobid=None, debug=False):
+    def load_rigorous_result(self, analysis_folder, jobid=None, rgcurve=None, debug=False):
         """Load a completed rigorous optimization result from disk.
 
         This reads saved parameters without launching a new subprocess.
@@ -917,6 +983,9 @@ class Decomposition:
             Specific job id (subfolder name, e.g. ``'001'``).  If None,
             loads the latest job.  Use ``list_rigorous_jobs()`` to see
             available jobs.
+        rgcurve : RgCurve, optional
+            Pre-computed Rg curve.  Avoids redundant per-frame Guinier
+            fitting when loading results.
         debug : bool, optional
             If True, reload modules from disk.
 
@@ -930,14 +999,14 @@ class Decomposition:
         After kernel restart, re-run data loading and quick decomposition,
         then::
 
-            result = decomp.load_rigorous_result("temp_analysis_scaffolded")
+            result = decomp.load_rigorous_result("temp_analysis_scaffolded", rgcurve=rgcurve)
             result.plot_components(rgcurve=rgcurve)
         """
         if debug:
             import molass.Rigorous.CurrentStateUtils
             reload(molass.Rigorous.CurrentStateUtils)
         from molass.Rigorous.CurrentStateUtils import load_rigorous_result as _load
-        return _load(self, analysis_folder, jobid=jobid, debug=debug)
+        return _load(self, analysis_folder, jobid=jobid, rgcurve=rgcurve, debug=debug)
 
     @staticmethod
     def list_rigorous_jobs(analysis_folder):

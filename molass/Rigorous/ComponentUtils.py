@@ -18,7 +18,7 @@ def get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params):
     rg_params = separated_params[2]
     sdmcol = separated_params[-1]
     # Infer pore_dist/rt_dist from function code
-    func_code = getattr(optimizer, 'function_code', None)
+    func_code = optimizer.get_function_code()
     me = mp = 1.5
     if func_code == 'G1300':
         # Lognormal pore + gamma: sdmcol = [N, K, x0, mu, sigma, N0, tI, k]

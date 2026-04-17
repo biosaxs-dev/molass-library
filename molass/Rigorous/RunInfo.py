@@ -127,6 +127,11 @@ class RunInfo:
         FileNotFoundError
             If no completed jobs are found.
 
+        See Also
+        --------
+        get_score_breakdown : Inspect the individual score and penalty
+            components that make up the objective value (fv).
+
         Examples
         --------
         ::
@@ -167,6 +172,24 @@ class RunInfo:
         Loads the best (or specified) optimized parameters from disk, runs them
         through the optimizer's objective function, and returns a dict mapping
         each score name to its value.
+
+        Score architecture
+        ------------------
+        The objective value ``fv`` is computed as::
+
+            fv = synthesize(scores, positive_elevate=3) + sum(penalties)
+
+        **Synthesized scores** (first 7): XR_2D_fitting, XR_LRF_residual,
+        UV_2D_fitting, UV_LRF_residual, Guinier_deviation,
+        Kratky_smoothness, SEC_conformance.  These are combined via a
+        weighted RMS + spread measure, shifted so that a raw score of -3
+        maps to zero contribution.
+
+        **Additive penalties** (remaining entries): mapping_penalty,
+        negative_penalty, baseline_penalty, outofbounds_penalty,
+        order_penalty, control_penalty, consistency_penalty.  These are
+        added directly to fv after synthesis.  A penalty of 1.0 raises
+        fv by exactly 1.0.
 
         Parameters
         ----------
@@ -227,7 +250,15 @@ class RunInfo:
         job_folder = os.path.join(jobs_folder, jobid)
         params = get_params(job_folder, debug=debug)
 
-        result = self.optimizer.objective_func(params, return_full=True)
+        # Temporarily disable basic_floor to match subprocess behavior.
+        # The optimization subprocess never receives basic_floor, so we
+        # must suppress it here to reproduce the same fv.
+        saved_floor = getattr(self.optimizer, 'basic_floor', None)
+        self.optimizer.basic_floor = None
+        try:
+            result = self.optimizer.objective_func(params, return_full=True)
+        finally:
+            self.optimizer.basic_floor = saved_floor
         fv = result[0]
         score_array = result[1]
         names = self.optimizer.get_score_names()

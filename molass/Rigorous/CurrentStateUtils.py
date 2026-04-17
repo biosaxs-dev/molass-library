@@ -2,6 +2,7 @@
 Rigorous.CurrentStateUtils.py
 """
 import os
+import numpy as np
 from collections import namedtuple
 from molass_legacy._MOLASS.SerialSettings import get_setting
 from molass_legacy.Optimizer.Scripting import get_params
@@ -135,7 +136,7 @@ def construct_decomposition_from_results(run_info, **kwargs):
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 
-def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
+def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debug=False):
     """Load a rigorous optimization result from disk without launching a subprocess.
 
     This is the static result viewer: it reads the saved parameter vector from
@@ -151,10 +152,13 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
         model type, and baseline information.
     analysis_folder : str
         Path to the analysis folder used during optimization (same value
-        passed to ``optimize_rigorously(analysis_folder=...)``).
+        passed to ``optimize_rigorously(analysis_folder=...)``).  
     jobid : str, optional
-        Specific job id to load (subfolder name under ``optimized/jobs/``).
+        Specific job id to load (subfolder name under ``optimized/jobs/``).  
         If ``None``, loads the latest (last sorted) job.
+    rgcurve : RgCurve, optional
+        Pre-computed Rg curve.  When provided, skips the expensive per-frame
+        Guinier fitting that ``ssd.xr.compute_rgcurve()`` would perform.
     debug : bool, optional
         If True, reload modules from disk.
 
@@ -211,7 +215,7 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
     )
 
     ssd = decomp.ssd
-    rgcurve_for_dsets = ssd.xr.compute_rgcurve()
+    rgcurve_for_dsets = rgcurve if rgcurve is not None else ssd.xr.compute_rgcurve()
     import io, warnings
     from contextlib import redirect_stdout, redirect_stderr
     with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), \
@@ -263,7 +267,12 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, debug=False):
         xr_h = xr_ccurve.get_scale_param()
         uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale / xr_h))
 
-    return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves)
+    # Preserve the optimizer's Rg values so that
+    # compute_reconstructed_rgcurve() matches MplMonitor.
+    optimizer_rgs = np.asarray(separated_params[2], dtype=float)
+
+    return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
+                         optimizer_rgs=optimizer_rgs)
 
 
 def list_rigorous_jobs(analysis_folder):

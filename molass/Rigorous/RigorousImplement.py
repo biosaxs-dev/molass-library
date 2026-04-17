@@ -264,6 +264,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     x_shifts = dsets.get_x_shifts()
     monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
 
+    # Wire dsets to monitor so the Export Data button can work (issue #96)
+    monitor.dsets = dsets
+
     # Pass anomaly mask to monitor for consistent band display
     from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
     jv, mask = get_anomaly_mask_from_ssd(decomposition.ssd)
