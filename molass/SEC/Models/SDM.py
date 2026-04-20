@@ -55,10 +55,10 @@ class SDM:
                 decomposition, mono_env, model_params=mono_model_params, **kwargs)
             env_params = estimate_sdm_lognormal_from_monopore(
                 mono_ccurves, decomposition.xr_icurve, **kwargs)
-            # Pass converged k from mono-pore to lognormal optimizer
+            # Do NOT pass mono-pore k to lognormal — the models have different
+            # parameterizations and the same k produces very different shapes.
+            # Let the lognormal optimizer use its default k=2.0 (Issue #108).
             ln_model_params = dict(model_params) if model_params else {}
-            mono_k = mono_ccurves[0].column.get_params()[9]
-            ln_model_params.setdefault('k', mono_k)
             new_xr_ccurves = optimize_sdm_lognormal_xr_decomposition(
                 decomposition, env_params, model_params=ln_model_params, **kwargs)
         else:

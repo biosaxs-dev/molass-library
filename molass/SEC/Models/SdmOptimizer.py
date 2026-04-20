@@ -257,16 +257,20 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     if rt_dist == 'exponential':
         k_init = 1.0
 
-    # Estimate initial scales
-    scales_init = []
+    # Estimate initial scales using NNLS (non-negative least squares).
+    # The previous peak-ratio method (y[argmax]/cy[argmax]) fails when the model
+    # curve peaks at a location where data is negative, producing negative/huge
+    # scales that clip to the lower bound and prevent NM from recovering (Issue #108).
+    from scipy.optimize import nnls as _nnls
+    A_cols = []
     for rg in rgv:
         column = SdmColumn([N, T, me, mp, t0, t0, N0, mu_init, sigma_init, k_init],
                            pore_dist='lognormal', rt_dist=rt_dist)
         ccurve = SdmComponentCurve(x, column, rg, scale=1.0)
-        cy = ccurve.get_y()
-        idx = np.argmax(cy)
-        scale = y[idx] / cy[idx] if cy[idx] > 0 else 1.0
-        scales_init.append(scale)
+        A_cols.append(ccurve.get_y())
+    A_mat = np.array(A_cols).T  # (n_frames, n_components)
+    scales_nnls, _ = _nnls(A_mat, y)
+    scales_init = [max(s, 0.01) for s in scales_nnls]
 
     # Compute initial data-fit error for Rg penalty calibration
     cy_init_list = []
@@ -342,7 +346,18 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     if model_params is not None:
         method = model_params.get('method', 'Nelder-Mead')
 
-    result = minimize(objective_function, initial_guess, bounds=bounds, method=method)
+    # Clip initial guess to bounds to avoid OptimizeWarning (Issue #108)
+    initial_guess = np.array(initial_guess, dtype=float)
+    for i, (lo, hi) in enumerate(bounds):
+        initial_guess[i] = np.clip(initial_guess[i], lo, hi)
+
+    # Lognormal has more parameters than mono-pore and needs more iterations
+    # to converge. Default NM maxiter (200*N) is insufficient (Issue #108).
+    n_params = len(initial_guess)
+    nm_options = {'maxiter': max(200 * n_params, 12000)}
+
+    result = minimize(objective_function, initial_guess, bounds=bounds,
+                      method=method, options=nm_options)
 
     if debug:
         print(f"Lognormal optimization: {_eval_count[0]} evals, success={result.success}")

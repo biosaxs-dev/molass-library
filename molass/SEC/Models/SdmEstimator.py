@@ -117,9 +117,8 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
 
     Converts the mono-pore column parameters to lognormal initial guess by:
     1. Extracting converged (N, T, x0, tI, N0, k) from the mono-pore result
-    2. Deriving effective poresize from Rg (not the estimator's stored value)
-    3. Setting mu=ln(poresize), sigma=0.3
-    4. Shifting x0/tI to align the lognormal PDF peak with the data peak
+    2. Setting mu = ln(geometric_mean(poresize_stored, 2.5*Rg_max)), sigma=0.3
+    3. Shifting x0/tI to align the lognormal PDF peak with the data peak
 
     Parameters
     ----------
@@ -141,11 +140,16 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
     column = mono_ccurves[0].column
     N, T, me, mp, x0, tI, N0, poresize_stored, timescale, k = column.get_params()
 
-    # The estimator's poresize is not optimized by the mono-pore optimizer.
-    # Derive an effective poresize from the optimized Rg values instead.
-    # In SEC, K_SEC ~ 0.5 corresponds to poresize ~ 2.5 * Rg.
+    # Use the mono-pore's stored poresize as the lognormal center,
+    # but scale it down. The mono-pore estimator's poresize (~171 Å) is the
+    # exclusion limit; for a lognormal distribution center, a smaller value
+    # works better as starting point. The 2.5*Rg heuristic was too small (~81 Å)
+    # and caused 85× worse initial fit, but poresize_stored was too large and
+    # led the optimizer into a bad basin (Rg hitting bounds).
+    # Geometric mean of the two gives a balanced starting point.
     rg_max = max(cc.rg for cc in mono_ccurves)
-    effective_poresize = 2.5 * rg_max
+    rg_based = 2.5 * rg_max
+    effective_poresize = np.sqrt(poresize_stored * rg_based)
     mu = np.log(effective_poresize)
     sigma = 0.3
 
@@ -164,8 +168,8 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
     t0_adj = x0 + shift
 
     if debug:
-        print(f"Lognormal from mono-pore: Rg_max={rg_max:.1f}, effective_poresize={effective_poresize:.1f}")
-        print(f"  stored poresize={poresize_stored:.1f} (not used), mu={mu:.4f}")
+        print(f"Lognormal from mono-pore: poresize_stored={poresize_stored:.1f}, rg_based={rg_based:.1f}")
+        print(f"  effective_poresize={effective_poresize:.1f} (geometric mean), mu={mu:.4f}")
         print(f"  PDF peak={pdf_peak:.0f}, data peak={data_peak:.0f}, shift={shift:.0f}")
         print(f"  x0: {x0:.1f} → {x0 + shift:.1f}, t0_adj={t0_adj:.1f}")
 
