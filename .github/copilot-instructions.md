@@ -233,6 +233,30 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 - `molass/__init__.py::get_version()` reads from `pyproject.toml` during local development, falls back to `importlib.metadata` for installed package
 - Use `get_version(toml_only=True)` in development to avoid confusion between local and installed versions
 
+### 9. Rigorous Optimization Internals (Issue #107)
+
+**Score Value (SV)**: The optimizer's raw objective `fv` is converted to a 0–100 scale for display:
+```
+SV = -200 / (1 + exp(-1.5 * fv)) + 100
+```
+Thresholds: **≥80 Good**, **60–80 Fair**, **<60 Poor**. Defined in `molass_legacy/Optimizer/FvScoreConverter.py` (`convert_score()`), aliased as `fv_to_sv()` in `molass/Rigorous/CurrentStateUtils.py`.
+
+**Parent vs subprocess architecture**: `optimize_rigorously()` builds the optimizer object in the parent process, then launches an independent subprocess via `BackRunner` + `subprocess.Popen`. The subprocess receives only serialized data (init_params.txt, bounds.txt, restrict.txt, etc.) — it reconstructs its own optimizer from disk. Therefore:
+- Parent-side `optimizer.objective_func(params)` and subprocess evaluations use the same code but independent instances
+- The parent optimizer is used post-hoc by `get_score_breakdown()`, `plot_objective_func()`, and `load_best_rigorous_result()` to replay results
+- Key files: `molass_legacy/Optimizer/BackRunner.py` (subprocess launch), `molass_legacy/Optimizer/MplMonitor.py` (parent-side monitoring)
+
+**callback.txt format**: Each optimizer evaluation appends a multi-line entry:
+```
+t=<timestamp>
+x=
+[param_0 param_1 ... param_n]    ← may span multiple lines for long arrays
+f=<fv_value>
+a=<True|False>                   ← accepted by optimizer
+c=<evaluation_count>
+```
+Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
+
 ---
 
 ## 📂 Repository Structure Quick Reference
