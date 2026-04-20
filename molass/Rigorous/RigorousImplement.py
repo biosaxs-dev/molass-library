@@ -55,40 +55,6 @@ def _set_identity_restrict_lists(ssd):
     set_setting('xr_restrict_list', xr_restrict)
     set_setting('uv_restrict_list', uv_restrict)
 
-def _compute_basic_floor(decomposition, data_ssd=None):
-    """Compute basic property floor values from the quick decomposition.
-
-    These floor values set a lower bound on physical plausibility that the
-    rigorous optimizer must not violate (pipeline monotonicity principle).
-
-    Parameters
-    ----------
-    data_ssd : SecSaxsData, optional
-        If provided, use this SSD's data matrix for P reconstruction
-        (should match what the optimizer actually optimizes against).
-    """
-    floor = {}
-    # P-matrix negativity: measure how negative the quick result's P columns are
-    # (should be near zero for a good quick result)
-    ssd = data_ssd if data_ssd is not None else decomposition.ssd
-    xr_M = ssd.xr.M
-    uv_M = ssd.uv.M if ssd.has_uv() else None
-
-    # Reconstruct P matrices from quick result via pseudoinverse
-    C_xr = np.array([c.y for c in decomposition.xr_ccurves])
-    P_xr = xr_M @ np.linalg.pinv(C_xr)
-    floor["p_neg_norm_xr"] = np.linalg.norm(P_xr[P_xr < 0])
-
-    if uv_M is not None and decomposition.uv_ccurves is not None:
-        C_uv = np.array([c.y for c in decomposition.uv_ccurves])
-        P_uv = uv_M @ np.linalg.pinv(C_uv)
-        floor["p_neg_norm_uv"] = np.linalg.norm(P_uv[P_uv < 0])
-
-    # Note: 1D fitting floor is not yet included because the quick result's
-    # normalized_rmsd values are not directly accessible here. The P-negativity
-    # floor is the most critical constraint for preventing the ATP-like regression.
-    return floor
-
 def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
     """Return a copy of *uncorrected_ssd* with anomalous frames interpolated.
 
@@ -245,10 +211,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             from .FunctionCodeUtils import detect_function_code
             function_code = detect_function_code(decomposition)
 
-        # Pipeline monotonicity: compute basic property floor from quick result
-        basic_floor = _compute_basic_floor(decomposition, data_ssd=trimmed_ssd)
-
-        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, basic_floor=basic_floor, function_code=function_code, debug=debug)
+        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, function_code=function_code, debug=debug)
         optimizer.set_xr_only(not data_ssd.has_uv())
         if frozen_components is not None:
             optimizer.set_frozen_components(frozen_components)

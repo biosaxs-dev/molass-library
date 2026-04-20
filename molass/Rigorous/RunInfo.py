@@ -250,15 +250,7 @@ class RunInfo:
         job_folder = os.path.join(jobs_folder, jobid)
         params = get_params(job_folder, debug=debug)
 
-        # Temporarily disable basic_floor to match subprocess behavior.
-        # The optimization subprocess never receives basic_floor, so we
-        # must suppress it here to reproduce the same fv.
-        saved_floor = getattr(self.optimizer, 'basic_floor', None)
-        self.optimizer.basic_floor = None
-        try:
-            result = self.optimizer.objective_func(params, return_full=True)
-        finally:
-            self.optimizer.basic_floor = saved_floor
+        result = self.optimizer.objective_func(params, return_full=True)
         fv = result[0]
         score_array = result[1]
         names = self.optimizer.get_score_names()
