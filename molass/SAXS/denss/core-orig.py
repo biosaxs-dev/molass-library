@@ -883,13 +883,13 @@ def direct_I2P(q, I, D=None):
     P = np.zeros(len(r))
     for ri in range(len(r)):
         qrsinqr = q * r[ri] * np.sin(q * r[ri])
-        P[ri] += np.trapezoid(qrsinqr * I, q)
+        P[ri] += np.trapz(qrsinqr * I, q)
     return r, 1 / (2 * np.pi ** 2) * P
 
 
 def P2Rg(r, P):
-    num = np.trapezoid(r ** 2 * P, r)
-    denom = 2 * np.trapezoid(P, r)
+    num = np.trapz(r ** 2 * P, r)
+    denom = 2 * np.trapz(P, r)
     rg2 = num / denom
     return rg2 ** 0.5
 

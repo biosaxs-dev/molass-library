@@ -376,3 +376,102 @@ _sdm_lognormal_pore_gamma_pdf_fast_impl = FftInvPdf(sdm_lognormal_pore_gamma_cf_
 def sdm_lognormal_pore_gamma_pdf_fast(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t0):
     """Fast version of sdm_lognormal_pore_gamma_pdf using Gauss-Legendre quadrature."""
     return scale * _sdm_lognormal_pore_gamma_pdf_fast_impl(x - t0, N, T, k, me, mp, mu, sigma, Rg, N0, 0)
+
+
+# --------------------------------------------------------------------------
+# Analytical moments of SDM lognormal-pore gamma distribution
+# --------------------------------------------------------------------------
+# The full elution PDF is expensive to evaluate (~10 ms for len(x)=800).
+# For initial parameter estimation by moment matching we only need the
+# first two moments (M1, Variance), which can be computed analytically by
+# integrating over the pore-size distribution. The integral is evaluated
+# by 64-point Gauss-Legendre quadrature on [Rg, max_rg].
+#
+# Per-call cost: ~50 us (≈200x faster than the full PDF). This makes
+# moment-matching viable inside an inner optimization loop.
+#
+# See molass-researcher 13v_moment_matching_strategy notebook for the
+# benchmark and derivation. Issue #113.
+
+_GL64_NODES, _GL64_WEIGHTS = np.polynomial.legendre.leggauss(64)
+_LOG_2PI_HALF = 0.5 * np.log(2.0 * np.pi)
+
+def _lognorm_pdf_fast(r, mu, sigma):
+    """Hand-rolled lognormal PDF (~6x faster than scipy.stats.lognorm.pdf,
+    bit-identical to ~1e-16 relative error)."""
+    z = (np.log(r) - mu) / sigma
+    return np.exp(-0.5 * z * z - _LOG_2PI_HALF) / (r * sigma)
+
+def sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me=1.5, mp=1.5):
+    """Compute (M1, Variance) of the SDM lognormal-pore gamma elution model.
+
+    For a single component with radius of gyration ``rg``, the residence-time
+    distribution is gamma with shape ``k`` and per-pore mean ``n(r)·tau(r)``,
+    weighted by the lognormal pore-size density L(r; mu, sigma).
+
+    Formulas:
+        M1  = t0 + k * I1
+        Var = k * (k + 1) * I2 + M1^2 / N0
+    where
+        I1 = integral over r in [rg, max_rg] of L(r) * n(r) * tau(r) dr
+        I2 = integral over r in [rg, max_rg] of L(r) * n(r) * tau(r)^2 dr
+        n(r)   = N * (1 - rg/r)^me
+        tau(r) = T * (1 - rg/r)^mp
+
+    The variance formula uses the second *raw* moment of the per-pore Gamma
+    distribution (k*(k+1)*theta^2), as appropriate for the compound-Poisson
+    structure of the SDM model.
+
+    Parameters
+    ----------
+    rg : float
+        Radius of gyration of the component (Å).
+    N, T : float
+        SDM column parameters (per-pore plate count and residence time).
+    N0 : float
+        Mobile-phase plate number (governs Gaussian dispersion).
+    t0 : float
+        Dead time / column offset.
+    k : float
+        Gamma shape parameter for residence-time distribution.
+    mu, sigma : float
+        Lognormal pore-size distribution parameters.
+    me, mp : float, optional
+        SEC partition exponents (default 1.5).
+
+    Returns
+    -------
+    (M1, Var) : tuple of float
+        First moment (mean) and central second moment (variance) of
+        the elution profile.
+
+    See Also
+    --------
+    sdm_lognormal_pore_gamma_pdf_fast : full elution PDF computation.
+    """
+    sigma2 = sigma * sigma
+    mode = np.exp(mu - sigma2)
+    stdev = np.exp(mu + 0.5 * sigma2) * np.sqrt(np.exp(sigma2) - 1.0)
+    max_rg = min(PORESIZE_INTEG_LIMIT, mode + 5.0 * stdev)
+    if max_rg <= rg:
+        # All pores excluded: pure mobile-phase Gaussian at t0
+        return t0, t0 * t0 / N0
+
+    half = 0.5 * (max_rg - rg)
+    mid  = 0.5 * (max_rg + rg)
+    r  = half * _GL64_NODES + mid
+    wt = half * _GL64_WEIGHTS
+
+    g = _lognorm_pdf_fast(r, mu, sigma)
+    ratio = np.minimum(1.0, rg / r)
+    one_minus = 1.0 - ratio
+    n_pore = N * one_minus**me
+    theta  = T * one_minus**mp
+
+    coeffs = g * n_pore * wt
+    I1 = np.dot(coeffs, theta)
+    I2 = np.dot(coeffs, theta * theta)
+
+    M1 = t0 + k * I1
+    Var = k * (k + 1.0) * I2 + M1 * M1 / N0
+    return M1, Var
