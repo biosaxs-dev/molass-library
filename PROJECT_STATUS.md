@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 17, 2026  
+**Last Updated**: April 21, 2026  
 **Current version**: 0.9.2
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,9 +11,22 @@
 
 ## 🎯 Current Task
 
-Working on: **G1300 result loading & score breakdown bugs fixed** ✅  
-Next: Compare SDM-lognormal rigorous result with EGH and mono-pore SDM(gamma)  
-See: `molass-researcher/experiments/13_rigorous_optimization/13r_sdm_lognormal_apo.ipynb`
+Working on: **Fast analytical moments for SDM lognormal init** ✅ (issue #113)  
+Next: End-to-end validation — re-run 13r/13y to confirm the new init path improves convergence (or doesn't regress)  
+See: `molass-researcher/experiments/13_rigorous_optimization/13v_moment_matching_strategy.ipynb`, `13y_sdm_init_comparison_2comp.ipynb`
+
+**Completed (April 21)** — issue #113, commit `f0f7b62`:
+- `SEC/Models/LognormalPore.py`: `sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me, mp)` — 64-pt Gauss-Legendre + hand-rolled `_lognorm_pdf_fast` (~50 µs/call, 200× faster than full PDF, 6× faster than scipy.stats)
+- `SEC/Models/SdmEstimator.py`: `refine_lognormal_params_by_moments()` — L-BFGS-B refinement of (t0, k, mu, sigma) against per-component empirical (M1, Var) from EGH ccurves
+- Wired into `estimate_sdm_lognormal_from_monopore()` via `decomposition=` + `moment_refine=True` kwargs (default on)
+- `SEC/Models/SDM.py`: passes `decomposition=decomposition` so default lognormal pipeline benefits
+- `tests/specific/200_Rigorous/test_030_sdm_lognormal_moments.py`: 4 tests, all pass
+- **Bug fixed during testing**: variance formula `k·I2` → `k·(k+1)·I2` (compound-Poisson 2nd raw moment of per-pore Gamma); now M1 matches FFT to 1e-8, Var to ~2%
+- Issue #113 closed
+
+**Completed (April 17)**:
+- `ComponentUtils.py`: `getattr(optimizer, 'function_code', None)` → `optimizer.get_function_code()` — fixed G1300 load path (#104)
+- `RunInfo.py`: `get_score_breakdown()` temporarily sets `basic_floor=None` to avoid inflated fv (#103)
 
 **Completed (April 17)**:
 - `ComponentUtils.py`: `getattr(optimizer, 'function_code', None)` → `optimizer.get_function_code()` — fixed G1300 load path (#104)
