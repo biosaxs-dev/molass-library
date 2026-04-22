@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 21, 2026  
+**Last Updated**: April 22, 2026  
 **Current version**: 0.9.2
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,28 +11,34 @@
 
 ## 🎯 Current Task
 
-Working on: **Fast analytical moments for SDM lognormal init** ✅ (issue #113)  
-Next: End-to-end validation — re-run 13r/13y to confirm the new init path improves convergence (or doesn't regress)  
-See: `molass-researcher/experiments/13_rigorous_optimization/13v_moment_matching_strategy.ipynb`, `13y_sdm_init_comparison_2comp.ipynb`
+Working on: **Split-architecture for `optimize_rigorously()` — Phase 3 validation** 🔬  
+Next: Confirm wall-time parity for `in_process=True` path (latest hypothesis: ipywidgets viz callback overhead in Jupyter; untested patch in `molass-legacy/Solvers/UltraNest/SamplerCallback.py`)  
+See: `Copilot/DESIGN_split_optimizer_architecture.md`, `molass-researcher/experiments/13_rigorous_optimization/13h_split_architecture_validation.ipynb`
 
-**Completed (April 21)** — issue #113, commit `f0f7b62`:
+**In flight (Apr 22)**:
+- `molass/Rigorous/RigorousImplement.py`: `in_process` kwarg branches to `molass_legacy.Optimizer.InProcessRunner.run_optimizer_in_process()`; same `dsets`, no subprocess re-derivation. Apo 2-comp NITER_CMP=1 smoke: subprocess 52s vs in-process 398s (algorithmically equivalent: Rg identical to 2 dp, in-process fv slightly better).
+- `Copilot/DESIGN_split_optimizer_architecture.md`: Phase 0 baseline table empty; pending NITER_CMP=20 numbers once wall-time parity is confirmed.
+- Pending umbrella issue: "Design: Split architecture for rigorous optimization" — parent of #117/#118/#119.
+
+---
+
+## 🎯 Recent Work
+
+### April 21, 2026 — Fast analytical moments for SDM lognormal init (issue #113)
+
 - `SEC/Models/LognormalPore.py`: `sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me, mp)` — 64-pt Gauss-Legendre + hand-rolled `_lognorm_pdf_fast` (~50 µs/call, 200× faster than full PDF, 6× faster than scipy.stats)
 - `SEC/Models/SdmEstimator.py`: `refine_lognormal_params_by_moments()` — L-BFGS-B refinement of (t0, k, mu, sigma) against per-component empirical (M1, Var) from EGH ccurves
 - Wired into `estimate_sdm_lognormal_from_monopore()` via `decomposition=` + `moment_refine=True` kwargs (default on)
 - `SEC/Models/SDM.py`: passes `decomposition=decomposition` so default lognormal pipeline benefits
 - `tests/specific/200_Rigorous/test_030_sdm_lognormal_moments.py`: 4 tests, all pass
 - **Bug fixed during testing**: variance formula `k·I2` → `k·(k+1)·I2` (compound-Poisson 2nd raw moment of per-pore Gamma); now M1 matches FFT to 1e-8, Var to ~2%
-- Issue #113 closed
+- Issue #113 closed; commit `f0f7b62`
 
-**Completed (April 17)**:
+### April 17, 2026 — G1300 load-path + score-breakdown fixes
 - `ComponentUtils.py`: `getattr(optimizer, 'function_code', None)` → `optimizer.get_function_code()` — fixed G1300 load path (#104)
 - `RunInfo.py`: `get_score_breakdown()` temporarily sets `basic_floor=None` to avoid inflated fv (#103)
 
-**Completed (April 17)**:
-- `ComponentUtils.py`: `getattr(optimizer, 'function_code', None)` → `optimizer.get_function_code()` — fixed G1300 load path (#104)
-- `RunInfo.py`: `get_score_breakdown()` temporarily sets `basic_floor=None` to avoid inflated fv (#103)
-
-**Completed (April 16)**:
+### April 16, 2026 — G1300 (SDM lognormal) objective wired end-to-end
 - G1300 legacy objective function created (`molass-legacy/ObjectiveFunctions/G1300.py`)
 - `FunctionCodeUtils.py`: activated `('lognormal', 'gamma'): 'G1300'`
 - `RigorousSdmParams.py`: lognormal branch with 8-element sdmcol_params
@@ -40,10 +46,6 @@ See: `molass-researcher/experiments/13_rigorous_optimization/13v_moment_matching
 - `SdmParams.py`: parameter names for 8-param case
 - `OptimizerUtils.py`: `"G1300": "SDM(lognormal)"` in MODEL_NAME_DICT
 - GitHub issues #93 (speedup) and #94 (G1300) filed and closed
-
----
-
-## 🎯 Recent Work
 
 ### April 15, 2026 — Two-axis SDM variant system (pore_dist × rt_dist)
 
