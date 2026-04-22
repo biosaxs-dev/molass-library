@@ -117,12 +117,30 @@ class Decomposition:
 
     @property
     def xr_components(self):
-        """Alias for ``xr_ccurves`` — the XR component curves."""
+        """Alias for ``xr_ccurves`` — the XR **elution-curve** parameter objects.
+
+        Returns a list of :class:`~molass.LowRank.ComponentCurve.ComponentCurve`
+        (one per component). Each holds the EGH parameters ``[H, tR, sigma, tau]``
+        of the elution curve only — these objects do **not** carry per-component
+        scattering profiles ``P[:, i]`` and cannot compute Rg.
+
+        For per-component scattering profiles or Rg-capable objects, use:
+
+        - :meth:`get_xr_matrices` — returns ``(M, C, P, Pe)`` numpy arrays.
+        - :meth:`get_xr_components` — returns ``XrComponent`` objects with
+          ``get_guinier_object()`` and ``get_jcurve_array()``.
+        """
         return self.xr_ccurves
 
     @property
     def uv_components(self):
-        """Alias for ``uv_ccurves`` — the UV component curves."""
+        """Alias for ``uv_ccurves`` — the UV **elution-curve** parameter objects.
+
+        Same caveat as :attr:`xr_components`: these are
+        :class:`~molass.LowRank.ComponentCurve.ComponentCurve` instances
+        carrying only EGH elution parameters, not UV spectra.
+        For per-component UV spectra, use :meth:`get_uv_matrices`.
+        """
         return self.uv_ccurves
 
     def get_num_components(self):
@@ -577,6 +595,33 @@ class Decomposition:
 
         return ret_components
 
+    def get_scattering_profiles(self, debug=False):
+        """
+        Get the per-component scattering profiles ``P`` and their errors ``Pe``.
+
+        This is a convenience accessor; equivalent to::
+
+            _, _, P, Pe = decomp.get_xr_matrices()
+
+        Returns
+        -------
+        qv : np.ndarray, shape (n_q,)
+            q-values in Å⁻¹ (alias of ``decomp.xr.qv``).
+        P : np.ndarray, shape (n_q, n_components)
+            Scattering profiles. ``P[:, i]`` is component ``i``'s profile.
+        Pe : np.ndarray, shape (n_q, n_components)
+            Propagated standard error on ``P``.
+
+        Notes
+        -----
+        Use this when you only need the SAXS profiles and want to skip
+        constructing :class:`~molass.LowRank.Component.XrComponent` objects.
+        For full per-component objects (with Guinier fitting), use
+        :meth:`get_xr_components`.
+        """
+        _M, _C, P, Pe = self.get_xr_matrices(debug=debug)
+        return self.xr.qv, P, Pe
+
     def get_uv_matrices(self, debug=False):
         """
         Get the matrices for the UV data.
@@ -716,7 +761,7 @@ class Decomposition:
         scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
         return peak_top_xes, scd_colors
     
-    def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False):
+    def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False, **kwargs):
         """
         Optimize the decomposition with a model.
 
@@ -739,6 +784,12 @@ class Decomposition:
         debug : bool, optional
             If True, enable debug mode.
 
+        **kwargs
+            Additional keyword arguments forwarded to the model's
+            ``optimize_decomposition`` and downstream estimators
+            (e.g. ``poresize_bounds``, ``N0``, ``include_M3`` for SDM —
+            see :func:`molass.SEC.Models.SdmEstimator.estimate_sdm_column_params`).
+
         Returns
         -------
         result : Decomposition
@@ -749,8 +800,67 @@ class Decomposition:
             reload(molass.SEC.ModelFactory)
         from molass.SEC.ModelFactory import create_model
         model = create_model(model_name, debug=debug)
-        return model.optimize_decomposition(self, rgcurve=rgcurve, model_params=model_params, debug=debug)
-    
+        return model.optimize_decomposition(self, rgcurve=rgcurve,
+                                            model_params=model_params,
+                                            debug=debug, **kwargs)
+
+    def recommend_num_components(self, k_max=3, model="SDM", rgcurve=None,
+                                 rt_dist="gamma",
+                                 cond_threshold=50.0, cos_threshold=0.99,
+                                 amp_threshold=0.20, quiet=True, debug=False):
+        """
+        Recommend ``num_components`` by detecting degeneracy at ``k+1``.
+
+        Sweeps ``k in 1..k_max`` on this decomposition's ``ssd``, runs
+        :meth:`optimize_with_model` for each ``k``, and applies a 4-metric
+        diagnostic (residual, ``cond(C)``, ``max cos(C[i],C[j])``, amp ratio)
+        plus the decision rule from issue #116. See
+        :func:`molass.LowRank.NumComponentsRecommender.recommend_num_components`
+        for full details.
+
+        Parameters
+        ----------
+        k_max : int, optional
+            Maximum ``num_components`` to try. Default 3.
+        model : str, optional
+            Model name forwarded to :meth:`optimize_with_model`. Default ``'SDM'``.
+        rgcurve : Curve, optional
+            Rg curve. If ``None``, computed via ``self.ssd.xr.compute_rgcurve()``.
+        rt_dist : str, optional
+            SDM residence-time distribution (``'gamma'`` or ``'exponential'``).
+        cond_threshold, cos_threshold, amp_threshold : float, optional
+            Degeneracy thresholds.
+        quiet : bool, optional
+            Suppress per-fit stdout/stderr. Default True.
+        debug : bool, optional
+            If True, do not suppress output and forward downstream.
+
+        Returns
+        -------
+        Recommendation
+            Named tuple ``(recommended_k, reason, metrics)`` where ``metrics``
+            is a ``pandas.DataFrame`` with one row per ``k``.
+
+        Examples
+        --------
+        ::
+
+            rec = decomp.recommend_num_components(k_max=3)
+            print(rec.recommended_k, '-', rec.reason)
+            print(rec.metrics)
+        """
+        if debug:
+            import molass.LowRank.NumComponentsRecommender as _ncr
+            reload(_ncr)
+        from molass.LowRank.NumComponentsRecommender import (
+            recommend_num_components as _impl)
+        return _impl(self, k_max=k_max, model=model, rgcurve=rgcurve,
+                     rt_dist=rt_dist,
+                     cond_threshold=cond_threshold,
+                     cos_threshold=cos_threshold,
+                     amp_threshold=amp_threshold,
+                     quiet=quiet, debug=debug)
+
     def make_rigorous_initparams(self, baseparams, debug=False):
         """
         Make initial parameters for rigorous optimization.
@@ -789,7 +899,8 @@ class Decomposition:
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
-                            clear_jobs=True, function_code=None, debug=False,
+                            clear_jobs=True, function_code=None,
+                            in_process=False, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -859,6 +970,13 @@ class Decomposition:
             If True (default), existing job folders are cleared before starting.
             Set to False after a kernel restart to preserve previous job results
             and reconstruct RunInfo without losing optimization history.
+        in_process : bool, optional
+            If True, run the optimizer in this Python process instead of
+            spawning a subprocess.  Recommended for notebook use: avoids
+            the parent/subprocess data-derivation divergence (see issues
+            #117 / #119) and keeps the optimizer running against the same
+            library-prepared data the parent already holds in memory.
+            Default is ``False`` while the in-process path is opt-in.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -914,7 +1032,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.

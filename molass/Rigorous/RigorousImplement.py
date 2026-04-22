@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -134,6 +134,14 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         the corrected data in decomposition.ssd.
     clear_jobs : bool, optional
         If True (default), clear existing job folders before starting.
+    in_process : bool, optional
+        If True, run the optimizer **in this Python process** instead of
+        spawning a subprocess.  The library-prepared optimizer (with the
+        live dsets, base curves, and spectral vectors built above) is the
+        one that runs — no re-derivation from disk, no parent/subprocess
+        divergence.  This is the recommended path for notebook use; the
+        default remains ``False`` (subprocess) during the opt-in phase.
+        See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -225,10 +233,78 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # run optimization (outside _quiet — subprocess launch message is useful)
     from molass_legacy.Optimizer.Scripting import run_optimizer
     x_shifts = dsets.get_x_shifts()
+
+    if in_process:
+        # In-process path: skip subprocess + MplMonitor entirely.  The
+        # optimizer object built above is the one that runs.  This
+        # eliminates the parent/subprocess data-derivation divergence
+        # diagnosed in #117 / #119 — there is no second derivation.
+        # See molass-library/Copilot/DESIGN_split_optimizer_architecture.md.
+        if debug:
+            import molass_legacy.Optimizer.InProcessRunner
+            reload(molass_legacy.Optimizer.InProcessRunner)
+        from molass_legacy.Optimizer.InProcessRunner import run_optimizer_in_process
+
+        result, work_folder = run_optimizer_in_process(
+            optimizer, init_params, niter=niter, method=method,
+            x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
+        )
+
+        if debug:
+            import molass.Rigorous.RunInfo
+            reload(molass.Rigorous.RunInfo)
+        from molass.Rigorous.RunInfo import RunInfo
+        run_info = RunInfo(
+            ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+            init_params=init_params, monitor=None,
+            analysis_folder=analysis_folder, decomposition=decomposition,
+        )
+        # Stash the in-process result so callers / tests can introspect
+        # without going back to disk.  callback.txt and optimizer.log are
+        # already on disk in `work_folder`.
+        run_info.in_process_result = result
+        run_info.work_folder = work_folder
+        return run_info
+
     monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
 
     # Wire dsets to monitor so the Export Data button can work (issue #96)
     monitor.dsets = dsets
+
+    # Build a subprocess-equivalent optimizer for on-screen objective
+    # re-evaluation, so MplMonitor SV matches callback.txt SV (issue #118).
+    # The parent's `optimizer` evaluates against live library-prepared dsets,
+    # while the subprocess re-derives dsets from in_folder via OptimizerInput;
+    # the two can diverge.  Until issue #119 unifies them at the data layer,
+    # we re-evaluate the on-screen objective using a subprocess-style instance.
+    try:
+        from molass_legacy._MOLASS.SerialSettings import get_setting
+        from molass_legacy.Optimizer.OptimizerMain import create_optimizer_from_job
+        job_folder = os.path.abspath(monitor.runner.working_folder)
+        trimming_txt = os.path.join(job_folder, 'trimming.txt')
+        in_folder = get_setting('in_folder')
+        # Suppress the noisy data-loading pipeline (re-runs trimming, baseline,
+        # peak recognition, mapping) — same suppression spirit as above.
+        import io as _io
+        from contextlib import redirect_stdout as _ro, redirect_stderr as _re_, ExitStack as _ES
+        _ms = _ES()
+        if not debug:
+            _ms.enter_context(_ro(_io.StringIO()))
+            _ms.enter_context(_re_(_io.StringIO()))
+        with _ms:
+            mon_opt = create_optimizer_from_job(
+                in_folder=in_folder,
+                n_components=optimizer.n_components,
+                class_code=optimizer.__class__.__name__,
+                trimming_txt=trimming_txt,
+                shared_memory=None,
+            )
+            mon_opt.set_xr_only(optimizer.xr_only)
+            mon_opt.prepare_for_optimization(init_params)
+        monitor.monitor_optimizer = mon_opt
+    except Exception:
+        # Fall back silently: monitor will use parent optimizer (legacy behavior)
+        monitor.monitor_optimizer = None
 
     # Pass anomaly mask to monitor for consistent band display
     from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd

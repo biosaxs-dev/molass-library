@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# molass-fork: DO NOT EDIT --- pristine upstream baseline (DENSS v1.8.7) for diffing
+# molass-fork: against the working copy (core.py). See UPSTREAM.md.
 #
 #    core.py
 #    A collection of python functions useful for solution scattering

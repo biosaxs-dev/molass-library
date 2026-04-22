@@ -310,10 +310,12 @@ def write_mrc(rho, side, filename="map.mrc"):
     nystart = -ys // 2
     nzstart = -zs // 2
     side = np.atleast_1d(side)
+    # molass-fork: explicit float() to satisfy stricter struct.pack() in Python 3.14
+    # (upstream passes 1-element numpy arrays directly to struct.pack('<fff', ...))
     if len(side) == 1:
-        a, b, c = side, side, side
+        a, b, c = float(side[0]), float(side[0]), float(side[0])
     elif len(side) == 3:
-        a, b, c = side
+        a, b, c = float(side[0]), float(side[1]), float(side[2])
     else:
         print("Error. Argument 'side' must be float or 3-tuple")
         return None
@@ -883,11 +885,13 @@ def direct_I2P(q, I, D=None):
     P = np.zeros(len(r))
     for ri in range(len(r)):
         qrsinqr = q * r[ri] * np.sin(q * r[ri])
+        # molass-fork: np.trapz removed in NumPy 2.0; np.trapezoid is the replacement
         P[ri] += np.trapezoid(qrsinqr * I, q)
     return r, 1 / (2 * np.pi ** 2) * P
 
 
 def P2Rg(r, P):
+    # molass-fork: np.trapz removed in NumPy 2.0; np.trapezoid is the replacement
     num = np.trapezoid(r ** 2 * P, r)
     denom = 2 * np.trapezoid(P, r)
     rg2 = num / denom
@@ -1200,7 +1204,8 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
         Idata = np.concatenate((Idata, Iextend[1:]))
 
     # create list of qbin indices just in region of data for later F scaling
-    qbin_args = np.in1d(qbinsc, qdata, assume_unique=True)
+    # molass-fork: np.in1d removed in NumPy 2.0; np.isin is the replacement
+    qbin_args = np.isin(qbinsc, qdata)
     qba = qbin_args  # just for brevity when using it later
     # set qba bins outside of scaling region to false.
     # start with bins in corners

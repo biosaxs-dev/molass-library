@@ -3,18 +3,42 @@
 Notes for AI assistants (Copilot, etc.) working in this repository across multiple sessions and machines.
 
 ## Terminal tips (VS Code, Windows PowerShell only)
-- `cd repo; git ...` — the tool may strip `cd` in PowerShell, running git in the wrong dir. Use `Push-Location repo; git ...` instead. (Not an issue in bash/zsh.)
-- Multi-line `gh issue create --body "..."` fails in PowerShell due to special chars. Use:
-  ```powershell
-  $body = @"
-  ...body text...
-  "@
-  $body | gh issue create --title "..." --label "enhancement" --body-file -
-  ```
-  In bash, use a heredoc: `gh issue create ... --body-file - <<'EOF'` ... `EOF`
+
+### Multi-repo `git` invocations
+Use `git -C <path> ...` instead of `cd <path>; git ...`. The terminal tool may silently strip `cd` from chained commands in PowerShell, running `git` against the wrong repo. (Not an issue in bash/zsh.)
+
+```powershell
+# ❌ Unreliable
+cd c:\Users\takahashi\GitHub\molass-library; git log -1
+# ✅ Reliable
+git -C c:\Users\takahashi\GitHub\molass-library log -1
+```
+
+### Multi-line `gh issue create` (preferred: temp-file pattern)
+Writing the body to a temp file and passing `--body-file <path>` avoids both (a) PowerShell quoting issues and (b) the VS Code terminal tool's "may be waiting for input" misfire that triggers on stdin pipes.
+
+```powershell
+$body = @'
+...markdown body...
+'@
+Set-Content -Path "$env:TEMP\issue.md" -Value $body -Encoding UTF8
+gh -R biosaxs-dev/molass-library issue create --title "..." --label "enhancement" --body-file "$env:TEMP\issue.md"
+```
+
+Stdin-pipe form (`$body | gh ... --body-file -`) also works but trips the false-input warning on every call.
+In bash, a heredoc is fine: `gh issue create ... --body-file - <<'EOF'` ... `EOF`.
+
+### NEVER use PowerShell text ops on non-ASCII files (CRITICAL)
+`Get-Content` / `.Replace()` / `WriteAllText()` / `Set-Content` (without explicit `-Encoding UTF8`) default to **cp932 (Shift-JIS) on Japanese Windows**. They silently garble UTF-8 multi-byte characters (–, Δ, Å, →, ×, etc.) and **destructively consume adjacent ASCII bytes** — making automated reversal impossible.
+
+Safe alternatives:
+- `replace_string_in_file` tool (VS Code's native edit tool)
+- Python `json` module for `.ipynb` files (explicitly reads/writes UTF-8)
+- `Set-Content -Encoding UTF8` when writing — never read-modify-write text files via PS
 
 ## GitHub Issues
 - Always use `gh` CLI to create issues — do NOT attempt browser-based approaches
+- **Always pass `-R biosaxs-dev/molass-library`** explicitly. `gh` auto-detects the repo from cwd, but in a multi-root workspace cwd is unreliable; explicit `-R` removes the ambiguity. (Same applies for other repos in the workspace — use `-R <owner>/<repo>` always.)
 - Repo: biosaxs-dev/molass-library
 
 ## Issue titling policy

@@ -23,9 +23,11 @@ dependencies = [
   "ruptures",
   "learnsaxs",
   "mrcfile",
+  "ipywidgets",
+  "ipykernel",
 ]
 
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 
 authors = [
   {name = "Molass Community"},

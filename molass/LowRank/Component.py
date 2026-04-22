@@ -234,14 +234,25 @@ class Component:
         return PairedRange(range_, minor=minor, peak_index=self.peak_index, elm_recs=elm_recs)
 class XrComponent(Component):
     """
-    A class to represent an X-ray component.
-    It contains the i-curve, j-curve, concentration curve, and related information.
+    A class to represent an X-ray (SAXS) component.
+
+    Holds the i-curve (elution), j-curve (scattering profile), concentration curve,
+    and related per-component data — i.e. **everything needed for Rg computation**.
+
+    To obtain ``XrComponent`` instances for a decomposition, call
+    :meth:`Decomposition.get_xr_components`. Note that
+    :attr:`Decomposition.xr_components` (without ``get_``) is a different object —
+    it is an alias for ``xr_ccurves`` (elution-only ``ComponentCurve`` parameters)
+    and cannot compute Rg.
+
+    For the underlying numpy matrices ``(M, C, P, Pe)``, see
+    :meth:`Decomposition.get_xr_matrices`.
 
     Attributes
     ----------
     sg : SimpleGuinier or None
         The SimpleGuinier object for Rg computation. It is None until it is computed.
-    
+
     """
     def __init__(self, *args):
         super().__init__(*args)
