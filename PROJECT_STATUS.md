@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 22, 2026  
+**Last Updated**: April 23, 2026  
 **Current version**: 0.9.2
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -23,6 +23,26 @@ See: `Copilot/DESIGN_split_optimizer_architecture.md`, `molass-researcher/experi
 ---
 
 ## 🎯 Recent Work
+
+### April 23, 2026 — RunInfo AI-friendliness sweep (issues #123–#125)
+
+**`molass/Rigorous/CurrentStateUtils.py`** (public API consolidation):
+- `check_progress(run_info_or_folder, label=None, write_snapshot=False)` — standalone function; accepts RunInfo or path string; returns `{'label', 'n_evals', 'best_fv', 'best_sv', 'sv_last10', 'timestamp'}`; `write_snapshot=True` writes `<analysis_folder>/optimized/progress_snapshot.json`
+- All 9 CurrentStateUtils functions re-exported from `molass.Rigorous.__init__` (public namespace)
+- Commits: `fdf33fa` (#123), `22850bb` (#124)
+
+**`molass/Rigorous/RunInfo.py`**:
+- Added class-level docstring listing all attributes (`ssd`, `optimizer`, `dsets`, `init_params`, `monitor`, `analysis_folder`, `decomposition`, `work_folder`, `in_process_result`)
+- `work_folder` and `in_process_result` are now proper `__init__` parameters (default `None`) — no more monkey-patching
+- New methods: `check_progress()`, `load_progress_snapshot()`, `load_monitor_snapshot()`
+- New properties: `monitor_snapshot_json_path`, `progress_snapshot_json_path`
+- Commit: `97d927f` (#125)
+
+**`molass/Rigorous/RigorousImplement.py`**:
+- Removed `run_info.work_folder = work_folder` and `run_info.in_process_result = result` monkey-patches; passed in `RunInfo(...)` constructor instead
+- Commit: `97d927f` (#125)
+
+**Tests**: 20/20 in `tests/specific/test_plot_convergence.py` pass (commit `b0f9f5a`). Issues #123, #124, #125 filed and closed.
 
 ### April 21, 2026 — Fast analytical moments for SDM lognormal init (issue #113)
 
