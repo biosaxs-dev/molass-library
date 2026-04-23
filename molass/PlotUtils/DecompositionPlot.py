@@ -9,6 +9,7 @@ from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
     'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
+    'rg_score_threshold', 'rg_marker_size', 'rg_cmap',
 }
 
 def _draw_anomaly_bands(decomposition, xr_ax, uv_ax):
@@ -67,12 +68,25 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
     if rgcurve is None:
         axt = None
     else:
+        # Issue #121: defaults chosen for visibility — low-score points should be
+        # discernible (was: cmap='YlGn' + s=3 made low-score points nearly
+        # invisible and made overlapping high-confidence dots near the peak look
+        # sparse). Override via kwargs if needed.
+        rg_score_threshold = kwargs.get('rg_score_threshold', None)
+        rg_marker_size = kwargs.get('rg_marker_size', 12)
+        rg_cmap = kwargs.get('rg_cmap', 'viridis')
+
         axt = ax.twinx()
         axt.set_ylabel("$R_g$")
-        cm = plt.get_cmap('YlGn')
+        cm = plt.get_cmap(rg_cmap)
         x_ = rgcurve.frames
+        rg_y = rgcurve.rgvalues
+        rg_c = rgcurve.scores
+        if rg_score_threshold is not None:
+            mask = rg_c >= rg_score_threshold
+            x_ = x_[mask]; rg_y = rg_y[mask]; rg_c = rg_c[mask]
         axt.grid(False)
-        sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm, label="Rg (data)")
+        sc = axt.scatter(x_, rg_y, c=rg_c, s=rg_marker_size, cmap=cm, label="Rg (data)")
         
         if reconstructed_rgcurve is not None:
             rx_ = reconstructed_rgcurve.frames
@@ -190,6 +204,9 @@ def plot_components_impl(decomposition, **kwargs):
     axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=rgcurve,
                              reconstructed_rgcurve=reconstructed_rgcurve,
                              recognition_curve=recognition_curve,
+                             rg_score_threshold=kwargs.get('rg_score_threshold', None),
+                             rg_marker_size=kwargs.get('rg_marker_size', 12),
+                             rg_cmap=kwargs.get('rg_cmap', 'viridis'),
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges
