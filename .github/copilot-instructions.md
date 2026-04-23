@@ -353,6 +353,12 @@ Kernel preference: global Python (`py`). Do not create venvs.
 
 ---
 
+## Response language
+
+**Response language**: English
+
+---
+
 ## 🔄 Updates (AI-Readiness Trail)
 
 | Date | What was learned / added |
