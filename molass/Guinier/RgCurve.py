@@ -74,7 +74,8 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
     intensities = [] if result_type is None else None
     for k, (i, result) in enumerate(rginfo_list):
         indeces.append(i)
-        values.append(result.Rg if result.Rg is not None else float('nan'))
+        rg = result.Rg
+        values.append(rg if (rg is not None and rg > 0) else float('nan'))
         if result_type is None:
             # SimpleGuinier result
             scores.append(result.score)
