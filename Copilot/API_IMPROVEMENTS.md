@@ -173,5 +173,6 @@ Discovered during Experiment 13h (rigorous optimization, UltraNest):
 | GitHub Issue | Description | Status |
 |-------------|-------------|--------|
 | [#123](https://github.com/biosaxs-dev/molass-library/issues/123) | Add `RunInfo.check_progress()` for mid-run progress monitoring | ✅ Done (closed) |
+| [#124](https://github.com/biosaxs-dev/molass-library/issues/124) | Add `write_snapshot` to `check_progress`; add `RunInfo.load_progress_snapshot()` | ✅ Done (closed) |
 
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.
