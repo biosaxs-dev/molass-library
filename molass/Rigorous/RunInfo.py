@@ -283,6 +283,33 @@ class RunInfo:
             "optimized", "figs", "mplmonitor_latest.json",
         )
 
+    def check_progress(self, label=None):
+        """Read callback.txt(s) from all jobs and report best SV so far.
+
+        Re-runnable at any time while the optimizer is running or after it
+        completes.  Does not require the optimizer to have finished.
+
+        The implementation lives in
+        :func:`molass.Rigorous.CurrentStateUtils.check_progress` so it can
+        be updated and reloaded without restarting the kernel — just call
+        ``importlib.reload(molass.Rigorous.CurrentStateUtils)`` and the
+        next invocation picks up the new logic automatically.
+
+        Parameters
+        ----------
+        label : str, optional
+            Display label prefix. Defaults to the analysis folder basename.
+
+        Examples
+        --------
+        ::
+
+            _run_sub.check_progress()                    # after cell [6]
+            _run_sub.check_progress(label="subprocess")  # explicit label
+        """
+        from molass.Rigorous.CurrentStateUtils import check_progress as _impl
+        _impl(self, label=label)
+
     def load_monitor_snapshot(self):
         """Load and return the MplMonitor JSON sidecar as a dict.
 

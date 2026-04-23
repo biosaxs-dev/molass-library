@@ -417,6 +417,77 @@ def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
     return True
 
 
+def check_progress(run_info_or_folder, label=None):
+    """Read callback.txt(s) from all jobs and report best SV so far.
+
+    Re-runnable at any time while the optimizer is running or after it
+    completes.  Accepts either a ``RunInfo`` object or a plain folder path
+    string, so it works even when the caller holds an older ``RunInfo``
+    instance from a previous session.
+
+    Parameters
+    ----------
+    run_info_or_folder : RunInfo or str
+        A ``RunInfo`` object (uses its ``analysis_folder`` attribute) or
+        a plain ``analysis_folder`` path string.
+    label : str, optional
+        Display label prefix. Defaults to the basename of the analysis folder.
+
+    Examples
+    --------
+    ::
+
+        # Via the RunInfo method (requires current class):
+        _run_sub.check_progress(label="subprocess")
+
+        # Via the standalone function (works with any RunInfo or a folder path):
+        from molass.Rigorous.CurrentStateUtils import check_progress
+        check_progress(_run_sub, label="subprocess")
+        check_progress("/path/to/analysis_folder")  # plain string also accepted
+    """
+    import os, re
+    import numpy as np
+
+    # Accept RunInfo instance or plain string
+    if isinstance(run_info_or_folder, str):
+        analysis_folder = run_info_or_folder
+    else:
+        analysis_folder = getattr(run_info_or_folder, 'analysis_folder', None)
+        if analysis_folder is None:
+            print("check_progress: no analysis_folder set on this RunInfo")
+            return
+
+    if label is None:
+        label = os.path.basename(analysis_folder.rstrip("/\\"))
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        print(f"{label}: jobs folder not yet created at:\n  {jobs_folder}")
+        return
+
+    all_fvals = []
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        content = open(cb, encoding="utf-8", errors="replace").read()
+        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
+        all_fvals.extend(fvals)
+
+    if not all_fvals:
+        print(f"{label}: no f= lines yet in {jobs_folder}")
+        return
+
+    best_fv = min(all_fvals)
+    best_sv = -200 / (1 + np.exp(-1.5 * best_fv)) + 100
+    best_so_far = np.minimum.accumulate(all_fvals)
+    sv_so_far = -200 / (1 + np.exp(-1.5 * best_so_far)) + 100
+
+    print(f"{label}: {len(all_fvals)} evaluations")
+    print(f"  best fv = {best_fv:.4f}  \u2192  SV = {best_sv:.2f}")
+    print(f"  SV best-so-far (last 10): {[round(v, 2) for v in sv_so_far[-10:]]}")
+
+
 def read_convergence_data(analysis_folder):
     """Read convergence data from all completed rigorous optimization jobs.
 
