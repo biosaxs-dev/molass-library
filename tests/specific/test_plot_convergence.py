@@ -117,6 +117,75 @@ def test_plot_custom_axes():
         plt.close(fig)
 
 
+# --- check_progress tests (issue #123) ---
+
+def test_check_progress_basic(capsys):
+    """check_progress prints evaluation count and best SV."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=2, improving=True)
+        from molass.Rigorous import check_progress
+        check_progress(af)   # plain folder-path string
+        out = capsys.readouterr().out
+        assert "evaluations" in out
+        assert "SV" in out
+
+
+def test_check_progress_with_label(capsys):
+    """label= prefix appears in output."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=1)
+        from molass.Rigorous import check_progress
+        check_progress(af, label="myrun")
+        out = capsys.readouterr().out
+        assert out.startswith("myrun:")
+
+
+def test_check_progress_run_info(capsys):
+    """check_progress accepts a RunInfo-like object with .analysis_folder."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=3)
+
+        class _FakeRunInfo:
+            analysis_folder = af
+
+        from molass.Rigorous import check_progress
+        check_progress(_FakeRunInfo(), label="fake")
+        out = capsys.readouterr().out
+        assert "fake:" in out
+        assert "evaluations" in out
+
+
+def test_check_progress_empty_folder(capsys):
+    """No callback.txt yet — prints a helpful message, does not raise."""
+    with tempfile.TemporaryDirectory() as td:
+        jobs = os.path.join(td, "optimized", "jobs", "000")
+        os.makedirs(jobs, exist_ok=True)   # folder exists but no callback.txt
+        from molass.Rigorous import check_progress
+        check_progress(td, label="empty")
+        out = capsys.readouterr().out
+        assert "no f= lines" in out
+
+
+def test_check_progress_missing_jobs_folder(capsys):
+    """optimized/jobs/ not yet created — prints a helpful message, does not raise."""
+    with tempfile.TemporaryDirectory() as td:
+        from molass.Rigorous import check_progress
+        check_progress(td, label="notstarted")
+        out = capsys.readouterr().out
+        assert "jobs folder not yet created" in out
+
+
+def test_check_progress_run_info_no_folder(capsys):
+    """RunInfo with analysis_folder=None — prints a helpful message, does not raise."""
+    class _FakeRunInfo:
+        analysis_folder = None
+
+    from molass.Rigorous import check_progress
+    check_progress(_FakeRunInfo())
+    out = capsys.readouterr().out
+    assert "no analysis_folder" in out
+
+
 if __name__ == '__main__':
     for name, func in list(globals().items()):
         if name.startswith('test_') and callable(func):
