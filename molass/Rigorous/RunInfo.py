@@ -306,6 +306,14 @@ class RunInfo:
 
             _run_sub.check_progress()                    # after cell [6]
             _run_sub.check_progress(label="subprocess")  # explicit label
+
+        See Also
+        --------
+        molass.Rigorous.check_progress : standalone form; also accepts a plain
+            folder-path string when no ``RunInfo`` instance is at hand::
+
+                from molass.Rigorous import check_progress
+                check_progress("/path/to/analysis_folder")
         """
         from molass.Rigorous.CurrentStateUtils import check_progress as _impl
         _impl(self, label=label)
