@@ -3,6 +3,37 @@ Rigorous.RunInfo.py
 """
 
 class RunInfo:
+    """Handle returned by :func:`molass.Rigorous.make_rigorous_decomposition`
+    (and ``Decomposition.optimize_rigorously()``).
+
+    Attributes
+    ----------
+    ssd : SecSaxsData
+        The SEC-SAXS dataset used for the optimization.
+    optimizer : Optimizer
+        The in-process optimizer object.  Only populated for the in-process
+        path (``in_process=True``); ``None`` for the subprocess path.
+    dsets : list
+        Dataset objects passed to the optimizer.
+    init_params : ndarray
+        Initial parameter vector used to start the optimization.
+    monitor : MplMonitor or None
+        Live monitor object for the subprocess path; ``None`` for in-process.
+    analysis_folder : str or None
+        Root folder for all optimizer output.  Set this if you want the
+        progress/sidecar helpers to work without arguments.
+    decomposition : Decomposition or None
+        The ``Decomposition`` object that launched this run.
+    work_folder : str or None
+        Absolute path to the job folder written by the in-process optimizer
+        (``<analysis_folder>/optimized/jobs/000`` or similar).  Set only for
+        the in-process path; ``None`` for the subprocess path.  Contains
+        ``init_params.txt``, ``callback.txt``, etc.
+    in_process_result : object or None
+        Raw result object returned by ``run_optimizer_in_process()``.
+        Set only for the in-process path.
+    """
+
     def __init__(self, ssd, optimizer, dsets, init_params, monitor=None,
                  analysis_folder=None, decomposition=None):
         self.ssd = ssd
@@ -12,6 +43,9 @@ class RunInfo:
         self.monitor = monitor
         self.analysis_folder = analysis_folder
         self.decomposition = decomposition
+        # Set by RigorousImplement for in_process=True runs:
+        self.work_folder = None
+        self.in_process_result = None
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)

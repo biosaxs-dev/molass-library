@@ -259,9 +259,6 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             init_params=init_params, monitor=None,
             analysis_folder=analysis_folder, decomposition=decomposition,
         )
-        # Stash the in-process result so callers / tests can introspect
-        # without going back to disk.  callback.txt and optimizer.log are
-        # already on disk in `work_folder`.
         run_info.in_process_result = result
         run_info.work_folder = work_folder
         return run_info
