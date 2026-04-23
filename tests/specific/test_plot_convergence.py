@@ -186,6 +186,95 @@ def test_check_progress_run_info_no_folder(capsys):
     assert "no analysis_folder" in out
 
 
+# --- write_snapshot / load_progress_snapshot tests (issue #124) ---
+
+def test_check_progress_returns_dict():
+    """check_progress returns a dict with expected keys."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=2)
+        from molass.Rigorous import check_progress
+        result = check_progress(af)
+        assert isinstance(result, dict)
+        for key in ("label", "n_evals", "best_fv", "best_sv", "sv_best_so_far", "timestamp"):
+            assert key in result, f"missing key: {key}"
+        assert result["n_evals"] == 20   # 2 jobs × 10 evals each
+        assert isinstance(result["best_sv"], float)
+        assert -200 < result["best_sv"] < 100
+
+
+def test_check_progress_write_snapshot(capsys):
+    """write_snapshot=True creates progress_snapshot.json and mentions the path."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=2)
+        from molass.Rigorous import check_progress
+        snap_path = os.path.join(os.path.abspath(af), "optimized", "progress_snapshot.json")
+        assert not os.path.exists(snap_path), "should not exist before call"
+        check_progress(af, write_snapshot=True)
+        assert os.path.exists(snap_path), "JSON file should be written"
+        out = capsys.readouterr().out
+        assert "snapshot written" in out
+
+
+def test_check_progress_snapshot_content():
+    """Written JSON has correct keys and plausible values."""
+    import json
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=3)
+        from molass.Rigorous import check_progress
+        returned = check_progress(af, write_snapshot=True)
+        snap_path = os.path.join(os.path.abspath(af), "optimized", "progress_snapshot.json")
+        on_disk = json.load(open(snap_path, encoding="utf-8"))
+        # Returned dict and on-disk JSON must agree
+        assert on_disk["n_evals"] == returned["n_evals"]
+        assert abs(on_disk["best_sv"] - returned["best_sv"]) < 1e-9
+        assert len(on_disk["sv_best_so_far"]) == on_disk["n_evals"]
+        assert "T" in on_disk["timestamp"]  # ISO 8601 includes "T"
+
+
+def test_load_progress_snapshot_via_run_info():
+    """RunInfo.load_progress_snapshot() reads back what check_progress wrote."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=2)
+        from molass.Rigorous.RunInfo import RunInfo
+
+        class _FakeRunInfo(RunInfo):
+            pass
+
+        ri = object.__new__(_FakeRunInfo)
+        ri.analysis_folder = af
+        ri.check_progress(write_snapshot=True)
+        snap = ri.load_progress_snapshot()
+        assert isinstance(snap, dict)
+        assert snap["n_evals"] == 20
+        assert -200 < snap["best_sv"] < 100
+
+
+def test_load_progress_snapshot_missing_raises():
+    """load_progress_snapshot raises FileNotFoundError if snapshot absent."""
+    with tempfile.TemporaryDirectory() as td:
+        af = _make_analysis_folder(td, n_jobs=1)
+        from molass.Rigorous.RunInfo import RunInfo
+
+        ri = object.__new__(RunInfo)
+        ri.analysis_folder = af
+        with pytest.raises(FileNotFoundError):
+            ri.load_progress_snapshot()
+
+
+def test_progress_snapshot_json_path_property():
+    """progress_snapshot_json_path returns expected path or None."""
+    import os
+    from molass.Rigorous.RunInfo import RunInfo
+
+    ri = object.__new__(RunInfo)
+    ri.analysis_folder = None
+    assert ri.progress_snapshot_json_path is None
+
+    ri.analysis_folder = "/some/folder"
+    p = ri.progress_snapshot_json_path
+    assert p.endswith(os.path.join("optimized", "progress_snapshot.json"))
+
+
 if __name__ == '__main__':
     for name, func in list(globals().items()):
         if name.startswith('test_') and callable(func):

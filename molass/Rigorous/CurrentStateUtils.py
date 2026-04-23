@@ -417,7 +417,7 @@ def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
     return True
 
 
-def check_progress(run_info_or_folder, label=None):
+def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     """Read callback.txt(s) from all jobs and report best SV so far.
 
     Re-runnable at any time while the optimizer is running or after it
@@ -432,6 +432,23 @@ def check_progress(run_info_or_folder, label=None):
         a plain ``analysis_folder`` path string.
     label : str, optional
         Display label prefix. Defaults to the basename of the analysis folder.
+    write_snapshot : bool, optional
+        If ``True``, write a compact JSON file to
+        ``<analysis_folder>/optimized/progress_snapshot.json`` in addition to
+        printing.  The file can be read back later — even from a new AI session
+        — via :meth:`RunInfo.load_progress_snapshot` or ``json.load(open(...))``::
+
+            _run_sub.check_progress(write_snapshot=True)
+            snap = _run_sub.load_progress_snapshot()  # dict
+
+        Default ``False`` (print-only, no side effects).
+
+    Returns
+    -------
+    dict or None
+        Progress data dict when there are evaluations to report; ``None``
+        otherwise.  Keys: ``label``, ``n_evals``, ``best_fv``, ``best_sv``,
+        ``sv_best_so_far`` (full list), ``timestamp`` (ISO 8601 UTC).
 
     Examples
     --------
@@ -440,8 +457,11 @@ def check_progress(run_info_or_folder, label=None):
         # Via the RunInfo method (requires current class):
         _run_sub.check_progress(label="subprocess")
 
+        # Persist for later AI-session retrieval:
+        snap = _run_sub.check_progress(write_snapshot=True)
+
         # Via the standalone function (works with any RunInfo or a folder path):
-        from molass.Rigorous.CurrentStateUtils import check_progress
+        from molass.Rigorous import check_progress
         check_progress(_run_sub, label="subprocess")
         check_progress("/path/to/analysis_folder")  # plain string also accepted
     """
@@ -486,6 +506,27 @@ def check_progress(run_info_or_folder, label=None):
     print(f"{label}: {len(all_fvals)} evaluations")
     print(f"  best fv = {best_fv:.4f}  \u2192  SV = {best_sv:.2f}")
     print(f"  SV best-so-far (last 10): {[round(v, 2) for v in sv_so_far[-10:]]}")
+
+    from datetime import datetime, timezone
+    snapshot = {
+        "label": label,
+        "n_evals": len(all_fvals),
+        "best_fv": float(best_fv),
+        "best_sv": float(best_sv),
+        "sv_best_so_far": [float(v) for v in sv_so_far],
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+    if write_snapshot:
+        import json
+        snapshot_path = os.path.join(
+            os.path.abspath(analysis_folder), "optimized", "progress_snapshot.json"
+        )
+        with open(snapshot_path, "w", encoding="utf-8") as fh:
+            json.dump(snapshot, fh, indent=2)
+        print(f"  snapshot written → {snapshot_path}")
+
+    return snapshot
 
 
 def read_convergence_data(analysis_folder):

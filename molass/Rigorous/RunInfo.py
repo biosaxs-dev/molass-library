@@ -283,7 +283,7 @@ class RunInfo:
             "optimized", "figs", "mplmonitor_latest.json",
         )
 
-    def check_progress(self, label=None):
+    def check_progress(self, label=None, write_snapshot=False):
         """Read callback.txt(s) from all jobs and report best SV so far.
 
         Re-runnable at any time while the optimizer is running or after it
@@ -299,13 +299,25 @@ class RunInfo:
         ----------
         label : str, optional
             Display label prefix. Defaults to the analysis folder basename.
+        write_snapshot : bool, optional
+            If ``True``, write a compact JSON file to
+            ``<analysis_folder>/optimized/progress_snapshot.json`` in addition
+            to printing.  Read back via :meth:`load_progress_snapshot`.
+            Default ``False``.
+
+        Returns
+        -------
+        dict or None
+            Progress data dict when there are evaluations to report; ``None``
+            otherwise.
 
         Examples
         --------
         ::
 
-            _run_sub.check_progress()                    # after cell [6]
-            _run_sub.check_progress(label="subprocess")  # explicit label
+            _run_sub.check_progress()                         # print only
+            _run_sub.check_progress(label="subprocess")       # explicit label
+            snap = _run_sub.check_progress(write_snapshot=True)  # persist + return
 
         See Also
         --------
@@ -316,7 +328,72 @@ class RunInfo:
                 check_progress("/path/to/analysis_folder")
         """
         from molass.Rigorous.CurrentStateUtils import check_progress as _impl
-        _impl(self, label=label)
+        return _impl(self, label=label, write_snapshot=write_snapshot)
+
+    @property
+    def progress_snapshot_json_path(self):
+        """Path to the progress snapshot JSON written by ``check_progress(write_snapshot=True)``.
+
+        Exists at ``<analysis_folder>/optimized/progress_snapshot.json``.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists yet.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "progress_snapshot.json",
+        )
+
+    def load_progress_snapshot(self):
+        """Load and return the progress snapshot JSON as a dict.
+
+        Written by :meth:`check_progress` when ``write_snapshot=True``.
+        Readable from any session — including a new AI session — without
+        re-running the optimizer.
+
+        Returns
+        -------
+        dict
+            Keys: ``label``, ``n_evals``, ``best_fv``, ``best_sv``,
+            ``sv_best_so_far``, ``timestamp``.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the snapshot does not exist yet (call
+            ``check_progress(write_snapshot=True)`` first).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            _run_sub.check_progress(write_snapshot=True)
+            snap = _run_sub.load_progress_snapshot()
+            print(f"best SV: {snap['best_sv']:.2f}")
+        """
+        import json, os
+        path = self.progress_snapshot_json_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"Progress snapshot not found: {path}\n"
+                "Call check_progress(write_snapshot=True) first."
+            )
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
 
     def load_monitor_snapshot(self):
         """Load and return the MplMonitor JSON sidecar as a dict.
