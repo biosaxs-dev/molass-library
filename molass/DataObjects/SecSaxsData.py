@@ -306,7 +306,7 @@ class SecSaxsData:
         return plot_3d_impl(self, **kwargs)
  
     def plot_compact(self, **kwargs):
-        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, **kwargs)
+        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, align_zero=False, **kwargs)
 
             Plots a pair of compact figures of UV and XR data.
 
@@ -320,6 +320,11 @@ class SecSaxsData:
                 If specified, the ratio curve will be plotted.
             moment_lines : bool, optional
                 If it is True, the moment lines will be plotted.
+            align_zero : bool, optional
+                If True, align the zero positions of the UV (twinx) and XR axes.
+                Default is False so each trace is autoscaled independently and
+                fills its own panel — preventing the smaller-amplitude trace
+                from appearing near-flat (issue #120).
 
             Returns
             -------

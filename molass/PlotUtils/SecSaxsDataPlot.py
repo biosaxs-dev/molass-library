@@ -121,6 +121,11 @@ def plot_compact_impl(ssd, **kwargs):
     baseline = kwargs.pop('baseline', False)
     ratio_curve = kwargs.pop('ratio_curve', False)
     moment_lines = kwargs.pop('moment_lines', False)
+    # Issue #120: aligning the zero positions of UV (twinx) and XR axes can make
+    # one trace appear near-flat when their amplitudes differ. Default to
+    # independent autoscaling so each trace fills its own panel faithfully.
+    # Pass align_zero=True to restore the legacy shared-zero behavior.
+    align_zero = kwargs.pop('align_zero', False)
 
     trim = ssd.make_trimming()
     mapping = ssd.get_mapping()
@@ -172,7 +177,8 @@ def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
     draw_anomaly_bands_for_ssd(ax1, axt, ssd)
 
-    align_zero_y(ax1, axt)
+    if align_zero:
+        align_zero_y(ax1, axt)
 
     ymin, ymax = ax1.get_ylim()
     ax1.set_ylim(ymin, ymax * 1.2)
