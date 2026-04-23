@@ -166,4 +166,12 @@ Discovered during Experiment 01g (March 2026):
 | [#21](https://github.com/biosaxs-dev/molass-library/issues/21) | `RgCurve.x` should carry original frame numbers, not column indices | ✅ Done (closed) |
 | [#22](https://github.com/biosaxs-dev/molass-library/issues/22) | `RgCurve.y` should be float array with `nan`, not object array with `None` | ✅ Done (closed) |
 
+### Newly filed (April 23, 2026)
+
+Discovered during Experiment 13h (rigorous optimization, UltraNest):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#123](https://github.com/biosaxs-dev/molass-library/issues/123) | Add `RunInfo.check_progress()` for mid-run progress monitoring | ✅ Done (closed) |
+
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.
