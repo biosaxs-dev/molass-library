@@ -260,3 +260,56 @@ class RunInfo:
             scores[name] = float(val)
 
         return {'fv': float(fv), 'scores': scores}
+
+    @property
+    def monitor_snapshot_json_path(self):
+        """Path to the MplMonitor JSON sidecar written during the last run.
+
+        The file is created when ``MOLASS_MONITOR_SNAPSHOT=1`` and exists at
+        ``<analysis_folder>/optimized/figs/mplmonitor_latest.json``.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "figs", "mplmonitor_latest.json",
+        )
+
+    def load_monitor_snapshot(self):
+        """Load and return the MplMonitor JSON sidecar as a dict.
+
+        Returns
+        -------
+        dict
+            Parsed JSON content.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the sidecar does not exist (``MOLASS_MONITOR_SNAPSHOT`` was not
+            set, or the optimizer has not run yet).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+        """
+        import json, os
+        path = self.monitor_snapshot_json_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"MplMonitor JSON sidecar not found: {path}\n"
+                "Set MOLASS_MONITOR_SNAPSHOT=1 before running optimize_rigorously()."
+            )
+        with open(path) as fh:
+            return json.load(fh)
