@@ -417,6 +417,47 @@ def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
     return True
 
 
+def parse_sv_history(analysis_folder):
+    """Parse all ``callback.txt`` files and return the SV best-so-far trajectory.
+
+    This is the pure data-extraction layer shared by :func:`check_progress`
+    and :attr:`RunInfo.sv_history`.  No printing, no file writes.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+
+    Returns
+    -------
+    list of float
+        ``sv_best_so_far``: one SV value per accepted evaluation, accumulated
+        as the running minimum.  Empty list if no evaluations are recorded yet.
+    """
+    import os, re
+    import numpy as np
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return []
+
+    all_fvals = []
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        content = open(cb, encoding="utf-8", errors="replace").read()
+        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
+        all_fvals.extend(fvals)
+
+    if not all_fvals:
+        return []
+
+    best_so_far = np.minimum.accumulate(all_fvals)
+    sv_so_far = -200 / (1 + np.exp(-1.5 * best_so_far)) + 100
+    return [float(v) for v in sv_so_far]
+
+
 def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     """Read callback.txt(s) from all jobs and report best SV so far.
 
@@ -465,7 +506,7 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
         check_progress(_run_sub, label="subprocess")
         check_progress("/path/to/analysis_folder")  # plain string also accepted
     """
-    import os, re
+    import os
     import numpy as np
 
     # Accept RunInfo instance or plain string
@@ -485,35 +526,26 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
         print(f"{label}: jobs folder not yet created at:\n  {jobs_folder}")
         return
 
-    all_fvals = []
-    for jobid in sorted(os.listdir(jobs_folder)):
-        cb = os.path.join(jobs_folder, jobid, "callback.txt")
-        if not os.path.exists(cb):
-            continue
-        content = open(cb, encoding="utf-8", errors="replace").read()
-        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
-        all_fvals.extend(fvals)
-
-    if not all_fvals:
+    sv_so_far = parse_sv_history(analysis_folder)
+    if not sv_so_far:
         print(f"{label}: no f= lines yet in {jobs_folder}")
         return
 
-    best_fv = min(all_fvals)
-    best_sv = -200 / (1 + np.exp(-1.5 * best_fv)) + 100
-    best_so_far = np.minimum.accumulate(all_fvals)
-    sv_so_far = -200 / (1 + np.exp(-1.5 * best_so_far)) + 100
+    best_sv = sv_so_far[-1]  # last value of min-so-far = global best
+    # Invert SV = -200/(1+exp(-1.5*fv))+100  →  fv = -ln(200/(100-SV)-1)/1.5
+    best_fv = -np.log(200.0 / (100.0 - best_sv) - 1.0) / 1.5
 
-    print(f"{label}: {len(all_fvals)} evaluations")
+    print(f"{label}: {len(sv_so_far)} evaluations")
     print(f"  best fv = {best_fv:.4f}  \u2192  SV = {best_sv:.2f}")
     print(f"  SV best-so-far (last 10): {[round(v, 2) for v in sv_so_far[-10:]]}")
 
     from datetime import datetime, timezone
     snapshot = {
         "label": label,
-        "n_evals": len(all_fvals),
+        "n_evals": len(sv_so_far),
         "best_fv": float(best_fv),
         "best_sv": float(best_sv),
-        "sv_best_so_far": [float(v) for v in sv_so_far],
+        "sv_best_so_far": sv_so_far,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 

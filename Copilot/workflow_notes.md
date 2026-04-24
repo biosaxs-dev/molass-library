@@ -92,3 +92,6 @@ When fixing AI-friendliness issues, follow this pattern per issue:
 
 ### Issues pending (filed, not yet implemented)
 - #50: Design: `allow_negative_peaks` as stored object state — separate baseline recognition from `corrected_copy`
+- #126: AI-friendliness: add `best_fv`/`best_sv` to `mplmonitor_latest.json` — implemented in molass-legacy `MplMonitor._build_monitor_snapshot_json()`
+- #127: AI-friendliness: write `run_complete.json` on optimizer job completion — implemented in molass-legacy `MplMonitor._write_run_complete_json()` + molass-library `RunInfo.run_complete_path` / `load_run_complete()`
+- #128: AI-friendliness: widget title should show best accepted SV, not current snapshot SV — implemented in molass-legacy `JobStatePlot.plot_objective_func()` (add `best_sv` kwarg, update title to `"best SV=XX.X  (cur=YY.Y)"`) + `MplMonitor.update_plot()` (compute `best_sv` from `job_state.fv` and pass through)

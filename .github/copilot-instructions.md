@@ -257,6 +257,14 @@ c=<evaluation_count>
 ```
 Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
 
+**SV consistency across methods (verified April 2026)**: SV is on the same scale for both Basin-Hopping (`bh`) and Nested Sampling (`ultranest`). The reason:
+- UltraNest internally receives `-fv` as its log-likelihood (`my_likelihood` in `SolverUltraNest.py` returns `-fv`). This negation is entirely internal; UltraNest maximises it, which is equivalent to minimising `fv`.
+- `callback.txt` always records the **raw `fv`** — the NS callback re-evaluates `self.objective(params)` directly (ignoring the negated `f` argument UltraNest passes), so `fv` in `callback.txt` is on the same scale as BH.
+- `convert_score(fv)` is therefore applied to the same `fv` scale in both methods.
+- Side-effect: the NS callback incurs one extra `objective_func` evaluation per accepted live-point (it re-evaluates instead of using `-f` from UltraNest). This is harmless for correctness but slightly wasteful.
+
+**Widget title vs best accepted SV (issue #128)**: The `MplMonitor` widget title (panel 3) now shows `"best SV=XX.X  (cur=YY.Y)"`. `best SV` is `convert_score(min(job_state.fv[:, 1]))` — the global min over all **accepted** NS callbacks. `cur` is the SV of the params being rendered at that snapshot. These can differ: UltraNest live-point proposals can temporarily visit higher-SV regions that are never accepted, making the `cur` value mislead upward relative to the converged best.
+
 ---
 
 ## 📂 Repository Structure Quick Reference

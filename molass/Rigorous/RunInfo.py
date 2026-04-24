@@ -459,3 +459,149 @@ class RunInfo:
             )
         with open(path) as fh:
             return json.load(fh)
+
+    @property
+    def sv_history(self):
+        """Min-so-far SV trajectory from all ``callback.txt`` files.
+
+        Returns the full sequence of best-SV-so-far values, one per accepted
+        optimizer evaluation.  Readable at any time — while the run is in
+        progress or after it completes.
+
+        Returns
+        -------
+        list of float
+            Running-minimum SV values.  ``sv_history[-1]`` is the best
+            accepted SV of the entire run.  Empty list if no evaluations
+            have been recorded yet.
+
+        Raises
+        ------
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            svs = run_sub.sv_history
+            print(f"best SV: {svs[-1]:.2f}  start SV: {svs[0]:.2f}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history
+        return parse_sv_history(self.analysis_folder)
+
+    def plot_sv_history(self, title=None, figsize=(8, 4)):
+        """Plot the min-so-far SV trajectory from ``callback.txt``.
+
+        One-liner convergence view.  Works at any time after at least one
+        evaluation has been accepted.
+
+        Parameters
+        ----------
+        title : str, optional
+            Figure title.  Defaults to ``"SV history — <folder basename>"``.
+        figsize : tuple, optional
+            Matplotlib figure size.  Default ``(8, 4)``.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        ::
+
+            run_sub.plot_sv_history()
+            run_sub.plot_sv_history(title="Apo 2-comp NS, subprocess path")
+        """
+        import os
+        import matplotlib.pyplot as plt
+
+        svs = self.sv_history
+        if not svs:
+            print("No SV history found (no callback.txt entries yet).")
+            return
+        if title is None:
+            folder_name = os.path.basename(
+                (self.analysis_folder or "").rstrip("/\\")
+            )
+            title = f"SV history — {folder_name}"
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.plot(svs, lw=1.5)
+        ax.set_xlabel("evaluation")
+        ax.set_ylabel("best SV so far")
+        ax.set_title(title)
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        plt.show()
+
+    @property
+    def run_complete_path(self):
+        """Path to run_complete.json written when the optimizer finishes normally.
+
+        The file is always created on completion (no env-var required) at
+        ``<analysis_folder>/optimized/figs/run_complete.json``.
+
+        It is the canonical, zero-parse-required answer to
+        "what was the best result?" for AI tools and notebook cells in a
+        new session.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists yet.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "figs", "run_complete.json",
+        )
+
+    def load_run_complete(self):
+        """Load and return the run_complete.json written on job completion.
+
+        Returns
+        -------
+        dict
+            Keys: ``schema_version``, ``completed_at``, ``best_fv``,
+            ``best_sv``, ``n_evals``, ``n_accepted``, ``analysis_folder``.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file does not exist yet (job still running, or completed
+            before this fix was active).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            rc = run_sub.load_run_complete()
+            print(f"best_sv = {rc['best_sv']:.2f}")
+        """
+        import json, os
+        path = self.run_complete_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"run_complete.json not found: {path}\n"
+                "The job may still be running, or it completed before "
+                "this feature was active (molass-legacy fix #AI-B required)."
+            )
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
