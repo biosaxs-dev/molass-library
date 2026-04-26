@@ -199,6 +199,23 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     with _stack:
         dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug)
 
+        # Drop a breadcrumb so external observers can find this run even
+        # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.
+        try:
+            from molass.Rigorous.RunRegistry import write_run_manifest
+            write_run_manifest(
+                analysis_folder,
+                role="analysis",
+                method=method,
+                niter=niter,
+                in_process=in_process,
+                monitor=monitor,
+                analysis_folder=analysis_folder,
+                status="starting",
+            )
+        except Exception:
+            pass
+
         # Determine which SSD the optimizer actually sees (for settings, floor, etc.)
         data_ssd = trimmed_ssd if trimmed_ssd is not None else decomposition.ssd
 
@@ -259,6 +276,26 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
         )
 
+        # Breadcrumb: drop a manifest in the work folder too, and update
+        # the analysis-folder manifest with completion + work_folder link.
+        try:
+            from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
+            write_run_manifest(
+                work_folder,
+                role="work",
+                method=method, niter=niter,
+                in_process=True, monitor=False,
+                analysis_folder=analysis_folder,
+                status="completed",
+            )
+            update_run_manifest(
+                analysis_folder,
+                work_folder=work_folder,
+                status="completed",
+            )
+        except Exception:
+            pass
+
         if debug:
             import molass.Rigorous.RunInfo
             reload(molass.Rigorous.RunInfo)
@@ -287,9 +324,45 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         # (already done above in `optimizer.prepare_for_optimization(init_params)`)
         runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts,
                    debug=debug)
+        # Breadcrumb: now that the runner has a working_folder + subprocess
+        # PID, expose them so external observers can find the live run.
+        try:
+            from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
+            sub_pid = getattr(runner.process, "pid", None)
+            write_run_manifest(
+                runner.working_folder,
+                role="work",
+                method=method, niter=niter,
+                in_process=False, monitor=False,
+                analysis_folder=analysis_folder,
+                subprocess_pid=sub_pid,
+                status="running",
+            )
+            update_run_manifest(
+                analysis_folder,
+                work_folder=runner.working_folder,
+                subprocess_pid=sub_pid,
+                status="running",
+            )
+        except Exception:
+            pass
         # Block until the subprocess exits.  Comparison flow will then read
         # results from disk via wait_for_rigorous_results / list_rigorous_jobs.
         rc = runner.process.wait()
+        try:
+            from molass.Rigorous.RunRegistry import update_run_manifest
+            update_run_manifest(
+                runner.working_folder,
+                status="completed",
+                subprocess_returncode=rc,
+            )
+            update_run_manifest(
+                analysis_folder,
+                status="completed",
+                subprocess_returncode=rc,
+            )
+        except Exception:
+            pass
         if debug:
             print(f"BackRunner subprocess exited with returncode={rc}")
 

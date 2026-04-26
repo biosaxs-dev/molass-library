@@ -17,3 +17,9 @@ from .ComparePaths import (
     ComparisonResult,
     PathResult,
 )
+from .RunRegistry import (
+    locate_recent_runs,
+    read_manifest,
+    write_run_manifest,
+    update_run_manifest,
+)
