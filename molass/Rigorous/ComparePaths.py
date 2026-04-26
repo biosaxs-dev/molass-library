@@ -135,6 +135,48 @@ class ComparisonResult:
             % (label, [r.label for r in self.results])
         )
 
+    def live_status(self, label=None):
+        """Return :meth:`RunInfo.live_status` snapshots for the comparison.
+
+        Convenience wrapper so callers don't have to spell out
+        ``result.by_label('subprocess').run_info.live_status()``.
+
+        Parameters
+        ----------
+        label : str, optional
+            If given, return the single dict for that path (e.g.
+            ``'subprocess'`` or ``'in_process'``).  If ``None`` (default),
+            return ``{label: status_dict, ...}`` for every path that has
+            a ``run_info`` available.
+
+        Returns
+        -------
+        dict
+            Either a single ``live_status`` dict (when ``label`` is given)
+            or a mapping of ``label → live_status dict``.
+
+        Examples
+        --------
+        ::
+
+            result = compare_optimization_paths(decomp, rgcurve, niter=20)
+            result.live_status()                      # both paths
+            result.live_status('subprocess')          # one path
+            aicKernelEval(expression="result.live_status()")
+        """
+        if label is not None:
+            r = self.by_label(label)
+            if r.run_info is None:
+                return None
+            return r.run_info.live_status()
+        out = {}
+        for r in self.results:
+            if r.run_info is None:
+                out[r.label] = None
+            else:
+                out[r.label] = r.run_info.live_status()
+        return out
+
     def summary_table(self, file=None):
         """Print a side-by-side summary table.
 
