@@ -540,6 +540,145 @@ class RunInfo:
         fig.tight_layout()
         plt.show()
 
+    def live_status(self):
+        """Return a single dict snapshot of where this run stands right now.
+
+        One-call replacement for the scattered probe pattern (``sv_history``
+        property + ``check_progress`` + ``RunRegistry.read_manifest`` +
+        ``getattr(self, 'subprocess_returncode', None)`` + ...) used in
+        diagnostic notebook cells.  Pure read: scans disk, never mutates.
+        Safe to invoke from ``aicKernelEval`` (issue ai-context-vscode#1)
+        or any sync cell, including while the run is still in flight.
+
+        Returns
+        -------
+        dict
+            Keys (all best-effort; missing data → ``None``):
+
+            - ``phase`` (str): one of ``'pending'``, ``'running'``,
+              ``'completed'``, ``'failed'``, ``'unknown'``.  Derived from
+              the manifest's ``status`` field plus any
+              ``subprocess_returncode`` available.
+            - ``n_evals`` (int): number of accepted optimizer evaluations
+              recorded in ``callback.txt`` so far.
+            - ``best_fv`` (float): inverted from ``best_sv`` (matches
+              ``check_progress`` arithmetic).
+            - ``best_sv`` (float): best score-value-so-far on the 0-100
+              scale.
+            - ``elapsed_s`` (float): seconds since manifest ``start_time``,
+              or ``None`` if the manifest isn't available yet.
+            - ``analysis_folder`` (str): from ``self.analysis_folder``.
+            - ``work_folder`` (str): from ``self.work_folder``, falling back
+              to walking ``analysis_folder`` for ``callback.txt``.
+            - ``subprocess_pid`` (int or None): from manifest.
+            - ``subprocess_returncode`` (int or None): from
+              ``self.subprocess_returncode`` or manifest.
+            - ``manifest`` (dict or None): the full ``RUN_MANIFEST.json``
+              contents from the analysis folder, when present.
+
+        Examples
+        --------
+        From a notebook cell while the run is in flight::
+
+            run_sub.live_status()
+
+        From outside the kernel via ai-context-vscode#1::
+
+            aicKernelEval(expression="run_sub.live_status()")
+        """
+        import os
+        from datetime import datetime, timezone
+
+        analysis_folder = self.analysis_folder
+        work_folder = self.work_folder
+
+        # Try to load the per-run manifest (RunRegistry breadcrumb).
+        manifest = None
+        if analysis_folder:
+            try:
+                from molass.Rigorous.RunRegistry import read_manifest
+                manifest = read_manifest(analysis_folder)
+            except Exception:
+                manifest = None
+
+        # If work_folder isn't set on the RunInfo, try the manifest, then
+        # fall back to a quick filesystem scan.  This is the same fallback
+        # pattern that diagnostic cells (e.g. 13h cell [6d]) hand-roll.
+        if work_folder is None and manifest is not None:
+            work_folder = manifest.get("work_folder")
+        if work_folder is None and analysis_folder and os.path.isdir(analysis_folder):
+            for root, _dirs, files in os.walk(analysis_folder):
+                if "callback.txt" in files:
+                    work_folder = root
+                    break
+
+        # SV history (cheap; reads callback.txt files only).
+        n_evals = 0
+        best_sv = None
+        best_fv = None
+        if analysis_folder:
+            try:
+                from molass.Rigorous.CurrentStateUtils import parse_sv_history
+                svs = parse_sv_history(analysis_folder)
+                n_evals = len(svs)
+                if n_evals:
+                    import math
+                    best_sv = float(svs[-1])
+                    # Invert SV = -200/(1+exp(-1.5*fv))+100
+                    try:
+                        best_fv = -math.log(200.0 / (100.0 - best_sv) - 1.0) / 1.5
+                    except (ValueError, ZeroDivisionError):
+                        best_fv = None
+            except Exception:
+                pass
+
+        # Subprocess returncode: prefer the live attribute (set by
+        # RigorousImplement on process.wait()), fall back to manifest.
+        rc = getattr(self, "subprocess_returncode", None)
+        sub_pid = None
+        if manifest is not None:
+            if rc is None:
+                rc = manifest.get("subprocess_returncode")
+            sub_pid = manifest.get("subprocess_pid")
+
+        # Phase: combine manifest status + returncode.
+        status = (manifest or {}).get("status")
+        if rc is not None and rc != 0:
+            phase = "failed"
+        elif rc == 0 or status == "completed":
+            phase = "completed"
+        elif status in ("running", "starting"):
+            phase = "running"
+        elif status == "pending":
+            phase = "pending"
+        else:
+            phase = "unknown"
+
+        # Elapsed time from manifest start_time (UTC ISO).
+        elapsed_s = None
+        start_time = (manifest or {}).get("start_time")
+        if start_time:
+            try:
+                t0 = datetime.fromisoformat(start_time)
+                if t0.tzinfo is None:
+                    t0 = t0.replace(tzinfo=timezone.utc)
+                elapsed_s = (datetime.now(timezone.utc) - t0).total_seconds()
+            except (ValueError, TypeError):
+                elapsed_s = None
+
+        return {
+            "phase": phase,
+            "n_evals": n_evals,
+            "best_fv": best_fv,
+            "best_sv": best_sv,
+            "elapsed_s": elapsed_s,
+            "analysis_folder": analysis_folder,
+            "work_folder": work_folder,
+            "subprocess_pid": sub_pid,
+            "subprocess_returncode": rc,
+            "manifest": manifest,
+        }
+
     @property
     def run_complete_path(self):
         """Path to run_complete.json written when the optimizer finishes normally.
