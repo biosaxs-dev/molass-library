@@ -375,6 +375,7 @@ def compare_optimization_paths(decomposition, rgcurve, *,
                                clear_jobs=True,
                                frozen_components=None,
                                function_code=None,
+                               monitor=False,
                                debug=False,
                                **kwargs):
     """Run ``optimize_rigorously`` along each requested path and compare.
@@ -408,6 +409,13 @@ def compare_optimization_paths(decomposition, rgcurve, *,
     timeout : float, optional
         Per-path timeout passed to ``wait_for_rigorous_results``.
         Default ``600`` s.
+    monitor : bool, optional
+        Forwarded to ``optimize_rigorously`` for the subprocess leg.
+        Default ``False`` — the comparison does not need the live
+        ``MplMonitor`` dashboard, and skipping it avoids the matplotlib /
+        ipywidgets fragility that has crashed the kernel on accept events
+        (Python 3.14 + degraded widget CDN).  Set ``True`` only if you
+        also want the dashboard while the comparison runs.
     clear_jobs, frozen_components, function_code, debug, **kwargs :
         Passed through to ``optimize_rigorously``.
 
@@ -442,6 +450,7 @@ def compare_optimization_paths(decomposition, rgcurve, *,
             niter=niter,
             clear_jobs=clear_jobs,
             in_process=in_process,
+            monitor=monitor,
             frozen_components=frozen_components,
             function_code=function_code,
             debug=debug,

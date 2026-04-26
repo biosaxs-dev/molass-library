@@ -900,7 +900,7 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=False, debug=False,
+                            in_process=False, monitor=True, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -977,6 +977,13 @@ class Decomposition:
             #117 / #119) and keeps the optimizer running against the same
             library-prepared data the parent already holds in memory.
             Default is ``False`` while the in-process path is opt-in.
+        monitor : bool, optional
+            Only meaningful when ``in_process=False``.  If True (default),
+            the subprocess is wrapped in the live ``MplMonitor`` ipywidgets
+            dashboard.  If False, the subprocess is launched directly via
+            ``BackRunner`` and the call blocks until it exits — use this
+            for batch / comparison runs (e.g. ``compare_optimization_paths``)
+            where the dashboard is not needed.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -1032,7 +1039,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.

@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -142,6 +142,15 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         divergence.  This is the recommended path for notebook use; the
         default remains ``False`` (subprocess) during the opt-in phase.
         See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
+    monitor : bool, optional
+        Only meaningful when ``in_process=False``.  If True (default),
+        spawn the subprocess via ``MplMonitor`` so the live ipywidgets
+        dashboard updates as the optimizer accepts new minima.  If False,
+        spawn the subprocess directly via ``BackRunner`` and block until
+        it exits — no widget, no live polling.  Use ``monitor=False`` for
+        batch/comparison runs where the dashboard is not needed (and to
+        avoid known fragility of the matplotlib widget pipeline on
+        Python 3.14 / degraded ipywidgets CDN).
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -261,6 +270,40 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         )
         run_info.in_process_result = result
         run_info.work_folder = work_folder
+        return run_info
+
+    if not monitor:
+        # Subprocess path WITHOUT MplMonitor.  Used by batch / comparison
+        # runs (e.g. compare_optimization_paths) where the live ipywidgets
+        # dashboard is not needed and would re-introduce the matplotlib /
+        # widget fragility we are trying to escape with split-architecture.
+        if debug:
+            import molass_legacy.Optimizer.BackRunner
+            reload(molass_legacy.Optimizer.BackRunner)
+        from molass_legacy.Optimizer.BackRunner import BackRunner
+
+        runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
+        # Mirror MplMonitor.run_impl: ensure optimizer is prepared before launch.
+        # (already done above in `optimizer.prepare_for_optimization(init_params)`)
+        runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts,
+                   debug=debug)
+        # Block until the subprocess exits.  Comparison flow will then read
+        # results from disk via wait_for_rigorous_results / list_rigorous_jobs.
+        rc = runner.process.wait()
+        if debug:
+            print(f"BackRunner subprocess exited with returncode={rc}")
+
+        if debug:
+            import molass.Rigorous.RunInfo
+            reload(molass.Rigorous.RunInfo)
+        from molass.Rigorous.RunInfo import RunInfo
+        run_info = RunInfo(
+            ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+            init_params=init_params, monitor=None,
+            analysis_folder=analysis_folder, decomposition=decomposition,
+        )
+        run_info.work_folder = runner.working_folder
+        run_info.subprocess_returncode = rc
         return run_info
 
     monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
