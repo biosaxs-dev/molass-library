@@ -268,65 +268,29 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # Wire dsets to monitor so the Export Data button can work (issue #96)
     monitor.dsets = dsets
 
-    # Build a subprocess-equivalent optimizer for on-screen objective
-    # re-evaluation, so MplMonitor SV matches callback.txt SV (issue #118).
-    # The parent's `optimizer` evaluates against live library-prepared dsets,
-    # while the subprocess re-derives dsets from in_folder via OptimizerInput;
-    # the two can diverge.  Until issue #119 unifies them at the data layer,
-    # we re-evaluate the on-screen objective using a subprocess-style instance.
-    try:
-        from molass_legacy._MOLASS.SerialSettings import get_setting
-        from molass_legacy.Optimizer.OptimizerMain import create_optimizer_from_job
-        job_folder = os.path.abspath(monitor.runner.working_folder)
-        trimming_txt = os.path.join(job_folder, 'trimming.txt')
-        in_folder = get_setting('in_folder')
-        # Suppress the noisy data-loading pipeline (re-runs trimming, baseline,
-        # peak recognition, mapping) — same suppression spirit as above.
-        import io as _io
-        from contextlib import redirect_stdout as _ro, redirect_stderr as _re_, ExitStack as _ES
-        _ms = _ES()
-        if not debug:
-            _ms.enter_context(_ro(_io.StringIO()))
-            _ms.enter_context(_re_(_io.StringIO()))
-        with _ms:
-            mon_opt = create_optimizer_from_job(
-                in_folder=in_folder,
-                n_components=optimizer.n_components,
-                class_code=optimizer.__class__.__name__,
-                trimming_txt=trimming_txt,
-                shared_memory=None,
-            )
-            mon_opt.set_xr_only(optimizer.xr_only)
-            mon_opt.prepare_for_optimization(init_params)
-        # mon_opt uses disk-loaded dsets (same as subprocess) so its objective_func
-        # matches callback.txt SV — this is the #118 alignment guarantee.
-        #
-        # Display-only patch (issue #129): the disk-load path produces curves
-        # in the original frame-number domain, but the parent's live curves use
-        # the trimmed (0..N-1) domain. The dashboard plots use xr_curve.x /
-        # uv_curve.x for axis ranges, so without this patch UV/Rg panels appear
-        # shifted left and the data falls off-axis.
-        #
-        # We replace ONLY the .x arrays (axis labels) — never .y, .max_y, or
-        # rg_curve — because objective_func reads xr_curve.max_y / xr_curve.y
-        # together with cached self.xr_norm1 / self.uv_norm1 (set at prepare
-        # time from .y). Touching .y or rg_curve would desynchronize the
-        # cached norms and break the #118 alignment (Fix #21 did this and was
-        # reverted). Touching only .x leaves all numerical pathways intact.
-        try:
-            if (mon_opt.xr_curve is not None and optimizer.xr_curve is not None
-                    and len(mon_opt.xr_curve.x) == len(optimizer.xr_curve.x)):
-                mon_opt.xr_curve.x = optimizer.xr_curve.x
-            if (mon_opt.uv_curve is not None and optimizer.uv_curve is not None
-                    and len(mon_opt.uv_curve.x) == len(optimizer.uv_curve.x)):
-                mon_opt.uv_curve.x = optimizer.uv_curve.x
-        except Exception as _e_disp:
-            import logging as _log_disp
-            _log_disp.getLogger(__name__).warning("display-only x-axis patch failed: %s", _e_disp)
-        monitor.monitor_optimizer = mon_opt
-    except Exception:
-        # Fall back silently: monitor will use parent optimizer (legacy behavior)
-        monitor.monitor_optimizer = None
+    # Display rendering uses the parent optimizer (issues #118, #128, #129).
+    #
+    # History:
+    #   #118 originally introduced `monitor_optimizer` (a subprocess-equivalent
+    #        optimizer built via `create_optimizer_from_job`) so the monitor's
+    #        on-screen per-snapshot SV would match callback.txt SV.
+    #   #128 changed the panel title to show `best_sv` (aggregated from
+    #        callback.txt by MplMonitor) instead of the per-snapshot SV.
+    #        The per-snapshot SV computed inside `plot_objective_func` is now
+    #        discarded — only the plot rendering still uses `display_optimizer`.
+    #   #129 the subprocess-equivalent optimizer renders curves in the
+    #        original frame-number domain (its disk-loaded dsets), while the
+    #        parent uses the trimmed (0..N-1) domain that the EGH parameters
+    #        in `init_params` are expressed in. Mixing them shifted the UV /
+    #        Rg / Xray panels off-axis. Patching `xr_curve.x` / `uv_curve.x`
+    #        on the monitor optimizer is unsafe because `objective_func`
+    #        reads them at every evaluation — see Fix #21 / G0346.objective_func.
+    #
+    # Resolution: leave `monitor_optimizer = None` so `MplMonitor` falls back
+    # to the parent `optimizer` for plot rendering. The title still shows
+    # `best_sv` from callback.txt (#128), so #118's user-visible guarantee
+    # is preserved without the coordinate-system conflict.
+    monitor.monitor_optimizer = None
 
     # Pass anomaly mask to monitor for consistent band display
     from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
