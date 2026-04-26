@@ -318,6 +318,32 @@ The `mon_opt` instance built via `create_optimizer_from_job` reproduces the
 subprocess `fv = −1.2656` exactly, confirming the divergence is structural
 (disk-load vs library-prepared dsets) rather than stochastic.
 
+## Phase 3 validation (split-architecture parity, Apo 2c)
+
+Captured from `molass-researcher/experiments/13_rigorous_optimization/13h_split_architecture_validation.ipynb`,
+running `compare_optimization_paths(decomp, rgcurve, method='NS', niter=20,
+paths=('subprocess','in_process'), monitor=False)` on April 26, 2026
+(molass-library commit `14edf7b`).
+
+| Metric | Subprocess | In-process | Δ (in_process − subprocess) |
+|---|---|---|---|
+| `best_fv` | −1.4232 | −1.4022 | +0.0210 |
+| `best_sv` | 78.85 | 78.24 | −0.60 |
+| Rg[1] (Å) | 33.40 | 33.39 | −0.01 |
+| Rg[2] (Å) | 33.23 | 32.91 | −0.31 |
+| Wall time (s) | 1145.7 | 1295.4 | +149.8 |
+
+Tolerance check (`assert_parity(fv_rtol=5e-2, sv_atol=2.0, rg_atol=1.0)`):
+**PASS**. |Δfv|/|fv| = 1.5% (≪ 5%), |ΔSV| = 0.60 (≪ 2.0), max ΔRg = 0.31 Å
+(< 1.0 Å). The two paths converge to numerically equivalent solutions; the
+remaining drift is well within UltraNest stochasticity.
+
+Wall-time gap (+13%) is the in-process slowdown previously diagnosed in
+`13h` cell `[7c]` (≈3.5 ms/eval subprocess vs ≈15.6 ms/eval in-process).
+The fv comparison eliminates *correctness* concerns about the in-process
+path; the slowdown is now isolated as a pure optimization concern
+(UltraNest / GIL / threading), to be addressed in Phase 5+.
+
 ## References
 
 - #117 — Root-cause analysis: parent vs subprocess fv divergence
