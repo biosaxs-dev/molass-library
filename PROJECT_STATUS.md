@@ -11,18 +11,52 @@
 
 ## 🎯 Current Task
 
-Working on: **Split-architecture for `optimize_rigorously()` — Phase 3 validation** 🔬  
-Next: Confirm wall-time parity for `in_process=True` path (latest hypothesis: ipywidgets viz callback overhead in Jupyter; untested patch in `molass-legacy/Solvers/UltraNest/SamplerCallback.py`)  
-See: `Copilot/DESIGN_split_optimizer_architecture.md`, `molass-researcher/experiments/13_rigorous_optimization/13h_split_architecture_validation.ipynb`
-
-**In flight (Apr 22)**:
-- `molass/Rigorous/RigorousImplement.py`: `in_process` kwarg branches to `molass_legacy.Optimizer.InProcessRunner.run_optimizer_in_process()`; same `dsets`, no subprocess re-derivation. Apo 2-comp NITER_CMP=1 smoke: subprocess 52s vs in-process 398s (algorithmically equivalent: Rg identical to 2 dp, in-process fv slightly better).
-- `Copilot/DESIGN_split_optimizer_architecture.md`: Phase 0 baseline table empty; pending NITER_CMP=20 numbers once wall-time parity is confirmed.
-- Pending umbrella issue: "Design: Split architecture for rigorous optimization" — parent of #117/#118/#119.
+Working on: **Issue #132 — `work_folder` consistency between in-process and subprocess paths** ⏳  
+Next: Open #132, trace where `work_folder` diverges between the two paths in `RigorousImplement.py`, align them.
 
 ---
 
 ## 🎯 Recent Work
+
+### April 26, 2026 — Run observability Tier-1 closeout + Phase 3 validation confirmed (Exp 13h)
+
+**Commits**: `798761e`, `8c4fede`, `18f0439`
+
+**`molass/Rigorous/RunInfo.py`** — `RunInfo.live_status()` (issue #133, closes):
+- One-call dict: `{phase, n_evals, best_fv, best_sv, elapsed_s, analysis_folder, work_folder, subprocess_pid, subprocess_returncode, manifest}`
+- Reads `RunRegistry` manifest + `parse_sv_history` from `callback.txt`; pure disk read, no side effects
+- `work_folder` fallback: walks `analysis_folder` for `callback.txt` if attribute not set
+- Phase derived from manifest `status` + `subprocess_returncode`
+- Tested: running → completed → failed → unknown (4 state transitions)
+
+**`molass/Rigorous/ComparePaths.py`** — `ComparisonResult.live_status(label=None)`:
+- Convenience wrapper: returns `{label: status_dict, ...}` or single dict when `label=` given
+- Composes with `aicKernelEval(expression="cmp.live_status()")` for external-observer use
+
+**Discoverability docs** (all pushed):
+- `ai-context-vscode` README: `aicKernelEval` documented (was package.json only)
+- `molass-library` copilot-instructions: "Live run observability stack" subsection added under §9
+- `molass-researcher` copilot-instructions: kernel-first routing rule updated — `live_status()` is now the first-line probe
+- `ai-context-standard` NOTEBOOK_CONVENTIONS: `aicKernelEval` added to `ai-context-vscode` tooling list
+- `molass-library` API_IMPROVEMENTS: #131–#133 + RunRegistry/aicKernelEval infrastructure logged
+
+**Phase 3 validation — confirmed (NITER_CMP=20, Apo 2-comp)**:
+
+| metric | subprocess | in-process | delta |
+|---|---:|---:|---:|
+| best_fv | −1.4232 | −1.4022 | +0.021 |
+| best_sv | 78.85 | 78.24 | −0.60 |
+| Rg[1] (Å) | 33.40 | 33.39 | −0.01 |
+| Rg[2] (Å) | 33.23 | 32.91 | −0.31 |
+| wall (s) | 1146 | 1295 | +13% |
+
+Parity assertion passed (`fv_rtol=5e-2, sv_atol=2.0, rg_atol=1.0`). Numbers reproduce the earlier Phase 3 table (same |ΔSV|=0.60, max ΔRg=0.31 Å) — in-process path behavior is stable run-to-run. Wall-time gap (+13–18%) confirmed as UltraNest/GIL overhead, not a correctness issue.
+
+**Notebook `13h_split_architecture_validation.ipynb`** restructured for Run-All:
+- Cell [6a]: `pprint(cmp.live_status())` — canonical progress probe
+- DIAG-INIT cell: extracts `run_sub/run_inp/inp_summary/sub_summary` from `cmp` so legacy diagnostic cells work when `RUN_DIAGNOSTICS=True`
+
+**Future work filed**: `freesemt/ai-context-vscode#2` — tool-availability hints + cell-completion notification (3-strikes guard; not building yet).
 
 ### April 23, 2026 — RunInfo AI-friendliness sweep (issues #123–#125)
 
