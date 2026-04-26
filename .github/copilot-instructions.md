@@ -265,6 +265,16 @@ Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
 
 **Widget title vs best accepted SV (issue #128)**: The `MplMonitor` widget title (panel 3) now shows `"best SV=XX.X  (cur=YY.Y)"`. `best SV` is `convert_score(min(job_state.fv[:, 1]))` — the global min over all **accepted** NS callbacks. `cur` is the SV of the params being rendered at that snapshot. These can differ: UltraNest live-point proposals can temporarily visit higher-SV regions that are never accepted, making the `cur` value mislead upward relative to the converged best.
 
+**Live run observability stack (April 2026)**: For any in-flight or completed rigorous run, prefer the canonical one-call probe over hand-rolled `sv_history` + `check_progress` + manifest reads:
+
+| Source | Probe |
+|--------|-------|
+| `RunInfo` (single run) | `run.live_status()` (issue #133) |
+| `ComparisonResult` (compare_optimization_paths) | `cmp.live_status()` or `cmp.live_status('subprocess')` |
+| External observer (no notebook cell) | `aicKernelEval(expression="run.live_status()")` (ai-context-vscode#1) |
+
+`live_status()` returns `{phase, n_evals, best_fv, best_sv, elapsed_s, analysis_folder, work_folder, subprocess_pid, subprocess_returncode, manifest}` in one disk read. It composes with `RunRegistry` (`molass.Rigorous.read_manifest`, `locate_recent_runs`) which writes/reads `RUN_MANIFEST.json` breadcrumbs in both `analysis_folder` and `work_folder`. Use these instead of parsing `callback.txt` directly.
+
 ---
 
 ## 📂 Repository Structure Quick Reference
