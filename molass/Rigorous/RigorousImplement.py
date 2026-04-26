@@ -298,24 +298,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             )
             mon_opt.set_xr_only(optimizer.xr_only)
             mon_opt.prepare_for_optimization(init_params)
-        # Fix #21: patch mon_opt's curve references with parent's after prepare_for_optimization.
-        # create_optimizer_from_job builds mon_opt from raw data (0-based local indices for
-        # splines), then apply_x_shifts shifts xr_curve.x to original frame numbers but does
-        # NOT rebuild the splines or rg_curve segments.  Result: xr_curve.x = [550..1309] but
-        # xr_curve.spline domain = [0..759]; rg_curve.segments at [~277..457] instead of
-        # [~892..1004].  Replacing with parent's curves (built consistently in original frame
-        # numbers throughout) gives correct spline domains and rg positions on the dashboard.
-        try:
-            mon_opt.xr_curve = optimizer.xr_curve
-            mon_opt.uv_curve = optimizer.uv_curve
-            mon_opt.uv_j = optimizer.uv_curve.x
-            mon_opt.rg_curve = optimizer.rg_curve
-            mon_opt.xm, mon_opt.ym, mon_opt.rg = optimizer.rg_curve.get_valid_curves()
-            mon_opt.mask = optimizer.rg_curve.get_mask()
-            mon_opt.ones_rg = np.ones(len(mon_opt.rg))
-        except Exception as _e21:
-            import logging as _log21
-            _log21.getLogger(__name__).warning("Fix #21 curve patch failed: %s", _e21)
+        # mon_opt uses disk-loaded dsets (same as subprocess) so its objective_func
+        # matches callback.txt SV — this is the #118 alignment guarantee.
+        # Do NOT patch mon_opt's curve references with parent's live objects:
+        # objective_func reads rg_curve internally, so replacing it would change
+        # the objective value and break the alignment (verified April 2026, issue #21 reverted).
         monitor.monitor_optimizer = mon_opt
     except Exception:
         # Fall back silently: monitor will use parent optimizer (legacy behavior)
