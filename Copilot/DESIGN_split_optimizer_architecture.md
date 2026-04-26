@@ -161,6 +161,83 @@ Adopt a **split architecture**:
   (tqdm or live matplotlib) driven directly from the optimizer's per-iteration
   callback. Cleaner than today — no file polling.
 
+#### Phase 2 step 3 — Default progress UX
+
+The in-process path replaces `MplMonitor`'s file-polling bridge with a direct
+Python callback. Three layered patterns, opt-in by argument:
+
+**Pattern 1 — `tqdm` (default, `progress="tqdm"`)**
+
+Single live line in the cell output, equivalent to today's `MplMonitor` title.
+
+```python
+from tqdm.auto import tqdm
+pbar = tqdm(total=niter)
+best = [float("inf")]
+
+def cb(params, fv, accepted):
+    best[0] = min(best[0], fv)
+    pbar.set_postfix(best_sv=f"{convert_score(best[0]):.2f}",
+                     cur_sv=f"{convert_score(fv):.2f}",
+                     acc=accepted)
+    pbar.update(1)
+```
+
+**Pattern 2 — Live matplotlib (`progress="plot"`)**
+
+SV trajectory + (throttled) 3-panel decomposition snapshot, equivalent to
+today's `MplMonitor` dashboard.
+
+```python
+%matplotlib widget
+fig, axes = plt.subplots(ncols=4, figsize=(20, 4))
+ax_sv = axes[-1]; fvs = []
+
+def cb(params, fv, accepted):
+    fvs.append(fv)
+    ax_sv.clear()
+    ax_sv.plot([convert_score(f) for f in fvs])
+    if len(fvs) % 5 == 0:                     # throttle
+        for ax in axes[:3]: ax.clear()
+        optimizer.objective_func(params, plot=True,
+                                 axis_info=(fig, list(axes[:3]) + [None]))
+    fig.canvas.draw_idle()
+```
+
+The `optimizer` here is the parent's prepared object — by construction the
+plotted state is the optimized state, so #117 / #118 / #129-class divergence
+is unreachable.
+
+**Pattern 3 — Reuse `MplMonitor` widget (`progress="dashboard"`, Phase 5)**
+
+`MplMonitor`'s rendering (ipywidgets dashboard, Resume/Terminate/Export
+buttons, anomaly bands) is independent of *how* params arrive. The
+in-process callback can call `monitor.update(params, fv)` directly — same
+widget, no file polling, no `monitor_optimizer` indirection.
+
+**User control mapping (vs today):**
+
+| Today (subprocess + MplMonitor) | In-process |
+|---|---|
+| Resume / Terminate buttons | Kernel "Interrupt" (`KeyboardInterrupt` in callback or solver) |
+| File-polled best SV in title | `min(fvs)` in callback |
+| 3-panel decomposition snapshot | `objective_func(params, plot=True, axis_info=...)` from callback |
+| Export job folder | Same — Phase 2 keeps `callback.txt` / `init_params.txt` writes |
+| Crash isolation | Lost on default path; recovered via `isolated=True` (Phase 5) |
+
+**API shape:**
+
+```python
+optimize_rigorously(decomposition, rgcurve,
+                    in_process=True,
+                    progress="tqdm",        # "tqdm" | "plot" | "dashboard" | None
+                    progress_every=1,        # throttle for "plot" / "dashboard"
+                    callback=None)           # user callback, runs after built-in UX
+```
+
+`callback=None` is the escape hatch — power users skip the built-in UX and
+get the raw `(params, fv, accepted)` stream.
+
 ### Phase 3 — Validation
 
 - In `molass-researcher/experiments/13_rigorous_optimization/13g_rigorous_apo_1c.ipynb`,
