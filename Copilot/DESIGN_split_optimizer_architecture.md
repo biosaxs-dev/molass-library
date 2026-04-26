@@ -226,14 +226,20 @@ the regression target Phase 3 / Phase 4 are validated against.
 
 | Metric | Subprocess (baseline) | In-process (Phase 3) |
 |---|---|---|
-| `best_fv` | _TBD_ | _TBD_ |
-| `best_sv` | _TBD_ | _TBD_ |
+| `best_fv` (logged in `callback.txt`) | −1.2656 | _TBD_ |
+| `best_sv` (from logged `fv`) | 73.94 | _TBD_ |
+| Parent re-eval `fv` (same params) | −1.4022 | _TBD_ |
+| Parent re-eval SV | 78.24 | _TBD_ |
+| ΔSV (parent − subprocess) | +4.30 | _TBD_ |
 | Recovered Rg | _TBD_ | _TBD_ |
-| Wall time (s) | _TBD_ | _TBD_ |
+| Wall time (s) | ≈153 | _TBD_ |
 
-Settings: `method='NS'`, `niter=20`, `clear_jobs=True`, default trimming,
-linear baseline, no anomaly mask. Update this table once the comparison
-cell has been run.
+Settings: Apo 2-component, `method='NS'`, `niter=30`, `clear_jobs=True`,
+default trimming, linear baseline, no anomaly mask. Captured April 26, 2026
+during the Fix #21 revert verification (commits `9d77a5e` → `b2ea136`).
+The `mon_opt` instance built via `create_optimizer_from_job` reproduces the
+subprocess `fv = −1.2656` exactly, confirming the divergence is structural
+(disk-load vs library-prepared dsets) rather than stochastic.
 
 ## References
 
