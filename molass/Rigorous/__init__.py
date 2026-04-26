@@ -12,3 +12,8 @@ from .CurrentStateUtils import (
     read_convergence_data,
     plot_convergence,
 )
+from .ComparePaths import (
+    compare_optimization_paths,
+    ComparisonResult,
+    PathResult,
+)
