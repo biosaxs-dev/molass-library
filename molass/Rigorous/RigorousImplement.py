@@ -300,9 +300,29 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             mon_opt.prepare_for_optimization(init_params)
         # mon_opt uses disk-loaded dsets (same as subprocess) so its objective_func
         # matches callback.txt SV — this is the #118 alignment guarantee.
-        # Do NOT patch mon_opt's curve references with parent's live objects:
-        # objective_func reads rg_curve internally, so replacing it would change
-        # the objective value and break the alignment (verified April 2026, issue #21 reverted).
+        #
+        # Display-only patch (issue #129): the disk-load path produces curves
+        # in the original frame-number domain, but the parent's live curves use
+        # the trimmed (0..N-1) domain. The dashboard plots use xr_curve.x /
+        # uv_curve.x for axis ranges, so without this patch UV/Rg panels appear
+        # shifted left and the data falls off-axis.
+        #
+        # We replace ONLY the .x arrays (axis labels) — never .y, .max_y, or
+        # rg_curve — because objective_func reads xr_curve.max_y / xr_curve.y
+        # together with cached self.xr_norm1 / self.uv_norm1 (set at prepare
+        # time from .y). Touching .y or rg_curve would desynchronize the
+        # cached norms and break the #118 alignment (Fix #21 did this and was
+        # reverted). Touching only .x leaves all numerical pathways intact.
+        try:
+            if (mon_opt.xr_curve is not None and optimizer.xr_curve is not None
+                    and len(mon_opt.xr_curve.x) == len(optimizer.xr_curve.x)):
+                mon_opt.xr_curve.x = optimizer.xr_curve.x
+            if (mon_opt.uv_curve is not None and optimizer.uv_curve is not None
+                    and len(mon_opt.uv_curve.x) == len(optimizer.uv_curve.x)):
+                mon_opt.uv_curve.x = optimizer.uv_curve.x
+        except Exception as _e_disp:
+            import logging as _log_disp
+            _log_disp.getLogger(__name__).warning("display-only x-axis patch failed: %s", _e_disp)
         monitor.monitor_optimizer = mon_opt
     except Exception:
         # Fall back silently: monitor will use parent optimizer (legacy behavior)
