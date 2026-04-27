@@ -46,6 +46,22 @@ class RunInfo:
         # Set by RigorousImplement for in_process=True runs:
         self.work_folder = None
         self.in_process_result = None
+        # Set by RigorousImplement when async_=True:
+        self._async_thread = None
+        self._async_error = None
+
+    @property
+    def is_alive(self):
+        """``True`` while an async background thread is running, ``False`` when done.
+
+        Always ``False`` for synchronous (blocking) runs.
+        Check this after ``optimize_rigorously(async_=True)`` to know when
+        it is safe to call :meth:`load_best` or :meth:`live_status`.
+        """
+        t = self._async_thread
+        if t is None:
+            return False
+        return t.is_alive()
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)
@@ -127,6 +143,13 @@ class RunInfo:
             If no ``analysis_folder`` was stored (e.g. RunInfo was created
             without one).
         """
+        # For async in-process runs, join the background thread directly.
+        if self._async_thread is not None:
+            self._async_thread.join(timeout=timeout if timeout else None)
+            if self._async_error is not None:
+                raise RuntimeError("Async optimizer failed") from self._async_error
+            return not self._async_thread.is_alive()
+
         if self.analysis_folder is None:
             raise ValueError(
                 "No analysis_folder stored in this RunInfo. "

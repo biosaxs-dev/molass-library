@@ -900,7 +900,7 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, debug=False,
+                            in_process=True, monitor=True, async_=False, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -985,6 +985,14 @@ class Decomposition:
             ``BackRunner`` and the call blocks until it exits — use this
             for batch / comparison runs (e.g. ``compare_optimization_paths``)
             where the dashboard is not needed.
+        async_ : bool, optional
+            Only meaningful when ``in_process=True``.  If True, the optimizer
+            runs in a background daemon thread and this call returns a
+            :class:`~molass.Rigorous.RunInfo.RunInfo` object **immediately**,
+            before the run completes.  Poll :attr:`RunInfo.is_alive` to check
+            whether the run is still in progress, then call
+            :meth:`RunInfo.wait` (instant if already done) to join the thread
+            before accessing results.  Default is False (blocking).
         debug : bool, optional
             If True, enable debug mode.
 
@@ -992,14 +1000,16 @@ class Decomposition:
         -------
         RunInfo
             A ``RunInfo`` object that tracks the optimization run.
-            Call ``run_info.wait()`` to block until done (subprocess path
-            only — the in-process path already blocks), then
-            ``run_info.load_best()`` to get the best ``Decomposition``.
+            For blocking runs (``async_=False``), the run is complete when
+            this returns.  For non-blocking runs (``async_=True``), call
+            ``run_info.wait()`` then ``run_info.load_best()``.
 
         See Also
         --------
         RunInfo.get_score_breakdown : Inspect the individual score and
             penalty components that make up the objective value (fv).
+        RunInfo.is_alive : Check whether an async run is still in progress.
+        RunInfo.wait : Block until the run completes.
         """
         # Backward compatibility: accept old name uncorrected_ssd
         if 'uncorrected_ssd' in kwargs:
@@ -1041,7 +1051,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.

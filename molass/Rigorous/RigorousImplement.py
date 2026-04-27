@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=False, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -272,31 +272,6 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             reload(molass_legacy.Optimizer.InProcessRunner)
         from molass_legacy.Optimizer.InProcessRunner import run_optimizer_in_process
 
-        result, work_folder = run_optimizer_in_process(
-            optimizer, init_params, niter=niter, method=method,
-            x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
-        )
-
-        # Breadcrumb: drop a manifest in the work folder too, and update
-        # the analysis-folder manifest with completion + work_folder link.
-        try:
-            from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
-            write_run_manifest(
-                work_folder,
-                role="work",
-                method=method, niter=niter,
-                in_process=True, monitor=False,
-                analysis_folder=analysis_folder,
-                status="completed",
-            )
-            update_run_manifest(
-                analysis_folder,
-                work_folder=work_folder,
-                status="completed",
-            )
-        except Exception:
-            pass
-
         if debug:
             import molass.Rigorous.RunInfo
             reload(molass.Rigorous.RunInfo)
@@ -306,8 +281,46 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             init_params=init_params, monitor=None,
             analysis_folder=analysis_folder, decomposition=decomposition,
         )
-        run_info.in_process_result = result
-        run_info.work_folder = work_folder
+
+        def _run_in_process():
+            _result, _work_folder = run_optimizer_in_process(
+                optimizer, init_params, niter=niter, method=method,
+                x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
+            )
+
+            # Breadcrumb: drop a manifest in the work folder too, and update
+            # the analysis-folder manifest with completion + work_folder link.
+            try:
+                from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
+                write_run_manifest(
+                    _work_folder,
+                    role="work",
+                    method=method, niter=niter,
+                    in_process=True, monitor=False,
+                    analysis_folder=analysis_folder,
+                    status="completed",
+                )
+                update_run_manifest(
+                    analysis_folder,
+                    work_folder=_work_folder,
+                    status="completed",
+                )
+            except Exception:
+                pass
+
+            run_info.in_process_result = _result
+            run_info.work_folder = _work_folder
+            run_info._async_error = None
+
+        if async_:
+            import threading
+            _thread = threading.Thread(target=_run_in_process, daemon=True)
+            run_info._async_thread = _thread
+            _thread.start()
+        else:
+            run_info._async_thread = None
+            _run_in_process()
+
         return run_info
 
     if not monitor:
