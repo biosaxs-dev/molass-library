@@ -251,17 +251,13 @@ get the raw `(params, fv, accepted)` stream.
   own issue (it cannot be a sync problem at this point — same process, same
   optimizer object).
 
-### Phase 4 — Flip default & retire workarounds
+### Phase 4 — Flip default & retire workarounds ✅ (April 27, 2026, commit 563e080, v0.9.4)
 
-- Change default to `in_process=True` in library API. Subprocess path remains
-  available via `in_process=False`; the legacy GUI continues to use the
-  subprocess path internally.
-- Close #117 and #119 — divergence no longer reachable on the default path.
-- Keep Fix 1 (#118 `monitor_optimizer`) in place — still useful for the
-  subprocess monitoring path.
-- Update Convention 9 in `.github/copilot-instructions.md` to document the
-  split architecture, when each path is used, and the contract.
-- Bump `molass-library` version; note in `PROJECT_STATUS.md`.
+- ✅ Changed default to `in_process=True` in `RigorousImplement.py`.
+- ✅ Closed #117 and #119 — divergence no longer reachable on the default path.
+- ✅ Fix 1 (#118 `monitor_optimizer`) kept in place — still useful for subprocess monitoring path.
+- ✅ Convention 9 in `.github/copilot-instructions.md` updated with split-architecture table.
+- ✅ Version bumped to 0.9.4; `PROJECT_STATUS.md` updated.
 
 ### Phase 5 — Optional hardening
 
