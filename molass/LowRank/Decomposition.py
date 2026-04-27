@@ -900,7 +900,7 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=False, monitor=True, debug=False,
+                            in_process=True, monitor=True, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -971,12 +971,13 @@ class Decomposition:
             Set to False after a kernel restart to preserve previous job results
             and reconstruct RunInfo without losing optimization history.
         in_process : bool, optional
-            If True, run the optimizer in this Python process instead of
-            spawning a subprocess.  Recommended for notebook use: avoids
-            the parent/subprocess data-derivation divergence (see issues
-            #117 / #119) and keeps the optimizer running against the same
-            library-prepared data the parent already holds in memory.
-            Default is ``False`` while the in-process path is opt-in.
+            If True (default), run the optimizer in this Python process instead of
+            spawning a subprocess.  Avoids the parent/subprocess data-derivation
+            divergence (see issues #117 / #119) and keeps the optimizer running
+            against the same library-prepared data the parent already holds in
+            memory.  Set ``False`` to use the legacy subprocess path (required
+            by the tkinter GUI; available as an escape hatch for notebook users
+            who need process isolation).
         monitor : bool, optional
             Only meaningful when ``in_process=False``.  If True (default),
             the subprocess is wrapped in the live ``MplMonitor`` ipywidgets
@@ -990,8 +991,9 @@ class Decomposition:
         Returns
         -------
         RunInfo
-            A ``RunInfo`` object that tracks the optimization subprocess.
-            Call ``run_info.wait()`` to block until done, then
+            A ``RunInfo`` object that tracks the optimization run.
+            Call ``run_info.wait()`` to block until done (subprocess path
+            only — the in-process path already blocks), then
             ``run_info.load_best()`` to get the best ``Decomposition``.
 
         See Also
