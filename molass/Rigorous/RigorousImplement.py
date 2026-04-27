@@ -294,9 +294,17 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         )
 
         def _run_in_process():
+            # Pass a callback so run_info.work_folder is set as soon as the
+            # job folder is allocated — before solve() starts.  This lets the
+            # MplMonitor watch thread initialize job_state and render the upper
+            # plot panel without waiting for the full run to finish. (#132)
+            def _on_folder_ready(wf):
+                run_info.work_folder = wf
+
             _result, _work_folder = run_optimizer_in_process(
                 optimizer, init_params, niter=niter, method=method,
                 x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
+                work_folder_callback=_on_folder_ready,
             )
 
             # Breadcrumb: drop a manifest in the work folder too, and update
