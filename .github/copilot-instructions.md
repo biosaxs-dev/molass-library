@@ -275,6 +275,8 @@ Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
 
 `live_status()` returns `{phase, n_evals, best_fv, best_sv, elapsed_s, analysis_folder, work_folder, subprocess_pid, subprocess_returncode, manifest}` in one disk read. It composes with `RunRegistry` (`molass.Rigorous.read_manifest`, `locate_recent_runs`) which writes/reads `RUN_MANIFEST.json` breadcrumbs in both `analysis_folder` and `work_folder`. Use these instead of parsing `callback.txt` directly.
 
+**In-process kernel restart safety (molass-legacy#26, April 2026)**: `optimize_rigorously(in_process=True)` is now safe to interrupt with VS Code "Restart Kernel". Previously, `optimizer.solve()` ran directly on the main thread; UltraNest's back-to-back numpy C calls held the GIL long enough to block `KeyboardInterrupt` delivery, causing the kernel to hang and VS Code to spawn duplicate kernels. Fix: `solve()` runs in a `daemon=True` thread; the main thread loops on `thread.join(timeout=0.05)`, releasing the GIL every 50 ms as an interrupt delivery point. Key file: `molass_legacy/Optimizer/InProcessRunner.py`.
+
 ---
 
 ## 📂 Repository Structure Quick Reference
