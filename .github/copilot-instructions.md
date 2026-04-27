@@ -375,7 +375,7 @@ GitHub/
 
 ## Notebook workflow
 
-See [NOTEBOOK_CONVENTIONS.md v0.1.0](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md)  
+Read [NOTEBOOK_CONVENTIONS.md v0.2.5](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.  
 Kernel preference: global Python (`py`). Do not create venvs.
 
 ---
