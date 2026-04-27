@@ -331,7 +331,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
 
             if progress == 'dashboard':
                 from molass_legacy.Optimizer.MplMonitor import MplMonitor
-                mon = MplMonitor.for_run_info(run_info)
+                mon = MplMonitor.for_run_info(run_info, niter=niter)
                 mon.create_dashboard()
                 mon.show()
                 mon.start_watching()
