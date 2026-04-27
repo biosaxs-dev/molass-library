@@ -900,7 +900,7 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, async_=False, debug=False,
+                            in_process=True, monitor=True, async_=False, progress=None, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -993,6 +993,17 @@ class Decomposition:
             whether the run is still in progress, then call
             :meth:`RunInfo.wait` (instant if already done) to join the thread
             before accessing results.  Default is False (blocking).
+        progress : str or None, optional
+            Controls live feedback during an async in-process run
+            (``in_process=True, async_=True``).  Currently the only supported
+            value is ``'dashboard'``, which creates an :class:`MplMonitor`
+            ipywidgets dashboard, calls ``show()`` and ``start_watching()``
+            automatically, and attaches the monitor to
+            :attr:`RunInfo.monitor`.  ``None`` (default) gives no
+            automatic feedback — suitable for batch or scripted runs.
+
+            Raises :class:`ValueError` if ``progress='dashboard'`` is used
+            without ``in_process=True`` and ``async_=True``.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -1034,6 +1045,17 @@ class Decomposition:
                 f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo)"
             )
 
+        if progress is not None:
+            _VALID_PROGRESS = {'dashboard'}
+            if progress not in _VALID_PROGRESS:
+                raise ValueError(
+                    f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
+                )
+            if not (in_process and async_):
+                raise ValueError(
+                    "progress='dashboard' requires in_process=True and async_=True"
+                )
+
         if free_components is not None:
             n_protein = self.num_components  # protein components (excludes baseline)
             all_indices = set(range(n_protein))
@@ -1051,7 +1073,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.

@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=False, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=False, progress=None, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -160,6 +160,17 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     Decomposition
         The refined decomposition object.
     """
+    if progress is not None:
+        _VALID_PROGRESS = {'dashboard'}
+        if progress not in _VALID_PROGRESS:
+            raise ValueError(
+                f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
+            )
+        if not (in_process and async_):
+            raise ValueError(
+                "progress='dashboard' requires in_process=True and async_=True"
+            )
+
     import molass.Rigorous.LegacyBridgeUtils
     reload(molass.Rigorous.LegacyBridgeUtils)
     import molass.Rigorous.FunctionCodeUtils
@@ -317,6 +328,14 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             _thread = threading.Thread(target=_run_in_process, daemon=True)
             run_info._async_thread = _thread
             _thread.start()
+
+            if progress == 'dashboard':
+                from molass_legacy.Optimizer.MplMonitor import MplMonitor
+                mon = MplMonitor.for_run_info(run_info)
+                mon.create_dashboard()
+                mon.show()
+                mon.start_watching()
+                run_info.monitor = mon
         else:
             run_info._async_thread = None
             _run_in_process()
