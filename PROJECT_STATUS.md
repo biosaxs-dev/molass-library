@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
-**Last Updated**: April 23, 2026  
-**Current version**: 0.9.2
+**Last Updated**: April 27, 2026  
+**Current version**: 0.9.4
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,12 +11,25 @@
 
 ## 🎯 Current Task
 
-Working on: **Issue #132 — `work_folder` consistency between in-process and subprocess paths** ⏳  
-Next: Open #132, trace where `work_folder` diverges between the two paths in `RigorousImplement.py`, align them.
+Working on: **Phase 4 — flip default + close #117/#119** ✅  
+Next: Close #117 and #119 on GitHub; update DESIGN doc Phase 4 section.
 
 ---
 
 ## 🎯 Recent Work
+
+### April 27, 2026 — Phase 4: flip `in_process` default to `True` (v0.9.4)
+
+**Phase 3 validation** (13h notebook, NITER_CMP=20, second independent run confirmed):
+- subprocess: best_fv=−1.4234, SV=78.85, wall=2448 s
+- in-process: best_fv=−1.4043, SV=78.31, wall=2910 s
+- `assert_parity(fv_rtol=5e-2, sv_atol=2.0, rg_atol=1.0)`: **PASS**
+
+**Phase 4 changes**:
+- `RigorousImplement.py`: `in_process=False` → `in_process=True` (default flipped)
+- Convention 9 in `.github/copilot-instructions.md`: replaced old "parent vs subprocess" paragraph with split-architecture table; added `in_process=True` as the default path
+- Issues #117 and #119: closed (divergence no longer reachable on default path)
+- Version bump: 0.9.3 → 0.9.4
 
 ### April 26, 2026 — Run observability Tier-1 closeout + Phase 3 validation confirmed (Exp 13h)
 

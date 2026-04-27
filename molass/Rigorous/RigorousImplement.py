@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -135,12 +135,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     clear_jobs : bool, optional
         If True (default), clear existing job folders before starting.
     in_process : bool, optional
-        If True, run the optimizer **in this Python process** instead of
-        spawning a subprocess.  The library-prepared optimizer (with the
-        live dsets, base curves, and spectral vectors built above) is the
-        one that runs — no re-derivation from disk, no parent/subprocess
-        divergence.  This is the recommended path for notebook use; the
-        default remains ``False`` (subprocess) during the opt-in phase.
+        If True (default), run the optimizer **in this Python process** instead
+        of spawning a subprocess.  The library-prepared optimizer (with the
+        live dsets, base curves, and spectral vectors built above) is the one
+        that runs — no re-derivation from disk, no parent/subprocess divergence.
+        Set ``False`` to use the legacy subprocess path (required by the tkinter
+        GUI; available as an escape hatch for notebook users who need process
+        isolation).
         See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
     monitor : bool, optional
         Only meaningful when ``in_process=False``.  If True (default),

@@ -241,12 +241,19 @@ SV = -200 / (1 + exp(-1.5 * fv)) + 100
 ```
 Thresholds: **≥80 Good**, **60–80 Fair**, **<60 Poor**. Defined in `molass_legacy/Optimizer/FvScoreConverter.py` (`convert_score()`), aliased as `fv_to_sv()` in `molass/Rigorous/CurrentStateUtils.py`.
 
-**Parent vs subprocess architecture**: `optimize_rigorously()` builds the optimizer object in the parent process, then launches an independent subprocess via `BackRunner` + `subprocess.Popen`. The subprocess receives only serialized data (init_params.txt, bounds.txt, restrict.txt, etc.) — it reconstructs its own optimizer from disk. Therefore:
-- Parent-side `optimizer.objective_func(params)` and subprocess evaluations use the same code but independent instances
-- The parent optimizer is used post-hoc by `get_score_breakdown()`, `plot_objective_func()`, and `load_best_rigorous_result()` to replay results
-- Key files: `molass_legacy/Optimizer/BackRunner.py` (subprocess launch), `molass_legacy/Optimizer/MplMonitor.py` (parent-side monitoring)
+**Split architecture (Phase 4, April 2026)**: `optimize_rigorously()` now defaults to `in_process=True`. Two paths exist:
 
-**callback.txt format**: Each optimizer evaluation appends a multi-line entry:
+| | In-process (default, `in_process=True`) | Subprocess (`in_process=False`) |
+|---|---|---|
+| Who uses it | Notebook / library API | Legacy tkinter GUI |
+| Optimizer source | Parent's prepared object (live dsets, base curves, spectral vectors) | Re-derived from disk via `OptimizerInput` |
+| Parent/subprocess divergence | Impossible — one process | Structural — two independent derivation pipelines (issues #117, #119) |
+| Crash isolation | None (kernel dies on segfault) | Yes (subprocess isolated) |
+| Key file | `molass_legacy/Optimizer/InProcessRunner.py` | `molass_legacy/Optimizer/BackRunner.py` |
+
+Design rationale: see `molass-library/Copilot/DESIGN_split_optimizer_architecture.md`.
+
+**callback.txt format**: Both paths write the same format. Each optimizer evaluation appends:
 ```
 t=<timestamp>
 x=
