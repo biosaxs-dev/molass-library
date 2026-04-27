@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 27, 2026  
+**Last Updated**: April 27, 2026 (evening)  
 **Current version**: 0.9.4
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,14 +11,34 @@
 
 ## 🎯 Current Task
 
-Working on: **Phase 4 — flip default + close #117/#119** ✅  
-Next: Close #117 and #119 on GitHub; update DESIGN doc Phase 4 section.
+Working on: **Phase 5 — in-process live dashboard (`progress='dashboard'`)** 🔬  
+Next: Kill hung kernel → re-run notebook 13u to verify dashboard renders and restart is clean.
 
 ---
 
 ## 🎯 Recent Work
 
-### April 27, 2026 — Phase 4: flip `in_process` default to `True` (v0.9.4)
+### April 27, 2026 — Phase 5: `progress='dashboard'` for in-process BH runs (molass-library#139)
+
+**All fixes in molass-legacy** (3 commits on `main`, unpushed):
+
+| commit | change |
+|--------|--------|
+| `b7cbf10` | `MplMonitor.for_run_info()`: add `niter` kwarg; set `self.niter/num_trials/max_trials/optimizer/dsets/job_state=None/curr_index`; guard `update_plot()` with `if job_state is None: return`; lazy `job_state` init in `watch_progress()` once `run_info.work_folder` is populated |
+| `e96da26` | `RigorousImplement.py`: pass `niter=niter` to `MplMonitor.for_run_info()` |
+| `d97b732` | `InProcessRunner.run_in_process_impl()`: explicitly remove `Logger` handlers from root logger in `finally` block — **fixes kernel-restart hang** |
+
+**Root cause of kernel-restart hang** (found this session):  
+`Logger("optimizer.log")` inside the optimizer daemon thread adds a `StreamHandler(sys.stderr)` to the **root logger**. In Jupyter, `sys.stderr` is ipykernel's `OutStream`. Python's `logging.shutdown()` atexit handler flushes all root-logger handlers on process exit. Flushing `OutStream` while the asyncio event loop is shutting down deadlocks the event loop, preventing kernel restart from completing.  
+Fix: `finally` block now removes both the `FileHandler` and `StreamHandler` from the root logger immediately after `solve()` returns.
+
+**Bug fixed in MplMonitor** (same session):  
+`for_run_info()` never called `run_impl()`, so `job_state`, `niter`, `optimizer`, `dsets` etc. were all absent. `show()` → `update_plot()` crashed with `AttributeError: 'MplMonitor' object has no attribute 'job_state'`. Fixed by setting required attributes in `for_run_info()` and guarding `update_plot()`.
+
+**Tests**: 14/14 MplMonitor tests pass (test_terminate_race.py + test_mpl_monitor_dashboard.py); 5/5 progress_dashboard validation tests pass.
+
+**Status**: molass-legacy commits are local only (not pushed). Kernel hang prevents live test of notebook 13u — will verify after kernel kill/restart.
+
 
 **Phase 3 validation** (13h notebook, NITER_CMP=20, second independent run confirmed):
 - subprocess: best_fv=−1.4234, SV=78.85, wall=2448 s
