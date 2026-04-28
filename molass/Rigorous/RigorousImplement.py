@@ -291,6 +291,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
             init_params=init_params, monitor=None,
             analysis_folder=analysis_folder, decomposition=decomposition,
+            rgcurve=rgcurve,
         )
 
         def _run_in_process():
@@ -430,6 +431,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
             init_params=init_params, monitor=None,
             analysis_folder=analysis_folder, decomposition=decomposition,
+            rgcurve=rgcurve,
         )
         run_info.work_folder = runner.working_folder
         run_info.subprocess_returncode = rc
@@ -477,4 +479,5 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     from molass.Rigorous.RunInfo import RunInfo
     return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
                    init_params=init_params, monitor=monitor,
-                   analysis_folder=analysis_folder, decomposition=decomposition)
+                   analysis_folder=analysis_folder, decomposition=decomposition,
+                   rgcurve=rgcurve)

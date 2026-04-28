@@ -35,7 +35,7 @@ class RunInfo:
     """
 
     def __init__(self, ssd, optimizer, dsets, init_params, monitor=None,
-                 analysis_folder=None, decomposition=None):
+                 analysis_folder=None, decomposition=None, rgcurve=None):
         self.ssd = ssd
         self.optimizer = optimizer
         self.dsets = dsets
@@ -43,6 +43,7 @@ class RunInfo:
         self.monitor = monitor
         self.analysis_folder = analysis_folder
         self.decomposition = decomposition
+        self.rgcurve = rgcurve          # cached to avoid recomputation in load_best/load_first
         # Set by RigorousImplement for in_process=True runs:
         self.work_folder = None
         self.in_process_result = None
@@ -62,6 +63,27 @@ class RunInfo:
         if t is None:
             return False
         return t.is_alive()
+
+    def __repr__(self):
+        if self._async_thread is not None:
+            state = "running" if self._async_thread.is_alive() else "done"
+        else:
+            state = "done"
+        parts = [f"state={state!r}"]
+        if self.analysis_folder is not None:
+            try:
+                from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
+                jobs = list_rigorous_jobs(self.analysis_folder)
+                if jobs:
+                    import math
+                    best_fv = min(j.best_fv for j in jobs)
+                    best_sv = -200 / (1 + math.exp(-1.5 * best_fv)) + 100
+                    n_evals = sum(j.iterations for j in jobs)
+                    parts.append(f"n_evals={n_evals}")
+                    parts.append(f"best_sv={best_sv:.1f}")
+            except Exception:
+                pass
+        return f"RunInfo({', '.join(parts)})"
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)
@@ -132,6 +154,11 @@ class RunInfo:
         poll_interval : float, optional
             Seconds between checks (default 5).
 
+            .. note::
+                For async in-process runs (``async_=True``), ``poll_interval``
+                is **silently ignored** — the implementation calls
+                ``thread.join(timeout)`` once with no looping.
+
         Returns
         -------
         bool
@@ -142,6 +169,27 @@ class RunInfo:
         ValueError
             If no ``analysis_folder`` was stored (e.g. RunInfo was created
             without one).
+
+        .. warning:: **Async in-process path** (``async_=True``)
+
+            This method calls ``_async_thread.join(timeout)`` once, which has
+            two failure modes for long BH/NS runs:
+
+            - **Default** ``timeout=600``: silently returns ``False`` for runs
+              longer than 10 minutes while the optimizer is still running.
+              Downstream calls to ``load_best()`` will then fail or load stale
+              results.
+            - ``timeout=0`` **(no limit)**: blocks the kernel's main thread
+              entirely.  No other cell — including ``live_status()``,
+              ``is_alive``, or any monitoring probe — can execute until the
+              optimizer finishes.
+
+            For interactive notebooks prefer :meth:`load_first`, which waits
+            only until the *first* result lands on disk and returns
+            immediately, or poll manually with::
+
+                if run_info.is_alive:
+                    print(run_info.live_status())
         """
         # For async in-process runs, join the background thread directly.
         if self._async_thread is not None:
@@ -220,8 +268,74 @@ class RunInfo:
                 "Cannot reconstruct result without the initial decomposition."
             )
         return load_rigorous_result(
-            decomp, self.analysis_folder, jobid=best.id, debug=debug
+            decomp, self.analysis_folder, jobid=best.id,
+            rgcurve=self.rgcurve, debug=debug
         )
+
+    def load_first(self, timeout=0, poll_interval=5, debug=False):
+        """Wait for the first rigorous result, then load the best job found so far.
+
+        Combines :func:`wait_for_rigorous_results` and :meth:`load_best` in
+        one call.  Safe to run immediately after firing the optimizer with
+        ``async_=True`` — there is no need to check ``is_alive`` or call
+        ``wait()`` first.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            Maximum seconds to wait for the first result (default ``0`` = no
+            limit).  When non-zero and no result appears within ``timeout``
+            seconds, raises :class:`TimeoutError`.
+        poll_interval : float, optional
+            Seconds between filesystem checks (default 5).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Decomposition
+            A Decomposition built from the best optimized parameters available
+            at the time the first result lands on disk.
+
+        Raises
+        ------
+        TimeoutError
+            If ``timeout > 0`` and no result appears within that time.
+
+        Notes
+        -----
+        Interrupt with **Ctrl+C** to cancel the wait at any time.
+
+        If the optimizer is still running when ``load_first()`` returns, the
+        result reflects only the jobs completed so far — not the final best.
+        Re-call :meth:`load_best` after the run finishes to get the true
+        global best.
+
+        Examples
+        --------
+        ::
+
+            run_info = decomp.optimize_rigorously(
+                rgcurve, method='BH', niter=200,
+                analysis_folder="temp_analysis",
+                async_=True,
+            )
+            # Safe to call immediately — blocks until first BH step is on disk:
+            result = run_info.load_first()
+            result.plot_components()
+        """
+        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results
+        ready = wait_for_rigorous_results(
+            self.analysis_folder,
+            timeout=timeout,
+            poll_interval=poll_interval,
+        )
+        if not ready:
+            raise TimeoutError(
+                f"No rigorous results appeared within {timeout}s "
+                f"in {self.analysis_folder}"
+            )
+        return self.load_best(debug=debug)
 
     def get_score_breakdown(self, jobid=None, debug=False):
         """Evaluate the objective function and return individual score components.
@@ -317,6 +431,219 @@ class RunInfo:
             scores[name] = float(val)
 
         return {'fv': float(fv), 'scores': scores}
+
+    def get_current_curves(self):
+        """Return the data and model curves currently shown on the monitor.
+
+        Delegates to ``MplMonitor.get_current_curves()`` (molass-legacy #31,
+        **monitor readability**).  Provides a single-call entry point from
+        the user-facing ``RunInfo`` object so that an AI agent can query
+        ``run_info.get_current_curves()`` without knowing about the internal
+        monitor attribute.
+
+        Returns
+        -------
+        dict or None
+            See ``MplMonitor.get_current_curves()`` for the full key list.
+            Returns ``None`` if the monitor is not set or has no data yet.
+        """
+        if self.monitor is None:
+            return None
+        return self.monitor.get_current_curves()
+
+    def diagnose(self, breakdown=None):
+        """Map score values to physical interpretations.
+
+        Calls ``get_score_breakdown()`` if no breakdown is provided, then
+        applies encoded rules to each score/score-pair and returns a list of
+        ``Diagnosis`` namedtuples with structured physical meaning.
+
+        This allows an AI agent (or a human) to understand *why* a fit is poor
+        without requiring domain knowledge: the rules encode the mapping from
+        numeric scores to physical causes.
+
+        Parameters
+        ----------
+        breakdown : dict, optional
+            Output of ``get_score_breakdown()``.  If None, it is computed
+            automatically (which loads and evaluates the best job from disk).
+
+        Returns
+        -------
+        list of Diagnosis
+            Each ``Diagnosis`` has the fields:
+            - ``score`` : str -- the score/penalty name (or pair)
+            - ``status`` : str -- ``'good'``, ``'fair'``, ``'poor'``, or
+              ``'failing'``
+            - ``reason`` : str -- human-readable explanation
+            - ``suggestion`` : str or None -- recommended next diagnostic step
+
+        Examples
+        --------
+        ::
+
+            run_info.wait()
+            for d in run_info.diagnose():
+                print(f"[{d.status.upper()}] {d.score}: {d.reason}")
+                if d.suggestion:
+                    print(f"  -> {d.suggestion}")
+        """
+        from collections import namedtuple
+
+        Diagnosis = namedtuple('Diagnosis', ['score', 'status', 'reason', 'suggestion'])
+
+        if breakdown is None:
+            breakdown = self.get_score_breakdown()
+
+        scores = breakdown['scores']
+        result = []
+
+        # --- Helper -------------------------------------------------------
+        def _status_from_val(val, thresholds):
+            # thresholds: list of (threshold, status) in order good -> failing
+            # val is negative (lower is better); thresholds are negative
+            # e.g. [(-1.0, 'good'), (-0.5, 'fair'), (-0.3, 'poor')]
+            for threshold, status in thresholds:
+                if val <= threshold:
+                    return status
+            return thresholds[-1][1]
+
+        # --- UV_LRF_residual ----------------------------------------------
+        uv_lrf = scores.get('UV_LRF_residual')
+        if uv_lrf is not None:
+            if uv_lrf > -0.1:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='failing',
+                    reason=(
+                        f"UV_LRF_residual = {uv_lrf:.3f} (near zero): the low-rank "
+                        "factorization cannot fit the UV data matrix at all. This "
+                        "usually means the UV model is completely misaligned with the data."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model peak positions.",
+                ))
+            elif uv_lrf > -0.3:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='poor',
+                    reason=(
+                        f"UV_LRF_residual = {uv_lrf:.3f}: the low-rank residual "
+                        "is poor, indicating a significant UV model misfit."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model curves.",
+                ))
+            elif uv_lrf > -0.7:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='fair',
+                    reason=f"UV_LRF_residual = {uv_lrf:.3f}: moderate UV low-rank residual.",
+                    suggestion=None,
+                ))
+
+        # --- UV vs XR 2D fitting ratio ------------------------------------
+        uv_2d = scores.get('UV_2D_fitting')
+        xr_2d = scores.get('XR_2D_fitting')
+        if uv_2d is not None and xr_2d is not None and xr_2d < 0 and uv_2d < 0:
+            # Both scores are negative; larger magnitude = better.
+            # ratio = UV/XR: close to 1 means similar quality; close to 0 means UV much worse.
+            ratio = uv_2d / xr_2d
+            if ratio < 0.33:
+                result.append(Diagnosis(
+                    score='UV_2D_fitting vs XR_2D_fitting',
+                    status='poor',
+                    reason=(
+                        f"UV_2D_fitting ({uv_2d:.3f}) is {xr_2d/uv_2d:.1f}x worse than "
+                        f"XR_2D_fitting ({xr_2d:.3f}): the UV 2D fit is disproportionately "
+                        "bad compared to XR, suggesting the UV model components are "
+                        "misaligned with the data while XR converged correctly."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to compare UV data vs model peak positions.",
+                ))
+            elif ratio < 0.67:
+                result.append(Diagnosis(
+                    score='UV_2D_fitting vs XR_2D_fitting',
+                    status='fair',
+                    reason=(
+                        f"UV_2D_fitting ({uv_2d:.3f}) is noticeably worse than "
+                        f"XR_2D_fitting ({xr_2d:.3f})."
+                    ),
+                    suggestion=None,
+                ))
+
+        # --- UV_2D_fitting absolute ----------------------------------------
+        if uv_2d is not None and uv_2d > -0.3:
+            if not any(d.score == 'UV_2D_fitting vs XR_2D_fitting' for d in result):
+                result.append(Diagnosis(
+                    score='UV_2D_fitting',
+                    status='poor',
+                    reason=f"UV_2D_fitting = {uv_2d:.3f}: poor UV 2D fit.",
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model.",
+                ))
+
+        # --- Guinier_deviation --------------------------------------------
+        guinier = scores.get('Guinier_deviation')
+        if guinier is not None:
+            if guinier > -0.3:
+                result.append(Diagnosis(
+                    score='Guinier_deviation',
+                    status='poor',
+                    reason=(
+                        f"Guinier_deviation = {guinier:.3f}: poor Rg consistency "
+                        "across elution frames. The decomposed components may not "
+                        "represent physically distinct species."
+                    ),
+                    suggestion="Inspect decomp.get_rgs() and check if Rg values are stable across elution.",
+                ))
+            elif guinier > -0.7:
+                result.append(Diagnosis(
+                    score='Guinier_deviation',
+                    status='fair',
+                    reason=f"Guinier_deviation = {guinier:.3f}: moderate Rg consistency.",
+                    suggestion=None,
+                ))
+
+        # --- SEC_conformance ----------------------------------------------
+        sec = scores.get('SEC_conformance')
+        if sec is not None and sec > -0.2:
+            result.append(Diagnosis(
+                score='SEC_conformance',
+                status='poor',
+                reason=(
+                    f"SEC_conformance = {sec:.3f}: the elution curve shape does not "
+                    "conform well to the SEC column model."
+                ),
+                suggestion=None,
+            ))
+
+        # --- Penalties ----------------------------------------------------
+        penalty_names = [
+            'mapping_penalty', 'negative_penalty', 'baseline_penalty',
+            'outofbounds_penalty', 'order_penalty', 'control_penalty',
+            'consistency_penalty',
+        ]
+        for pname in penalty_names:
+            pval = scores.get(pname)
+            if pval is not None and pval > 0.1:
+                result.append(Diagnosis(
+                    score=pname,
+                    status='poor',
+                    reason=(
+                        f"{pname} = {pval:.3f}: a physical constraint is violated "
+                        "(penalty > 0.1 raises fv directly)."
+                    ),
+                    suggestion=None,
+                ))
+
+        # --- All good ------------------------------------------------------
+        if not result:
+            result.append(Diagnosis(
+                score='overall',
+                status='good',
+                reason="No significant issues detected in any score or penalty.",
+                suggestion=None,
+            ))
+
+        return result
 
     @property
     def monitor_snapshot_json_path(self):

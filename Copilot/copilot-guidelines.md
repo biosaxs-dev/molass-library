@@ -35,6 +35,18 @@ Use this magic phrase to initialize both technical context and behavioral rules:
 
     Do not batch multiple fixes into one issue. Proposals and detailed descriptions live in `Copilot/API_IMPROVEMENTS.md`; completed/pending GitHub issue numbers are tracked in `/memories/molass_library_workflow.md` (persistent user memory across all sessions).
 
+12. **AI-Friendliness Classes:** Issues filed under Rule 11 fall into five classes. Use these to assess gaps and guide discovery of new improvements:
+
+    | Class | What it removes | Typical examples |
+    |-------|-----------------|-----------------|
+    | **Naming** | Opaque identifiers that cannot be interpreted without prior context | `iv`→`q_values`, `xr_ccurves`→`xr_components`, `uncorrected_ssd`→`trimmed_ssd` |
+    | **Observability** | Runtime state that is visible on screen but not queryable as data | `get_current_curves()`, `wait()`/`load_best()`, callback.txt format documentation |
+    | **Interpretability** | Numeric values that can be read but not interpreted without domain knowledge | `diagnose()`, score architecture docstring, breadcrumbs in `get_score_breakdown()` |
+    | **Workflow friction** | Operations that block, disrupt, or add unnecessary steps to the working loop | Noise suppression (`quiet=True`), async execution, kernel restart safety |
+    | **Navigation** | Hard to locate the right file or function without deep prior context | `copilot-instructions.md` conventions, `workflow_notes.md`, cross-repo call chain documentation |
+
+    *Naming* and *workflow friction* tend to be general (applicable to any Python library). *Observability* and *interpretability* tend to be domain-specific (SEC-SAXS optimization semantics). When assessing what to improve next, look for gaps: e.g., a new module with opaque attribute names (Naming), or a new score with no physical explanation (Interpretability).
+
 ---
 
 ## Notes
