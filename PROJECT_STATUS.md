@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: April 27, 2026 (evening)  
+**Last Updated**: April 29, 2026 (evening)  
 **Current version**: 0.9.4
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,12 +11,46 @@
 
 ## 🎯 Current Task
 
-Working on: **Phase 5 — in-process live dashboard (`progress='dashboard'`)** 🔬  
-Next: Kill hung kernel → re-run notebook 13u to verify dashboard renders and restart is clean.
+**Phase 5 dashboard complete; molass-legacy#34 fully closed; two Tkinter GUI crashes fixed ✅**  
+Next: Choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
 
 ---
 
 ## 🎯 Recent Work
+
+### April 29, 2026 — Phase 5 polish + molass-legacy#34 closed + two Tkinter GUI crashes fixed
+
+**molass-legacy changes** (v0.5.7 → v0.6.0):
+
+| File | Change |
+|------|--------|
+| `MplMonitor.py` | `_running_status()` → status label shows "(in-process)" vs "(subprocess)"; `for_run_info()` auto-detects `function_code` via `optimizer.get_function_code()` → fixes `model=None`; atexit lock-free cleanup (deadlock fix); `_RunInfoSource.terminate()` calls `request_stop()`; `_RunInfoSource.run()` added for Resume path |
+| `InProcessRunner.py` | atexit + `finally` lock-free cleanup of `fileh` — same deadlock fix as MplMonitor |
+| `ModeledPeaks.py` | `from molass_legacy.UV.UvPreRecog import UvPreRecog` moved before the `baseline_type` branch; was only imported in `== 1` branch but used unconditionally → `UnboundLocalError` in the Tkinter GUI when `baseline_type == 2` or `3` |
+| `UvBaseSpline.py` | Added `if ty is not None:` guard in `__call__()` before `np.cumsum(ty)`; `get_curve_xy_impl()` passes `ty = None` (dummy) → `float * array(None)` → `TypeError` |
+| `BackRunner.py` | Saves `in_folder.txt` to job folder (enables `DsetsDebug.reconstruct_subprocess_dsets()`) |
+| `OptimizerMain.py` | Injects parent's exported `uv_diff_spline_x/y.npy` into subprocess optimizer (molass-legacy#34 final fix) |
+| `OptimizerSettings.py` | Added `trust_rg_curve_folder` setting (set `True` by parent when rg-curve exported) |
+| `DsetsDebug.py` *(new)* | Debug tool: reconstructs subprocess datasets for parity comparison |
+| `pyproject.toml` | `0.5.7` → `0.6.0` |
+
+**molass-library changes** (molass_legacy dep bumped to `>=0.6.0`):
+
+| File | Change |
+|------|--------|
+| `LegacyBridgeUtils.py` | `prepare_rigorous_folders()` exports parent's `uv_diff_spline_x/y.npy` and sets `trust_rg_curve_folder=True` |
+| `RunInfo.py` | `request_stop()` method; `compare_subprocess_dsets()` debug tool; `_stop_event` attribute |
+| `RigorousImplement.py` | Passes `stop_event` to `run_optimizer_in_process()` |
+| `Decomposition.py` | Minor fix |
+| `pyproject.toml` | `molass_legacy>=0.5.6` → `>=0.6.0` |
+
+**molass-legacy#34 closing verified** (April 29):  
+Final divergence source was `uv_curve.spline` built with 0-based x in subprocess vs original frame numbers in parent. Fixed in `BasicOptimizer.__init__` (commit `5845cd8`). SV=78.23 vs parent 78.24 (delta_fv=0.0003). Issue closed.
+
+**Atexit deadlock root cause** (kernel restart hang):  
+`_fh.close()` in atexit acquires the handler lock. The daemon optimizer thread holds the same lock during log calls → deadlock when Python atexit runs `_fh.close()` concurrently. Fix: remove `_fh` from `_handlerList` (no lock needed) + `_fh.stream.close()` (no lock) — `logging.shutdown()` never sees the handler and the stream is closed safely.
+
+**13u_ns_subprocess_monitoring.ipynb**: Cell [5] now has `progress=None` — `progress='dashboard'` raises `ValueError` when `in_process=False`.
 
 ### April 27, 2026 — Phase 5: `progress='dashboard'` for in-process BH runs (molass-library#139)
 

@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=False, progress=None, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -160,6 +160,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     Decomposition
         The refined decomposition object.
     """
+    # NS (UltraNest) segfaults in-process (molass-library#138).
+    # Auto-route to the subprocess path which has a working MplMonitor dashboard.
+    _NS_METHODS = {'NS'}
+    if in_process and method in _NS_METHODS:
+        in_process = False
+        progress = None   # subprocess path uses monitor=True for its dashboard
+
     if progress is not None:
         _VALID_PROGRESS = {'dashboard'}
         if progress not in _VALID_PROGRESS:
@@ -306,6 +313,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 optimizer, init_params, niter=niter, method=method,
                 x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
                 work_folder_callback=_on_folder_ready,
+                stop_event=run_info._stop_event,
             )
 
             # Breadcrumb: drop a manifest in the work folder too, and update

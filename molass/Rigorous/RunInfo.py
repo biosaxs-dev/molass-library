@@ -50,6 +50,21 @@ class RunInfo:
         # Set by RigorousImplement when async_=True:
         self._async_thread = None
         self._async_error = None
+        # Cooperative stop flag for in-process async runs.  Set via
+        # request_stop(); InProcessRunner checks it and injects
+        # KeyboardInterrupt into the solver thread.
+        import threading as _threading
+        self._stop_event = _threading.Event()
+
+    def request_stop(self):
+        """Request cooperative termination of an async in-process run.
+
+        Sets the stop event that ``InProcessRunner`` checks between solver
+        iterations.  The solver thread receives a ``KeyboardInterrupt`` at
+        the next Python bytecode boundary (~50 ms at most).  Has no effect
+        if the run is already finished or was not in-process.
+        """
+        self._stop_event.set()
 
     @property
     def is_alive(self):
@@ -644,6 +659,119 @@ class RunInfo:
             ))
 
         return result
+
+    def compare_subprocess_dsets(self, plot=True, mp_b_sweep=True,
+                                  mp_b_range=(-200.0, 200.0), n_points=81):
+        """Debug tool for molass-legacy#34: compare parent vs subprocess datasets.
+
+        Reconstructs the datasets as the subprocess would derive them (by
+        re-reading raw data from disk via ``FullOptInput`` → ``OptDataSets``),
+        then compares them with the parent's live datasets side-by-side.
+
+        If ``mp_b_sweep=True`` and ``self.optimizer`` is available, also sweeps
+        the objective function along the mp_b axis for both the parent optimizer
+        (parent dsets) and a subprocess-reconstructed optimizer (subprocess
+        dsets).  This shows whether — and *why* — the two objective landscapes
+        differ, which is the root cause of #34.
+
+        Parameters
+        ----------
+        plot : bool, optional
+            If ``True`` (default), produce visual comparison plots.
+        mp_b_sweep : bool, optional
+            If ``True`` (default), also sweep mp_b on both optimizers and plot
+            the objective landscape.  Requires ``self.optimizer`` to be set.
+        mp_b_range : (float, float), optional
+            Range of mp_b values for the sweep.  Default ``(-200, 200)``.
+        n_points : int, optional
+            Number of evaluation points for the mp_b sweep.  Default 81.
+
+        Returns
+        -------
+        sub_dsets : OptDataSets
+            The subprocess-reconstructed dataset object for further inspection.
+
+        Raises
+        ------
+        RuntimeError
+            If ``work_folder`` or ``dsets`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            # After a subprocess run (in_process=False):
+            run_info = decomp.optimize_rigorously(rgcurve, in_process=False)
+            sub_dsets = run_info.compare_subprocess_dsets()
+        """
+        if self.work_folder is None:
+            raise RuntimeError(
+                "work_folder is not set. Run optimize_rigorously() first, or "
+                "set run_info.work_folder manually."
+            )
+        if self.dsets is None:
+            raise RuntimeError("dsets is not set on this RunInfo.")
+
+        from molass_legacy.Optimizer.DsetsDebug import (
+            reconstruct_subprocess_dsets,
+            compare_dsets,
+            plot_dsets_comparison,
+            get_mp_b_index,
+            sweep_mp_b,
+            plot_mp_b_sweep,
+            reconstruct_subprocess_optimizer,
+        )
+
+        print(f"Reconstructing subprocess dsets from: {self.work_folder}")
+        sub_dsets = reconstruct_subprocess_dsets(self.work_folder)
+
+        print("\n--- Numerical comparison ---")
+        compare_dsets(self.dsets, sub_dsets)
+
+        if plot:
+            plot_dsets_comparison(self.dsets, sub_dsets)
+
+        if mp_b_sweep and self.optimizer is not None:
+            print("\n--- mp_b objective landscape sweep ---")
+            mp_b_idx = get_mp_b_index(self.optimizer)
+            init_mp_b = float(self.init_params[mp_b_idx])
+            print(f"mp_b_index={mp_b_idx},  init mp_b={init_mp_b:.4f}")
+
+            # Reconstruct the subprocess optimizer using the same trimming.txt.
+            print("Reconstructing subprocess optimizer (this may take a moment)...")
+            sub_optimizer = reconstruct_subprocess_optimizer(
+                self.work_folder,
+                n_components=self.optimizer.n_components,
+                class_code=self.optimizer.__class__.__name__,
+            )
+            sub_optimizer.prepare_for_optimization(self.init_params)
+
+            # Sweep both.
+            print(f"Sweeping mp_b over [{mp_b_range[0]}, {mp_b_range[1]}] "
+                  f"({n_points} points) × 2 optimizers...")
+            mp_b_a, fv_a = sweep_mp_b(
+                self.optimizer, self.init_params,
+                mp_b_range=mp_b_range, n_points=n_points, mp_b_index=mp_b_idx,
+            )
+            mp_b_b, fv_b = sweep_mp_b(
+                sub_optimizer, self.init_params,
+                mp_b_range=mp_b_range, n_points=n_points, mp_b_index=mp_b_idx,
+            )
+
+            if plot:
+                plot_mp_b_sweep(
+                    [mp_b_a, mp_b_b], [fv_a, fv_b],
+                    ["parent", "subprocess"],
+                    init_mp_b=init_mp_b,
+                )
+        elif mp_b_sweep and self.optimizer is None:
+            print(
+                "\n[mp_b_sweep skipped] self.optimizer is None. "
+                "For subprocess runs (in_process=False), the optimizer is stored "
+                "on run_info; check that it was not set to None explicitly."
+            )
+
+        return sub_dsets
 
     @property
     def monitor_snapshot_json_path(self):

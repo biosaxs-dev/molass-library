@@ -900,7 +900,7 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, async_=False, progress=None, debug=False,
+                            in_process=True, monitor=True, async_=True, progress='dashboard', debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -986,18 +986,18 @@ class Decomposition:
             for batch / comparison runs (e.g. ``compare_optimization_paths``)
             where the dashboard is not needed.
         async_ : bool, optional
-            Only meaningful when ``in_process=True``.  If True, the optimizer
+            Only meaningful when ``in_process=True``.  If True (default), the optimizer
             runs in a background daemon thread and this call returns a
             :class:`~molass.Rigorous.RunInfo.RunInfo` object **immediately**,
             before the run completes.  Poll :attr:`RunInfo.is_alive` to check
             whether the run is still in progress, then call
             :meth:`RunInfo.wait` (instant if already done) to join the thread
-            before accessing results.  Default is False (blocking).
+            before accessing results.  Set ``False`` for blocking (batch) runs.
         progress : str or None, optional
             Controls live feedback during an async in-process run
-            (``in_process=True, async_=True``).  Currently the only supported
-            value is ``'dashboard'``, which creates an :class:`MplMonitor`
-            ipywidgets dashboard, calls ``show()`` and ``start_watching()``
+            (``in_process=True, async_=True``).  Default is ``'dashboard'``,
+            which creates an :class:`MplMonitor` ipywidgets dashboard, calls
+            ``show()`` and ``start_watching()``
             automatically, and attaches the monitor to
             :attr:`RunInfo.monitor`.  ``None`` (default) gives no
             automatic feedback — suitable for batch or scripted runs.

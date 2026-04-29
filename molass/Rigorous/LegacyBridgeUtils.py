@@ -149,13 +149,67 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
             shutil.rmtree(temp_in_folder)
 
     # make datasets and basecurves
-    from molass_legacy.RgProcess.RgCurve import check_rg_folder
     dsets = make_dsets_from_decomposition(decomposition, rgcurve, data_ssd=data_ssd, debug=debug)
     basecurves, baseparams = make_basecurves_from_decomposition(decomposition, data_ssd=data_ssd, debug=False)
-    rg_folder_ok = check_rg_folder(rg_folder)
-    if not rg_folder_ok:
-        rgcurve_ = dsets[1]
-        rgcurve_.export(rg_folder)
+    # Always overwrite the rg-curve folder with the current LegacyRgCurve so that
+    # the subprocess uses the exact same Rg data as the parent optimizer.
+    # (molass-legacy#34 root cause: stale rg-curve from a previous run caused
+    # different objective function values between parent and subprocess.)
+    import shutil, time as _time
+    if os.path.exists(rg_folder):
+        shutil.rmtree(rg_folder)
+    os.makedirs(rg_folder)
+    rgcurve_ = dsets[1]
+    rgcurve_.export(rg_folder)
+    # Write a marker file so the subprocess can bypass check_rg_folder without
+    # relying on SerialSettings propagation (molass-legacy#34).
+    # trust.txt is the primary mechanism; trust_rg_curve_folder=True in
+    # opt_settings.txt is kept as a belt-and-suspenders backup.
+    with open(os.path.join(rg_folder, 'trust.txt'), 'w') as _f:
+        _f.write('parent_exported')
+    set_setting("trust_rg_curve_folder", True)
+
+    # Also export to a SEPARATE parent-exclusive folder (molass-legacy#34 robust fix).
+    # rg_curve_parent/ is never written by the subprocess, so it is immune to any
+    # mysterious clearing of rg-curve/.  The subprocess checks for this folder first
+    # when trust_rg_curve_folder=True.
+    parent_rg_folder = os.path.join(optimizer_folder, "rg_curve_parent")
+    if os.path.exists(parent_rg_folder):
+        shutil.rmtree(parent_rg_folder)
+    os.makedirs(parent_rg_folder)
+    rgcurve_.export(parent_rg_folder)
+
+    # Export parent's UV diff_spline so subprocess uses same baseline evaluation
+    # (molass-legacy#34: second divergence source — UvBaseSpline.diff_spline was
+    # computed from different data in subprocess vs parent).
+    uv_base_curve = basecurves[0]
+    _ds_exported = False
+    if hasattr(uv_base_curve, 'diff_spline') and uv_base_curve.diff_spline is not None:
+        if hasattr(uv_base_curve, 'curve1') and uv_base_curve.curve1 is not None:
+            _ds_x = uv_base_curve.curve1.x
+        else:
+            # Fallback: use a range inferred from the UV data shape
+            ssd_ = data_ssd if data_ssd is not None else decomposition.ssd
+            _ds_x = ssd_.uv.get_icurve().x if ssd_.has_uv() else np.arange(100)
+        _ds_y = uv_base_curve.diff_spline(_ds_x)
+        np.save(os.path.join(optimizer_folder, 'uv_diff_spline_x.npy'), _ds_x)
+        np.save(os.path.join(optimizer_folder, 'uv_diff_spline_y.npy'), _ds_y)
+        _ds_exported = True
+
+    # Diagnostic log (molass-legacy#34): confirm what the parent actually wrote.
+    # Written to optimizer_folder (not rg_folder) so it survives if rg_folder is cleared.
+    _prep_log = os.path.join(optimizer_folder, 'parent_prep.log')
+    with open(_prep_log, 'a') as _f:
+        _t = _time.strftime('%H:%M:%S')
+        _f.write(f"[{_t}] prepare_rigorous_folders: export completed\n")
+        _f.write(f"  rg_folder={rg_folder}\n")
+        _f.write(f"  rg_folder ok.stamp: {os.path.exists(os.path.join(rg_folder, 'ok.stamp'))}\n")
+        _f.write(f"  rg_folder trust.txt: {os.path.exists(os.path.join(rg_folder, 'trust.txt'))}\n")
+        _f.write(f"  parent_rg_folder ok.stamp: {os.path.exists(os.path.join(parent_rg_folder, 'ok.stamp'))}\n")
+        _f.write(f"  parent_rg_folder files: {sorted(os.listdir(parent_rg_folder))}\n")
+        _f.write(f"  uv_diff_spline exported: {_ds_exported}\n")
+        if _ds_exported:
+            _f.write(f"    x range [{_ds_x[0]:.1f}, {_ds_x[-1]:.1f}] len={len(_ds_x)}\n")
 
     return dsets, basecurves, baseparams, exported
 
