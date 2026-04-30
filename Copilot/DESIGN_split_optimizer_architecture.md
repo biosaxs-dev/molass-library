@@ -269,6 +269,55 @@ get the raw `(params, fv, accepted)` stream.
   today's per-job subprocess fan-out.
 - Optional `timeout_per_job` watchdog to cancel hung runs.
 
+#### Phase 5 — Windows / GIL analysis (April 30, 2026)
+
+The `isolated=True` proposal assumes `fork` semantics: the forked child inherits
+the parent's prepared `optimizer` object in memory.  **On Windows, `fork` does not
+exist** — the only available multiprocessing start method is `spawn`, which requires
+pickling the callable and all arguments to send them to the child.  `BasicOptimizer`
+holds a `Logger` with a `FileHandler`, threading locks, and C-extension state and is
+**not picklable**.  `ProcessPoolExecutor` as proposed will not work on this machine
+without first making the optimizer picklable.
+
+The two goals in #134 are therefore **separable on Windows**:
+
+| Goal | Unix (`fork`) | Windows (`spawn`) |
+|---|---|---|
+| **Crash isolation** — SegFault kills child only | `ProcessPoolExecutor` works | ❌ requires picklable optimizer |
+| **GIL-free performance** — eliminate +13% wall-time gap | Child has its own GIL | Same — but **Python 3.14t already solves this for free** |
+
+**Python version / GIL roadmap** (project requires `>=3.12,<3.15`):
+
+| Version | GIL status |
+|---|---|
+| ≤ 3.12 | Always on — no opt-out |
+| 3.13 / 3.13t | On by default; `3.13t` build disables it (`sys._is_gil_enabled()` → False) |
+| 3.14 / 3.14t | Same — standard build has GIL on; `3.14t` build disables it |
+| 3.15+ | Free-threading expected as default (tentative) |
+
+Confirmed on this machine (April 30, 2026): Python **3.14.4 standard build**, GIL
+**enabled** (`sys._is_gil_enabled()` → True), start method `spawn`.
+
+The +13% wall-time gap in the Phase 3 validation table above was measured on
+April 26, 2026 — **before molass-legacy#18** (ColumnInterp Fortran-order fix +
+`gc.disable()` wrap, April 24–25, 2026) which reduced bare fv time from
+~17.9 ms to ~5–6 ms/call.  The residual gap must be re-measured before
+investing in `isolated=True` infrastructure.
+
+**Recommended sequencing for Phase 5:**
+
+1. Re-run `compare_optimization_paths` after molass-legacy#18 to measure the
+   current wall-time gap.
+2. Test with Python `3.14t` (free-threaded build) to quantify the GIL
+   contribution — if the gap shrinks significantly, free-threaded Python
+   eliminates it with zero code change and #134 may become unnecessary for
+   performance purposes.
+3. If crash isolation is still desired on Windows: make `BasicOptimizer`
+   picklable (serialize numpy arrays + scalar settings to a plain dict;
+   reconstruct in the child) — this is a significant refactor.
+   Alternatively, scope `isolated=True` to Unix only with a `sys.platform`
+   guard and document the limitation.
+
 ## What we'd do first
 
 Phases 0, 1 (steps 1–2), 2 (steps 1–2), 3 (step 1). That's the smallest slice that
@@ -345,5 +394,8 @@ path; the slowdown is now isolated as a pure optimization concern
 - #117 — Root-cause analysis: parent vs subprocess fv divergence
 - #118 — Fix 1: `monitor_optimizer` indirection in `MplMonitor` (closed)
 - #119 — Fix 2 (reopened): subprocess should optimize against library-prepared data
+- molass-legacy#18 — ColumnInterp Fortran-order fix + `gc.disable()` wrap; reduced
+  in-process fv time from ~17.9 ms to ~5–6 ms/call (closed, April 2026)
+- molass-library#134 — `isolated=True` flag proposal (open); see Phase 5 analysis above
 - Convention 9 in `molass-library/.github/copilot-instructions.md` — current
   documented behavior of the subprocess architecture

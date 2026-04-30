@@ -1,6 +1,14 @@
 """
 Rigorous.RunInfo.py
 """
+import weakref
+
+# Module-level weak reference to the currently-running in-process RunInfo.
+# Set when an async in-process run starts; cleared (to None) when it
+# finishes or when the kernel is restarted (module is reloaded → None).
+# Used by the idempotency guard in make_rigorous_decomposition_impl.
+_active_inprocess = None
+
 
 class RunInfo:
     """Handle returned by :func:`molass.Rigorous.make_rigorous_decomposition`
@@ -78,6 +86,65 @@ class RunInfo:
         if t is None:
             return False
         return t.is_alive()
+
+    @property
+    def current_work_folder(self):
+        """The currently-active (or most-recently-used) job folder.
+
+        Unlike :attr:`work_folder` — which is reset to ``None`` at the start
+        of each auto-resume trial — this property always returns the best
+        available answer:
+
+        1. ``self.work_folder`` if already set.
+        2. The most recently modified ``jobs/NNN`` sub-folder under
+           ``analysis_folder/optimized/jobs/`` (the highest ``NNN`` that
+           exists on disk).
+        3. ``None`` if neither is available.
+
+        This is the right folder to probe with ``aicKernelEval`` during a
+        multi-trial run (``max_trials > 0``).  Fixes issue #150.
+        """
+        import os
+        if self.work_folder is not None:
+            return self.work_folder
+        af = self.analysis_folder
+        if af is None:
+            return None
+        jobs_dir = os.path.join(af, 'optimized', 'jobs')
+        if not os.path.isdir(jobs_dir):
+            return None
+        try:
+            subdirs = sorted(
+                d for d in os.listdir(jobs_dir)
+                if os.path.isdir(os.path.join(jobs_dir, d))
+            )
+            if subdirs:
+                return os.path.join(jobs_dir, subdirs[-1])
+        except OSError:
+            pass
+        return None
+
+    def update_manifest_on_resume(self, work_folder):
+        """Update ``RUN_MANIFEST.json`` when a new auto-resume trial starts.
+
+        Called from ``MplMonitor._RunInfoSource._wf_callback`` as soon as
+        the new job folder is allocated, so that :meth:`live_status` reads
+        the correct ``work_folder`` and ``phase='running'`` for the new
+        trial.  Fixes issue #148.
+
+        Parameters
+        ----------
+        work_folder : str
+            Absolute path to the newly-allocated job folder.
+        """
+        af = self.analysis_folder
+        if af is None:
+            return
+        try:
+            from molass.Rigorous.RunRegistry import update_run_manifest
+            update_run_manifest(af, status='running', work_folder=work_folder)
+        except Exception:
+            pass
 
     def __repr__(self):
         if self._async_thread is not None:
@@ -208,6 +275,16 @@ class RunInfo:
         """
         # For async in-process runs, join the background thread directly.
         if self._async_thread is not None:
+            import warnings
+            warnings.warn(
+                "run_info.wait() on an async in-process run blocks the kernel "
+                "until the entire BH/NS run finishes (potentially hours).  "
+                "Use run_info.load_first() instead: it returns as soon as the "
+                "first result lands on disk, while the optimizer continues in "
+                "the background.",
+                UserWarning,
+                stacklevel=2,
+            )
             self._async_thread.join(timeout=timeout if timeout else None)
             if self._async_error is not None:
                 raise RuntimeError("Async optimizer failed") from self._async_error
@@ -1079,16 +1156,15 @@ class RunInfo:
             except Exception:
                 manifest = None
 
-        # If work_folder isn't set on the RunInfo, try the manifest, then
-        # fall back to a quick filesystem scan.  This is the same fallback
-        # pattern that diagnostic cells (e.g. 13h cell [6d]) hand-roll.
+        # If work_folder isn't set on the RunInfo, use current_work_folder
+        # (which finds the latest jobs/NNN directory on disk).  This handles
+        # the auto-resume window where work_folder is transiently None (#149)
+        # and the stale-manifest case where the manifest still points at the
+        # previous trial's folder (#148 / #150).
+        if work_folder is None:
+            work_folder = self.current_work_folder
         if work_folder is None and manifest is not None:
             work_folder = manifest.get("work_folder")
-        if work_folder is None and analysis_folder and os.path.isdir(analysis_folder):
-            for root, _dirs, files in os.walk(analysis_folder):
-                if "callback.txt" in files:
-                    work_folder = root
-                    break
 
         # SV history (cheap; reads callback.txt files only).
         n_evals = 0
@@ -1119,9 +1195,15 @@ class RunInfo:
                 rc = manifest.get("subprocess_returncode")
             sub_pid = manifest.get("subprocess_pid")
 
-        # Phase: combine manifest status + returncode.
+        # Phase: combine manifest status + returncode + live is_alive.
+        # is_alive takes priority: if the thread is still running the phase
+        # must be 'running' regardless of what the manifest says.  This
+        # handles the auto-resume window where the manifest still records
+        # 'completed' from the previous trial (#148).
         status = (manifest or {}).get("status")
-        if rc is not None and rc != 0:
+        if self.is_alive:
+            phase = "running"
+        elif rc is not None and rc != 0:
             phase = "failed"
         elif rc == 0 or status == "completed":
             phase = "completed"
@@ -1222,3 +1304,136 @@ class RunInfo:
             )
         with open(path, encoding="utf-8") as fh:
             return json.load(fh)
+
+    @classmethod
+    def reconnect(cls, analysis_folder, raise_if_not_found=True):
+        """Reconnect to a running or completed optimization from disk.
+
+        Creates a minimal ``RunInfo`` populated from the manifest and disk
+        state in ``analysis_folder``.  Useful after a kernel restart or an
+        accidental cell re-run that destroyed the original live reference.
+
+        The recovered ``RunInfo`` supports all disk-based operations:
+        :meth:`live_status`, :attr:`sv_history`, :meth:`load_best`,
+        :meth:`load_first`, :meth:`plot_sv_history`.
+
+        It does **not** have a live optimizer, so :meth:`get_score_breakdown`
+        and :meth:`diagnose` require the optimizer to be reconstructed
+        separately (not automatic).
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The ``analysis_folder`` that was passed to
+            ``optimize_rigorously()``.
+        raise_if_not_found : bool, optional
+            If True (default), raise ``FileNotFoundError`` when no manifest
+            exists.  If False, return ``None`` instead — useful inside the
+            idempotency guard where a missing manifest simply means no
+            prior run exists.
+
+        Returns
+        -------
+        RunInfo or None
+            A reconstituted ``RunInfo``, or ``None`` if
+            ``raise_if_not_found=False`` and no manifest is found.
+
+        Raises
+        ------
+        FileNotFoundError
+            If no ``RUN_MANIFEST.json`` is found and
+            ``raise_if_not_found=True``.
+
+        Examples
+        --------
+        After a kernel restart::
+
+            run_info = RunInfo.reconnect(analysis_folder)
+            run_info.live_status()
+            run_info.plot_sv_history()
+            result = run_info.load_best()
+        """
+        import os
+        import threading
+        from molass.Rigorous.RunRegistry import read_manifest
+
+        manifest = read_manifest(analysis_folder)
+        if manifest is None:
+            if raise_if_not_found:
+                raise FileNotFoundError(
+                    f"No RUN_MANIFEST.json found in {analysis_folder}.\n"
+                    "Either no run has been launched there, or the folder "
+                    "does not exist."
+                )
+            return None
+
+        # Reconstruct a minimal RunInfo without calling __init__ so we
+        # don't impose live-object requirements (no optimizer, no SSD).
+        obj = cls.__new__(cls)
+        obj.ssd = None
+        obj.optimizer = None
+        obj.dsets = None
+        obj.init_params = None
+        obj.monitor = None
+        obj.analysis_folder = os.path.abspath(analysis_folder)
+        obj.decomposition = None
+        obj.rgcurve = None
+        obj.work_folder = None
+        obj.in_process_result = None
+        obj._async_thread = None
+        obj._async_error = None
+        obj._stop_event = threading.Event()
+
+        # Restore work_folder from manifest (may be None for very early runs).
+        wf = manifest.get("work_folder")
+        if wf is None:
+            # Fall back: find the latest jobs/NNN directory on disk.
+            jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+            if os.path.isdir(jobs_dir):
+                try:
+                    subdirs = sorted(
+                        d for d in os.listdir(jobs_dir)
+                        if os.path.isdir(os.path.join(jobs_dir, d))
+                    )
+                    if subdirs:
+                        wf = os.path.join(jobs_dir, subdirs[-1])
+                except OSError:
+                    pass
+        obj.work_folder = wf
+
+        # Restore subprocess returncode if already written to manifest.
+        obj.subprocess_returncode = manifest.get("subprocess_returncode")
+
+        return obj
+
+    def _is_subprocess_alive(self):
+        """Return True if the subprocess recorded in the manifest is still running.
+
+        Used by the idempotency guard.  Tries psutil first, falls back to
+        os.kill(pid, 0) on POSIX.
+        """
+        import os
+        manifest = None
+        if self.analysis_folder:
+            from molass.Rigorous.RunRegistry import read_manifest
+            manifest = read_manifest(self.analysis_folder)
+        if manifest is None:
+            return False
+        sub_pid = manifest.get("subprocess_pid")
+        status = manifest.get("status")
+        if sub_pid is None:
+            return False
+        # Fast path: manifest already records completion
+        if status in ("completed", "failed"):
+            return False
+        try:
+            import psutil
+            return psutil.pid_exists(int(sub_pid))
+        except ImportError:
+            pass
+        # POSIX fallback
+        try:
+            os.kill(int(sub_pid), 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False

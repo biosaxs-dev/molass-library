@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -119,11 +119,16 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     analysis_folder : str, optional
         The folder to save analysis results.
     niter : int, optional
-        Number of iterations. Default 20.
+        Iteration budget.  Meaning depends on ``method``:
+
+        * ``'BH'``: literal number of Basin-Hopping outer steps (default 20).
+        * ``'NS'``: multiplied by 7 000 to form ``max_ncalls`` for UltraNest
+          (``niter=20`` → 140 000 likelihood evaluations).
+
+        Default 20.
     method : str, optional
-        Optimization algorithm: ``'BH'`` (Basin-Hopping, default),
-        ``'NS'`` (Nested Sampling / UltraNest), ``'MCMC'`` (emcee),
-        ``'SMC'`` (Sequential Monte Carlo).
+        Optimization algorithm: ``'BH'`` (Basin-Hopping, default) or
+        ``'NS'`` (Nested Sampling / UltraNest).
     frozen_components : list of int, optional
         0-based indices of protein components to freeze during optimization.
         Their EGH shape parameters, Rg, and UV scale will be held constant
@@ -177,6 +182,40 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             raise ValueError(
                 "progress='dashboard' requires in_process=True and async_=True"
             )
+
+    # ── Idempotency guard (molass-library#151) ──────────────────────────
+    # Before doing any expensive setup, check whether a run is already live
+    # for this analysis_folder / in-process thread.  If so, return the
+    # existing RunInfo with a RuntimeWarning instead of starting a second run.
+    import molass.Rigorous.RunInfo as _run_info_mod
+    if in_process and async_:
+        _existing = None
+        _ref = _run_info_mod._active_inprocess
+        if _ref is not None:
+            _existing = _ref()   # dereference weak reference
+        if _existing is not None and _existing.is_alive:
+            import warnings
+            warnings.warn(
+                "An in-process optimization is already running "
+                f"(analysis_folder={_existing.analysis_folder!r}). "
+                "Returning the existing RunInfo instead of starting a new run.",
+                RuntimeWarning, stacklevel=3,
+            )
+            return _existing
+    elif not in_process and analysis_folder is not None:
+        _recovered = _run_info_mod.RunInfo.reconnect(
+            analysis_folder, raise_if_not_found=False
+        )
+        if _recovered is not None and _recovered._is_subprocess_alive():
+            import warnings
+            warnings.warn(
+                "An optimization subprocess is already running for "
+                f"analysis_folder={analysis_folder!r}. "
+                "Returning the reconnected RunInfo instead of starting a new run.",
+                RuntimeWarning, stacklevel=3,
+            )
+            return _recovered
+    # ────────────────────────────────────────────────────────────────────
 
     import molass.Rigorous.LegacyBridgeUtils
     reload(molass.Rigorous.LegacyBridgeUtils)
@@ -339,6 +378,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             run_info.in_process_result = _result
             run_info.work_folder = _work_folder
             run_info._async_error = None
+            # Clear the module-level weak reference when the run finishes.
+            import molass.Rigorous.RunInfo as _run_info_mod
+            _run_info_mod._active_inprocess = None
 
         if async_:
             import threading
@@ -360,9 +402,15 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             run_info._async_thread = _thread
             _thread.start()
 
+            # Register the new run as the active in-process run.
+            import molass.Rigorous.RunInfo as _run_info_mod
+            import weakref
+            _run_info_mod._active_inprocess = weakref.ref(run_info)
+
             if progress == 'dashboard':
                 from molass_legacy.Optimizer.MplMonitor import MplMonitor
                 mon = MplMonitor.for_run_info(run_info, niter=niter,
+                                              max_trials=max_trials,
                                               function_code=function_code)
                 mon.create_dashboard()
                 mon.show()

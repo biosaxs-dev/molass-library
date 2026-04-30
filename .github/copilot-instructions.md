@@ -288,6 +288,10 @@ Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
 
 **In-process kernel restart safety (molass-legacy#26, April 2026)**: `optimize_rigorously(in_process=True)` is now safe to interrupt with VS Code "Restart Kernel". Previously, `optimizer.solve()` ran directly on the main thread; UltraNest's back-to-back numpy C calls held the GIL long enough to block `KeyboardInterrupt` delivery, causing the kernel to hang and VS Code to spawn duplicate kernels. Fix: `solve()` runs in a `daemon=True` thread; the main thread loops on `thread.join(timeout=0.05)`, releasing the GIL every 50 ms as an interrupt delivery point. Key file: `molass_legacy/Optimizer/InProcessRunner.py`.
 
+**In-process wall-time gap and Phase 5 analysis (April 2026)**: The in-process path was ~5× slower than subprocess before molass-legacy#18 fixed two root causes: (1) `ColumnInterp.D_` stored in C (row-major) order causing per-column cache misses → switched to Fortran order for 1.87× speedup; (2) GC cycle detector overhead ~25% → wrapped `optimizer.solve()` in `gc.disable()` / `gc.enable()` for 1.33× speedup. A residual ~13% wall-time gap remained (measured before these fixes); **re-benchmarking is needed** to know the current state.
+
+Phase 5 (molass-library#134, `isolated=True`) proposes `ProcessPoolExecutor` for crash isolation, but **this will not work on Windows** because the default start method is `spawn` (not `fork`) and `BasicOptimizer` is not picklable (holds a `Logger`, threading locks, C-extension state). The two Phase 5 goals — crash isolation and GIL-free performance — are separable: the performance goal may be solved for free by switching to Python `3.14t` (free-threaded build). Full analysis in `Copilot/DESIGN_split_optimizer_architecture.md` § "Phase 5 — Windows / GIL analysis".
+
 ---
 
 ## 📂 Repository Structure Quick Reference

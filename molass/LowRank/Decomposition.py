@@ -427,11 +427,30 @@ class Decomposition:
                 When both *fig* and *axes* are provided the caller is
                 responsible for creating axes with compatible geometry.
 
+        rgcurve : molass.Guinier.RgCurve.RgCurve, optional
+            If provided, overlays the per-frame Rg values as a scatter plot on
+            the XR elution subplot (``axes[1, 0]``), colour-coded by Guinier
+            fit score.  Obtain via ``decomp.get_rg_curve()``.
+
+            Example::
+
+                rgcurve = decomp.get_rg_curve()
+                decomp.plot_components(rgcurve=rgcurve)
+
+        rg_score_threshold : float, optional
+            Only Rg points whose Guinier fit score exceeds this value are
+            plotted.  Default is ``None`` (all points shown).
+        rg_marker_size : float, optional
+            Marker size for the Rg scatter points.  Default is ``12``.
+        rg_cmap : str, optional
+            Matplotlib colormap name used to colour Rg markers by score.
+            Default is ``'viridis'``.
+
         Returns
         -------
         result : PlotResult
             A PlotResult object which contains the following attributes.
-            
+
             - fig: The matplotlib Figure object.
             - axes: A 2×3 array of Axes objects.
         """
@@ -900,7 +919,8 @@ class Decomposition:
                             frozen_components=None, free_components=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, async_=True, progress='dashboard', debug=False,
+                            in_process=True, monitor=True, async_=True, progress='dashboard',
+                            max_trials=0, debug=False,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -909,9 +929,11 @@ class Decomposition:
         ----------
         rgcurve : Curve
             The Rg curve to use for the decomposition.
-        analysis_folder : str, optional
-            The folder to save analysis results.  Optimization creates
-            the following layout on disk::
+        analysis_folder : str, **required**
+            The folder to save analysis results.  Must be provided explicitly —
+            passing ``None`` raises ``ValueError``.
+            Example: ``analysis_folder='temp_analysis_apo_bh'``.
+            Optimization creates the following layout on disk::
 
                 <analysis_folder>/
                     optimized/
@@ -935,13 +957,15 @@ class Decomposition:
             - ``'NS'`` — **Nested Sampling** (UltraNest). Explores the
               full parameter space; useful when the objective landscape
               has multiple well-separated minima.
-            - ``'MCMC'`` — **Markov Chain Monte Carlo** (emcee). Samples
-              the posterior distribution. Good for uncertainty estimation.
-            - ``'SMC'`` — **Sequential Monte Carlo** (PyABC / PyMC).
-              Population-based sampling; can be effective for complex
-              multi-modal landscapes.
         niter : int, optional
-            The number of iterations for the optimization. Default is 20.
+            Iteration budget.  Meaning depends on ``method``:
+
+            * ``'BH'``: literal number of Basin-Hopping outer steps
+              (default 20).
+            * ``'NS'``: multiplied by 7 000 to form ``max_ncalls`` for
+              UltraNest (``niter=20`` → 140 000 likelihood evaluations).
+
+            Default is 20.
         frozen_components : list of int, optional
             0-based indices of protein components to freeze during optimization.
             Their EGH shape parameters (H, mu, sigma, tau), Rg, and UV scale
@@ -1004,6 +1028,15 @@ class Decomposition:
 
             Raises :class:`ValueError` if ``progress='dashboard'`` is used
             without ``in_process=True`` and ``async_=True``.
+        max_trials : int, optional
+            Maximum number of automatic sequential re-trials after each
+            trial completes.  Default ``0`` means no automatic re-start —
+            the user decides manually via the Resume button.
+
+            Only meaningful when ``in_process=True`` and
+            ``progress='dashboard'``.  The subprocess path (``in_process=False``)
+            always uses its own default of 30.  Set ``max_trials=30`` here
+            to match that behaviour for unattended in-process runs.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -1015,6 +1048,28 @@ class Decomposition:
             this returns.  For non-blocking runs (``async_=True``), call
             ``run_info.load_first()`` to wait for the first result and load it,
             or ``run_info.wait()`` then ``run_info.load_best()``.
+
+        Notes
+        -----
+        The elution model (EGH, SDM, EDM) is **not** a parameter of this
+        method — it is determined by the decomposition object itself
+        (``self.xr_ccurves[0].model``).  Passing ``model=`` raises
+        ``TypeError: Unexpected keyword arguments``.
+
+        To optimize with a different model, use
+        :meth:`optimize_with_model` instead.  That method handles
+        EGH → SDM/EDM parameter conversion internally, using the EGH
+        shape parameters as a starting point for column-parameter
+        estimation.
+
+        Typical staged workflow::
+
+            decomp = corrected.quick_decomposition()           # EGH
+            run_info = decomp.optimize_rigorously(             # refine EGH
+                analysis_folder='temp_analysis_apo_egh', ...)
+            result_egh = run_info.load_best()
+            run_info_sdm = result_egh.optimize_with_model(     # EGH -> SDM
+                'SDM', analysis_folder='temp_analysis_apo_sdm', ...)
 
         See Also
         --------
@@ -1040,6 +1095,12 @@ class Decomposition:
 
         if frozen_components is not None and free_components is not None:
             raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
+
+        if analysis_folder is None:
+            raise ValueError(
+                "analysis_folder is required. "
+                "Example: optimize_rigorously(analysis_folder='temp_analysis_apo_bh', ...)"
+            )
 
         _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC'}
         if method not in _VALID_METHODS:
@@ -1076,7 +1137,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, debug=debug)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
