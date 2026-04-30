@@ -359,10 +359,16 @@ class RunInfo:
                 "No decomposition stored in this RunInfo. "
                 "Cannot reconstruct result without the initial decomposition."
             )
-        return load_rigorous_result(
+        result = load_rigorous_result(
             decomp, self.analysis_folder, jobid=best.id,
             rgcurve=self.rgcurve, debug=debug
         )
+        # Attach the score so callers can write `result.sv` / `result.fv`
+        # without having to re-parse callback.txt separately. (#157)
+        from molass.Rigorous.CurrentStateUtils import fv_to_sv
+        result.fv = best.best_fv
+        result.sv = float(fv_to_sv(best.best_fv))
+        return result
 
     def load_first(self, timeout=0, poll_interval=5, debug=False):
         """Wait for the first rigorous result, then load the best job found so far.
