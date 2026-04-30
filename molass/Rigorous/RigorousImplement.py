@@ -217,6 +217,17 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             return _recovered
     # ────────────────────────────────────────────────────────────────────
 
+    # Normalize analysis_folder to an absolute path so that RunInfo,
+    # _jobs_dir, write_run_manifest, and MplMonitor are all immune to
+    # os.chdir() calls made by the async optimizer thread inside
+    # InProcessRunner.run_optimizer_in_process().  A relative path stored
+    # in SerialSettings or RunInfo.analysis_folder resolves against
+    # whatever CWD is current at the time it is used — after the thread
+    # calls os.chdir(work_folder) that CWD is jobs/000/, producing the
+    # doubled path  ...jobs/000/<rel>/optimized/monitor.log.
+    if analysis_folder is not None:
+        analysis_folder = os.path.abspath(analysis_folder)
+
     import molass.Rigorous.LegacyBridgeUtils
     reload(molass.Rigorous.LegacyBridgeUtils)
     import molass.Rigorous.FunctionCodeUtils

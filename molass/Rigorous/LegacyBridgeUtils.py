@@ -113,6 +113,12 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     from molass_legacy._MOLASS.SerialSettings import get_setting, set_setting
     if analysis_folder is None:
         analysis_folder = get_setting('analysis_folder')
+    # Convert to absolute path BEFORE storing in settings.  If a relative path is
+    # stored and the async optimizer thread later calls os.chdir(work_folder),
+    # os.chdir is process-wide, so the main thread's FileHandler calls (e.g.
+    # MplMonitor.monitor.log) would resolve the relative path against the new CWD
+    # → doubled path like  jobs/000/temp_analysis_apo_bh/optimized/monitor.log.
+    analysis_folder = os.path.abspath(analysis_folder)
     set_setting('analysis_folder', analysis_folder)
     optimizer_folder = os.path.join(analysis_folder, "optimized")
     set_setting('optimizer_folder', optimizer_folder)
