@@ -1115,9 +1115,9 @@ class Decomposition:
                     f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
                 )
             if not (in_process and async_):
-                raise ValueError(
-                    "progress='dashboard' requires in_process=True and async_=True"
-                )
+                # Auto-degrade: silently fall back rather than raising.
+                # (molass-library#159)
+                progress = None
 
         if free_components is not None:
             n_protein = self.num_components  # protein components (excludes baseline)
