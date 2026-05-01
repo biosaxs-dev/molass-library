@@ -1046,7 +1046,7 @@ class Decomposition:
             A ``RunInfo`` object that tracks the optimization run.
             For blocking runs (``async_=False``), the run is complete when
             this returns.  For non-blocking runs (``async_=True``), call
-            ``run_info.load_first()`` to wait for the first result and load it,
+            ``run_info.load_best()`` to wait for the first result and load it,
             or ``run_info.wait()`` then ``run_info.load_best()``.
 
         Notes
@@ -1077,9 +1077,8 @@ class Decomposition:
             penalty components that make up the objective value (fv).
         RunInfo.is_alive : Check whether an async run is still in progress.
         RunInfo.wait : Block until the run completes.
-        RunInfo.load_first : Wait for the first result then load it (recommended
-            for ``async_=True`` runs instead of ``wait()`` + ``load_best()``).
-        """
+        RunInfo.load_best : Wait for the first result then load it (recommended
+            for ``async_=True`` runs instead of ``wait()`` + ``load_best()``).        """
         # Backward compatibility: accept old name uncorrected_ssd
         if 'uncorrected_ssd' in kwargs:
             import warnings

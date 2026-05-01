@@ -51,7 +51,7 @@ class RunInfo:
         self.monitor = monitor
         self.analysis_folder = analysis_folder
         self.decomposition = decomposition
-        self.rgcurve = rgcurve          # cached to avoid recomputation in load_best/load_first
+        self.rgcurve = rgcurve          # cached to avoid recomputation in load_best
         # Set by RigorousImplement for in_process=True runs:
         self.work_folder = None
         self.in_process_result = None
@@ -266,8 +266,8 @@ class RunInfo:
               ``is_alive``, or any monitoring probe — can execute until the
               optimizer finishes.
 
-            For interactive notebooks prefer :meth:`load_first`, which waits
-            only until the *first* result lands on disk and returns
+            For interactive notebooks prefer :meth:`load_best`, which waits
+            only until the first result lands on disk and returns
             immediately, or poll manually with::
 
                 if run_info.is_alive:
@@ -279,7 +279,7 @@ class RunInfo:
             warnings.warn(
                 "run_info.wait() on an async in-process run blocks the kernel "
                 "until the entire BH/NS run finishes (potentially hours).  "
-                "Use run_info.load_first() instead: it returns as soon as the "
+                "Use run_info.load_best() instead: it returns as soon as the "
                 "first result lands on disk, while the optimizer continues in "
                 "the background.",
                 UserWarning,
@@ -300,29 +300,46 @@ class RunInfo:
             self.analysis_folder, timeout=timeout, poll_interval=poll_interval
         )
 
-    def load_best(self, debug=False):
-        """Load the best rigorous optimization result.
+    def load_best(self, timeout=0, poll_interval=5, debug=False):
+        """Load the best rigorous optimization result, waiting until one is available.
 
-        Combines ``list_rigorous_jobs()`` and ``load_rigorous_result()``
-        into one call: finds the job with the lowest objective function
-        value and reconstructs the ``Decomposition`` from it.
+        Safe to call immediately after :meth:`optimize_rigorously` — it blocks
+        until at least one job has completed, then returns the result with the
+        lowest objective function value found so far.  Re-running this cell while
+        the optimizer is still going always returns the best result available at
+        that moment.
 
         Parameters
         ----------
+        timeout : float, optional
+            Maximum seconds to wait for the first result (default ``0`` = no
+            limit).  When non-zero and no result appears within ``timeout``
+            seconds, raises :class:`TimeoutError`.
+        poll_interval : float, optional
+            Seconds between filesystem checks (default 5).
         debug : bool, optional
             If True, reload modules from disk.
 
         Returns
         -------
         Decomposition
-            A Decomposition built from the best optimized parameters.
+            A Decomposition built from the best optimized parameters available
+            at the time the call returns.  The ``result.sv`` and ``result.fv``
+            attributes are attached for convenience.
 
         Raises
         ------
         ValueError
             If no ``analysis_folder`` was stored.
-        FileNotFoundError
-            If no completed jobs are found.
+        TimeoutError
+            If ``timeout > 0`` and no result appears within that time.
+
+        Notes
+        -----
+        Interrupt with **Ctrl+C** to cancel the wait at any time.
+
+        If the optimizer is still running, the result reflects only the jobs
+        completed so far.  Re-call after the run finishes to get the final best.
 
         See Also
         --------
@@ -334,9 +351,8 @@ class RunInfo:
         ::
 
             run_info = decomp.optimize_rigorously(
-                analysis_folder="temp_analysis", niter=30)
-            run_info.wait(timeout=600)
-            result = run_info.load_best()
+                analysis_folder="temp_analysis", method='BH', max_trials=30)
+            result = run_info.load_best()   # blocks until first BH job lands
             result.plot_components()
         """
         if self.analysis_folder is None:
@@ -344,14 +360,21 @@ class RunInfo:
                 "No analysis_folder stored in this RunInfo. "
                 "Pass analysis_folder= to optimize_rigorously()."
             )
+        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results
+        ready = wait_for_rigorous_results(
+            self.analysis_folder,
+            timeout=timeout,
+            poll_interval=poll_interval,
+        )
+        if not ready:
+            raise TimeoutError(
+                f"No rigorous results appeared within {timeout}s "
+                f"in {self.analysis_folder}"
+            )
         from molass.Rigorous.CurrentStateUtils import (
             list_rigorous_jobs, load_rigorous_result,
         )
         jobs = list_rigorous_jobs(self.analysis_folder)
-        if not jobs:
-            raise FileNotFoundError(
-                f"No completed jobs found in {self.analysis_folder}"
-            )
         best = min(jobs, key=lambda j: j.best_fv)
         decomp = self.decomposition
         if decomp is None:
@@ -369,71 +392,6 @@ class RunInfo:
         result.fv = best.best_fv
         result.sv = float(fv_to_sv(best.best_fv))
         return result
-
-    def load_first(self, timeout=0, poll_interval=5, debug=False):
-        """Wait for the first rigorous result, then load the best job found so far.
-
-        Combines :func:`wait_for_rigorous_results` and :meth:`load_best` in
-        one call.  Safe to run immediately after firing the optimizer with
-        ``async_=True`` — there is no need to check ``is_alive`` or call
-        ``wait()`` first.
-
-        Parameters
-        ----------
-        timeout : float, optional
-            Maximum seconds to wait for the first result (default ``0`` = no
-            limit).  When non-zero and no result appears within ``timeout``
-            seconds, raises :class:`TimeoutError`.
-        poll_interval : float, optional
-            Seconds between filesystem checks (default 5).
-        debug : bool, optional
-            If True, reload modules from disk.
-
-        Returns
-        -------
-        Decomposition
-            A Decomposition built from the best optimized parameters available
-            at the time the first result lands on disk.
-
-        Raises
-        ------
-        TimeoutError
-            If ``timeout > 0`` and no result appears within that time.
-
-        Notes
-        -----
-        Interrupt with **Ctrl+C** to cancel the wait at any time.
-
-        If the optimizer is still running when ``load_first()`` returns, the
-        result reflects only the jobs completed so far — not the final best.
-        Re-call :meth:`load_best` after the run finishes to get the true
-        global best.
-
-        Examples
-        --------
-        ::
-
-            run_info = decomp.optimize_rigorously(
-                rgcurve, method='BH', niter=200,
-                analysis_folder="temp_analysis",
-                async_=True,
-            )
-            # Safe to call immediately — blocks until first BH step is on disk:
-            result = run_info.load_first()
-            result.plot_components()
-        """
-        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results
-        ready = wait_for_rigorous_results(
-            self.analysis_folder,
-            timeout=timeout,
-            poll_interval=poll_interval,
-        )
-        if not ready:
-            raise TimeoutError(
-                f"No rigorous results appeared within {timeout}s "
-                f"in {self.analysis_folder}"
-            )
-        return self.load_best(debug=debug)
 
     def get_score_breakdown(self, jobid=None, debug=False):
         """Evaluate the objective function and return individual score components.
@@ -1321,7 +1279,7 @@ class RunInfo:
 
         The recovered ``RunInfo`` supports all disk-based operations:
         :meth:`live_status`, :attr:`sv_history`, :meth:`load_best`,
-        :meth:`load_first`, :meth:`plot_sv_history`.
+        :meth:`load_best`, :meth:`plot_sv_history`.
 
         It does **not** have a live optimizer, so :meth:`get_score_breakdown`
         and :meth:`diagnose` require the optimizer to be reconstructed

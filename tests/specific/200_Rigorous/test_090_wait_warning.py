@@ -1,6 +1,6 @@
 """
 Test that run_info.wait() on an async in-process run emits a UserWarning
-redirecting the user to load_first().
+redirecting the user to load_best().
 
 See: https://github.com/biosaxs-dev/molass-library/issues/155
 """
@@ -36,4 +36,4 @@ def test_wait_emits_userwarning_for_async_in_process():
     user_warnings = [w for w in caught if issubclass(w.category, UserWarning)]
     assert len(user_warnings) == 1, "Expected exactly one UserWarning from wait()"
     msg = str(user_warnings[0].message)
-    assert "load_first" in msg, f"Warning should mention load_first(), got: {msg}"
+    assert "load_best" in msg, f"Warning should mention load_best(), got: {msg}"
