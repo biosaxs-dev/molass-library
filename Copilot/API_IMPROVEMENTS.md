@@ -194,4 +194,10 @@ Related infrastructure shipped alongside #133:
 | `ComparisonResult.live_status()` | `molass.Rigorous.ComparePaths` | Convenience wrapper over the per-path `RunInfo.live_status()` |
 | `aicKernelEval` tool | [ai-context-vscode](https://github.com/freesemt/ai-context-vscode) v0.3.0 | External-observer access to live kernel state — composes with `live_status()` for one-tool-call run probes |
 
+Discovered while debugging `in_process=False` in molass-researcher experiment 16b:
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#159](https://github.com/biosaxs-dev/molass-library/issues/159) | Auto-degrade `progress='dashboard'` when `in_process=False` instead of raising `ValueError` | ✅ Done (bdb8697) |
+
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.
