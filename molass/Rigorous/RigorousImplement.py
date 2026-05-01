@@ -157,6 +157,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         batch/comparison runs where the dashboard is not needed (and to
         avoid known fragility of the matplotlib widget pipeline on
         Python 3.14 / degraded ipywidgets CDN).
+    progress : str or None, optional
+        **Deprecated / internal** — users should not need to set this.
+        The library selects the best available monitoring automatically based
+        on ``in_process`` and ``async_``.  When ``in_process=True`` and
+        ``async_=True`` the default ``'dashboard'`` renders an ipywidgets panel
+        in the notebook cell.  In all other cases it is silently ignored.
+        (molass-library#159)
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -178,10 +185,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             raise ValueError(
                 f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
             )
+        # Auto-degrade: 'dashboard' is only available in-process + async.
+        # If the caller passed in_process=False (or async_=False), silently
+        # fall back to no in-notebook widget rather than raising.
+        # (molass-library#159 — progress should not be a user-facing concern)
         if not (in_process and async_):
-            raise ValueError(
-                "progress='dashboard' requires in_process=True and async_=True"
-            )
+            progress = None
 
     # ── Idempotency guard (molass-library#151) ──────────────────────────
     # Before doing any expensive setup, check whether a run is already live
