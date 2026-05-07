@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
-**Last Updated**: April 29, 2026 (evening)  
-**Current version**: 0.9.4
+**Last Updated**: May 7, 2026  
+**Current version**: 0.9.5
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,8 +11,8 @@
 
 ## 🎯 Current Task
 
-**Phase 5 dashboard complete; molass-legacy#34 fully closed; two Tkinter GUI crashes fixed ✅**  
-Next: Choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
+**molass-legacy#34–#42 all fixed; subprocess/in-process objective parity achieved ✅**  
+Next: Re-run 16b with fresh subprocess to confirm SV convergence in practice, then choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
 
 ---
 
