@@ -164,6 +164,13 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # Exporting y-values here lets OptDataSets.get_dsets_impl override after loading from disk.
     np.save(os.path.join(optimizer_folder, 'ip_xr_elcurve_y.npy'), dsets[0][0].y)
     np.save(os.path.join(optimizer_folder, 'ip_uv_elcurve_y.npy'), dsets[2][0].y)
+    # Export in-process data matrices so subprocess uses same corrected 2D data (molass-legacy#39).
+    # The subprocess loads D/U via sd.get_xr/uv_data_separate_ly() (legacy correction),
+    # which differs from the molass-library baseline-corrected ssd.xr.M / ssd.uv.M used
+    # by in-process.  Different D/U causes different xrD_/uvD_ in BasicOptimizer, so even
+    # with identical init_params the objective landscapes differ → systematic ~3 SV gap.
+    np.save(os.path.join(optimizer_folder, 'ip_xr_D.npy'), dsets[0][1])
+    np.save(os.path.join(optimizer_folder, 'ip_uv_U.npy'), dsets[2][1])
     # Always overwrite the rg-curve folder with the current LegacyRgCurve so that
     # the subprocess uses the exact same Rg data as the parent optimizer.
     # (molass-legacy#34 root cause: stale rg-curve from a previous run caused
