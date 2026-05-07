@@ -157,6 +157,13 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # make datasets and basecurves
     dsets = make_dsets_from_decomposition(decomposition, rgcurve, data_ssd=data_ssd, debug=debug)
     basecurves, baseparams = make_basecurves_from_decomposition(decomposition, data_ssd=data_ssd, debug=False)
+
+    # Export in-process ElCurve y-values so subprocess uses same curves (molass-legacy#38).
+    # The subprocess re-derives ElCurves via legacy smoothing (get_xr/uv_data_separate_ly),
+    # producing ~4% difference from the EGH-fitted curves used by the in-process path.
+    # Exporting y-values here lets OptDataSets.get_dsets_impl override after loading from disk.
+    np.save(os.path.join(optimizer_folder, 'ip_xr_elcurve_y.npy'), dsets[0][0].y)
+    np.save(os.path.join(optimizer_folder, 'ip_uv_elcurve_y.npy'), dsets[2][0].y)
     # Always overwrite the rg-curve folder with the current LegacyRgCurve so that
     # the subprocess uses the exact same Rg data as the parent optimizer.
     # (molass-legacy#34 root cause: stale rg-curve from a previous run caused
