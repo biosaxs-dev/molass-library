@@ -172,6 +172,12 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     np.save(os.path.join(optimizer_folder, 'ip_xr_D.npy'), dsets[0][1])
     np.save(os.path.join(optimizer_folder, 'ip_uv_U.npy'), dsets[2][1])
     np.save(os.path.join(optimizer_folder, 'ip_xr_E.npy'), dsets.E)
+    # Export in-process qvector so subprocess uses the same trimmed q-values
+    # (molass-legacy#41: subprocess sd.qvector has 972 elements from the full
+    # raw data; in-process corrected SSD has 966 elements after trimming.
+    # The difference shifts GuinierDeviation's xr_index bisection → different fv.)
+    _export_ssd = data_ssd if data_ssd is not None else decomposition.ssd
+    np.save(os.path.join(optimizer_folder, 'ip_xr_qvector.npy'), _export_ssd.xr.q_values)
     # Always overwrite the rg-curve folder with the current LegacyRgCurve so that
     # the subprocess uses the exact same Rg data as the parent optimizer.
     # (molass-legacy#34 root cause: stale rg-curve from a previous run caused
