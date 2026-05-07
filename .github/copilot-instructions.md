@@ -1,4 +1,4 @@
-<!-- AI Context Standard v0.8.9 - Adopted: 2026-04-02 -->
+<!-- AI Context Standard v0.9.2 - Adopted: 2026-05-07 -->
 # AI Assistant Initialization Guide — molass-library
 
 **Purpose**: Initialize AI context for coding work in this repository  
