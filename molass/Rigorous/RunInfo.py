@@ -1014,6 +1014,37 @@ class RunInfo:
         from molass.Rigorous.CurrentStateUtils import parse_sv_history
         return parse_sv_history(self.analysis_folder)
 
+    @property
+    def sv_history_per_job(self):
+        """Per-job SV best-so-far trajectories from all ``callback.txt`` files.
+
+        Like :attr:`sv_history` but preserves job boundaries.  Useful when a
+        BH run spans multiple restarts (jobs ``000``, ``001``, ...) and you
+        want to know how much each restart contributed.
+
+        Returns
+        -------
+        dict[str, list of float]
+            Mapping from job id (e.g. ``'000'``) to the list of global
+            best-SV-so-far values recorded within that job.  Empty dict if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            per_job = run_info.sv_history_per_job
+            for job_id, svs in per_job.items():
+                print(f"job {job_id}: {len(svs)} evals, best SV = {svs[-1]:.1f}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history_per_job
+        return parse_sv_history_per_job(self.analysis_folder)
+
     def plot_sv_history(self, title=None, figsize=(8, 4)):
         """Plot the min-so-far SV trajectory from ``callback.txt``.
 

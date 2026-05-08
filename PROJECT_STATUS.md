@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: May 7, 2026  
+**Last Updated**: May 8, 2026  
 **Current version**: 0.9.5
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,12 +11,42 @@
 
 ## 🎯 Current Task
 
-**molass-legacy#34–#42 all fixed; subprocess/in-process objective parity achieved ✅**  
-Next: Re-run 16b with fresh subprocess to confirm SV convergence in practice, then choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
+**molass-legacy#52 fixed ✅ — duplicate dashboard panel eliminated for fast datasets (ATP, MY)**  
+Next: Run the full in-process vs subprocess comparison for ATP (16d vs 16e) and MY (16f vs 16g) to confirm SV parity across datasets, then choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
 
 ---
 
 ## 🎯 Recent Work
+
+### May 8, 2026 — molass-legacy#52: duplicate dashboard panel fix + ATP/MY experiment notebooks (16d–16g)
+
+**molass-legacy changes** (v0.6.0 → v0.6.1):
+
+| File | Change |
+|------|--------|
+| `MplMonitor.py` | Fix duplicate upper panel for fast datasets (ATP, MY): replaced `display(self.fig)` inside `with Output():` context with `fig.savefig()` → PNG bytes → `self.plot_output.outputs = (...)` trait assignment. IPython double-routing was the root cause: a background thread calling `display()` during active cell execution routes the message to both the cell's raw output and the Output widget simultaneously. Trait assignment bypasses IPython routing entirely. |
+| `pyproject.toml` | `0.6.0` → `0.6.1` |
+
+**molass-library changes** (issue #161):
+
+| File | Change |
+|------|--------|
+| `molass/Rigorous/CurrentStateUtils.py` | `parse_sv_history_per_job(analysis_folder)` — parses all jobs' `callback.txt` files and returns `{job_id: [best_sv_at_each_accepted_step]}` dict |
+| `molass/Rigorous/RunInfo.py` | `sv_history_per_job` property — live access to per-job SV history for in-process runs |
+| `tests/specific/200_Rigorous/test_100_sv_history_per_job.py` | Test for `parse_sv_history_per_job` |
+| `.github/copilot-instructions.md` | Added molass-legacy#52 entry |
+
+**molass-researcher new notebooks**:
+
+| Notebook | Purpose |
+|----------|---------|
+| `16d_atp_bh_inprocess.ipynb` | ATP dataset: in-process BH run |
+| `16e_atp_bh_subprocess.ipynb` | ATP dataset: subprocess BH run |
+| `16f_my_bh_inprocess.ipynb` | MY dataset: in-process BH run |
+| `16g_my_bh_subprocess.ipynb` | MY dataset: subprocess BH run |
+
+**Root cause of duplicate panel (molass-legacy#52)**:  
+IPython double-routing: background thread `display()` during active cell execution routes to both the cell's raw output and the Output widget. Fast datasets (ATP, MY) trigger this race; slow datasets (APO) do not. Fix: render figure to PNG bytes and assign `plot_output.outputs` directly as a trait — bypasses IPython routing entirely.
 
 ### April 29, 2026 — Phase 5 polish + molass-legacy#34 closed + two Tkinter GUI crashes fixed
 

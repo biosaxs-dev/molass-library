@@ -458,6 +458,64 @@ def parse_sv_history(analysis_folder):
     return [float(v) for v in sv_so_far]
 
 
+def parse_sv_history_per_job(analysis_folder):
+    """Parse ``callback.txt`` files and return per-job SV best-so-far trajectories.
+
+    Like :func:`parse_sv_history` but preserves job boundaries.  Each job's
+    SV sequence starts fresh from its own first accepted evaluation but
+    inherits the global running minimum from all preceding jobs.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+
+    Returns
+    -------
+    dict[str, list of float]
+        Mapping from job id (e.g. ``'000'``, ``'001'``) to the list of
+        global best-SV-so-far values recorded within that job.  Jobs with no
+        accepted evaluations are omitted.  Empty dict if no evaluations are
+        recorded yet.
+
+    Examples
+    --------
+    ::
+
+        per_job = parse_sv_history_per_job(run_info.analysis_folder)
+        for job_id, svs in per_job.items():
+            print(f"job {job_id}: {len(svs)} evals, best SV = {svs[-1]:.1f}")
+    """
+    import os, re
+    import numpy as np
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return {}
+
+    result = {}
+    global_best_fv = None
+
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        content = open(cb, encoding="utf-8", errors="replace").read()
+        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
+        if not fvals:
+            continue
+
+        job_svs = []
+        for fv in fvals:
+            if global_best_fv is None or fv < global_best_fv:
+                global_best_fv = fv
+            sv = -200 / (1 + np.exp(-1.5 * global_best_fv)) + 100
+            job_svs.append(float(sv))
+        result[jobid] = job_svs
+
+    return result
+
+
 def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     """Read callback.txt(s) from all jobs and report best SV so far.
 
