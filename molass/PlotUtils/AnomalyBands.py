@@ -16,17 +16,31 @@ def get_anomaly_mask_from_ssd(ssd):
     Returns (jv, mask) where mask is a boolean array, or (None, None)
     if no anomaly information is available.
 
-    Only returns a mask when ``corrected_copy()`` has cached a concrete
-    boolean array in ``xr.anomaly_mask``.  The auto-detect mode
-    (``has_anomaly_mask=True``, ``anomaly_mask=None``) is NOT resolved
-    here because the recognition-curve test only makes sense after
-    baseline correction.
+    Handles both concrete boolean arrays (from ``corrected_copy()``) and
+    ``slice`` objects (stored by ``set_anomaly_mask()`` on trimmed data),
+    converting the latter to a boolean array over ``jv``.
     """
     xr = ssd.xr
     xr_mask = getattr(xr, 'anomaly_mask', None)
 
-    if xr_mask is not None and hasattr(xr_mask, 'any') and xr_mask.any():
-        return xr.jv, xr_mask
+    if xr_mask is None:
+        return None, None
+
+    jv = xr.jv
+
+    # Slice stored by set_anomaly_mask() — convert to boolean array over jv
+    if isinstance(xr_mask, slice):
+        bool_mask = np.zeros(len(jv), dtype=bool)
+        i0 = np.searchsorted(jv, xr_mask.start)
+        i1 = np.searchsorted(jv, xr_mask.stop, side='right')
+        bool_mask[i0:i1] = True
+        if bool_mask.any():
+            return jv, bool_mask
+        return None, None
+
+    # Concrete boolean array (from corrected_copy())
+    if hasattr(xr_mask, 'any') and xr_mask.any():
+        return jv, xr_mask
 
     return None, None
 

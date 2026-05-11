@@ -570,11 +570,33 @@ class SecSaxsData:
         return ret_method
 
     def set_anomaly_mask(self, mask=None):
-        """Declare that this dataset contains anomalous frames to exclude from baseline fitting.
+        """Declare that this dataset contains anomalous frames to exclude.
 
         Delegates to ``self.xr.set_anomaly_mask()`` (and ``self.uv``
         if present).  See :meth:`SsMatrixData.set_anomaly_mask` for
         full documentation.
+
+        When *mask* is ``None`` (the default), this method first tries
+        :meth:`~molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly`
+        on the **pre-correction** recognition curve.  If a region is found,
+        it is used as an explicit mask (equivalent to passing it directly).
+        If nothing is found, the mask is stored as ``None`` and detection is
+        deferred to ``corrected_copy()``, which checks the post-correction
+        recognition curve instead — with a UserWarning so the caller is aware.
+
+        **Effect on downstream steps**:
+
+        - ``corrected_copy()`` — excluded frames are **linearly interpolated**
+          in the XR data matrix (and the corresponding UV frames via the
+          XR↔UV mapping), then excluded from the LPM baseline anchor pool.
+          The interpolated data is what the corrected SSD carries.
+        - ``optimize_rigorously()`` — when ``trimmed_ssd`` is provided
+          (Pattern B), the trimmed data is interpolated in the same way
+          before the optimizer sees it.  The optimizer therefore never
+          evaluates the objective on anomaly frames; the smooth bridge
+          values are fitted instead.  The MplMonitor dashboard marks
+          these regions with translucent bands so the interpolated section
+          is visually distinguishable from real data.
 
         .. note::
             For mild anomalies, prefer ``allow_negative_peaks=True`` in
@@ -587,9 +609,44 @@ class SecSaxsData:
         ----------
         mask : array-like of bool, slice, or None, optional
             Frames to exclude.  When a ``slice`` is given, start/stop are
-            interpreted as frame numbers.
+            interpreted as frame numbers.  When ``None``, auto-detection
+            via :meth:`~molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly`
+            is attempted first.
+
+        Returns
+        -------
+        slice or None
+            The detected anomaly slice when auto-detection was used, or
+            *mask* when an explicit mask was supplied, or ``None``.
+
+        See Also
+        --------
+        SsMatrixData.detect_anomaly : Pre-correction anomaly detection algorithm.
         """
         import numpy as np
+        import warnings
+
+        # Auto-detect from pre-correction recognition curve
+        if mask is None:
+            detected = self.xr.detect_anomaly()
+            if detected is not None:
+                mask = detected
+                warnings.warn(
+                    f"set_anomaly_mask(): anomaly auto-detected at frames "
+                    f"{detected.start}–{detected.stop - 1} "
+                    f"({detected.stop - detected.start} frames). "
+                    f"Pass mask=slice({detected.start}, {detected.stop}) to suppress this message.",
+                    UserWarning, stacklevel=2,
+                )
+            else:
+                warnings.warn(
+                    "set_anomaly_mask(): no anomaly found in the pre-correction recognition curve. "
+                    "Detection is deferred to corrected_copy() (post-correction). "
+                    "If you know the frame range, pass it explicitly: "
+                    "ssd.set_anomaly_mask(mask=slice(start, stop)).",
+                    UserWarning, stacklevel=2,
+                )
+
         # Capture pre-mask signal range for safety check
         pre_range = np.ptp(self.xr.get_icurve().y)
 
@@ -600,13 +657,14 @@ class SecSaxsData:
         # Safety check: warn if signal was drastically reduced (issue #75)
         post_range = np.ptp(self.xr.get_icurve().y)
         if pre_range > 0 and post_range / pre_range < 0.1:
-            import warnings
             warnings.warn(
                 f"XR signal range dropped by {(1 - post_range/pre_range)*100:.0f}% after anomaly masking "
                 f"({pre_range:.2e} -> {post_range:.2e}). The mask may be too aggressive. "
                 f"Consider using allow_negative_peaks=True in quick_decomposition() instead.",
                 stacklevel=2,
             )
+
+        return mask
 
     def set_allow_negative_peaks(self, value=True, mask=None):
         """Deprecated: use ``set_anomaly_mask(mask)`` instead."""
@@ -711,6 +769,7 @@ class SecSaxsData:
 
         ssd_copy.time_required = time() - start_time
         ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
+        ssd_copy.corrected = True  # flag for optimize_rigorously() Pattern A/B warning (#164)
         return ssd_copy
 
     @staticmethod

@@ -106,7 +106,7 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -247,6 +247,28 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                                                     construct_legacy_optimizer
                                                     )
 
+    # Warn when Pattern A is used (no trimmed_ssd, but decomposition.ssd is corrected).
+    # Pattern B (trimmed_ssd=trimmed) is recommended: the optimizer fits baseline
+    # as a free parameter on uncorrected data, avoiding any LPM bias baked into D.
+    # Pattern A is mathematically valid at the global optimum but pre-commits to
+    # the LPM baseline, which can be biased (e.g. negative on anomaly datasets).
+    # See molass-library#163 (comment) and #164 for background.
+    #
+    # PLACEMENT CONSTRAINT: this block must remain ABOVE the `with _stack:` context
+    # manager below.  The _stack enters warnings.simplefilter("ignore"), which would
+    # swallow this warning silently.  Do NOT move this block inside `with _stack:`.
+    if trimmed_ssd is None and getattr(decomposition.ssd, 'corrected', False):
+        import warnings as _w
+        _w.warn(
+            "optimize_rigorously() is running on corrected data (Pattern A). "
+            "The recommended approach is to pass trimmed_ssd=<your trimmed SSD> (Pattern B), "
+            "which lets the optimizer fit the baseline as a free parameter on uncorrected data. "
+            "This is safe to ignore, but may produce a suboptimal initial baseline "
+            "if the LPM correction is biased.",
+            UserWarning,
+            stacklevel=3,   # chain: user cell → Decomposition.optimize_rigorously → here
+        )
+
     # If the trimmed data has anomaly-masked frames, interpolate them
     # on a copy so the optimizer doesn't try to fit physically anomalous
     # signal.  This mirrors corrected_copy()'s _interpolate_excluded step.
@@ -255,6 +277,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # subtraction — uncorrected sums remain positive.
     if trimmed_ssd is not None:
         trimmed_ssd = _apply_anomaly_interpolation(trimmed_ssd, corrected_ssd=decomposition.ssd)
+
+    # Dry-run mode: fire all pre-flight checks (above) and return without
+    # building the optimizer.  Used by tests to verify warnings and guards
+    # without running the full heavy pipeline.  (molass-library#165)
+    if _dry_run:
+        return None
 
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
@@ -436,6 +464,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 mon.show()
                 mon.start_watching()
                 run_info.monitor = mon
+                # Pass anomaly mask to monitor for consistent band display
+                from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
+                _jv, _mask = get_anomaly_mask_from_ssd(decomposition.ssd)
+                if _jv is not None:
+                    mon.anomaly_jv = _jv
+                    mon.anomaly_mask = _mask
         else:
             run_info._async_thread = None
             _run_in_process()

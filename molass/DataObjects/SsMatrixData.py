@@ -262,6 +262,91 @@ class SsMatrixData:
     def negative_peak_mask(self, value):
         self.anomaly_mask = value
 
+    def detect_anomaly(self, sigma_scale=3.0, buffer_fraction=0.1):
+        """Detect the anomalous frame range from the pre-correction recognition curve.
+
+        Uses a three-step algorithm:
+
+        1. Estimate buffer-zone noise σ from the first and last
+           ``buffer_fraction`` fraction of frames.
+        2. Find the largest contiguous run of frames below
+           ``-sigma_scale * σ`` (the "deep-negative core").
+        3. Expand the core outward while the recognition curve
+           remains negative (fringe expansion).
+
+        This algorithm works on the **pre-correction** recognition curve, so
+        it can be called before ``corrected_copy()`` and the result passed
+        directly to ``set_anomaly_mask(mask=slice(start, stop))``.
+
+        Parameters
+        ----------
+        sigma_scale : float, optional
+            Threshold multiplier for the deep-negative core.  Default 3.0.
+        buffer_fraction : float, optional
+            Fraction of frames at each end used to estimate noise σ.
+            Default 0.1 (first and last 10 %).
+
+        Returns
+        -------
+        slice or None
+            A slice of frame numbers ``slice(start, stop)`` covering the
+            detected anomaly region, or ``None`` if no anomaly was found.
+
+        Examples
+        --------
+        >>> anom = ssd.xr.detect_anomaly()
+        >>> if anom is not None:
+        ...     ssd.set_anomaly_mask(mask=anom)
+        >>> corrected = ssd.corrected_copy()
+        """
+        rc_y = self.get_recognition_curve().y
+        jv = self.jv
+        n = len(rc_y)
+
+        # Step 1: buffer-zone noise from first+last buffer_fraction of frames
+        k = max(1, int(n * buffer_fraction))
+        buffer_zone = np.concatenate([rc_y[:k], rc_y[-k:]])
+        noise_sigma = buffer_zone.std()
+        if noise_sigma == 0:
+            return None
+        threshold = -sigma_scale * noise_sigma
+
+        # Step 2: find largest contiguous run of frames below threshold
+        below = rc_y < threshold
+        if not below.any():
+            return None
+
+        # Walk the boolean array to collect runs
+        best_start = best_len = 0
+        cur_start = cur_len = 0
+        in_run = False
+        for i, b in enumerate(below):
+            if b:
+                if not in_run:
+                    cur_start = i
+                    cur_len = 1
+                    in_run = True
+                else:
+                    cur_len += 1
+                if cur_len > best_len:
+                    best_len = cur_len
+                    best_start = cur_start
+            else:
+                in_run = False
+
+        if best_len == 0:
+            return None
+
+        # Step 3: expand outward while rc_y < 0
+        lo = best_start
+        hi = best_start + best_len - 1
+        while lo > 0 and rc_y[lo - 1] < 0:
+            lo -= 1
+        while hi < n - 1 and rc_y[hi + 1] < 0:
+            hi += 1
+
+        return slice(int(jv[lo]), int(jv[hi]) + 1)
+
     def get_baseline2d(self, **kwargs):
         """Get the 2D baseline for the matrix data using the specified method.
 
