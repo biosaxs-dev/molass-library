@@ -106,6 +106,62 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
+def _load_best_init_params(analysis_folder, init_params):
+    """Load the best params from previous jobs when resuming (``clear_jobs=False``).
+
+    Scans ``analysis_folder/optimized/jobs/*/callback.txt``, finds the job
+    with the global minimum ``fv``, and returns the corresponding best params.
+
+    Returns ``None`` if no valid previous jobs are found (so the caller falls
+    back to the original ``decomp``-derived ``init_params``).
+
+    The length of the returned array is verified against ``init_params`` to
+    guard against mismatched runs (e.g. different ``num_components``).
+    """
+    jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+    if not os.path.isdir(jobs_dir):
+        return None
+
+    try:
+        from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
+        from molass_legacy.Optimizer.Scripting import get_params
+    except ImportError:
+        return None
+
+    best_fv = None
+    best_job = None
+
+    for job_name in sorted(os.listdir(jobs_dir)):
+        job_dir = os.path.join(jobs_dir, job_name)
+        cb_file = os.path.join(job_dir, "callback.txt")
+        if not os.path.isfile(cb_file):
+            continue
+        try:
+            fv_list, _ = read_callback_txt_impl(cb_file)
+            if not fv_list:
+                continue
+            job_best_fv = min(entry[1] for entry in fv_list)
+            if best_fv is None or job_best_fv < best_fv:
+                best_fv = job_best_fv
+                best_job = job_dir
+        except Exception:
+            continue
+
+    if best_job is None:
+        return None
+
+    try:
+        best = get_params(best_job)
+        if best is not None and len(best) == len(init_params):
+            print(f"Resume: loading best params from {os.path.basename(best_job)} "
+                  f"(fv={best_fv:.4f}) as init_params.")
+            return best
+    except Exception:
+        pass
+
+    return None
+
+
 def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False):
     """
     Make a rigorous decomposition using a given RG curve.
@@ -360,6 +416,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         set_optimizer_settings(num_components=num_components, model=model, method=method)
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
+        # When resuming (clear_jobs=False), override with the best params found
+        # across previous jobs — starting from the best known point is almost
+        # always better than starting from the initial decomp params (#169).
+        if not clear_jobs:
+            _resume_init = _load_best_init_params(analysis_folder, init_params)
+            if _resume_init is not None:
+                init_params = _resume_init
         optimizer.prepare_for_optimization(init_params)
 
     # run optimization (outside _quiet — subprocess launch message is useful)

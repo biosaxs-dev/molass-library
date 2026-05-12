@@ -996,6 +996,10 @@ class Decomposition:
             If True (default), existing job folders are cleared before starting.
             Set to False after a kernel restart to preserve previous job results
             and reconstruct RunInfo without losing optimization history.
+            When False and previous jobs exist, the best params found so far are
+            automatically used as ``init_params`` for the new trial (resuming
+            from the best known point rather than the original decomp params,
+            see issue #169).
         in_process : bool, optional
             If True (default), run the optimizer in this Python process instead of
             spawning a subprocess.  Avoids the parent/subprocess data-derivation
