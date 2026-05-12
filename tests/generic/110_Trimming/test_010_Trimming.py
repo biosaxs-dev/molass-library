@@ -29,5 +29,23 @@ def test_020_adaptive_nsigmas():
     # Trimming should retain data (not crash)
     assert len(trimmed.xr.jv) > 0
 
+def test_030_uv_wavelength():
+    """Verify trimmed_copy(uv_wavelength=(None, 550)) clips UV to <= 550 nm."""
+    from molass.DataObjects import SecSaxsData as SSD
+    from molass_data import SAMPLE1
+    ssd = SSD(SAMPLE1)
+    wl_max = 550.0
+    trimmed = ssd.trimmed_copy(uv_wavelength=(None, wl_max))
+    assert trimmed.uv is not None, "UV data should be present"
+    uv_wl = trimmed.uv.wavelengths
+    assert uv_wl.max() <= wl_max, (
+        f"UV wavelengths should be <= {wl_max} nm, got max={uv_wl.max():.1f}"
+    )
+    # Default trimming (no uv_wavelength) should produce more wavelengths
+    trimmed_default = ssd.trimmed_copy()
+    assert len(trimmed_default.uv.wavelengths) >= len(uv_wl), (
+        "Clipped trimming should have no more wavelengths than the default"
+    )
+
 if __name__ == "__main__":
     test_010_PKS()

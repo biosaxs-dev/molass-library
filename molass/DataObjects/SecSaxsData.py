@@ -472,8 +472,8 @@ class SecSaxsData:
                            beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
-    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None):
-        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None)
 
         Parameters
         ----------
@@ -486,6 +486,12 @@ class SecSaxsData:
             It must be provided if `jranges` is specified.
         nsigmas : int or float, optional
             If specified, passed to make_trimming() to control the σ-window width.
+        uv_wavelength : tuple of (float or None, float or None), optional
+            UV wavelength range in nm to include, as ``(wl_min, wl_max)``.
+            Use ``None`` for either end to keep the dataset default
+            (``None`` on the min side uses the instrument's usable wavelength start,
+            typically ~250 nm; ``None`` on the max side uses the full upper end).
+            Example: ``uv_wavelength=(None, 550)`` trims UV to ≤ 550 nm.
 
         Returns
         -------
@@ -496,10 +502,19 @@ class SecSaxsData:
         from molass.Global.Quiet import suppress_if_quiet
         with suppress_if_quiet():
             if trimming is None:
+                uv_wr = None
+                if uv_wavelength is not None and self.uv is not None:
+                    from bisect import bisect_right
+                    wl_min_nm, wl_max_nm = uv_wavelength
+                    default_start, default_stop = self.uv.get_usable_wrange()
+                    wl = self.uv.wv
+                    start = bisect_right(wl, wl_min_nm) if wl_min_nm is not None else default_start
+                    stop  = bisect_right(wl, wl_max_nm) if wl_max_nm is not None else default_stop
+                    uv_wr = (start, stop)
                 if nsigmas is not None:
-                    trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+                    trimming = self.make_trimming(nsigmas=nsigmas, uv_wr=uv_wr, debug=False)
                 else:
-                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
+                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, uv_wr=uv_wr, debug=False)
             else:
                 assert jranges is None, "jranges must be None if trimming is specified."
                 assert nsigmas is None, "nsigmas must be None if trimming is specified."
@@ -977,6 +992,7 @@ class SecSaxsData:
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',
             'curve_model', 'smoothing', 'decompargs', 'peakpositions',
             'smooth_uv', 'consistent_uv', 'ip_effect_info',
+            'rgcurve',
         }
         unknown = set(kwargs) - _KNOWN_KWARGS
         if unknown:
@@ -1008,9 +1024,13 @@ class SecSaxsData:
             except Exception:
                 pass  # detect_peaks may fail on edge cases; don't block decomposition
 
+        rgcurve = kwargs.pop('rgcurve', None)
         from molass.Global.Quiet import suppress_if_quiet
         with suppress_if_quiet(debug=debug):
-            return make_decomposition_impl(self, num_components, **kwargs)
+            result = make_decomposition_impl(self, num_components, **kwargs)
+            if rgcurve is not None:
+                result._rgcurve = rgcurve
+            return result
 
     def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.rigorous_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)

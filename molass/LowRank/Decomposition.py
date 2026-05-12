@@ -274,7 +274,9 @@ class Decomposition:
             plt.title("Rg vs. elution frame")
             plt.show()
         """
-        return self.xr.compute_rgcurve()
+        if getattr(self, '_rgcurve', None) is None:
+            self._rgcurve = self.xr.compute_rgcurve()
+        return self._rgcurve
 
     def compute_reconstructed_rgcurve(self, debug=False):
         """Compute the reconstructed Rg curve as a concentration-weighted average.
