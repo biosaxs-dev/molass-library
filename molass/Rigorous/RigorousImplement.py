@@ -358,6 +358,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         _stack.enter_context(_wctx)
         _warnings.simplefilter("ignore")
 
+    # Capture the original input data folder before prepare_rigorous_folders may
+    # overwrite the global 'in_folder' setting with the temp export directory.
+    from molass_legacy.SerialAnalyzer.DataUtils import get_in_folder as _get_in_folder_raw
+    _original_in_folder = _get_in_folder_raw()
+
     with _stack:
         dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug)
 
@@ -527,6 +532,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 mon.show()
                 mon.start_watching()
                 run_info.monitor = mon
+                # Store original input path so draw_suptitle shows real data folder
+                # (not the temp_in_folder that prepare_rigorous_folders may set)
+                mon.input_folder = _original_in_folder
                 # Pass anomaly mask to monitor for consistent band display
                 from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
                 _jv, _mask = get_anomaly_mask_from_ssd(decomposition.ssd)
