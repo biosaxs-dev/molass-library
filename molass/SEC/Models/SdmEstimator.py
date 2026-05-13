@@ -110,6 +110,16 @@ def estimate_sdm_column_params(decomposition, **kwargs):
             return modeled_moments
         return error
 
+    # The void volume t0 must precede every component peak — it represents where
+    # completely-excluded particles elute. Without an upper bound, the optimizer
+    # finds a degenerate solution: t0 ≈ main-peak position, N*T → 0. This looks
+    # good for M1 but produces physically meaningless column parameters and causes
+    # the XR decomposition to place components at the wrong frame positions.
+    min_peak_frame = float(min(cx[cy.argmax()] for ccurve in xr_ccurves
+                               for cx, cy in [ccurve.get_xy()]))
+    t0_upper = min_peak_frame - 1  # void volume must be before the first component
+    t0_init = min_peak_frame * 0.5  # start midway between 0 and the first component
+
     # Multi-start search: this objective has two basins (symmetric: large
     # poresize / small T;  asymmetric: small poresize / large T). The M3 term
     # discriminates between them but a single Nelder-Mead start often gets
@@ -117,13 +127,13 @@ def estimate_sdm_column_params(decomposition, **kwargs):
     # See issue #111 discussion.
     lo, hi = poresize_bounds
     if N0_fixed is None:
-        bounds = [(100, 5000), (1e-3, 5), N0_bounds, (-1000, 1000), poresize_bounds]
+        bounds = [(100, 5000), (1e-3, 5), N0_bounds, (0, t0_upper), poresize_bounds]
         def make_init(ps):
-            return [500, 1.0, 10000, 0, ps]
+            return [500, 1.0, 10000, t0_init, ps]
     else:
-        bounds = [(100, 5000), (1e-3, 5), (-1000, 1000), poresize_bounds]
+        bounds = [(100, 5000), (1e-3, 5), (0, t0_upper), poresize_bounds]
         def make_init(ps):
-            return [500, 1.0, 0, ps]
+            return [500, 1.0, t0_init, ps]
 
     poresize_starts = sorted(set([
         lo + 0.1*(hi - lo),
