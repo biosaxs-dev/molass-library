@@ -109,7 +109,7 @@ def recommend_num_components(
     """Recommend ``num_components`` by detecting degeneracy at ``k+1``.
 
     For each ``k in 1..k_max``, runs a fresh
-    ``ssd.quick_decomposition(num_components=k).optimize_with_model(model, ...)``
+    ``ssd.quick_decomposition(num_components=k).upgrade(model, ...)``
     on ``decomp.ssd``, then computes four diagnostics:
 
     - ``residual = ||M - PC|| / ||M||``  (P solved as ``M @ pinv(C)``)
@@ -130,10 +130,10 @@ def recommend_num_components(
     k_max : int, optional
         Maximum ``num_components`` to try. Default 3.
     model : str, optional
-        Model name passed to :meth:`Decomposition.optimize_with_model`.
+        Model name passed to :meth:`Decomposition.upgrade`.
         Default ``'SDM'``.
     rgcurve : Curve, optional
-        Rg curve to pass to ``optimize_with_model``. If ``None``, computed
+        Rg curve to pass to ``upgrade``. If ``None``, computed
         once via ``decomp.ssd.xr.compute_rgcurve()``.
     rt_dist : str, optional
         SDM residence-time distribution (``'gamma'`` or ``'exponential'``).
@@ -155,7 +155,7 @@ def recommend_num_components(
     Notes
     -----
     Verified across 7 datasets (SAMPLE1-4 + Apo + ATP + MY) - see issue #116.
-    The diagnostic uses ``optimize_with_model`` (cheap, ~seconds per fit), not
+    The diagnostic uses ``upgrade`` (cheap, ~seconds per fit), not
     rigorous optimization.
     """
     ssd = decomp.ssd
@@ -178,13 +178,13 @@ def recommend_num_components(
                      warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     d_k = ssd.quick_decomposition(num_components=k)
-                    d_opt = d_k.optimize_with_model(
+                    d_opt = d_k.upgrade(
                         model, rgcurve=rgcurve,
                         model_params={"rt_dist": rt_dist},
                         debug=debug)
             else:
                 d_k = ssd.quick_decomposition(num_components=k)
-                d_opt = d_k.optimize_with_model(
+                d_opt = d_k.upgrade(
                     model, rgcurve=rgcurve,
                     model_params={"rt_dist": rt_dist},
                     debug=debug)

@@ -782,14 +782,18 @@ class Decomposition:
         scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
         return peak_top_xes, scd_colors
     
-    def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False, **kwargs):
+    def upgrade(self, model, *, rgcurve=None, model_params=None, debug=False, **kwargs):
         """
-        Optimize the decomposition with a model.
+        Upgrade the decomposition to a physics-aware column model (SDM or EDM).
+
+        Replaces the EGH elution model with a more physically realistic
+        column model, using the EGH shape parameters as a starting point
+        for column-parameter estimation.
 
         Parameters
         ----------
-        model_name : str
-            The name of the model to use for optimization.
+        model : str
+            The name of the column model to use.
 
             Supported models:
 
@@ -820,10 +824,21 @@ class Decomposition:
             import molass.SEC.ModelFactory
             reload(molass.SEC.ModelFactory)
         from molass.SEC.ModelFactory import create_model
-        model = create_model(model_name, debug=debug)
-        return model.optimize_decomposition(self, rgcurve=rgcurve,
-                                            model_params=model_params,
-                                            debug=debug, **kwargs)
+        sec_model = create_model(model, debug=debug)
+        return sec_model.optimize_decomposition(self, rgcurve=rgcurve,
+                                                model_params=model_params,
+                                                debug=debug, **kwargs)
+
+    def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False, **kwargs):
+        """Deprecated. Use :meth:`upgrade` instead."""
+        import warnings
+        warnings.warn(
+            "optimize_with_model is deprecated; use upgrade() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.upgrade(model_name, rgcurve=rgcurve, model_params=model_params,
+                            debug=debug, **kwargs)
 
     def recommend_num_components(self, k_max=3, model="SDM", rgcurve=None,
                                  rt_dist="gamma",
@@ -833,7 +848,7 @@ class Decomposition:
         Recommend ``num_components`` by detecting degeneracy at ``k+1``.
 
         Sweeps ``k in 1..k_max`` on this decomposition's ``ssd``, runs
-        :meth:`optimize_with_model` for each ``k``, and applies a 4-metric
+        :meth:`upgrade` for each ``k``, and applies a 4-metric
         diagnostic (residual, ``cond(C)``, ``max cos(C[i],C[j])``, amp ratio)
         plus the decision rule from issue #116. See
         :func:`molass.LowRank.NumComponentsRecommender.recommend_num_components`
@@ -844,7 +859,7 @@ class Decomposition:
         k_max : int, optional
             Maximum ``num_components`` to try. Default 3.
         model : str, optional
-            Model name forwarded to :meth:`optimize_with_model`. Default ``'SDM'``.
+            Model name forwarded to :meth:`upgrade`. Default ``'SDM'``.
         rgcurve : Curve, optional
             Rg curve. If ``None``, computed via ``self.ssd.xr.compute_rgcurve()``.
         rt_dist : str, optional
@@ -1062,8 +1077,8 @@ class Decomposition:
         (``self.xr_ccurves[0].model``).  Passing ``model=`` raises
         ``TypeError: Unexpected keyword arguments``.
 
-        To optimize with a different model, use
-        :meth:`optimize_with_model` instead.  That method handles
+        To upgrade to a different column model, use
+        :meth:`upgrade` instead.  That method handles
         EGH → SDM/EDM parameter conversion internally, using the EGH
         shape parameters as a starting point for column-parameter
         estimation.
@@ -1074,7 +1089,7 @@ class Decomposition:
             run_info = decomp.optimize_rigorously(             # refine EGH
                 analysis_folder='temp_analysis_apo_egh', ...)
             result_egh = run_info.load_best()
-            run_info_sdm = result_egh.optimize_with_model(     # EGH -> SDM
+            run_info_sdm = result_egh.upgrade(                 # EGH -> SDM
                 'SDM', analysis_folder='temp_analysis_apo_sdm', ...)
 
         See Also
