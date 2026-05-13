@@ -128,7 +128,12 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         bounds += [(0.5, 10.0)]      # k free for gamma
     bounds += [(rg*0.5, rg*1.5) for rg in rgv]
     upper_scale = xr_icurve.get_max_y() * 1000      # upper bounds for scales seem be large enough
-    bounds += [(1e-3, upper_scale) for _ in range(num_components)]
+    # Lower bound must accommodate initial_scales, which can be much smaller than
+    # 1e-3 for datasets with large frame ranges or small signal amplitudes (e.g. MY).
+    # Using a fixed 1e-3 causes the optimizer to start at the lower-bound wall and
+    # never move below it, producing wrong fits.
+    lower_scale = max(min(initial_scales) * 1e-2, 1e-15) if initial_scales else 1e-15
+    bounds += [(lower_scale, upper_scale) for _ in range(num_components)]
     if model_params is None:
         method = None
     else:
