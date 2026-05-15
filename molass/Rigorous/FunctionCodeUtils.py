@@ -37,6 +37,8 @@ def detect_function_code(decomposition):
         to use the default for the model.
     """
     ccurve = decomposition.xr_ccurves[0]
+    if ccurve.model == "cedm":
+        return 'G2020'
     if ccurve.model != "sdm":
         return None
     column = ccurve.column

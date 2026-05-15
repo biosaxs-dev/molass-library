@@ -93,3 +93,73 @@ def test_e_bounds_none_disables_constraint():
     # Just check it runs without error; we do not assert on the e value
     ccurves_opt = optimize_edm_xr_decomposition(decomp, init, e_bounds=None)
     assert len(ccurves_opt) == 1
+
+
+def test_shared_column_returns_correct_number_of_curves():
+    """shared_column=True must return one EdmComponentCurve per component,
+    with shared t0/u/e/Dz, per-component a/b/cinj, and physical bounds met."""
+
+    x = np.linspace(50, 200, 300)
+
+    # Two synthetic EDM components with known peak positions and different amplitudes
+    # (different cinj breaks the swap-symmetry so the optimizer converges reliably).
+    # Use the actual EDM signal as the target data so the optimizer has a clear minimum.
+    # Component 0 (larger molecule, earlier elution): a=0.8, cinj=2.0
+    # Component 1 (smaller molecule, later elution):  a=2.0, cinj=0.5
+    p0 = _make_edm_params(t0=70.0, u=1.2, a=0.8, b=0.5, e=0.45, Dz=0.01, cinj=2.0)
+    p1 = _make_edm_params(t0=70.0, u=1.2, a=2.0, b=0.5, e=0.45, Dz=0.01, cinj=0.5)
+
+    y0 = edm_impl(x, *p0)
+    y1 = edm_impl(x, *p1)
+
+    peak_frame_0 = float(x[np.argmax(y0)])
+    peak_frame_1 = float(x[np.argmax(y1)])
+
+    # Use Gaussian position-anchors at the EDM peak locations
+    ccurve0 = _FakeCurve(x, peak_frame_0, amplitude=2.0)
+    ccurve1 = _FakeCurve(x, peak_frame_1, amplitude=0.5)
+
+    # Use actual EDM sum as target data (not Gaussian sum) — gives the optimizer
+    # a clear minimum near the true parameters.
+    class _EDMDecomposition:
+        def __init__(self, x, y, ccurves):
+            self.xr_icurve = _FakeIcurve(x, y)
+            self.xr_ccurves = ccurves
+            self.num_components = len(ccurves)
+
+    decomp = _EDMDecomposition(x, y0 + y1, [ccurve0, ccurve1])
+    init = np.array([p0, p1])
+
+    ccurves_opt = optimize_edm_xr_decomposition(decomp, init, shared_column=True)
+
+    # Correct number of components returned
+    assert len(ccurves_opt) == 2
+
+    # All components share t0, u, e, Dz (identical float values)
+    t0_vals = [c.params[0] for c in ccurves_opt]
+    u_vals  = [c.params[1] for c in ccurves_opt]
+    e_vals  = [c.params[4] for c in ccurves_opt]
+    Dz_vals = [c.params[5] for c in ccurves_opt]
+    assert t0_vals[0] == pytest.approx(t0_vals[1], rel=1e-9), "t0 must be shared"
+    assert u_vals[0]  == pytest.approx(u_vals[1],  rel=1e-9), "u must be shared"
+    assert e_vals[0]  == pytest.approx(e_vals[1],  rel=1e-9), "e must be shared"
+    assert Dz_vals[0] == pytest.approx(Dz_vals[1], rel=1e-9), "Dz must be shared"
+
+    # e stays in physical range (0.2, 0.85)
+    for i, c in enumerate(ccurves_opt):
+        e_val = c.params[4]
+        assert 0.2 <= e_val <= 0.85, f"Component {i}: e={e_val:.4f} outside (0.2, 0.85)"
+
+    # cinj stays at or above cinj_min=0.05
+    for i, c in enumerate(ccurves_opt):
+        cinj_val = c.params[6]
+        assert cinj_val >= 0.05, f"Component {i}: cinj={cinj_val:.4f} below cinj_min"
+
+    # K_SEC order preserved: component 0 (anchored near peak_frame_0 < peak_frame_1)
+    # must have smaller a than component 1.  This is the key correctness criterion:
+    # larger a → more retained → later elution.
+    a0, a1 = ccurves_opt[0].params[2], ccurves_opt[1].params[2]
+    assert a0 < a1, (
+        f"K_SEC order wrong: a[0]={a0:.4f} >= a[1]={a1:.4f}, "
+        f"but comp 0 peaks at {peak_frame_0:.1f} < comp 1 at {peak_frame_1:.1f}"
+    )

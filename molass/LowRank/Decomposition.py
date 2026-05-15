@@ -929,6 +929,12 @@ class Decomposition:
                 reload(molass.Rigorous.RigorousEdmParams)
             from molass.Rigorous.RigorousEdmParams import make_rigorous_initparams_impl
             return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        elif self.model == 'cedm':
+            if debug:
+                import molass.Rigorous.RigorousCedmParams
+                reload(molass.Rigorous.RigorousCedmParams)
+            from molass.Rigorous.RigorousCedmParams import make_rigorous_initparams_impl
+            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 

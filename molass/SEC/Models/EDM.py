@@ -30,6 +30,10 @@ class EDM:
             The optimized decomposition.
         """
         debug = kwargs.get('debug', False)
+        # Merge constructor kwargs (e.g. shared_column set by ModelFactory for CEDM)
+        # with call-time kwargs; call-time values take precedence.
+        merged = {**self.kwargs, **kwargs}
+        kwargs = merged
         if debug:
             from importlib import reload
             import molass.SEC.Models.EdmEstimator

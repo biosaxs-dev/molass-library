@@ -106,6 +106,8 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
             optimizer.params_type.get_estimator(editor, t0_upper_bound=t0upper_bound, debug=debug)
         elif model == "EDM":
             optimizer.params_type.get_estimator(editor, developing=True, debug=debug)
+        elif model == "CEDM":
+            pass  # CedmParams uses RigorousCedmParams for init; no legacy estimator needed
     
     return optimizer
 

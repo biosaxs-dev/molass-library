@@ -48,7 +48,7 @@ class EdmComponentCurve(ComponentCurve):
     params : tuple
         The parameters of the EDM column (N, T, me, mp, x0,
     """
-    def __init__(self, x, params):
+    def __init__(self, x, params, model='edm'):
         """
         Initializes the EDM component curve.
         Parameters
@@ -57,11 +57,14 @@ class EdmComponentCurve(ComponentCurve):
             The x values.
         params : tuple
             The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).
+        model : str, optional
+            Model tag.  Use ``'cedm'`` for constrained-EDM curves where
+            t0, u, e, Dz are shared across components (default ``'edm'``).
         """
         self.x = x
         self.params = params
         self.moment = None
-        self.model = 'edm'
+        self.model = model
     
     def get_y(self, x=None):
         """
