@@ -56,13 +56,34 @@ def get_edm_xr_ccurves(optimizer, xr_icurve, separated_params):
         xr_ccurves.append(EdmComponentCurve(x, p))
     return xr_ccurves
 
+def get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params):
+    """Reconstruct EdmComponentCurve objects for CEDM (constrained-EDM).
+
+    CEDM stores shared column params (t0, u, e, Dz) as separated_params[7]
+    and per-component params (a, b, cinj) as separated_params[0] (nc×3).
+    Reconstruct the full 7-param vector expected by edm_impl:
+        [t0_sh, u_sh, a_k, b_k, e_sh, Dz_sh, cinj_k]
+    """
+    import numpy as np
+    from molass.SEC.Models.EdmComponentCurve import EdmComponentCurve
+    xr_params_abc = separated_params[0]   # shape (nc, 3): (a, b, cinj) per component
+    t0_sh, u_sh, e_sh, Dz_sh = separated_params[7]  # shared column params
+    x = xr_icurve.x
+    xr_ccurves = []
+    for a_k, b_k, cinj_k in xr_params_abc:
+        full_params = np.array([t0_sh, u_sh, a_k, b_k, e_sh, Dz_sh, cinj_k])
+        xr_ccurves.append(EdmComponentCurve(x, full_params))
+    return xr_ccurves
+
 def get_xr_ccurves(optimizer, xr_icurve, separated_params):
     model_name = optimizer.get_model_name()
     if model_name == 'EGH':
         return get_egh_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'SDM':
         return get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name in ('EDM', 'CEDM'):
+    elif model_name == 'EDM':
         return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
+    elif model_name == 'CEDM':
+        return get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params)
     else:
         raise ValueError(f"Unknown model_name: {model_name}")
