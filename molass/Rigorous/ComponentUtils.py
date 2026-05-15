@@ -62,7 +62,7 @@ def get_xr_ccurves(optimizer, xr_icurve, separated_params):
         return get_egh_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'SDM':
         return get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name == 'EDM':
+    elif model_name in ('EDM', 'CEDM'):
         return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
     else:
         raise ValueError(f"Unknown model_name: {model_name}")

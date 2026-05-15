@@ -62,7 +62,8 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             - ``e_bounds`` kwarg (same meaning as the top-level kwarg)
             - ``cinj_min`` kwarg
 
-            Default False.
+            Default True.  Pass ``False`` to use unconstrained (free) EDM,
+            which is deprecated and will be removed in a future release.
 
     Returns
     -------
@@ -170,7 +171,18 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             new_xr_ccurves.append(EdmComponentCurve(x, full_params))
         return new_xr_ccurves
 
-    shared_column = kwargs.get('shared_column', False)
+    _unset = object()
+    shared_column = kwargs.get('shared_column', _unset)
+    if shared_column is _unset:
+        shared_column = True  # CEDM is the default; free-EDM is deprecated
+    elif not shared_column:
+        import warnings
+        warnings.warn(
+            "shared_column=False (free-EDM) is deprecated and will be removed in a future release. "
+            "Use the default shared_column=True (constrained-EDM / CEDM) instead.",
+            DeprecationWarning,
+            stacklevel=3,
+        )
 
     if shared_column:
         # --- Constrained-EDM mode ---
