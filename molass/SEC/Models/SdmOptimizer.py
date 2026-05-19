@@ -392,10 +392,14 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         k_init = 2.0
         rt_dist = 'gamma'
         rg_penalty_weight = 1.0
+        sigma_max = 0.8
+        min_rg_gap = 0.5
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
         rg_penalty_weight = model_params.get('rg_penalty_weight', 1.0)
+        sigma_max = model_params.get('sigma_max', 0.8)
+        min_rg_gap = model_params.get('min_rg_gap', 0.5)  # Å — minimum required Rg gap between components
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -432,15 +436,25 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         rgv_ = params[8:8 + num_components]
         scales_ = params[8 + num_components:8 + 2 * num_components]
 
-        if sigma_ < 0.01 or sigma_ > 2.0:
+        if sigma_ < 0.01 or sigma_ > sigma_max:
             return 1e20
         if mu_ < 1.0 or mu_ > 8.0:
             return 1e20
 
         # Rg ordering penalty (Rg should be descending)
-        rg_diff = np.diff(rgv_)
+        rg_diff = np.diff(rgv_)   # negative when ordered: rg_diff = rg[i+1] - rg[i] < 0
         non_ordered = np.where(rg_diff > 0)[0]
         order_penalty = np.sum(rg_diff[non_ordered] ** 2) * 1e3
+
+        # Minimum Rg gap penalty — prevents components collapsing to identical curves.
+        # For descending order: -rg_diff should be >= min_rg_gap.
+        # Penalty ∝ (shortfall)² when the gap is insufficient (Issue #180).
+        if min_rg_gap > 0 and num_components > 1:
+            shortfall = min_rg_gap + rg_diff   # positive where -rg_diff < min_rg_gap
+            insufficient = shortfall[shortfall > 0]
+            gap_penalty = np.sum(insufficient ** 2) * rg_penalty_scale * 100
+        else:
+            gap_penalty = 0.0
 
         x_ = x - tI_
         t0_ = x0_ - tI_
@@ -453,7 +467,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         ty = np.sum(cy_list, axis=0)
         # Penalize Rg deviation from Guinier values (prevents Rg drift in lognormal model)
         rg_penalty = rg_penalty_scale * np.sum(((rgv_ - rgv) / rgv) ** 2)
-        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty
+        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty
         _eval_count[0] += 1
         n = _eval_count[0]
         if debug and n % 50 == 0:
@@ -480,7 +494,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     else:
         bounds += [(0.5, 10.0)]     # k free for gamma
     bounds += [(2.0, 8.0)]          # mu
-    bounds += [(0.01, 2.0)]         # sigma
+    bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
     bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]
     upper_scale = xr_icurve.get_max_y() * 1000
     bounds += [(1e-3, upper_scale) for _ in range(num_components)]
@@ -510,9 +524,22 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         print(f"Rg initial (Guinier): {rgv}")
         print(f"Rg penalty weight: {rg_penalty_weight}, initial_error: {initial_error:.4g}")
 
+    import warnings as _warnings
     N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = result.x[0:8]
     rgv_ = result.x[8:8 + num_components]
     scales_ = result.x[8 + num_components:8 + 2 * num_components]
+
+    # Warn when sigma is close to its upper bound — indicates a near-degenerate
+    # solution where the optimizer could not separate the components properly.
+    # This typically happens when the dataset has only one dominant species.
+    if sigma_ > sigma_max * 0.9:
+        _warnings.warn(
+            f"SDM(lognormal) optimizer converged at sigma={sigma_:.4f} (sigma_max={sigma_max}). "
+            "The two components may have collapsed to near-identical pore distributions. "
+            "Check plot_components() and consider using pore_dist='mono' or "
+            "reducing num_components to 1.",
+            UserWarning, stacklevel=3
+        )
 
     column = SdmColumn([N_, T_, me, mp, x0_, tI_, N0_, mu_, sigma_, k_],
                        pore_dist='lognormal', rt_dist=rt_dist)
@@ -527,6 +554,24 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     for rg, scale in zip(rgv_, scales_):
         ccurve = SdmComponentCurve(x, column, rg, scale)
         new_xr_ccurves.append(ccurve)
+
+    # Guard: check that the resulting C matrix is not near-singular (Issue #180).
+    # A degenerate C (cond >> 1) means pinv(C) amplifies noise catastrophically,
+    # making the extracted scattering profiles P = M @ pinv(C) numerically garbage
+    # and causing Guinier analysis to fail inside plot_components().
+    if num_components > 1:
+        C_mat = np.array([cc.get_y() for cc in new_xr_ccurves])
+        cond_C = np.linalg.cond(C_mat)
+        if cond_C > 1e6:
+            raise RuntimeError(
+                f"SDM(lognormal) produced a degenerate decomposition "
+                f"(C condition number = {cond_C:.2e}, sigma = {sigma_:.4f}). "
+                "The component elution curves are nearly identical; "
+                "P = M @ pinv(C) would be numerically meaningless. "
+                "This typically occurs when the dataset contains only one dominant species. "
+                "Suggested actions: use pore_dist='mono', or reduce num_components to 1."
+            )
+
     return new_xr_ccurves
 
 def adjust_rg_and_poresize(sdm_decomposition, rgcurve=None):

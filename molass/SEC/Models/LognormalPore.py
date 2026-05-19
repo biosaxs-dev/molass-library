@@ -374,8 +374,25 @@ def sdm_lognormal_pore_gamma_cf_fast(w, N, T, k, me, mp, mu, sigma, Rg, N0, t0, 
 _sdm_lognormal_pore_gamma_pdf_fast_impl = FftInvPdf(sdm_lognormal_pore_gamma_cf_fast)
 
 def sdm_lognormal_pore_gamma_pdf_fast(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t0):
-    """Fast version of sdm_lognormal_pore_gamma_pdf using Gauss-Legendre quadrature."""
-    return scale * _sdm_lognormal_pore_gamma_pdf_fast_impl(x - t0, N, T, k, me, mp, mu, sigma, Rg, N0, 0)
+    """Fast version of sdm_lognormal_pore_gamma_pdf using Gauss-Legendre quadrature.
+
+    Applies an adaptive timescale as a performance optimization: by scaling
+    ``(x - t0)`` into the [0, 1023] range, FftInvPdf can use the default N=1024
+    grid rather than auto-resizing to a larger power of 2.  The timescale is
+    capped at DEFAULT_TIMESCALE (0.25) so it never exceeds the mono-model default.
+
+    Safety note: FftInvPdf now auto-resizes its FFT grid whenever the query range
+    exceeds N (see FftUtils.py, issue #181), so this timescale is no longer
+    required for correctness.  It is kept here purely to avoid the 2× FFT cost
+    of the N=2048 fallback during optimization (thousands of PDF evaluations).
+    """
+    from molass.SEC.Models.SdmMonoPore import DEFAULT_TIMESCALE
+    x_shifted_max = np.max(x) - t0
+    ts_safe = (1024 - 1) / x_shifted_max if x_shifted_max > 0 else DEFAULT_TIMESCALE
+    ts = min(DEFAULT_TIMESCALE, ts_safe)
+    return scale * ts * _sdm_lognormal_pore_gamma_pdf_fast_impl(
+        ts * (x - t0), N, ts * T, k, me, mp, mu, sigma, Rg, N0, 0
+    )
 
 
 # --------------------------------------------------------------------------

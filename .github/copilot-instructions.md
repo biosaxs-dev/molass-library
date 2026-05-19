@@ -72,6 +72,7 @@ Raw data folder / molass_data sample
 - **`molass-legacy`** is a required dependency (installed separately). The `Rigorous/` module bridges to it heavily via `LegacyBridgeUtils.py`. Do not assume all optimization logic is in `molass-library`.
 - **`molass_data`** is a separate data package (not in this repo) that provides test samples (`SAMPLE1`–`SAMPLE4`).
 - **Dual-channel design**: `SecSaxsData` carries both XR (X-ray) and UV data. Many methods have `xr_only` variants. REGALS uses SAXS only; Molass uses UV + SAXS (information asymmetry — document when comparing).
+- **EDM `e` parameter**: In `molass_legacy/SecTheory/Edm.py`, `e` (default 0.4) is **V₀/(V₀+Vp)** — the mobile-phase fraction of the *accessible* volume only. Solid bead volume is entirely outside the EDM mass balance. This is **not** the standard chromatographic total porosity ε_T=(V₀+Vp)/V_column. The phase ratio `F=(1-e)/e = Vp/V₀` directly. In the 2D column simulation (`SEC/ColumnSimulation.py`, rs=0.0381, ~42 grains): V₀≈0.109, Vp≈0.096, V_solid≈0.096 → e≈0.53, F≈0.88. The Henry coefficient `a = K_SEC × (Vp/V₀)`; default a=1.5 requires Vp/V₀≥1.5 (beyond the simulation geometry).
 
 ### The Canonical Usage Pattern
 
@@ -383,7 +384,7 @@ GitHub/
 
 ## Notebook workflow
 
-Read [NOTEBOOK_CONVENTIONS.md v0.2.5](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.  
+Read [NOTEBOOK_CONVENTIONS.md v0.2.6](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.  
 Kernel preference: global Python (`py`). Do not create venvs.
 
 ---
