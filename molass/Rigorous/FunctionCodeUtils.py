@@ -39,6 +39,8 @@ def detect_function_code(decomposition):
     ccurve = decomposition.xr_ccurves[0]
     if ccurve.model == "cedm":
         return 'G2020'
+    if ccurve.model == "lkm":
+        return 'G1400'
     if ccurve.model != "sdm":
         return None
     column = ccurve.column

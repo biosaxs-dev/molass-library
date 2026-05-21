@@ -1,10 +1,36 @@
 """
 SEC.Models.EdmOptimizer.py
 """
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from molass_legacy.Models.RateTheory.EDM import edm_impl
+
+_POSITIVE_B_WARNING = (
+    "EDM fitted b = {b_vals} > 0 for component(s) {comps}.  "
+    "In SEC, tailing is normally caused by finite mass-transfer kinetics (b = 0), "
+    "not by Langmuir adsorption (b > 0).  A positive b may indicate secondary "
+    "adsorption, column overloading, or the model compensating for kinetic tailing "
+    "with the wrong mechanism.  "
+    "Pass suppress_positive_b_warning=True to silence this warning."
+)
+
+_B_WARN_THRESHOLD = 1e-3   # b values below this are treated as numerical zero
+
+def _check_positive_b(b_values, suppress, stacklevel=4):
+    """Issue a UserWarning if any fitted b > _B_WARN_THRESHOLD (unless suppressed)."""
+    if suppress:
+        return
+    pos = [(i, float(b)) for i, b in enumerate(b_values) if b > _B_WARN_THRESHOLD]
+    if pos:
+        comps = [i for i, _ in pos]
+        vals  = [f"{v:.4f}" for _, v in pos]
+        warnings.warn(
+            _POSITIVE_B_WARNING.format(b_vals=", ".join(vals), comps=comps),
+            UserWarning,
+            stacklevel=stacklevel,
+        )
 
 def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
     """ Optimize the EDM decomposition.
@@ -64,6 +90,14 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
 
             Default True.  Pass ``False`` to use unconstrained (free) EDM,
             which is deprecated and will be removed in a future release.
+
+        suppress_positive_b_warning : bool, optional
+            If True, suppress the UserWarning that is issued when any fitted
+            ``b`` parameter is positive.  In SEC, b > 0 (Langmuir adsorption)
+            is physically unusual — right-tailing is normally kinetic (b = 0).
+            A positive b may indicate secondary adsorption, overloading, or
+            the model compensating for kinetic tailing with the wrong mechanism.
+            Default False.
 
     Returns
     -------
@@ -165,6 +199,10 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         if debug:
             print(f"  shared e = {e_fitted:.4f}")
 
+        # b is at index 3 in the 6-element other_params ([t0,u,a,b,Dz,cinj])
+        b_fitted_shared_e = other_fitted[:, 3]
+        _check_positive_b(b_fitted_shared_e,
+                          suppress=kwargs.get('suppress_positive_b_warning', False))
         new_xr_ccurves = []
         for other_params in other_fitted:
             full_params = np.insert(other_params, E_IDX, e_fitted)
@@ -287,6 +325,8 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             for i, (a_v, b_v, cinj_v) in enumerate(per_comp_fit):
                 print(f"  comp {i}: a={a_v:.4f}  b={b_v:.4f}  cinj={cinj_v:.4f}")
 
+        _check_positive_b(per_comp_fit[:, 1],
+                          suppress=kwargs.get('suppress_positive_b_warning', False))
         new_xr_ccurves = []
         for a_v, b_v, cinj_v in per_comp_fit:
             full_params = np.array([t0_fit, u_fit, a_v, b_v, e_fit, Dz_fit, cinj_v])
@@ -314,6 +354,10 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             centroid = np.sum(cy * x) / cy_abs_sum if cy_abs_sum > 0 else float('nan')
             print(f"  Component {i}: centroid={centroid:.1f}  EGH peak={egh_peak:.1f}  diff={centroid - egh_peak:.1f}")
 
+    # b is at index 3 in the 7-element free-EDM param vector [t0,u,a,b,e,Dz,cinj]
+    b_fitted_free = result.x.reshape(shape)[:, 3]
+    _check_positive_b(b_fitted_free,
+                      suppress=kwargs.get('suppress_positive_b_warning', False))
     new_xr_ccurves = []
     for params in result.x.reshape(shape):
         ccurve = EdmComponentCurve(x, params)

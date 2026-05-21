@@ -75,6 +75,24 @@ def get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params):
         xr_ccurves.append(EdmComponentCurve(x, full_params))
     return xr_ccurves
 
+def get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params):
+    """Reconstruct LkmComponentCurve objects from LKM optimizer results."""
+    from molass.SEC.Models.LkmComponentCurve import LkmComponentCurve
+    xr_params   = separated_params[0]   # scales per component
+    rg_params   = separated_params[2]   # Rg per component
+    lkmcol      = separated_params[-1]  # [Pe, t0, R_0, k_MT_0, R_1, k_MT_1, ...]
+    Pe = lkmcol[0]
+    t0 = lkmcol[1]
+    x  = xr_icurve.x
+    nc = len(xr_params)
+    xr_ccurves = []
+    for i in range(nc):
+        R_i    = lkmcol[2 + 2 * i]
+        k_MT_i = lkmcol[2 + 2 * i + 1]
+        xr_ccurves.append(LkmComponentCurve(x, Pe, t0, k_MT_i, R_i, xr_params[i], rg=rg_params[i]))
+    return xr_ccurves
+
+
 def get_xr_ccurves(optimizer, xr_icurve, separated_params):
     model_name = optimizer.get_model_name()
     if model_name == 'EGH':
@@ -85,5 +103,7 @@ def get_xr_ccurves(optimizer, xr_icurve, separated_params):
         return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'CEDM':
         return get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params)
+    elif model_name == 'LKM':
+        return get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params)
     else:
         raise ValueError(f"Unknown model_name: {model_name}")

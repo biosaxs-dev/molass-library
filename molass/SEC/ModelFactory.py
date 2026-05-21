@@ -35,5 +35,11 @@ def create_model(model_name, **kwargs):
         if model_name == 'cedm':
             kwargs.setdefault('shared_column', True)
         return EDM(**kwargs)
+    elif model_name == 'lkm':
+        if debug:
+            import molass.SEC.Models.LKM
+            reload(molass.SEC.Models.LKM)
+        from molass.SEC.Models.LKM import LKM
+        return LKM(**kwargs)
     else:
         raise ValueError(f"Unknown model name: {model_name}")
