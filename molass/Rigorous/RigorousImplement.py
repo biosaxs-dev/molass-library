@@ -162,7 +162,7 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -469,6 +469,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 x_shifts=x_shifts, clear_jobs=clear_jobs, debug=debug,
                 work_folder_callback=_on_folder_ready,
                 stop_event=run_info._stop_event,
+                ns_narrow_bounds=ns_narrow_bounds,
             )
 
             # Breadcrumb: drop a manifest in the work folder too, and update
