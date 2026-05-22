@@ -64,7 +64,13 @@ def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
         Dead time — mobile-phase transit time (same units as ``x``).
     k_MT : float
         Mass-transfer rate constant [1/time], **standard LKM convention**:
-        ``k_MT = k_STLC / (1 - ε)``  where ε is the mobile-phase porosity.
+        ``dq/dt = k_MT × (a·c − q)``  (ε = mobile-phase porosity).
+
+        Some LKM solvers normalise the rate internally by ``(1−ε)``.  For
+        example, the `STLC <https://github.com/sartorius-research/STLC>`_
+        package implements ``dq/dt = k/(1−ε) × (a·c − q)``, so its
+        user-facing ``k`` differs from ``k_MT``.  Convert with
+        ``k_MT = k_solver / (1 − ε)`` before passing to this function.
     R : float
         Retention factor  R = t_R / t0 = 1 + F*a
         (F = phase ratio = (1-ε)/ε, a = Henry coefficient).

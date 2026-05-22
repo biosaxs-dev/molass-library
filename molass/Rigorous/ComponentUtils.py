@@ -99,10 +99,10 @@ def get_xr_ccurves(optimizer, xr_icurve, separated_params):
         return get_egh_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'SDM':
         return get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name == 'EDM':
-        return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name == 'CEDM':
+    elif model_name in ('EDM', 'CEDM'):   # G2020: constrained EDM (now the standard "EDM")
         return get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params)
+    elif model_name == 'NEDM':            # G2010: non-constrained EDM
+        return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'LKM':
         return get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params)
     else:
