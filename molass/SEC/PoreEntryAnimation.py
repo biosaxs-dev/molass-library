@@ -43,6 +43,8 @@ def run_simulation(
     n_steps=10_000,
     v_drift=0.10,
     seed=42,
+    k_ads=0.0,
+    k_des=1.0,
 ):
     """
     Run a single-molecule Brownian simulation through a grain assembly.
@@ -70,20 +72,27 @@ def run_simulation(
         Downward mobile-phase drift speed (mobile-phase steps only).
     seed : int
         Random seed.
+    k_ads : float
+        Langmuir adsorption rate (per unit time).  0 = pure SEC (no wall binding).
+    k_des : float
+        Langmuir desorption rate (per unit time).  K_ads = k_ads / k_des.
 
     Returns
     -------
     dict with keys:
         positions       : ndarray (n_steps+1, 2)
         states          : ndarray (n_steps+1,)  — grain index or -1 (mobile)
+        wall_bound      : ndarray (n_steps+1,) bool — True when wall-adsorbed
         entry_times     : ndarray  — simulation time of each pore entry
-        dwell_times     : ndarray  — duration of each completed pore dwell
+        dwell_times     : ndarray  — total pore dwell duration (free + adsorbed)
         entry_grain_arr : ndarray  — which grain for each entry
         grains          : list of NewGrain
         R_p             : float    — Knox pore radius
         rho             : float    — r_mol / R_p
         K_SEC_theory    : float    — Knox (1-rho)^2 approximation
         T_total         : float
+        K_ads_theory    : float    — k_ads / k_des equilibrium constant
+        K_eff_theory    : float    — K_SEC_theory * (1 + K_ads_theory)
     """
     if grain_centers is None:
         grain_centers = _DEFAULT_GRAIN_CENTERS
@@ -107,6 +116,8 @@ def run_simulation(
     positions[0] = pos
 
     entry_times, dwell_starts, dwell_times, entry_grain_list = [], [], [], []
+    wall_bound      = np.zeros(n_steps + 1, dtype=bool)
+    wall_bound_flag = False   # True when molecule is adsorbed to the pore wall
 
     for step in range(n_steps):
         dx      = rng.normal(0, sigma, 2)
@@ -148,26 +159,43 @@ def run_simulation(
                     else:
                         new_pos = pos.copy()
         else:
-            # In-pore phase
-            grain    = grains[in_grain]
-            particle = Particle(tuple(pos), r_mol)
-            nx, ny, inmobile = get_next_position_impl(
-                particle, grain,
-                pos[0], pos[1],
-                new_pos[0], new_pos[1])
-            new_pos = np.array([nx, ny])
+            # In-pore phase — two sub-states: free or wall-adsorbed
+            if wall_bound_flag:
+                # Wall-adsorbed: frozen in place, wait for desorption
+                new_pos = pos.copy()
+                if k_des > 0 and rng.random() < k_des * dt:
+                    wall_bound_flag = False       # desorb -> free in pore
+            else:
+                # Free in pore: try to adsorb, or normal Brownian step
+                if k_ads > 0 and rng.random() < k_ads * dt:
+                    wall_bound_flag = True         # adsorb -> frozen at pore wall
+                    new_pos = pos.copy()
+                else:
+                    grain    = grains[in_grain]
+                    particle = Particle(tuple(pos), r_mol)
+                    nx, ny, inmobile = get_next_position_impl(
+                        particle, grain,
+                        pos[0], pos[1],
+                        new_pos[0], new_pos[1])
+                    new_pos = np.array([nx, ny])
 
-            if inmobile:
-                dwell_times.append(step * dt - dwell_starts[-1])
-                in_grain = -1
+                    if inmobile:
+                        dwell_times.append(step * dt - dwell_starts[-1])
+                        in_grain        = -1
+                        wall_bound_flag = False
 
-        pos               = new_pos
-        positions[step+1] = pos
-        states[step+1]    = in_grain
+        pos                = new_pos
+        positions[step+1]  = pos
+        states[step+1]     = in_grain
+        wall_bound[step+1] = wall_bound_flag
+
+    K_ads_theory = k_ads / k_des if k_des > 0 else float('inf')
+    K_eff_theory = K_SEC_theory * (1 + K_ads_theory)
 
     return dict(
         positions       = positions,
         states          = states,
+        wall_bound      = wall_bound,
         entry_times     = np.array(entry_times),
         dwell_times     = np.array(dwell_times),
         entry_grain_arr = np.array(entry_grain_list, dtype=int),
@@ -176,6 +204,8 @@ def run_simulation(
         rho             = rho,
         K_SEC_theory    = K_SEC_theory,
         T_total         = n_steps * dt,
+        K_ads_theory    = K_ads_theory,
+        K_eff_theory    = K_eff_theory,
     )
 
 
@@ -189,6 +219,8 @@ def get_pore_entry_animation(
     n_steps=10_000,
     v_drift=0.10,
     seed=42,
+    k_ads=0.0,
+    k_des=1.0,
     n_frames=200,
     interval=40,
     close_plot=True,
@@ -200,13 +232,13 @@ def get_pore_entry_animation(
     FuncAnimation with three panels:
 
     - Left  : 2D grain assembly with molecule trajectory tail and colour-coded state
-              (royalblue = mobile phase, orchid = inside pore)
+              (royalblue = mobile, orchid = free in pore, tomato = wall-adsorbed)
     - Top-right  : Cumulative pore-entry count N(t) with linear-rate overlay
     - Bottom-right : Dwell-time histogram with exponential fit
 
     Parameters
     ----------
-    r_mol, R_grain, num_pores, grain_centers, W, H, D, dt, n_steps, v_drift, seed
+    r_mol, R_grain, num_pores, grain_centers, W, H, D, dt, n_steps, v_drift, seed, k_ads, k_des
         Passed directly to `run_simulation`.
     n_frames : int
         Number of animation frames (default 200).
@@ -226,10 +258,12 @@ def get_pore_entry_animation(
         r_mol=r_mol, R_grain=R_grain, num_pores=num_pores,
         grain_centers=grain_centers, W=W, H=H,
         D=D, dt=dt, n_steps=n_steps, v_drift=v_drift, seed=seed,
+        k_ads=k_ads, k_des=k_des,
     )
 
     positions    = sim['positions']
     states       = sim['states']
+    wall_bound   = sim['wall_bound']
     entry_times  = sim['entry_times']
     dwell_times  = sim['dwell_times']
     grains       = sim['grains']
@@ -297,7 +331,9 @@ def get_pore_entry_animation(
                 pts = pts[wraps[-1] + 1:]
         traj_line.set_data(pts[:, 0], pts[:, 1])
 
-        color = 'orchid' if states[si] >= 0 else 'royalblue'
+        if   states[si] < 0:  color = 'royalblue'
+        elif wall_bound[si]:  color = 'tomato'
+        else:                 color = 'orchid'
         mol_dot.set_data([positions[si, 0]], [positions[si, 1]])
         mol_dot.set_color(color)
 
@@ -328,7 +364,10 @@ def get_pore_entry_animation(
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.93)
-    plt.suptitle('Pore entry animation -- grain-sector geometry', fontsize=10)
+    title = 'Pore entry animation -- grain-sector geometry'
+    if k_ads > 0:
+        title += f'  (Langmuir: k_ads={k_ads}, k_des={k_des})'
+    plt.suptitle(title, fontsize=10)
 
     ani = FuncAnimation(fig, update, frames=n_frames,
                         init_func=init, blit=False, interval=interval)
