@@ -326,8 +326,9 @@ def get_pore_entry_animation(
 
         return traj_line, mol_dot, count_line, rate_line
 
-    plt.suptitle('Pore entry animation -- grain-sector geometry', fontsize=10, y=1.01)
     plt.tight_layout()
+    plt.subplots_adjust(top=0.93)
+    plt.suptitle('Pore entry animation -- grain-sector geometry', fontsize=10)
 
     ani = FuncAnimation(fig, update, frames=n_frames,
                         init_func=init, blit=False, interval=interval)
