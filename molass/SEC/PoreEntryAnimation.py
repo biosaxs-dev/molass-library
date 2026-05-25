@@ -43,8 +43,8 @@ def run_simulation(
     n_steps=10_000,
     v_drift=0.10,
     seed=42,
-    k_ads=0.0,
-    k_des=1.0,
+    k_a=0.0,
+    k_d=1.0,
 ):
     """
     Run a single-molecule Brownian simulation through a grain assembly.
@@ -72,10 +72,10 @@ def run_simulation(
         Downward mobile-phase drift speed (mobile-phase steps only).
     seed : int
         Random seed.
-    k_ads : float
+    k_a : float
         Langmuir adsorption rate (per unit time).  0 = pure SEC (no wall binding).
-    k_des : float
-        Langmuir desorption rate (per unit time).  K_ads = k_ads / k_des.
+    k_d : float
+        Langmuir desorption rate (per unit time).
 
     Returns
     -------
@@ -91,8 +91,8 @@ def run_simulation(
         rho             : float    — r_mol / R_p
         K_SEC_theory    : float    — Knox (1-rho)^2 approximation
         T_total         : float
-        K_ads_theory    : float    — k_ads / k_des equilibrium constant
-        K_eff_theory    : float    — K_SEC_theory * (1 + K_ads_theory)
+        K_ads           : float    — k_a / k_d equilibrium constant
+        K_eff_theory    : float    — K_SEC_theory * (1 + K_ads)
     """
     if grain_centers is None:
         grain_centers = _DEFAULT_GRAIN_CENTERS
@@ -163,11 +163,11 @@ def run_simulation(
             if wall_bound_flag:
                 # Wall-adsorbed: frozen in place, wait for desorption
                 new_pos = pos.copy()
-                if k_des > 0 and rng.random() < k_des * dt:
+                if k_d > 0 and rng.random() < k_d * dt:
                     wall_bound_flag = False       # desorb -> free in pore
             else:
                 # Free in pore: try to adsorb, or normal Brownian step
-                if k_ads > 0 and rng.random() < k_ads * dt:
+                if k_a > 0 and rng.random() < k_a * dt:
                     wall_bound_flag = True         # adsorb -> frozen at pore wall
                     new_pos = pos.copy()
                 else:
@@ -189,8 +189,8 @@ def run_simulation(
         states[step+1]     = in_grain
         wall_bound[step+1] = wall_bound_flag
 
-    K_ads_theory = k_ads / k_des if k_des > 0 else float('inf')
-    K_eff_theory = K_SEC_theory * (1 + K_ads_theory)
+    K_ads = k_a / k_d if k_d > 0 else float('inf')
+    K_eff_theory = K_SEC_theory * (1 + K_ads)
 
     return dict(
         positions       = positions,
@@ -204,7 +204,7 @@ def run_simulation(
         rho             = rho,
         K_SEC_theory    = K_SEC_theory,
         T_total         = n_steps * dt,
-        K_ads_theory    = K_ads_theory,
+        K_ads           = K_ads,
         K_eff_theory    = K_eff_theory,
     )
 
@@ -219,8 +219,8 @@ def get_pore_entry_animation(
     n_steps=10_000,
     v_drift=0.10,
     seed=42,
-    k_ads=0.0,
-    k_des=1.0,
+    k_a=0.0,
+    k_d=1.0,
     n_frames=200,
     interval=40,
     close_plot=True,
@@ -238,7 +238,7 @@ def get_pore_entry_animation(
 
     Parameters
     ----------
-    r_mol, R_grain, num_pores, grain_centers, W, H, D, dt, n_steps, v_drift, seed, k_ads, k_des
+    r_mol, R_grain, num_pores, grain_centers, W, H, D, dt, n_steps, v_drift, seed, k_a, k_d
         Passed directly to `run_simulation`.
     n_frames : int
         Number of animation frames (default 200).
@@ -258,7 +258,7 @@ def get_pore_entry_animation(
         r_mol=r_mol, R_grain=R_grain, num_pores=num_pores,
         grain_centers=grain_centers, W=W, H=H,
         D=D, dt=dt, n_steps=n_steps, v_drift=v_drift, seed=seed,
-        k_ads=k_ads, k_des=k_des,
+        k_a=k_a, k_d=k_d,
     )
 
     positions    = sim['positions']
@@ -362,12 +362,12 @@ def get_pore_entry_animation(
 
         return traj_line, mol_dot, count_line, rate_line
 
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.93)
     title = 'Pore entry animation -- grain-sector geometry'
-    if k_ads > 0:
-        title += f'  (Langmuir: k_ads={k_ads}, k_des={k_des})'
-    plt.suptitle(title, fontsize=10)
+    if k_a > 0:
+        title += f'\n(Langmuir: k_a={k_a}, k_d={k_d})'
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.84)
+    plt.suptitle(title, fontsize=9.5, y=0.97)
 
     ani = FuncAnimation(fig, update, frames=n_frames,
                         init_func=init, blit=False, interval=interval)
