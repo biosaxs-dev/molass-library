@@ -162,7 +162,7 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -418,7 +418,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             optimizer.set_frozen_components(frozen_components)
 
         from molass_legacy.Optimizer.Scripting import set_optimizer_settings
-        set_optimizer_settings(num_components=num_components, model=model, method=method)
+        set_optimizer_settings(num_components=num_components, model=model, method=method,
+                               ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps)
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
         # When resuming (clear_jobs=False), override with the best params found
@@ -470,6 +471,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 work_folder_callback=_on_folder_ready,
                 stop_event=run_info._stop_event,
                 ns_narrow_bounds=ns_narrow_bounds,
+                ns_adaptive_nsteps=ns_adaptive_nsteps,
             )
 
             # Breadcrumb: drop a manifest in the work folder too, and update
