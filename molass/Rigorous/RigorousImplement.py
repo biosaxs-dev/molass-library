@@ -162,7 +162,7 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -415,11 +415,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, function_code=function_code, debug=debug)
         optimizer.set_xr_only(not data_ssd.has_uv())
         if frozen_components is not None:
-            optimizer.set_frozen_components(frozen_components)
+            optimizer.freeze_components(frozen_components)
+        if frozen_param_groups is not None:
+            optimizer.freeze_param_groups(frozen_param_groups)
 
         from molass_legacy.Optimizer.Scripting import set_optimizer_settings
         set_optimizer_settings(num_components=num_components, model=model, method=method,
-                               ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps)
+                               ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps)
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
         # When resuming (clear_jobs=False), override with the best params found
@@ -472,6 +474,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 stop_event=run_info._stop_event,
                 ns_narrow_bounds=ns_narrow_bounds,
                 ns_adaptive_nsteps=ns_adaptive_nsteps,
+                ns_nsteps=ns_nsteps,
             )
 
             # Breadcrumb: drop a manifest in the work folder too, and update
