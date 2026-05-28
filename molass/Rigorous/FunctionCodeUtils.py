@@ -33,8 +33,16 @@ def detect_function_code(decomposition):
     Returns
     -------
     str or None
-        A function code string (e.g. ``'G1200'``), or ``None``
-        to use the default for the model.
+        A function code string, or ``None`` to use the default for the model.
+
+        Supported models and their codes:
+
+        - ``'egh'`` → ``None``  (EGH, default G1100 path)
+        - ``'sdm'`` → ``'G1100'`` / ``'G1200'`` / ``'G1300'`` (depends on
+          ``pore_dist`` / ``rt_dist`` on the ``SdmColumn``)
+        - ``'edm'`` → ``None`` (EDM)
+        - ``'cedm'`` → ``'G2020'`` (CEDM — continuous EDM)
+        - ``'lkm'`` → ``'G1400'`` (LKM — Lumped Kinetic Model)
     """
     ccurve = decomposition.xr_ccurves[0]
     if ccurve.model == "cedm":

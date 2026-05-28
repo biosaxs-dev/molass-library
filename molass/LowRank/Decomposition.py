@@ -944,6 +944,29 @@ class Decomposition:
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 
+    def get_rigorous_param_count(self):
+        """Return the number of parameters for rigorous optimization.
+
+        Convenience wrapper around :meth:`make_rigorous_initparams` that
+        handles the ``baseparams`` setup internally.  Useful for a quick
+        sanity-check before committing to a long run::
+
+            decomp_lkm = LKM().optimize_decomposition(decomp_egh)
+            print(decomp_lkm.get_rigorous_param_count())  # e.g. 30
+
+        Works for all supported models (EGH, SDM, EDM, CEDM, LKM).
+
+        Returns
+        -------
+        int
+            Number of parameters in the flat init-params vector that will be
+            passed to the legacy objective function (G1100 / G1200 / G1300 /
+            G1400 / G2020).
+        """
+        from molass.Rigorous.LegacyBridgeUtils import make_basecurves_from_decomposition
+        _, baseparams = make_basecurves_from_decomposition(self)
+        return len(self.make_rigorous_initparams(baseparams))
+
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
                             frozen_param_groups=None,
@@ -1099,14 +1122,23 @@ class Decomposition:
         shape parameters as a starting point for column-parameter
         estimation.
 
-        Typical staged workflow::
+        Typical staged workflows::
 
-            decomp = corrected.quick_decomposition()           # EGH
-            run_info = decomp.optimize_rigorously(             # refine EGH
+            # EGH → refine with G1100
+            decomp = corrected.quick_decomposition()
+            run_info = decomp.optimize_rigorously(
                 analysis_folder='temp_analysis_apo_egh', ...)
             result_egh = run_info.load_best()
-            run_info_sdm = result_egh.upgrade(                 # EGH -> SDM
+
+            # EGH → SDM upgrade → refine with G1200/G1300
+            run_info_sdm = result_egh.upgrade(
                 'SDM', analysis_folder='temp_analysis_apo_sdm', ...)
+
+            # EGH → LKM upgrade → refine with G1400 (auto-detected)
+            from molass.SEC.Models.LKM import LKM
+            decomp_lkm = LKM().optimize_decomposition(decomp)  # moment-matching
+            run_lkm = decomp_lkm.optimize_rigorously(          # G1400 auto-selected
+                analysis_folder='temp_analysis_apo_lkm', ...)
 
         See Also
         --------
