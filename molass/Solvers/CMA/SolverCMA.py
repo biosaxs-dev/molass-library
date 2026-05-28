@@ -125,6 +125,17 @@ class SolverCMA:
                 best_x = gen_best_x.copy()
                 minima_callback(best_x, best_fv, True)
 
+            # Cooperative stop: check the stop signal every generation, not just
+            # on improvement.  Without this, a converged CMA run (no new best)
+            # never calls minima_callback, so request_stop() / Terminate button
+            # has no effect until the ctypes KI injection fires — which can fail
+            # if pycma is inside a C extension holding the GIL.  This makes the
+            # dashboard hang at "Status: Terminating..." indefinitely.
+            # (molass-library#170)
+            if (getattr(self.optimizer, '_stop_event', None) is not None
+                    and self.optimizer._stop_event.is_set()):
+                break
+
         r = es.result
         return OptimizeResult(
             x=np.array(r.xbest),
