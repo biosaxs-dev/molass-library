@@ -205,21 +205,15 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         isolation).
         See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
     monitor : bool, optional
-        Only meaningful when ``in_process=False``.  If True (default),
-        spawn the subprocess via ``MplMonitor`` so the live ipywidgets
-        dashboard updates as the optimizer accepts new minima.  If False,
-        spawn the subprocess directly via ``BackRunner`` and block until
-        it exits — no widget, no live polling.  Use ``monitor=False`` for
-        batch/comparison runs where the dashboard is not needed (and to
-        avoid known fragility of the matplotlib widget pipeline on
-        Python 3.14 / degraded ipywidgets CDN).
+        Controls the ``MplMonitor`` ipywidgets dashboard.  When True
+        (default), a live dashboard is shown whether the run is in-process
+        or subprocess.  When False, no dashboard is created — the run
+        proceeds silently.  Use ``monitor=False`` for batch / comparison
+        runs (e.g. ``compare_optimization_paths``) where the widget is not
+        needed.
     progress : str or None, optional
-        **Deprecated / internal** — users should not need to set this.
-        The library selects the best available monitoring automatically based
-        on ``in_process`` and ``async_``.  When ``in_process=True`` and
-        ``async_=True`` the default ``'dashboard'`` renders an ipywidgets panel
-        in the notebook cell.  In all other cases it is silently ignored.
-        (molass-library#159)
+        **Deprecated and ignored** — use ``monitor=True``/``False`` instead.
+        Kept in the signature only for backward compatibility.
     debug : bool, optional
         If True, enable debug mode with additional output.
 
@@ -233,20 +227,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _NS_METHODS = {'NS'}
     if in_process and method in _NS_METHODS:
         in_process = False
-        progress = None   # subprocess path uses monitor=True for its dashboard
 
-    if progress is not None:
-        _VALID_PROGRESS = {'dashboard'}
-        if progress not in _VALID_PROGRESS:
-            raise ValueError(
-                f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
-            )
-        # Auto-degrade: 'dashboard' is only available in-process + async.
-        # If the caller passed in_process=False (or async_=False), silently
-        # fall back to no in-notebook widget rather than raising.
-        # (molass-library#159 — progress should not be a user-facing concern)
-        if not (in_process and async_):
-            progress = None
+    # progress parameter is deprecated and ignored — monitor=True/False is the
+    # single control for the dashboard in both in_process paths.
 
     # ── Idempotency guard (molass-library#151) ──────────────────────────
     # Before doing any expensive setup, check whether a run is already live
@@ -529,7 +512,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             import weakref
             _run_info_mod._active_inprocess = weakref.ref(run_info)
 
-            if progress == 'dashboard':
+            if monitor:
                 from molass_legacy.Optimizer.MplMonitor import MplMonitor
                 mon = MplMonitor.for_run_info(run_info, niter=niter,
                                               max_trials=max_trials,

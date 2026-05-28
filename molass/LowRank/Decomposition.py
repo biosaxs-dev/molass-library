@@ -1065,12 +1065,12 @@ class Decomposition:
             by the tkinter GUI; available as an escape hatch for notebook users
             who need process isolation).
         monitor : bool, optional
-            Only meaningful when ``in_process=False``.  If True (default),
-            the subprocess is wrapped in the live ``MplMonitor`` ipywidgets
-            dashboard.  If False, the subprocess is launched directly via
-            ``BackRunner`` and the call blocks until it exits — use this
-            for batch / comparison runs (e.g. ``compare_optimization_paths``)
-            where the dashboard is not needed.
+            Controls the ``MplMonitor`` ipywidgets dashboard.  When True
+            (default), a live dashboard is shown whether the run is
+            in-process or subprocess.  When False, no dashboard is created
+            — the run proceeds silently.  Use ``monitor=False`` for batch /
+            comparison runs (e.g. ``compare_optimization_paths``) where the
+            widget is not needed.
         async_ : bool, optional
             Only meaningful when ``in_process=True``.  If True (default), the optimizer
             runs in a background daemon thread and this call returns a
@@ -1080,25 +1080,17 @@ class Decomposition:
             :meth:`RunInfo.wait` (instant if already done) to join the thread
             before accessing results.  Set ``False`` for blocking (batch) runs.
         progress : str or None, optional
-            Controls live feedback during an async in-process run
-            (``in_process=True, async_=True``).  Default is ``'dashboard'``,
-            which creates an :class:`MplMonitor` ipywidgets dashboard, calls
-            ``show()`` and ``start_watching()``
-            automatically, and attaches the monitor to
-            :attr:`RunInfo.monitor`.  ``None`` (default) gives no
-            automatic feedback — suitable for batch or scripted runs.
-
-            Raises :class:`ValueError` if ``progress='dashboard'`` is used
-            without ``in_process=True`` and ``async_=True``.
+            **Deprecated and ignored** — use ``monitor=True``/``False`` instead.
+            Kept in the signature only for backward compatibility.
         max_trials : int, optional
             Maximum number of automatic sequential re-trials after each
             trial completes.  Default ``0`` means no automatic re-start —
             the user decides manually via the Resume button.
 
-            Only meaningful when ``in_process=True`` and
-            ``progress='dashboard'``.  The subprocess path (``in_process=False``)
-            always uses its own default of 30.  Set ``max_trials=30`` here
-            to match that behaviour for unattended in-process runs.
+            Only meaningful when ``in_process=True`` and ``monitor=True``.
+            The subprocess path (``in_process=False``) always uses its own
+            default of 30.  Set ``max_trials=30`` here to match that
+            behaviour for unattended in-process runs.
         debug : bool, optional
             If True, enable debug mode.
 
@@ -1178,16 +1170,7 @@ class Decomposition:
                 f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo, CMA=CMA-ES)"
             )
 
-        if progress is not None:
-            _VALID_PROGRESS = {'dashboard'}
-            if progress not in _VALID_PROGRESS:
-                raise ValueError(
-                    f"Unknown progress={progress!r}. Valid values: {sorted(_VALID_PROGRESS)}"
-                )
-            if not (in_process and async_):
-                # Auto-degrade: silently fall back rather than raising.
-                # (molass-library#159)
-                progress = None
+        # progress is deprecated and ignored; monitor=True/False is the control.
 
         if free_components is not None:
             n_protein = self.num_components  # protein components (excludes baseline)
