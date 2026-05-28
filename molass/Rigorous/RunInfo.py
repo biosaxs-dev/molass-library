@@ -58,6 +58,8 @@ class RunInfo:
         # Set by RigorousImplement when async_=True:
         self._async_thread = None
         self._async_error = None
+        # Set by RigorousImplement for monitor=False subprocess runs (issue #189):
+        self._subprocess_process = None
         # Cooperative stop flag for in-process async runs.  Set via
         # request_stop(); InProcessRunner checks it and injects
         # KeyboardInterrupt into the solver thread.
@@ -76,16 +78,19 @@ class RunInfo:
 
     @property
     def is_alive(self):
-        """``True`` while an async background thread is running, ``False`` when done.
+        """``True`` while the background optimizer is still running.
 
-        Always ``False`` for synchronous (blocking) runs.
-        Check this after ``optimize_rigorously(async_=True)`` to know when
-        it is safe to call :meth:`load_best` or :meth:`live_status`.
+        Works for both async in-process runs (``async_=True``) and
+        subprocess runs (``monitor=False, in_process=False``).
+        Returns ``False`` once the run completes or for synchronous runs.
         """
         t = self._async_thread
-        if t is None:
-            return False
-        return t.is_alive()
+        if t is not None:
+            return t.is_alive()
+        p = self._subprocess_process
+        if p is not None:
+            return p.poll() is None
+        return False
 
     @property
     def current_work_folder(self):
@@ -273,6 +278,24 @@ class RunInfo:
                 if run_info.is_alive:
                     print(run_info.live_status())
         """
+        # For subprocess runs (monitor=False), wait on the process directly.
+        if self._subprocess_process is not None:
+            if timeout:
+                try:
+                    self._subprocess_process.wait(timeout=timeout)
+                except Exception:
+                    return self._subprocess_process.poll() is not None
+            else:
+                self._subprocess_process.wait()
+            rc = self._subprocess_process.returncode
+            try:
+                from molass.Rigorous.RunRegistry import update_run_manifest
+                update_run_manifest(self.work_folder, status="completed", subprocess_returncode=rc)
+                update_run_manifest(self.analysis_folder, status="completed", subprocess_returncode=rc)
+            except Exception:
+                pass
+            return True
+
         # For async in-process runs, join the background thread directly.
         if self._async_thread is not None:
             import warnings

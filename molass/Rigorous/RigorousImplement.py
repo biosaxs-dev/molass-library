@@ -563,6 +563,15 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             reload(molass_legacy.Optimizer.BackRunner)
         from molass_legacy.Optimizer.BackRunner import BackRunner
 
+        # When clear_jobs=True, remove all existing job folders so BackRunner
+        # starts at job 000 (BackRunner.get_work_folder() just picks the next
+        # empty slot and would skip non-empty folders from a previous run).
+        if clear_jobs:
+            import shutil
+            _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+            if os.path.isdir(_jobs_dir):
+                shutil.rmtree(_jobs_dir)
+
         runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
         # Mirror MplMonitor.run_impl: ensure optimizer is prepared before launch.
         # (already done above in `optimizer.prepare_for_optimization(init_params)`)
@@ -590,26 +599,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             )
         except Exception:
             pass
-        # Block until the subprocess exits.  Comparison flow will then read
-        # results from disk via wait_for_rigorous_results / list_rigorous_jobs.
-        rc = runner.process.wait()
-        try:
-            from molass.Rigorous.RunRegistry import update_run_manifest
-            update_run_manifest(
-                runner.working_folder,
-                status="completed",
-                subprocess_returncode=rc,
-            )
-            update_run_manifest(
-                analysis_folder,
-                status="completed",
-                subprocess_returncode=rc,
-            )
-        except Exception:
-            pass
-        if debug:
-            print(f"BackRunner subprocess exited with returncode={rc}")
-
+        # Return immediately — do NOT block on runner.process.wait().
+        # load_best() polls the filesystem and returns as soon as the first
+        # result lands on disk.  run_info.wait() can be used to block until
+        # all iterations complete (issue #189).
         if debug:
             import molass.Rigorous.RunInfo
             reload(molass.Rigorous.RunInfo)
@@ -621,7 +614,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             rgcurve=rgcurve,
         )
         run_info.work_folder = runner.working_folder
-        run_info.subprocess_returncode = rc
+        run_info._subprocess_process = runner.process
         return run_info
 
     monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
@@ -664,7 +657,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    return RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
-                   init_params=init_params, monitor=monitor,
-                   analysis_folder=analysis_folder, decomposition=decomposition,
-                   rgcurve=rgcurve)
+    run_info = RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+                       init_params=init_params, monitor=monitor,
+                       analysis_folder=analysis_folder, decomposition=decomposition,
+                       rgcurve=rgcurve)
+    try:
+        run_info.work_folder = monitor.working_folder
+    except Exception:
+        pass
+    return run_info

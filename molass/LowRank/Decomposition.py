@@ -1138,11 +1138,11 @@ class Decomposition:
                 "Example: optimize_rigorously(analysis_folder='temp_analysis_apo_bh', ...)"
             )
 
-        _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC'}
+        _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC', 'CMA'}
         if method not in _VALID_METHODS:
             raise ValueError(
                 f"Unknown method {method!r}. Valid values: {sorted(_VALID_METHODS)} "
-                f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo)"
+                f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo, CMA=CMA-ES)"
             )
 
         if progress is not None:

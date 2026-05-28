@@ -228,13 +228,32 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 | P5+ (constrained global search) | `Rigorous/`, EGH/SDM/EDM models |
 | P6+ (Kratky preprocessing) | Not yet implemented — candidate feature |
 
-### 8. Version Convention
+### 8. Expensive-Object Caching Pattern (May 2026)
+
+When a method produces an expensive computed object (like `RgCurve`), follow this three-layer pattern:
+
+1. **`get_<noun>()`** on the highest-level object the user already holds signals "cached, safe to call repeatedly". It computes on first call and returns the cached result thereafter.
+2. **Downstream methods** (`quick_decomposition`, `optimize_rigorously`, etc.) accept it as an optional parameter. If passed, they use it; if omitted, they compute it internally. No required parameters added.
+3. **Naming**: `get_rg_curve()` (with underscore, `get_` prefix) — not `compute_rgcurve()`. The `get_` prefix is the convention for cached accessors; `compute_` means "always runs".
+
+**Canonical workflow** (no redundant computation):
+```python
+rgcurve = corrected.get_rg_curve()                      # once, cached on corrected
+decomp   = corrected.quick_decomposition(rgcurve=rgcurve)  # injected → cached in decomp
+run_cma  = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
+run_bh   = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
+```
+
+**Implemented so far**: `SecSaxsData.get_rg_curve()`, `Decomposition.get_rg_curve()` (issue #168).  
+**When adding new expensive objects** (e.g. `baseline2d`, `peak_positions`): apply the same pattern.
+
+### 9. Version Convention
 
 - Check `pyproject.toml` for current version (e.g., `0.8.2`)
 - `molass/__init__.py::get_version()` reads from `pyproject.toml` during local development, falls back to `importlib.metadata` for installed package
 - Use `get_version(toml_only=True)` in development to avoid confusion between local and installed versions
 
-### 9. Rigorous Optimization Internals (Issue #107)
+### 10. Rigorous Optimization Internals (Issue #107)
 
 **Score Value (SV)**: The optimizer's raw objective `fv` is converted to a 0–100 scale for display:
 ```

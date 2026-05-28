@@ -902,6 +902,39 @@ class SecSaxsData:
         else:
             return self.beamline_info.get_concfactor()
     
+    def get_rg_curve(self):
+        """Compute the per-frame Rg curve from the corrected XR data, with caching.
+
+        Runs a Guinier fit on every elution frame independently and returns
+        the results as an ``RgCurve`` object.  The result is cached on this
+        instance, so repeated calls are free.
+
+        This is the recommended entry point for obtaining the Rg curve before
+        decomposition.  Pass the returned object to ``quick_decomposition()``
+        and ``optimize_rigorously()`` to avoid redundant recomputation::
+
+            rgcurve = corrected.get_rg_curve()            # computed once, cached
+            decomp   = corrected.quick_decomposition(rgcurve=rgcurve)
+            run      = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
+
+        Returns
+        -------
+        rgcurve : molass.Guinier.RgCurve.RgCurve
+            An ``RgCurve`` with attributes:
+
+            - ``.x`` — frame indices (integer array)
+            - ``.y`` — Rg values in Å; ``NaN`` where Guinier fit failed
+            - ``.scores`` — Guinier fit quality scores (0–1)
+
+        See also
+        --------
+        XrData.compute_rgcurve : underlying computation (no caching)
+        Decomposition.get_rg_curve : same pattern on a Decomposition object
+        """
+        if getattr(self, '_rgcurve', None) is None:
+            self._rgcurve = self.xr.compute_rgcurve()
+        return self._rgcurve
+
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 

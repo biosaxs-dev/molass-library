@@ -126,14 +126,11 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     set_setting('analysis_folder', analysis_folder)
     optimizer_folder = os.path.join(analysis_folder, "optimized")
     set_setting('optimizer_folder', optimizer_folder)
-    rg_folder = os.path.join(optimizer_folder, "rg-curve")
 
     if not os.path.exists(analysis_folder):
         os.makedirs(analysis_folder)
     if not os.path.exists(optimizer_folder):
         os.makedirs(optimizer_folder)
-    if not os.path.exists(rg_folder):
-        os.makedirs(rg_folder)
 
     temp_in_folder = os.path.abspath(os.path.join(analysis_folder, "temp_in_folder"))
     in_folder = get_setting('in_folder')
@@ -182,33 +179,16 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # The difference shifts GuinierDeviation's xr_index bisection → different fv.)
     _export_ssd = data_ssd if data_ssd is not None else decomposition.ssd
     np.save(os.path.join(optimizer_folder, 'ip_xr_qvector.npy'), _export_ssd.xr.q_values)
-    # Always overwrite the rg-curve folder with the current LegacyRgCurve so that
-    # the subprocess uses the exact same Rg data as the parent optimizer.
-    # (molass-legacy#34 root cause: stale rg-curve from a previous run caused
-    # different objective function values between parent and subprocess.)
+    # Export the Rg curve to rg_curve_parent/ — the subprocess reads exclusively
+    # from here.  The old rg-curve/ was a redundant second copy (molass-legacy#34 cleanup).
     import shutil, time as _time
-    if os.path.exists(rg_folder):
-        shutil.rmtree(rg_folder)
-    os.makedirs(rg_folder)
     rgcurve_ = dsets[1]
-    rgcurve_.export(rg_folder)
-    # Write a marker file so the subprocess can bypass check_rg_folder without
-    # relying on SerialSettings propagation (molass-legacy#34).
-    # trust.txt is the primary mechanism; trust_rg_curve_folder=True in
-    # opt_settings.txt is kept as a belt-and-suspenders backup.
-    with open(os.path.join(rg_folder, 'trust.txt'), 'w') as _f:
-        _f.write('parent_exported')
-    set_setting("trust_rg_curve_folder", True)
-
-    # Also export to a SEPARATE parent-exclusive folder (molass-legacy#34 robust fix).
-    # rg_curve_parent/ is never written by the subprocess, so it is immune to any
-    # mysterious clearing of rg-curve/.  The subprocess checks for this folder first
-    # when trust_rg_curve_folder=True.
     parent_rg_folder = os.path.join(optimizer_folder, "rg_curve_parent")
     if os.path.exists(parent_rg_folder):
         shutil.rmtree(parent_rg_folder)
     os.makedirs(parent_rg_folder)
     rgcurve_.export(parent_rg_folder)
+    set_setting("trust_rg_curve_folder", True)
 
     # Export parent's UV diff_spline so subprocess uses same baseline evaluation
     # (molass-legacy#34: second divergence source — UvBaseSpline.diff_spline was
@@ -233,9 +213,6 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     with open(_prep_log, 'a') as _f:
         _t = _time.strftime('%H:%M:%S')
         _f.write(f"[{_t}] prepare_rigorous_folders: export completed\n")
-        _f.write(f"  rg_folder={rg_folder}\n")
-        _f.write(f"  rg_folder ok.stamp: {os.path.exists(os.path.join(rg_folder, 'ok.stamp'))}\n")
-        _f.write(f"  rg_folder trust.txt: {os.path.exists(os.path.join(rg_folder, 'trust.txt'))}\n")
         _f.write(f"  parent_rg_folder ok.stamp: {os.path.exists(os.path.join(parent_rg_folder, 'ok.stamp'))}\n")
         _f.write(f"  parent_rg_folder files: {sorted(os.listdir(parent_rg_folder))}\n")
         _f.write(f"  uv_diff_spline exported: {_ds_exported}\n")
