@@ -799,6 +799,8 @@ class Decomposition:
 
             - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
             - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+            - ``CEDM``: Continuous EDM (shared-column variant of EDM)
+            - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html>`_
 
         rgcurve : Curve, optional
             The Rg curve to use for the optimization.
@@ -1135,8 +1137,7 @@ class Decomposition:
                 'SDM', analysis_folder='temp_analysis_apo_sdm', ...)
 
             # EGH → LKM upgrade → refine with G1400 (auto-detected)
-            from molass.SEC.Models.LKM import LKM
-            decomp_lkm = LKM().optimize_decomposition(decomp)  # moment-matching
+            decomp_lkm = decomp.upgrade('LKM')                 # moment-matching
             run_lkm = decomp_lkm.optimize_rigorously(          # G1400 auto-selected
                 analysis_folder='temp_analysis_apo_lkm', ...)
 
