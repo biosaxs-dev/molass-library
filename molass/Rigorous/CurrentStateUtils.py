@@ -333,13 +333,15 @@ def list_rigorous_jobs(analysis_folder):
         if len(fv_list) <= 1:
             continue  # only init entry — BH/NS has not started yet
 
-        # For BH: use accepted (a=True) entries to get the true BH best.
-        # For NS: all entries are a=False by design — use all of them.
-        accepted = [row for row in fv_list if row[2] is True]
-        best_entries = accepted if accepted else fv_list
+        # Use all entries for best_fv regardless of a=True/False.
+        # For BH: the true best may be in a rejected basin (a=False).
+        # For CMA: a=True marks a generation improvement but NOT whether it
+        #   beats the init params — init gets a=False and is often the best.
+        # For NS: all entries are a=False by design.
+        # get_params() (Scripting.py) also uses argmin over all entries.
         fv_arr = np.array(fv_list, dtype=object)
         iterations = len(fv_arr)
-        best_fv = float(min(row[1] for row in best_entries))
+        best_fv = float(min(row[1] for row in fv_list))
         # Last iteration's timestamp (column 3)
         timestamp = fv_list[-1][3]
 

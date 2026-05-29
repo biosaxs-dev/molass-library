@@ -35,8 +35,8 @@ def test_no_accepted_entries_excluded():
         assert jobs == [], "Expected no jobs when only the init entry exists"
 
 
-def test_accepted_entries_included():
-    """A BH job with a=True entries must return the best accepted fv."""
+def test_best_fv_across_all_entries():
+    """best_fv must be the global minimum across ALL entries, regardless of a=True/False."""
     from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -50,25 +50,31 @@ def test_accepted_entries_included():
         jobs = list_rigorous_jobs(tmpdir)
         assert len(jobs) == 1
         assert abs(jobs[0].best_fv - (-1.633)) < 1e-6, \
-            f"Expected best_fv=-1.633 (accepted only), got {jobs[0].best_fv}"
+            f"Expected best_fv=-1.633 (global min), got {jobs[0].best_fv}"
 
 
-def test_init_worse_than_accepted_not_used():
-    """Init params (a=False) must not pollute best_fv even if numerically lower."""
+def test_cma_init_is_best_included():
+    """CMA issue #194: init entry (a=False) IS the best result 窶・must be included.
+
+    CMA marks its own generation improvements as a=True starting from an often-worse
+    point.  The init params (from quick_decomposition) are frequently better than
+    anything CMA finds.  best_fv must be the global min across all entries.
+    """
     from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
 
     with tempfile.TemporaryDirectory() as tmpdir:
         jobs_dir = os.path.join(tmpdir, "optimized", "jobs", "000")
-        # Pathological case: init has a very low fv but was not accepted
+        # CMA scenario: init is better than any CMA generation result
         _write_callback(jobs_dir, [
-            (-9.999, False),  # init (not accepted, artificially low)
-            (-1.614, True),
+            (-1.4049, False),  # init (from quick_decomposition 窶・very good)
+            (-1.3600, True),   # CMA generation 1 improvement (worse than init)
+            (-1.3700, True),   # CMA generation 2 improvement (worse than init)
         ])
 
         jobs = list_rigorous_jobs(tmpdir)
         assert len(jobs) == 1
-        assert abs(jobs[0].best_fv - (-1.614)) < 1e-6, \
-            "Init (a=False) fv must not be used as best_fv for BH"
+        assert abs(jobs[0].best_fv - (-1.4049)) < 1e-6, \
+            f"Init fv must be included as best_fv when it is the global min, got {jobs[0].best_fv}"
 
 
 def test_ns_all_false_entries_included():

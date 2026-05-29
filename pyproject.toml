@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "0.9.7"
+version = "0.9.8"
 
 dependencies = [
   "numpy",
@@ -25,6 +25,7 @@ dependencies = [
   "mrcfile",
   "ipywidgets",
   "ipykernel",
+  "cma",
 ]
 
 requires-python = ">=3.12,<3.15"
