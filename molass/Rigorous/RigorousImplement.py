@@ -232,9 +232,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # STATUS_ACCESS_VIOLATION (0xC0000005) on Windows / Python 3.14+.
     # Root cause: IPython's ProactorEventLoop (IOCP) runs concurrently with the
     # optimizer's daemon thread executing NumPy BLAS code after the cell returns.
-    # Keeping the cell alive (blocking) avoids the crash → fall back to async_=False.
-    # MplMonitor dashboard is not supported in the async_=False path, so monitor
-    # is also forced to False to avoid a dangling watch thread.
+    # Fall back to in_process=False (subprocess) which keeps the cell non-blocking
+    # and preserves the MplMonitor dashboard — the normal user experience.
     # See molass-library#193 and 21c_cma_inprocess_repro.ipynb for full investigation.
     _ASYNC_CRASH_METHODS = {'CMA'}
     if in_process and async_ and method in _ASYNC_CRASH_METHODS:
@@ -242,14 +241,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         _w.warn(
             f"optimize_rigorously(in_process=True, async_=True, method={method!r}) "
             "crashes the Jupyter kernel on Windows/Python 3.14+ (STATUS_ACCESS_VIOLATION). "
-            "Falling back to async_=False (blocking cell). "
-            "The MplMonitor dashboard is not available in this mode. "
+            "Falling back to in_process=False (subprocess). "
+            "The MplMonitor dashboard remains available. "
             "See molass-library#193.",
             UserWarning,
             stacklevel=3,
         )
-        async_ = False
-        monitor = False
+        in_process = False
 
     # progress parameter is deprecated and ignored — monitor=True/False is the
     # single control for the dashboard in both in_process paths.

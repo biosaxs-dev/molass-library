@@ -1,10 +1,11 @@
 """
-Test that optimize_rigorously() falls back to async_=False and emits a
+Test that optimize_rigorously() falls back to in_process=False (subprocess) and emits a
 UserWarning when called with method='CMA', in_process=True, async_=True.
 
 This guard prevents STATUS_ACCESS_VIOLATION kernel crashes caused by
 IPython's asyncio event loop running concurrently with the optimizer's
 NumPy BLAS daemon thread on Windows / Python 3.14+.
+The subprocess fallback preserves the MplMonitor dashboard for the user.
 
 See: https://github.com/biosaxs-dev/molass-library/issues/193
      molass-researcher experiments/21_rigorous_solvers/21c_cma_inprocess_repro.ipynb
@@ -48,10 +49,10 @@ def test_cma_inprocess_async_emits_warning(tmp_path):
         w for w in caught
         if issubclass(w.category, UserWarning)
         and "CMA" in str(w.message)
-        and "async_=False" in str(w.message)
+        and "in_process=False" in str(w.message)
     ]
     assert cma_warnings, (
-        "Expected a UserWarning mentioning 'CMA' and 'async_=False' when "
+        "Expected a UserWarning mentioning 'CMA' and 'in_process=False' when "
         "optimize_rigorously(method='CMA', in_process=True, async_=True) is called. "
         f"Got: {[str(w.message) for w in caught]}"
     )
@@ -76,10 +77,10 @@ def test_cma_async_false_no_warning(tmp_path):
         w for w in caught
         if issubclass(w.category, UserWarning)
         and "CMA" in str(w.message)
-        and "async_=False" in str(w.message)
+        and "in_process=False" in str(w.message)
     ]
     assert not cma_warnings, (
-        "No CMA async warning should be emitted when async_=False is already set. "
+        "No CMA async warning should be emitted when async_=False is explicitly set. "
         f"Got: {[str(w.message) for w in caught]}"
     )
 
