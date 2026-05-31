@@ -11,8 +11,13 @@
 
 ## 🎯 Current Task
 
-**molass-legacy#52 fixed ✅ — duplicate dashboard panel eliminated for fast datasets (ATP, MY)**  
-Next: Run the full in-process vs subprocess comparison for ATP (16d vs 16e) and MY (16f vs 16g) to confirm SV parity across datasets, then choose next feature — candidates: Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
+**molass-library#195 fixed ✅ — SDM lognormal `upgrade()` failure when `rgcurve` is passed**  
+Two linked bugs caused the optimizer to converge at 2D residual≈0.981 instead of ≈0.21:
+- Fix 1 (`SdmEstimator.py`): use `k=2.0` (not mono k) for shift test peak in `estimate_sdm_lognormal_from_monopore`  
+- Fix 2 (`SDM.py`): strip `rgcurve` from the kwargs passed to the mono stage in the lognormal pipeline  
+Verified in `molass-researcher/experiments/22_legacy_support/22e_sample1_sdm_comparison.ipynb`.  
+
+Next: commit these fixes and consider next candidates — Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
 
 ---
 

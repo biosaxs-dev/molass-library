@@ -40,7 +40,14 @@ class SDM:
             reload(molass.SEC.Models.UvOptimizer)
 
         model_params = kwargs.pop('model_params', None)
-        pore_dist = model_params.get('pore_dist', 'mono') if model_params else 'mono'
+        # Accept pore_dist as a direct kwarg (takes precedence over model_params)
+        pore_dist_kwarg = kwargs.pop('pore_dist', None)
+        if pore_dist_kwarg is not None:
+            pore_dist = pore_dist_kwarg
+        elif model_params is not None:
+            pore_dist = model_params.get('pore_dist', 'mono')
+        else:
+            pore_dist = 'mono'
 
         if pore_dist == 'lognormal':
             from molass.SEC.Models.SdmEstimator import estimate_sdm_lognormal_from_monopore
@@ -51,8 +58,13 @@ class SDM:
             from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
             from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
             mono_env = estimate_sdm_column_params(decomposition, **kwargs)
+            # Strip rgcurve from the mono stage: the mono result is scaffolding
+            # to seed lognormal estimation. Passing rgcurve here shifts k
+            # significantly (e.g. 2.0 → 1.4), which changes N/T and drives the
+            # lognormal optimizer into a bad local minimum (Issue #195).
+            mono_kwargs = {k: v for k, v in kwargs.items() if k != 'rgcurve'}
             mono_ccurves = optimize_sdm_xr_decomposition(
-                decomposition, mono_env, model_params=mono_model_params, **kwargs)
+                decomposition, mono_env, model_params=mono_model_params, **mono_kwargs)
             env_params = estimate_sdm_lognormal_from_monopore(
                 mono_ccurves, decomposition.xr_icurve,
                 decomposition=decomposition, **kwargs)

@@ -808,6 +808,12 @@ class Decomposition:
         model_params : dict, optional
             The parameters for the model.
 
+        pore_dist : str, optional
+            For SDM only: pore-size distribution to use.
+            ``'mono'`` (default) uses a single pore size (G1200, gamma residence time);
+            ``'lognormal'`` uses a lognormal pore distribution (G1300).
+            Takes precedence over ``model_params['pore_dist']`` when both are given.
+
         debug : bool, optional
             If True, enable debug mode.
 

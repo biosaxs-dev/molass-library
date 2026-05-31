@@ -128,3 +128,78 @@ def guess_multiple_impl(x, y, xr_ccurves, respect_egh=False, debug=False):
     sort_pairs = sorted(zip(peak_pos, edm_params_list), key=lambda x: x[0])
     final_params_list = [pair[1] for pair in sort_pairs]
     return np.array(final_params_list)
+
+
+def estimate_cedm_shared_params(x, y, xr_ccurves, debug=False, **kwargs):
+    """Canonical estimator for CEDM (G2020) initial parameters.
+
+    Combines rough per-component EDM fitting (:func:`guess_multiple_impl`)
+    with a joint shared-column L-BFGS-B optimisation to produce physically
+    meaningful CEDM params with varied ``b`` values and shared column
+    parameters.
+
+    Parameters
+    ----------
+    x : array-like
+        Elution frame positions.
+    y : array-like
+        XR integrated intensity values.
+    xr_ccurves : list
+        Component curves.  Each must expose:
+
+        - ``.x``     — array of frame positions (for peak-frame detection)
+        - ``.y``     — array of intensity values (for peak-frame detection)
+        - ``get_y()`` — method returning the component intensity (for rough fit)
+
+    debug : bool, optional
+        If ``True``, print optimisation diagnostics.
+    **kwargs
+        Forwarded to :func:`molass.SEC.Models.EdmOptimizer.optimize_edm_xr_decomposition`
+        (e.g. ``e_bounds``, ``cinj_min``, ``suppress_positive_b_warning``).
+
+    Returns
+    -------
+    cedm_colparams : np.ndarray, shape (4,)
+        Shared column parameters ``[t0_sh, u_sh, e_sh, Dz_sh]``.
+    abc_params : np.ndarray, shape (nc, 3)
+        Per-component parameters ``[[a_0, b_0, cinj_0], ...]``.
+    """
+    if debug:
+        from importlib import reload
+        import molass.SEC.Models.EdmOptimizer
+        reload(molass.SEC.Models.EdmOptimizer)
+    from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition
+
+    nc = len(xr_ccurves)
+
+    # Step 1: rough per-component estimate — provides Dz and cinj seed values
+    rough_params = guess_multiple_impl(x, y, xr_ccurves, debug=debug)  # (nc, 7)
+
+    # Step 2: build a minimal mock decomposition for optimize_edm_xr_decomposition
+    class _MockIcurve:
+        def get_xy(inner_self):
+            return x, y
+
+    class _MockDecomp:
+        def __init__(inner_self):
+            inner_self.num_components = nc
+            inner_self.xr_icurve = _MockIcurve()
+            inner_self.xr_ccurves = xr_ccurves  # need .x and .y for peak anchors
+
+    # Step 3: shared-column optimisation
+    # The optimizer resets b_init=0 and e_init=0.5 analytically, so the
+    # b≈-4 from guess_multiple_impl does not pollute the result.
+    kwargs.setdefault('shared_column', True)
+    new_ccurves = optimize_edm_xr_decomposition(
+        _MockDecomp(), rough_params, debug=debug, **kwargs
+    )
+
+    # Step 4: extract CEDM params — all curves share t0, u, e, Dz
+    # params layout: [t0, u, a, b, e, Dz, cinj]
+    p0 = new_ccurves[0].params
+    cedm_colparams = np.array([p0[0], p0[1], p0[4], p0[5]])   # [t0_sh, u_sh, e_sh, Dz_sh]
+    abc_params = np.array(
+        [[cc.params[2], cc.params[3], cc.params[6]] for cc in new_ccurves]
+    )  # (nc, 3): [a_k, b_k, cinj_k]
+
+    return cedm_colparams, abc_params

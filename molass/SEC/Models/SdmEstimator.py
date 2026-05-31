@@ -252,10 +252,14 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
     mu = np.log(effective_poresize)
     sigma = 0.3
 
-    # Create a test lognormal PDF with the dominant component to find peak position
+    # Create a test lognormal PDF with the dominant component to find peak position.
+    # Use k=2.0 (the lognormal optimizer's default k_init) for the shift computation,
+    # NOT the mono k (which may differ, e.g. k=1.4 when rgcurve anchors the mono fit).
+    # Using mono k here causes a wrong shift that derails the lognormal optimizer init.
     x_data, y_data = xr_icurve.get_xy()
     rg_dominant = mono_ccurves[0].rg
-    col_test = SdmColumn([N, T, me, mp, x0, tI, N0, mu, sigma, k],
+    k_for_shift = 2.0   # matches lognormal optimizer default k_init
+    col_test = SdmColumn([N, T, me, mp, x0, tI, N0, mu, sigma, k_for_shift],
                          pore_dist='lognormal', rt_dist=column.rt_dist)
     cc_test = SdmComponentCurve(x_data, col_test, rg_dominant, scale=1.0)
     cy_test = cc_test.get_y()

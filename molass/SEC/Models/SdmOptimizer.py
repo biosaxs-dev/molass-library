@@ -365,7 +365,23 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     env_params : tuple
         The environmental parameters ``(N, T, me, mp, N0, t0, mu, sigma)``.
     model_params : dict, optional
-        The parameters for the SDM model.
+        The parameters for the SDM model.  Recognized keys:
+
+        ``ln_pore_sigma`` : float or None (default 0.3)
+            Standard deviation of ``ln(r/r0)``, held constant during
+            optimization (removed from the free-parameter vector).
+            Invariant to the choice of length unit (a unit change only
+            shifts all ``ln(r/r0)`` values by a constant, which drops out
+            of the standard deviation).
+            The default 0.3 implies pores span a factor of
+            ``exp(0.3) ≈ 1.35`` around the median — a reasonable prior for
+            most SEC columns.  Pass ``None`` to make sigma a free parameter;
+            note that sigma is underdetermined when ``num_components=1``
+            and will drift to ``sigma_max`` if left free.
+        ``sigma_max`` : float (default 0.8)
+            Upper bound on sigma when it is free.
+        ``k`` : float (default 2.0)
+        ``rt_dist`` : str (default ``'gamma'``)
     kwargs : dict
         Additional parameters for the optimization process.
 
@@ -388,18 +404,23 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     N, T, me, mp, N0, t0, mu_init, sigma_init = env_params
     rgv = np.asarray(decomposition.get_rgs())
 
+    # ln_pore_sigma default: 0.3 — std-dev of ln(r/r0), invariant to unit choice.
+    # Free sigma (None) is underdetermined for num_components=1 and drifts to sigma_max.
+    _LN_PORE_SIGMA_DEFAULT = 0.3
     if model_params is None:
         k_init = 2.0
         rt_dist = 'gamma'
         rg_penalty_weight = 1.0
         sigma_max = 0.8
         min_rg_gap = 0.5
+        ln_pore_sigma = _LN_PORE_SIGMA_DEFAULT
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
         rg_penalty_weight = model_params.get('rg_penalty_weight', 1.0)
         sigma_max = model_params.get('sigma_max', 0.8)
         min_rg_gap = model_params.get('min_rg_gap', 0.5)  # Å — minimum required Rg gap between components
+        ln_pore_sigma = model_params.get('ln_pore_sigma', _LN_PORE_SIGMA_DEFAULT)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -432,9 +453,15 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     rg_penalty_scale = rg_penalty_weight * initial_error
 
     def objective_function(params):
-        N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = params[0:8]
-        rgv_ = params[8:8 + num_components]
-        scales_ = params[8 + num_components:8 + 2 * num_components]
+        N_, T_, x0_, tI_, N0_, k_, mu_ = params[0:7]
+        if ln_pore_sigma is None:
+            sigma_ = params[7]
+            rgv_start = 8
+        else:
+            sigma_ = ln_pore_sigma
+            rgv_start = 7
+        rgv_ = params[rgv_start:rgv_start + num_components]
+        scales_ = params[rgv_start + num_components:rgv_start + 2 * num_components]
 
         if sigma_ < 0.01 or sigma_ > sigma_max:
             return 1e20
@@ -476,8 +503,10 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
 
     _eval_count = [0]
 
-    # Initial guess: [N, T, x0, tI, N0, k, mu, sigma, ...Rg, ...scale]
-    initial_guess = [N, T, t0, t0, N0, k_init, mu_init, sigma_init]
+    # Initial guess: [N, T, x0, tI, N0, k, mu, (sigma if free), ...Rg, ...scale]
+    initial_guess = [N, T, t0, t0, N0, k_init, mu_init]
+    if ln_pore_sigma is None:
+        initial_guess += [sigma_init]
     initial_guess += list(rgv)
     initial_guess += scales_init
 
@@ -494,7 +523,8 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     else:
         bounds += [(0.5, 10.0)]     # k free for gamma
     bounds += [(2.0, 8.0)]          # mu
-    bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
+    if ln_pore_sigma is None:
+        bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
     bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]
     upper_scale = xr_icurve.get_max_y() * 1000
     bounds += [(1e-3, upper_scale) for _ in range(num_components)]
@@ -516,23 +546,31 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     result = minimize(objective_function, initial_guess, bounds=bounds,
                       method=method, options=nm_options)
 
+    import warnings as _warnings
+    N_, T_, x0_, tI_, N0_, k_, mu_ = result.x[0:7]
+    if ln_pore_sigma is None:
+        sigma_ = result.x[7]
+        rgv_start = 8
+    else:
+        sigma_ = ln_pore_sigma
+        rgv_start = 7
+    rgv_ = result.x[rgv_start:rgv_start + num_components]
+    scales_ = result.x[rgv_start + num_components:rgv_start + 2 * num_components]
+
     if debug:
         print(f"Lognormal optimization: {_eval_count[0]} evals, success={result.success}")
-        print("N=%g, T=%g, x0=%g, tI=%g, N0=%g, k=%g, mu=%g, sigma=%g" % tuple(result.x[0:8]))
-        print("Rgs:", result.x[8:8 + num_components])
-        print("Scales:", result.x[8 + num_components:8 + 2 * num_components])
+        sigma_str = f"{sigma_:.4f}(fixed)" if ln_pore_sigma is not None else f"{sigma_:.4f}"
+        print(f"N={N_:.4g}, T={T_:.4g}, x0={x0_:.4g}, tI={tI_:.4g}, N0={N0_:.4g}, k={k_:.4g}, mu={mu_:.4g}, sigma={sigma_str}")
+        print("Rgs:", rgv_)
+        print("Scales:", scales_)
         print(f"Rg initial (Guinier): {rgv}")
         print(f"Rg penalty weight: {rg_penalty_weight}, initial_error: {initial_error:.4g}")
-
-    import warnings as _warnings
-    N_, T_, x0_, tI_, N0_, k_, mu_, sigma_ = result.x[0:8]
-    rgv_ = result.x[8:8 + num_components]
-    scales_ = result.x[8 + num_components:8 + 2 * num_components]
 
     # Warn when sigma is close to its upper bound — indicates a near-degenerate
     # solution where the optimizer could not separate the components properly.
     # This typically happens when the dataset has only one dominant species.
-    if sigma_ > sigma_max * 0.9:
+    # Skip when sigma was fixed by the caller — user explicitly chose a constant.
+    if ln_pore_sigma is None and sigma_ > sigma_max * 0.9:
         _warnings.warn(
             f"SDM(lognormal) optimizer converged at sigma={sigma_:.4f} (sigma_max={sigma_max}). "
             "The two components may have collapsed to near-identical pore distributions. "
@@ -548,7 +586,8 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         print("initial_scales:", scales_init)
         print("optimized scales:", list(scales_))
         print("optimized k:", k_)
-        print("optimized mu:", mu_, "sigma:", sigma_)
+        sigma_str = f"{sigma_:.4f}(fixed)" if ln_pore_sigma is not None else f"{sigma_:.4f}"
+        print("optimized mu:", mu_, "sigma:", sigma_str)
 
     new_xr_ccurves = []
     for rg, scale in zip(rgv_, scales_):
