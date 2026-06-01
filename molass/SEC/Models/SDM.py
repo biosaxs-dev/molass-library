@@ -49,6 +49,13 @@ class SDM:
         else:
             pore_dist = 'mono'
 
+        # rgcurve has no effect on SDM upgrade quality (verified: identical 2D XR residuals
+        # with and without rgcurve for both mono and lognormal on SAMPLE1, 22e cell 10).
+        # For mono: adjust_rg_and_poresize() does not use rgcurve.
+        # For lognormal: estimator and optimizer are rgcurve-independent.
+        # Strip it here so it cannot accidentally propagate to any sub-function.
+        kwargs.pop('rgcurve', None)
+
         if pore_dist == 'lognormal':
             from molass.SEC.Models.SdmEstimator import estimate_sdm_lognormal_from_monopore
             from molass.SEC.Models.SdmOptimizer import optimize_sdm_lognormal_xr_decomposition
@@ -58,13 +65,8 @@ class SDM:
             from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
             from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
             mono_env = estimate_sdm_column_params(decomposition, **kwargs)
-            # Strip rgcurve from the mono stage: the mono result is scaffolding
-            # to seed lognormal estimation. Passing rgcurve here shifts k
-            # significantly (e.g. 2.0 → 1.4), which changes N/T and drives the
-            # lognormal optimizer into a bad local minimum (Issue #195).
-            mono_kwargs = {k: v for k, v in kwargs.items() if k != 'rgcurve'}
             mono_ccurves = optimize_sdm_xr_decomposition(
-                decomposition, mono_env, model_params=mono_model_params, **mono_kwargs)
+                decomposition, mono_env, model_params=mono_model_params, **kwargs)
             env_params = estimate_sdm_lognormal_from_monopore(
                 mono_ccurves, decomposition.xr_icurve,
                 decomposition=decomposition, **kwargs)
@@ -90,8 +92,7 @@ class SDM:
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if pore_dist != 'lognormal':
-            rgcurve = kwargs.pop('rgcurve', None)
-            adjust_rg_and_poresize(sdm_decomposition, rgcurve=rgcurve)
+            adjust_rg_and_poresize(sdm_decomposition)
 
         if debug:
             import matplotlib.pyplot as plt

@@ -287,6 +287,28 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     rgv_ = result.x[6:6+num_components]
     scales_ = result.x[6+num_components:6+2*num_components]
     poresize_ = result.x[6+2*num_components]
+
+    # Post-NM NNLS rescaling: given the converged column shape, solve for optimal
+    # scales analytically. NM may drift scales during joint shape exploration;
+    # NNLS finds the exact 1D-fit optimum at the converged shape.
+    from scipy.optimize import nnls as _nnls
+    _rhov_ = np.clip(rgv_ / poresize_, 0.0, 1.0)
+    _x_tI = x - tI_
+    _t0_post = x0_ - tI_
+    _A_cols = []
+    for _rho in _rhov_:
+        _ni = N_ * (1 - _rho) ** me
+        _ti = T_ * (1 - _rho) ** mp
+        if rt_dist == 'exponential':
+            _cy = _pdf_func(_x_tI, _ni, _ti, N0_, _t0_post, timescale=timescale)
+        else:
+            _theta = _ti / k_
+            _cy = _pdf_func(_x_tI, _ni, k_, _theta, N0_, _t0_post, timescale=timescale)
+        _A_cols.append(_cy)
+    _A_mat = np.array(_A_cols).T
+    _scales_nnls, _ = _nnls(_A_mat, y)
+    scales_ = np.array([max(s, 1e-3) for s in _scales_nnls])
+
     column = SdmColumn([N_, T_, me, mp, x0_, tI_, N0_, poresize_, timescale, k_],
                        pore_dist=pore_dist, rt_dist=rt_dist)
     print("initial_scales:", initial_scales)
@@ -559,6 +581,20 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         rgv_start = 7
     rgv_ = result.x[rgv_start:rgv_start + num_components]
     scales_ = result.x[rgv_start + num_components:rgv_start + 2 * num_components]
+
+    # Post-NM NNLS rescaling: given the converged column shape, solve for optimal
+    # scales analytically. NM may drift scales during joint shape exploration;
+    # NNLS finds the exact 1D-fit optimum at the converged shape.
+    _x_tI = x - tI_
+    _t0_post = x0_ - tI_
+    _A_cols = []
+    for _rg in rgv_:
+        _cy = sdm_lognormal_pore_gamma_pdf_fast(
+            _x_tI, 1.0, N_, T_, k_, me, mp, mu_, sigma_, _rg, N0_, _t0_post)
+        _A_cols.append(_cy)
+    _A_mat = np.array(_A_cols).T
+    _scales_nnls, _ = _nnls(_A_mat, y)
+    scales_ = np.array([max(s, 1e-3) for s in _scales_nnls])
 
     if debug:
         print(f"Lognormal optimization: {_eval_count[0]} evals, success={result.success}")
