@@ -3,12 +3,25 @@
 
 """
 import numpy as np
+from collections import namedtuple
 from molass.SEC.Models.SdmMonoPore import (
     sdm_monopore_pdf,
     sdm_monopore_gamma_pdf,
     DEFAULT_TIMESCALE,
 )
 from molass.LowRank.ComponentCurve import ComponentCurve
+
+SdmMonoColumnParams = namedtuple(
+    'SdmMonoColumnParams',
+    ['N', 'T', 'me', 'mp', 'x0', 'tI', 'N0', 'poresize', 'timescale', 'k']
+)
+"""`get_params()` return type for ``pore_dist='mono'``."""
+
+SdmLognormalColumnParams = namedtuple(
+    'SdmLognormalColumnParams',
+    ['N', 'T', 'me', 'mp', 'x0', 'tI', 'N0', 'mu', 'sigma', 'k']
+)
+"""`get_params()` return type for ``pore_dist='lognormal'``."""
 
 class SdmColumn:
     """
@@ -55,14 +68,19 @@ class SdmColumn:
 
     def get_params(self):
         """
-        Returns the parameters of the SDM column.
+        Returns the parameters of the SDM column as a named tuple.
 
         Returns
         -------
-        tuple
-            The parameters of the SDM column.
+        SdmMonoColumnParams or SdmLognormalColumnParams
+            Named tuple with fields ``(N, T, me, mp, x0, tI, N0,
+            poresize, timescale, k)`` for mono, or
+            ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)`` for lognormal.
+            Backward-compatible with positional unpacking.
         """
-        return self.params
+        if self.pore_dist == 'lognormal':
+            return SdmLognormalColumnParams(*self.params)
+        return SdmMonoColumnParams(*self.params)
 
 class SdmComponentCurve(ComponentCurve):
     """

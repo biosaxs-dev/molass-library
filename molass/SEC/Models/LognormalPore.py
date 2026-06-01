@@ -422,6 +422,18 @@ def _lognorm_pdf_fast(r, mu, sigma):
 def sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me=1.5, mp=1.5):
     """Compute (M1, Variance) of the SDM lognormal-pore gamma elution model.
 
+    .. note::\n        ``me`` and ``mp`` default to 1.5 (standard SDM SEC exponents).  When
+        using column-fitted values, pass them explicitly — they live at positions
+        2 and 3 of ``SdmColumn.get_params()`` (i.e., ``col.get_params().me``)
+        but are keyword-only here::
+
+            M1, Var = sdm_lognormal_model_moments(
+                rg, N, T, N0, t0, k, mu, sigma,
+                me=ln_env.me, mp=ln_env.mp)  # ln_env from estimate_sdm_lognormal_from_monopore
+
+        ``k`` (gamma shape) is **not** in the ``LognormalEnv`` 8-tuple; use
+        ``col.get_params().k`` from the mono-pore result for moment-matching.
+
     For a single component with radius of gyration ``rg``, the residence-time
     distribution is gamma with shape ``k`` and per-pore mean ``n(r)·tau(r)``,
     weighted by the lognormal pore-size density L(r; mu, sigma).

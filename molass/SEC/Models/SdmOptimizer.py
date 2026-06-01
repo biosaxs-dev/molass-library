@@ -602,18 +602,28 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         C_mat = np.array([cc.get_y() for cc in new_xr_ccurves])
         cond_C = np.linalg.cond(C_mat)
         if cond_C > 1e6:
+            pore_opt = np.exp(mu_)
+            rg_max_val = float(np.max(rgv_))
+            pore_safe = 2.0 * rg_max_val
+            pore_hint = (
+                f" Optimized pore center: {pore_opt:.1f} Å (mu={mu_:.3f})."
+                f" SDM separation requires pore ≤ 2×Rg_max = {pore_safe:.1f} Å;"
+                f" above this, K_SEC values compress and elution curves converge."
+                f" Try constraining the moment-matching bound to"
+                f" mu_max = ln({pore_safe:.1f}) = {np.log(pore_safe):.4f}."
+            ) if pore_opt > pore_safe else ""
             raise RuntimeError(
                 f"SDM(lognormal) produced a degenerate decomposition "
                 f"(C condition number = {cond_C:.2e}, sigma = {sigma_:.4f}). "
                 "The component elution curves are nearly identical; "
-                "P = M @ pinv(C) would be numerically meaningless. "
-                "This typically occurs when the dataset contains only one dominant species. "
-                "Suggested actions: use pore_dist='mono', or reduce num_components to 1."
+                "P = M @ pinv(C) would be numerically meaningless."
+                + pore_hint +
+                " Other suggested actions: use pore_dist='mono', or reduce num_components to 1."
             )
 
     return new_xr_ccurves
 
-def adjust_rg_and_poresize(sdm_decomposition, rgcurve=None):
+def adjust_rg_and_poresize(sdm_decomposition):
     """ Adjust rg and poresize in the decomposition based on the optimized component curves.
     """
     from .SdmComponentCurve import SdmColumn

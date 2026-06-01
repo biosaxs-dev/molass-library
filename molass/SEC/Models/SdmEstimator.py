@@ -2,7 +2,24 @@
 SEC.Models.SdmEstimator.py
 """
 import numpy as np
+from collections import namedtuple
 from scipy.optimize import minimize
+
+LognormalEnv = namedtuple(
+    'LognormalEnv',
+    ['N', 'T', 'me', 'mp', 'N0', 't0', 'mu', 'sigma']
+)
+"""Named-tuple form of the lognormal env-params 8-tuple ``(N, T, me, mp, N0, t0, mu, sigma)``.
+
+Returned by ``estimate_sdm_lognormal_from_monopore`` and accepted by
+``optimize_sdm_lognormal_xr_decomposition`` as its ``env_params`` argument.
+Backward-compatible with positional unpacking.
+
+Note: ``k`` (gamma shape) is *not* included here; it lives in
+``model_params={'k': ...}`` of the lognormal optimizer (default 2.0).
+Access ``me`` and ``mp`` via ``ln_env.me`` / ``ln_env.mp`` when calling
+``sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me=..., mp=...)``.
+"""
 
 def estimate_sdm_column_params(decomposition, **kwargs):
     """
@@ -285,7 +302,7 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
             decomposition, N, T, N0, t0_adj, k, mu, sigma,
             me=me, mp=mp, debug=debug)
 
-    return N, T, me, mp, N0, t0_adj, mu, sigma
+    return LognormalEnv(N, T, me, mp, N0, t0_adj, mu, sigma)
 
 
 def refine_lognormal_params_by_moments(
@@ -295,13 +312,19 @@ def refine_lognormal_params_by_moments(
 
     Given an initial guess (typically from ``estimate_sdm_lognormal_from_monopore``
     which uses heuristic poresize geometric mean + sigma=0.3), this function
-    refines (mu, sigma, k, t0) by L-BFGS-B against the per-component (M1, Var)
+    refines (mu, sigma, k, t0) by Nelder-Mead against the per-component (M1, Var)
     extracted from the EGH decomposition.
+
+    The upper bound on ``mu`` is enforced as ``ln(2 × Rg_max)`` — the SDM
+    separation criterion.  Above this, K_SEC values compress across components
+    and elution curves converge, causing a degenerate Stage-3 decomposition.
+    The L-BFGS-B solver that was used previously could overshoot this bound,
+    accidentally yielding a bad starting point or causing a degenerate collapse;
+    Nelder-Mead with an explicit penalty respects the bound by construction.
 
     Uses the fast analytical moment evaluator
     :func:`molass.SEC.Models.LognormalPore.sdm_lognormal_model_moments`
-    (~50 us/call), so the full refinement (~100 evals × num_components) costs
-    only a few ms.
+    (~50 us/call), so the full refinement costs only a few tens of ms.
 
     Only (mu, sigma, k, t0) are refined; (N, T, N0) are held fixed because
     the mono-pore stage already constrains them well from M1+M2+M3 matching.
@@ -352,29 +375,36 @@ def refine_lognormal_params_by_moments(
 
     eps = 1e-30
 
+    # Rg-derived upper bound on mu: pore center must stay ≤ 2 × Rg_max
+    # so that K_SEC values remain distinct and Stage-3 elution curves stay
+    # separated.  Overshooting this bound causes a degenerate (rank-1) C
+    # matrix in Stage 3 and a RuntimeError.
+    rg_max = float(np.max(rgv))
+    mu_max = np.log(2.0 * rg_max)
+    mu_start = min(mu, mu_max - 0.05)
+
     def objective(params):
         t0_, k_, mu_, sigma_ = params
+        # Hard bounds enforced via large penalty (Nelder-Mead has no native bounds)
+        if (k_ < 0.5 or k_ > 30
+                or mu_ < 2.0 or mu_ > mu_max
+                or sigma_ < 0.05 or sigma_ > 1.5):
+            return 1e6
         err = 0.0
         for i, (M1_t, Var_t) in enumerate(target_moments):
             M1_m, Var_m = sdm_lognormal_model_moments(
                 rgv[i], N, T, N0, t0_, k_, mu_, sigma_, me=me, mp=mp)
-            # log-sum keeps the M1 (~hundreds) and Var (~thousands) terms
-            # on comparable scales without manual weighting
+            # log-sum keeps M1 (~hundreds) and Var (~thousands) on comparable
+            # scales without manual weighting
             err += props[i] * (
                 np.log((M1_m - M1_t)**2 + eps)
                 + np.log((Var_m - Var_t)**2 + eps)
             )
         return err
 
-    bounds = [
-        (t0 - 500, t0 + 500),       # t0
-        (max(0.5, k * 0.3), max(10.0, k * 3)),   # k
-        (max(2.0, mu - 1.0), min(7.0, mu + 1.0)),   # mu
-        (0.05, 1.5),                # sigma
-    ]
-    x0 = [t0, k, mu, sigma]
-
-    result = minimize(objective, x0, method='L-BFGS-B', bounds=bounds)
+    result = minimize(objective, [t0, k, mu_start, sigma],
+                      method='Nelder-Mead',
+                      options={'maxiter': 20000, 'xatol': 1e-4, 'fatol': 1e-4})
     t0_r, k_r, mu_r, sigma_r = result.x
 
     if debug:
