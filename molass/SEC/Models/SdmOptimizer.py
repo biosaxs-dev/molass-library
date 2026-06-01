@@ -414,6 +414,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         sigma_max = 0.8
         min_rg_gap = 0.5
         ln_pore_sigma = _LN_PORE_SIGMA_DEFAULT
+        nm_maxiter = None
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
@@ -421,6 +422,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         sigma_max = model_params.get('sigma_max', 0.8)
         min_rg_gap = model_params.get('min_rg_gap', 0.5)  # Å — minimum required Rg gap between components
         ln_pore_sigma = model_params.get('ln_pore_sigma', _LN_PORE_SIGMA_DEFAULT)
+        nm_maxiter = model_params.get('maxiter', None)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -540,8 +542,9 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
 
     # Lognormal has more parameters than mono-pore and needs more iterations
     # to converge. Default NM maxiter (200*N) is insufficient (Issue #108).
+    # nm_maxiter can be reduced via model_params={'maxiter': N} for quick init passes.
     n_params = len(initial_guess)
-    nm_options = {'maxiter': max(200 * n_params, 12000)}
+    nm_options = {'maxiter': nm_maxiter if nm_maxiter is not None else max(200 * n_params, 12000)}
 
     result = minimize(objective_function, initial_guess, bounds=bounds,
                       method=method, options=nm_options)
