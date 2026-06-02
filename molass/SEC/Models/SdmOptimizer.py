@@ -30,6 +30,7 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     """
     # N, T, N0, t0, poresize
     debug = kwargs.get('debug', False)
+    progress = kwargs.get('progress', False)
     if debug:
         from importlib import reload
         import molass.SEC.Models.SdmComponentCurve
@@ -137,7 +138,10 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         peak_positions = np.array([x0_ + N_ * (1-rho)**me * T_ * (1-rho)**mp for rho in rhov])
         position_penalty = np.sum((peak_positions - egh_peak_frames) ** 2) * position_anchor_scale
         error = np.sum((y - ty)**2) + order_penalty + rg_anchor_penalty + position_penalty
+        _eval_count[0] += 1
         return error
+
+    _eval_count = [0]
 
     # Void volume must precede every component peak — compute once, used for
     # both the physics-based starting point and the x0 upper bound.
@@ -259,16 +263,32 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         method = model_params.get('method', 'Nelder-Mead')
     # Multi-start: try both estimator-based and physics-based starting points;
     # keep whichever achieves the lower objective value.
+    def _nm_callback(xk):
+        if _pbar is not None:
+            _pbar.update(1)
+            _pbar.set_postfix(evals=_eval_count[0], refresh=False)
+
+    if progress:
+        from tqdm.auto import tqdm as _tqdm
+        _pbar = _tqdm(desc='SDM(mono) opt', unit='iter', dynamic_ncols=True)
+    else:
+        _pbar = None
+
     result = None
     start_names = ['estimator', 'physics']
     for i, (name, start) in enumerate(zip(start_names, [initial_guess, physics_guess])):
-        r = minimize(objective_function, start, bounds=bounds, method=method)
+        if _pbar is not None:
+            _pbar.set_description(f'SDM(mono) {name}')
+        r = minimize(objective_function, start, bounds=bounds, method=method,
+                     callback=_nm_callback if _pbar is not None else None)
         if debug:
             scales_i = r.x[6+num_components:6+2*num_components]
             poresize_i = r.x[6+2*num_components]
             print(f"  Start [{name}]: obj={r.fun:.6f}, scales={np.array2string(scales_i, precision=4)}, poresize={poresize_i:.1f}")
         if result is None or r.fun < result.fun:
             result = r
+    if _pbar is not None:
+        _pbar.close()
 
     if debug:
         print("Optimization success:", result.success)
@@ -419,6 +439,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         reload(molass.SEC.Models.SdmComponentCurve)
     from .SdmComponentCurve import SdmColumn, SdmComponentCurve
     from molass.SEC.Models.LognormalPore import sdm_lognormal_pore_gamma_pdf_fast
+    progress = kwargs.get('progress', False)
 
     num_components = decomposition.num_components
     xr_icurve = decomposition.xr_icurve
@@ -526,6 +547,13 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         return error
 
     _eval_count = [0]
+    _iter_count = [0]
+
+    def _nm_callback(xk):
+        _iter_count[0] += 1
+        if _pbar is not None:
+            _pbar.update(1)
+            _pbar.set_postfix(evals=_eval_count[0], refresh=False)
 
     # Initial guess: [N, T, x0, tI, N0, k, mu, (sigma if free), ...Rg, ...scale]
     initial_guess = [N, T, t0, t0, N0, k_init, mu_init]
@@ -568,8 +596,19 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     n_params = len(initial_guess)
     nm_options = {'maxiter': nm_maxiter if nm_maxiter is not None else max(200 * n_params, 12000)}
 
+    if progress:
+        from tqdm.auto import tqdm as _tqdm
+        _pbar = _tqdm(total=nm_options['maxiter'], desc='SDM(lognormal) NM', unit='iter',
+                      dynamic_ncols=True)
+    else:
+        _pbar = None
+
     result = minimize(objective_function, initial_guess, bounds=bounds,
-                      method=method, options=nm_options)
+                      method=method, options=nm_options,
+                      callback=_nm_callback if _pbar is not None else None)
+    if _pbar is not None:
+        _pbar.update(_pbar.total - _pbar.n)  # fill to 100% — NM converges before maxiter
+        _pbar.close()
 
     import warnings as _warnings
     N_, T_, x0_, tI_, N0_, k_, mu_ = result.x[0:7]

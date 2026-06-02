@@ -6,8 +6,7 @@ import os
 import inspect
 import functools
 import numpy as np
-from tqdm import tqdm
-# from tqdm import tqdm_notebook as tqdm
+from tqdm.auto import tqdm
 
 # Workaround: scipy.stats._axis_nan_policy_wrapper calls inspect.getfullargspec
 # on every linregress call. In Python 3.13 this is very slow. Cache it.

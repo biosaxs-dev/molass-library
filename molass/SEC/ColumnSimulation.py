@@ -485,7 +485,7 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     if use_tqdm:
         # https://stackoverflow.com/questions/60998231/python-how-to-make-tqdm-print-one-line-of-progress-bar-in-shell
         import sys
-        from tqdm import tqdm
+        from tqdm.auto import tqdm
         frames = tqdm(range(num_frames))
     else:
         frames = num_frames

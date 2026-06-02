@@ -63,6 +63,30 @@ Use this magic phrase to initialize both technical context and behavioral rules:
 
 These guidelines were developed in collaboration with GitHub Copilot (GPT-4.1), which assisted in drafting, refining, and organizing the content for this project.
 
+13. **Repository Role Separation (Architecture Principle):** The two-repo structure has a clear intended division:
+
+    - **`molass-legacy`** — maintained for the **tkinter GUI** and as a **historical record**. The GUI should be actively maintained. Legacy-only code that is not called by any GUI path or library path can be left as-is for reference.
+    - **`molass-library`** — the home for **all active computational code**: models, estimators, optimizers, data objects, and algorithms. Any piece of computation that improves or is shared across both the GUI and the notebook API belongs here.
+
+    The current dependency graph (`molass-library` imports from `molass-legacy`) is an **interim state**, not the target. The target direction is:
+    ```
+    Target:  molass-legacy (GUI) → molass-library (computation)
+    ```
+
+    **When to act on this principle**: Refactoring toward this target should happen incrementally — when a relevant need arises (e.g., fixing a bug, adding a feature, or unifying a duplicated algorithm). Do not refactor speculatively. Each step should leave both repos in a working state.
+
+    **Migration levels** (in increasing effort):
+    | Level | Scope |
+    |-------|-------|
+    | A — Estimators | Legacy estimators delegate to library (✅ complete for SDM, EDM/CEDM) |
+    | B — Physical models | `egh`, `edm_impl`, SDM/LKM model equations moved to library |
+    | C — Optimizer | `BasicOptimizer`, `InProcessRunner` moved to library |
+
+    Level A is complete. Levels B and C require circular-import surgery and should be planned carefully before execution.
+
+    **Data object consolidation** (parallel track — not a sequential level):  
+    The legacy `sd` (`SerialData`) and the library `ssd` (`SecSaxsData`) represent the same concept at different stages of development. The long-term goal is for `ssd` to fully replace `sd` as the authoritative data container, with the GUI eventually constructing and accepting `ssd` directly. This is a larger refactor than A–C above because `sd` is deeply embedded in the legacy GUI's internal data flow. Incremental steps: identify GUI paths that construct or pass `sd`, and replace them one by one with `ssd` equivalents.
+
 ---
 
 ## A Note on Human–AI Reliance

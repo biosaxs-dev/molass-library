@@ -65,8 +65,9 @@ class SDM:
             from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
             from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
             mono_env = estimate_sdm_column_params(decomposition, **kwargs)
+            mono_kwargs = {k: v for k, v in kwargs.items() if k != 'progress'}
             mono_ccurves = optimize_sdm_xr_decomposition(
-                decomposition, mono_env, model_params=mono_model_params, **kwargs)
+                decomposition, mono_env, model_params=mono_model_params, **mono_kwargs)
             env_params = estimate_sdm_lognormal_from_monopore(
                 mono_ccurves, decomposition.xr_icurve,
                 decomposition=decomposition, **kwargs)
