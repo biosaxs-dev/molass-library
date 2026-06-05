@@ -87,6 +87,8 @@ These guidelines were developed in collaboration with GitHub Copilot (GPT-4.1), 
     **Data object consolidation** (parallel track — not a sequential level):  
     The legacy `sd` (`SerialData`) and the library `ssd` (`SecSaxsData`) represent the same concept at different stages of development. The long-term goal is for `ssd` to fully replace `sd` as the authoritative data container, with the GUI eventually constructing and accepting `ssd` directly. This is a larger refactor than A–C above because `sd` is deeply embedded in the legacy GUI's internal data flow. Incremental steps: identify GUI paths that construct or pass `sd`, and replace them one by one with `ssd` equivalents.
 
+    **Next planned step (2026-06-05)**: Replace `PeakEditor`'s "Complementary View" (legacy `ComplementaryView` dialog) with library `plot_components_impl`. Approach: in `show_peak_editor_impl` (OptimizerUtils.py), construct `ssd`+`Decomposition` alongside existing `sd`/`corrected_sd`, pass as optional `decomposition=` kwarg to `PeakEditor`; `show_complementary_view()` uses it when available, falls back to legacy otherwise. First step: check whether a `sd → ssd` conversion utility already exists. See `/memories/repo/complementary-view-refactor-plan.md` for full details.
+
 ---
 
 ## A Note on Human–AI Reliance
