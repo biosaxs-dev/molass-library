@@ -97,7 +97,7 @@ class Decomposition:
         self.model = xr_ccurves[0].model
         self._optimizer_rgs = kwargs.get('optimizer_rgs', None)
 
-    def copy_with_new_components(self, xr_ccurves, uv_ccurves):
+    def copy_with_new_components(self, xr_ccurves, uv_ccurves, **kwargs):
         """
         Create a new Decomposition with new component curves.
 
@@ -113,7 +113,7 @@ class Decomposition:
         Decomposition
             A new Decomposition object with the specified component curves.
         """
-        return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges)
+        return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges, **kwargs)
 
     @property
     def xr_components(self):
@@ -276,6 +276,11 @@ class Decomposition:
         """
         if getattr(self, '_rgcurve', None) is None:
             self._rgcurve = self.xr.compute_rgcurve()
+        # NOTE: the cached Rg curve lives on this Decomposition object (_rgcurve),
+        # NOT on self.ssd.  self.ssd._rgcurve is always None because self.ssd is a
+        # fresh object created during quick_decomposition().  Always read from
+        # decomposition._rgcurve, never from decomposition.ssd._rgcurve.
+        # (molass-library #202)
         return self._rgcurve
 
     def compute_reconstructed_rgcurve(self, debug=False):

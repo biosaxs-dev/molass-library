@@ -23,7 +23,7 @@ inspect.getfullargspec = _cached_getfullargspec
 
 ADD_ALL_RESULTS = True
 
-def compute_rgcurve_info(xrdata):
+def compute_rgcurve_info(xrdata, progress_cb=None):
     """
     Computes Rg curve information from XR data.
     It uses the SimpleGuinier class to compute Rg values for each j-curve in the XR data.
@@ -32,6 +32,13 @@ def compute_rgcurve_info(xrdata):
     ----------
     xrdata : XrData
         The XR data from which to compute the Rg curve information.
+    progress_cb : callable or None, optional
+        Optional callback called after each frame with ``(rg_buffer, j)`` where
+        ``rg_buffer`` is a float array of shape ``(n_frames,)`` containing the
+        Rg values computed so far (0 for not-yet-computed frames) and ``j`` is
+        the 0-based column index of the current frame.  The signature matches
+        the legacy ``ProgressCallback`` so GUI callers can drive a progress bar
+        and live Rg overlay with no additional adaptation.
 
     Returns
     -------
@@ -43,9 +50,16 @@ def compute_rgcurve_info(xrdata):
     xrM = xrdata.M
     xrE = xrdata.E
     jv = xrdata.jv  # original frame numbers (may differ from 0..N after trimming)
+    n_frames = xrM.shape[1]
+    rg_buffer = np.zeros(n_frames)  # running buffer for progress_cb
     rginfo_list = []
-    for j in tqdm(range(xrM.shape[1])):
+    for j in tqdm(range(n_frames)):
         sg = SimpleGuinier(np.array([qv, xrM[:,j], xrE[:,j]]).T)
+        rg = sg.Rg
+        if rg is not None and rg > 0:
+            rg_buffer[j] = rg
+        if progress_cb is not None:
+            progress_cb(rg_buffer, j)
         if sg.Rg is not None or ADD_ALL_RESULTS:
             # rginfo_list.append((j, sg.Rg, sg.score))
             rginfo_list.append((int(jv[j]), sg))

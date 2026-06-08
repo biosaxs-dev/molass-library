@@ -902,7 +902,7 @@ class SecSaxsData:
         else:
             return self.beamline_info.get_concfactor()
     
-    def get_rg_curve(self):
+    def get_rg_curve(self, progress_cb=None):
         """Compute the per-frame Rg curve from the corrected XR data, with caching.
 
         Runs a Guinier fit on every elution frame independently and returns
@@ -916,6 +916,16 @@ class SecSaxsData:
             rgcurve = corrected.get_rg_curve()            # computed once, cached
             decomp   = corrected.quick_decomposition(rgcurve=rgcurve)
             run      = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
+
+        Parameters
+        ----------
+        progress_cb : callable or None, optional
+            Optional callback ``(rg_buffer, j)`` called after each frame.
+            ``rg_buffer`` is a float array of accumulated Rg values (0 for
+            not-yet-computed frames); ``j`` is the 0-based column index.
+            The signature is compatible with the legacy ``ProgressCallback``
+            so GUI callers can drive a progress bar and live Rg overlay.
+            Ignored if the result is already cached.
 
         Returns
         -------
@@ -932,7 +942,7 @@ class SecSaxsData:
         Decomposition.get_rg_curve : same pattern on a Decomposition object
         """
         if getattr(self, '_rgcurve', None) is None:
-            self._rgcurve = self.xr.compute_rgcurve()
+            self._rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
         return self._rgcurve
 
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
