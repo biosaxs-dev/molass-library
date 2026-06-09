@@ -1162,8 +1162,10 @@ class Decomposition:
             if trimmed_ssd is not None:
                 raise ValueError("Cannot specify both trimmed_ssd and uncorrected_ssd")
             trimmed_ssd = kwargs.pop('uncorrected_ssd')
-        if kwargs:
-            raise TypeError(f"Unexpected keyword arguments: {list(kwargs)}")
+        # Remaining kwargs are solver-specific hyperparameters (e.g. de_pop_size, de_variant).
+        # Pass them through as solver_kwargs without raising TypeError — adding a new solver
+        # no longer requires changing this signature (molass-library#204).
+        solver_kwargs = kwargs if kwargs else None
 
         if frozen_components is not None and free_components is not None:
             raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
@@ -1174,11 +1176,11 @@ class Decomposition:
                 "Example: optimize_rigorously(analysis_folder='temp_analysis_apo_bh', ...)"
             )
 
-        _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC', 'CMA'}
+        _VALID_METHODS = {'BH', 'NS', 'MCMC', 'SMC', 'CMA', 'DE', 'NSGA2'}
         if method not in _VALID_METHODS:
             raise ValueError(
                 f"Unknown method {method!r}. Valid values: {sorted(_VALID_METHODS)} "
-                f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo, CMA=CMA-ES)"
+                f"(BH=Basin-Hopping, NS=Nested Sampling, MCMC=Markov Chain Monte Carlo, SMC=Sequential Monte Carlo, CMA=CMA-ES, DE=Differential Evolution, NSGA2=Multi-Objective NSGA-II)"
             )
 
         # progress is deprecated and ignored; monitor=True/False is the control.
@@ -1200,7 +1202,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
