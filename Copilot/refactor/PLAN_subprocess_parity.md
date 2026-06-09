@@ -52,7 +52,7 @@ All 7 parity overrides silently skip → subprocess uses legacy-derived data.
 
 ---
 
-## Divergence factors (all 7, now clearly mapped)
+## Divergence factors (all 8, now clearly mapped)
 
 | # | Factor | Override file | Loaded in | Fixed for Path B | Fixed for Path C |
 |---|---|---|---|---|---|
@@ -63,6 +63,31 @@ All 7 parity overrides silently skip → subprocess uses legacy-derived data.
 | 5 | E matrix | `ip_xr_E.npy` | `OptDataSets.__init__` | ✅ #40 | ❌ |
 | 6 | qvector | `ip_xr_qvector.npy` | `OptimizerMain.create_optimizer_from_job` | ✅ #41 | ❌ |
 | 7 | FixedBaselineOptimizer | (removed) | `optimizer_main` | ✅ #42 | ✅ #42 |
+| **8** | **Rg curve smoothness** | `rg-curve/` (library vs legacy) | `GuinierDeviation` in objective | ⚠️ Changed | ❌ |
+
+**Factor 8 details (hypothesis — to be investigated)**:  
+The Jun 8 "Complementary View → Plot Components" refactor (`molass-legacy@7f96055`) changed
+`PeakEditor.prepare_rg_curve()` to use `ssd.get_rg_curve()` (library estimator) instead of
+the previous legacy `fullopt_input.get_dsets(compute_rg=True)` path. The resulting Rg curve
+is exported to `rg-curve/` which `GuinierDeviation` reads in the subprocess objective.
+
+If the library Rg curve is **less smooth** than the legacy one, `Guinier_deviation`
+oscillates more → rougher landscape → DE (population-based, sensitive to landscape noise)
+converges prematurely; BH (local NM descent) averages over the noise.
+
+**Factor 8 investigation result (Jun 9, 2026)**:
+
+Rg quality comparison on the same dataset:
+- GUI `rg-curve/` (library, post-Jun-8 refactor): n=121, mean=0.813, median=0.948, >0.8: 74%
+- Notebook `rg_curve_parent/` (library via `prepare_rigorous_folders`): n=112, mean=0.756, median=0.959, >0.8: 71%
+
+**Conclusion: Rg smoothness is NOT the primary cause of the DE SV gap.** Quality distributions
+are similar (both library path). The ~5.8 SV gap is dominated by Factors 1–6 (missing
+ip_*.npy files). The Jun 8 Rg unification refactor is not the culprit.
+
+Note: analysis-020 BH (GUI subprocess, no ip_*.npy) also gives SV≈78.56 — the same gap
+that BH had before issues #38–42 were fixed. This confirms the gap is caused by missing
+ip_*.npy, not by Rg curve quality.
 
 ---
 
