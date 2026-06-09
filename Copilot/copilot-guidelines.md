@@ -47,31 +47,21 @@ Use this magic phrase to initialize both technical context and behavioral rules:
 
     *Naming* and *workflow friction* tend to be general (applicable to any Python library). *Observability* and *interpretability* tend to be domain-specific (SEC-SAXS optimization semantics). When assessing what to improve next, look for gaps: e.g., a new module with opaque attribute names (Naming), or a new score with no physical explanation (Interpretability).
 
-13. **Repository Role Separation (Architecture Principle):** The two-repo structure has a clear intended division:
-
-    - **`molass-legacy`** — maintained for the **tkinter GUI** and as a **historical record**. The GUI should be actively maintained. Legacy-only code that is not called by any GUI path or library path can be left as-is for reference.
-    - **`molass-library`** — the home for **all active computational code**: models, estimators, optimizers, data objects, and algorithms. Any piece of computation that improves or is shared across both the GUI and the notebook API belongs here.
-
-    The current dependency graph (`molass-library` imports from `molass-legacy`) is an **interim state**, not the target. The target direction is:
+13. **Repository Role Separation (Architecture Principle):** The target dependency direction is:
     ```
     Target:  molass-legacy (GUI) → molass-library (computation)
+    Current: molass-library imports from molass-legacy  (interim state)
     ```
+    - `molass-legacy` — GUI and historical record
+    - `molass-library` — all active computational code
 
-    **When to act on this principle**: Refactoring toward this target should happen incrementally — when a relevant need arises (e.g., fixing a bug, adding a feature, or unifying a duplicated algorithm). Do not refactor speculatively. Each step should leave both repos in a working state.
+    **When to act**: Incrementally, when a relevant need arises. Do not refactor speculatively.
 
-    **Migration levels** (in increasing effort):
-    | Level | Scope |
-    |-------|-------|
-    | A — Estimators | Legacy estimators delegate to library (✅ complete for SDM, EDM/CEDM) |
-    | B — Physical models | `egh`, `edm_impl`, SDM/LKM model equations moved to library |
-    | C — Optimizer | `BasicOptimizer`, `InProcessRunner` moved to library |
+    **Migration levels**: A (Estimators ✅), B (Physical models ⏳), C (Optimizer ⏳)
 
-    Level A is complete. Levels B and C require circular-import surgery and should be planned carefully before execution.
-
-    **Data object consolidation** (parallel track — not a sequential level):  
-    The legacy `sd` (`SerialData`) and the library `ssd` (`SecSaxsData`) represent the same concept at different stages of development. The long-term goal is for `ssd` to fully replace `sd` as the authoritative data container, with the GUI eventually constructing and accepting `ssd` directly. This is a larger refactor than A–C above because `sd` is deeply embedded in the legacy GUI's internal data flow. Incremental steps: identify GUI paths that construct or pass `sd`, and replace them one by one with `ssd` equivalents.
-
-    **Next planned step (2026-06-05)**: Replace `PeakEditor`'s "Complementary View" (legacy `ComplementaryView` dialog) with library `plot_components_impl`. Approach: in `show_peak_editor_impl` (OptimizerUtils.py), construct `ssd`+`Decomposition` alongside existing `sd`/`corrected_sd`, pass as optional `decomposition=` kwarg to `PeakEditor`; `show_complementary_view()` uses it when available, falls back to legacy otherwise. First step: check whether a `sd → ssd` conversion utility already exists. See `/memories/repo/complementary-view-refactor-plan.md` for full details.
+    **Full details**: [`Copilot/refactor/ARCHITECTURE.md`](refactor/ARCHITECTURE.md)  
+    **Active fix plan**: [`Copilot/refactor/PLAN_subprocess_parity.md`](refactor/PLAN_subprocess_parity.md) (molass-library#206)  
+    **All refactor docs**: [`Copilot/refactor/`](refactor/)
 
 ---
 
