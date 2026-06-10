@@ -903,6 +903,37 @@ class SecSaxsData:
             return self.beamline_info.get_concfactor()
 
     @classmethod
+    def from_legacy_sd(cls, sd, include_uv=False):
+        """Construct an SSD from a legacy SerialData (``sd``) object.
+
+        This is the Phase 1 bridge for the SD → SSD migration.  Once an SSD
+        is built from ``sd``, the full library pipeline is available:
+
+            ssd_raw      = SecSaxsData.from_legacy_sd(sd)
+            ssd_trimmed  = ssd_raw.trimmed_copy()   # applies library q-trimming
+            ssd_corrected = ssd_trimmed.corrected_copy()
+            rg = ssd_corrected.get_rg_curve()       # library-quality rg_curve
+
+        Parameters
+        ----------
+        sd : SerialData
+            Legacy data object.  ``sd.xray_array`` must be of shape
+            ``(n_q, n_frames, 3)`` where the last axis holds ``[q, I, E]``.
+        include_uv : bool
+            Not yet implemented — reserved for Phase 3.  Ignored for now.
+
+        Returns
+        -------
+        SecSaxsData  (untrimmed, uncorrected — same state as loading from folder)
+        """
+        xr_M  = sd.xray_array[:, :, 1]          # (n_q, n_frames)
+        xr_E  = sd.xray_array[:, :, 2]          # (n_q, n_frames)
+        xr_qv = np.asarray(sd.qvector)          # (n_q,)
+        xr_jv = np.arange(xr_M.shape[1])        # 0-based, caller can override
+
+        return cls.from_arrays(xr_M, xr_qv, xr_E, xr_jv=xr_jv, trimmed=False)
+
+    @classmethod
     def from_arrays(cls, xr_M, xr_qv, xr_E, xr_jv=None,
                     uv_M=None, uv_wv=None, uv_E=None, uv_jv=None,
                     trimmed=False):
