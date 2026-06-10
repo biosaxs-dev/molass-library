@@ -901,7 +901,71 @@ class SecSaxsData:
             return None
         else:
             return self.beamline_info.get_concfactor()
-    
+
+    @classmethod
+    def from_arrays(cls, xr_M, xr_qv, xr_E, xr_jv=None,
+                    uv_M=None, uv_wv=None, uv_E=None, uv_jv=None,
+                    trimmed=False):
+        """Construct an SSD directly from numpy arrays, without reading from disk.
+
+        This is the array-level entry point for the SD → SSD migration path.
+        The primary use case is reconstructing an SSD from the ip_*.npy files
+        exported by BackRunner or prepare_rigorous_folders, so that the full
+        library pipeline (baseline correction, rg_curve) can be applied to
+        GUI data without re-reading the raw data files.
+
+        Parameters
+        ----------
+        xr_M : ndarray of shape (n_q, n_frames)
+            XR intensity matrix (corrected or uncorrected).
+        xr_qv : ndarray of shape (n_q,)
+            q-values in Å⁻¹.
+        xr_E : ndarray of shape (n_q, n_frames)
+            XR error matrix.
+        xr_jv : ndarray of shape (n_frames,) or None
+            Original frame numbers.  If None, defaults to ``np.arange(n_frames)``.
+        uv_M : ndarray or None
+            UV absorbance matrix.  If None, SSD is XR-only.
+        uv_wv : ndarray or None
+            UV wavelengths (nm).
+        uv_E : ndarray or None
+            UV error matrix (rarely used).
+        uv_jv : ndarray or None
+            UV frame numbers.
+        trimmed : bool
+            Whether this data is already trimmed (sets ``ssd.trimmed``).
+
+        Returns
+        -------
+        SecSaxsData
+
+        Examples
+        --------
+        Reconstruct from GUI ip_*.npy files::
+
+            import numpy as np
+            D   = np.load('ip_xr_D.npy')
+            qv  = np.load('ip_xr_qvector.npy')
+            E   = np.load('ip_xr_E.npy')
+            jv  = np.load('ip_xr_jv.npy')          # optional
+            ssd = SecSaxsData.from_arrays(D, qv, E, xr_jv=jv, trimmed=True)
+            rg  = ssd.compute_rgcurve()             # skip baseline: data already corrected
+        """
+        from molass.DataObjects.XrData import XrData
+
+        if xr_jv is None:
+            xr_jv = np.arange(xr_M.shape[1])
+        xr_data = XrData(xr_M, xr_qv, xr_jv, xr_E)
+
+        uv_data = None
+        if uv_M is not None:
+            from molass.DataObjects.UvData import UvData
+            if uv_jv is None:
+                uv_jv = np.arange(uv_M.shape[1])
+            uv_data = UvData(uv_M, uv_wv, uv_jv, uv_E)
+
+        return cls(object_list=[xr_data, uv_data], trimmed=trimmed)
+
     def get_rg_curve(self, progress_cb=None):
         """Compute the per-frame Rg curve from the corrected XR data, with caching.
 
