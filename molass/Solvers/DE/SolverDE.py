@@ -54,12 +54,13 @@ class SolverDE:
     """
 
     def __init__(self, optimizer, pop_size=None, variant="DE/rand/1/bin",
-                 CR=0.5, F=0.5):
+                 CR=0.5, F=0.5, warm_sigma=1.0):
         self.optimizer = optimizer
         self._pop_size = pop_size
         self.variant = variant
         self.CR = CR
         self.F = F
+        self.warm_sigma = warm_sigma
 
     def minimize(self, objective, init_params, niter=100, seed=1234,
                  bounds=None, narrow_bounds=False, show_history=False):
@@ -127,7 +128,8 @@ class SolverDE:
             variant=self.variant,
             CR=self.CR,
             F=self.F,
-            sampling=_WarmStartSampling(init_params, xl, xu, seed=seed),
+            sampling=_WarmStartSampling(init_params, xl, xu, seed=seed,
+                                         warm_sigma=self.warm_sigma),
         ).setup(problem, termination=NoTermination(), seed=seed, verbose=False)
 
         minima_callback = self.optimizer.minima_callback
@@ -192,21 +194,33 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 
 
 class _WarmStartSampling(FloatRandomSampling):
-    """Seed the first individual with init_params; fill the rest randomly.
+    """Initialise the population in a Gaussian cloud around init_params.
+
+    All population members are drawn from N(init_params, warm_sigma²), clipped
+    to [xl, xu].  Member 0 is set exactly to init_params so the known best is
+    always preserved.
+
+    This guarantees that successive DE jobs (restarted from a previous job's
+    best) never produce a population whose best individual is worse than the
+    warm-start point — the regression observed when only X[0] was seeded and
+    the rest were random.
 
     ``_do`` must return a plain numpy array — the base ``Sampling.__call__``
     wraps it into a ``Population`` automatically.
     """
 
-    def __init__(self, init_params, xl, xu, seed=1234):
+    def __init__(self, init_params, xl, xu, seed=1234, warm_sigma=1.0):
         super().__init__()
         self._init = np.clip(init_params, xl, xu)
         self._xl = xl
         self._xu = xu
         self._seed = seed
+        self._warm_sigma = warm_sigma
 
     def _do(self, problem, n_samples, **kwargs):
         rng = np.random.default_rng(self._seed)
-        X = rng.uniform(self._xl, self._xu, size=(n_samples, len(self._init)))
-        X[0] = self._init           # first individual = warm start
+        noise = rng.normal(0.0, self._warm_sigma,
+                           size=(n_samples, len(self._init)))
+        X = np.clip(self._init + noise, self._xl, self._xu)
+        X[0] = self._init           # member 0 = exact warm start
         return X
