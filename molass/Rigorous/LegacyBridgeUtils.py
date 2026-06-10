@@ -182,16 +182,17 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # Export frame numbers (jv) so BackRunner / compute_rg_curve_from_arrays
     # can assign the correct original frame indices to the recomputed rg_curve.
     np.save(os.path.join(optimizer_folder, 'ip_xr_jv.npy'), _export_ssd.xr.jv)
-    # Export the Rg curve to rg_curve_parent/ — the subprocess reads exclusively
-    # from here.  The old rg-curve/ was a redundant second copy (molass-legacy#34 cleanup).
+    # Export the Rg curve to rg-curve/ — the single authoritative folder for rg_curve.
+    # rg_curve_parent/ has been eliminated (molass-legacy#78): both prepare_rigorous_folders()
+    # and BackRunner.run() write directly to rg-curve/.  The subprocess reads rg-curve/ and
+    # runs the trimming consistency check; within the same session, trimming always matches.
     import shutil, time as _time
     rgcurve_ = dsets[1]
-    parent_rg_folder = os.path.join(optimizer_folder, "rg_curve_parent")
-    if os.path.exists(parent_rg_folder):
-        shutil.rmtree(parent_rg_folder)
-    os.makedirs(parent_rg_folder)
-    rgcurve_.export(parent_rg_folder)
-    set_setting("trust_rg_curve_folder", True)
+    rg_curve_folder = os.path.join(optimizer_folder, "rg-curve")
+    if os.path.exists(rg_curve_folder):
+        shutil.rmtree(rg_curve_folder)
+    os.makedirs(rg_curve_folder)
+    rgcurve_.export(rg_curve_folder)
 
     # Export parent's UV diff_spline so subprocess uses same baseline evaluation
     # (molass-legacy#34: second divergence source — UvBaseSpline.diff_spline was
@@ -216,8 +217,8 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     with open(_prep_log, 'a') as _f:
         _t = _time.strftime('%H:%M:%S')
         _f.write(f"[{_t}] prepare_rigorous_folders: export completed\n")
-        _f.write(f"  parent_rg_folder ok.stamp: {os.path.exists(os.path.join(parent_rg_folder, 'ok.stamp'))}\n")
-        _f.write(f"  parent_rg_folder files: {sorted(os.listdir(parent_rg_folder))}\n")
+        _f.write(f"  rg-curve/ ok.stamp: {os.path.exists(os.path.join(rg_curve_folder, 'ok.stamp'))}\n")
+        _f.write(f"  rg-curve/ files: {sorted(os.listdir(rg_curve_folder))}\n")
         _f.write(f"  uv_diff_spline exported: {_ds_exported}\n")
         if _ds_exported:
             _f.write(f"    x range [{_ds_x[0]:.1f}, {_ds_x[-1]:.1f}] len={len(_ds_x)}\n")
