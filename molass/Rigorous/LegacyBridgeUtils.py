@@ -179,6 +179,9 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # The difference shifts GuinierDeviation's xr_index bisection → different fv.)
     _export_ssd = data_ssd if data_ssd is not None else decomposition.ssd
     np.save(os.path.join(optimizer_folder, 'ip_xr_qvector.npy'), _export_ssd.xr.q_values)
+    # Export frame numbers (jv) so BackRunner / compute_rg_curve_from_arrays
+    # can assign the correct original frame indices to the recomputed rg_curve.
+    np.save(os.path.join(optimizer_folder, 'ip_xr_jv.npy'), _export_ssd.xr.jv)
     # Export the Rg curve to rg_curve_parent/ — the subprocess reads exclusively
     # from here.  The old rg-curve/ was a redundant second copy (molass-legacy#34 cleanup).
     import shutil, time as _time
