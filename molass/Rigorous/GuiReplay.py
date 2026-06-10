@@ -86,9 +86,22 @@ class GuiScenario:
         """
         return float(self.optimizer.objective_func(self.init_params))
 
-    def get_score_breakdown(self):
-        """Return score breakdown at init_params."""
-        return self.optimizer.get_score_breakdown(self.init_params)
+    def get_score_breakdown(self, params=None):
+        """Return score breakdown at init_params (or any given params).
+
+        Returns
+        -------
+        dict  {'fv': float, 'scores': {name: value}}
+            Same structure as RunInfo.get_score_breakdown().
+        """
+        if params is None:
+            params = self.init_params
+        result = self.optimizer.objective_func(params, return_full=True)
+        fv = float(result[0])
+        score_array = result[1]
+        names = self.optimizer.get_score_names()
+        scores = {name: float(val) for name, val in zip(names, score_array)}
+        return {'fv': fv, 'scores': scores}
 
     def run_inprocess(self, method='BH', niter=20, seed=1234,
                       analysis_folder=None, **solver_kwargs):
