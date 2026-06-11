@@ -84,6 +84,8 @@ def get_version(toml_only=False):
     """
     return Version(_get_version_impl(toml_only, __file__, __package__))
 
+__version__ = str(get_version())
+
 def requires(version):
     """
     Assert that the installed molass version meets a minimum requirement.
