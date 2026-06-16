@@ -92,6 +92,34 @@ def get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params):
         xr_ccurves.append(LkmComponentCurve(x, Pe, t0, k_MT_i, R_i, xr_params[i], rg=rg_params[i]))
     return xr_ccurves
 
+def get_grm_xr_ccurves(optimizer, xr_icurve, separated_params):
+    """Reconstruct GrmComponentCurve objects from GRM optimizer results."""
+    from molass.SEC.Models.GrmComponentCurve import GrmComponentCurve
+    xr_params = separated_params[0]   # scales per component
+    rg_params = separated_params[2]   # Rg per component
+    grmcol    = separated_params[-1]  # [Pe, t0, R_p, D_eff, R_0, k_ext_0, ...]
+    Pe    = grmcol[0]
+    t0    = grmcol[1]
+    R_p   = grmcol[2]
+    D_eff = grmcol[3]
+    x     = xr_icurve.x
+    nc    = len(xr_params)
+    # Reconstruct shared a_star as mean over components  (R_i = 1 + F*a_star)
+    # We retrieve F_ratio from the optimizer's params_type if possible.
+    try:
+        F_ratio = optimizer._F_ratio
+    except AttributeError:
+        F_ratio = 1.5   # fallback default
+    xr_ccurves = []
+    for i in range(nc):
+        R_i     = grmcol[4 + 2 * i]
+        k_ext_i = grmcol[4 + 2 * i + 1]
+        a_star_i = (R_i - 1.0) / F_ratio
+        xr_ccurves.append(GrmComponentCurve(
+            x, Pe, t0, R_p, D_eff, a_star_i, F_ratio,
+            k_ext_i, R_i, xr_params[i], rg=rg_params[i]))
+    return xr_ccurves
+
 
 def get_xr_ccurves(optimizer, xr_icurve, separated_params):
     model_name = optimizer.get_model_name()
@@ -105,5 +133,7 @@ def get_xr_ccurves(optimizer, xr_icurve, separated_params):
         return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'LKM':
         return get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params)
+    elif model_name == 'GRM':
+        return get_grm_xr_ccurves(optimizer, xr_icurve, separated_params)
     else:
         raise ValueError(f"Unknown model_name: {model_name}")

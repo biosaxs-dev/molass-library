@@ -43,12 +43,15 @@ def detect_function_code(decomposition):
         - ``'edm'`` → ``None`` (EDM)
         - ``'cedm'`` → ``'G2020'`` (CEDM — continuous EDM)
         - ``'lkm'`` → ``'G1400'`` (LKM — Lumped Kinetic Model)
+        - ``'grm'`` → ``'G1500'`` (GRM — General Rate Model)
     """
     ccurve = decomposition.xr_ccurves[0]
     if ccurve.model == "cedm":
         return 'G2020'
     if ccurve.model == "lkm":
         return 'G1400'
+    if ccurve.model == "grm":
+        return 'G1500'
     if ccurve.model != "sdm":
         return None
     column = ccurve.column

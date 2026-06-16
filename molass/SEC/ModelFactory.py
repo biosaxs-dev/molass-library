@@ -41,5 +41,11 @@ def create_model(model_name, **kwargs):
             reload(molass.SEC.Models.LKM)
         from molass.SEC.Models.LKM import LKM
         return LKM(**kwargs)
+    elif model_name == 'grm':
+        if debug:
+            import molass.SEC.Models.GRM
+            reload(molass.SEC.Models.GRM)
+        from molass.SEC.Models.GRM import GRM
+        return GRM(**kwargs)
     else:
         raise ValueError(f"Unknown model name: {model_name}")

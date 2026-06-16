@@ -806,6 +806,7 @@ class Decomposition:
             - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
             - ``CEDM``: Continuous EDM (shared-column variant of EDM)
             - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html>`_
+            - ``GRM``: General Rate Model (film mass transfer + intraparticle pore diffusion)
 
         rgcurve : Curve, optional
             The Rg curve to use for the optimization.
@@ -953,6 +954,12 @@ class Decomposition:
                 import molass.Rigorous.RigorousLkmParams
                 reload(molass.Rigorous.RigorousLkmParams)
             from molass.Rigorous.RigorousLkmParams import make_rigorous_initparams_impl
+            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
+        elif self.model == 'grm':
+            if debug:
+                import molass.Rigorous.RigorousGrmParams
+                reload(molass.Rigorous.RigorousGrmParams)
+            from molass.Rigorous.RigorousGrmParams import make_rigorous_initparams_impl
             return make_rigorous_initparams_impl(self, baseparams, debug=debug)
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
@@ -1162,6 +1169,10 @@ class Decomposition:
             if trimmed_ssd is not None:
                 raise ValueError("Cannot specify both trimmed_ssd and uncorrected_ssd")
             trimmed_ssd = kwargs.pop('uncorrected_ssd')
+        # model is auto-detected from decomposition.xr_ccurves[0].model in RigorousImplement.
+        # If the user passes model= explicitly (e.g. model='GRM'), silently discard it here —
+        # the decomposition's component curves are authoritative.
+        kwargs.pop('model', None)
         # Remaining kwargs are solver-specific hyperparameters (e.g. de_pop_size, de_variant).
         # Pass them through as solver_kwargs without raising TypeError — adding a new solver
         # no longer requires changing this signature (molass-library#204).
