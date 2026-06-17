@@ -43,11 +43,19 @@ class EDM:
             import molass.SEC.Models.UvOptimizer
             reload(molass.SEC.Models.UvOptimizer)
         from molass.SEC.Models.EdmEstimator import estimate_edm_init_params
-        from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition
+        from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition, refine_edm_per_component
         from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
         init_params = estimate_edm_init_params(decomposition, **kwargs)
+        # Pass 1 (heavy): full shared-column optimisation — finds (t0, u, e, Dz, a, b, cinj).
         new_xr_ccurves = optimize_edm_xr_decomposition(decomposition, init_params, **kwargs)
+        # Pass 2 (lighter, optional): fix shared column (t0, u, e, Dz), refine per-component (a, b, cinj).
+        # Beneficial for SAMPLE2/SAMPLE3 (massive fv improvement) but regresses SAMPLE4 (4-comp).
+        # SAMPLE4 regression root cause: unconstrained b → EDM overflow for 4-component systems.
+        # Enable via refine_per_component=True once b-bounds / overflow handling is improved.
+        if kwargs.get('refine_per_component', False):
+            x, y = decomposition.xr_icurve.get_xy()
+            new_xr_ccurves = refine_edm_per_component(new_xr_ccurves, x, y, **kwargs)
         if decomposition.uv is None:
             new_uv_ccurves = None
         else:

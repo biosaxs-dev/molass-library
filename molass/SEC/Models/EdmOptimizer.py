@@ -363,3 +363,116 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         ccurve = EdmComponentCurve(x, params)
         new_xr_ccurves.append(ccurve)
     return new_xr_ccurves
+
+
+def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
+    """Lighter second XR pass: fix shared column, refine per-component (a, b, cinj).
+
+    This is the EDM analog of SDM's UV pass (which fixes XR and only refines
+    mapping + UV scales).  The shared column parameters ``(t0, u, e, Dz)`` are
+    extracted from the already-optimised ``edm_ccurves`` and held fixed.  Only
+    the per-component ``(a, b, cinj)`` parameters are free.
+
+    This split is physically motivated:
+    - Shared column (t0, u, e, Dz): column geometry, determined by the first full
+      pass and not expected to improve from further unconstrained refinement.
+    - Per-component (a = K_SEC, b, cinj): molecule-specific, benefit from
+      refinement once the column baseline is stable.
+
+    Parameters
+    ----------
+    edm_ccurves : list of EdmComponentCurve
+        Output of a previous :func:`optimize_edm_xr_decomposition` call.
+        All curves must share the same ``(t0, u, e, Dz)`` (i.e. the result of a
+        ``shared_column=True`` run).
+    x : array-like
+        Elution frame positions (same as used in the first pass).
+    y : array-like
+        XR integrated intensity (same as used in the first pass).
+    kwargs : dict
+        cinj_min : float, optional
+            Lower bound for cinj.  Default 0.05.
+        position_anchor_scale : float, optional
+            Scale for soft centroid-to-EGH-peak penalty.  Default 1e-5.
+        suppress_positive_b_warning : bool, optional
+            Suppress the b > 0 UserWarning.  Default False.
+        debug : bool, optional
+
+    Returns
+    -------
+    refined_ccurves : list of EdmComponentCurve
+    """
+    from .EdmComponentCurve import EdmComponentCurve
+
+    debug = kwargs.get('debug', False)
+    cinj_min = kwargs.get('cinj_min', 0.05)
+    position_anchor_scale = kwargs.get('position_anchor_scale', 1e-5)
+
+    # Extract shared column from first component (all share them by construction).
+    p0 = edm_ccurves[0].params   # [t0, u, a, b, e, Dz, cinj]
+    t0_fixed, u_fixed, e_fixed, Dz_fixed = p0[0], p0[1], p0[4], p0[5]
+
+    n_comp = len(edm_ccurves)
+    # EGH peak frames: soft position anchors to prevent component collapse.
+    egh_peak_frames = np.array(
+        [c.x[c.y.argmax()] for c in edm_ccurves], dtype=float
+    )
+
+    # Initial per-component params from previous pass.
+    abc_init = np.array([[cc.params[2], cc.params[3], cc.params[6]]
+                         for cc in edm_ccurves])   # (n_comp, 3): a, b, cinj
+
+    N_PER_COMP = 3  # a, b, cinj
+
+    def objective_abc(p_flat, return_cy_list=False):
+        per_comp = p_flat.reshape(n_comp, N_PER_COMP)
+        cy_list = []
+        for a_v, b_v, cinj_v in per_comp:
+            full = np.array([t0_fixed, u_fixed, a_v, b_v, e_fixed, Dz_fixed, cinj_v])
+            cy = np.nan_to_num(edm_impl(x, *full), nan=0.0, posinf=0.0, neginf=0.0)
+            cy_list.append(cy)
+        if return_cy_list:
+            return cy_list
+        ty = np.sum(cy_list, axis=0)
+        data_error = np.sum((ty - y) ** 2)
+        position_penalty = 0.0
+        for cy, egh_peak in zip(cy_list, egh_peak_frames):
+            cy_abs_sum = np.sum(np.abs(cy))
+            if cy_abs_sum > 0:
+                centroid = np.sum(cy * x) / cy_abs_sum
+                position_penalty += (centroid - egh_peak) ** 2
+            else:
+                position_penalty += (x[-1] - egh_peak) ** 2
+        return data_error + position_penalty * position_anchor_scale
+
+    abc_bounds = []
+    for _ in range(n_comp):
+        abc_bounds += [
+            (0.0, None),          # a (K_SEC ≥ 0)
+            (None, None),         # b (unconstrained)
+            (cinj_min, None),     # cinj
+        ]
+
+    result = minimize(
+        objective_abc, abc_init.flatten(),
+        bounds=abc_bounds, method='L-BFGS-B',
+        options={'maxiter': 10000, 'ftol': 1e-14, 'gtol': 1e-9}
+    )
+
+    if debug:
+        print(f"  refine_edm_per_component: fval={result.fun:.6g}  success={result.success}")
+        per_comp_fit = result.x.reshape(n_comp, N_PER_COMP)
+        for i, (a_v, b_v, cinj_v) in enumerate(per_comp_fit):
+            print(f"  comp {i}: a={a_v:.4f}  b={b_v:.4f}  cinj={cinj_v:.4f}")
+
+    _check_positive_b(
+        result.x.reshape(n_comp, N_PER_COMP)[:, 1],
+        suppress=kwargs.get('suppress_positive_b_warning', False),
+        stacklevel=3,
+    )
+
+    refined_ccurves = []
+    for a_v, b_v, cinj_v in result.x.reshape(n_comp, N_PER_COMP):
+        full_params = np.array([t0_fixed, u_fixed, a_v, b_v, e_fixed, Dz_fixed, cinj_v])
+        refined_ccurves.append(EdmComponentCurve(x, full_params, model='cedm'))
+    return refined_ccurves
