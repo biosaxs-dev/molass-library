@@ -9,6 +9,20 @@ from molass.SEC.Models.SdmMonoPore import (
     DEFAULT_TIMESCALE,
 )
 
+
+def _proxy_rgs_from_peak_frames(decomposition, poresize_ref=100.0,
+                                rho_min=0.15, rho_max=0.35):
+    """Build Rg proxies from peak-frame order when Guinier Rg is disabled."""
+    xr_ccurves = decomposition.xr_ccurves
+    peak_frames = np.array([float(c.x[c.y.argmax()]) for c in xr_ccurves])
+    fmin, fmax = float(np.min(peak_frames)), float(np.max(peak_frames))
+    if abs(fmax - fmin) < 1e-12:
+        rho = np.full(len(peak_frames), (rho_min + rho_max) * 0.5)
+    else:
+        norm = (fmax - peak_frames) / (fmax - fmin)
+        rho = rho_min + norm * (rho_max - rho_min)
+    return np.asarray(rho * poresize_ref, dtype=float)
+
 def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, **kwargs):
     """ Optimize the SDM decomposition.
 
@@ -41,12 +55,28 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     xr_icurve = decomposition.xr_icurve
     x, y = xr_icurve.get_xy()
     N, T, me, mp, N0, t0, poresize = env_params
-    rgv = np.asarray(decomposition.get_rgs())
+    # AI-friendliness switch shared with estimator:
+    # when False, avoid using potentially noisy Guinier Rgs as optimization
+    # references and use peak-frame proxy Rgs instead.
+    use_guinier_rgs = kwargs.get('use_guinier_rgs', None)
+    if use_guinier_rgs is None and model_params is not None:
+        use_guinier_rgs = model_params.get('use_guinier_rgs', False)
+    if use_guinier_rgs is None:
+        use_guinier_rgs = False
+    if use_guinier_rgs:
+        rgv = np.asarray(decomposition.get_rgs())
+    else:
+        rgv = _proxy_rgs_from_peak_frames(decomposition)
 
     # Quality-adaptive Rg anchoring: uses Guinier fit quality at each component's
     # peak frame to weight soft constraints in the objective and set hard-bound width.
     rgcurve = kwargs.get('rgcurve')
-    rg_anchor_scale = model_params.get('rg_anchor_scale', 1.0) if model_params else 1.0
+    if model_params and 'rg_anchor_scale' in model_params:
+        rg_anchor_scale = model_params['rg_anchor_scale']
+    else:
+        # In proxy-Rg mode, default anchor is off to avoid pulling results back
+        # toward Guinier-derived references.
+        rg_anchor_scale = 1.0 if use_guinier_rgs else 0.0
     rg_quality_threshold = model_params.get('rg_quality_threshold', 0.7) if model_params else 0.7
     if rgcurve is not None:
         jv_rg = np.array(rgcurve.frames)
@@ -99,6 +129,16 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         rg_diff = np.diff(rgv_)
         non_ordered = np.where(rg_diff > 0)[0]
         order_penalty = np.sum(rg_diff[non_ordered]**2) * 1e3  # penalty for non-ordered rgv
+        
+        # Minimum Rg separation penalty: prevent components from collapsing to identical Rgs
+        # when they're geometrically distinguished (e.g., separate SEC peaks with different Rgs).
+        # This prevents NNLS rank deficiency from driving minority components toward zero.
+        # Target: maintain at least 1 Å separation between adjacent components.
+        min_rg_sep_target = 1.0  # Å (strong pressure to separate)
+        rg_sep_deficit = np.maximum(0, min_rg_sep_target - np.abs(rg_diff))
+        rg_sep_penalty = np.sum(rg_sep_deficit**2) * 1e2  # Scale: 100 per Å²
+        order_penalty += rg_sep_penalty
+        
         # poresize is now an optimization variable (last in params vector)
         poresize_ = params[6+2*num_components]
         rhov = rgv_/poresize_
@@ -131,13 +171,19 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         # Quality-weighted soft Rg anchoring: pulls each component's Rg toward
         # its EGH-estimated value in proportion to the Guinier fit quality.
         # quality ≈ 1 → strong pull (stays near EGH Rg); quality ≈ 0 → unconstrained.
-        rg_anchor_penalty = np.sum(rg_qualities * ((rgv_ / rgv - 1) ** 2)) * rg_anchor_scale
+        rgv_safe = np.maximum(rgv, 1e-12)
+        rg_anchor_penalty = np.sum(rg_qualities * ((rgv_ / rgv_safe - 1) ** 2)) * rg_anchor_scale
         # Position constraint: use theoretical centroid (mean of gamma, = x0 + N*T*(1-rho)^6)
         # which is amplitude-independent — prevents collapse to degenerate solution even
         # when one component's scale → 0. Peak position is the priority per user guidance.
         peak_positions = np.array([x0_ + N_ * (1-rho)**me * T_ * (1-rho)**mp for rho in rhov])
         position_penalty = np.sum((peak_positions - egh_peak_frames) ** 2) * position_anchor_scale
-        error = np.sum((y - ty)**2) + order_penalty + rg_anchor_penalty + position_penalty
+        # Scale penalty: weak quadratic penalty to discourage near-zero scales. Weight is tiny
+        # (1e-4) so it barely affects the fit but provides a nudge away from collapse.
+        # At s=0.001: penalty ≈ 1e-10; at s=0.01: ≈ 1e-8; at s=0.1: ≈ 1e-6.
+        # This is ~0.01% of typical data fit errors, so won't distort the solution.
+        scale_penalty = np.sum((1.0 / np.maximum(scales_, 1e-8)) ** 2) * 1e-4
+        error = np.sum((y - ty)**2) + order_penalty + rg_anchor_penalty + position_penalty + scale_penalty
         _eval_count[0] += 1
         return error
 
@@ -152,8 +198,25 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     # Estimator-based start (may be degenerate: t0 at upper bound → comp 0 vanishes)
     # Clamp to 1 frame inside the upper bound to avoid Nelder-Mead logit ±∞ at the boundary.
     t0_start = min(float(t0), x0_hi - 1.0)
+    
+    # Spread out close Rgs to avoid NNLS rank deficiency: when initial Rgs are
+    # too close (< 2 Å separation), the resulting elution curves become nearly collinear,
+    # causing NNLS to solve minority components to zero. Solution: increase separation
+    # in the starting point, let optimizer refine toward true solution.
+    rgv_init = list(rgv)
+    rgv_diffs = np.diff(rgv_init)
+    min_sep_target = 2.0  # Å — target separation in initial guess
+    for i in np.where(rgv_diffs < min_sep_target)[0]:
+        # Increase gap between components i and i+1
+        gap_needed = min_sep_target - rgv_diffs[i]
+        # Spread: i (earlier) → lower Rg, i+1 (later) → higher Rg
+        # Move both toward the center, then expand
+        mid = (rgv_init[i] + rgv_init[i+1]) / 2.0
+        rgv_init[i] = mid - min_sep_target / 2.0
+        rgv_init[i+1] = mid + min_sep_target / 2.0
+    
     initial_guess = [N, T, t0_start, t0_start, N0, k_init]
-    initial_guess += list(rgv)
+    initial_guess += rgv_init
 
     initial_scales = estimate_initial_scales()
     initial_guess += initial_scales
@@ -184,9 +247,19 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         rho_derived = 1.0 - frac ** (1.0 / (me + mp))
         rg_derived = float(np.clip(rho_derived * poresize_physics, 1.0, poresize_physics * 0.99))
         rgv_physics.append(rg_derived)
-    # Compute physics-specific scales
+    
+    # Also spread out physics-based Rgs if too close (same as estimator start)
+    rgv_physics_spread = list(rgv_physics)
+    rgv_phys_diffs = np.diff(rgv_physics_spread)
+    min_sep_target_phys = 2.0  # Å
+    for i in np.where(rgv_phys_diffs < min_sep_target_phys)[0]:
+        mid_p = (rgv_physics_spread[i] + rgv_physics_spread[i+1]) / 2.0
+        rgv_physics_spread[i] = mid_p - min_sep_target_phys / 2.0
+        rgv_physics_spread[i+1] = mid_p + min_sep_target_phys / 2.0
+    
+    # Compute physics-specific scales using spread Rgs
     physics_scales = []
-    for rg_p in rgv_physics:
+    for rg_p in rgv_physics_spread:
         column_p = SdmColumn([N_physics, T_physics, me, mp, x0_physics, x0_physics, N0, poresize_physics, timescale, k_init],
                              pore_dist=pore_dist, rt_dist=rt_dist)
         ccurve_p = SdmComponentCurve(x, column_p, rg_p, scale=1.0)
@@ -194,7 +267,7 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         idx_p = int(np.argmax(cy_p))
         physics_scales.append(float(y[idx_p] / cy_p[idx_p]) if cy_p[idx_p] > 0 else 1.0)
     physics_guess = [N_physics, T_physics, x0_physics, x0_physics, N0, k_init]
-    physics_guess += rgv_physics
+    physics_guess += rgv_physics_spread
     physics_guess += physics_scales
     physics_guess += [poresize_physics]   # poresize as last parameter
 
@@ -233,13 +306,19 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     ]
     bounds += rg_bounds
     upper_scale = xr_icurve.get_max_y() * 1000      # upper bounds for scales seem be large enough
-    # Per-component scale lower bounds: 20% of physics_scales (SEC-consistent amplitude prior).
-    # physics_scales are computed at poresize=100 where peak positions match the data, so
-    # they represent well-grounded amplitude estimates. Using 20% prevents total collapse of a
-    # component while allowing 5x downward amplitude flexibility from the physics estimate.
-    # Also floor at 10% of the EGH-based initial_scale as a secondary guard.
-    bounds += [(max(ps * 0.20, si * 0.10, 1e-15), upper_scale)
-               for ps, si in zip(physics_scales, initial_scales)]
+    # Per-component scale lower bounds: prevent collapse under high overlap.
+    # Under high overlap where all components map to similar retention times, NNLS can make
+    # minority components near-zero. To combat this, enforce a minimum scale for each component
+    # proportional to its initial EGH amplitude. This preserves the relative component sizes
+    # from the EGH fit while allowing the SDM optimizer to adjust proportions within reasonable
+    # bounds (factor of 2 up/down). min_ratio=0.5 means each component stays ≥50% of its EGH size.
+    egh_scales = [c.y.max() for c in decomposition.xr_ccurves]
+    min_ratio = 0.5
+    bounds += [(max(sc * min_ratio, 1e-6), upper_scale)
+               for sc in egh_scales]
+    
+    # DEBUG: Log bounds for scale parameters
+    scale_bounds = bounds[-num_components:]
     # Restrict poresize to a tight range around the physics-derived value (100).
     # With poresize free in [75, 150] or [50, 500], the optimizer drifts to ≥150
     # (or 178) and collapses comp 0 to zero.  Bounding to ±10% of poresize_physics
@@ -258,7 +337,7 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
     if not (poresize_lo * 1.01 <= initial_guess[-1] <= poresize_hi * 0.99):
         initial_guess[-1] = poresize_physics   # estimator poresize out of range → use physics value
     if model_params is None:
-        method = None
+        method = 'Nelder-Mead'
     else:
         method = model_params.get('method', 'Nelder-Mead')
     # Multi-start: try both estimator-based and physics-based starting points;
@@ -276,6 +355,9 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
 
     result = None
     start_names = ['estimator', 'physics']
+    # DEBUG: Show initial guess and bounds before optimization
+    init_scales_est = np.array(initial_guess[6+num_components:6+2*num_components])
+    init_scales_phys = np.array(physics_guess[6+num_components:6+2*num_components])
     for i, (name, start) in enumerate(zip(start_names, [initial_guess, physics_guess])):
         if _pbar is not None:
             _pbar.set_description(f'SDM(mono) {name}')
@@ -331,11 +413,8 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
 
     column = SdmColumn([N_, T_, me, mp, x0_, tI_, N0_, poresize_, timescale, k_],
                        pore_dist=pore_dist, rt_dist=rt_dist)
-    print("initial_scales:", initial_scales)
-    print("optimized scales_:", scales_)
-    print("optimized k:", k_)
     new_xr_ccurves = []
-    for rg, scale in zip(rgv_, scales_):
+    for i, (rg, scale) in enumerate(zip(rgv_, scales_)):
         ccurve = SdmComponentCurve(x, column, rg, scale)
         new_xr_ccurves.append(ccurve)
     return new_xr_ccurves

@@ -5,6 +5,24 @@ import numpy as np
 from collections import namedtuple
 from scipy.optimize import minimize
 
+
+def _proxy_rgs_from_peak_frames(decomposition, poresize_ref=100.0,
+                                rho_min=0.15, rho_max=0.35):
+    """Build Rg proxies from peak-frame order when Guinier Rg is disabled.
+
+    Earlier elution frames map to larger rho (thus larger Rg), preserving
+    SEC ordering without relying on noisy per-component Guinier estimates.
+    """
+    xr_ccurves = decomposition.xr_ccurves
+    peak_frames = np.array([float(c.x[c.y.argmax()]) for c in xr_ccurves])
+    fmin, fmax = float(np.min(peak_frames)), float(np.max(peak_frames))
+    if abs(fmax - fmin) < 1e-12:
+        rho = np.full(len(peak_frames), (rho_min + rho_max) * 0.5)
+    else:
+        norm = (fmax - peak_frames) / (fmax - fmin)
+        rho = rho_min + norm * (rho_max - rho_min)
+    return np.asarray(rho * poresize_ref, dtype=float)
+
 LognormalEnv = namedtuple(
     'LognormalEnv',
     ['N', 'T', 'me', 'mp', 'N0', 't0', 'mu', 'sigma']
@@ -67,8 +85,16 @@ def estimate_sdm_column_params(decomposition, **kwargs):
     W1 = kwargs.get('M1_weight', 6.0)
     W2 = kwargs.get('M2_weight', 2.0)
     W3 = kwargs.get('M3_weight', 2.0)
+    # AI-friendliness switch:
+    # - True  -> use decomposition.get_rgs() (Guinier-derived)
+    # - False -> use peak-frame proxy Rgs (stable ordering for weak components)
+    # Default is False for upgrade-stage initialization.
+    use_guinier_rgs = kwargs.get('use_guinier_rgs', False)
 
-    rgv = np.asarray(decomposition.get_rgs())
+    if use_guinier_rgs:
+        rgv = np.asarray(decomposition.get_rgs())
+    else:
+        rgv = _proxy_rgs_from_peak_frames(decomposition)
     xr_ccurves = decomposition.xr_ccurves
 
     # Per-component target moments: (M1, std, sk^(1/3))
@@ -170,7 +196,8 @@ def estimate_sdm_column_params(decomposition, **kwargs):
     N, T, N0_out, t0, poresize = unpack(result.x)
     if debug:
         import matplotlib.pyplot as plt
-        print("Rgs:", rgv)
+        src = 'Guinier' if use_guinier_rgs else 'peak-frame proxy'
+        print(f"Rgs ({src}):", rgv)
         print("Optimization success:", result.success)
         print("Estimated parameters: N=%g, T=%g, N0=%g, t0=%g, poresize=%g"
               % (N, T, N0_out, t0, poresize))

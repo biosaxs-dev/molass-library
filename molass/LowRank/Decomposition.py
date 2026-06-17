@@ -1215,6 +1215,60 @@ class Decomposition:
 
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs)
 
+    def score_initial(self, trimmed_ssd=None, analysis_folder=None,
+                      function_code=None, debug=False):
+        """Evaluate the rigorous objective function once at initial parameters.
+
+        A lightweight alternative to :meth:`optimize_rigorously` when you only
+        need to know the starting score before launching full BH/NS.  Equivalent
+        to the **final plot of the legacy PeakEditor** — UV/XR decompositions
+        with individual score components — but callable from a notebook without
+        triggering any optimization loop.
+
+        For models other than EGH, call :meth:`upgrade` first::
+
+            decomp_sdm = decomp.upgrade(model='SDM')
+            result = decomp_sdm.score_initial(trimmed_ssd=trimmed)
+
+        Parameters
+        ----------
+        trimmed_ssd : SecSaxsData, optional
+            Trimmed (uncorrected) SSD (Pattern B, recommended).
+        analysis_folder : str, optional
+            Where to write optimizer setup artefacts.  Defaults to a
+            temporary directory that is deleted after the call.
+        function_code : str, optional
+            Override auto-detected function code.
+        debug : bool, optional
+
+        Returns
+        -------
+        InitialScoreResult
+            Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
+            ``.diagnose()``, ``.print_summary()``.
+
+        Examples
+        --------
+        ::
+
+            result_auto = decomp_auto.score_initial(trimmed_ssd=trimmed)
+            result_prop = decomp_prop.score_initial(trimmed_ssd=trimmed)
+            result_auto.plot(title="Auto EGH")
+            result_prop.plot(title="Proportional 1:1:1:1")
+            result_auto.print_summary()
+
+        See Also
+        --------
+        optimize_rigorously : Full BH/NS optimization.
+        RunInfo.get_score_breakdown : Score breakdown after optimization.
+        """
+        from molass.Rigorous.InitialScore import make_initial_score_impl
+        return make_initial_score_impl(
+            self, trimmed_ssd=trimmed_ssd,
+            analysis_folder=analysis_folder,
+            function_code=function_code, debug=debug,
+        )
+
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
 

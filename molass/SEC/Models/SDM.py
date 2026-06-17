@@ -40,6 +40,14 @@ class SDM:
             reload(molass.SEC.Models.UvOptimizer)
 
         model_params = kwargs.pop('model_params', None)
+        # AI-friendliness switch:
+        # Default for upgrade() is non-Guinier mode (False), because weak
+        # components can make per-component Guinier Rg unstable at init time.
+        # Explicit model_params/kwargs values still override this default.
+        if 'use_guinier_rgs' not in kwargs:
+            kwargs['use_guinier_rgs'] = False
+            if model_params is not None and 'use_guinier_rgs' in model_params:
+                kwargs['use_guinier_rgs'] = model_params['use_guinier_rgs']
         # Accept pore_dist as a direct kwarg (takes precedence over model_params)
         pore_dist_kwarg = kwargs.pop('pore_dist', None)
         if pore_dist_kwarg is not None:
