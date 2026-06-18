@@ -61,7 +61,7 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
         uv_idx = int(np.argmin(np.abs(x - peak_uv_frame)))
         uv_val = float(y[uv_idx])
         s0 = uv_val / peak_xr_val if peak_xr_val > 0 else 1.0
-        initial_scales.append(float(np.clip(s0, 1e-3, 10.0)))
+        initial_scales.append(float(max(s0, 1e-3)))   # no upper clip — ratio can exceed 10
 
     if debug:
         scale_str = '[' + ', '.join(f'{s:.3g}' for s in initial_scales) + ']'
@@ -69,7 +69,12 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
 
     initial_guess = [a, b] + initial_scales
     dx = (x[-1] - x[0])*0.1
-    bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(1e-3, 10.0) for _ in range(num_components)]
+    # Upper bound: 3× the largest initial scale estimate (data-driven, not hard-wired).
+    # The old hard-coded 10.0 cap was too tight when UV/XR amplitude ratio > 10
+    # (e.g. UV ≈ 14 OD, XR ≈ 0.5 counts → ratio ≈ 28), causing optimized scales
+    # to saturate at the bound and uv_params to appear "too small".
+    upper_scale = max(initial_scales) * 3.0
+    bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(1e-3, upper_scale) for _ in range(num_components)]
     result = minimize(objective_function, initial_guess, bounds=bounds)
 
     if debug:

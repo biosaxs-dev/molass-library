@@ -6,9 +6,6 @@ import numpy as np
 from importlib import reload
 
 def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
-    # Rg parameters
-    orig_rg_params = decomposition.get_rgs()
-
     # XR initial parameters
     xr_params = []
     rg_params = []
@@ -17,8 +14,6 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
         rg_params.append(ccurve.rg)
     xr_params = np.array(xr_params)
     rg_params = np.array(rg_params)
-    print("Original Rg params:", orig_rg_params)
-    print("SDM adjusted Rg params:", rg_params)
 
     # XR baseline parameters
     xr_baseparams = baseparams[1]

@@ -1,5 +1,13 @@
 """
-LowRank.RigorousEghParams.py
+Rigorous.RigorousEdmParams.py
+
+Build the flat initial-params vector for G2020 (EDM rigorous optimizer)
+from an EDM-model decomposition.
+
+Works through polymorphism: ``ccurve.get_params()`` on an ``EdmComponentCurve``
+returns the 7-element EDM params ``(t0, u, a, b, e, Dz, cinj)`` per component.
+``uv_ccurve.scale`` is the UV/XR peak-height ratio, same as what
+``estimate_uv_weights_from_peaks`` computes in the legacy estimator.
 """
 import os
 import numpy as np
