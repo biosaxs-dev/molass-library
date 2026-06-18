@@ -1040,6 +1040,67 @@ class SecSaxsData:
             self._rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
         return self._rgcurve
 
+    def recommend_decomposition_options(self, egh_overlap_threshold=1.3):
+        """Recommend keyword arguments for ``quick_decomposition()`` by detecting peaks.
+
+        Uses EGH peeling to identify elution components robustly.  Consecutive
+        EGH peaks whose spacing/sigma_sum ratio falls below *egh_overlap_threshold*
+        are merged into a single component.
+
+        Example::
+
+            opts = corrected.recommend_decomposition_options()
+            # → {'num_components': 2, 'xr_peakpositions': [145, 220]}
+            # or → {'num_components': 3, 'proportions': [1, 1, 1]}
+            opts['num_components'] = 3    # easy override
+            decomp = corrected.quick_decomposition(**opts)
+
+        Parameters
+        ----------
+        egh_overlap_threshold : float, optional
+            EGH peak pairs with spacing/sigma_sum below this value are merged
+            into one component.  Default 1.3.
+
+        Returns
+        -------
+        dict
+            Keyword arguments for ``quick_decomposition()``.
+
+        See also
+        --------
+        recommend_decomposition : convenience wrapper that calls this method
+            and then ``quick_decomposition(**opts)``.
+        """
+        from molass.Decompose.Recommend import recommend_decomposition_options as _impl
+        return _impl(self.xr, egh_overlap_threshold=egh_overlap_threshold)
+
+    def recommend_decomposition(self, **kwargs):
+        """Automatically detect peaks and return a decomposition.
+
+        Combines :meth:`recommend_decomposition_options` with
+        :meth:`quick_decomposition`.  Any keyword argument overrides the
+        automatic recommendation::
+
+            # One-liner — fully automatic:
+            decomp = corrected.recommend_decomposition()
+
+            # Override a single field while keeping the rest automatic:
+            decomp = corrected.recommend_decomposition(num_components=3)
+
+        Parameters
+        ----------
+        **kwargs
+            Any keyword accepted by ``quick_decomposition()``.  These are
+            merged *after* the automatic options, so they take priority.
+
+        Returns
+        -------
+        Decomposition
+        """
+        opts = self.recommend_decomposition_options()
+        opts.update(kwargs)
+        return self.quick_decomposition(**opts)
+
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 

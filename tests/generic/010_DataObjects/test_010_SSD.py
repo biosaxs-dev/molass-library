@@ -327,3 +327,65 @@ def test_22_uv_monitor_alias():
     ssd_mon.uv.monitor = 300
     assert ssd_mon.uv.pickat == 300
     assert ssd_mon.uv.uv_pickat == 300
+
+
+# --- shared corrected fixture for recommend_* tests (issue #212) ---
+_corrected_instance = None
+
+def _get_corrected():
+    global _corrected_instance
+    if _corrected_instance is None:
+        _corrected_instance = ssd_instance.trimmed_copy().corrected_copy()
+    return _corrected_instance
+
+
+def test_23_recommend_decomposition_options_structure():
+    """recommend_decomposition_options() returns a valid quick_decomposition dict — issue #212."""
+    corrected = _get_corrected()
+    opts = corrected.recommend_decomposition_options()
+
+    assert isinstance(opts, dict), "should return a dict"
+    assert 'num_components' in opts, "must contain 'num_components'"
+    n = opts['num_components']
+    assert isinstance(n, int) and n >= 1, "num_components must be a positive int"
+
+    # Exactly one of the two method keys should be present (or neither for n=1)
+    has_pos   = 'xr_peakpositions' in opts
+    has_prop  = 'proportions' in opts
+    assert not (has_pos and has_prop), "xr_peakpositions and proportions are mutually exclusive"
+    if has_pos:
+        assert len(opts['xr_peakpositions']) == n
+    if has_prop:
+        assert len(opts['proportions']) == n
+
+
+def test_24_recommend_decomposition_options_is_usable():
+    """quick_decomposition(**recommend_decomposition_options()) succeeds — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    opts = corrected.recommend_decomposition_options()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.quick_decomposition(**opts)
+    assert decomp is not None
+    assert len(decomp.xr_ccurves) == opts['num_components']
+
+
+def test_25_recommend_decomposition_one_liner():
+    """recommend_decomposition() returns a Decomposition — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.recommend_decomposition()
+    assert decomp is not None
+
+
+def test_26_recommend_decomposition_override():
+    """recommend_decomposition(num_components=N) overrides the automatic choice — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.recommend_decomposition(num_components=3)
+    assert len(decomp.xr_ccurves) == 3
