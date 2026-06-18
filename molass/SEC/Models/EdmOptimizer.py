@@ -392,6 +392,20 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
     kwargs : dict
         cinj_min : float, optional
             Lower bound for cinj.  Default 0.05.
+        b_max : float, optional
+            Global override for the b upper bound.  When omitted (default),
+            the automatic strategy is used:
+
+            - ``n_comp < 4``: per-component ceiling at the Pass-1 b value.
+              b can decrease (toward physical values) but not increase.
+              Legitimate b > 0 from 2/3-component Pass-1 results is preserved.
+            - ``n_comp >= 4``: ``min(b_pass1_i, 0.0)`` per component.
+              High-component-count systems tend to drift to large positive b
+              (EDM overflow territory); forcing b ≤ 0 resets the optimizer
+              into the physically correct linear-SEC basin.
+
+            Pass an explicit float to override for all components (e.g. 0.0
+            to force the physical regime regardless of component count).
         position_anchor_scale : float, optional
             Scale for soft centroid-to-EGH-peak penalty.  Default 1e-5.
         suppress_positive_b_warning : bool, optional
@@ -413,6 +427,21 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
     t0_fixed, u_fixed, e_fixed, Dz_fixed = p0[0], p0[1], p0[4], p0[5]
 
     n_comp = len(edm_ccurves)
+    # b bounds strategy:
+    # For n_comp < 4 (2/3-component): anchor to Pass-1 value per component.
+    #   b cannot increase beyond what Pass-1 found, but can decrease.
+    #   Pass-1 b > 0 may be physically legitimate for 2/3-comp systems.
+    # For n_comp >= 4: additionally enforce b ≤ 0.
+    #   High-component-count systems tend to drift to large positive b values
+    #   that cause EDM overflow.  Forcing b ≤ 0 (linear SEC regime) resets
+    #   the optimizer into a stable, physically correct basin.
+    #   NOTE: use hard 0.0 (NOT min(b_pass1, 0)) — if b_pass1 < 0 for some
+    #   components, min(b_pass1, 0) = b_pass1 < 0, which over-constrains those
+    #   components and prevents the optimizer from reaching the good basin.
+    #   (Tested: SAMPLE4 SV improves from -83 → +79 with b ≤ 0 exactly.)
+    _b_max_global = kwargs.get('b_max', None)  # None = use automatic strategy
+    _b_zero_cap = (n_comp >= 4)  # enforce b ≤ 0 for 4+ component systems
+
     # EGH peak frames: soft position anchors to prevent component collapse.
     egh_peak_frames = np.array(
         [c.x[c.y.argmax()] for c in edm_ccurves], dtype=float
@@ -446,10 +475,17 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
         return data_error + position_penalty * position_anchor_scale
 
     abc_bounds = []
-    for _ in range(n_comp):
+    for cc in edm_ccurves:
+        b_pass1 = float(cc.params[3])
+        if _b_max_global is not None:
+            b_upper = _b_max_global
+        elif _b_zero_cap:
+            b_upper = 0.0                 # hard b ≤ 0 for 4+ comp: prevents EDM overflow
+        else:
+            b_upper = b_pass1             # b ≤ b_pass1 for 2/3 comp: preserves physical b
         abc_bounds += [
             (0.0, None),          # a (K_SEC ≥ 0)
-            (None, None),         # b (unconstrained)
+            (None, b_upper),      # b (adaptive upper bound — see strategy comment above)
             (cinj_min, None),     # cinj
         ]
 

@@ -419,6 +419,84 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         new_xr_ccurves.append(ccurve)
     return new_xr_ccurves
 
+
+def refine_sdm_per_component(sdm_ccurves, x, y, **kwargs):
+    """
+    Pass 2 (lighter): fix shared column params, refine per-component (rg, scale) only.
+
+    This is the SDM analog of ``refine_edm_per_component``.  After Pass 1 has
+    established a good shared-column characterisation (N, T, me, mp, x0, tI, N0,
+    poresize, timescale, k), this pass holds those fixed and adjusts only the
+    per-component radius-of-gyration and amplitude — a lower-dimensional problem
+    that is less prone to degeneracy under high component overlap.
+
+    Parameters
+    ----------
+    sdm_ccurves : list of SdmComponentCurve
+        Pass-1 optimised SDM component curves (mono or lognormal pore_dist).
+    x : array
+        Frame positions (same grid as used by the component curves).
+    y : array
+        Total XR elution curve values to fit.
+
+    Returns
+    -------
+    list of SdmComponentCurve
+        Refined curves with fixed shared column and optimised per-component
+        (rg, scale).  The column object is shared across all returned curves.
+    """
+    if not sdm_ccurves:
+        return sdm_ccurves
+
+    from scipy.optimize import minimize as _minimize
+    from .SdmComponentCurve import SdmColumn, SdmComponentCurve
+
+    col0 = sdm_ccurves[0].column
+    pore_dist = col0.pore_dist
+    rt_dist = col0.rt_dist
+    # Fixed column taken directly from Pass-1 result
+    fixed_col = SdmColumn(list(col0.params), pore_dist=pore_dist, rt_dist=rt_dist)
+
+    if pore_dist == 'mono':
+        poresize = float(col0.params[7])
+        rg_hard_upper = poresize * 0.99
+    else:
+        # lognormal: derive a generous upper from the median pore size (exp(mu))
+        mu = float(col0.params[7])
+        rg_hard_upper = float(np.exp(mu)) * 0.99
+
+    nc = len(sdm_ccurves)
+    rg0 = np.array([float(cc.rg) for cc in sdm_ccurves])
+    scale0 = np.array([float(cc.scale) for cc in sdm_ccurves])
+    upper_scale = float(np.max(y)) * 1000.0
+
+    rg_bounds = [(max(rg * 0.5, 1.0), min(rg * 1.5, rg_hard_upper)) for rg in rg0]
+    scale_bounds = [(max(sc * 0.1, 1e-9), upper_scale) for sc in scale0]
+    bounds = rg_bounds + scale_bounds
+    x0_vec = np.concatenate([rg0, scale0])
+
+    def objective(params):
+        rgs = params[:nc]
+        scales = params[nc:]
+        y_model = np.zeros_like(y, dtype=float)
+        for rg_i, scale_i in zip(rgs, scales):
+            cc_i = SdmComponentCurve(x, fixed_col, float(np.clip(rg_i, 1.0, rg_hard_upper)), float(scale_i))
+            y_model += cc_i.get_y()
+        residual = y - y_model
+        return float(np.dot(residual, residual))
+
+    result = _minimize(objective, x0_vec, bounds=bounds, method='L-BFGS-B',
+                       options={'maxiter': 2000, 'ftol': 1e-12, 'gtol': 1e-8})
+
+    rgs_ = result.x[:nc]
+    scales_ = result.x[nc:]
+
+    return [
+        SdmComponentCurve(x, fixed_col, float(np.clip(rg_i, 1.0, rg_hard_upper)), float(scale_i))
+        for rg_i, scale_i in zip(rgs_, scales_)
+    ]
+
+
 def optimize_sdm_uv_decomposition(decomposition, xr_ccurves, **kwargs):
     """ Optimize the SDM UV decomposition.
 
