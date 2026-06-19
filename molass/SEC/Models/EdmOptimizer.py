@@ -261,9 +261,15 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         # Bounds
         # t0: left unconstrained — the optimizer starts from the analytical
         #     value (t0_sh ≈ free-EDM minimum) and L-BFGS-B follows the gradient.
-        # b:  left unconstrained — extreme b values give the EDM curve the
-        #     flexibility to match asymmetric elution peaks.  nan_to_num in the
-        #     objective handles any numerical overflow that arises.
+        # b:  can be constrained via kwargs (e.g., b_bounds=(-2, 0.5) from
+        #     auto-derived EGH tau analysis).  Default: unconstrained.
+        # a:  can be constrained via kwargs (e.g., a_bounds=(0, 2.5) from
+        #     auto-derived EGH retention analysis).  Default: (0, ∞).
+        
+        # Extract bounds from kwargs (auto-derived in EdmEstimator if not specified)
+        a_bounds_kw = kwargs.get('a_bounds', None)
+        b_bounds_kw = kwargs.get('b_bounds', None)
+        
         sc_bounds = [
             (None, None),             # t0_sh: unconstrained (starts at analytical value)
             (1e-3, None),             # u_sh  — must be positive
@@ -272,18 +278,28 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         ]
         pc_bounds = []
         for _ in range(n_comp):
+            # Per-component bounds: apply kwargs overrides if present
+            a_bound = a_bounds_kw if a_bounds_kw is not None else (0.0, None)
+            b_bound = b_bounds_kw if b_bounds_kw is not None else (None, None)
             pc_bounds += [
-                (0.0, None),          # a_i   (K_SEC ≥ 0)
-                (None, None),         # b_i   (unconstrained; nan_to_num guards overflow)
+                a_bound,              # a_i   (K_SEC, user or auto-derived bounds)
+                b_bound,              # b_i   (user or auto-derived bounds)
                 (cinj_min, None),     # cinj_i (prevents collapse)
             ]
         sc_bounds = sc_bounds + pc_bounds
+        
+        # Order penalty scale: enforce K_SEC monotonicity (a[0] ≤ a[1] ≤ ...)
+        # In SEC, earlier-eluting components have larger Rg → more excluded → smaller a.
+        # kwargs can override via 'a_order_penalty_scale' (default 1e-3).
+        a_order_penalty_scale = kwargs.get('a_order_penalty_scale', 1e-3)
 
         def objective_sc(p_flat, return_cy_list=False):
             t0_v, u_v, e_v, Dz_v = p_flat[:N_SHARED]
             per_comp = p_flat[N_SHARED:].reshape(n_comp, N_PER_COMP)
             cy_list = []
+            a_values = []
             for a_v, b_v, cinj_v in per_comp:
+                a_values.append(a_v)
                 full = np.array([t0_v, u_v, a_v, b_v, e_v, Dz_v, cinj_v])
                 # Replace NaN/Inf (from overflow in pathological regions) with 0
                 # so the position penalty is still applied to out-of-range curves.
@@ -293,6 +309,7 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
                 return cy_list
             ty = np.sum(cy_list, axis=0)
             data_error = np.sum((ty - y) ** 2)
+            
             position_penalty = 0.0
             for cy, egh_peak in zip(cy_list, egh_peak_frames):
                 cy_abs_sum = np.sum(np.abs(cy))
@@ -303,7 +320,20 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
                     # Curve is zero everywhere — apply a strong penalty so the
                     # optimizer does not "hide" a component outside the data range.
                     position_penalty += (x[-1] - egh_peak) ** 2
-            return data_error + position_penalty * position_anchor_scale
+            
+            # Order penalty: penalize when a[i] > a[i+1] (wrong order)
+            # Components are ordered by EGH peak position (early → late elution).
+            # SEC principle: early elution → larger Rg → smaller K_SEC (a).
+            # So a[0] ≤ a[1] ≤ ... ≤ a[n-1] is the expected ordering.
+            order_penalty = 0.0
+            for i in range(n_comp - 1):
+                if a_values[i] > a_values[i+1]:
+                    # Wrong order: penalize the squared violation
+                    order_penalty += (a_values[i] - a_values[i+1]) ** 2
+            
+            return (data_error + 
+                    position_penalty * position_anchor_scale +
+                    order_penalty * a_order_penalty_scale)
 
         # Single optimization from the analytical starting point.
         # No two-phase, no multi-start — L-BFGS-B from (e=0.5, b=0) follows
