@@ -31,11 +31,13 @@ dependencies = [
 requires-python = ">=3.12,<3.15"
 
 authors = [
-  {name = "Molass Community"},
+  {name = "Masatsuyo Takahashi", orcid = "0009-0007-1466-5563"},
+  {name = "Nobutaka Shimizu", orcid = "0000-0002-3636-1663"},
 ]
 
 maintainers = [
-  {name = "Molass Community"}
+  {name = "Masatsuyo Takahashi", orcid = "0009-0007-1466-5563"},
+  {name = "Nobutaka Shimizu", orcid = "0000-0002-3636-1663"},
 ]
 
 description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
@@ -44,9 +46,15 @@ license = { text = "GNU General Public License v3.0" }
 
 keywords = ["SEC-SAXS"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 4 - Beta",
   "Programming Language :: Python",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
 ]
 
 [project.optional-dependencies]

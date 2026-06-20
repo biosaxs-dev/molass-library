@@ -11,11 +11,34 @@ Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html),
 
 ## Installation
 
+**Requirements:** Python 3.12, 3.13, or 3.14
+
 To install this package, use pip as follows:
 
 ```
 pip install -U molass
+pip install molass_data  # Sample datasets for tutorials and testing
 ```
+
+For development (requires `molass-legacy` as a sibling directory):
+
+```
+git clone https://github.com/biosaxs-dev/molass-library
+git clone https://github.com/biosaxs-dev/molass-legacy
+cd molass-library
+pip install -e ".[testing]"
+pip install molass_data
+```
+
+## Quick Start
+
+For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-dev.github.io/molass-tutorial/chapters/01/quick-start.html) section, or run the corresponding test file:
+
+```python
+pytest tests/tutorial/01-quick_start.py -v
+```
+
+The [molass-beginner](https://github.com/biosaxs-dev/molass-beginner) repository provides an interactive onboarding experience in VS Code Agent mode.
 
 ## Documentation
 
@@ -31,6 +54,9 @@ pip install -U molass
 To join the community, see:
 
 - **Handbook:** https://biosaxs-dev.github.io/molass-develop — maintenance, for developers
+- **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
+- **Support:** [GitHub Discussions](https://github.com/biosaxs-dev/molass-library/discussions) — ask questions and share ideas
+- **Issues:** [GitHub Issues](https://github.com/biosaxs-dev/molass-library/issues) — report bugs or request features
 
 Especially for testing, see the first two sections in
 - **Testing:** https://biosaxs-dev.github.io/molass-develop/chapters/06/testing.html
