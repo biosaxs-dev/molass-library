@@ -19,13 +19,13 @@ dependencies = [
   "psutil",
   "seaborn",
   "numba",
-  "numba",
   "ruptures",
   "learnsaxs",
   "mrcfile",
   "ipywidgets",
   "ipykernel",
   "cma",
+  "shapely",
 ]
 
 requires-python = ">=3.12,<3.15"
