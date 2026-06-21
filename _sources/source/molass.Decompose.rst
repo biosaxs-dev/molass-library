@@ -14,5 +14,6 @@ Submodules
 
    molass.Decompose.Partner
    molass.Decompose.Proportional
+   molass.Decompose.Recommend
    molass.Decompose.VaryUtils
    molass.Decompose.XrOnlyUtils

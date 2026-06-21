@@ -16,41 +16,45 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.Rigorous.RunInfo';</script>
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="SAXS" href="molass.SAXS.html" />
+    <link rel="next" title="Rigorous.RunRegistry" href="molass.Rigorous.RunRegistry.html" />
     <link rel="prev" title="Rigorous.RigorousSdmParams" href="molass.Rigorous.RigorousSdmParams.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -66,19 +70,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -86,7 +79,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -94,8 +86,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,21 +134,17 @@
     
     
     <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <script>document.write(`<img src="../_static/molamola.png" class="logo__image only-dark" alt="Molass Library  documentation - Home"/>`);</script>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
@@ -174,11 +163,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Bridge.html">Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyBaselines.html">Bridge.LegacyBaselines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyRgCurve.html">Bridge.LegacyRgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.OptimizerInput.html">Bridge.OptimizerInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdAdapter.html">Bridge.SdAdapter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdProxy.html">Bridge.SdProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -205,6 +195,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Recommend.html">Decompose.Recommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
@@ -238,9 +229,11 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Global.html">Global</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Global.Options.html">Global.Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Global.Quiet.html">Global.Quiet</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.GuinierDeviation.html">Guinier.GuinierDeviation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
@@ -273,6 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.NumComponentsRecommender.html">LowRank.NumComponentsRecommender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
@@ -299,6 +293,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Peaks.html">Peaks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Peaks.EghPeeler.html">Peaks.EghPeeler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.Recognizer.html">Peaks.Recognizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.RecognizerSpecific.html">Peaks.RecognizerSpecific</a></li>
@@ -306,6 +301,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.AnomalyBands.html">PlotUtils.AnomalyBands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Comparison.html">PlotUtils.Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.DecompositionPlot.html">PlotUtils.DecompositionPlot</a></li>
@@ -336,14 +332,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComparePaths.html">Rigorous.ComparePaths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.FunctionCodeUtils.html">Rigorous.FunctionCodeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.GuiReplay.html">Rigorous.GuiReplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.InitialScore.html">Rigorous.InitialScore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousCedmParams.html">Rigorous.RigorousCedmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEghParams.html">Rigorous.RigorousEghParams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousGrmParams.html">Rigorous.RigorousGrmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousImplement.html">Rigorous.RigorousImplement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousLkmParams.html">Rigorous.RigorousLkmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousSdmParams.html">Rigorous.RigorousSdmParams</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Rigorous.RunInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RunRegistry.html">Rigorous.RunRegistry</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -377,8 +381,20 @@
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -395,6 +411,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ModelFactory.html">SEC.ModelFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.PoreEntryAnimation.html">SEC.PoreEntryAnimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
 </ul>
 </details></li>
@@ -403,8 +420,20 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -431,6 +460,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Testing.html">Testing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Testing.HeadlessPeakEditor.html">Testing.HeadlessPeakEditor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Testing.PlotControl.html">Testing.PlotControl</a></li>
 </ul>
 </details></li>
@@ -449,9 +479,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -549,7 +584,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -563,25 +598,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -605,7 +632,39 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo"><code class="docutils literal notranslate"><span class="pre">RunInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.ssd"><code class="docutils literal notranslate"><span class="pre">RunInfo.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.optimizer"><code class="docutils literal notranslate"><span class="pre">RunInfo.optimizer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.dsets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.init_params"><code class="docutils literal notranslate"><span class="pre">RunInfo.init_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.monitor"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.analysis_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.analysis_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.decomposition</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.in_process_result"><code class="docutils literal notranslate"><span class="pre">RunInfo.in_process_result</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.request_stop"><code class="docutils literal notranslate"><span class="pre">RunInfo.request_stop()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.is_alive"><code class="docutils literal notranslate"><span class="pre">RunInfo.is_alive</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.current_work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.current_work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.update_manifest_on_resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.update_manifest_on_resume()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_current_decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_decomposition()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.resume()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.wait"><code class="docutils literal notranslate"><span class="pre">RunInfo.wait()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_best"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_best()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_current_curves"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_curves()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.diagnose"><code class="docutils literal notranslate"><span class="pre">RunInfo.diagnose()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.compare_subprocess_dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.compare_subprocess_dsets()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.monitor_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor_snapshot_json_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.check_progress"><code class="docutils literal notranslate"><span class="pre">RunInfo.check_progress()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.progress_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.progress_snapshot_json_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_progress_snapshot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_monitor_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_monitor_snapshot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.sv_history_per_job"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history_per_job</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.plot_sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.plot_sv_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.live_status"><code class="docutils literal notranslate"><span class="pre">RunInfo.live_status()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.run_complete_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.run_complete_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_run_complete"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_run_complete()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.reconnect"><code class="docutils literal notranslate"><span class="pre">RunInfo.reconnect()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -624,12 +683,814 @@ document.write(`
 <p>Rigorous.RunInfo.py</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RunInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RunInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decomposition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handle returned by <code class="xref py py-func docutils literal notranslate"><span class="pre">molass.Rigorous.make_rigorous_decomposition()</span></code>
+(and <code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_rigorously()</span></code>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.ssd">
+<span class="sig-name descname"><span class="pre">ssd</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.ssd" title="Link to this definition">#</a></dt>
+<dd><p>The SEC-SAXS dataset used for the optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData">SecSaxsData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.optimizer">
+<span class="sig-name descname"><span class="pre">optimizer</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.optimizer" title="Link to this definition">#</a></dt>
+<dd><p>The in-process optimizer object.  Only populated for the in-process
+path (<code class="docutils literal notranslate"><span class="pre">in_process=True</span></code>); <code class="docutils literal notranslate"><span class="pre">None</span></code> for the subprocess path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optimizer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.dsets">
+<span class="sig-name descname"><span class="pre">dsets</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.dsets" title="Link to this definition">#</a></dt>
+<dd><p>Dataset objects passed to the optimizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.init_params">
+<span class="sig-name descname"><span class="pre">init_params</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.init_params" title="Link to this definition">#</a></dt>
+<dd><p>Initial parameter vector used to start the optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.monitor">
+<span class="sig-name descname"><span class="pre">monitor</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.monitor" title="Link to this definition">#</a></dt>
+<dd><p>Live monitor object for the subprocess path; <code class="docutils literal notranslate"><span class="pre">None</span></code> for in-process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MplMonitor or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.analysis_folder">
+<span class="sig-name descname"><span class="pre">analysis_folder</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.analysis_folder" title="Link to this definition">#</a></dt>
+<dd><p>Root folder for all optimizer output.  Set this if you want the
+progress/sidecar helpers to work without arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.decomposition">
+<span class="sig-name descname"><span class="pre">decomposition</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.decomposition" title="Link to this definition">#</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">Decomposition</span></code> object that launched this run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.work_folder">
+<span class="sig-name descname"><span class="pre">work_folder</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.work_folder" title="Link to this definition">#</a></dt>
+<dd><p>Absolute path to the job folder written by the in-process optimizer
+(<code class="docutils literal notranslate"><span class="pre">&lt;analysis_folder&gt;/optimized/jobs/000</span></code> or similar).  Set only for
+the in-process path; <code class="docutils literal notranslate"><span class="pre">None</span></code> for the subprocess path.  Contains
+<code class="docutils literal notranslate"><span class="pre">init_params.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code>, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.in_process_result">
+<span class="sig-name descname"><span class="pre">in_process_result</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.in_process_result" title="Link to this definition">#</a></dt>
+<dd><p>Raw result object returned by <code class="docutils literal notranslate"><span class="pre">run_optimizer_in_process()</span></code>.
+Set only for the in-process path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.request_stop">
+<span class="sig-name descname"><span class="pre">request_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.request_stop" title="Link to this definition">#</a></dt>
+<dd><p>Request cooperative termination of an async in-process run.</p>
+<p>Sets the stop event that <code class="docutils literal notranslate"><span class="pre">InProcessRunner</span></code> checks between solver
+iterations.  The solver thread receives a <code class="docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code> at
+the next Python bytecode boundary (~50 ms at most).  Has no effect
+if the run is already finished or was not in-process.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.is_alive">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_alive</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.is_alive" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> while the background optimizer is still running.</p>
+<p>Works for both async in-process runs (<code class="docutils literal notranslate"><span class="pre">async_=True</span></code>) and
+subprocess runs (<code class="docutils literal notranslate"><span class="pre">monitor=False,</span> <span class="pre">in_process=False</span></code>).
+Returns <code class="docutils literal notranslate"><span class="pre">False</span></code> once the run completes or for synchronous runs.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.current_work_folder">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_work_folder</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.current_work_folder" title="Link to this definition">#</a></dt>
+<dd><p>The currently-active (or most-recently-used) job folder.</p>
+<p>Unlike <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.work_folder" title="molass.Rigorous.RunInfo.RunInfo.work_folder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">work_folder</span></code></a> — which is reset to <code class="docutils literal notranslate"><span class="pre">None</span></code> at the start
+of each auto-resume trial — this property always returns the best
+available answer:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">self.work_folder</span></code> if already set.</p></li>
+<li><p>The most recently modified <code class="docutils literal notranslate"><span class="pre">jobs/NNN</span></code> sub-folder under
+<code class="docutils literal notranslate"><span class="pre">analysis_folder/optimized/jobs/</span></code> (the highest <code class="docutils literal notranslate"><span class="pre">NNN</span></code> that
+exists on disk).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> if neither is available.</p></li>
+</ol>
+<p>This is the right folder to probe with <code class="docutils literal notranslate"><span class="pre">aicKernelEval</span></code> during a
+multi-trial run (<code class="docutils literal notranslate"><span class="pre">max_trials</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>).  Fixes issue #150.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.update_manifest_on_resume">
+<span class="sig-name descname"><span class="pre">update_manifest_on_resume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">work_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.update_manifest_on_resume" title="Link to this definition">#</a></dt>
+<dd><p>Update <code class="docutils literal notranslate"><span class="pre">RUN_MANIFEST.json</span></code> when a new auto-resume trial starts.</p>
+<p>Called from <code class="docutils literal notranslate"><span class="pre">MplMonitor._RunInfoSource._wf_callback</span></code> as soon as
+the new job folder is allocated, so that <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.live_status" title="molass.Rigorous.RunInfo.RunInfo.live_status"><code class="xref py py-meth docutils literal notranslate"><span class="pre">live_status()</span></code></a> reads
+the correct <code class="docutils literal notranslate"><span class="pre">work_folder</span></code> and <code class="docutils literal notranslate"><span class="pre">phase='running'</span></code> for the new
+trial.  Fixes issue #148.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>work_folder</strong> (<em>str</em>) – Absolute path to the newly-allocated job folder.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.get_current_decomposition">
 <span class="sig-name descname"><span class="pre">get_current_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.get_current_decomposition" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.resume">
+<span class="sig-name descname"><span class="pre">resume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.resume" title="Link to this definition">#</a></dt>
+<dd><p>Resume optimization from the best parameters of the previous run.</p>
+<p>This mirrors the legacy GUI’s “Resume” button: extracts the best
+parameters from the completed job’s callback.txt, then launches a
+new optimizer subprocess using those as the starting point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>niter</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of iterations for the resumed optimization. Default is 20.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode (reloads modules from disk). Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – The same RunInfo instance, updated with the new monitor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo" title="molass.Rigorous.RunInfo.RunInfo">RunInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.wait" title="Link to this definition">#</a></dt>
+<dd><p>Wait for rigorous optimization results to become available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum seconds to wait (default 600). Use <code class="docutils literal notranslate"><span class="pre">0</span></code> for no limit.</p></li>
+<li><p><strong>poll_interval</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Seconds between checks (default 5).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For async in-process runs (<code class="docutils literal notranslate"><span class="pre">async_=True</span></code>), <code class="docutils literal notranslate"><span class="pre">poll_interval</span></code>
+is <strong>silently ignored</strong> — the implementation calls
+<code class="docutils literal notranslate"><span class="pre">thread.join(timeout)</span></code> once with no looping.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if results appeared, <code class="docutils literal notranslate"><span class="pre">False</span></code> if timed out.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If no <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was stored (e.g. RunInfo was created
+    without one).</p></li>
+<li><p><strong>.. warning:</strong> – <strong>Async in-process path</strong> (<code class="docutils literal notranslate"><span class="pre">async_=True</span></code>): This method calls <code class="docutils literal notranslate"><span class="pre">_async_thread.join(timeout)</span></code> once, which has
+    two failure modes for long BH/NS runs:
+    
+    - <strong>Default</strong> <code class="docutils literal notranslate"><span class="pre">timeout=600</span></code>: silently returns <code class="docutils literal notranslate"><span class="pre">False</span></code> for runs
+      longer than 10 minutes while the optimizer is still running.
+      Downstream calls to <code class="docutils literal notranslate"><span class="pre">load_best()</span></code> will then fail or load stale
+      results.
+    - <code class="docutils literal notranslate"><span class="pre">timeout=0</span></code> <strong>(no limit)</strong>: blocks the kernel’s main thread
+      entirely.  No other cell — including <code class="docutils literal notranslate"><span class="pre">live_status()</span></code>,
+      <code class="docutils literal notranslate"><span class="pre">is_alive</span></code>, or any monitoring probe — can execute until the
+      optimizer finishes.
+    
+    For interactive notebooks prefer <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.load_best" title="molass.Rigorous.RunInfo.RunInfo.load_best"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_best()</span></code></a>, which waits
+    only until the first result lands on disk and returns
+    immediately, or poll manually with::
+    
+        if run_info.is_alive:
+            print(run_info.live_status())</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.load_best">
+<span class="sig-name descname"><span class="pre">load_best</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.load_best" title="Link to this definition">#</a></dt>
+<dd><p>Load the best rigorous optimization result, waiting until one is available.</p>
+<p>Safe to call immediately after <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code> — it blocks
+until at least one job has completed, then returns the result with the
+lowest objective function value found so far.  Re-running this cell while
+the optimizer is still going always returns the best result available at
+that moment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum seconds to wait for the first result (default <code class="docutils literal notranslate"><span class="pre">0</span></code> = no
+limit).  When non-zero and no result appears within <code class="docutils literal notranslate"><span class="pre">timeout</span></code>
+seconds, raises <code class="xref py py-class docutils literal notranslate"><span class="pre">TimeoutError</span></code>.</p></li>
+<li><p><strong>poll_interval</strong> (<em>float</em><em>, </em><em>optional</em>) – Seconds between filesystem checks (default 5).</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reload modules from disk.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Decomposition built from the best optimized parameters available
+at the time the call returns.  The <code class="docutils literal notranslate"><span class="pre">result.sv</span></code> and <code class="docutils literal notranslate"><span class="pre">result.fv</span></code>
+attributes are attached for convenience.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If no <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was stored.</p></li>
+<li><p><strong>TimeoutError</strong> – If <code class="docutils literal notranslate"><span class="pre">timeout</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and no result appears within that time.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Interrupt with <strong>Ctrl+C</strong> to cancel the wait at any time.</p>
+<p>If the optimizer is still running, the result reflects only the jobs
+completed so far.  Re-call after the run finishes to get the final best.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown" title="molass.Rigorous.RunInfo.RunInfo.get_score_breakdown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_score_breakdown</span></code></a></dt><dd><p>Inspect the individual score and penalty components that make up the objective value (fv).</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_info</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span>
+    <span class="n">analysis_folder</span><span class="o">=</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BH&#39;</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">load_best</span><span class="p">()</span>   <span class="c1"># blocks until first BH job lands</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot_components</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.get_score_breakdown">
+<span class="sig-name descname"><span class="pre">get_score_breakdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jobid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate the objective function and return individual score components.</p>
+<p>Loads the best (or specified) optimized parameters from disk, runs them
+through the optimizer’s objective function, and returns a dict mapping
+each score name to its value.</p>
+<section id="score-architecture">
+<h2>Score architecture<a class="headerlink" href="#score-architecture" title="Link to this heading">#</a></h2>
+<p>The objective value <code class="docutils literal notranslate"><span class="pre">fv</span></code> is computed as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fv</span> <span class="o">=</span> <span class="n">synthesize</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">positive_elevate</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">penalties</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Synthesized scores</strong> (first 7): XR_2D_fitting, XR_LRF_residual,
+UV_2D_fitting, UV_LRF_residual, Guinier_deviation,
+Kratky_smoothness, SEC_conformance.  These are combined via a
+weighted RMS + spread measure, shifted so that a raw score of -3
+maps to zero contribution.</p>
+<p><strong>Additive penalties</strong> (remaining entries): mapping_penalty,
+negative_penalty, baseline_penalty, outofbounds_penalty,
+order_penalty, control_penalty, consistency_penalty.  These are
+added directly to fv after synthesis.  A penalty of 1.0 raises
+fv by exactly 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param jobid<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Specific job id to evaluate. If None, uses the best job
+(lowest <code class="docutils literal notranslate"><span class="pre">best_fv</span></code>).</p>
+</dd>
+<dt class="field-even">type jobid<span class="colon">:</span></dt>
+<dd class="field-even"><p>str, optional</p>
+</dd>
+<dt class="field-odd">param debug<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If True, reload modules from disk.</p>
+</dd>
+<dt class="field-even">type debug<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool, optional</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">{'fv':</span> <span class="pre">float,</span> <span class="pre">'scores':</span> <span class="pre">{name:</span> <span class="pre">value,</span> <span class="pre">...}}</span></code> where <code class="docutils literal notranslate"><span class="pre">scores</span></code>
+maps each score/penalty name to its numeric value.</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">raises ValueError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If no <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was stored.</p>
+</dd>
+<dt class="field-even">raises FileNotFoundError<span class="colon">:</span></dt>
+<dd class="field-even"><p>If no completed jobs are found.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_info</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span>
+    <span class="n">analysis_folder</span><span class="o">=</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">run_info</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="n">breakdown</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">get_score_breakdown</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">breakdown</span><span class="p">[</span><span class="s1">&#39;scores&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.get_current_curves">
+<span class="sig-name descname"><span class="pre">get_current_curves</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.get_current_curves" title="Link to this definition">#</a></dt>
+<dd><p>Return the data and model curves currently shown on the monitor.</p>
+<p>Delegates to <code class="docutils literal notranslate"><span class="pre">MplMonitor.get_current_curves()</span></code> (molass-legacy #31,
+<strong>monitor readability</strong>).  Provides a single-call entry point from
+the user-facing <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> object so that an AI agent can query
+<code class="docutils literal notranslate"><span class="pre">run_info.get_current_curves()</span></code> without knowing about the internal
+monitor attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>See <code class="docutils literal notranslate"><span class="pre">MplMonitor.get_current_curves()</span></code> for the full key list.
+Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if the monitor is not set or has no data yet.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.diagnose">
+<span class="sig-name descname"><span class="pre">diagnose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">breakdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.diagnose" title="Link to this definition">#</a></dt>
+<dd><p>Map score values to physical interpretations.</p>
+<p>Calls <code class="docutils literal notranslate"><span class="pre">get_score_breakdown()</span></code> if no breakdown is provided, then
+applies encoded rules to each score/score-pair and returns a list of
+<code class="docutils literal notranslate"><span class="pre">Diagnosis</span></code> namedtuples with structured physical meaning.</p>
+<p>This allows an AI agent (or a human) to understand <em>why</em> a fit is poor
+without requiring domain knowledge: the rules encode the mapping from
+numeric scores to physical causes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>breakdown</strong> (<em>dict</em><em>, </em><em>optional</em>) – Output of <code class="docutils literal notranslate"><span class="pre">get_score_breakdown()</span></code>.  If None, it is computed
+automatically (which loads and evaluates the best job from disk).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Each <code class="docutils literal notranslate"><span class="pre">Diagnosis</span></code> has the fields:
+- <code class="docutils literal notranslate"><span class="pre">score</span></code> : str – the score/penalty name (or pair)
+- <code class="docutils literal notranslate"><span class="pre">status</span></code> : str – <code class="docutils literal notranslate"><span class="pre">'good'</span></code>, <code class="docutils literal notranslate"><span class="pre">'fair'</span></code>, <code class="docutils literal notranslate"><span class="pre">'poor'</span></code>, or</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">'failing'</span></code></p>
+</div></blockquote>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reason</span></code> : str – human-readable explanation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">suggestion</span></code> : str or None – recommended next diagnostic step</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of Diagnosis</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_info</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">run_info</span><span class="o">.</span><span class="n">diagnose</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">score</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">suggestion</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  -&gt; </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">suggestion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.compare_subprocess_dsets">
+<span class="sig-name descname"><span class="pre">compare_subprocess_dsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp_b_sweep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp_b_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-200.0,</span> <span class="pre">200.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">81</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.compare_subprocess_dsets" title="Link to this definition">#</a></dt>
+<dd><p>Debug tool for molass-legacy#34: compare parent vs subprocess datasets.</p>
+<p>Reconstructs the datasets as the subprocess would derive them (by
+re-reading raw data from disk via <code class="docutils literal notranslate"><span class="pre">FullOptInput</span></code> → <code class="docutils literal notranslate"><span class="pre">OptDataSets</span></code>),
+then compares them with the parent’s live datasets side-by-side.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">mp_b_sweep=True</span></code> and <code class="docutils literal notranslate"><span class="pre">self.optimizer</span></code> is available, also sweeps
+the objective function along the mp_b axis for both the parent optimizer
+(parent dsets) and a subprocess-reconstructed optimizer (subprocess
+dsets).  This shows whether — and <em>why</em> — the two objective landscapes
+differ, which is the root cause of #34.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plot</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), produce visual comparison plots.</p></li>
+<li><p><strong>mp_b_sweep</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), also sweep mp_b on both optimizers and plot
+the objective landscape.  Requires <code class="docutils literal notranslate"><span class="pre">self.optimizer</span></code> to be set.</p></li>
+<li><p><strong>mp_b_range</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em>) – Range of mp_b values for the sweep.  Default <code class="docutils literal notranslate"><span class="pre">(-200,</span> <span class="pre">200)</span></code>.</p></li>
+<li><p><strong>n_points</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of evaluation points for the mp_b sweep.  Default 81.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sub_dsets</strong> – The subprocess-reconstructed dataset object for further inspection.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>OptDataSets</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If <code class="docutils literal notranslate"><span class="pre">work_folder</span></code> or <code class="docutils literal notranslate"><span class="pre">dsets</span></code> is not set on this RunInfo.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># After a subprocess run (in_process=False):</span>
+<span class="n">run_info</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span><span class="n">rgcurve</span><span class="p">,</span> <span class="n">in_process</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sub_dsets</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">compare_subprocess_dsets</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.monitor_snapshot_json_path">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">monitor_snapshot_json_path</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.monitor_snapshot_json_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the MplMonitor JSON sidecar written during the last run.</p>
+<p>The file is created when <code class="docutils literal notranslate"><span class="pre">MOLASS_MONITOR_SNAPSHOT=1</span></code> and exists at
+<code class="docutils literal notranslate"><span class="pre">&lt;analysis_folder&gt;/optimized/figs/mplmonitor_latest.json</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>str</em> – Absolute path to the JSON file, whether or not it exists.</p></li>
+<li><p><em>None</em> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was not set on this RunInfo.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.check_progress">
+<span class="sig-name descname"><span class="pre">check_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.check_progress" title="Link to this definition">#</a></dt>
+<dd><p>Read callback.txt(s) from all jobs and report best SV so far.</p>
+<p>Re-runnable at any time while the optimizer is running or after it
+completes.  Does not require the optimizer to have finished.</p>
+<p>The implementation lives in
+<a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.check_progress" title="molass.Rigorous.CurrentStateUtils.check_progress"><code class="xref py py-func docutils literal notranslate"><span class="pre">molass.Rigorous.CurrentStateUtils.check_progress()</span></code></a> so it can
+be updated and reloaded without restarting the kernel — just call
+<code class="docutils literal notranslate"><span class="pre">importlib.reload(molass.Rigorous.CurrentStateUtils)</span></code> and the
+next invocation picks up the new logic automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Display label prefix. Defaults to the analysis folder basename.</p></li>
+<li><p><strong>write_snapshot</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, write a compact JSON file to
+<code class="docutils literal notranslate"><span class="pre">&lt;analysis_folder&gt;/optimized/progress_snapshot.json</span></code> in addition
+to printing.  Read back via <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot" title="molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_progress_snapshot()</span></code></a>.
+Default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Progress data dict when there are evaluations to report; <code class="docutils literal notranslate"><span class="pre">None</span></code>
+otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict or None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_run_sub</span><span class="o">.</span><span class="n">check_progress</span><span class="p">()</span>                         <span class="c1"># print only</span>
+<span class="n">_run_sub</span><span class="o">.</span><span class="n">check_progress</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;subprocess&quot;</span><span class="p">)</span>       <span class="c1"># explicit label</span>
+<span class="n">snap</span> <span class="o">=</span> <span class="n">_run_sub</span><span class="o">.</span><span class="n">check_progress</span><span class="p">(</span><span class="n">write_snapshot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># persist + return</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">molass.Rigorous.check_progress</span></code></dt><dd><p>standalone form; also accepts a plain folder-path string when no <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> instance is at hand:: from molass.Rigorous import check_progress check_progress(“/path/to/analysis_folder”)</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.progress_snapshot_json_path">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">progress_snapshot_json_path</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.progress_snapshot_json_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the progress snapshot JSON written by <code class="docutils literal notranslate"><span class="pre">check_progress(write_snapshot=True)</span></code>.</p>
+<p>Exists at <code class="docutils literal notranslate"><span class="pre">&lt;analysis_folder&gt;/optimized/progress_snapshot.json</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>str</em> – Absolute path to the JSON file, whether or not it exists yet.</p></li>
+<li><p><em>None</em> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was not set on this RunInfo.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot">
+<span class="sig-name descname"><span class="pre">load_progress_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot" title="Link to this definition">#</a></dt>
+<dd><p>Load and return the progress snapshot JSON as a dict.</p>
+<p>Written by <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.check_progress" title="molass.Rigorous.RunInfo.RunInfo.check_progress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_progress()</span></code></a> when <code class="docutils literal notranslate"><span class="pre">write_snapshot=True</span></code>.
+Readable from any session — including a new AI session — without
+re-running the optimizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Keys: <code class="docutils literal notranslate"><span class="pre">label</span></code>, <code class="docutils literal notranslate"><span class="pre">n_evals</span></code>, <code class="docutils literal notranslate"><span class="pre">best_fv</span></code>, <code class="docutils literal notranslate"><span class="pre">best_sv</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sv_best_so_far</span></code>, <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If the snapshot does not exist yet (call
+    <code class="docutils literal notranslate"><span class="pre">check_progress(write_snapshot=True)</span></code> first).</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> is not set on this RunInfo.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_run_sub</span><span class="o">.</span><span class="n">check_progress</span><span class="p">(</span><span class="n">write_snapshot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">snap</span> <span class="o">=</span> <span class="n">_run_sub</span><span class="o">.</span><span class="n">load_progress_snapshot</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;best SV: </span><span class="si">{</span><span class="n">snap</span><span class="p">[</span><span class="s1">&#39;best_sv&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.load_monitor_snapshot">
+<span class="sig-name descname"><span class="pre">load_monitor_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.load_monitor_snapshot" title="Link to this definition">#</a></dt>
+<dd><p>Load and return the MplMonitor JSON sidecar as a dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed JSON content.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If the sidecar does not exist (<code class="docutils literal notranslate"><span class="pre">MOLASS_MONITOR_SNAPSHOT</span></code> was not
+    set, or the optimizer has not run yet).</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> is not set on this RunInfo.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.sv_history">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sv_history</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.sv_history" title="Link to this definition">#</a></dt>
+<dd><p>Min-so-far SV trajectory from all <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code> files.</p>
+<p>Returns the full sequence of best-SV-so-far values, one per accepted
+optimizer evaluation.  Readable at any time — while the run is in
+progress or after it completes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Running-minimum SV values.  <code class="docutils literal notranslate"><span class="pre">sv_history[-1]</span></code> is the best
+accepted SV of the entire run.  Empty list if no evaluations
+have been recorded yet.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of float</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> is not set on this RunInfo.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">svs</span> <span class="o">=</span> <span class="n">run_sub</span><span class="o">.</span><span class="n">sv_history</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;best SV: </span><span class="si">{</span><span class="n">svs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  start SV: </span><span class="si">{</span><span class="n">svs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.sv_history_per_job">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sv_history_per_job</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.sv_history_per_job" title="Link to this definition">#</a></dt>
+<dd><p>Per-job SV best-so-far trajectories from all <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code> files.</p>
+<p>Like <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.sv_history" title="molass.Rigorous.RunInfo.RunInfo.sv_history"><code class="xref py py-attr docutils literal notranslate"><span class="pre">sv_history</span></code></a> but preserves job boundaries.  Useful when a
+BH run spans multiple restarts (jobs <code class="docutils literal notranslate"><span class="pre">000</span></code>, <code class="docutils literal notranslate"><span class="pre">001</span></code>, …) and you
+want to know how much each restart contributed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping from job id (e.g. <code class="docutils literal notranslate"><span class="pre">'000'</span></code>) to the list of global
+best-SV-so-far values recorded within that job.  Empty dict if no
+evaluations have been recorded yet.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, list of float]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">per_job</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">sv_history_per_job</span>
+<span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">svs</span> <span class="ow">in</span> <span class="n">per_job</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;job </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">svs</span><span class="p">)</span><span class="si">}</span><span class="s2"> evals, best SV = </span><span class="si">{</span><span class="n">svs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.plot_sv_history">
+<span class="sig-name descname"><span class="pre">plot_sv_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">4)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.plot_sv_history" title="Link to this definition">#</a></dt>
+<dd><p>Plot the min-so-far SV trajectory from <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code>.</p>
+<p>One-liner convergence view.  Works at any time after at least one
+evaluation has been accepted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Figure title.  Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;SV</span> <span class="pre">history</span> <span class="pre">—</span> <span class="pre">&lt;folder</span> <span class="pre">basename&gt;&quot;</span></code>.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Matplotlib figure size.  Default <code class="docutils literal notranslate"><span class="pre">(8,</span> <span class="pre">4)</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_sub</span><span class="o">.</span><span class="n">plot_sv_history</span><span class="p">()</span>
+<span class="n">run_sub</span><span class="o">.</span><span class="n">plot_sv_history</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Apo 2-comp NS, subprocess path&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.live_status">
+<span class="sig-name descname"><span class="pre">live_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.live_status" title="Link to this definition">#</a></dt>
+<dd><p>Return a single dict snapshot of where this run stands right now.</p>
+<p>One-call replacement for the scattered probe pattern (<code class="docutils literal notranslate"><span class="pre">sv_history</span></code>
+property + <code class="docutils literal notranslate"><span class="pre">check_progress</span></code> + <code class="docutils literal notranslate"><span class="pre">RunRegistry.read_manifest</span></code> +
+<code class="docutils literal notranslate"><span class="pre">getattr(self,</span> <span class="pre">'subprocess_returncode',</span> <span class="pre">None)</span></code> + …) used in
+diagnostic notebook cells.  Pure read: scans disk, never mutates.
+Safe to invoke from <code class="docutils literal notranslate"><span class="pre">aicKernelEval</span></code> (issue ai-context-vscode#1)
+or any sync cell, including while the run is still in flight.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>Keys (all best-effort; missing data → <code class="docutils literal notranslate"><span class="pre">None</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">phase</span></code> (str): one of <code class="docutils literal notranslate"><span class="pre">'pending'</span></code>, <code class="docutils literal notranslate"><span class="pre">'running'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'completed'</span></code>, <code class="docutils literal notranslate"><span class="pre">'failed'</span></code>, <code class="docutils literal notranslate"><span class="pre">'unknown'</span></code>.  Derived from
+the manifest’s <code class="docutils literal notranslate"><span class="pre">status</span></code> field plus any
+<code class="docutils literal notranslate"><span class="pre">subprocess_returncode</span></code> available.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_evals</span></code> (int): number of accepted optimizer evaluations
+recorded in <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code> so far.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">best_fv</span></code> (float): inverted from <code class="docutils literal notranslate"><span class="pre">best_sv</span></code> (matches
+<code class="docutils literal notranslate"><span class="pre">check_progress</span></code> arithmetic).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">best_sv</span></code> (float): best score-value-so-far on the 0-100
+scale.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elapsed_s</span></code> (float): seconds since manifest <code class="docutils literal notranslate"><span class="pre">start_time</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the manifest isn’t available yet.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> (str): from <code class="docutils literal notranslate"><span class="pre">self.analysis_folder</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">work_folder</span></code> (str): from <code class="docutils literal notranslate"><span class="pre">self.work_folder</span></code>, falling back
+to walking <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> for <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subprocess_pid</span></code> (int or None): from manifest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subprocess_returncode</span></code> (int or None): from
+<code class="docutils literal notranslate"><span class="pre">self.subprocess_returncode</span></code> or manifest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manifest</span></code> (dict or None): the full <code class="docutils literal notranslate"><span class="pre">RUN_MANIFEST.json</span></code>
+contents from the analysis folder, when present.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>From a notebook cell while the run is in flight:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_sub</span><span class="o">.</span><span class="n">live_status</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>From outside the kernel via ai-context-vscode#1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aicKernelEval</span><span class="p">(</span><span class="n">expression</span><span class="o">=</span><span class="s2">&quot;run_sub.live_status()&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.run_complete_path">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">run_complete_path</span></span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.run_complete_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to run_complete.json written when the optimizer finishes normally.</p>
+<p>The file is always created on completion (no env-var required) at
+<code class="docutils literal notranslate"><span class="pre">&lt;analysis_folder&gt;/optimized/figs/run_complete.json</span></code>.</p>
+<p>It is the canonical, zero-parse-required answer to
+“what was the best result?” for AI tools and notebook cells in a
+new session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>str</em> – Absolute path to the JSON file, whether or not it exists yet.</p></li>
+<li><p><em>None</em> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> was not set on this RunInfo.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.load_run_complete">
+<span class="sig-name descname"><span class="pre">load_run_complete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.load_run_complete" title="Link to this definition">#</a></dt>
+<dd><p>Load and return the run_complete.json written on job completion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Keys: <code class="docutils literal notranslate"><span class="pre">schema_version</span></code>, <code class="docutils literal notranslate"><span class="pre">completed_at</span></code>, <code class="docutils literal notranslate"><span class="pre">best_fv</span></code>,
+<code class="docutils literal notranslate"><span class="pre">best_sv</span></code>, <code class="docutils literal notranslate"><span class="pre">n_evals</span></code>, <code class="docutils literal notranslate"><span class="pre">n_accepted</span></code>, <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If the file does not exist yet (job still running, or completed
+    before this fix was active).</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> is not set on this RunInfo.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">run_sub</span><span class="o">.</span><span class="n">load_run_complete</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;best_sv = </span><span class="si">{</span><span class="n">rc</span><span class="p">[</span><span class="s1">&#39;best_sv&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.Rigorous.RunInfo.RunInfo.reconnect">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">reconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_if_not_found</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RunInfo.RunInfo.reconnect" title="Link to this definition">#</a></dt>
+<dd><p>Reconnect to a running or completed optimization from disk.</p>
+<p>Creates a minimal <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> populated from the manifest and disk
+state in <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code>.  Useful after a kernel restart or an
+accidental cell re-run that destroyed the original live reference.</p>
+<p>The recovered <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> supports all disk-based operations:
+<a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.live_status" title="molass.Rigorous.RunInfo.RunInfo.live_status"><code class="xref py py-meth docutils literal notranslate"><span class="pre">live_status()</span></code></a>, <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.sv_history" title="molass.Rigorous.RunInfo.RunInfo.sv_history"><code class="xref py py-attr docutils literal notranslate"><span class="pre">sv_history</span></code></a>, <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.load_best" title="molass.Rigorous.RunInfo.RunInfo.load_best"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_best()</span></code></a>,
+<a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.load_best" title="molass.Rigorous.RunInfo.RunInfo.load_best"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_best()</span></code></a>, <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.plot_sv_history" title="molass.Rigorous.RunInfo.RunInfo.plot_sv_history"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot_sv_history()</span></code></a>.</p>
+<p>It does <strong>not</strong> have a live optimizer, so <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown" title="molass.Rigorous.RunInfo.RunInfo.get_score_breakdown"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_score_breakdown()</span></code></a>
+and <a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo.diagnose" title="molass.Rigorous.RunInfo.RunInfo.diagnose"><code class="xref py py-meth docutils literal notranslate"><span class="pre">diagnose()</span></code></a> require the optimizer to be reconstructed
+separately (not automatic).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_folder</strong> (<em>str</em>) – The <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> that was passed to
+<code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p></li>
+<li><p><strong>raise_if_not_found</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), raise <code class="docutils literal notranslate"><span class="pre">FileNotFoundError</span></code> when no manifest
+exists.  If False, return <code class="docutils literal notranslate"><span class="pre">None</span></code> instead — useful inside the
+idempotency guard where a missing manifest simply means no
+prior run exists.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A reconstituted <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if
+<code class="docutils literal notranslate"><span class="pre">raise_if_not_found=False</span></code> and no manifest is found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.Rigorous.RunInfo.RunInfo" title="molass.Rigorous.RunInfo.RunInfo">RunInfo</a> or None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If no <code class="docutils literal notranslate"><span class="pre">RUN_MANIFEST.json</span></code> is found and
+    <code class="docutils literal notranslate"><span class="pre">raise_if_not_found=True</span></code>.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>After a kernel restart:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_info</span> <span class="o">=</span> <span class="n">RunInfo</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="n">analysis_folder</span><span class="p">)</span>
+<span class="n">run_info</span><span class="o">.</span><span class="n">live_status</span><span class="p">()</span>
+<span class="n">run_info</span><span class="o">.</span><span class="n">plot_sv_history</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">load_best</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </dd></dl>
 
@@ -656,11 +1517,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="molass.SAXS.html"
+       href="molass.Rigorous.RunRegistry.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">SAXS</p>
+        <p class="prev-next-title">Rigorous.RunRegistry</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -671,17 +1532,51 @@ document.write(`
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo"><code class="docutils literal notranslate"><span class="pre">RunInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.ssd"><code class="docutils literal notranslate"><span class="pre">RunInfo.ssd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.optimizer"><code class="docutils literal notranslate"><span class="pre">RunInfo.optimizer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.dsets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.init_params"><code class="docutils literal notranslate"><span class="pre">RunInfo.init_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.monitor"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.analysis_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.analysis_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.decomposition</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.in_process_result"><code class="docutils literal notranslate"><span class="pre">RunInfo.in_process_result</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.request_stop"><code class="docutils literal notranslate"><span class="pre">RunInfo.request_stop()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.is_alive"><code class="docutils literal notranslate"><span class="pre">RunInfo.is_alive</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.current_work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.current_work_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.update_manifest_on_resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.update_manifest_on_resume()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_current_decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_decomposition()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.resume()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.wait"><code class="docutils literal notranslate"><span class="pre">RunInfo.wait()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_best"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_best()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.get_current_curves"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_curves()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.diagnose"><code class="docutils literal notranslate"><span class="pre">RunInfo.diagnose()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.compare_subprocess_dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.compare_subprocess_dsets()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.monitor_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor_snapshot_json_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.check_progress"><code class="docutils literal notranslate"><span class="pre">RunInfo.check_progress()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.progress_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.progress_snapshot_json_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_progress_snapshot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_monitor_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_monitor_snapshot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.sv_history_per_job"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history_per_job</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.plot_sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.plot_sv_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.live_status"><code class="docutils literal notranslate"><span class="pre">RunInfo.live_status()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.run_complete_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.run_complete_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.load_run_complete"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_run_complete()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RunInfo.RunInfo.reconnect"><code class="docutils literal notranslate"><span class="pre">RunInfo.reconnect()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -732,8 +1627,8 @@ By Molass Community
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

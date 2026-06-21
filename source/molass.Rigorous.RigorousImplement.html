@@ -16,41 +16,45 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.Rigorous.RigorousImplement';</script>
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Rigorous.RigorousSdmParams" href="molass.Rigorous.RigorousSdmParams.html" />
-    <link rel="prev" title="Rigorous.RigorousEghParams" href="molass.Rigorous.RigorousEghParams.html" />
+    <link rel="next" title="Rigorous.RigorousLkmParams" href="molass.Rigorous.RigorousLkmParams.html" />
+    <link rel="prev" title="Rigorous.RigorousGrmParams" href="molass.Rigorous.RigorousGrmParams.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -66,19 +70,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -86,7 +79,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -94,8 +86,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,21 +134,17 @@
     
     
     <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <script>document.write(`<img src="../_static/molamola.png" class="logo__image only-dark" alt="Molass Library  documentation - Home"/>`);</script>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
@@ -174,11 +163,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Bridge.html">Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyBaselines.html">Bridge.LegacyBaselines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyRgCurve.html">Bridge.LegacyRgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.OptimizerInput.html">Bridge.OptimizerInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdAdapter.html">Bridge.SdAdapter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdProxy.html">Bridge.SdProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -205,6 +195,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Recommend.html">Decompose.Recommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
@@ -238,9 +229,11 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Global.html">Global</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Global.Options.html">Global.Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Global.Quiet.html">Global.Quiet</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.GuinierDeviation.html">Guinier.GuinierDeviation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
@@ -273,6 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.NumComponentsRecommender.html">LowRank.NumComponentsRecommender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
@@ -299,6 +293,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Peaks.html">Peaks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Peaks.EghPeeler.html">Peaks.EghPeeler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.Recognizer.html">Peaks.Recognizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.RecognizerSpecific.html">Peaks.RecognizerSpecific</a></li>
@@ -306,6 +301,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.AnomalyBands.html">PlotUtils.AnomalyBands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Comparison.html">PlotUtils.Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.DecompositionPlot.html">PlotUtils.DecompositionPlot</a></li>
@@ -336,14 +332,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComparePaths.html">Rigorous.ComparePaths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.FunctionCodeUtils.html">Rigorous.FunctionCodeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.GuiReplay.html">Rigorous.GuiReplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.InitialScore.html">Rigorous.InitialScore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousCedmParams.html">Rigorous.RigorousCedmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEghParams.html">Rigorous.RigorousEghParams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousGrmParams.html">Rigorous.RigorousGrmParams</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Rigorous.RigorousImplement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousLkmParams.html">Rigorous.RigorousLkmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousSdmParams.html">Rigorous.RigorousSdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RunInfo.html">Rigorous.RunInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RunRegistry.html">Rigorous.RunRegistry</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -377,8 +381,20 @@
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -395,6 +411,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ModelFactory.html">SEC.ModelFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.PoreEntryAnimation.html">SEC.PoreEntryAnimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
 </ul>
 </details></li>
@@ -403,8 +420,20 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -431,6 +460,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Testing.html">Testing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Testing.HeadlessPeakEditor.html">Testing.HeadlessPeakEditor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Testing.PlotControl.html">Testing.PlotControl</a></li>
 </ul>
 </details></li>
@@ -449,9 +479,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -549,7 +584,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -563,25 +598,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -604,6 +631,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subprocess-coordinate-contract-issue-80">Subprocess Coordinate Contract (Issue #80)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_decomposition_impl()</span></code></a></li>
 </ul>
             </nav>
@@ -618,16 +646,65 @@ document.write(`
                   
   <section id="module-molass.Rigorous.RigorousImplement">
 <span id="rigorous-rigorousimplement"></span><h1>Rigorous.RigorousImplement<a class="headerlink" href="#module-molass.Rigorous.RigorousImplement" title="Link to this heading">#</a></h1>
-<p>LowRank.RigorousImplement</p>
+<p>Rigorous.RigorousImplement</p>
+<section id="subprocess-coordinate-contract-issue-80">
+<h2>Subprocess Coordinate Contract (Issue #80)<a class="headerlink" href="#subprocess-coordinate-contract-issue-80" title="Link to this heading">#</a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code> exports data for the legacy subprocess
+(<code class="docutils literal notranslate"><span class="pre">needs_export=True</span></code>, e.g. anomaly-masked datasets), the following
+contract applies:</p>
+<ol class="arabic simple">
+<li><p>Exported filenames carry original frame numbers from <code class="docutils literal notranslate"><span class="pre">ssd.xr.jv</span></code>
+(e.g. <code class="docutils literal notranslate"><span class="pre">PREFIX_00032.dat</span></code>), so the legacy loader sets
+<code class="docutils literal notranslate"><span class="pre">start_file_no</span></code> correctly.</p></li>
+<li><p>The restrict-lists written to <code class="docutils literal notranslate"><span class="pre">trimming.txt</span></code> are identity
+<code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">N,</span> <span class="pre">N)</span></code> — no re-trimming, since the data is already trimmed.</p></li>
+<li><p>The subprocess does NOT need <code class="docutils literal notranslate"><span class="pre">elution_recognition</span></code>, anomaly masks,
+or original trimming info — all preprocessing is already applied.</p></li>
+</ol>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl">
-<span class="sig-name descname"><span class="pre">make_rigorous_decomposition_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">make_rigorous_decomposition_impl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen_param_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed_ssd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dashboard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_narrow_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_adaptive_nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl" title="Link to this definition">#</a></dt>
 <dd><p>Make a rigorous decomposition using a given RG curve.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The initial decomposition to refine.</p></li>
+<li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The initial decomposition to refine (built on corrected data).</p></li>
 <li><p><strong>rgcurve</strong> (<em>RgComponentCurve</em>) – The Rg component curve to use for refinement.</p></li>
+<li><p><strong>analysis_folder</strong> (<em>str</em><em>, </em><em>optional</em>) – The folder to save analysis results.</p></li>
+<li><p><strong>niter</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>Iteration budget.  Meaning depends on <code class="docutils literal notranslate"><span class="pre">method</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'BH'</span></code>: literal number of Basin-Hopping outer steps (default 20).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'NS'</span></code>: multiplied by 7 000 to form <code class="docutils literal notranslate"><span class="pre">max_ncalls</span></code> for UltraNest
+(<code class="docutils literal notranslate"><span class="pre">niter=20</span></code> → 140 000 likelihood evaluations).</p></li>
+</ul>
+<p>Default 20.</p>
+</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Optimization algorithm: <code class="docutils literal notranslate"><span class="pre">'BH'</span></code> (Basin-Hopping, default) or
+<code class="docutils literal notranslate"><span class="pre">'NS'</span></code> (Nested Sampling / UltraNest).</p></li>
+<li><p><strong>frozen_components</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – 0-based indices of protein components to freeze during optimization.
+Their EGH shape parameters, Rg, and UV scale will be held constant
+at the values from the initial decomposition.</p></li>
+<li><p><strong>trimmed_ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a><em>, </em><em>optional</em>) – Trimmed but not baseline-corrected SSD.  When provided, the optimizer
+fits against this data (with baseline as a free parameter) instead of
+the corrected data in decomposition.ssd.</p></li>
+<li><p><strong>clear_jobs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), clear existing job folders before starting.</p></li>
+<li><p><strong>in_process</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), run the optimizer <strong>in this Python process</strong> instead
+of spawning a subprocess.  The library-prepared optimizer (with the
+live dsets, base curves, and spectral vectors built above) is the one
+that runs — no re-derivation from disk, no parent/subprocess divergence.
+Set <code class="docutils literal notranslate"><span class="pre">False</span></code> to use the legacy subprocess path (required by the tkinter
+GUI; available as an escape hatch for notebook users who need process
+isolation).
+See <code class="docutils literal notranslate"><span class="pre">molass-library/Copilot/DESIGN_split_optimizer_architecture.md</span></code>.</p></li>
+<li><p><strong>monitor</strong> (<em>bool</em><em>, </em><em>optional</em>) – Controls the <code class="docutils literal notranslate"><span class="pre">MplMonitor</span></code> ipywidgets dashboard.  When True
+(default), a live dashboard is shown whether the run is in-process
+or subprocess.  When False, no dashboard is created — the run
+proceeds silently.  Use <code class="docutils literal notranslate"><span class="pre">monitor=False</span></code> for batch / comparison
+runs (e.g. <code class="docutils literal notranslate"><span class="pre">compare_optimization_paths</span></code>) where the widget is not
+needed.</p></li>
+<li><p><strong>progress</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <strong>Deprecated and ignored</strong> — use <code class="docutils literal notranslate"><span class="pre">monitor=True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code> instead.
+Kept in the signature only for backward compatibility.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
 </ul>
 </dd>
@@ -654,20 +731,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="molass.Rigorous.RigorousEghParams.html"
+       href="molass.Rigorous.RigorousGrmParams.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Rigorous.RigorousEghParams</p>
+        <p class="prev-next-title">Rigorous.RigorousGrmParams</p>
       </div>
     </a>
     <a class="right-next"
-       href="molass.Rigorous.RigorousSdmParams.html"
+       href="molass.Rigorous.RigorousLkmParams.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Rigorous.RigorousSdmParams</p>
+        <p class="prev-next-title">Rigorous.RigorousLkmParams</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -678,15 +755,18 @@ document.write(`
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subprocess-coordinate-contract-issue-80">Subprocess Coordinate Contract (Issue #80)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_decomposition_impl()</span></code></a></li>
 </ul>
   </nav></div>
@@ -736,8 +816,8 @@ By Molass Community
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

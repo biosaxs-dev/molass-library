@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   molass.Guinier.GuinierDeviation
    molass.Guinier.RgCurve
    molass.Guinier.RgCurveUtils
    molass.Guinier.RgEstimator

@@ -12,8 +12,9 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   molass.Bridge.V2Result
    molass.Bridge.LegacyBaselines
    molass.Bridge.LegacyRgCurve
    molass.Bridge.OptimizerInput
+   molass.Bridge.SdAdapter
    molass.Bridge.SdProxy
+   molass.Bridge.V2Result

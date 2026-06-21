@@ -16,33 +16,36 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="icon" href="_static/molamola.png"/>
     <link rel="index" title="Index" href="genindex.html" />
@@ -50,6 +53,7 @@
     <link rel="next" title="Baseline" href="source/molass.Baseline.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -65,19 +69,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -85,7 +78,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -93,8 +85,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -112,7 +104,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -142,21 +135,17 @@
     
     
     <img src="_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <script>document.write(`<img src="_static/molamola.png" class="logo__image only-dark" alt="Molass Library  documentation - Home"/>`);</script>
+    <img src="_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
@@ -175,11 +164,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Bridge.html">Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.LegacyBaselines.html">Bridge.LegacyBaselines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.LegacyRgCurve.html">Bridge.LegacyRgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.OptimizerInput.html">Bridge.OptimizerInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.SdAdapter.html">Bridge.SdAdapter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.SdProxy.html">Bridge.SdProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -206,6 +196,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.Recommend.html">Decompose.Recommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
@@ -239,9 +230,11 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Global.html">Global</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Global.Options.html">Global.Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Global.Quiet.html">Global.Quiet</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html">Guinier.GuinierDeviation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
@@ -274,6 +267,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.Decomposition.html">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html">LowRank.NumComponentsRecommender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
@@ -300,6 +294,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Peaks.html">Peaks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Peaks.EghPeeler.html">Peaks.EghPeeler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Peaks.Recognizer.html">Peaks.Recognizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Peaks.RecognizerSpecific.html">Peaks.RecognizerSpecific</a></li>
@@ -307,6 +302,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.PlotUtils.AnomalyBands.html">PlotUtils.AnomalyBands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.PlotUtils.Comparison.html">PlotUtils.Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.PlotUtils.DecompositionPlot.html">PlotUtils.DecompositionPlot</a></li>
@@ -337,14 +333,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html">Rigorous.ComparePaths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.FunctionCodeUtils.html">Rigorous.FunctionCodeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html">Rigorous.GuiReplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html">Rigorous.InitialScore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousCedmParams.html">Rigorous.RigorousCedmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousEghParams.html">Rigorous.RigorousEghParams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousGrmParams.html">Rigorous.RigorousGrmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousImplement.html">Rigorous.RigorousImplement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousLkmParams.html">Rigorous.RigorousLkmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RigorousSdmParams.html">Rigorous.RigorousSdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html">Rigorous.RunInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html">Rigorous.RunRegistry</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -378,8 +382,20 @@
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -396,6 +412,7 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.ModelFactory.html">SEC.ModelFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.PoreEntryAnimation.html">SEC.PoreEntryAnimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
 </ul>
 </details></li>
@@ -404,8 +421,20 @@
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -432,6 +461,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="source/molass.Testing.html">Testing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.HeadlessPeakEditor.html">Testing.HeadlessPeakEditor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.PlotControl.html">Testing.PlotControl</a></li>
 </ul>
 </details></li>
@@ -450,9 +480,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -550,7 +585,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -564,25 +599,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -661,7 +688,7 @@ document.write(`
 
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Version">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Version" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Version" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to represent and compare software version strings.</p>
 </dd></dl>
@@ -824,26 +851,6 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source/molass.Bridge.html">Bridge</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Bridge.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="source/molass.Bridge.V2Result.html">Bridge.V2Result</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh"><code class="docutils literal notranslate"><span class="pre">get_num_components_assumming_egh()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.extract_params_assumming_egh"><code class="docutils literal notranslate"><span class="pre">extract_params_assumming_egh()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result"><code class="docutils literal notranslate"><span class="pre">V2Result</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.folder"><code class="docutils literal notranslate"><span class="pre">V2Result.folder</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.trimming</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.init_params</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.best_params</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.import_trimming()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_init_params()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_init_params()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_best_params()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_best_params()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.get_trimming()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_original_ssd"><code class="docutils literal notranslate"><span class="pre">V2Result.get_original_ssd()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_trimmed_ssd"><code class="docutils literal notranslate"><span class="pre">V2Result.get_trimmed_ssd()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Bridge.LegacyBaselines.html">Bridge.LegacyBaselines</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.LegacyBaselines.html#molass.Bridge.LegacyBaselines.make_basecurves_from_sd"><code class="docutils literal notranslate"><span class="pre">make_basecurves_from_sd()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.LegacyBaselines.html#molass.Bridge.LegacyBaselines.make_equivalent_uv_baseparams"><code class="docutils literal notranslate"><span class="pre">make_equivalent_uv_baseparams()</span></code></a></li>
@@ -862,6 +869,12 @@ explicit and easily discoverable.</p>
 </li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Bridge.SdAdapter.html">Bridge.SdAdapter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.SdAdapter.html#molass.Bridge.SdAdapter.make_ssd_from_corrected_sd"><code class="docutils literal notranslate"><span class="pre">make_ssd_from_corrected_sd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.SdAdapter.html#molass.Bridge.SdAdapter.decomposition_from_optimizer_params"><code class="docutils literal notranslate"><span class="pre">decomposition_from_optimizer_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.SdAdapter.html#molass.Bridge.SdAdapter.make_ssd_from_dsets"><code class="docutils literal notranslate"><span class="pre">make_ssd_from_dsets()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Bridge.SdProxy.html">Bridge.SdProxy</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.AbsorbanceProxy"><code class="docutils literal notranslate"><span class="pre">AbsorbanceProxy</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.EcurveProxy"><code class="docutils literal notranslate"><span class="pre">EcurveProxy</span></code></a></li>
@@ -872,6 +885,26 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.SdProxy.get_xr_data_separate_ly"><code class="docutils literal notranslate"><span class="pre">SdProxy.get_xr_data_separate_ly()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.SdProxy.get_uv_curve"><code class="docutils literal notranslate"><span class="pre">SdProxy.get_uv_curve()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.SdProxy.html#molass.Bridge.SdProxy.SdProxy.get_uv_data_separate_ly"><code class="docutils literal notranslate"><span class="pre">SdProxy.get_uv_data_separate_ly()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Bridge.V2Result.html">Bridge.V2Result</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.get_num_components_assumming_egh"><code class="docutils literal notranslate"><span class="pre">get_num_components_assumming_egh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.extract_params_assumming_egh"><code class="docutils literal notranslate"><span class="pre">extract_params_assumming_egh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result"><code class="docutils literal notranslate"><span class="pre">V2Result</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.folder"><code class="docutils literal notranslate"><span class="pre">V2Result.folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.trimming</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.init_params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.best_params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.import_trimming()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_init_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_init_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_init_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.import_best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.import_best_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_best_params"><code class="docutils literal notranslate"><span class="pre">V2Result.get_best_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_trimming"><code class="docutils literal notranslate"><span class="pre">V2Result.get_trimming()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_original_ssd"><code class="docutils literal notranslate"><span class="pre">V2Result.get_original_ssd()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Bridge.V2Result.html#molass.Bridge.V2Result.V2Result.get_trimmed_ssd"><code class="docutils literal notranslate"><span class="pre">V2Result.get_trimmed_ssd()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -935,15 +968,23 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.trimmed_copy()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.set_baseline_method"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.set_baseline_method()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_baseline_method"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_baseline_method()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.set_anomaly_mask"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.set_anomaly_mask()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.set_allow_negative_peaks"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.set_allow_negative_peaks()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.corrected_copy"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.corrected_copy()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.estimate_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.estimate_mapping()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_mapping"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_mapping()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_concfactor"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_concfactor()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.from_legacy_sd"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.from_legacy_sd()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.from_arrays"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.from_arrays()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_rg_curve"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_rg_curve()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.recommend_decomposition_options"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.recommend_decomposition_options()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.recommend_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.recommend_decomposition()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.quick_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.quick_decomposition()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.rigorous_decomposition"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.rigorous_decomposition()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.inspect_ip_effect"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.inspect_ip_effect()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_uv_device_id"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_uv_device_id()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_beamline_name"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_beamline_name()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_data_info"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_data_info()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.export"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.export()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.plot_varied_decompositions"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.plot_varied_decompositions()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData.get_spectral_vectors"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.get_spectral_vectors()</span></code></a></li>
@@ -960,6 +1001,10 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.E"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.E</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.moment</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.baseline_method</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.allow_negative_peaks"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.allow_negative_peaks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.has_anomaly_mask"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.has_anomaly_mask</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.negative_peak_mask"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.negative_peak_mask</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.anomaly_mask"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.anomaly_mask</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#id0"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.data</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.q_values"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.q_values</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.frame_indices"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.frame_indices</span></code></a></li>
@@ -970,6 +1015,11 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_moment"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_moment()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_baseline_method()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline_method"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline_method()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_anomaly_mask"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_anomaly_mask()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.set_allow_negative_peaks"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.set_allow_negative_peaks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#id1"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.allow_negative_peaks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#id2"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.negative_peak_mask</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.detect_anomaly()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_baseline2d"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_baseline2d()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_snr_weights"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_snr_weights()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.get_positive_ratio"><code class="docutils literal notranslate"><span class="pre">SsMatrixData.get_positive_ratio()</span></code></a></li>
@@ -986,6 +1036,7 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.uv_pickat"><code class="docutils literal notranslate"><span class="pre">UvData.uv_pickat</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.monitor"><code class="docutils literal notranslate"><span class="pre">UvData.monitor</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#id0"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#id1"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.DataObjects.UvData.html#molass.DataObjects.UvData.UvData.wavelength_range"><code class="docutils literal notranslate"><span class="pre">UvData.wavelength_range</span></code></a></li>
@@ -1108,6 +1159,10 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.estimate_initial_params"><code class="docutils literal notranslate"><span class="pre">estimate_initial_params()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.debug_plot"><code class="docutils literal notranslate"><span class="pre">debug_plot()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Decompose.Proportional.html#molass.Decompose.Proportional.decompose_proportionally"><code class="docutils literal notranslate"><span class="pre">decompose_proportionally()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Decompose.Recommend.html">Decompose.Recommend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Decompose.Recommend.html#molass.Decompose.Recommend.recommend_decomposition_options"><code class="docutils literal notranslate"><span class="pre">recommend_decomposition_options()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
@@ -1285,12 +1340,25 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Global.Options.html#molass.Global.Options.get_molass_options"><code class="docutils literal notranslate"><span class="pre">get_molass_options()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Global.Quiet.html">Global.Quiet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Global.Quiet.html#molass.Global.Quiet.suppress_if_quiet"><code class="docutils literal notranslate"><span class="pre">suppress_if_quiet()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source/molass.Guinier.html">Guinier</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Guinier.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html">Guinier.GuinierDeviation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html#molass.Guinier.GuinierDeviation.GuinierDeviation"><code class="docutils literal notranslate"><span class="pre">GuinierDeviation</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html#molass.Guinier.GuinierDeviation.GuinierDeviation.update_region"><code class="docutils literal notranslate"><span class="pre">GuinierDeviation.update_region()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html#molass.Guinier.GuinierDeviation.GuinierDeviation.compute_deviation"><code class="docutils literal notranslate"><span class="pre">GuinierDeviation.compute_deviation()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.GuinierDeviation.html#molass.Guinier.GuinierDeviation.GuinierDeviation.compute_rgcurve_deviation"><code class="docutils literal notranslate"><span class="pre">GuinierDeviation.compute_rgcurve_deviation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Guinier.RgCurve.html">Guinier.RgCurve</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve"><code class="docutils literal notranslate"><span class="pre">RgCurve</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve.indeces"><code class="docutils literal notranslate"><span class="pre">RgCurve.indeces</span></code></a></li>
@@ -1305,7 +1373,18 @@ explicit and easily discoverable.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.compute_rg_curve_from_arrays"><code class="docutils literal notranslate"><span class="pre">compute_rg_curve_from_arrays()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.compute_rgcurve_info"><code class="docutils literal notranslate"><span class="pre">compute_rgcurve_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.ValidBools"><code class="docutils literal notranslate"><span class="pre">ValidBools</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.ValidBools.all_frames"><code class="docutils literal notranslate"><span class="pre">ValidBools.all_frames</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.ValidBools.segment"><code class="docutils literal notranslate"><span class="pre">ValidBools.segment</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.convert_to_milder_qualities"><code class="docutils literal notranslate"><span class="pre">convert_to_milder_qualities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.get_connected_curve_info"><code class="docutils literal notranslate"><span class="pre">get_connected_curve_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.get_reconstructed_curve"><code class="docutils literal notranslate"><span class="pre">get_reconstructed_curve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.compute_rg_curves"><code class="docutils literal notranslate"><span class="pre">compute_rg_curves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.plot_rg_curves"><code class="docutils literal notranslate"><span class="pre">plot_rg_curves()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Guinier.RgCurveUtils.html#molass.Guinier.RgCurveUtils.compute_rgcurve_info_atsas"><code class="docutils literal notranslate"><span class="pre">compute_rgcurve_info_atsas()</span></code></a></li>
 </ul>
 </li>
@@ -1474,7 +1553,9 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_guinier_objects"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_guinier_objects()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_rgs"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rgs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_channel_consistency"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_channel_consistency()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_rg_curve"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rg_curve()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.compute_reconstructed_rgcurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_reconstructed_rgcurve()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_P_at"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_P_at()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.component_quality_scores"><code class="docutils literal notranslate"><span class="pre">Decomposition.component_quality_scores()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.is_component_reliable"><code class="docutils literal notranslate"><span class="pre">Decomposition.is_component_reliable()</span></code></a></li>
@@ -1482,15 +1563,26 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.update_xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.update_xr_ranks()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_matrices()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_components()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_scattering_profiles"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_scattering_profiles()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_matrices()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_uv_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_components()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_pairedranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_pairedranges()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_proportions"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_proportions()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.upgrade"><code class="docutils literal notranslate"><span class="pre">Decomposition.upgrade()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.recommend_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.recommend_num_components()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.make_rigorous_initparams"><code class="docutils literal notranslate"><span class="pre">Decomposition.make_rigorous_initparams()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.get_rigorous_param_count"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rigorous_param_count()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.optimize_rigorously"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_rigorously()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.score_initial"><code class="docutils literal notranslate"><span class="pre">Decomposition.score_initial()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.load_best_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_best_rigorous_result()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.load_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_rigorous_result()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.list_rigorous_jobs"><code class="docutils literal notranslate"><span class="pre">Decomposition.list_rigorous_jobs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.has_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.has_rigorous_results()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.wait_for_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.wait_for_rigorous_results()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition.plot_convergence"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_convergence()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1502,6 +1594,20 @@ explicit and easily discoverable.</p>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.get_denoised_data"><code class="docutils literal notranslate"><span class="pre">get_denoised_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.LowRankInfo.html#molass.LowRank.LowRankInfo.compute_lowrank_matrices"><code class="docutils literal notranslate"><span class="pre">compute_lowrank_matrices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html">LowRank.NumComponentsRecommender</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#background">Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.Recommendation"><code class="docutils literal notranslate"><span class="pre">Recommendation</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.Recommendation.recommended_k"><code class="docutils literal notranslate"><span class="pre">Recommendation.recommended_k</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.Recommendation.reason"><code class="docutils literal notranslate"><span class="pre">Recommendation.reason</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.Recommendation.metrics"><code class="docutils literal notranslate"><span class="pre">Recommendation.metrics</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#id0"><code class="docutils literal notranslate"><span class="pre">Recommendation.metrics</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#id1"><code class="docutils literal notranslate"><span class="pre">Recommendation.reason</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#id2"><code class="docutils literal notranslate"><span class="pre">Recommendation.recommended_k</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.recommend_num_components"><code class="docutils literal notranslate"><span class="pre">recommend_num_components()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.LowRank.PairedRange.html">LowRank.PairedRange</a><ul>
@@ -1626,6 +1732,11 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source/molass.Peaks.html">Peaks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Peaks.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Peaks.EghPeeler.html">Peaks.EghPeeler</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Peaks.EghPeeler.html#physical-basis-for-max-sigma-ratio">Physical basis for max_sigma_ratio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Peaks.EghPeeler.html#molass.Peaks.EghPeeler.egh_peel"><code class="docutils literal notranslate"><span class="pre">egh_peel()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Peaks.PeakSimilarity.html#molass.Peaks.PeakSimilarity.PeakSimilarity"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Peaks.PeakSimilarity.html#molass.Peaks.PeakSimilarity.PeakSimilarity.objective"><code class="docutils literal notranslate"><span class="pre">PeakSimilarity.objective</span></code></a></li>
@@ -1658,6 +1769,12 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.PlotUtils.Annotation3D.html#molass.PlotUtils.Annotation3D.add_annotate3D"><code class="docutils literal notranslate"><span class="pre">add_annotate3D()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.PlotUtils.Annotation3D.html#molass.PlotUtils.Annotation3D.get_labeltext_from_line"><code class="docutils literal notranslate"><span class="pre">get_labeltext_from_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.PlotUtils.AnomalyBands.html">PlotUtils.AnomalyBands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.PlotUtils.AnomalyBands.html#molass.PlotUtils.AnomalyBands.get_anomaly_mask_from_ssd"><code class="docutils literal notranslate"><span class="pre">get_anomaly_mask_from_ssd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.PlotUtils.AnomalyBands.html#molass.PlotUtils.AnomalyBands.draw_anomaly_bands"><code class="docutils literal notranslate"><span class="pre">draw_anomaly_bands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.PlotUtils.AnomalyBands.html#molass.PlotUtils.AnomalyBands.draw_anomaly_bands_for_ssd"><code class="docutils literal notranslate"><span class="pre">draw_anomaly_bands_for_ssd()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a><ul>
@@ -1837,15 +1954,132 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source/molass.Rigorous.html">Rigorous</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Rigorous.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html">Rigorous.ComparePaths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult"><code class="docutils literal notranslate"><span class="pre">PathResult</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.label"><code class="docutils literal notranslate"><span class="pre">PathResult.label</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.in_process"><code class="docutils literal notranslate"><span class="pre">PathResult.in_process</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.analysis_folder"><code class="docutils literal notranslate"><span class="pre">PathResult.analysis_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.run_info"><code class="docutils literal notranslate"><span class="pre">PathResult.run_info</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.conv"><code class="docutils literal notranslate"><span class="pre">PathResult.conv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.best"><code class="docutils literal notranslate"><span class="pre">PathResult.best</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.rgs"><code class="docutils literal notranslate"><span class="pre">PathResult.rgs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.elapsed"><code class="docutils literal notranslate"><span class="pre">PathResult.elapsed</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.completed"><code class="docutils literal notranslate"><span class="pre">PathResult.completed</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id0"><code class="docutils literal notranslate"><span class="pre">PathResult.label</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id1"><code class="docutils literal notranslate"><span class="pre">PathResult.in_process</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id2"><code class="docutils literal notranslate"><span class="pre">PathResult.analysis_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id3"><code class="docutils literal notranslate"><span class="pre">PathResult.run_info</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id4"><code class="docutils literal notranslate"><span class="pre">PathResult.conv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id5"><code class="docutils literal notranslate"><span class="pre">PathResult.best</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id6"><code class="docutils literal notranslate"><span class="pre">PathResult.rgs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id7"><code class="docutils literal notranslate"><span class="pre">PathResult.elapsed</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#id8"><code class="docutils literal notranslate"><span class="pre">PathResult.completed</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.best_fv"><code class="docutils literal notranslate"><span class="pre">PathResult.best_fv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.PathResult.best_sv"><code class="docutils literal notranslate"><span class="pre">PathResult.best_sv</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult"><code class="docutils literal notranslate"><span class="pre">ComparisonResult</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.results"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.results</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.niter"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.niter</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.method"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.method</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.rgcurve"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.rgcurve</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.by_label"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.by_label()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.live_status"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.live_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.summary_table"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.summary_table()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.plot_convergence"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.plot_convergence()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.plot_components"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.plot_components()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.ComparisonResult.assert_parity"><code class="docutils literal notranslate"><span class="pre">ComparisonResult.assert_parity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComparePaths.html#molass.Rigorous.ComparePaths.compare_optimization_paths"><code class="docutils literal notranslate"><span class="pre">compare_optimization_paths()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_egh_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_egh_xr_ccurves()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_sdm_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_sdm_xr_ccurves()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_edm_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_edm_xr_ccurves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_cedm_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_cedm_xr_ccurves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_lkm_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_lkm_xr_ccurves()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_grm_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_grm_xr_ccurves()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.ComponentUtils.html#molass.Rigorous.ComponentUtils.get_xr_ccurves"><code class="docutils literal notranslate"><span class="pre">get_xr_ccurves()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo"><code class="docutils literal notranslate"><span class="pre">JobInfo</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo.best_fv"><code class="docutils literal notranslate"><span class="pre">JobInfo.best_fv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo.id"><code class="docutils literal notranslate"><span class="pre">JobInfo.id</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo.iterations"><code class="docutils literal notranslate"><span class="pre">JobInfo.iterations</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo.timestamp"><code class="docutils literal notranslate"><span class="pre">JobInfo.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence"><code class="docutils literal notranslate"><span class="pre">JobConvergence</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.best_fv"><code class="docutils literal notranslate"><span class="pre">JobConvergence.best_fv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.best_sv"><code class="docutils literal notranslate"><span class="pre">JobConvergence.best_sv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.evals"><code class="docutils literal notranslate"><span class="pre">JobConvergence.evals</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.fvs"><code class="docutils literal notranslate"><span class="pre">JobConvergence.fvs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.id"><code class="docutils literal notranslate"><span class="pre">JobConvergence.id</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobConvergence.timestamps"><code class="docutils literal notranslate"><span class="pre">JobConvergence.timestamps</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.best_fv"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.best_fv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.best_job_id"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.best_job_id</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.best_sv"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.best_sv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.jobs"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.jobs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.n_jobs"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.n_jobs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.spread"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.spread</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo.trend"><code class="docutils literal notranslate"><span class="pre">ConvergenceInfo.trend</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.fv_to_sv"><code class="docutils literal notranslate"><span class="pre">fv_to_sv()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.construct_decomposition_from_results"><code class="docutils literal notranslate"><span class="pre">construct_decomposition_from_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.load_rigorous_result"><code class="docutils literal notranslate"><span class="pre">load_rigorous_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.list_rigorous_jobs"><code class="docutils literal notranslate"><span class="pre">list_rigorous_jobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.has_rigorous_results"><code class="docutils literal notranslate"><span class="pre">has_rigorous_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.wait_for_rigorous_results"><code class="docutils literal notranslate"><span class="pre">wait_for_rigorous_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.parse_sv_history"><code class="docutils literal notranslate"><span class="pre">parse_sv_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.parse_sv_history_per_job"><code class="docutils literal notranslate"><span class="pre">parse_sv_history_per_job()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.check_progress"><code class="docutils literal notranslate"><span class="pre">check_progress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.read_convergence_data"><code class="docutils literal notranslate"><span class="pre">read_convergence_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.plot_convergence"><code class="docutils literal notranslate"><span class="pre">plot_convergence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.FunctionCodeUtils.html">Rigorous.FunctionCodeUtils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.FunctionCodeUtils.html#molass.Rigorous.FunctionCodeUtils.detect_function_code"><code class="docutils literal notranslate"><span class="pre">detect_function_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html">Rigorous.GuiReplay</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#usage-example">Usage example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario"><code class="docutils literal notranslate"><span class="pre">GuiScenario</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.analysis_folder"><code class="docutils literal notranslate"><span class="pre">GuiScenario.analysis_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.work_folder"><code class="docutils literal notranslate"><span class="pre">GuiScenario.work_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.optimizer"><code class="docutils literal notranslate"><span class="pre">GuiScenario.optimizer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.init_params"><code class="docutils literal notranslate"><span class="pre">GuiScenario.init_params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.fv_init"><code class="docutils literal notranslate"><span class="pre">GuiScenario.fv_init</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.n_components"><code class="docutils literal notranslate"><span class="pre">GuiScenario.n_components</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.class_code"><code class="docutils literal notranslate"><span class="pre">GuiScenario.class_code</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.eval_init"><code class="docutils literal notranslate"><span class="pre">GuiScenario.eval_init()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.get_score_breakdown"><code class="docutils literal notranslate"><span class="pre">GuiScenario.get_score_breakdown()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.run_inprocess"><code class="docutils literal notranslate"><span class="pre">GuiScenario.run_inprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.load_gui_scenario"><code class="docutils literal notranslate"><span class="pre">load_gui_scenario()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html">Rigorous.InitialScore</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.fv"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.fv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.sv"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.sv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.breakdown"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.breakdown</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.optimizer"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.optimizer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.init_params"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.init_params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.plot"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.plot()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.diagnose"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.diagnose()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult.print_summary"><code class="docutils literal notranslate"><span class="pre">InitialScoreResult.print_summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.make_initial_score_impl"><code class="docutils literal notranslate"><span class="pre">make_initial_score_impl()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a><ul>
@@ -1853,6 +2087,10 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html#molass.Rigorous.LegacyBridgeUtils.make_basecurves_from_decomposition"><code class="docutils literal notranslate"><span class="pre">make_basecurves_from_decomposition()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html#molass.Rigorous.LegacyBridgeUtils.construct_legacy_optimizer"><code class="docutils literal notranslate"><span class="pre">construct_legacy_optimizer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.LegacyBridgeUtils.html#molass.Rigorous.LegacyBridgeUtils.prepare_rigorous_folders"><code class="docutils literal notranslate"><span class="pre">prepare_rigorous_folders()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousCedmParams.html">Rigorous.RigorousCedmParams</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousCedmParams.html#molass.Rigorous.RigorousCedmParams.make_rigorous_initparams_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_initparams_impl()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a><ul>
@@ -1863,8 +2101,17 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousEghParams.html#molass.Rigorous.RigorousEghParams.make_rigorous_initparams_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_initparams_impl()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousGrmParams.html">Rigorous.RigorousGrmParams</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousGrmParams.html#molass.Rigorous.RigorousGrmParams.make_rigorous_initparams_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_initparams_impl()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousImplement.html">Rigorous.RigorousImplement</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousImplement.html#subprocess-coordinate-contract-issue-80">Subprocess Coordinate Contract (Issue #80)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousImplement.html#molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_decomposition_impl()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousLkmParams.html">Rigorous.RigorousLkmParams</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RigorousLkmParams.html#molass.Rigorous.RigorousLkmParams.make_rigorous_initparams_impl"><code class="docutils literal notranslate"><span class="pre">make_rigorous_initparams_impl()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RigorousSdmParams.html">Rigorous.RigorousSdmParams</a><ul>
@@ -1873,9 +2120,53 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html">Rigorous.RunInfo</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo"><code class="docutils literal notranslate"><span class="pre">RunInfo</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.ssd"><code class="docutils literal notranslate"><span class="pre">RunInfo.ssd</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.optimizer"><code class="docutils literal notranslate"><span class="pre">RunInfo.optimizer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.dsets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.init_params"><code class="docutils literal notranslate"><span class="pre">RunInfo.init_params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.monitor"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.analysis_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.analysis_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.decomposition</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.work_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.in_process_result"><code class="docutils literal notranslate"><span class="pre">RunInfo.in_process_result</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.request_stop"><code class="docutils literal notranslate"><span class="pre">RunInfo.request_stop()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.is_alive"><code class="docutils literal notranslate"><span class="pre">RunInfo.is_alive</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.current_work_folder"><code class="docutils literal notranslate"><span class="pre">RunInfo.current_work_folder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.update_manifest_on_resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.update_manifest_on_resume()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.get_current_decomposition"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_decomposition()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.resume"><code class="docutils literal notranslate"><span class="pre">RunInfo.resume()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.wait"><code class="docutils literal notranslate"><span class="pre">RunInfo.wait()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.load_best"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_best()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.get_score_breakdown"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.get_current_curves"><code class="docutils literal notranslate"><span class="pre">RunInfo.get_current_curves()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.diagnose"><code class="docutils literal notranslate"><span class="pre">RunInfo.diagnose()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.compare_subprocess_dsets"><code class="docutils literal notranslate"><span class="pre">RunInfo.compare_subprocess_dsets()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.monitor_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.monitor_snapshot_json_path</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.check_progress"><code class="docutils literal notranslate"><span class="pre">RunInfo.check_progress()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.progress_snapshot_json_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.progress_snapshot_json_path</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.load_progress_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_progress_snapshot()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.load_monitor_snapshot"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_monitor_snapshot()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.sv_history_per_job"><code class="docutils literal notranslate"><span class="pre">RunInfo.sv_history_per_job</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.plot_sv_history"><code class="docutils literal notranslate"><span class="pre">RunInfo.plot_sv_history()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.live_status"><code class="docutils literal notranslate"><span class="pre">RunInfo.live_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.run_complete_path"><code class="docutils literal notranslate"><span class="pre">RunInfo.run_complete_path</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.load_run_complete"><code class="docutils literal notranslate"><span class="pre">RunInfo.load_run_complete()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo.reconnect"><code class="docutils literal notranslate"><span class="pre">RunInfo.reconnect()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html">Rigorous.RunRegistry</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#id1">Rigorous.RunRegistry</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#why-this-exists">Why this exists</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#public-helpers">Public helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#molass.Rigorous.RunRegistry.write_run_manifest"><code class="docutils literal notranslate"><span class="pre">write_run_manifest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#molass.Rigorous.RunRegistry.update_run_manifest"><code class="docutils literal notranslate"><span class="pre">update_run_manifest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#molass.Rigorous.RunRegistry.read_manifest"><code class="docutils literal notranslate"><span class="pre">read_manifest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Rigorous.RunRegistry.html#molass.Rigorous.RunRegistry.locate_recent_runs"><code class="docutils literal notranslate"><span class="pre">locate_recent_runs()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1990,8 +2281,20 @@ explicit and easily discoverable.</p>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -2065,6 +2368,11 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.ModelFactory.html#molass.SEC.ModelFactory.create_model"><code class="docutils literal notranslate"><span class="pre">create_model()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.PoreEntryAnimation.html">SEC.PoreEntryAnimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.PoreEntryAnimation.html#molass.SEC.PoreEntryAnimation.run_simulation"><code class="docutils literal notranslate"><span class="pre">run_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.PoreEntryAnimation.html#molass.SEC.PoreEntryAnimation.get_pore_entry_animation"><code class="docutils literal notranslate"><span class="pre">get_pore_entry_animation()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.StationaryMove.html">SEC.StationaryMove</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.find_nearest_wall"><code class="docutils literal notranslate"><span class="pre">find_nearest_wall()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.StationaryMove.html#molass.SEC.StationaryMove.compute_boundary_walls"><code class="docutils literal notranslate"><span class="pre">compute_boundary_walls()</span></code></a></li>
@@ -2108,16 +2416,123 @@ explicit and easily discoverable.</p>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html#molass.SEC.Models.EdmEstimatorImpl.guess"><code class="docutils literal notranslate"><span class="pre">guess()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html#molass.SEC.Models.EdmEstimatorImpl.guess_multiple_impl"><code class="docutils literal notranslate"><span class="pre">guess_multiple_impl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmEstimatorImpl.html#molass.SEC.Models.EdmEstimatorImpl.estimate_cedm_shared_params"><code class="docutils literal notranslate"><span class="pre">estimate_cedm_shared_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#assumptions">Assumptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#model-parameters">Model parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#transfer-function-laplace-domain">Transfer function (Laplace domain)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#note-on-edm-func-molass-legacy">Note on edm_func (molass-legacy)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#molass.SEC.Models.EdmLinear.edm_linear_cf"><code class="docutils literal notranslate"><span class="pre">edm_linear_cf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmLinear.html#molass.SEC.Models.EdmLinear.edm_pdf"><code class="docutils literal notranslate"><span class="pre">edm_pdf()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html#molass.SEC.Models.EdmOptimizer.optimize_edm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_edm_xr_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmOptimizer.html#molass.SEC.Models.EdmOptimizer.refine_edm_per_component"><code class="docutils literal notranslate"><span class="pre">refine_edm_per_component()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.EdmRecommend.html#molass.SEC.Models.EdmRecommend.suggest_cedm_bounds_from_egh"><code class="docutils literal notranslate"><span class="pre">suggest_cedm_bounds_from_egh()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GEC.html">SEC.Models.GEC</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GEC.html#molass.SEC.Models.GEC.gec_monopore_pdf"><code class="docutils literal notranslate"><span class="pre">gec_monopore_pdf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GEC.html#molass.SEC.Models.GEC.robust_gec_monopore_pdf"><code class="docutils literal notranslate"><span class="pre">robust_gec_monopore_pdf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GEC.html#molass.SEC.Models.GEC.gec_monopore_cf"><code class="docutils literal notranslate"><span class="pre">gec_monopore_cf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GRM.html">SEC.Models.GRM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GRM.html#molass.SEC.Models.GRM.GRM"><code class="docutils literal notranslate"><span class="pre">GRM</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GRM.html#molass.SEC.Models.GRM.GRM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">GRM.optimize_decomposition()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.x</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.Pe"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.Pe</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.t0"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.t0</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.R_p"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.R_p</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.D_eff"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.D_eff</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.a_star"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.a_star</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.F_ratio"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.F_ratio</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.k_ext"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.k_ext</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.R"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.R</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.scale"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.scale</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.rg"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.rg</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.model"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.model</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.y"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.y</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.get_y()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.get_xy"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.get_xy()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.get_peak_position"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.get_peak_position()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.GrmComponentCurve.html#molass.SEC.Models.GrmComponentCurve.GrmComponentCurve.get_scale_param"><code class="docutils literal notranslate"><span class="pre">GrmComponentCurve.get_scale_param()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html#strategy">Strategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmEstimator.html#molass.SEC.Models.GrmEstimator.estimate_grm_init_params"><code class="docutils literal notranslate"><span class="pre">estimate_grm_init_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#assumptions">Assumptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#model-parameters">Model parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#retention-factor">Retention factor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#transfer-function-laplace-domain-qamar-2014-eqs-2224-37">Transfer function (Laplace domain, Qamar 2014 eqs. 22–24, 37)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#moment-formulas-qamar-2014-table-1-dirichlet-bcs-linear-isotherm">Moment formulas (Qamar 2014 Table 1, Dirichlet BCs, linear isotherm)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#grm-lkm-moment-matching-qamar-2014-appendix-c">GRM ↔ LKM moment matching (Qamar 2014, Appendix C)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#molass.SEC.Models.GrmLinear.grm_linear_cf"><code class="docutils literal notranslate"><span class="pre">grm_linear_cf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmLinear.html#molass.SEC.Models.GrmLinear.grm_pdf"><code class="docutils literal notranslate"><span class="pre">grm_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.GrmOptimizer.html#molass.SEC.Models.GrmOptimizer.optimize_grm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_grm_xr_decomposition()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LKM.html">SEC.Models.LKM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LKM.html#molass.SEC.Models.LKM.LKM"><code class="docutils literal notranslate"><span class="pre">LKM</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LKM.html#molass.SEC.Models.LKM.LKM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">LKM.optimize_decomposition()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.x"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.x</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.Pe"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.Pe</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.t0"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.t0</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.k_MT"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.k_MT</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.R"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.R</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.scale"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.scale</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.rg"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.rg</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.model"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.model</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.y"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.y</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.get_y"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.get_y()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.get_scale_param"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.get_scale_param()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.get_peak_top_x"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.get_peak_top_x()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.LkmComponentCurve.html#molass.SEC.Models.LkmComponentCurve.LkmComponentCurve.get_params"><code class="docutils literal notranslate"><span class="pre">LkmComponentCurve.get_params()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmEstimator.html#molass.SEC.Models.LkmEstimator.estimate_lkm_init_params"><code class="docutils literal notranslate"><span class="pre">estimate_lkm_init_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html#assumptions">Assumptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html#model-parameters">Model parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html#transfer-function-laplace-domain">Transfer function (Laplace domain)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html#molass.SEC.Models.LkmLinear.lkm_linear_cf"><code class="docutils literal notranslate"><span class="pre">lkm_linear_cf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmLinear.html#molass.SEC.Models.LkmLinear.lkm_pdf"><code class="docutils literal notranslate"><span class="pre">lkm_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LkmOptimizer.html#molass.SEC.Models.LkmOptimizer.optimize_lkm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_lkm_xr_decomposition()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a><ul>
@@ -2133,6 +2548,9 @@ explicit and easily discoverable.</p>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_pore_gamma_integrand_impl"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_pore_gamma_integrand_impl()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_pore_gamma_cf"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_pore_gamma_cf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_pore_gamma_pdf"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_pore_gamma_pdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_pore_gamma_cf_fast"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_pore_gamma_cf_fast()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_pore_gamma_pdf_fast"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_pore_gamma_pdf_fast()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.LognormalPore.html#molass.SEC.Models.LognormalPore.sdm_lognormal_model_moments"><code class="docutils literal notranslate"><span class="pre">sdm_lognormal_model_moments()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SDM.html">SEC.Models.SDM</a><ul>
@@ -2143,8 +2561,36 @@ explicit and easily discoverable.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.N"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.N</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.N0"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.N0</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.T"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.T</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.k"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.k</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.me"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.me</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.mp"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.mp</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.poresize"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.poresize</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.tI"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.tI</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.timescale"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.timescale</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.x0"><code class="docutils literal notranslate"><span class="pre">SdmMonoColumnParams.x0</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.N"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.N</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.N0"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.N0</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.T"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.T</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.k"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.k</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.me"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.me</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.mp"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.mp</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.mu"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.mu</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.sigma"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.sigma</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.tI"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.tI</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmLognormalColumnParams.x0"><code class="docutils literal notranslate"><span class="pre">SdmLognormalColumnParams.x0</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn"><code class="docutils literal notranslate"><span class="pre">SdmColumn</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn.params"><code class="docutils literal notranslate"><span class="pre">SdmColumn.params</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn.pore_dist"><code class="docutils literal notranslate"><span class="pre">SdmColumn.pore_dist</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn.rt_dist"><code class="docutils literal notranslate"><span class="pre">SdmColumn.rt_dist</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmColumn.get_params"><code class="docutils literal notranslate"><span class="pre">SdmColumn.get_params()</span></code></a></li>
 </ul>
 </li>
@@ -2159,7 +2605,21 @@ explicit and easily discoverable.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html">SEC.Models.SdmEstimator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv"><code class="docutils literal notranslate"><span class="pre">LognormalEnv</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.N"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.N0"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N0</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.T"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.T</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.me"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.me</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.mp"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.mp</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.mu"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.mu</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.sigma"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.sigma</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.LognormalEnv.t0"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.t0</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.estimate_sdm_column_params"><code class="docutils literal notranslate"><span class="pre">estimate_sdm_column_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.estimate_sdm_lognormal_column_params"><code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_column_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.estimate_sdm_lognormal_from_monopore"><code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.refine_lognormal_params_by_moments"><code class="docutils literal notranslate"><span class="pre">refine_lognormal_params_by_moments()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmMonoPore.html">SEC.Models.SdmMonoPore</a><ul>
@@ -2171,7 +2631,9 @@ explicit and easily discoverable.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html">SEC.Models.SdmOptimizer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.optimize_sdm_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_sdm_xr_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.refine_sdm_per_component"><code class="docutils literal notranslate"><span class="pre">refine_sdm_per_component()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.optimize_sdm_uv_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_sdm_uv_decomposition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.optimize_sdm_lognormal_xr_decomposition"><code class="docutils literal notranslate"><span class="pre">optimize_sdm_lognormal_xr_decomposition()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.SEC.Models.SdmOptimizer.html#molass.SEC.Models.SdmOptimizer.adjust_rg_and_poresize"><code class="docutils literal notranslate"><span class="pre">adjust_rg_and_poresize()</span></code></a></li>
 </ul>
 </li>
@@ -2288,7 +2750,12 @@ explicit and easily discoverable.</p>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.control_matplotlib_plot"><code class="docutils literal notranslate"><span class="pre">control_matplotlib_plot()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.suppress_numerical_warnings"><code class="docutils literal notranslate"><span class="pre">suppress_numerical_warnings()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.configure_for_test"><code class="docutils literal notranslate"><span class="pre">configure_for_test()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#molass.Testing.draw_scores_headless"><code class="docutils literal notranslate"><span class="pre">draw_scores_headless()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="source/molass.Testing.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source/molass.Testing.HeadlessPeakEditor.html">Testing.HeadlessPeakEditor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.HeadlessPeakEditor.html#molass.Testing.HeadlessPeakEditor.draw_scores_headless"><code class="docutils literal notranslate"><span class="pre">draw_scores_headless()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="source/molass.Testing.PlotControl.html">Testing.PlotControl</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController"><code class="docutils literal notranslate"><span class="pre">PlotController</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="source/molass.Testing.PlotControl.html#molass.Testing.PlotControl.PlotController.show_or_save"><code class="docutils literal notranslate"><span class="pre">PlotController.show_or_save()</span></code></a></li>
@@ -2386,14 +2853,16 @@ explicit and easily discoverable.</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-molass">Module Functions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.to_int_tuple"><code class="docutils literal notranslate"><span class="pre">to_int_tuple()</span></code></a></li>
@@ -2452,8 +2921,8 @@ By Molass Community
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

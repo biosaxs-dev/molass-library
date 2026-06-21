@@ -16,33 +16,36 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'source/molass.LowRank.Decomposition';</script>
     <link rel="icon" href="../_static/molamola.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -51,6 +54,7 @@
     <link rel="prev" title="LowRank.CurveDecomposer" href="molass.LowRank.CurveDecomposer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -66,19 +70,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -86,7 +79,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -94,8 +86,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +103,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -141,21 +134,17 @@
     
     
     <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <script>document.write(`<img src="../_static/molamola.png" class="logo__image only-dark" alt="Molass Library  documentation - Home"/>`);</script>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
@@ -174,11 +163,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Bridge.html">Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyBaselines.html">Bridge.LegacyBaselines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.LegacyRgCurve.html">Bridge.LegacyRgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.OptimizerInput.html">Bridge.OptimizerInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdAdapter.html">Bridge.SdAdapter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Bridge.SdProxy.html">Bridge.SdProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Bridge.V2Result.html">Bridge.V2Result</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.DataObjects.html">DataObjects</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -205,6 +195,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Decompose.html">Decompose</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Partner.html">Decompose.Partner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Proportional.html">Decompose.Proportional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Decompose.Recommend.html">Decompose.Recommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.VaryUtils.html">Decompose.VaryUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Decompose.XrOnlyUtils.html">Decompose.XrOnlyUtils</a></li>
 </ul>
@@ -238,9 +229,11 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Global.html">Global</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.Global.Options.html">Global.Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Global.Quiet.html">Global.Quiet</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Guinier.html">Guinier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Guinier.GuinierDeviation.html">Guinier.GuinierDeviation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurve.html">Guinier.RgCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgCurveUtils.html">Guinier.RgCurveUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Guinier.RgEstimator.html">Guinier.RgEstimator</a></li>
@@ -273,6 +266,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">LowRank.Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ErrorPropagate.html">LowRank.ErrorPropagate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.LowRankInfo.html">LowRank.LowRankInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.LowRank.NumComponentsRecommender.html">LowRank.NumComponentsRecommender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PairedRange.html">LowRank.PairedRange</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.PositionedDecomposer.html">LowRank.PositionedDecomposer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.LowRank.ProportionalDecomposer.html">LowRank.ProportionalDecomposer</a></li>
@@ -299,6 +293,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Peaks.html">Peaks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Peaks.EghPeeler.html">Peaks.EghPeeler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.PeakSimilarity.html">Peaks.PeakSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.Recognizer.html">Peaks.Recognizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Peaks.RecognizerSpecific.html">Peaks.RecognizerSpecific</a></li>
@@ -306,6 +301,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.PlotUtils.html">PlotUtils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Annotation3D.html">PlotUtils.Annotation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.AnomalyBands.html">PlotUtils.AnomalyBands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Arrow3D.html">PlotUtils.Arrow3D</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.Comparison.html">PlotUtils.Comparison</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.PlotUtils.DecompositionPlot.html">PlotUtils.DecompositionPlot</a></li>
@@ -336,14 +332,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Rigorous.html">Rigorous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComparePaths.html">Rigorous.ComparePaths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.ComponentUtils.html">Rigorous.ComponentUtils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html">Rigorous.CurrentStateUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.FunctionCodeUtils.html">Rigorous.FunctionCodeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.GuiReplay.html">Rigorous.GuiReplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.InitialScore.html">Rigorous.InitialScore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.LegacyBridgeUtils.html">Rigorous.LegacyBridgeUtils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousCedmParams.html">Rigorous.RigorousCedmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEdmParams.html">Rigorous.RigorousEdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousEghParams.html">Rigorous.RigorousEghParams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousGrmParams.html">Rigorous.RigorousGrmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousImplement.html">Rigorous.RigorousImplement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousLkmParams.html">Rigorous.RigorousLkmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RigorousSdmParams.html">Rigorous.RigorousSdmParams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RunInfo.html">Rigorous.RunInfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.Rigorous.RunRegistry.html">Rigorous.RunRegistry</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.SAXS.html">SAXS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -377,8 +381,20 @@
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -395,6 +411,7 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnSliceStates.html">SEC.ColumnSliceStates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ColumnStructure.html">SEC.ColumnStructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.ModelFactory.html">SEC.ModelFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.PoreEntryAnimation.html">SEC.PoreEntryAnimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.StationaryMove.html">SEC.StationaryMove</a></li>
 </ul>
 </details></li>
@@ -403,8 +420,20 @@
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmComponentCurve.html">SEC.Models.EdmComponentCurve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimator.html">SEC.Models.EdmEstimator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmEstimatorImpl.html">SEC.Models.EdmEstimatorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmLinear.html">SEC.Models.EdmLinear</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmOptimizer.html">SEC.Models.EdmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.EdmRecommend.html">SEC.Models.EdmRecommend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GEC.html">SEC.Models.GEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GRM.html">SEC.Models.GRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmComponentCurve.html">SEC.Models.GrmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmEstimator.html">SEC.Models.GrmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmLinear.html">SEC.Models.GrmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.GrmOptimizer.html">SEC.Models.GrmOptimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LKM.html">SEC.Models.LKM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmComponentCurve.html">SEC.Models.LkmComponentCurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmEstimator.html">SEC.Models.LkmEstimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmLinear.html">SEC.Models.LkmLinear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LkmOptimizer.html">SEC.Models.LkmOptimizer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.LognormalPore.html">SEC.Models.LognormalPore</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SDM.html">SEC.Models.SDM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html">SEC.Models.SdmComponentCurve</a></li>
@@ -431,6 +460,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="molass.Testing.html">Testing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="molass.Testing.HeadlessPeakEditor.html">Testing.HeadlessPeakEditor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="molass.Testing.PlotControl.html">Testing.PlotControl</a></li>
 </ul>
 </details></li>
@@ -449,9 +479,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -549,7 +584,7 @@
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -563,25 +598,17 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -624,7 +651,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_guinier_objects()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rgs"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rgs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_channel_consistency"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_channel_consistency()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rg_curve"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rg_curve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_reconstructed_rgcurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_reconstructed_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_P_at"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_P_at()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.component_quality_scores"><code class="docutils literal notranslate"><span class="pre">Decomposition.component_quality_scores()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.is_component_reliable"><code class="docutils literal notranslate"><span class="pre">Decomposition.is_component_reliable()</span></code></a></li>
@@ -632,15 +661,26 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.update_xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.update_xr_ranks()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_matrices()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_components()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_scattering_profiles"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_scattering_profiles()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_matrices()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_pairedranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_pairedranges()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_proportions"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_proportions()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.upgrade"><code class="docutils literal notranslate"><span class="pre">Decomposition.upgrade()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.recommend_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.recommend_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.make_rigorous_initparams"><code class="docutils literal notranslate"><span class="pre">Decomposition.make_rigorous_initparams()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rigorous_param_count"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rigorous_param_count()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_rigorously()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.score_initial"><code class="docutils literal notranslate"><span class="pre">Decomposition.score_initial()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.load_best_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_best_rigorous_result()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.load_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_rigorous_result()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.list_rigorous_jobs"><code class="docutils literal notranslate"><span class="pre">Decomposition.list_rigorous_jobs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.has_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.has_rigorous_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.wait_for_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.wait_for_rigorous_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_convergence"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_convergence()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -662,7 +702,7 @@ about the components of a SecSaxsData, which is mathematically interpreted as
 a low rank approximation of a matrix.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paired_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_icurve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_curve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paired_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to store the result of decomposition which is a low rank approximation.</p>
 <p>The result includes both components of X-ray and UV data and their associated information.</p>
@@ -826,7 +866,7 @@ a low rank approximation of a matrix.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.copy_with_new_components">
-<span class="sig-name descname"><span class="pre">copy_with_new_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy_with_new_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xr_ccurves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_ccurves</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.copy_with_new_components" title="Link to this definition">#</a></dt>
 <dd><p>Create a new Decomposition with new component curves.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -846,14 +886,28 @@ a low rank approximation of a matrix.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.xr_components">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xr_components</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr_components" title="Link to this definition">#</a></dt>
-<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">xr_ccurves</span></code> — the XR component curves.</p>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">xr_components</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.xr_components" title="Link to this definition">#</a></dt>
+<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">xr_ccurves</span></code> — the XR <strong>elution-curve</strong> parameter objects.</p>
+<p>Returns a list of <a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a>
+(one per component). Each holds the EGH parameters <code class="docutils literal notranslate"><span class="pre">[H,</span> <span class="pre">tR,</span> <span class="pre">sigma,</span> <span class="pre">tau]</span></code>
+of the elution curve only — these objects do <strong>not</strong> carry per-component
+scattering profiles <code class="docutils literal notranslate"><span class="pre">P[:,</span> <span class="pre">i]</span></code> and cannot compute Rg.</p>
+<p>For per-component scattering profiles or Rg-capable objects, use:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices" title="molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_xr_matrices()</span></code></a> — returns <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">C,</span> <span class="pre">P,</span> <span class="pre">Pe)</span></code> numpy arrays.</p></li>
+<li><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components" title="molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_xr_components()</span></code></a> — returns <code class="docutils literal notranslate"><span class="pre">XrComponent</span></code> objects with
+<code class="docutils literal notranslate"><span class="pre">get_guinier_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">get_jcurve_array()</span></code>.</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.uv_components">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uv_components</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv_components" title="Link to this definition">#</a></dt>
-<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">uv_ccurves</span></code> — the UV component curves.</p>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">uv_components</span></span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.uv_components" title="Link to this definition">#</a></dt>
+<dd><p>Alias for <code class="docutils literal notranslate"><span class="pre">uv_ccurves</span></code> — the UV <strong>elution-curve</strong> parameter objects.</p>
+<p>Same caveat as <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.xr_components" title="molass.LowRank.Decomposition.Decomposition.xr_components"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xr_components</span></code></a>: these are
+<a class="reference internal" href="molass.LowRank.ComponentCurve.html#molass.LowRank.ComponentCurve.ComponentCurve" title="molass.LowRank.ComponentCurve.ComponentCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentCurve</span></code></a> instances
+carrying only EGH elution parameters, not UV spectra.
+For per-component UV spectra, use <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices" title="molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_uv_matrices()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -913,6 +967,38 @@ always safe to use in numeric / numpy operations.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_channel_consistency">
+<span class="sig-name descname"><span class="pre">get_channel_consistency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_channel_consistency" title="Link to this definition">#</a></dt>
+<dd><p>Check UV/XR proportion consistency across decomposition channels.</p>
+<p>Computes the area fraction of each component in the XR and UV
+elution curves and reports the maximum absolute difference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p><strong>result</strong> – A namedtuple with fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inconsistency</span></code> (float): max <a href="#id1"><span class="problematic" id="id2">|XR_frac_i - UV_frac_i|</span></a>
+across components. 0.0 = perfect agreement, 1.0 = completely
+different. Values above ~0.1 suggest the decomposition has
+assigned different proportions to UV and XR channels.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xr_fractions</span></code> (list of float): area fraction per XR component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uv_fractions</span></code> (list of float): area fraction per UV component</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ChannelConsistency</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">get_channel_consistency</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistency: </span><span class="si">{</span><span class="n">cc</span><span class="o">.</span><span class="n">inconsistency</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">cc</span><span class="o">.</span><span class="n">inconsistency</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: UV/XR proportions diverged&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_rg_curve">
 <span class="sig-name descname"><span class="pre">get_rg_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_rg_curve" title="Link to this definition">#</a></dt>
 <dd><p>Compute the per-frame Rg curve from the raw XR data.</p>
@@ -952,6 +1038,28 @@ region per frame.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.compute_reconstructed_rgcurve">
+<span class="sig-name descname"><span class="pre">compute_reconstructed_rgcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.compute_reconstructed_rgcurve" title="Link to this definition">#</a></dt>
+<dd><p>Compute the reconstructed Rg curve as a concentration-weighted average.</p>
+<p>At each frame <em>j</em>, the reconstructed Rg is the weighted average of
+each component’s Rg, weighted by the component’s elution intensity:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Rg_recon(j) = Σ_k  [C_k(j) / Σ_k C_k(j)]  ×  Rg_k
+</pre></div>
+</div>
+<p>This matches the legacy <code class="docutils literal notranslate"><span class="pre">plot_rg_curves</span></code> / <code class="docutils literal notranslate"><span class="pre">compute_rg_curves</span></code>
+in <code class="docutils literal notranslate"><span class="pre">GuinierTools.RgCurveUtils</span></code> and the <code class="docutils literal notranslate"><span class="pre">GuinierDeviation</span></code>
+scoring used by <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgcurve</strong> – An <code class="docutils literal notranslate"><span class="pre">RgCurve</span></code> with the same frame indices as the data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve" title="molass.Guinier.RgCurve.RgCurve">molass.Guinier.RgCurve.RgCurve</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_P_at">
 <span class="sig-name descname"><span class="pre">get_P_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_P_at" title="Link to this definition">#</a></dt>
 <dd><p>Return the XR scattering matrix P interpolated onto <em>q_target</em>.</p>
@@ -967,7 +1075,7 @@ that all columns peak at 1.  Default <code class="docutils literal notranslate">
 <dd class="field-even"><p><strong>P_interp</strong> – Scattering matrix P evaluated at <em>q_target</em>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray, shape (m, n_components)</p>
+<dd class="field-odd"><p>np.ndarray, shape (m, <a class="reference internal" href="molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.n_components" title="molass.Rigorous.GuiReplay.GuiScenario.n_components">n_components</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1034,7 +1142,7 @@ well-separated in Rg and carries a non-trivial fraction of the signal.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
-<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.10.8)"><em>matplotlib.figure.Figure</em></a><em>, </em><em>optional</em>) – An existing Figure to draw into. If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), a new
+<li><p><strong>fig</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.11.0)"><em>matplotlib.figure.Figure</em></a><em>, </em><em>optional</em>) – An existing Figure to draw into. If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), a new
 figure is created automatically.</p></li>
 <li><p><strong>axes</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>2</em><em>, </em><em>3</em><em>)</em><em>, </em><em>optional</em>) – <p>A 2×3 array of Axes to draw into. Must be provided together with
 <code class="docutils literal notranslate"><span class="pre">fig</span></code> when injecting into an existing subplot grid. If <code class="docutils literal notranslate"><span class="pre">None</span></code>
@@ -1054,6 +1162,20 @@ axes[1, 2]  XR Guinier plot  ← Kratky is omitted when axes are injected
 responsible for creating axes with compatible geometry.</p>
 </div>
 </p></li>
+<li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve" title="molass.Guinier.RgCurve.RgCurve"><em>molass.Guinier.RgCurve.RgCurve</em></a><em>, </em><em>optional</em>) – <p>If provided, overlays the per-frame Rg values as a scatter plot on
+the XR elution subplot (<code class="docutils literal notranslate"><span class="pre">axes[1,</span> <span class="pre">0]</span></code>), colour-coded by Guinier
+fit score.  Obtain via <code class="docutils literal notranslate"><span class="pre">decomp.get_rg_curve()</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rgcurve</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">get_rg_curve</span><span class="p">()</span>
+<span class="n">decomp</span><span class="o">.</span><span class="n">plot_components</span><span class="p">(</span><span class="n">rgcurve</span><span class="o">=</span><span class="n">rgcurve</span><span class="p">)</span>
+</pre></div>
+</div>
+</p></li>
+<li><p><strong>rg_score_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Only Rg points whose Guinier fit score exceeds this value are
+plotted.  Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> (all points shown).</p></li>
+<li><p><strong>rg_marker_size</strong> (<em>float</em><em>, </em><em>optional</em>) – Marker size for the Rg scatter points.  Default is <code class="docutils literal notranslate"><span class="pre">12</span></code>.</p></li>
+<li><p><strong>rg_cmap</strong> (<em>str</em><em>, </em><em>optional</em>) – Matplotlib colormap name used to colour Rg markers by score.
+Default is <code class="docutils literal notranslate"><span class="pre">'viridis'</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1148,6 +1270,31 @@ rows are <code class="docutils literal notranslate"><span class="pre">[frame_x,<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_scattering_profiles">
+<span class="sig-name descname"><span class="pre">get_scattering_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_scattering_profiles" title="Link to this definition">#</a></dt>
+<dd><p>Get the per-component scattering profiles <code class="docutils literal notranslate"><span class="pre">P</span></code> and their errors <code class="docutils literal notranslate"><span class="pre">Pe</span></code>.</p>
+<p>This is a convenience accessor; equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">Pe</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">get_xr_matrices</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>qv</strong> (<em>np.ndarray, shape (n_q,)</em>) – q-values in Å⁻¹ (alias of <code class="docutils literal notranslate"><span class="pre">decomp.xr.qv</span></code>).</p></li>
+<li><p><strong>P</strong> (<em>np.ndarray, shape (n_q, n_components)</em>) – Scattering profiles. <code class="docutils literal notranslate"><span class="pre">P[:,</span> <span class="pre">i]</span></code> is component <code class="docutils literal notranslate"><span class="pre">i</span></code>’s profile.</p></li>
+<li><p><strong>Pe</strong> (<em>np.ndarray, shape (n_q, n_components)</em>) – Propagated standard error on <code class="docutils literal notranslate"><span class="pre">P</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Use this when you only need the SAXS profiles and want to skip
+constructing <a class="reference internal" href="molass.LowRank.Component.html#molass.LowRank.Component.XrComponent" title="molass.LowRank.Component.XrComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">XrComponent</span></code></a> objects.
+For full per-component objects (with Guinier fitting), use
+<a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components" title="molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_xr_components()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_uv_matrices">
 <span class="sig-name descname"><span class="pre">get_uv_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices" title="Link to this definition">#</a></dt>
 <dd><p>Get the matrices for the UV data.</p>
@@ -1209,7 +1356,7 @@ Proportional to the amount (concentration × volume) of each
 species in the SEC peak region.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>np.ndarray, shape (n_components,)</p>
+<dd class="field-even"><p>np.ndarray, shape (<a class="reference internal" href="molass.Rigorous.GuiReplay.html#molass.Rigorous.GuiReplay.GuiScenario.n_components" title="molass.Rigorous.GuiReplay.GuiScenario.n_components">n_components</a>,)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1244,22 +1391,36 @@ species in the SEC peak region.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.optimize_with_model">
-<span class="sig-name descname"><span class="pre">optimize_with_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model" title="Link to this definition">#</a></dt>
-<dd><p>Optimize the decomposition with a model.</p>
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.upgrade">
+<span class="sig-name descname"><span class="pre">upgrade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="Link to this definition">#</a></dt>
+<dd><p>Upgrade the decomposition to a physics-aware column model (SDM or EDM).</p>
+<p>Replaces the EGH elution model with a more physically realistic
+column model, using the EGH shape parameters as a starting point
+for column-parameter estimation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_name</strong> (<em>str</em>) – <p>The name of the model to use for optimization.</p>
+<li><p><strong>model</strong> (<em>str</em>) – <p>The name of the column model to use.</p>
 <p>Supported models:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">SDM</span></code>: <a class="reference external" href="https://biosaxs-dev.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model">Stochastic Dispersive Model</a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">EDM</span></code>: <a class="reference external" href="https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model">Equilibrium Dispersive Model</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CEDM</span></code>: Continuous EDM (shared-column variant of EDM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LKM</span></code>: <a class="reference external" href="https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html">Lumped Kinetic Model</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GRM</span></code>: General Rate Model (film mass transfer + intraparticle pore diffusion)</p></li>
 </ul>
 </p></li>
 <li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – The Rg curve to use for the optimization.</p></li>
 <li><p><strong>model_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – The parameters for the model.</p></li>
+<li><p><strong>pore_dist</strong> (<em>str</em><em>, </em><em>optional</em>) – For SDM only: pore-size distribution to use.
+<code class="docutils literal notranslate"><span class="pre">'mono'</span></code> (default) uses a single pore size (G1200, gamma residence time);
+<code class="docutils literal notranslate"><span class="pre">'lognormal'</span></code> uses a lognormal pore distribution (G1300).
+Takes precedence over <code class="docutils literal notranslate"><span class="pre">model_params['pore_dist']</span></code> when both are given.</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments forwarded to the model’s
+<code class="docutils literal notranslate"><span class="pre">optimize_decomposition</span></code> and downstream estimators
+(e.g. <code class="docutils literal notranslate"><span class="pre">poresize_bounds</span></code>, <code class="docutils literal notranslate"><span class="pre">N0</span></code>, <code class="docutils literal notranslate"><span class="pre">include_M3</span></code> for SDM —
+see <a class="reference internal" href="molass.SEC.Models.SdmEstimator.html#molass.SEC.Models.SdmEstimator.estimate_sdm_column_params" title="molass.SEC.Models.SdmEstimator.estimate_sdm_column_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">molass.SEC.Models.SdmEstimator.estimate_sdm_column_params()</span></code></a>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1269,6 +1430,52 @@ species in the SEC peak region.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.optimize_with_model">
+<span class="sig-name descname"><span class="pre">optimize_with_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model" title="Link to this definition">#</a></dt>
+<dd><p>Deprecated. Use <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="molass.LowRank.Decomposition.Decomposition.upgrade"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade()</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.recommend_num_components">
+<span class="sig-name descname"><span class="pre">recommend_num_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SDM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cond_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cos_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.recommend_num_components" title="Link to this definition">#</a></dt>
+<dd><p>Recommend <code class="docutils literal notranslate"><span class="pre">num_components</span></code> by detecting degeneracy at <code class="docutils literal notranslate"><span class="pre">k+1</span></code>.</p>
+<p>Sweeps <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">in</span> <span class="pre">1..k_max</span></code> on this decomposition’s <code class="docutils literal notranslate"><span class="pre">ssd</span></code>, runs
+<a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="molass.LowRank.Decomposition.Decomposition.upgrade"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade()</span></code></a> for each <code class="docutils literal notranslate"><span class="pre">k</span></code>, and applies a 4-metric
+diagnostic (residual, <code class="docutils literal notranslate"><span class="pre">cond(C)</span></code>, <code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">cos(C[i],C[j])</span></code>, amp ratio)
+plus the decision rule from issue #116. See
+<a class="reference internal" href="molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.recommend_num_components" title="molass.LowRank.NumComponentsRecommender.recommend_num_components"><code class="xref py py-func docutils literal notranslate"><span class="pre">molass.LowRank.NumComponentsRecommender.recommend_num_components()</span></code></a>
+for full details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum <code class="docutils literal notranslate"><span class="pre">num_components</span></code> to try. Default 3.</p></li>
+<li><p><strong>model</strong> (<em>str</em><em>, </em><em>optional</em>) – Model name forwarded to <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="molass.LowRank.Decomposition.Decomposition.upgrade"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade()</span></code></a>. Default <code class="docutils literal notranslate"><span class="pre">'SDM'</span></code>.</p></li>
+<li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – Rg curve. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, computed via <code class="docutils literal notranslate"><span class="pre">self.ssd.xr.compute_rgcurve()</span></code>.</p></li>
+<li><p><strong>rt_dist</strong> (<em>str</em><em>, </em><em>optional</em>) – SDM residence-time distribution (<code class="docutils literal notranslate"><span class="pre">'gamma'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>).</p></li>
+<li><p><strong>cond_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>cos_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>amp_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>quiet</strong> (<em>bool</em><em>, </em><em>optional</em>) – Suppress per-fit stdout/stderr. Default True.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, do not suppress output and forward downstream.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Named tuple <code class="docutils literal notranslate"><span class="pre">(recommended_k,</span> <span class="pre">reason,</span> <span class="pre">metrics)</span></code> where <code class="docutils literal notranslate"><span class="pre">metrics</span></code>
+is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> with one row per <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.LowRank.NumComponentsRecommender.html#molass.LowRank.NumComponentsRecommender.Recommendation" title="molass.LowRank.NumComponentsRecommender.Recommendation">Recommendation</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rec</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">recommend_num_components</span><span class="p">(</span><span class="n">k_max</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">recommended_k</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">rec</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -1289,26 +1496,429 @@ species in the SEC peak region.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.get_rigorous_param_count">
+<span class="sig-name descname"><span class="pre">get_rigorous_param_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.get_rigorous_param_count" title="Link to this definition">#</a></dt>
+<dd><p>Return the number of parameters for rigorous optimization.</p>
+<p>Convenience wrapper around <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.make_rigorous_initparams" title="molass.LowRank.Decomposition.Decomposition.make_rigorous_initparams"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_rigorous_initparams()</span></code></a> that
+handles the <code class="docutils literal notranslate"><span class="pre">baseparams</span></code> setup internally.  Useful for a quick
+sanity-check before committing to a long run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">decomp_lkm</span> <span class="o">=</span> <span class="n">LKM</span><span class="p">()</span><span class="o">.</span><span class="n">optimize_decomposition</span><span class="p">(</span><span class="n">decomp_egh</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">decomp_lkm</span><span class="o">.</span><span class="n">get_rigorous_param_count</span><span class="p">())</span>  <span class="c1"># e.g. 30</span>
+</pre></div>
+</div>
+<p>Works for all supported models (EGH, SDM, EDM, CEDM, LKM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of parameters in the flat init-params vector that will be
+passed to the legacy objective function (G1100 / G1200 / G1300 /
+G1400 / G2020).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.optimize_rigorously">
-<span class="sig-name descname"><span class="pre">optimize_rigorously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">optimize_rigorously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen_param_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed_ssd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dashboard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_narrow_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_adaptive_nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns_nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously" title="Link to this definition">#</a></dt>
 <dd><p>Perform a rigorous decomposition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The Rg curve to use for the decomposition.</p></li>
-<li><p><strong>analysis_folder</strong> (<em>str</em><em>, </em><em>optional</em>) – The folder to save analysis results.</p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for rigorous optimization. Default is ‘BH’.</p></li>
-<li><p><strong>niter</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations for the optimization. Default is 20.</p></li>
+<li><p><strong>analysis_folder</strong> (str, <strong>required</strong>) – <p>The folder to save analysis results.  Must be provided explicitly —
+passing <code class="docutils literal notranslate"><span class="pre">None</span></code> raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.
+Example: <code class="docutils literal notranslate"><span class="pre">analysis_folder='temp_analysis_apo_bh'</span></code>.
+Optimization creates the following layout on disk:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">analysis_folder</span><span class="o">&gt;/</span>
+    <span class="n">optimized</span><span class="o">/</span>
+        <span class="n">jobs</span><span class="o">/</span>
+            <span class="mi">000</span><span class="o">/</span><span class="n">callback</span><span class="o">.</span><span class="n">txt</span>   <span class="c1"># job 0</span>
+            <span class="mi">001</span><span class="o">/</span><span class="n">callback</span><span class="o">.</span><span class="n">txt</span>   <span class="c1"># job 1 (e.g. after Resume)</span>
+            <span class="o">...</span>
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code> records per-iteration objective values
+and parameter vectors.  Use <code class="docutils literal notranslate"><span class="pre">list_rigorous_jobs()</span></code> to
+inspect existing jobs, or <code class="docutils literal notranslate"><span class="pre">load_rigorous_result()</span></code> to
+reconstruct a <code class="docutils literal notranslate"><span class="pre">Decomposition</span></code> from a completed job.</p>
+</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>The optimization algorithm to use. Default is <code class="docutils literal notranslate"><span class="pre">'BH'</span></code>.</p>
+<p>Valid values:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'BH'</span></code> — <strong>Basin-Hopping</strong> (default). Nelder-Mead local
+minimization with stochastic perturbation between basins.
+Good general-purpose choice.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'NS'</span></code> — <strong>Nested Sampling</strong> (UltraNest). Explores the
+full parameter space; useful when the objective landscape
+has multiple well-separated minima.</p></li>
+</ul>
+</p></li>
+<li><p><strong>niter</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>Iteration budget.  Meaning depends on <code class="docutils literal notranslate"><span class="pre">method</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'BH'</span></code>: literal number of Basin-Hopping outer steps
+(default 20).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'NS'</span></code>: multiplied by 7 000 to form <code class="docutils literal notranslate"><span class="pre">max_ncalls</span></code> for
+UltraNest (<code class="docutils literal notranslate"><span class="pre">niter=20</span></code> → 140 000 likelihood evaluations).</p></li>
+</ul>
+<p>Default is 20.</p>
+</p></li>
+<li><p><strong>frozen_components</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – 0-based indices of protein components to freeze during optimization.
+Their EGH shape parameters (H, mu, sigma, tau), Rg, and UV scale
+will be held constant at the values from the initial decomposition.
+Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">free_components</span></code>.</p></li>
+<li><p><strong>free_components</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – 0-based indices of protein components to optimize. All other
+components will be frozen. This is the complement of
+<code class="docutils literal notranslate"><span class="pre">frozen_components</span></code> — use whichever is shorter.
+E.g., <code class="docutils literal notranslate"><span class="pre">free_components=[4]</span></code> to optimize only the main peak.
+Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">frozen_components</span></code>.</p></li>
+<li><p><strong>trimmed_ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a><em>, </em><em>optional</em>) – <p>The trimmed but <strong>not</strong> baseline-corrected SSD — i.e., the
+output of <code class="docutils literal notranslate"><span class="pre">ssd.trimmed_copy()</span></code> before <code class="docutils literal notranslate"><span class="pre">corrected_copy()</span></code>.
+When provided, the optimizer fits its model (EGH components +
+linear baseline) directly to this data, while using the
+corrected decomposition for EGH initialization.  This is the
+recommended two-stage approach: baseline correction helps peak
+initialization in the quick stage, but the rigorous stage
+should fit baseline as a free parameter on uncorrected data.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version The: </span>old name <code class="docutils literal notranslate"><span class="pre">uncorrected_ssd</span></code> is accepted as an alias
+but will be removed in a future release.</p>
+</div>
+</p></li>
+<li><p><strong>clear_jobs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), existing job folders are cleared before starting.
+Set to False after a kernel restart to preserve previous job results
+and reconstruct RunInfo without losing optimization history.
+When False and previous jobs exist, the best params found so far are
+automatically used as <code class="docutils literal notranslate"><span class="pre">init_params</span></code> for the new trial (resuming
+from the best known point rather than the original decomp params,
+see issue #169).</p></li>
+<li><p><strong>in_process</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), run the optimizer in this Python process instead of
+spawning a subprocess.  Avoids the parent/subprocess data-derivation
+divergence (see issues #117 / #119) and keeps the optimizer running
+against the same library-prepared data the parent already holds in
+memory.  Set <code class="docutils literal notranslate"><span class="pre">False</span></code> to use the legacy subprocess path (required
+by the tkinter GUI; available as an escape hatch for notebook users
+who need process isolation).</p></li>
+<li><p><strong>monitor</strong> (<em>bool</em><em>, </em><em>optional</em>) – Controls the <code class="docutils literal notranslate"><span class="pre">MplMonitor</span></code> ipywidgets dashboard.  When True
+(default), a live dashboard is shown whether the run is
+in-process or subprocess.  When False, no dashboard is created
+— the run proceeds silently.  Use <code class="docutils literal notranslate"><span class="pre">monitor=False</span></code> for batch /
+comparison runs (e.g. <code class="docutils literal notranslate"><span class="pre">compare_optimization_paths</span></code>) where the
+widget is not needed.</p></li>
+<li><p><strong>async</strong> (<em>bool</em><em>, </em><em>optional</em>) – Only meaningful when <code class="docutils literal notranslate"><span class="pre">in_process=True</span></code>.  If True (default), the optimizer
+runs in a background daemon thread and this call returns a
+<a class="reference internal" href="molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo" title="molass.Rigorous.RunInfo.RunInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunInfo</span></code></a> object <strong>immediately</strong>,
+before the run completes.  Poll <code class="xref py py-attr docutils literal notranslate"><span class="pre">RunInfo.is_alive</span></code> to check
+whether the run is still in progress, then call
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">RunInfo.wait()</span></code> (instant if already done) to join the thread
+before accessing results.  Set <code class="docutils literal notranslate"><span class="pre">False</span></code> for blocking (batch) runs.</p></li>
+<li><p><strong>progress</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <strong>Deprecated and ignored</strong> — use <code class="docutils literal notranslate"><span class="pre">monitor=True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code> instead.
+Kept in the signature only for backward compatibility.</p></li>
+<li><p><strong>max_trials</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>Maximum number of automatic sequential re-trials after each
+trial completes.  Default <code class="docutils literal notranslate"><span class="pre">0</span></code> means no automatic re-start —
+the user decides manually via the Resume button.</p>
+<p>Only meaningful when <code class="docutils literal notranslate"><span class="pre">in_process=True</span></code> and <code class="docutils literal notranslate"><span class="pre">monitor=True</span></code>.
+The subprocess path (<code class="docutils literal notranslate"><span class="pre">in_process=False</span></code>) always uses its own
+default of 30.  Set <code class="docutils literal notranslate"><span class="pre">max_trials=30</span></code> here to match that
+behaviour for unattended in-process runs.</p>
+</p></li>
 <li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>result</strong> – A new Decomposition object after rigorous decomposition.</p>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> object that tracks the optimization run.
+For blocking runs (<code class="docutils literal notranslate"><span class="pre">async_=False</span></code>), the run is complete when
+this returns.  For non-blocking runs (<code class="docutils literal notranslate"><span class="pre">async_=True</span></code>), call
+<code class="docutils literal notranslate"><span class="pre">run_info.load_best()</span></code> to wait for the first result and load it,
+or <code class="docutils literal notranslate"><span class="pre">run_info.wait()</span></code> then <code class="docutils literal notranslate"><span class="pre">run_info.load_best()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Rigorous.RunInfo.html#molass.Rigorous.RunInfo.RunInfo" title="molass.Rigorous.RunInfo.RunInfo">RunInfo</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The elution model (EGH, SDM, EDM) is <strong>not</strong> a parameter of this
+method — it is determined by the decomposition object itself
+(<code class="docutils literal notranslate"><span class="pre">self.xr_ccurves[0].model</span></code>).  Passing <code class="docutils literal notranslate"><span class="pre">model=</span></code> raises
+<code class="docutils literal notranslate"><span class="pre">TypeError:</span> <span class="pre">Unexpected</span> <span class="pre">keyword</span> <span class="pre">arguments</span></code>.</p>
+<p>To upgrade to a different column model, use
+<a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="molass.LowRank.Decomposition.Decomposition.upgrade"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade()</span></code></a> instead.  That method handles
+EGH → SDM/EDM parameter conversion internally, using the EGH
+shape parameters as a starting point for column-parameter
+estimation.</p>
+<p>Typical staged workflows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># EGH → refine with G1100</span>
+<span class="n">decomp</span> <span class="o">=</span> <span class="n">corrected</span><span class="o">.</span><span class="n">quick_decomposition</span><span class="p">()</span>
+<span class="n">run_info</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span>
+    <span class="n">analysis_folder</span><span class="o">=</span><span class="s1">&#39;temp_analysis_apo_egh&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">result_egh</span> <span class="o">=</span> <span class="n">run_info</span><span class="o">.</span><span class="n">load_best</span><span class="p">()</span>
+
+<span class="c1"># EGH → SDM upgrade → refine with G1200/G1300</span>
+<span class="n">run_info_sdm</span> <span class="o">=</span> <span class="n">result_egh</span><span class="o">.</span><span class="n">upgrade</span><span class="p">(</span>
+    <span class="s1">&#39;SDM&#39;</span><span class="p">,</span> <span class="n">analysis_folder</span><span class="o">=</span><span class="s1">&#39;temp_analysis_apo_sdm&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># EGH → LKM upgrade → refine with G1400 (auto-detected)</span>
+<span class="n">decomp_lkm</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">upgrade</span><span class="p">(</span><span class="s1">&#39;LKM&#39;</span><span class="p">)</span>                 <span class="c1"># moment-matching</span>
+<span class="n">run_lkm</span> <span class="o">=</span> <span class="n">decomp_lkm</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span>          <span class="c1"># G1400 auto-selected</span>
+    <span class="n">analysis_folder</span><span class="o">=</span><span class="s1">&#39;temp_analysis_apo_lkm&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown</span></code></dt><dd><p>Inspect the individual score and penalty components that make up the objective value (fv).</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.is_alive</span></code></dt><dd><p>Check whether an async run is still in progress.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.wait</span></code></dt><dd><p>Block until the run completes.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.load_best</span></code></dt><dd><p>Wait for the first result then load it (recommended for <code class="docutils literal notranslate"><span class="pre">async_=True</span></code> runs instead of <code class="docutils literal notranslate"><span class="pre">wait()</span></code> + <code class="docutils literal notranslate"><span class="pre">load_best()</span></code>).</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.score_initial">
+<span class="sig-name descname"><span class="pre">score_initial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trimmed_ssd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.score_initial" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate the rigorous objective function once at initial parameters.</p>
+<p>A lightweight alternative to <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously" title="molass.LowRank.Decomposition.Decomposition.optimize_rigorously"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code></a> when you only
+need to know the starting score before launching full BH/NS.  Equivalent
+to the <strong>final plot of the legacy PeakEditor</strong> — UV/XR decompositions
+with individual score components — but callable from a notebook without
+triggering any optimization loop.</p>
+<p>For models other than EGH, call <a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.upgrade" title="molass.LowRank.Decomposition.Decomposition.upgrade"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upgrade()</span></code></a> first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">decomp_sdm</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">upgrade</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s1">&#39;SDM&#39;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">decomp_sdm</span><span class="o">.</span><span class="n">score_initial</span><span class="p">(</span><span class="n">trimmed_ssd</span><span class="o">=</span><span class="n">trimmed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trimmed_ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a><em>, </em><em>optional</em>) – Trimmed (uncorrected) SSD (Pattern B, recommended).</p></li>
+<li><p><strong>analysis_folder</strong> (<em>str</em><em>, </em><em>optional</em>) – Where to write optimizer setup artefacts.  Defaults to a
+temporary directory that is deleted after the call.</p></li>
+<li><p><strong>function_code</strong> (<em>str</em><em>, </em><em>optional</em>) – Override auto-detected function code.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Has <code class="docutils literal notranslate"><span class="pre">.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">.fv</span></code>, <code class="docutils literal notranslate"><span class="pre">.breakdown</span></code>, <code class="docutils literal notranslate"><span class="pre">.plot()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.diagnose()</span></code>, <code class="docutils literal notranslate"><span class="pre">.print_summary()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Rigorous.InitialScore.html#molass.Rigorous.InitialScore.InitialScoreResult" title="molass.Rigorous.InitialScore.InitialScoreResult">InitialScoreResult</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_auto</span> <span class="o">=</span> <span class="n">decomp_auto</span><span class="o">.</span><span class="n">score_initial</span><span class="p">(</span><span class="n">trimmed_ssd</span><span class="o">=</span><span class="n">trimmed</span><span class="p">)</span>
+<span class="n">result_prop</span> <span class="o">=</span> <span class="n">decomp_prop</span><span class="o">.</span><span class="n">score_initial</span><span class="p">(</span><span class="n">trimmed_ssd</span><span class="o">=</span><span class="n">trimmed</span><span class="p">)</span>
+<span class="n">result_auto</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Auto EGH&quot;</span><span class="p">)</span>
+<span class="n">result_prop</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Proportional 1:1:1:1&quot;</span><span class="p">)</span>
+<span class="n">result_auto</span><span class="o">.</span><span class="n">print_summary</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously" title="molass.LowRank.Decomposition.Decomposition.optimize_rigorously"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_rigorously</span></code></a></dt><dd><p>Full BH/NS optimization.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown</span></code></dt><dd><p>Score breakdown after optimization.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.load_best_rigorous_result">
+<span class="sig-name descname"><span class="pre">load_best_rigorous_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.load_best_rigorous_result" title="Link to this definition">#</a></dt>
+<dd><p>Load the best rigorous optimization result from disk.</p>
+<p>Convenience method that combines <code class="docutils literal notranslate"><span class="pre">list_rigorous_jobs()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">load_rigorous_result()</span></code> into a single call: finds the job
+with the lowest objective function value and reconstructs the
+<code class="docutils literal notranslate"><span class="pre">Decomposition</span></code> from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p></li>
+<li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve" title="molass.Guinier.RgCurve.RgCurve"><em>RgCurve</em></a><em>, </em><em>optional</em>) – Pre-computed Rg curve.  Avoids redundant per-frame Guinier
+fitting when loading results.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reload modules from disk.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Decomposition with the best optimized components.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If no completed jobs are found.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">RunInfo.get_score_breakdown</span></code></dt><dd><p>Inspect the individual score and penalty components that make up the objective value (fv).</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">load_best_rigorous_result</span><span class="p">(</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot_components</span><span class="p">()</span>
+
+<span class="c1"># Fast: skip redundant Guinier fitting by passing rgcurve</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">load_best_rigorous_result</span><span class="p">(</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">,</span> <span class="n">rgcurve</span><span class="o">=</span><span class="n">rgcurve</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.load_rigorous_result">
+<span class="sig-name descname"><span class="pre">load_rigorous_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jobid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgcurve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.load_rigorous_result" title="Link to this definition">#</a></dt>
+<dd><p>Load a completed rigorous optimization result from disk.</p>
+<p>This reads saved parameters without launching a new subprocess.
+Use it to view results from a previous session after a kernel or
+VS Code restart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.
+See <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code> for the folder layout.</p></li>
+<li><p><strong>jobid</strong> (<em>str</em><em>, </em><em>optional</em>) – Specific job id (subfolder name, e.g. <code class="docutils literal notranslate"><span class="pre">'001'</span></code>).  If None,
+loads the latest job.  Use <code class="docutils literal notranslate"><span class="pre">list_rigorous_jobs()</span></code> to see
+available jobs.</p></li>
+<li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.Guinier.RgCurve.html#molass.Guinier.RgCurve.RgCurve" title="molass.Guinier.RgCurve.RgCurve"><em>RgCurve</em></a><em>, </em><em>optional</em>) – Pre-computed Rg curve.  Avoids redundant per-frame Guinier
+fitting when loading results.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reload modules from disk.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Decomposition with the optimized components.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition">Decomposition</a></p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>After kernel restart, re-run data loading and quick decomposition,
+then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">load_rigorous_result</span><span class="p">(</span><span class="s2">&quot;temp_analysis_scaffolded&quot;</span><span class="p">,</span> <span class="n">rgcurve</span><span class="o">=</span><span class="n">rgcurve</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot_components</span><span class="p">(</span><span class="n">rgcurve</span><span class="o">=</span><span class="n">rgcurve</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.list_rigorous_jobs">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">list_rigorous_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.list_rigorous_jobs" title="Link to this definition">#</a></dt>
+<dd><p>List completed rigorous optimization jobs on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Each entry is a <code class="docutils literal notranslate"><span class="pre">JobInfo(id,</span> <span class="pre">iterations,</span> <span class="pre">best_fv,</span> <span class="pre">timestamp)</span></code>
+namedtuple.  Sorted by job id.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.JobInfo" title="molass.Rigorous.CurrentStateUtils.JobInfo">JobInfo</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jobs</span> <span class="o">=</span> <span class="n">Decomposition</span><span class="o">.</span><span class="n">list_rigorous_jobs</span><span class="p">(</span><span class="s2">&quot;temp_analysis_scaffolded&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job </span><span class="si">{</span><span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">job</span><span class="o">.</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> iters, best fv=</span><span class="si">{</span><span class="n">job</span><span class="o">.</span><span class="n">best_fv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Then load a specific job</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">load_rigorous_result</span><span class="p">(</span><span class="s2">&quot;temp_analysis_scaffolded&quot;</span><span class="p">,</span> <span class="n">jobid</span><span class="o">=</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.has_rigorous_results">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">has_rigorous_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.has_rigorous_results" title="Link to this definition">#</a></dt>
+<dd><p>Check whether any rigorous optimization results are available.</p>
+<p>Lightweight filesystem check — does not parse results.  Use this
+to poll readiness before calling <code class="docutils literal notranslate"><span class="pre">load_rigorous_result()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">list_rigorous_jobs()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if at least one job has a <code class="docutils literal notranslate"><span class="pre">callback.txt</span></code> file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">Decomposition</span><span class="o">.</span><span class="n">has_rigorous_results</span><span class="p">(</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">):</span>
+    <span class="n">jobs</span> <span class="o">=</span> <span class="n">Decomposition</span><span class="o">.</span><span class="n">list_rigorous_jobs</span><span class="p">(</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.wait_for_rigorous_results">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">wait_for_rigorous_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.wait_for_rigorous_results" title="Link to this definition">#</a></dt>
+<dd><p>Block until rigorous optimization results become available.</p>
+<p>Polls the filesystem until at least one job has written a
+<code class="docutils literal notranslate"><span class="pre">callback.txt</span></code>, or the timeout is reached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum seconds to wait (default 600). Use <code class="docutils literal notranslate"><span class="pre">0</span></code> for no limit.</p></li>
+<li><p><strong>poll_interval</strong> (<em>float</em><em>, </em><em>optional</em>) – Seconds between checks (default 5).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if results appeared, <code class="docutils literal notranslate"><span class="pre">False</span></code> if timed out.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">decomp</span><span class="o">.</span><span class="n">optimize_rigorously</span><span class="p">(</span><span class="n">analysis_folder</span><span class="o">=</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">Decomposition</span><span class="o">.</span><span class="n">wait_for_rigorous_results</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">decomp</span><span class="o">.</span><span class="n">load_rigorous_result</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="molass.LowRank.Decomposition.Decomposition.plot_convergence">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">plot_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.Decomposition.Decomposition.plot_convergence" title="Link to this definition">#</a></dt>
+<dd><p>Plot and return convergence data across rigorous optimization jobs.</p>
+<p>Shows two subplots: (1) best fv per job, (2) per-job fv trajectory.
+Returns a <code class="docutils literal notranslate"><span class="pre">ConvergenceInfo</span></code> namedtuple for programmatic assessment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analysis_folder</strong> (<em>str</em>) – The same <code class="docutils literal notranslate"><span class="pre">analysis_folder</span></code> passed to <code class="docutils literal notranslate"><span class="pre">optimize_rigorously()</span></code>.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib Axes</em><em> or </em><em>array</em><em> of </em><em>Axes</em><em>, </em><em>optional</em>) – If provided, plot into these axes (expects 2).</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Figure title.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Namedtuple with fields: <code class="docutils literal notranslate"><span class="pre">jobs</span></code>, <code class="docutils literal notranslate"><span class="pre">best_fv</span></code>, <code class="docutils literal notranslate"><span class="pre">best_job_id</span></code>,
+<code class="docutils literal notranslate"><span class="pre">spread</span></code>, <code class="docutils literal notranslate"><span class="pre">trend</span></code> (<code class="docutils literal notranslate"><span class="pre">'improving'</span></code>/<code class="docutils literal notranslate"><span class="pre">'worsening'</span></code>/<code class="docutils literal notranslate"><span class="pre">'stable'</span></code>),
+<code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="molass.Rigorous.CurrentStateUtils.html#molass.Rigorous.CurrentStateUtils.ConvergenceInfo" title="molass.Rigorous.CurrentStateUtils.ConvergenceInfo">ConvergenceInfo</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">info</span> <span class="o">=</span> <span class="n">Decomposition</span><span class="o">.</span><span class="n">plot_convergence</span><span class="p">(</span><span class="s2">&quot;temp_analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">best_fv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, trend: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">trend</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -1351,14 +1961,16 @@ species in the SEC peak region.</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition"><code class="docutils literal notranslate"><span class="pre">Decomposition</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.ssd"><code class="docutils literal notranslate"><span class="pre">Decomposition.ssd</span></code></a></li>
@@ -1380,7 +1992,9 @@ species in the SEC peak region.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_guinier_objects"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_guinier_objects()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rgs"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rgs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_channel_consistency"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_channel_consistency()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rg_curve"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rg_curve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_reconstructed_rgcurve"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_reconstructed_rgcurve()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_P_at"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_P_at()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.component_quality_scores"><code class="docutils literal notranslate"><span class="pre">Decomposition.component_quality_scores()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.is_component_reliable"><code class="docutils literal notranslate"><span class="pre">Decomposition.is_component_reliable()</span></code></a></li>
@@ -1388,15 +2002,26 @@ species in the SEC peak region.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.update_xr_ranks"><code class="docutils literal notranslate"><span class="pre">Decomposition.update_xr_ranks()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_matrices()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_xr_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_xr_components()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_scattering_profiles"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_scattering_profiles()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_matrices"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_matrices()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_uv_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_uv_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_pairedranges"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_pairedranges()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_proportions"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_proportions()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.compute_scds"><code class="docutils literal notranslate"><span class="pre">Decomposition.compute_scds()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_cd_color_info"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_cd_color_info()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.upgrade"><code class="docutils literal notranslate"><span class="pre">Decomposition.upgrade()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_with_model"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_with_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.recommend_num_components"><code class="docutils literal notranslate"><span class="pre">Decomposition.recommend_num_components()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.make_rigorous_initparams"><code class="docutils literal notranslate"><span class="pre">Decomposition.make_rigorous_initparams()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.get_rigorous_param_count"><code class="docutils literal notranslate"><span class="pre">Decomposition.get_rigorous_param_count()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.optimize_rigorously"><code class="docutils literal notranslate"><span class="pre">Decomposition.optimize_rigorously()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.score_initial"><code class="docutils literal notranslate"><span class="pre">Decomposition.score_initial()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.load_best_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_best_rigorous_result()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.load_rigorous_result"><code class="docutils literal notranslate"><span class="pre">Decomposition.load_rigorous_result()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.list_rigorous_jobs"><code class="docutils literal notranslate"><span class="pre">Decomposition.list_rigorous_jobs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.has_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.has_rigorous_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.wait_for_rigorous_results"><code class="docutils literal notranslate"><span class="pre">Decomposition.wait_for_rigorous_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.Decomposition.Decomposition.plot_convergence"><code class="docutils literal notranslate"><span class="pre">Decomposition.plot_convergence()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1447,8 +2072,8 @@ By Molass Community
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

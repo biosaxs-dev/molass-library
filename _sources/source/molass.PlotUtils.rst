@@ -13,6 +13,7 @@ Submodules
    :maxdepth: 4
 
    molass.PlotUtils.Annotation3D
+   molass.PlotUtils.AnomalyBands
    molass.PlotUtils.Arrow3D
    molass.PlotUtils.Comparison
    molass.PlotUtils.DecompositionPlot

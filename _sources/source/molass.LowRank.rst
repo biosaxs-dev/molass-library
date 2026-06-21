@@ -23,6 +23,7 @@ Submodules
    molass.LowRank.Decomposition
    molass.LowRank.ErrorPropagate
    molass.LowRank.LowRankInfo
+   molass.LowRank.NumComponentsRecommender
    molass.LowRank.PairedRange
    molass.LowRank.PositionedDecomposer
    molass.LowRank.ProportionalDecomposer
