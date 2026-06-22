@@ -24,7 +24,9 @@ def test_001_quick_decomposition():
 @control_matplotlib_plot
 def test_002_rigorous_optimization():
     from time import sleep
-    global run_info
+    global run_info, decomposition, rgcurve
+    if 'decomposition' not in globals():
+        test_001_quick_decomposition()
     run_info = decomposition.optimize_rigorously(rgcurve=rgcurve, analysis_folder="temp_analysis_egh", method='NS', niter=20)
     current_decomposition = run_info.get_current_decomposition(wait_for_first_results=True)
     current_decomposition.plot_components(title="Rigorous Optimization Result", rgcurve=rgcurve)
