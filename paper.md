@@ -106,6 +106,8 @@ To address underdeterminedness and enhance interpretability, Molass Library inco
 * **EGH**: Exponential Gaussian Hybrid [@LAN20011]
 * **SDM**: Stochastic Dispersive Model [@Felinger1999]
 * **EDM**: Equilibrium Dispersive Model [@Ur2021]
+* **LKM**: Lumped Kinetic Model (reference TBD)
+* **GRM**: General Rate Model [@Qamar2014]
 
 These models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
 
