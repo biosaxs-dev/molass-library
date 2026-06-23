@@ -119,6 +119,7 @@ Generative AI tools (GitHub Copilot with Claude Sonnet 4, Claude Opus 4, and ear
 
 * **Paper text**: AI assistance was used to improve English grammar, sentence structure, and clarity. All technical content, design decisions, and scientific claims were authored by the human authors.
 * **Code generation**: AI contributed to implementing routine code (e.g., standard NumPy operations, Matplotlib boilerplate) as well as targeted bug fixes and API improvements identified through AI-driven usability testing. All core algorithms, elution curve models, and scientific logic were designed and directed by the human authors.
+* **Model development**: AI collaboration was integral to the rapid development of LKM (Lumped Kinetic Model) and GRM (General Rate Model) support (2026). The library's scriptable architecture enabled iterative AI-assisted coding sessions that would have been impractical with GUI-only code. The human authors directed all model design decisions, numerical implementations, and validation procedures.
 * **Documentation**: Significant portions of the tutorial notebooks and API documentation were initially drafted with AI assistance, then reviewed, corrected, and refined by the human authors.
 * **AI-friendliness improvement cycle**: As described in the Software Design section, AI agents were used as systematic testers of the library's API. Usability issues discovered during AI-driven analysis sessions were logged as GitHub Issues and resolved iteratively, improving API discoverability and error reporting.
 
