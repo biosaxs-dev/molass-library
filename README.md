@@ -31,7 +31,7 @@ pip install molass_data
 
 ## Quick Start
 
-For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-dev.github.io/molass-tutorial/chapters/01/quick-start.html) section, or run the corresponding test file:
+For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-dev.github.io/molass-tutorial/chapters/00/quick-start.html) section, or run the corresponding test file:
 
 ```python
 pytest tests/tutorial/01-quick_start.py -v
@@ -54,17 +54,16 @@ To join the community, see:
 
 - **Handbook:** https://biosaxs-dev.github.io/molass-develop — maintenance, for developers
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
-- **Support:** [GitHub Discussions](https://github.com/biosaxs-dev/molass-library/discussions) — ask questions and share ideas
-- **Issues:** [GitHub Issues](https://github.com/biosaxs-dev/molass-library/issues) — report bugs or request features
+- **Support:** [GitHub Issues](https://github.com/biosaxs-dev/molass-library/issues) — questions, bugs, and feature requests
 
 Especially for testing, see the first two sections in
 - **Testing:** https://biosaxs-dev.github.io/molass-develop/chapters/06/testing.html
 
 ## Copilot Usage
 
-Context is auto-loaded from `.github/copilot-instructions.md` when using GitHub Copilot in Agent mode (AI Context Standard v0.7).
+Context is auto-loaded from `.github/copilot-instructions.md` when using GitHub Copilot in Agent mode ([AI Context Standard](https://github.com/freesemt/ai-context-standard)).
 
-For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/master/Copilot/copilot-guidelines.md).
+For behavioral rules and user-type guidance, see [`Copilot/copilot-guidelines.md`](https://github.com/biosaxs-dev/molass-library/blob/main/Copilot/copilot-guidelines.md).
 
 ## Optional Features
 
