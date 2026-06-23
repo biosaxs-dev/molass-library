@@ -31,7 +31,7 @@ pip install molass_data
 
 ## Quick Start
 
-For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-dev.github.io/molass-tutorial/chapters/00/quick-start.html) section, or run the corresponding test file:
+For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-dev.github.io/molass-tutorial/chapters/00/quick_start.html) section, or run the corresponding test file:
 
 ```python
 pytest tests/tutorial/01-quick_start.py -v
