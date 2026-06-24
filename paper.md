@@ -28,7 +28,7 @@ bibliography: paper.bib
 
 # Summary
 
-Molass Library is a modern, open-source Python package designed for the analysis of SEC-SAXS (Small-Angle X-ray Scattering coupled with Size Exclusion Chromatography) experimental data. It represents a comprehensive rewrite of the original MOLASS tool [@Yonezawa:2023], currently hosted at the Japanese synchrotron radiation facilities, [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html). By leveraging the Python ecosystem and supporting interactive scripting in Jupyter notebooks, Molass Library provides enhanced flexibility, reproducibility, and extensibility compared to its predecessor.
+Molass Library is a modern, open-source Python package designed for the analysis of SEC-SAXS (Small-Angle X-ray Scattering coupled with Size Exclusion Chromatography) experimental data. It refactors the original MOLASS architecture [@Yonezawa:2023], currently hosted at the Japanese synchrotron radiation facilities, [Photon Factory](https://pfwww.kek.jp/saxs/MOLASS.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html). By leveraging the Python ecosystem and supporting interactive scripting in Jupyter notebooks, Molass Library provides enhanced flexibility, reproducibility, and extensibility compared to its predecessor.
 
 A typical SEC-SAXS experiment involves two interconnected processes:
 
@@ -52,7 +52,7 @@ Analysis of SEC-SAXS data is inherently multi-step and complex. A typical workfl
 7. Folding state estimation – Kratky plot [@Kratky_1963]
 8. Electron density calculation 
 
-Molass Library currently implements steps 3–7. For steps 1 and 2, users may employ SAngler [@Shimizu:2016] or device-specific software, while for step 8, DENSS [@Grant:2018] is recommended.
+Molass Library currently implements steps 3–7. For steps 1 and 2, users may employ SAngler [@Shimizu:2016] or device-specific software, while for step 8, DENSS [@Grant:2018] is bundled.
 
 # State of the field
 
@@ -62,9 +62,13 @@ Several software tools address SEC-SAXS data processing. The proprietary ATSAS s
 
 The MOLASS library is designed to support sustainable software development through an open framework that enables broad community participation and contribution. This design philosophy prioritizes explicit, readable code over graphical interfaces, making the analysis methodology transparent for both learning and AI-assisted maintenance. We are actively enhancing AI-readiness through systematic usability testing with AI agents and iterative improvements to API discoverability and inline documentation. The architecture emphasizes modularity and clear separation of concerns: elution curve models (EGH, SDM, EDM) are isolated as parametric functions; low-rank factorization uses standard linear algebra (Moore-Penrose pseudoinverse); and visualization is decoupled from computation. By integrating established packages (NumPy, SciPy, pybaselines, ruptures) rather than reimplementing core functionality, we reduce custom code volume and enhance long-term viability. This approach allows domain researchers to maintain and extend the code using AI-assisted development tools.
 
+The library maintains a runtime dependency on molass_legacy for rigorous optimization and some computational functions during incremental refactoring. The dependency is invisible to end users—molass-library provides a clean, Pythonic API while the internal implementation is gradually migrated. This approach allows sustainable development by a small facility-based team: refactoring occurs incrementally when fixing bugs or adding features, rather than through disruptive rewrites.
+
 # Research Impact Statement
 
 The MOLASS library has demonstrated scientific value through research conducted using its predecessor GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
+
+**Molass-library-specific impact**: While molass-library (released November 2025) does not yet have published research by external users, insider development experience validates the architectural approach. The integration of LKM (Lumped Kinetic Model) and GRM (General Rate Model) in 2026, developed collaboratively with AI assistance (see AI usage disclosure), demonstrates a key benefit of the scriptable architecture: AI-assisted model development that would have been impractical with GUI-only code. This insider validation previews the kind of workflows we expect external users to benefit from as adoption grows. We are actively building onboarding materials to support broader community adoption.
 
 # Notable package dependencies
 
@@ -82,13 +86,13 @@ A central feature of Molass Library is its implementation of **low rank factoriz
 
 $$ M = P \cdot C \qquad (1) $$
 
-Roughly speaking, in practice methods find P and C that minimize ||M - PC||² (plus regularization terms) rather than achieving exact equality.
-
 where:
 
 * $M$: measured data matrix
 * $P$: matrix of component scattering curves
 * $C$: matrix of component elution curves
+
+In practice, methods find $P$ and $C$ that minimize $||M - PC||^2$ (plus regularization terms) rather than achieving exact equality.
 
 The optimal solution in the least-squares sense is given by:
 
@@ -109,7 +113,7 @@ To address underdeterminedness and enhance interpretability, Molass Library inco
 * **LKM**: Lumped Kinetic Model [@Felinger2004]
 * **GRM**: General Rate Model [@Qamar2014]
 
-These models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
+EGH, with fewer constraints, is used as a first fitter which can be "upgraded" to other physical models. Combined, these models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
 
 # Availability and Documentation
 
