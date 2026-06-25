@@ -66,7 +66,7 @@ LKM initialisation from GRM result:
 
 References
 ----------
-- Qamar et al. (2014), Comput. Chem. Eng. 71:383–399 (GRM CF formula)
+- Qamar et al. (2014), Chem. Eng. Sci. 107:192–205 (GRM CF formula)
 - Validated in molass-researcher/experiments/27_qamar_2014_paper/27a, 27b
   - μ₁ error: 0.00%,  σ² error: 0.00% vs Qamar 2014 Table 1
   - Timing: ~1.1× LKM overhead
