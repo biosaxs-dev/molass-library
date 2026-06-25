@@ -25,6 +25,7 @@ H(s) = exp( Pe/2 * (1 - sqrt(1 + 4*s*t0*(s + k_MT*R) / (Pe*(s + k_MT)))) )
 References
 ----------
 - Lapidus & Amundson (1952), J. Phys. Chem. 56:984
+- Felinger et al. (2004), J. Chromatogr. A 1043:149–157 (SDM≡LKM equivalence)
 - Validated against STLC PDE solver in molass-researcher/experiments/19_sdm_upgrade/19g, 19h
 """
 import numpy as np
@@ -102,6 +103,21 @@ def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
         numbers (Pe ~ 100–500) the D=0 approximation introduces a systematic
         k_MT underestimation of ~3–4% (validated in experiment 19h).  This
         PDE-CF implementation avoids that bias.
+
+    Equivalence to the stochastic–dispersive model (Felinger 2004)
+        Felinger *et al.* (J. Chromatogr. A 1043:149–157, 2004) proved that
+        the **LKM is mathematically identical to the stochastic–dispersive model
+        (SDM)** in linear chromatography, provided exponential sojourn times
+        and Poisson-distributed adsorption events are assumed.  The parameter
+        mapping is:
+
+        - ``k_MT`` (molass) ≡ ``kd`` (Felinger desorption rate constant)
+        - ``Nm`` (Felinger mass transfer units) = ``k_MT × k' × t0``
+          where ``k' = R - 1`` (retention factor).
+
+        This equivalence holds **only for linear isotherms** (b=0 in EDM).
+        For nonlinear chromatography (fronting or tailing peaks), the LKM and
+        SDM diverge.
 
     Examples
     --------
