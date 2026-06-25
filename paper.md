@@ -113,7 +113,7 @@ To address underdeterminedness and enhance interpretability, Molass Library inco
 * **LKM**: Lumped Kinetic Model [@Felinger2004]
 * **GRM**: General Rate Model [@Qamar2014]
 
-EGH, with fewer constraints, is used as a first fitter which can be "upgraded" to other physical models. Combined, these models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
+EGH, with fewer constraints, is used as a first fitter which can be "upgraded" to other physical models. The theoretical model hierarchy EDM ⊂ LKM ⊂ GRM reflects increasing physical detail (equilibrium dispersive → lumped kinetic → resolved film/pore transport), but the current implementation prioritizes analytical tractability: EDM supports nonlinear isotherms via the Hopf-Cole transformation, while LKM and GRM are restricted to linear isotherms where characteristic-function methods apply. Combined, these models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
 
 # Availability and Documentation
 
