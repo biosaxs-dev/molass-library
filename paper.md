@@ -66,9 +66,9 @@ The library maintains a runtime dependency on molass_legacy for rigorous optimiz
 
 # Research Impact Statement
 
-The MOLASS library has demonstrated scientific value through research conducted using its predecessor GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
+The MOLASS GUI version has demonstrated scientific value through research conducted using its predecessor GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
 
-**Molass-library-specific impact**: While molass-library (released November 2025) does not yet have published research by external users, insider development experience validates the architectural approach. The integration of LKM (Lumped Kinetic Model) and GRM (General Rate Model) in 2026, developed collaboratively with AI assistance (see AI usage disclosure), demonstrates a key benefit of the scriptable architecture: AI-assisted model development that would have been impractical with GUI-only code. This insider validation previews the kind of workflows we expect external users to benefit from as adoption grows. We are actively building onboarding materials to support broader community adoption.
+The library architecture enables AI-assisted method development, where new approaches are prototyped in Jupyter notebooks, validated, integrated into the library, and deployed to GUI users through the API layer. This workflow has enabled the recent development of advanced column models (LKM, GRM) that would have been impractical in the legacy codebase, demonstrating how the architecture supports both methodological innovation and stable routine analysis.
 
 # Notable package dependencies
 
@@ -113,7 +113,7 @@ To address underdeterminedness and enhance interpretability, Molass Library inco
 * **LKM**: Lumped Kinetic Model [@Felinger2004]
 * **GRM**: General Rate Model [@Qamar2014]
 
-EGH, with fewer constraints, is used as a first fitter which can be "upgraded" to other physical models. The theoretical model hierarchy EDM ⊂ LKM ⊂ GRM reflects increasing physical detail (equilibrium dispersive → lumped kinetic → resolved film/pore transport), but the current implementation prioritizes analytical tractability: EDM supports nonlinear isotherms via the Hopf-Cole transformation, while LKM and GRM are restricted to linear isotherms where characteristic-function methods apply. Combined, these models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
+EGH, with fewer constraints, is used as a first fitter which can be "upgraded" to other physical models. The theoretical model hierarchy EDM ⊂ LKM ⊂ GRM reflects increasing physical detail (equilibrium dispersive → lumped kinetic → resolved film/pore transport), but the current implementation prioritizes analytical tractability: EDM supports nonlinear isotherms, while LKM and GRM are restricted to linear isotherms where characteristic-function methods apply. Combined, these models allow users to impose domain-specific constraints, thereby enhancing both the accuracy and the physical relevance of the chromatographic peak decomposition.
 
 # Availability and Documentation
 
