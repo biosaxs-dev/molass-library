@@ -3,8 +3,8 @@ Solvers.NSGA2
 
 .. automodule:: molass.Solvers.NSGA2
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

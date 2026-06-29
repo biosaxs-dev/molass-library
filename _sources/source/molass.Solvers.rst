@@ -3,8 +3,8 @@ Solvers
 
 .. automodule:: molass.Solvers
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 -----------

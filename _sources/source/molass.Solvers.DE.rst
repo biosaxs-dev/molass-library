@@ -3,8 +3,8 @@ Solvers.DE
 
 .. automodule:: molass.Solvers.DE
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

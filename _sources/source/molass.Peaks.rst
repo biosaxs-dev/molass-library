@@ -12,7 +12,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   molass.Peaks.EghPeeler
    molass.Peaks.PeakSimilarity
    molass.Peaks.Recognizer
    molass.Peaks.RecognizerSpecific

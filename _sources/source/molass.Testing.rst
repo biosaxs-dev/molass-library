@@ -12,5 +12,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   molass.Testing.HeadlessPeakEditor
    molass.Testing.PlotControl

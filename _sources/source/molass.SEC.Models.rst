@@ -16,20 +16,8 @@ Submodules
    molass.SEC.Models.EdmComponentCurve
    molass.SEC.Models.EdmEstimator
    molass.SEC.Models.EdmEstimatorImpl
-   molass.SEC.Models.EdmLinear
    molass.SEC.Models.EdmOptimizer
-   molass.SEC.Models.EdmRecommend
    molass.SEC.Models.GEC
-   molass.SEC.Models.GRM
-   molass.SEC.Models.GrmComponentCurve
-   molass.SEC.Models.GrmEstimator
-   molass.SEC.Models.GrmLinear
-   molass.SEC.Models.GrmOptimizer
-   molass.SEC.Models.LKM
-   molass.SEC.Models.LkmComponentCurve
-   molass.SEC.Models.LkmEstimator
-   molass.SEC.Models.LkmLinear
-   molass.SEC.Models.LkmOptimizer
    molass.SEC.Models.LognormalPore
    molass.SEC.Models.SDM
    molass.SEC.Models.SdmComponentCurve

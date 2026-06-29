@@ -13,4 +13,3 @@ Submodules
    :maxdepth: 4
 
    molass.Global.Options
-   molass.Global.Quiet

@@ -27,21 +27,17 @@ Submodules
    molass.InterParticle
    molass.Legacy
    molass.Local
-   molass.Logging
    molass.LowRank
    molass.Mapping
-   molass.MathUtils
    molass.PackageUtils
    molass.Peaks
    molass.PlotUtils
    molass.Progress
    molass.Reports
-   molass.Rigorous
    molass.SAXS
    molass.SEC
    molass.ScipyUtils
    molass.Shapes
-   molass.Solvers
    molass.Stats
    molass.SurveyUtils
    molass.Testing

@@ -25,5 +25,4 @@ Submodules
    molass.SEC.ColumnSliceStates
    molass.SEC.ColumnStructure
    molass.SEC.ModelFactory
-   molass.SEC.PoreEntryAnimation
    molass.SEC.StationaryMove
