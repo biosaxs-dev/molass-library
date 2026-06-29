@@ -66,7 +66,7 @@ The library maintains a runtime dependency on molass_legacy for rigorous optimiz
 
 # Research Impact Statement
 
-The MOLASS GUI version has demonstrated scientific value through research conducted using its predecessor GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
+The MOLASS legacy code has demonstrated scientific value through research conducted using its GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
 
 The library architecture enables AI-assisted method development, where new approaches are prototyped in Jupyter notebooks, validated, integrated into the library, and deployed to GUI users through the API layer. This workflow has enabled the recent development of advanced column models (LKM, GRM) that would have been impractical in the legacy codebase, demonstrating how the architecture supports both methodological innovation and stable routine analysis.
 
@@ -77,6 +77,7 @@ Molass Library is built on robust scientific Python libraries, including NumPy, 
 * **pybaselines** [@pybaselines] for advanced baseline correction
 * **ruptures** [@TRUONG2020107299] for change point detection
 * **scipy.signal.find_peaks** for peak recognition
+* **scikit-learn** for peak grouping by k-means algorithm
 
 By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter) to Jupyter-based scripting further streamlines reproducibility and collaboration.
 
