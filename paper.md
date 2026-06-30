@@ -68,7 +68,7 @@ The library maintains a runtime dependency on molass_legacy for rigorous optimiz
 
 The MOLASS legacy code has demonstrated scientific value through research conducted using its GUI tool [@Jiang:2023; @Furukawa:2025], as well as through its contribution to the development of SEC-SAXS data analysis systems at synchrotron facilities [@Yonezawa:2023]. MOLASS is regarded within the community as providing a rigorous peak decomposition framework for SEC-SAXS analysis [@Matsui:2024].
 
-The library architecture enables AI-assisted method development, where new approaches are prototyped in Jupyter notebooks, validated, integrated into the library, and deployed to GUI users through the API layer. This workflow has enabled the recent development of advanced chromatography models (LKM, GRM) that would have been impractical in the legacy codebase, demonstrating how the architecture supports both methodological innovation and stable routine analysis.
+The library architecture enables AI-assisted method development, where new approaches are prototyped in Jupyter notebooks, validated, integrated into the library, and deployed to GUI users through the API layer. This workflow has enabled the recent development of advanced chromatography models (LKM, GRM) that would have been impractical in the legacy codebase, demonstrating how the architecture supports both methodological innovation and stable routine analysis. The integration of these physical models with rigorous optimization is expected to enhance the physical interpretability and reliability of decomposition results for domain researchers.
 
 # Notable package dependencies
 
