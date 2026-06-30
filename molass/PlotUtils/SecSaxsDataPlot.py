@@ -121,6 +121,11 @@ def plot_compact_impl(ssd, **kwargs):
     baseline = kwargs.pop('baseline', False)
     ratio_curve = kwargs.pop('ratio_curve', False)
     moment_lines = kwargs.pop('moment_lines', False)
+    # Issue #120: aligning the zero positions of UV (twinx) and XR axes can make
+    # one trace appear near-flat when their amplitudes differ. Default to
+    # independent autoscaling so each trace fills its own panel faithfully.
+    # Pass align_zero=True to restore the legacy shared-zero behavior.
+    align_zero = kwargs.pop('align_zero', False)
 
     trim = ssd.make_trimming()
     mapping = ssd.get_mapping()
@@ -168,7 +173,12 @@ def plot_compact_impl(ssd, **kwargs):
         axt.plot(mp_baseline.x, mp_baseline.y, ls=':', color='red', label="UV Baseline")
         axt.legend(loc="center left")
 
-    align_zero_y(ax1, axt)
+    # Anomaly exclusion bands — consistent with plot_components() and MplMonitor
+    from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
+    draw_anomaly_bands_for_ssd(ax1, axt, ssd)
+
+    if align_zero:
+        align_zero_y(ax1, axt)
 
     ymin, ymax = ax1.get_ylim()
     ax1.set_ylim(ymin, ymax * 1.2)
@@ -216,7 +226,12 @@ def plot_compact_impl(ssd, **kwargs):
     uv_jslice = trim.uv_slices[0]
     i, j = ij_from_slice(uv_jslice)
     ax2.axvspan(*uv_jcurve.x[[i,j]], color='green', alpha=0.1)
-    ax2.axvline(280, color='yellow')  # Assuming 280 nm is the wavelength of interest
+    ax2.axvline(uv_wl, color='yellow')  # pickat wavelength
+    uv_peak_wavelength = float(uv_jcurve.x[np.argmax(uv_jcurve.y)])
+    if (uv_peak_wavelength - uv_wl) > 5:
+        # Peak above pickat signals a non-standard sample (e.g., 290 nm nucleotide)
+        ax2.axvline(uv_peak_wavelength, color='red', linestyle='--', alpha=0.7,
+                    label=f"peak at {uv_peak_wavelength:.0f} nm")
     ax2.set_xlabel("Wavelength (nm)")
     ax2.legend()
 
@@ -241,4 +256,7 @@ def plot_compact_impl(ssd, **kwargs):
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2, ax3),
                       mapping=mapping, xr_curve=xr_curve, uv_curve=uv_curve, mp_curve=mp_curve,
-                      moment=moment)
+                      moment=moment,
+                      uv_pickat=uv_wl,
+                      uv_peak_wavelength=uv_peak_wavelength,
+                      xr_peak_frame=m)

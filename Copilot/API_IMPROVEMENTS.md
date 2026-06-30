@@ -166,4 +166,38 @@ Discovered during Experiment 01g (March 2026):
 | [#21](https://github.com/biosaxs-dev/molass-library/issues/21) | `RgCurve.x` should carry original frame numbers, not column indices | ✅ Done (closed) |
 | [#22](https://github.com/biosaxs-dev/molass-library/issues/22) | `RgCurve.y` should be float array with `nan`, not object array with `None` | ✅ Done (closed) |
 
+### Newly filed (April 23, 2026)
+
+Discovered during Experiment 13h (rigorous optimization, UltraNest):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#123](https://github.com/biosaxs-dev/molass-library/issues/123) | Add `RunInfo.check_progress()` for mid-run progress monitoring | ✅ Done (closed) |
+| [#124](https://github.com/biosaxs-dev/molass-library/issues/124) | Add `write_snapshot` to `check_progress`; add `RunInfo.load_progress_snapshot()` | ✅ Done (closed) |
+| [#125](https://github.com/biosaxs-dev/molass-library/issues/125) | Document `RunInfo` attributes; add `work_folder`/`in_process_result` to constructor; remove monkey-patches | ✅ Done (closed) |
+
+### Newly filed (April 26, 2026)
+
+Discovered while validating Phase 3 split-architecture (in-process vs subprocess) on Experiment 13h:
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#131](https://github.com/biosaxs-dev/molass-library/issues/131) | (duplicate of #132) | ✅ Closed as dup |
+| [#132](https://github.com/biosaxs-dev/molass-library/issues/132) | `work_folder` consistency between in-process and subprocess paths | ⏳ Open |
+| [#133](https://github.com/biosaxs-dev/molass-library/issues/133) | `RunInfo.live_status()`: one-call progress dict for in-flight runs | ✅ Done (closed) |
+
+Related infrastructure shipped alongside #133:
+
+| Component | Where | Purpose |
+|-----------|-------|---------|
+| `RunRegistry` (`read_manifest`, `locate_recent_runs`, `write_run_manifest`, `update_run_manifest`) | `molass.Rigorous` | Disk-side `RUN_MANIFEST.json` breadcrumbs in both `analysis_folder` and `work_folder` |
+| `ComparisonResult.live_status()` | `molass.Rigorous.ComparePaths` | Convenience wrapper over the per-path `RunInfo.live_status()` |
+| `aicKernelEval` tool | [ai-context-vscode](https://github.com/freesemt/ai-context-vscode) v0.3.0 | External-observer access to live kernel state — composes with `live_status()` for one-tool-call run probes |
+
+Discovered while debugging `in_process=False` in molass-researcher experiment 16b:
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#159](https://github.com/biosaxs-dev/molass-library/issues/159) | Auto-degrade `progress='dashboard'` when `in_process=False` instead of raising `ValueError` | ✅ Done (bdb8697) |
+
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.

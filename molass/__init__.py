@@ -84,7 +84,6 @@ def get_version(toml_only=False):
     """
     return Version(_get_version_impl(toml_only, __file__, __package__))
 
-# Module-level __version__ attribute for molass.__version__ access
 __version__ = str(get_version())
 
 def requires(version):

@@ -6,7 +6,7 @@ from importlib import reload
 from sys import platform
 import threading
 import molass_legacy
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from molass_legacy._MOLASS.SerialSettings import set_setting
 
 ALLOWED_KEYS = {'rgcurves', 'ranges', 'decomposition',

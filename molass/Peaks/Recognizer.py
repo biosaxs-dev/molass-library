@@ -53,7 +53,12 @@ def get_peak_positions(icurve, debug=False, **kwargs):
         peaks, _ = find_peaks(y,
                               height=height
                               )
-        assert len(peaks) > 0
+        if len(peaks) == 0:
+            raise RuntimeError(
+                f"No peaks found in the elution curve ({len(y)} data points). "
+                f"This often happens when trimming is too aggressive (nsigmas too small). "
+                f"Try ssd.trimmed_copy(nsigmas=20) for wider trimming."
+            )
 
     if debug:
         from scipy.signal import peak_prominences

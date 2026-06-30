@@ -64,6 +64,21 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     # Example: num_pores=4 → 90° sectors, num_pores=32 → 11.25° sectors
     rs = 0.0381  # Adjusted to match 3D sphere packing fraction ~0.64 (was 0.04 → 70% packing)
 
+    # --- Column geometry / EDM parameter correspondence ---
+    # Column rectangle: width=(xmax-xmin)=0.3, height=(ymax-ymin)=1.0  → total area = 0.30
+    # Each grain (circle, radius rs): area = π*rs² ≈ 0.00457
+    # With ~42 grains: total circle area ≈ 0.192
+    #   V0  (interstitial void)  = 0.30 - 0.192 ≈ 0.109  (area outside all circles)
+    #   Vp  (pore volume)        = 0.192/2 ≈ 0.096       (lavender sectors = half of each circle)
+    #   V_solid                  = 0.192/2 ≈ 0.096       (gray sectors = excluded from EDM)
+    #   Vp/V0 ≈ 0.88
+    # Correspondence to EDM parameters (SecTheory/Edm.py):
+    #   e_EDM = V0/(V0+Vp)  ≈ 0.53    (mobile fraction of accessible volume)
+    #   F     = Vp/V0       ≈ 0.88    (phase ratio; F = (1-e)/e in Edm.__init__)
+    #   a_EDM = K_SEC × (Vp/V0)       (Henry coefficient; a=1.5 requires Vp/V0≥1.5)
+    # Note: e_EDM ≠ standard total porosity ε_T = (V0+Vp)/V_column ≈ 0.68
+    # (ε_T includes Vp+V0 in numerator but uses full column in denominator)
+
     if seed is not None:
         np.random.seed(seed)
 
@@ -470,7 +485,7 @@ def get_animation(num_frames=None, interval=100, seed=None, close_plot=True, ret
     if use_tqdm:
         # https://stackoverflow.com/questions/60998231/python-how-to-make-tqdm-print-one-line-of-progress-bar-in-shell
         import sys
-        from tqdm import tqdm
+        from tqdm.auto import tqdm
         frames = tqdm(range(num_frames))
     else:
         frames = num_frames

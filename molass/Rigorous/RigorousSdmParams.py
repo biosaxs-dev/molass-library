@@ -6,9 +6,6 @@ import numpy as np
 from importlib import reload
 
 def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
-    # Rg parameters
-    orig_rg_params = decomposition.get_rgs()
-
     # XR initial parameters
     xr_params = []
     rg_params = []
@@ -17,8 +14,6 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
         rg_params.append(ccurve.rg)
     xr_params = np.array(xr_params)
     rg_params = np.array(rg_params)
-    print("Original Rg params:", orig_rg_params)
-    print("SDM adjusted Rg params:", rg_params)
 
     # XR baseline parameters
     xr_baseparams = baseparams[1]
@@ -41,7 +36,16 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
 
     # SecCol parameters
     column = decomposition.xr_ccurves[0].column
-    N, T, me, mp, x0, tI, N0, poresize, timescale = column.get_params()
-    K = N*T
-    sdmcol_params = np.array([N, K, x0, poresize, N0, tI])
+    params = column.get_params()
+    K = params[0] * params[1]  # N * T
+    if getattr(column, 'pore_dist', 'mono') == 'lognormal':
+        # params: (N, T, me, mp, x0, tI, N0, mu, sigma, k)
+        N, T, me, mp, x0, tI, N0, mu, sigma, k = params
+        sdmcol_params = np.array([N, K, x0, mu, sigma, N0, tI, k])    # 8 params for G1300
+    else:
+        N, T, me, mp, x0, tI, N0, poresize, timescale, k = params
+        if getattr(column, 'rt_dist', 'gamma') == 'exponential':
+            sdmcol_params = np.array([N, K, x0, poresize, N0, tI])        # 6 params for G1100
+        else:
+            sdmcol_params = np.array([N, K, x0, poresize, N0, tI, k])     # 7 params for G1200
     return np.concatenate([xr_params, xr_baseparams, rg_params, (a, b), uv_params, uv_baseparams, init_mappable_range, sdmcol_params])

@@ -3,8 +3,25 @@
 
 """
 import numpy as np
-from molass_legacy.Models.Stochastic.DispersivePdf import dispersive_monopore_pdf
+from collections import namedtuple
+from molass.SEC.Models.SdmMonoPore import (
+    sdm_monopore_pdf,
+    sdm_monopore_gamma_pdf,
+    DEFAULT_TIMESCALE,
+)
 from molass.LowRank.ComponentCurve import ComponentCurve
+
+SdmMonoColumnParams = namedtuple(
+    'SdmMonoColumnParams',
+    ['N', 'T', 'me', 'mp', 'x0', 'tI', 'N0', 'poresize', 'timescale', 'k']
+)
+"""`get_params()` return type for ``pore_dist='mono'``."""
+
+SdmLognormalColumnParams = namedtuple(
+    'SdmLognormalColumnParams',
+    ['N', 'T', 'me', 'mp', 'x0', 'tI', 'N0', 'mu', 'sigma', 'k']
+)
+"""`get_params()` return type for ``pore_dist='lognormal'``."""
 
 class SdmColumn:
     """
@@ -13,29 +30,57 @@ class SdmColumn:
     Attributes
     ----------
     params : tuple
-        The parameters of the SDM column (N, T, me, mp, x0, tI, N0, poresize, timescale)
+        The parameters of the SDM column.
+
+        - ``pore_dist='mono'``:      ``(N, T, me, mp, x0, tI, N0, poresize, timescale, k)``
+        - ``pore_dist='lognormal'``:  ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)``
+
+        Positions 0–6 and 9 are shared; positions 7–8 differ by pore_dist.
+    pore_dist : str
+        Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
+    rt_dist : str
+        Residence-time distribution: ``'exponential'`` or ``'gamma'`` (default).
     """
-    def __init__(self, params):
+    def __init__(self, params, pore_dist='mono', rt_dist='gamma'):
         """
         Initializes the SDM column.
 
         Parameters
         ----------
         params : tuple
-            The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale)
+            The column parameters:
+
+            - ``pore_dist='mono'``:      ``(N, T, me, mp, x0, tI, N0, poresize, timescale, k)``
+            - ``pore_dist='lognormal'``:  ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)``
+
+            If k is omitted (9 elements), defaults to 1.0 (exponential, backward compatible).
+        pore_dist : str, optional
+            Pore-size distribution: ``'mono'`` (default) or ``'lognormal'``.
+        rt_dist : str, optional
+            Residence-time distribution: ``'exponential'`` or ``'gamma'`` (default).
         """
+        if len(params) == 9:
+            # backward compatible: mono-pore (k=1)
+            params = list(params) + [1.0]
         self.params = params
+        self.pore_dist = pore_dist
+        self.rt_dist = rt_dist
 
     def get_params(self):
         """
-        Returns the parameters of the SDM column.
+        Returns the parameters of the SDM column as a named tuple.
 
         Returns
         -------
-        tuple
-            The parameters of the SDM column.
+        SdmMonoColumnParams or SdmLognormalColumnParams
+            Named tuple with fields ``(N, T, me, mp, x0, tI, N0,
+            poresize, timescale, k)`` for mono, or
+            ``(N, T, me, mp, x0, tI, N0, mu, sigma, k)`` for lognormal.
+            Backward-compatible with positional unpacking.
         """
-        return self.params
+        if self.pore_dist == 'lognormal':
+            return SdmLognormalColumnParams(*self.params)
+        return SdmMonoColumnParams(*self.params)
 
 class SdmComponentCurve(ComponentCurve):
     """
@@ -65,19 +110,44 @@ class SdmComponentCurve(ComponentCurve):
         """
         self.column = column
         self.rg = rg
-        N, T, me, mp, x0, tI, N0, poresize, timescale = column.get_params()
         self.x = x
         self.moment = None
         self.model = 'sdm'
-        self.tI = tI
-        self._x = x - tI
-        rho = rg/poresize
-        if rho > 1.0:
-            rho = 1.0
-        ni = N*(1 - rho)**me
-        ti = T*(1 - rho)**mp
-        t0 = x0 - tI
-        self.params = (ni, ti, N0, t0, timescale)
+
+        if column.pore_dist == 'lognormal':
+            from molass.SEC.Models.LognormalPore import (
+                sdm_lognormal_pore_pdf,
+                sdm_lognormal_pore_gamma_pdf_fast,
+            )
+            # params: (N, T, me, mp, x0, tI, N0, mu, sigma, k)
+            N, T, me, mp, x0, tI, N0, mu, sigma, k = column.get_params()
+            self.tI = tI
+            self._x = x - tI
+            t0 = x0 - tI
+            if column.rt_dist == 'exponential':
+                self.params = (1.0, N, T, me, mp, mu, sigma, rg, N0, t0)
+                self._pdf_func = sdm_lognormal_pore_pdf
+            else:
+                self.params = (1.0, N, T, k, me, mp, mu, sigma, rg, N0, t0)
+                self._pdf_func = sdm_lognormal_pore_gamma_pdf_fast
+        else:
+            # params: (N, T, me, mp, x0, tI, N0, poresize, timescale, k)
+            N, T, me, mp, x0, tI, N0, poresize, timescale, k = column.get_params()
+            self.tI = tI
+            self._x = x - tI
+            rho = rg/poresize
+            if rho > 1.0:
+                rho = 1.0
+            ni = N*(1 - rho)**me
+            ti = T*(1 - rho)**mp
+            t0 = x0 - tI
+            if column.rt_dist == 'exponential':
+                self.params = (ni, ti, N0, t0, timescale)
+                self._pdf_func = sdm_monopore_pdf
+            else:
+                theta = ti / k  # Gamma scale: mean = k*theta = ti
+                self.params = (ni, k, theta, N0, t0, timescale)
+                self._pdf_func = sdm_monopore_gamma_pdf
         self.scale = scale
     
     def get_y(self, x=None):
@@ -98,7 +168,7 @@ class SdmComponentCurve(ComponentCurve):
             _x = self._x
         else:
             _x = x - self.tI
-        return self.scale * dispersive_monopore_pdf(_x, *self.params)
+        return self.scale * self._pdf_func(_x, *self.params)
     
     def get_peak_top_x(self):
         """

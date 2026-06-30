@@ -27,11 +27,25 @@ def create_model(model_name, **kwargs):
             reload(molass.SEC.Models.SDM)
         from molass.SEC.Models.SDM import SDM
         return SDM(**kwargs)
-    elif model_name == 'edm':
+    elif model_name in ('edm', 'cedm'):
         if debug:
             import molass.SEC.Models.EDM
             reload(molass.SEC.Models.EDM)   
         from molass.SEC.Models.EDM import EDM
+        if model_name == 'cedm':
+            kwargs.setdefault('shared_column', True)
         return EDM(**kwargs)
+    elif model_name == 'lkm':
+        if debug:
+            import molass.SEC.Models.LKM
+            reload(molass.SEC.Models.LKM)
+        from molass.SEC.Models.LKM import LKM
+        return LKM(**kwargs)
+    elif model_name == 'grm':
+        if debug:
+            import molass.SEC.Models.GRM
+            reload(molass.SEC.Models.GRM)
+        from molass.SEC.Models.GRM import GRM
+        return GRM(**kwargs)
     else:
         raise ValueError(f"Unknown model name: {model_name}")

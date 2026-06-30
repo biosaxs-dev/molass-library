@@ -44,6 +44,12 @@ def test_05_repr():
     assert "wavelengths=" in uv_repr and "frames=" in uv_repr, f"uv repr missing shape info: {uv_repr}"
     assert "nm" in uv_repr, f"uv repr should include wavelength range in nm: {uv_repr}"
 
+def test_05b_ssd_repr():
+    r = repr(ssd_instance)
+    assert "SecSaxsData" in r
+    assert "xr=242 frames" in r
+    assert "trimmed=False" in r
+
 def test_06_wavelength_range():
     uv = ssd_instance.uv
     wl_min, wl_max = uv.wavelength_range
@@ -285,3 +291,101 @@ def test_20_corrected_copy_precomputed_baseline():
 
     # XR matrices should be equal
     np.testing.assert_allclose(corrected_pre.xr.M, corrected_std.xr.M, atol=1e-12)
+
+def test_21_get_data_info():
+    """get_data_info() returns DataInfo namedtuple with UV peak wavelength and pickat mismatch."""
+    info = ssd_instance.get_data_info()
+    assert info.n_xr_frames == ssd_instance.xr.M.shape[1]
+    assert info.n_uv_frames == ssd_instance.uv.M.shape[1]
+    assert info.uv_pickat == 280
+    assert info.is_trimmed == False
+    # SAMPLE1 peak is at ~234 nm (peptide bond), below pickat 280 → no mismatch
+    assert info.uv_peak_wavelength < 250
+    assert info.pickat_mismatch == False
+    # SAMPLE1 has no significant negative XR regions (neg dip <3% of peak)
+    assert info.has_negative_xr_regions == False
+    assert info.negative_xr_fraction is not None
+    # Baseline self-test: SAMPLE1 is clean, p should be high (not significant)
+    assert info.baseline_selftest_p is not None
+    assert info.baseline_selftest_p > 0.01
+    # uv_monitor is alias for uv_pickat
+    assert info.uv_monitor == info.uv_pickat
+
+
+def test_22_uv_monitor_alias():
+    """uv_monitor alias works in SSD constructor and UvData property."""
+    from molass_data import SAMPLE1
+    from molass.DataObjects import SecSaxsData as SSD
+
+    # Constructor alias
+    ssd_mon = SSD(SAMPLE1, uv_monitor=290)
+    assert ssd_mon.uv.pickat == 290
+    assert ssd_mon.uv.monitor == 290
+    assert ssd_mon.uv.uv_pickat == 290
+
+    # Property setter
+    ssd_mon.uv.monitor = 300
+    assert ssd_mon.uv.pickat == 300
+    assert ssd_mon.uv.uv_pickat == 300
+
+
+# --- shared corrected fixture for recommend_* tests (issue #212) ---
+_corrected_instance = None
+
+def _get_corrected():
+    global _corrected_instance
+    if _corrected_instance is None:
+        _corrected_instance = ssd_instance.trimmed_copy().corrected_copy()
+    return _corrected_instance
+
+
+def test_23_recommend_decomposition_options_structure():
+    """recommend_decomposition_options() returns a valid quick_decomposition dict — issue #212."""
+    corrected = _get_corrected()
+    opts = corrected.recommend_decomposition_options()
+
+    assert isinstance(opts, dict), "should return a dict"
+    assert 'num_components' in opts, "must contain 'num_components'"
+    n = opts['num_components']
+    assert isinstance(n, int) and n >= 1, "num_components must be a positive int"
+
+    # Exactly one of the two method keys should be present (or neither for n=1)
+    has_pos   = 'xr_peakpositions' in opts
+    has_prop  = 'proportions' in opts
+    assert not (has_pos and has_prop), "xr_peakpositions and proportions are mutually exclusive"
+    if has_pos:
+        assert len(opts['xr_peakpositions']) == n
+    if has_prop:
+        assert len(opts['proportions']) == n
+
+
+def test_24_recommend_decomposition_options_is_usable():
+    """quick_decomposition(**recommend_decomposition_options()) succeeds — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    opts = corrected.recommend_decomposition_options()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.quick_decomposition(**opts)
+    assert decomp is not None
+    assert len(decomp.xr_ccurves) == opts['num_components']
+
+
+def test_25_recommend_decomposition_one_liner():
+    """recommend_decomposition() returns a Decomposition — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.recommend_decomposition()
+    assert decomp is not None
+
+
+def test_26_recommend_decomposition_override():
+    """recommend_decomposition(num_components=N) overrides the automatic choice — issue #212."""
+    import warnings
+    corrected = _get_corrected()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        decomp = corrected.recommend_decomposition(num_components=3)
+    assert len(decomp.xr_ccurves) == 3

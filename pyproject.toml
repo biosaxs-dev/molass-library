@@ -4,11 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-<<<<<<< HEAD
-version = "0.8.9"
-=======
-version = "0.9.0"
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
+version = "1.0.1"
 
 dependencies = [
   "numpy",
@@ -16,31 +12,32 @@ dependencies = [
   "matplotlib",
   "tqdm",
   "pybaselines>=1.2.0",
-<<<<<<< HEAD
-  "molass_legacy>=0.5.3",
-=======
-  "molass_legacy>=0.5.4",
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
+  "molass_legacy>=1.6.10",
   "statsmodels",
   "scikit-learn",
   "toml",
   "psutil",
   "seaborn",
   "numba",
-  "numba",
   "ruptures",
   "learnsaxs",
   "mrcfile",
+  "ipywidgets",
+  "ipykernel",
+  "cma",
+  "shapely",
 ]
 
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 
 authors = [
-  {name = "Molass Community"},
+  {name = "Masatsuyo Takahashi", orcid = "0009-0007-1466-5563"},
+  {name = "Nobutaka Shimizu", orcid = "0000-0002-3636-1663"},
 ]
 
 maintainers = [
-  {name = "Molass Community"}
+  {name = "Masatsuyo Takahashi", orcid = "0009-0007-1466-5563"},
+  {name = "Nobutaka Shimizu", orcid = "0000-0002-3636-1663"},
 ]
 
 description = "Matrix Optimization with Low-rank factorization for Automated analysis of SEC-SAXS"
@@ -49,9 +46,15 @@ license = { text = "GNU General Public License v3.0" }
 
 keywords = ["SEC-SAXS"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 4 - Beta",
   "Programming Language :: Python",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
 ]
 
 [project.optional-dependencies]

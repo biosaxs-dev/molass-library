@@ -38,22 +38,70 @@ class SDM:
             reload(molass.SEC.Models.SdmOptimizer)
             import molass.SEC.Models.UvOptimizer
             reload(molass.SEC.Models.UvOptimizer)
-        from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
-        from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition, adjust_rg_and_poresize
-        from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
-        env_params = estimate_sdm_column_params(decomposition, **kwargs)
         model_params = kwargs.pop('model_params', None)
-        new_xr_ccurves = optimize_sdm_xr_decomposition(decomposition, env_params, model_params=model_params, **kwargs)
+        # AI-friendliness switch:
+        # Default for upgrade() is non-Guinier mode (False), because weak
+        # components can make per-component Guinier Rg unstable at init time.
+        # Explicit model_params/kwargs values still override this default.
+        if 'use_guinier_rgs' not in kwargs:
+            kwargs['use_guinier_rgs'] = False
+            if model_params is not None and 'use_guinier_rgs' in model_params:
+                kwargs['use_guinier_rgs'] = model_params['use_guinier_rgs']
+        # Accept pore_dist as a direct kwarg (takes precedence over model_params)
+        pore_dist_kwarg = kwargs.pop('pore_dist', None)
+        if pore_dist_kwarg is not None:
+            pore_dist = pore_dist_kwarg
+        elif model_params is not None:
+            pore_dist = model_params.get('pore_dist', 'mono')
+        else:
+            pore_dist = 'mono'
+
+        # rgcurve has no effect on SDM upgrade quality (verified: identical 2D XR residuals
+        # with and without rgcurve for both mono and lognormal on SAMPLE1, 22e cell 10).
+        # For mono: adjust_rg_and_poresize() does not use rgcurve.
+        # For lognormal: estimator and optimizer are rgcurve-independent.
+        # Strip it here so it cannot accidentally propagate to any sub-function.
+        kwargs.pop('rgcurve', None)
+
+        if pore_dist == 'lognormal':
+            from molass.SEC.Models.SdmEstimator import estimate_sdm_lognormal_from_monopore
+            from molass.SEC.Models.SdmOptimizer import optimize_sdm_lognormal_xr_decomposition
+            # Two-stage: run mono-pore first for a good starting point
+            mono_model_params = dict(model_params) if model_params else {}
+            mono_model_params['pore_dist'] = 'mono'
+            from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
+            from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition
+            mono_env = estimate_sdm_column_params(decomposition, **kwargs)
+            mono_kwargs = {k: v for k, v in kwargs.items() if k != 'progress'}
+            mono_ccurves = optimize_sdm_xr_decomposition(
+                decomposition, mono_env, model_params=mono_model_params, **mono_kwargs)
+            env_params = estimate_sdm_lognormal_from_monopore(
+                mono_ccurves, decomposition.xr_icurve,
+                decomposition=decomposition, **kwargs)
+            # Do NOT pass mono-pore k to lognormal — the models have different
+            # parameterizations and the same k produces very different shapes.
+            # Let the lognormal optimizer use its default k=2.0 (Issue #108).
+            ln_model_params = dict(model_params) if model_params else {}
+            new_xr_ccurves = optimize_sdm_lognormal_xr_decomposition(
+                decomposition, env_params, model_params=ln_model_params, **kwargs)
+        else:
+            from molass.SEC.Models.SdmEstimator import estimate_sdm_column_params
+            from molass.SEC.Models.SdmOptimizer import optimize_sdm_xr_decomposition, adjust_rg_and_poresize
+            env_params = estimate_sdm_column_params(decomposition, **kwargs)
+            new_xr_ccurves = optimize_sdm_xr_decomposition(
+                decomposition, env_params, model_params=model_params, **kwargs)
+
         if decomposition.uv is None:
             from molass.Decompose.XrOnlyUtils import make_dummy_uv_ccurves
             new_uv_ccurves = make_dummy_uv_ccurves(decomposition.ssd, new_xr_ccurves)
         else:
+            from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
             new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
-        rgcurve = kwargs.pop('rgcurve', None)
-        adjust_rg_and_poresize(sdm_decomposition, rgcurve=rgcurve)
+        if pore_dist != 'lognormal':
+            adjust_rg_and_poresize(sdm_decomposition)
 
         if debug:
             import matplotlib.pyplot as plt

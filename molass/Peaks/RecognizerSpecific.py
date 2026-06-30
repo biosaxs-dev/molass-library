@@ -4,9 +4,8 @@ Peaks.RecognizerSpecific.py
 
 def bridge_recognize_peaks(x, y, num_peaks=None, debug=False):
     """
-    Bridge function to recognize peaks in a curve using the legacy method.
-    This function is a wrapper around the legacy peak recognition method
-    when `num_peaks` is specified.
+    Recognize peak positions using EghPeeler (library-native implementation).
+
     Parameters
     ----------
     x : array-like
@@ -14,7 +13,7 @@ def bridge_recognize_peaks(x, y, num_peaks=None, debug=False):
     y : array-like
         The y-coordinates of the curve.
     num_peaks : int, optional
-        The number of peaks to recognize. If None, the legacy method will not be used.
+        The number of peaks to recognize.
     debug : bool, optional
         If True, additional debugging information will be printed and plotted.
 
@@ -23,13 +22,16 @@ def bridge_recognize_peaks(x, y, num_peaks=None, debug=False):
     list
         A list of indices where peaks are found in the curve.
     """
-    from molass_legacy.QuickAnalysis.ModeledPeaks import recognize_peaks
-    params_list = recognize_peaks(x, y, num_peaks=num_peaks, exact_num_peaks=num_peaks, debug=debug)
+    from molass.Peaks.EghPeeler import egh_peel
+    params_list = egh_peel(x, y, num_components=num_peaks, debug=debug)
     peaks = []
-    for h, m, s, t in params_list:
-        peaks.append(int(round(m - x[0])))
+    for h, mu, sigma, tau in params_list:
+        peaks.append(int(round(mu - x[0])))
     if debug:
+        import numpy as np
         import matplotlib.pyplot as plt
+        x = np.asarray(x)
+        y = np.asarray(y)
         plt.plot(x, y, label='Curve')
         plt.scatter(x[peaks], y[peaks], color='red', label='Peaks')
         plt.legend()

@@ -202,14 +202,16 @@ class XrData(SsMatrixData):
         y = compute_baseline_impl(icurve.x, icurve.y, **kwargs)
         return Curve(icurve.x, y, type='i')
 
-    def compute_rgcurve(self, return_info=False, debug=False):
+    def compute_rgcurve(self, return_info=False, progress_cb=None, debug=False):
         """ssd.compute_rgcurve()
 
         Returns a Rg-curve which is computed using the Molass standard method.
 
         Parameters
         ----------
-        None
+        progress_cb : callable or None, optional
+            Optional callback ``(rg_buffer, j)`` called after each frame.
+            See :func:`~molass.Guinier.RgCurveUtils.compute_rgcurve_info`.
 
         Returns
         -------
@@ -220,7 +222,7 @@ class XrData(SsMatrixData):
             import molass.Guinier.RgCurveUtils
             reload(molass.Guinier.RgCurveUtils)
         from molass.Guinier.RgCurveUtils import compute_rgcurve_info
-        rginfo = compute_rgcurve_info(self)
+        rginfo = compute_rgcurve_info(self, progress_cb=progress_cb)
         if return_info:
             return rginfo
         else:

@@ -1,14 +1,176 @@
 """
 Rigorous.RunInfo.py
 """
+import weakref
+
+# Module-level weak reference to the currently-running in-process RunInfo.
+# Set when an async in-process run starts; cleared (to None) when it
+# finishes or when the kernel is restarted (module is reloaded → None).
+# Used by the idempotency guard in make_rigorous_decomposition_impl.
+_active_inprocess = None
+
 
 class RunInfo:
-    def __init__(self, ssd, optimizer, dsets, init_params, monitor=None):
+    """Handle returned by :func:`molass.Rigorous.make_rigorous_decomposition`
+    (and ``Decomposition.optimize_rigorously()``).
+
+    Attributes
+    ----------
+    ssd : SecSaxsData
+        The SEC-SAXS dataset used for the optimization.
+    optimizer : Optimizer
+        The in-process optimizer object.  Only populated for the in-process
+        path (``in_process=True``); ``None`` for the subprocess path.
+    dsets : list
+        Dataset objects passed to the optimizer.
+    init_params : ndarray
+        Initial parameter vector used to start the optimization.
+    monitor : MplMonitor or None
+        Live monitor object for the subprocess path; ``None`` for in-process.
+    analysis_folder : str or None
+        Root folder for all optimizer output.  Set this if you want the
+        progress/sidecar helpers to work without arguments.
+    decomposition : Decomposition or None
+        The ``Decomposition`` object that launched this run.
+    work_folder : str or None
+        Absolute path to the job folder written by the in-process optimizer
+        (``<analysis_folder>/optimized/jobs/000`` or similar).  Set only for
+        the in-process path; ``None`` for the subprocess path.  Contains
+        ``init_params.txt``, ``callback.txt``, etc.
+    in_process_result : object or None
+        Raw result object returned by ``run_optimizer_in_process()``.
+        Set only for the in-process path.
+    """
+
+    def __init__(self, ssd, optimizer, dsets, init_params, monitor=None,
+                 analysis_folder=None, decomposition=None, rgcurve=None):
         self.ssd = ssd
         self.optimizer = optimizer
         self.dsets = dsets
         self.init_params = init_params
         self.monitor = monitor
+        self.analysis_folder = analysis_folder
+        self.decomposition = decomposition
+        self.rgcurve = rgcurve          # cached to avoid recomputation in load_best
+        # Set by RigorousImplement for in_process=True runs:
+        self.work_folder = None
+        self.in_process_result = None
+        # Set by RigorousImplement when async_=True:
+        self._async_thread = None
+        self._async_error = None
+        # Set by RigorousImplement for monitor=False subprocess runs (issue #189):
+        self._subprocess_process = None
+        # Cooperative stop flag for in-process async runs.  Set via
+        # request_stop(); InProcessRunner checks it and injects
+        # KeyboardInterrupt into the solver thread.
+        import threading as _threading
+        self._stop_event = _threading.Event()
+
+    def request_stop(self):
+        """Request cooperative termination of an async in-process run.
+
+        Sets the stop event that ``InProcessRunner`` checks between solver
+        iterations.  The solver thread receives a ``KeyboardInterrupt`` at
+        the next Python bytecode boundary (~50 ms at most).  Has no effect
+        if the run is already finished or was not in-process.
+        """
+        self._stop_event.set()
+
+    @property
+    def is_alive(self):
+        """``True`` while the background optimizer is still running.
+
+        Works for both async in-process runs (``async_=True``) and
+        subprocess runs (``monitor=False, in_process=False``).
+        Returns ``False`` once the run completes or for synchronous runs.
+        """
+        t = self._async_thread
+        if t is not None:
+            return t.is_alive()
+        p = self._subprocess_process
+        if p is not None:
+            return p.poll() is None
+        return False
+
+    @property
+    def current_work_folder(self):
+        """The currently-active (or most-recently-used) job folder.
+
+        Unlike :attr:`work_folder` — which is reset to ``None`` at the start
+        of each auto-resume trial — this property always returns the best
+        available answer:
+
+        1. ``self.work_folder`` if already set.
+        2. The most recently modified ``jobs/NNN`` sub-folder under
+           ``analysis_folder/optimized/jobs/`` (the highest ``NNN`` that
+           exists on disk).
+        3. ``None`` if neither is available.
+
+        This is the right folder to probe with ``aicKernelEval`` during a
+        multi-trial run (``max_trials > 0``).  Fixes issue #150.
+        """
+        import os
+        if self.work_folder is not None:
+            return self.work_folder
+        af = self.analysis_folder
+        if af is None:
+            return None
+        jobs_dir = os.path.join(af, 'optimized', 'jobs')
+        if not os.path.isdir(jobs_dir):
+            return None
+        try:
+            subdirs = sorted(
+                d for d in os.listdir(jobs_dir)
+                if os.path.isdir(os.path.join(jobs_dir, d))
+            )
+            if subdirs:
+                return os.path.join(jobs_dir, subdirs[-1])
+        except OSError:
+            pass
+        return None
+
+    def update_manifest_on_resume(self, work_folder):
+        """Update ``RUN_MANIFEST.json`` when a new auto-resume trial starts.
+
+        Called from ``MplMonitor._RunInfoSource._wf_callback`` as soon as
+        the new job folder is allocated, so that :meth:`live_status` reads
+        the correct ``work_folder`` and ``phase='running'`` for the new
+        trial.  Fixes issue #148.
+
+        Parameters
+        ----------
+        work_folder : str
+            Absolute path to the newly-allocated job folder.
+        """
+        af = self.analysis_folder
+        if af is None:
+            return
+        try:
+            from molass.Rigorous.RunRegistry import update_run_manifest
+            update_run_manifest(af, status='running', work_folder=work_folder)
+        except Exception:
+            pass
+
+    def __repr__(self):
+        if self._async_thread is not None:
+            state = "running" if self._async_thread.is_alive() else "done"
+        else:
+            state = "done"
+        parts = [f"state={state!r}"]
+        if self.analysis_folder is not None:
+            try:
+                from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
+                jobs = list_rigorous_jobs(self.analysis_folder)
+                if jobs:
+                    import math
+                    best_fv = min(j.best_fv for j in jobs)
+                    best_sv = -200 / (1 + math.exp(-1.5 * best_fv)) + 100
+                    n_evals = sum(j.iterations for j in jobs)
+                    parts.append(f"n_evals={n_evals}")
+                    parts.append(f"best_sv={best_sv:.1f}")
+            except Exception:
+                pass
+        return f"RunInfo({', '.join(parts)})"
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)
@@ -68,3 +230,1228 @@ class RunInfo:
         self.monitor = monitor
         self.init_params = best_params
         return self
+
+    def wait(self, timeout=600, poll_interval=5):
+        """Wait for rigorous optimization results to become available.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            Maximum seconds to wait (default 600). Use ``0`` for no limit.
+        poll_interval : float, optional
+            Seconds between checks (default 5).
+
+            .. note::
+                For async in-process runs (``async_=True``), ``poll_interval``
+                is **silently ignored** — the implementation calls
+                ``thread.join(timeout)`` once with no looping.
+
+        Returns
+        -------
+        bool
+            ``True`` if results appeared, ``False`` if timed out.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored (e.g. RunInfo was created
+            without one).
+
+        .. warning:: **Async in-process path** (``async_=True``)
+
+            This method calls ``_async_thread.join(timeout)`` once, which has
+            two failure modes for long BH/NS runs:
+
+            - **Default** ``timeout=600``: silently returns ``False`` for runs
+              longer than 10 minutes while the optimizer is still running.
+              Downstream calls to ``load_best()`` will then fail or load stale
+              results.
+            - ``timeout=0`` **(no limit)**: blocks the kernel's main thread
+              entirely.  No other cell — including ``live_status()``,
+              ``is_alive``, or any monitoring probe — can execute until the
+              optimizer finishes.
+
+            For interactive notebooks prefer :meth:`load_best`, which waits
+            only until the first result lands on disk and returns
+            immediately, or poll manually with::
+
+                if run_info.is_alive:
+                    print(run_info.live_status())
+        """
+        # For subprocess runs (monitor=False), wait on the process directly.
+        if self._subprocess_process is not None:
+            if timeout:
+                try:
+                    self._subprocess_process.wait(timeout=timeout)
+                except Exception:
+                    return self._subprocess_process.poll() is not None
+            else:
+                self._subprocess_process.wait()
+            rc = self._subprocess_process.returncode
+            try:
+                from molass.Rigorous.RunRegistry import update_run_manifest
+                update_run_manifest(self.work_folder, status="completed", subprocess_returncode=rc)
+                update_run_manifest(self.analysis_folder, status="completed", subprocess_returncode=rc)
+            except Exception:
+                pass
+            return True
+
+        # For async in-process runs, join the background thread directly.
+        if self._async_thread is not None:
+            import warnings
+            warnings.warn(
+                "run_info.wait() on an async in-process run blocks the kernel "
+                "until the entire BH/NS run finishes (potentially hours).  "
+                "Use run_info.load_best() instead: it returns as soon as the "
+                "first result lands on disk, while the optimizer continues in "
+                "the background.",
+                UserWarning,
+                stacklevel=2,
+            )
+            self._async_thread.join(timeout=timeout if timeout else None)
+            if self._async_error is not None:
+                raise RuntimeError("Async optimizer failed") from self._async_error
+            return not self._async_thread.is_alive()
+
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results
+        return wait_for_rigorous_results(
+            self.analysis_folder, timeout=timeout, poll_interval=poll_interval
+        )
+
+    def load_best(self, timeout=0, poll_interval=5, debug=False):
+        """Load the best rigorous optimization result, waiting until one is available.
+
+        Safe to call immediately after :meth:`optimize_rigorously` — it blocks
+        until at least one job has completed, then returns the result with the
+        lowest objective function value found so far.  Re-running this cell while
+        the optimizer is still going always returns the best result available at
+        that moment.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            Maximum seconds to wait for the first result (default ``0`` = no
+            limit).  When non-zero and no result appears within ``timeout``
+            seconds, raises :class:`TimeoutError`.
+        poll_interval : float, optional
+            Seconds between filesystem checks (default 5).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Decomposition
+            A Decomposition built from the best optimized parameters available
+            at the time the call returns.  The ``result.sv`` and ``result.fv``
+            attributes are attached for convenience.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored.
+        TimeoutError
+            If ``timeout > 0`` and no result appears within that time.
+
+        Notes
+        -----
+        Interrupt with **Ctrl+C** to cancel the wait at any time.
+
+        If the optimizer is still running, the result reflects only the jobs
+        completed so far.  Re-call after the run finishes to get the final best.
+
+        See Also
+        --------
+        get_score_breakdown : Inspect the individual score and penalty
+            components that make up the objective value (fv).
+
+        Examples
+        --------
+        ::
+
+            run_info = decomp.optimize_rigorously(
+                analysis_folder="temp_analysis", method='BH', max_trials=30)
+            result = run_info.load_best()   # blocks until first BH job lands
+            result.plot_components()
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import wait_for_rigorous_results
+        ready = wait_for_rigorous_results(
+            self.analysis_folder,
+            timeout=timeout,
+            poll_interval=poll_interval,
+        )
+        if not ready:
+            raise TimeoutError(
+                f"No rigorous results appeared within {timeout}s "
+                f"in {self.analysis_folder}"
+            )
+        from molass.Rigorous.CurrentStateUtils import (
+            list_rigorous_jobs, load_rigorous_result,
+        )
+        jobs = list_rigorous_jobs(self.analysis_folder)
+        best = min(jobs, key=lambda j: j.best_fv)
+        decomp = self.decomposition
+        if decomp is None:
+            raise ValueError(
+                "No decomposition stored in this RunInfo. "
+                "Cannot reconstruct result without the initial decomposition."
+            )
+        result = load_rigorous_result(
+            decomp, self.analysis_folder, jobid=best.id,
+            rgcurve=self.rgcurve, debug=debug
+        )
+        # Attach the score so callers can write `result.sv` / `result.fv`
+        # without having to re-parse callback.txt separately. (#157)
+        from molass.Rigorous.CurrentStateUtils import fv_to_sv
+        result.fv = best.best_fv
+        result.sv = float(fv_to_sv(best.best_fv))
+        return result
+
+    def get_score_breakdown(self, jobid=None, debug=False):
+        """Evaluate the objective function and return individual score components.
+
+        Loads the best (or specified) optimized parameters from disk, runs them
+        through the optimizer's objective function, and returns a dict mapping
+        each score name to its value.
+
+        Score architecture
+        ------------------
+        The objective value ``fv`` is computed as::
+
+            fv = synthesize(scores, positive_elevate=3) + sum(penalties)
+
+        **Synthesized scores** (first 7): XR_2D_fitting, XR_LRF_residual,
+        UV_2D_fitting, UV_LRF_residual, Guinier_deviation,
+        Kratky_smoothness, SEC_conformance.  These are combined via a
+        weighted RMS + spread measure, shifted so that a raw score of -3
+        maps to zero contribution.
+
+        **Additive penalties** (remaining entries): mapping_penalty,
+        negative_penalty, baseline_penalty, outofbounds_penalty,
+        order_penalty, control_penalty, consistency_penalty.  These are
+        added directly to fv after synthesis.  A penalty of 1.0 raises
+        fv by exactly 1.0.
+
+        Parameters
+        ----------
+        jobid : str, optional
+            Specific job id to evaluate. If None, uses the best job
+            (lowest ``best_fv``).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        dict
+            ``{'fv': float, 'scores': {name: value, ...}}`` where ``scores``
+            maps each score/penalty name to its numeric value.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored.
+        FileNotFoundError
+            If no completed jobs are found.
+
+        Examples
+        --------
+        ::
+
+            run_info = decomp.optimize_rigorously(
+                analysis_folder="temp_analysis", niter=30)
+            run_info.wait()
+            breakdown = run_info.get_score_breakdown()
+            for name, val in breakdown['scores'].items():
+                print(f"{name}: {val:.4f}")
+        """
+        import os
+        from molass_legacy.Optimizer.Scripting import get_params
+
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+
+        optimizer_folder = os.path.join(
+            os.path.abspath(self.analysis_folder), "optimized"
+        )
+        jobs_folder = os.path.join(optimizer_folder, "jobs")
+
+        if jobid is None:
+            from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs
+            jobs = list_rigorous_jobs(self.analysis_folder)
+            if not jobs:
+                raise FileNotFoundError(
+                    f"No completed jobs found in {self.analysis_folder}"
+                )
+            best = min(jobs, key=lambda j: j.best_fv)
+            jobid = best.id
+
+        job_folder = os.path.join(jobs_folder, jobid)
+        params = get_params(job_folder, debug=debug)
+
+        result = self.optimizer.objective_func(params, return_full=True)
+        fv = result[0]
+        score_array = result[1]
+        names = self.optimizer.get_score_names()
+
+        scores = {}
+        for name, val in zip(names, score_array):
+            scores[name] = float(val)
+
+        return {'fv': float(fv), 'scores': scores}
+
+    def get_current_curves(self):
+        """Return the data and model curves currently shown on the monitor.
+
+        Delegates to ``MplMonitor.get_current_curves()`` (molass-legacy #31,
+        **monitor readability**).  Provides a single-call entry point from
+        the user-facing ``RunInfo`` object so that an AI agent can query
+        ``run_info.get_current_curves()`` without knowing about the internal
+        monitor attribute.
+
+        Returns
+        -------
+        dict or None
+            See ``MplMonitor.get_current_curves()`` for the full key list.
+            Returns ``None`` if the monitor is not set or has no data yet.
+        """
+        if self.monitor is None:
+            return None
+        return self.monitor.get_current_curves()
+
+    def diagnose(self, breakdown=None):
+        """Map score values to physical interpretations.
+
+        Calls ``get_score_breakdown()`` if no breakdown is provided, then
+        applies encoded rules to each score/score-pair and returns a list of
+        ``Diagnosis`` namedtuples with structured physical meaning.
+
+        This allows an AI agent (or a human) to understand *why* a fit is poor
+        without requiring domain knowledge: the rules encode the mapping from
+        numeric scores to physical causes.
+
+        Parameters
+        ----------
+        breakdown : dict, optional
+            Output of ``get_score_breakdown()``.  If None, it is computed
+            automatically (which loads and evaluates the best job from disk).
+
+        Returns
+        -------
+        list of Diagnosis
+            Each ``Diagnosis`` has the fields:
+            - ``score`` : str -- the score/penalty name (or pair)
+            - ``status`` : str -- ``'good'``, ``'fair'``, ``'poor'``, or
+              ``'failing'``
+            - ``reason`` : str -- human-readable explanation
+            - ``suggestion`` : str or None -- recommended next diagnostic step
+
+        Examples
+        --------
+        ::
+
+            run_info.wait()
+            for d in run_info.diagnose():
+                print(f"[{d.status.upper()}] {d.score}: {d.reason}")
+                if d.suggestion:
+                    print(f"  -> {d.suggestion}")
+        """
+        from collections import namedtuple
+
+        Diagnosis = namedtuple('Diagnosis', ['score', 'status', 'reason', 'suggestion'])
+
+        if breakdown is None:
+            breakdown = self.get_score_breakdown()
+
+        scores = breakdown['scores']
+        result = []
+
+        # --- Helper -------------------------------------------------------
+        def _status_from_val(val, thresholds):
+            # thresholds: list of (threshold, status) in order good -> failing
+            # val is negative (lower is better); thresholds are negative
+            # e.g. [(-1.0, 'good'), (-0.5, 'fair'), (-0.3, 'poor')]
+            for threshold, status in thresholds:
+                if val <= threshold:
+                    return status
+            return thresholds[-1][1]
+
+        # --- UV_LRF_residual ----------------------------------------------
+        uv_lrf = scores.get('UV_LRF_residual')
+        if uv_lrf is not None:
+            if uv_lrf > -0.1:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='failing',
+                    reason=(
+                        f"UV_LRF_residual = {uv_lrf:.3f} (near zero): the low-rank "
+                        "factorization cannot fit the UV data matrix at all. This "
+                        "usually means the UV model is completely misaligned with the data."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model peak positions.",
+                ))
+            elif uv_lrf > -0.3:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='poor',
+                    reason=(
+                        f"UV_LRF_residual = {uv_lrf:.3f}: the low-rank residual "
+                        "is poor, indicating a significant UV model misfit."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model curves.",
+                ))
+            elif uv_lrf > -0.7:
+                result.append(Diagnosis(
+                    score='UV_LRF_residual',
+                    status='fair',
+                    reason=f"UV_LRF_residual = {uv_lrf:.3f}: moderate UV low-rank residual.",
+                    suggestion=None,
+                ))
+
+        # --- UV vs XR 2D fitting ratio ------------------------------------
+        uv_2d = scores.get('UV_2D_fitting')
+        xr_2d = scores.get('XR_2D_fitting')
+        if uv_2d is not None and xr_2d is not None and xr_2d < 0 and uv_2d < 0:
+            # Both scores are negative; larger magnitude = better.
+            # ratio = UV/XR: close to 1 means similar quality; close to 0 means UV much worse.
+            ratio = uv_2d / xr_2d
+            if ratio < 0.33:
+                result.append(Diagnosis(
+                    score='UV_2D_fitting vs XR_2D_fitting',
+                    status='poor',
+                    reason=(
+                        f"UV_2D_fitting ({uv_2d:.3f}) is {xr_2d/uv_2d:.1f}x worse than "
+                        f"XR_2D_fitting ({xr_2d:.3f}): the UV 2D fit is disproportionately "
+                        "bad compared to XR, suggesting the UV model components are "
+                        "misaligned with the data while XR converged correctly."
+                    ),
+                    suggestion="Call run_info.get_current_curves() to compare UV data vs model peak positions.",
+                ))
+            elif ratio < 0.67:
+                result.append(Diagnosis(
+                    score='UV_2D_fitting vs XR_2D_fitting',
+                    status='fair',
+                    reason=(
+                        f"UV_2D_fitting ({uv_2d:.3f}) is noticeably worse than "
+                        f"XR_2D_fitting ({xr_2d:.3f})."
+                    ),
+                    suggestion=None,
+                ))
+
+        # --- UV_2D_fitting absolute ----------------------------------------
+        if uv_2d is not None and uv_2d > -0.3:
+            if not any(d.score == 'UV_2D_fitting vs XR_2D_fitting' for d in result):
+                result.append(Diagnosis(
+                    score='UV_2D_fitting',
+                    status='poor',
+                    reason=f"UV_2D_fitting = {uv_2d:.3f}: poor UV 2D fit.",
+                    suggestion="Call run_info.get_current_curves() to inspect UV data vs model.",
+                ))
+
+        # --- Guinier_deviation --------------------------------------------
+        guinier = scores.get('Guinier_deviation')
+        if guinier is not None:
+            if guinier > -0.3:
+                result.append(Diagnosis(
+                    score='Guinier_deviation',
+                    status='poor',
+                    reason=(
+                        f"Guinier_deviation = {guinier:.3f}: poor Rg consistency "
+                        "across elution frames. The decomposed components may not "
+                        "represent physically distinct species."
+                    ),
+                    suggestion="Inspect decomp.get_rgs() and check if Rg values are stable across elution.",
+                ))
+            elif guinier > -0.7:
+                result.append(Diagnosis(
+                    score='Guinier_deviation',
+                    status='fair',
+                    reason=f"Guinier_deviation = {guinier:.3f}: moderate Rg consistency.",
+                    suggestion=None,
+                ))
+
+        # --- SEC_conformance ----------------------------------------------
+        sec = scores.get('SEC_conformance')
+        if sec is not None and sec > -0.2:
+            result.append(Diagnosis(
+                score='SEC_conformance',
+                status='poor',
+                reason=(
+                    f"SEC_conformance = {sec:.3f}: the elution curve shape does not "
+                    "conform well to the SEC column model."
+                ),
+                suggestion=None,
+            ))
+
+        # --- Penalties ----------------------------------------------------
+        penalty_names = [
+            'mapping_penalty', 'negative_penalty', 'baseline_penalty',
+            'outofbounds_penalty', 'order_penalty', 'control_penalty',
+            'consistency_penalty',
+        ]
+        for pname in penalty_names:
+            pval = scores.get(pname)
+            if pval is not None and pval > 0.1:
+                result.append(Diagnosis(
+                    score=pname,
+                    status='poor',
+                    reason=(
+                        f"{pname} = {pval:.3f}: a physical constraint is violated "
+                        "(penalty > 0.1 raises fv directly)."
+                    ),
+                    suggestion=None,
+                ))
+
+        # --- All good ------------------------------------------------------
+        if not result:
+            result.append(Diagnosis(
+                score='overall',
+                status='good',
+                reason="No significant issues detected in any score or penalty.",
+                suggestion=None,
+            ))
+
+        return result
+
+    def compare_subprocess_dsets(self, plot=True, mp_b_sweep=True,
+                                  mp_b_range=(-200.0, 200.0), n_points=81):
+        """Debug tool for molass-legacy#34: compare parent vs subprocess datasets.
+
+        Reconstructs the datasets as the subprocess would derive them (by
+        re-reading raw data from disk via ``FullOptInput`` → ``OptDataSets``),
+        then compares them with the parent's live datasets side-by-side.
+
+        If ``mp_b_sweep=True`` and ``self.optimizer`` is available, also sweeps
+        the objective function along the mp_b axis for both the parent optimizer
+        (parent dsets) and a subprocess-reconstructed optimizer (subprocess
+        dsets).  This shows whether — and *why* — the two objective landscapes
+        differ, which is the root cause of #34.
+
+        Parameters
+        ----------
+        plot : bool, optional
+            If ``True`` (default), produce visual comparison plots.
+        mp_b_sweep : bool, optional
+            If ``True`` (default), also sweep mp_b on both optimizers and plot
+            the objective landscape.  Requires ``self.optimizer`` to be set.
+        mp_b_range : (float, float), optional
+            Range of mp_b values for the sweep.  Default ``(-200, 200)``.
+        n_points : int, optional
+            Number of evaluation points for the mp_b sweep.  Default 81.
+
+        Returns
+        -------
+        sub_dsets : OptDataSets
+            The subprocess-reconstructed dataset object for further inspection.
+
+        Raises
+        ------
+        RuntimeError
+            If ``work_folder`` or ``dsets`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            # After a subprocess run (in_process=False):
+            run_info = decomp.optimize_rigorously(rgcurve, in_process=False)
+            sub_dsets = run_info.compare_subprocess_dsets()
+        """
+        if self.work_folder is None:
+            raise RuntimeError(
+                "work_folder is not set. Run optimize_rigorously() first, or "
+                "set run_info.work_folder manually."
+            )
+        if self.dsets is None:
+            raise RuntimeError("dsets is not set on this RunInfo.")
+
+        from molass_legacy.Optimizer.DsetsDebug import (
+            reconstruct_subprocess_dsets,
+            compare_dsets,
+            plot_dsets_comparison,
+            get_mp_b_index,
+            sweep_mp_b,
+            plot_mp_b_sweep,
+            reconstruct_subprocess_optimizer,
+        )
+
+        print(f"Reconstructing subprocess dsets from: {self.work_folder}")
+        sub_dsets = reconstruct_subprocess_dsets(self.work_folder)
+
+        print("\n--- Numerical comparison ---")
+        compare_dsets(self.dsets, sub_dsets)
+
+        if plot:
+            plot_dsets_comparison(self.dsets, sub_dsets)
+
+        if mp_b_sweep and self.optimizer is not None:
+            print("\n--- mp_b objective landscape sweep ---")
+            mp_b_idx = get_mp_b_index(self.optimizer)
+            init_mp_b = float(self.init_params[mp_b_idx])
+            print(f"mp_b_index={mp_b_idx},  init mp_b={init_mp_b:.4f}")
+
+            # Reconstruct the subprocess optimizer using the same trimming.txt.
+            print("Reconstructing subprocess optimizer (this may take a moment)...")
+            sub_optimizer = reconstruct_subprocess_optimizer(
+                self.work_folder,
+                n_components=self.optimizer.n_components,
+                class_code=self.optimizer.__class__.__name__,
+            )
+            sub_optimizer.prepare_for_optimization(self.init_params)
+
+            # Sweep both.
+            print(f"Sweeping mp_b over [{mp_b_range[0]}, {mp_b_range[1]}] "
+                  f"({n_points} points) × 2 optimizers...")
+            mp_b_a, fv_a = sweep_mp_b(
+                self.optimizer, self.init_params,
+                mp_b_range=mp_b_range, n_points=n_points, mp_b_index=mp_b_idx,
+            )
+            mp_b_b, fv_b = sweep_mp_b(
+                sub_optimizer, self.init_params,
+                mp_b_range=mp_b_range, n_points=n_points, mp_b_index=mp_b_idx,
+            )
+
+            if plot:
+                plot_mp_b_sweep(
+                    [mp_b_a, mp_b_b], [fv_a, fv_b],
+                    ["parent", "subprocess"],
+                    init_mp_b=init_mp_b,
+                )
+        elif mp_b_sweep and self.optimizer is None:
+            print(
+                "\n[mp_b_sweep skipped] self.optimizer is None. "
+                "For subprocess runs (in_process=False), the optimizer is stored "
+                "on run_info; check that it was not set to None explicitly."
+            )
+
+        return sub_dsets
+
+    @property
+    def monitor_snapshot_json_path(self):
+        """Path to the MplMonitor JSON sidecar written during the last run.
+
+        The file is created when ``MOLASS_MONITOR_SNAPSHOT=1`` and exists at
+        ``<analysis_folder>/optimized/figs/mplmonitor_latest.json``.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "figs", "mplmonitor_latest.json",
+        )
+
+    def check_progress(self, label=None, write_snapshot=False):
+        """Read callback.txt(s) from all jobs and report best SV so far.
+
+        Re-runnable at any time while the optimizer is running or after it
+        completes.  Does not require the optimizer to have finished.
+
+        The implementation lives in
+        :func:`molass.Rigorous.CurrentStateUtils.check_progress` so it can
+        be updated and reloaded without restarting the kernel — just call
+        ``importlib.reload(molass.Rigorous.CurrentStateUtils)`` and the
+        next invocation picks up the new logic automatically.
+
+        Parameters
+        ----------
+        label : str, optional
+            Display label prefix. Defaults to the analysis folder basename.
+        write_snapshot : bool, optional
+            If ``True``, write a compact JSON file to
+            ``<analysis_folder>/optimized/progress_snapshot.json`` in addition
+            to printing.  Read back via :meth:`load_progress_snapshot`.
+            Default ``False``.
+
+        Returns
+        -------
+        dict or None
+            Progress data dict when there are evaluations to report; ``None``
+            otherwise.
+
+        Examples
+        --------
+        ::
+
+            _run_sub.check_progress()                         # print only
+            _run_sub.check_progress(label="subprocess")       # explicit label
+            snap = _run_sub.check_progress(write_snapshot=True)  # persist + return
+
+        See Also
+        --------
+        molass.Rigorous.check_progress : standalone form; also accepts a plain
+            folder-path string when no ``RunInfo`` instance is at hand::
+
+                from molass.Rigorous import check_progress
+                check_progress("/path/to/analysis_folder")
+        """
+        from molass.Rigorous.CurrentStateUtils import check_progress as _impl
+        return _impl(self, label=label, write_snapshot=write_snapshot)
+
+    @property
+    def progress_snapshot_json_path(self):
+        """Path to the progress snapshot JSON written by ``check_progress(write_snapshot=True)``.
+
+        Exists at ``<analysis_folder>/optimized/progress_snapshot.json``.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists yet.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "progress_snapshot.json",
+        )
+
+    def load_progress_snapshot(self):
+        """Load and return the progress snapshot JSON as a dict.
+
+        Written by :meth:`check_progress` when ``write_snapshot=True``.
+        Readable from any session — including a new AI session — without
+        re-running the optimizer.
+
+        Returns
+        -------
+        dict
+            Keys: ``label``, ``n_evals``, ``best_fv``, ``best_sv``,
+            ``sv_best_so_far``, ``timestamp``.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the snapshot does not exist yet (call
+            ``check_progress(write_snapshot=True)`` first).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            _run_sub.check_progress(write_snapshot=True)
+            snap = _run_sub.load_progress_snapshot()
+            print(f"best SV: {snap['best_sv']:.2f}")
+        """
+        import json, os
+        path = self.progress_snapshot_json_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"Progress snapshot not found: {path}\n"
+                "Call check_progress(write_snapshot=True) first."
+            )
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    def load_monitor_snapshot(self):
+        """Load and return the MplMonitor JSON sidecar as a dict.
+
+        Returns
+        -------
+        dict
+            Parsed JSON content.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the sidecar does not exist (``MOLASS_MONITOR_SNAPSHOT`` was not
+            set, or the optimizer has not run yet).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+        """
+        import json, os
+        path = self.monitor_snapshot_json_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"MplMonitor JSON sidecar not found: {path}\n"
+                "Set MOLASS_MONITOR_SNAPSHOT=1 before running optimize_rigorously()."
+            )
+        with open(path) as fh:
+            return json.load(fh)
+
+    @property
+    def sv_history(self):
+        """Min-so-far SV trajectory from all ``callback.txt`` files.
+
+        Returns the full sequence of best-SV-so-far values, one per accepted
+        optimizer evaluation.  Readable at any time — while the run is in
+        progress or after it completes.
+
+        Returns
+        -------
+        list of float
+            Running-minimum SV values.  ``sv_history[-1]`` is the best
+            accepted SV of the entire run.  Empty list if no evaluations
+            have been recorded yet.
+
+        Raises
+        ------
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            svs = run_sub.sv_history
+            print(f"best SV: {svs[-1]:.2f}  start SV: {svs[0]:.2f}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history
+        return parse_sv_history(self.analysis_folder)
+
+    @property
+    def sv_history_per_job(self):
+        """Per-job SV best-so-far trajectories from all ``callback.txt`` files.
+
+        Like :attr:`sv_history` but preserves job boundaries.  Useful when a
+        BH run spans multiple restarts (jobs ``000``, ``001``, ...) and you
+        want to know how much each restart contributed.
+
+        Returns
+        -------
+        dict[str, list of float]
+            Mapping from job id (e.g. ``'000'``) to the list of global
+            best-SV-so-far values recorded within that job.  Empty dict if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            per_job = run_info.sv_history_per_job
+            for job_id, svs in per_job.items():
+                print(f"job {job_id}: {len(svs)} evals, best SV = {svs[-1]:.1f}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history_per_job
+        return parse_sv_history_per_job(self.analysis_folder)
+
+    def plot_sv_history(self, title=None, figsize=(8, 4)):
+        """Plot the min-so-far SV trajectory from ``callback.txt``.
+
+        One-liner convergence view.  Works at any time after at least one
+        evaluation has been accepted.
+
+        Parameters
+        ----------
+        title : str, optional
+            Figure title.  Defaults to ``"SV history — <folder basename>"``.
+        figsize : tuple, optional
+            Matplotlib figure size.  Default ``(8, 4)``.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        ::
+
+            run_sub.plot_sv_history()
+            run_sub.plot_sv_history(title="Apo 2-comp NS, subprocess path")
+        """
+        import os
+        import matplotlib.pyplot as plt
+
+        svs = self.sv_history
+        if not svs:
+            print("No SV history found (no callback.txt entries yet).")
+            return
+        if title is None:
+            folder_name = os.path.basename(
+                (self.analysis_folder or "").rstrip("/\\")
+            )
+            title = f"SV history — {folder_name}"
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.plot(svs, lw=1.5)
+        ax.set_xlabel("evaluation")
+        ax.set_ylabel("best SV so far")
+        ax.set_title(title)
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        plt.show()
+
+    def live_status(self):
+        """Return a single dict snapshot of where this run stands right now.
+
+        One-call replacement for the scattered probe pattern (``sv_history``
+        property + ``check_progress`` + ``RunRegistry.read_manifest`` +
+        ``getattr(self, 'subprocess_returncode', None)`` + ...) used in
+        diagnostic notebook cells.  Pure read: scans disk, never mutates.
+        Safe to invoke from ``aicKernelEval`` (issue ai-context-vscode#1)
+        or any sync cell, including while the run is still in flight.
+
+        Returns
+        -------
+        dict
+            Keys (all best-effort; missing data → ``None``):
+
+            - ``phase`` (str): one of ``'pending'``, ``'running'``,
+              ``'completed'``, ``'failed'``, ``'unknown'``.  Derived from
+              the manifest's ``status`` field plus any
+              ``subprocess_returncode`` available.
+            - ``n_evals`` (int): number of accepted optimizer evaluations
+              recorded in ``callback.txt`` so far.
+            - ``best_fv`` (float): inverted from ``best_sv`` (matches
+              ``check_progress`` arithmetic).
+            - ``best_sv`` (float): best score-value-so-far on the 0-100
+              scale.
+            - ``elapsed_s`` (float): seconds since manifest ``start_time``,
+              or ``None`` if the manifest isn't available yet.
+            - ``analysis_folder`` (str): from ``self.analysis_folder``.
+            - ``work_folder`` (str): from ``self.work_folder``, falling back
+              to walking ``analysis_folder`` for ``callback.txt``.
+            - ``subprocess_pid`` (int or None): from manifest.
+            - ``subprocess_returncode`` (int or None): from
+              ``self.subprocess_returncode`` or manifest.
+            - ``manifest`` (dict or None): the full ``RUN_MANIFEST.json``
+              contents from the analysis folder, when present.
+
+        Examples
+        --------
+        From a notebook cell while the run is in flight::
+
+            run_sub.live_status()
+
+        From outside the kernel via ai-context-vscode#1::
+
+            aicKernelEval(expression="run_sub.live_status()")
+        """
+        import os
+        from datetime import datetime, timezone
+
+        analysis_folder = self.analysis_folder
+        work_folder = self.work_folder
+
+        # Try to load the per-run manifest (RunRegistry breadcrumb).
+        manifest = None
+        if analysis_folder:
+            try:
+                from molass.Rigorous.RunRegistry import read_manifest
+                manifest = read_manifest(analysis_folder)
+            except Exception:
+                manifest = None
+
+        # If work_folder isn't set on the RunInfo, use current_work_folder
+        # (which finds the latest jobs/NNN directory on disk).  This handles
+        # the auto-resume window where work_folder is transiently None (#149)
+        # and the stale-manifest case where the manifest still points at the
+        # previous trial's folder (#148 / #150).
+        if work_folder is None:
+            work_folder = self.current_work_folder
+        if work_folder is None and manifest is not None:
+            work_folder = manifest.get("work_folder")
+
+        # SV history (cheap; reads callback.txt files only).
+        n_evals = 0
+        best_sv = None
+        best_fv = None
+        if analysis_folder:
+            try:
+                from molass.Rigorous.CurrentStateUtils import parse_sv_history
+                svs = parse_sv_history(analysis_folder)
+                n_evals = len(svs)
+                if n_evals:
+                    import math
+                    best_sv = float(svs[-1])
+                    # Invert SV = -200/(1+exp(-1.5*fv))+100
+                    try:
+                        best_fv = -math.log(200.0 / (100.0 - best_sv) - 1.0) / 1.5
+                    except (ValueError, ZeroDivisionError):
+                        best_fv = None
+            except Exception:
+                pass
+
+        # Subprocess returncode: prefer the live attribute (set by
+        # RigorousImplement on process.wait()), fall back to manifest.
+        rc = getattr(self, "subprocess_returncode", None)
+        sub_pid = None
+        if manifest is not None:
+            if rc is None:
+                rc = manifest.get("subprocess_returncode")
+            sub_pid = manifest.get("subprocess_pid")
+
+        # Phase: combine manifest status + returncode + live is_alive.
+        # is_alive takes priority: if the thread is still running the phase
+        # must be 'running' regardless of what the manifest says.  This
+        # handles the auto-resume window where the manifest still records
+        # 'completed' from the previous trial (#148).
+        status = (manifest or {}).get("status")
+        if self.is_alive:
+            phase = "running"
+        elif rc is not None and rc != 0:
+            phase = "failed"
+        elif rc == 0 or status == "completed":
+            phase = "completed"
+        elif status in ("running", "starting"):
+            phase = "running"
+        elif status == "pending":
+            phase = "pending"
+        else:
+            phase = "unknown"
+
+        # Elapsed time from manifest start_time (UTC ISO).
+        elapsed_s = None
+        start_time = (manifest or {}).get("start_time")
+        if start_time:
+            try:
+                t0 = datetime.fromisoformat(start_time)
+                if t0.tzinfo is None:
+                    t0 = t0.replace(tzinfo=timezone.utc)
+                elapsed_s = (datetime.now(timezone.utc) - t0).total_seconds()
+            except (ValueError, TypeError):
+                elapsed_s = None
+
+        return {
+            "phase": phase,
+            "n_evals": n_evals,
+            "best_fv": best_fv,
+            "best_sv": best_sv,
+            "elapsed_s": elapsed_s,
+            "analysis_folder": analysis_folder,
+            "work_folder": work_folder,
+            "subprocess_pid": sub_pid,
+            "subprocess_returncode": rc,
+            "manifest": manifest,
+        }
+
+    @property
+    def run_complete_path(self):
+        """Path to run_complete.json written when the optimizer finishes normally.
+
+        The file is always created on completion (no env-var required) at
+        ``<analysis_folder>/optimized/figs/run_complete.json``.
+
+        It is the canonical, zero-parse-required answer to
+        "what was the best result?" for AI tools and notebook cells in a
+        new session.
+
+        Returns
+        -------
+        str
+            Absolute path to the JSON file, whether or not it exists yet.
+        None
+            If ``analysis_folder`` was not set on this RunInfo.
+        """
+        import os
+        if self.analysis_folder is None:
+            return None
+        return os.path.join(
+            os.path.abspath(self.analysis_folder),
+            "optimized", "figs", "run_complete.json",
+        )
+
+    def load_run_complete(self):
+        """Load and return the run_complete.json written on job completion.
+
+        Returns
+        -------
+        dict
+            Keys: ``schema_version``, ``completed_at``, ``best_fv``,
+            ``best_sv``, ``n_evals``, ``n_accepted``, ``analysis_folder``.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file does not exist yet (job still running, or completed
+            before this fix was active).
+        ValueError
+            If ``analysis_folder`` is not set on this RunInfo.
+
+        Examples
+        --------
+        ::
+
+            rc = run_sub.load_run_complete()
+            print(f"best_sv = {rc['best_sv']:.2f}")
+        """
+        import json, os
+        path = self.run_complete_path
+        if path is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"run_complete.json not found: {path}\n"
+                "The job may still be running, or it completed before "
+                "this feature was active (molass-legacy fix #AI-B required)."
+            )
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    @classmethod
+    def reconnect(cls, analysis_folder, raise_if_not_found=True):
+        """Reconnect to a running or completed optimization from disk.
+
+        Creates a minimal ``RunInfo`` populated from the manifest and disk
+        state in ``analysis_folder``.  Useful after a kernel restart or an
+        accidental cell re-run that destroyed the original live reference.
+
+        The recovered ``RunInfo`` supports all disk-based operations:
+        :meth:`live_status`, :attr:`sv_history`, :meth:`load_best`,
+        :meth:`load_best`, :meth:`plot_sv_history`.
+
+        It does **not** have a live optimizer, so :meth:`get_score_breakdown`
+        and :meth:`diagnose` require the optimizer to be reconstructed
+        separately (not automatic).
+
+        Parameters
+        ----------
+        analysis_folder : str
+            The ``analysis_folder`` that was passed to
+            ``optimize_rigorously()``.
+        raise_if_not_found : bool, optional
+            If True (default), raise ``FileNotFoundError`` when no manifest
+            exists.  If False, return ``None`` instead — useful inside the
+            idempotency guard where a missing manifest simply means no
+            prior run exists.
+
+        Returns
+        -------
+        RunInfo or None
+            A reconstituted ``RunInfo``, or ``None`` if
+            ``raise_if_not_found=False`` and no manifest is found.
+
+        Raises
+        ------
+        FileNotFoundError
+            If no ``RUN_MANIFEST.json`` is found and
+            ``raise_if_not_found=True``.
+
+        Examples
+        --------
+        After a kernel restart::
+
+            run_info = RunInfo.reconnect(analysis_folder)
+            run_info.live_status()
+            run_info.plot_sv_history()
+            result = run_info.load_best()
+        """
+        import os
+        import threading
+        from molass.Rigorous.RunRegistry import read_manifest
+
+        manifest = read_manifest(analysis_folder)
+        if manifest is None:
+            if raise_if_not_found:
+                raise FileNotFoundError(
+                    f"No RUN_MANIFEST.json found in {analysis_folder}.\n"
+                    "Either no run has been launched there, or the folder "
+                    "does not exist."
+                )
+            return None
+
+        # Reconstruct a minimal RunInfo without calling __init__ so we
+        # don't impose live-object requirements (no optimizer, no SSD).
+        obj = cls.__new__(cls)
+        obj.ssd = None
+        obj.optimizer = None
+        obj.dsets = None
+        obj.init_params = None
+        obj.monitor = None
+        obj.analysis_folder = os.path.abspath(analysis_folder)
+        obj.decomposition = None
+        obj.rgcurve = None
+        obj.work_folder = None
+        obj.in_process_result = None
+        obj._async_thread = None
+        obj._async_error = None
+        obj._stop_event = threading.Event()
+
+        # Restore work_folder from manifest (may be None for very early runs).
+        wf = manifest.get("work_folder")
+        if wf is None:
+            # Fall back: find the latest jobs/NNN directory on disk.
+            jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+            if os.path.isdir(jobs_dir):
+                try:
+                    subdirs = sorted(
+                        d for d in os.listdir(jobs_dir)
+                        if os.path.isdir(os.path.join(jobs_dir, d))
+                    )
+                    if subdirs:
+                        wf = os.path.join(jobs_dir, subdirs[-1])
+                except OSError:
+                    pass
+        obj.work_folder = wf
+
+        # Restore subprocess returncode if already written to manifest.
+        obj.subprocess_returncode = manifest.get("subprocess_returncode")
+
+        return obj
+
+    def _is_subprocess_alive(self):
+        """Return True if the subprocess recorded in the manifest is still running.
+
+        Used by the idempotency guard.  Tries psutil first, falls back to
+        os.kill(pid, 0) on POSIX.
+        """
+        import os
+        manifest = None
+        if self.analysis_folder:
+            from molass.Rigorous.RunRegistry import read_manifest
+            manifest = read_manifest(self.analysis_folder)
+        if manifest is None:
+            return False
+        sub_pid = manifest.get("subprocess_pid")
+        status = manifest.get("status")
+        if sub_pid is None:
+            return False
+        # Fast path: manifest already records completion
+        if status in ("completed", "failed"):
+            return False
+        try:
+            import psutil
+            return psutil.pid_exists(int(sub_pid))
+        except ImportError:
+            pass
+        # POSIX fallback
+        try:
+            os.kill(int(sub_pid), 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False

@@ -8,6 +8,60 @@ from time import time
 from importlib import reload
 import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
+
+def _baseline_selftest(M, recognition_curve):
+    """Baseline self-test: detect buffer-frame contamination.
+
+    Compares per-q-row negative fraction in the peak region between a
+    buffer-mean-flat baseline (uses Otsu-classified buffer frames) and an
+    endpoint-linear baseline (uses only the first and last frame).
+
+    If using buffer information produces *more* negatives than the simple
+    endpoint reference, the buffer frames are likely contaminated.
+
+    Returns the one-sided Wilcoxon signed-rank p-value, or None if the
+    test cannot be computed (too few q-rows with nonzero difference).
+    """
+    from scipy.stats import wilcoxon
+    from molass.Baseline.BuffitBaseline import _otsu_threshold
+
+    rc_y = recognition_curve.y
+    normalized = (rc_y - rc_y.min()) / (rc_y.max() - rc_y.min() + 1e-30)
+    otsu_thr = _otsu_threshold(normalized)
+    buffer_mask = normalized < otsu_thr
+    peak_mask = ~buffer_mask
+
+    if peak_mask.sum() < 2 or buffer_mask.sum() < 2:
+        return None
+
+    n_q, n_f = M.shape
+
+    # Endpoint-linear baseline (2-point per q-row)
+    bl_endpoint = np.empty_like(M)
+    for i in range(n_q):
+        bl_endpoint[i, :] = np.linspace(M[i, 0], M[i, -1], n_f)
+
+    # Buffer-mean flat baseline
+    buf_mean = M[:, buffer_mask].mean(axis=1)
+    bl_bufmean = buf_mean[:, None] * np.ones((1, n_f))
+
+    # Per-q-row negative-fraction difference
+    peak_cols = np.where(peak_mask)[0]
+    per_q_nf = np.empty(n_q)
+    for i in range(n_q):
+        row_peak_ep = M[i, peak_cols] - bl_endpoint[i, peak_cols]
+        row_peak_bm = M[i, peak_cols] - bl_bufmean[i, peak_cols]
+        nf_ref = np.mean(row_peak_ep < 0)
+        nf_test = np.mean(row_peak_bm < 0)
+        per_q_nf[i] = nf_test - nf_ref
+
+    nonzero = per_q_nf[per_q_nf != 0]
+    if len(nonzero) < 10:
+        return None
+
+    _, p_value = wilcoxon(nonzero, alternative='greater')
+    return float(p_value)
+
 class SecSaxsData:
     """
     A class to represent a SEC-SAXS data object.
@@ -49,6 +103,7 @@ class SecSaxsData:
                  time_initialized=None,
                  datafiles=None,
                  uv_pickat=None,
+                 uv_monitor=None,
                  xr_pickat=None,
                  debug=False):
         """ssd = SecSacsData(data_folder)
@@ -88,6 +143,9 @@ class SecSaxsData:
             The wavelength (nm) at which to extract the UV elution profile.
             Defaults to 280 nm when None. Use 290 for samples like ATP or MY
             where the UV signal is measured at 290 nm.
+        uv_monitor : float, optional
+            Alias for ``uv_pickat``. Follows chromatography convention
+            ("monitoring wavelength"). If both are given, ``uv_monitor`` wins.
         xr_pickat : float, optional
             The q-value (Å⁻¹) at which to extract the XR elution profile.
             Defaults to 0.02 when None.
@@ -102,38 +160,40 @@ class SecSaxsData:
         """
         start_time = time()
         self.logger = logging.getLogger(__name__)
+        from molass.Global.Quiet import suppress_if_quiet
         if folder is None:
             assert object_list is not None
             xr_data, uv_data = object_list
             self.datafiles = datafiles
         else:
             assert object_list is None
-            if uv_only:
-                xrM = None
-                xrE = None
-                qv = None
-            else:
-                if not os.path.isdir(folder):
-                    raise FileNotFoundError(f"Folder {folder} does not exist.")
-                
-                from molass.DataUtils.XrLoader import load_xr_with_options
-                xr_array, datafiles = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
-                xrM = xr_array[:,:,1].T
-                xrE = xr_array[:,:,2].T
-                qv = xr_array[0,:,0]
-                set_setting('in_folder', folder)    # for backward compatibility
-                self.datafiles = datafiles
+            with suppress_if_quiet(debug=debug):
+                if uv_only:
+                    xrM = None
+                    xrE = None
+                    qv = None
+                else:
+                    if not os.path.isdir(folder):
+                        raise FileNotFoundError(f"Folder {folder} does not exist.")
+                    
+                    from molass.DataUtils.XrLoader import load_xr_with_options
+                    xr_array, datafiles = load_xr_with_options(folder, remove_bubbles=remove_bubbles, logger=self.logger)
+                    xrM = xr_array[:,:,1].T
+                    xrE = xr_array[:,:,2].T
+                    qv = xr_array[0,:,0]
+                    set_setting('in_folder', folder)    # for backward compatibility
+                    self.datafiles = datafiles
 
-            if xr_only:
-                uvM, wv = None, None
-            else:
-                from molass.DataUtils.UvLoader import load_uv
-                from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
-                uvM, wv, conc_file = load_uv(folder, return_also_conc_file=True)
-                beamline_info = get_beamlineinfo_from_settings()
-                set_setting('uv_folder', folder)    # for backward compatibility
-                set_setting('uv_file', conc_file)   # for backward compatibility
-            uvE = None
+                if xr_only:
+                    uvM, wv = None, None
+                else:
+                    from molass.DataUtils.UvLoader import load_uv
+                    from molass.DataUtils.Beamline import get_beamlineinfo_from_settings
+                    uvM, wv, conc_file = load_uv(folder, return_also_conc_file=True)
+                    beamline_info = get_beamlineinfo_from_settings()
+                    set_setting('uv_folder', folder)    # for backward compatibility
+                    set_setting('uv_file', conc_file)   # for backward compatibility
+                uvE = None
  
             if xrM is None:
                 xr_data = None
@@ -150,8 +210,9 @@ class SecSaxsData:
     
         self.xr = xr_data
         self.uv = uv_data
-        if uv_pickat is not None and self.uv is not None:
-            self.uv.pickat = uv_pickat
+        effective_uv_pickat = uv_monitor if uv_monitor is not None else uv_pickat
+        if effective_uv_pickat is not None and self.uv is not None:
+            self.uv.pickat = effective_uv_pickat
         if xr_pickat is not None and self.xr is not None:
             self.xr.pickat = xr_pickat
         self.trimmed = trimmed
@@ -164,6 +225,15 @@ class SecSaxsData:
             self.time_initialized = time_initialized
         self.time_required = self.time_initialized          # updated later in trimmed_copy() or corrected_copy()
         self.time_required_total = self.time_initialized    # updated later in trimmed_copy() or corrected_copy()
+
+    def __repr__(self):
+        parts = []
+        if self.xr is not None:
+            parts.append(f"xr={self.xr.M.shape[1]} frames")
+        if self.uv is not None:
+            parts.append(f"uv={self.uv.M.shape[1]} frames, pickat={self.uv.pickat}")
+        parts.append(f"trimmed={self.trimmed}")
+        return f"SecSaxsData({', '.join(parts)})"
 
     def has_xr(self):
         """ssd.has_xr()
@@ -236,7 +306,7 @@ class SecSaxsData:
         return plot_3d_impl(self, **kwargs)
  
     def plot_compact(self, **kwargs):
-        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, **kwargs)
+        """ssd.plot_compact(title=None, baseline=False, ratio_curve=None, moment_lines=False, align_zero=False, **kwargs)
 
             Plots a pair of compact figures of UV and XR data.
 
@@ -250,6 +320,11 @@ class SecSaxsData:
                 If specified, the ratio curve will be plotted.
             moment_lines : bool, optional
                 If it is True, the moment lines will be plotted.
+            align_zero : bool, optional
+                If True, align the zero positions of the UV (twinx) and XR axes.
+                Default is False so each trace is autoscaled independently and
+                fills its own panel — preventing the smaller-amplitude trace
+                from appearing near-flat (issue #120).
 
             Returns
             -------
@@ -397,8 +472,8 @@ class SecSaxsData:
                            beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
-    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None):
-        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None)
 
         Parameters
         ----------
@@ -411,6 +486,12 @@ class SecSaxsData:
             It must be provided if `jranges` is specified.
         nsigmas : int or float, optional
             If specified, passed to make_trimming() to control the σ-window width.
+        uv_wavelength : tuple of (float or None, float or None), optional
+            UV wavelength range in nm to include, as ``(wl_min, wl_max)``.
+            Use ``None`` for either end to keep the dataset default
+            (``None`` on the min side uses the instrument's usable wavelength start,
+            typically ~250 nm; ``None`` on the max side uses the full upper end).
+            Example: ``uv_wavelength=(None, 550)`` trims UV to ≤ 550 nm.
 
         Returns
         -------
@@ -418,14 +499,25 @@ class SecSaxsData:
             A trimmed copy of the SSD object with the specified trimming specification applied.
         """
         start_time = time()
-        if trimming is None:
-            if nsigmas is not None:
-                trimming = self.make_trimming(nsigmas=nsigmas, debug=False)
+        from molass.Global.Quiet import suppress_if_quiet
+        with suppress_if_quiet():
+            if trimming is None:
+                uv_wr = None
+                if uv_wavelength is not None and self.uv is not None:
+                    from bisect import bisect_right
+                    wl_min_nm, wl_max_nm = uv_wavelength
+                    default_start, default_stop = self.uv.get_usable_wrange()
+                    wl = self.uv.wv
+                    start = bisect_right(wl, wl_min_nm) if wl_min_nm is not None else default_start
+                    stop  = bisect_right(wl, wl_max_nm) if wl_max_nm is not None else default_stop
+                    uv_wr = (start, stop)
+                if nsigmas is not None:
+                    trimming = self.make_trimming(nsigmas=nsigmas, uv_wr=uv_wr, debug=False)
+                else:
+                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, uv_wr=uv_wr, debug=False)
             else:
-                trimming = self.make_trimming(jranges=jranges, mapping=mapping, debug=False)
-        else:
-            assert jranges is None, "jranges must be None if trimming is specified."
-            assert nsigmas is None, "nsigmas must be None if trimming is specified."
+                assert jranges is None, "jranges must be None if trimming is specified."
+                assert nsigmas is None, "nsigmas must be None if trimming is specified."
         result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
                            trimmed=True, trimming=trimming,
                            mapping=mapping,
@@ -492,42 +584,102 @@ class SecSaxsData:
             ret_method = (xr_method, uv_method)
         return ret_method
 
-<<<<<<< HEAD
-    def set_allow_negative_peaks(self, value=True, mask=None):
-        """Declare that this dataset contains physically real negative peaks.
-
-        Delegates to ``self.xr.set_allow_negative_peaks()`` (and ``self.uv``
-        if present).  See :meth:`SsMatrixData.set_allow_negative_peaks` for
-=======
     def set_anomaly_mask(self, mask=None):
-        """Declare that this dataset contains anomalous frames to exclude from baseline fitting.
+        """Declare that this dataset contains anomalous frames to exclude.
 
         Delegates to ``self.xr.set_anomaly_mask()`` (and ``self.uv``
         if present).  See :meth:`SsMatrixData.set_anomaly_mask` for
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         full documentation.
+
+        When *mask* is ``None`` (the default), this method first tries
+        :meth:`~molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly`
+        on the **pre-correction** recognition curve.  If a region is found,
+        it is used as an explicit mask (equivalent to passing it directly).
+        If nothing is found, the mask is stored as ``None`` and detection is
+        deferred to ``corrected_copy()``, which checks the post-correction
+        recognition curve instead — with a UserWarning so the caller is aware.
+
+        **Effect on downstream steps**:
+
+        - ``corrected_copy()`` — excluded frames are **linearly interpolated**
+          in the XR data matrix (and the corresponding UV frames via the
+          XR↔UV mapping), then excluded from the LPM baseline anchor pool.
+          The interpolated data is what the corrected SSD carries.
+        - ``optimize_rigorously()`` — when ``trimmed_ssd`` is provided
+          (Pattern B), the trimmed data is interpolated in the same way
+          before the optimizer sees it.  The optimizer therefore never
+          evaluates the objective on anomaly frames; the smooth bridge
+          values are fitted instead.  The MplMonitor dashboard marks
+          these regions with translucent bands so the interpolated section
+          is visually distinguishable from real data.
+
+        .. note::
+            For mild anomalies, prefer ``allow_negative_peaks=True`` in
+            ``quick_decomposition()`` instead.  This method excludes frames
+            from the data matrix and can be too aggressive for some datasets.
+            Use ``ssd.xr.get_icurve()`` after calling this to verify the
+            signal is not destroyed.
 
         Parameters
         ----------
-<<<<<<< HEAD
-        value : bool, optional
-            Default True.
-=======
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         mask : array-like of bool, slice, or None, optional
             Frames to exclude.  When a ``slice`` is given, start/stop are
-            interpreted as frame numbers.
-        """
-<<<<<<< HEAD
-        self.xr.set_allow_negative_peaks(value, mask=mask)
-        if self.uv is not None:
-            self.uv.set_allow_negative_peaks(value, mask=mask)
+            interpreted as frame numbers.  When ``None``, auto-detection
+            via :meth:`~molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly`
+            is attempted first.
 
-    def corrected_copy(self, debug=False, **baseline_kwargs):
-=======
+        Returns
+        -------
+        slice or None
+            The detected anomaly slice when auto-detection was used, or
+            *mask* when an explicit mask was supplied, or ``None``.
+
+        See Also
+        --------
+        SsMatrixData.detect_anomaly : Pre-correction anomaly detection algorithm.
+        """
+        import numpy as np
+        import warnings
+
+        # Auto-detect from pre-correction recognition curve
+        if mask is None:
+            detected = self.xr.detect_anomaly()
+            if detected is not None:
+                mask = detected
+                warnings.warn(
+                    f"set_anomaly_mask(): anomaly auto-detected at frames "
+                    f"{detected.start}–{detected.stop - 1} "
+                    f"({detected.stop - detected.start} frames). "
+                    f"Pass mask=slice({detected.start}, {detected.stop}) to suppress this message.",
+                    UserWarning, stacklevel=2,
+                )
+            else:
+                warnings.warn(
+                    "set_anomaly_mask(): no anomaly found in the pre-correction recognition curve. "
+                    "Detection is deferred to corrected_copy() (post-correction). "
+                    "If you know the frame range, pass it explicitly: "
+                    "ssd.set_anomaly_mask(mask=slice(start, stop)).",
+                    UserWarning, stacklevel=2,
+                )
+
+        # Capture pre-mask signal range for safety check
+        pre_range = np.ptp(self.xr.get_icurve().y)
+
         self.xr.set_anomaly_mask(mask=mask)
         if self.uv is not None:
             self.uv.set_anomaly_mask(mask=mask)
+
+        # Safety check: warn if signal was drastically reduced (issue #75)
+        post_range = np.ptp(self.xr.get_icurve().y)
+        if pre_range > 0 and post_range / pre_range < 0.1:
+            warnings.warn(
+                f"XR signal range dropped by {(1 - post_range/pre_range)*100:.0f}% after anomaly masking "
+                f"({pre_range:.2e} -> {post_range:.2e}). The mask may be too aggressive. "
+                f"Consider using allow_negative_peaks=True in quick_decomposition() instead.",
+                stacklevel=2,
+            )
+
+        return mask
 
     def set_allow_negative_peaks(self, value=True, mask=None):
         """Deprecated: use ``set_anomaly_mask(mask)`` instead."""
@@ -546,7 +698,6 @@ class SecSaxsData:
                 self.uv.anomaly_mask = None
 
     def corrected_copy(self, baseline=None, debug=False, **baseline_kwargs):
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         """ssd.corrected_copy()
         
         Returns a deep copy of this object which has been corrected
@@ -574,82 +725,78 @@ class SecSaxsData:
         Examples
         --------
         >>> corrected = ssd.corrected_copy()                          # standard LPM
-<<<<<<< HEAD
-        >>> ssd.set_allow_negative_peaks()                            # for negative-peak datasets
-        >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
-=======
         >>> ssd.set_anomaly_mask()                                    # for negative-peak datasets
         >>> corrected = ssd.corrected_copy()                          # LPM with negative frames masked
         >>> corrected = ssd.corrected_copy(baseline=my_baseline)      # pre-computed XR baseline
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         """
         start_time = time()
+        from molass.Global.Quiet import suppress_if_quiet
         ssd_copy = self.copy(trimmed=self.trimmed, trimming=self.trimming, datafiles=self.datafiles)
 
-        if baseline is not None:
-            import warnings
-            warnings.warn(
-                "Pre-computed baseline applies to XR only; "
-                "UV baseline is computed normally.",
-                stacklevel=2,
-            )
-            ssd_copy.xr.M -= baseline
-        else:
-            baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
-            ssd_copy.xr.M -= baseline
+        with suppress_if_quiet(debug=debug):
+            if baseline is not None:
+                import warnings
+                warnings.warn(
+                    "Pre-computed baseline applies to XR only; "
+                    "UV baseline is computed normally.",
+                    stacklevel=2,
+                )
+                ssd_copy.xr.M -= baseline
+            else:
+                baseline = ssd_copy.xr.get_baseline2d(debug=debug, **baseline_kwargs)
+                ssd_copy.xr.M -= baseline
 
-        # Interpolate negative-peak frames: replace excluded columns with
-        # per-row linear interpolation between the boundary values so that
-        # the excluded region sits at the local baseline level instead of
-        # being zeroed (which would conflict with the optimizer's own
-        # baseline model).
-        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
-        if exclude is not None and exclude.any():
-            self._interpolate_excluded(ssd_copy.xr.M, exclude)
+            # Unified anomaly detection across XR and UV channels.
+            # When set_anomaly_mask() was called, both xr and uv have the flag.
+            # Detect XR anomalies via recognition_curve < 0 on the CORRECTED data.
+            # Note: pre-correction detection was attempted but rejected because
+            # buffer noise in the pre-correction recognition curve produces too
+            # many false positives (e.g. 152/1445 frames for MY), and interpolating
+            # those frames destroys the peak region and UV-XR mapping.
+            # UV auto-detection is NOT done because uv_icurve.y < 0 is normal
+            # for absorbing samples (e.g. 290nm) and would destroy actual signal.
+            # UV is interpolated only for frames mapped from XR-detected anomalies.
+            xr_exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
 
-        # Interpolate negative-peak frames: replace excluded columns with
-        # per-row linear interpolation between the boundary values so that
-        # the excluded region sits at the local baseline level instead of
-        # being zeroed (which would conflict with the optimizer's own
-        # baseline model).
-        exclude = self._resolve_neg_peak_exclude(ssd_copy.xr)
-        if exclude is not None and exclude.any():
-            self._interpolate_excluded(ssd_copy.xr.M, exclude)
+            if ssd_copy.uv is not None:
+                baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
+                ssd_copy.uv.M -= baseline
 
-        if ssd_copy.uv is not None:
-            baseline = ssd_copy.uv.get_baseline2d(debug=debug, **baseline_kwargs)
-            ssd_copy.uv.M -= baseline
-
-            # Interpolate UV frames corresponding to the XR negative-peak region
-            if exclude is not None and exclude.any():
+        # Interpolate XR for XR-detected anomalies
+        if xr_exclude is not None and xr_exclude.any():
+            self._interpolate_excluded(ssd_copy.xr.M, xr_exclude)
+            # Map to UV and interpolate corresponding frames
+            if ssd_copy.uv is not None:
                 mapping = self.get_mapping()
                 if mapping is not None and not isinstance(mapping, tuple):
                     xr_jv = ssd_copy.xr.jv
                     uv_jv = ssd_copy.uv.jv
-                    xr_frames_excluded = xr_jv[exclude]
+                    xr_frames_excluded = xr_jv[xr_exclude]
                     uv_frames_mapped = mapping.slope * xr_frames_excluded + mapping.intercept
                     uv_lo, uv_hi = uv_frames_mapped.min(), uv_frames_mapped.max()
                     uv_exclude = (uv_jv >= uv_lo) & (uv_jv <= uv_hi)
                     if uv_exclude.any():
                         self._interpolate_excluded(ssd_copy.uv.M, uv_exclude)
 
+        # Cache the mask for visualization (plot bands)
+        if xr_exclude is not None:
+            ssd_copy.xr.anomaly_mask = xr_exclude
+
         ssd_copy.time_required = time() - start_time
         ssd_copy.time_required_total = self.time_required_total + ssd_copy.time_required
+        ssd_copy.corrected = True  # flag for optimize_rigorously() Pattern A/B warning (#164)
         return ssd_copy
 
     @staticmethod
     def _resolve_neg_peak_exclude(xr):
-<<<<<<< HEAD
-        """Resolve allow_negative_peaks into a bool exclude mask (or None)."""
-        if not getattr(xr, 'allow_negative_peaks', False):
-            return None
-        np_mask = getattr(xr, 'negative_peak_mask', None)
-=======
-        """Resolve anomaly mask into a bool exclude mask (or None)."""
+        """Resolve anomaly mask into a bool exclude mask (or None).
+
+        When auto-detecting (``anomaly_mask=None``), frames where the
+        recognition curve is negative are flagged.
+        """
         if not getattr(xr, 'has_anomaly_mask', False):
             return None
         np_mask = getattr(xr, 'anomaly_mask', None)
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         jv = xr.jv
         if np_mask is None:
             return xr.get_recognition_curve().y < 0
@@ -754,7 +901,206 @@ class SecSaxsData:
             return None
         else:
             return self.beamline_info.get_concfactor()
-    
+
+    @classmethod
+    def from_legacy_sd(cls, sd, include_uv=False):
+        """Construct an SSD from a legacy SerialData (``sd``) object.
+
+        This is the Phase 1 bridge for the SD → SSD migration.  Once an SSD
+        is built from ``sd``, the full library pipeline is available:
+
+            ssd_raw      = SecSaxsData.from_legacy_sd(sd)
+            ssd_trimmed  = ssd_raw.trimmed_copy()   # applies library q-trimming
+            ssd_corrected = ssd_trimmed.corrected_copy()
+            rg = ssd_corrected.get_rg_curve()       # library-quality rg_curve
+
+        Parameters
+        ----------
+        sd : SerialData
+            Legacy data object.  ``sd.xray_array`` must be of shape
+            ``(n_q, n_frames, 3)`` where the last axis holds ``[q, I, E]``.
+        include_uv : bool
+            Not yet implemented — reserved for Phase 3.  Ignored for now.
+
+        Returns
+        -------
+        SecSaxsData  (untrimmed, uncorrected — same state as loading from folder)
+        """
+        xr_M  = sd.xray_array[:, :, 1]          # (n_q, n_frames)
+        xr_E  = sd.xray_array[:, :, 2]          # (n_q, n_frames)
+        xr_qv = np.asarray(sd.qvector)          # (n_q,)
+        xr_jv = np.arange(xr_M.shape[1])        # 0-based, caller can override
+
+        return cls.from_arrays(xr_M, xr_qv, xr_E, xr_jv=xr_jv, trimmed=False)
+
+    @classmethod
+    def from_arrays(cls, xr_M, xr_qv, xr_E, xr_jv=None,
+                    uv_M=None, uv_wv=None, uv_E=None, uv_jv=None,
+                    trimmed=False):
+        """Construct an SSD directly from numpy arrays, without reading from disk.
+
+        This is the array-level entry point for the SD → SSD migration path.
+        The primary use case is reconstructing an SSD from the ip_*.npy files
+        exported by BackRunner or prepare_rigorous_folders, so that the full
+        library pipeline (baseline correction, rg_curve) can be applied to
+        GUI data without re-reading the raw data files.
+
+        Parameters
+        ----------
+        xr_M : ndarray of shape (n_q, n_frames)
+            XR intensity matrix (corrected or uncorrected).
+        xr_qv : ndarray of shape (n_q,)
+            q-values in Å⁻¹.
+        xr_E : ndarray of shape (n_q, n_frames)
+            XR error matrix.
+        xr_jv : ndarray of shape (n_frames,) or None
+            Original frame numbers.  If None, defaults to ``np.arange(n_frames)``.
+        uv_M : ndarray or None
+            UV absorbance matrix.  If None, SSD is XR-only.
+        uv_wv : ndarray or None
+            UV wavelengths (nm).
+        uv_E : ndarray or None
+            UV error matrix (rarely used).
+        uv_jv : ndarray or None
+            UV frame numbers.
+        trimmed : bool
+            Whether this data is already trimmed (sets ``ssd.trimmed``).
+
+        Returns
+        -------
+        SecSaxsData
+
+        Examples
+        --------
+        Reconstruct from GUI ip_*.npy files::
+
+            import numpy as np
+            D   = np.load('ip_xr_D.npy')
+            qv  = np.load('ip_xr_qvector.npy')
+            E   = np.load('ip_xr_E.npy')
+            jv  = np.load('ip_xr_jv.npy')          # optional
+            ssd = SecSaxsData.from_arrays(D, qv, E, xr_jv=jv, trimmed=True)
+            rg  = ssd.compute_rgcurve()             # skip baseline: data already corrected
+        """
+        from molass.DataObjects.XrData import XrData
+
+        if xr_jv is None:
+            xr_jv = np.arange(xr_M.shape[1])
+        xr_data = XrData(xr_M, xr_qv, xr_jv, xr_E)
+
+        uv_data = None
+        if uv_M is not None:
+            from molass.DataObjects.UvData import UvData
+            if uv_jv is None:
+                uv_jv = np.arange(uv_M.shape[1])
+            uv_data = UvData(uv_M, uv_wv, uv_jv, uv_E)
+
+        return cls(object_list=[xr_data, uv_data], trimmed=trimmed)
+
+    def get_rg_curve(self, progress_cb=None):
+        """Compute the per-frame Rg curve from the corrected XR data, with caching.
+
+        Runs a Guinier fit on every elution frame independently and returns
+        the results as an ``RgCurve`` object.  The result is cached on this
+        instance, so repeated calls are free.
+
+        This is the recommended entry point for obtaining the Rg curve before
+        decomposition.  Pass the returned object to ``quick_decomposition()``
+        and ``optimize_rigorously()`` to avoid redundant recomputation::
+
+            rgcurve = corrected.get_rg_curve()            # computed once, cached
+            decomp   = corrected.quick_decomposition(rgcurve=rgcurve)
+            run      = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
+
+        Parameters
+        ----------
+        progress_cb : callable or None, optional
+            Optional callback ``(rg_buffer, j)`` called after each frame.
+            ``rg_buffer`` is a float array of accumulated Rg values (0 for
+            not-yet-computed frames); ``j`` is the 0-based column index.
+            The signature is compatible with the legacy ``ProgressCallback``
+            so GUI callers can drive a progress bar and live Rg overlay.
+            Ignored if the result is already cached.
+
+        Returns
+        -------
+        rgcurve : molass.Guinier.RgCurve.RgCurve
+            An ``RgCurve`` with attributes:
+
+            - ``.x`` — frame indices (integer array)
+            - ``.y`` — Rg values in Å; ``NaN`` where Guinier fit failed
+            - ``.scores`` — Guinier fit quality scores (0–1)
+
+        See also
+        --------
+        XrData.compute_rgcurve : underlying computation (no caching)
+        Decomposition.get_rg_curve : same pattern on a Decomposition object
+        """
+        if getattr(self, '_rgcurve', None) is None:
+            self._rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
+        return self._rgcurve
+
+    def recommend_decomposition_options(self, egh_overlap_threshold=1.3):
+        """Recommend keyword arguments for ``quick_decomposition()`` by detecting peaks.
+
+        Uses EGH peeling to identify elution components robustly.  Consecutive
+        EGH peaks whose spacing/sigma_sum ratio falls below *egh_overlap_threshold*
+        are merged into a single component.
+
+        Example::
+
+            opts = corrected.recommend_decomposition_options()
+            # → {'num_components': 2, 'xr_peakpositions': [145, 220]}
+            # or → {'num_components': 3, 'proportions': [1, 1, 1]}
+            opts['num_components'] = 3    # easy override
+            decomp = corrected.quick_decomposition(**opts)
+
+        Parameters
+        ----------
+        egh_overlap_threshold : float, optional
+            EGH peak pairs with spacing/sigma_sum below this value are merged
+            into one component.  Default 1.3.
+
+        Returns
+        -------
+        dict
+            Keyword arguments for ``quick_decomposition()``.
+
+        See also
+        --------
+        recommend_decomposition : convenience wrapper that calls this method
+            and then ``quick_decomposition(**opts)``.
+        """
+        from molass.Decompose.Recommend import recommend_decomposition_options as _impl
+        return _impl(self.xr, egh_overlap_threshold=egh_overlap_threshold)
+
+    def recommend_decomposition(self, **kwargs):
+        """Automatically detect peaks and return a decomposition.
+
+        Combines :meth:`recommend_decomposition_options` with
+        :meth:`quick_decomposition`.  Any keyword argument overrides the
+        automatic recommendation::
+
+            # One-liner — fully automatic:
+            decomp = corrected.recommend_decomposition()
+
+            # Override a single field while keeping the rest automatic:
+            decomp = corrected.recommend_decomposition(num_components=3)
+
+        Parameters
+        ----------
+        **kwargs
+            Any keyword accepted by ``quick_decomposition()``.  These are
+            merged *after* the automatic options, so they take priority.
+
+        Returns
+        -------
+        Decomposition
+        """
+        opts = self.recommend_decomposition_options()
+        opts.update(kwargs)
+        return self.quick_decomposition(**opts)
+
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 
@@ -845,6 +1191,7 @@ class SecSaxsData:
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',
             'curve_model', 'smoothing', 'decompargs', 'peakpositions',
             'smooth_uv', 'consistent_uv', 'ip_effect_info',
+            'rgcurve',
         }
         unknown = set(kwargs) - _KNOWN_KWARGS
         if unknown:
@@ -876,7 +1223,13 @@ class SecSaxsData:
             except Exception:
                 pass  # detect_peaks may fail on edge cases; don't block decomposition
 
-        return make_decomposition_impl(self, num_components, **kwargs)
+        rgcurve = kwargs.pop('rgcurve', None)
+        from molass.Global.Quiet import suppress_if_quiet
+        with suppress_if_quiet(debug=debug):
+            result = make_decomposition_impl(self, num_components, **kwargs)
+            if rgcurve is not None:
+                result._rgcurve = rgcurve
+            return result
 
     def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.rigorous_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
@@ -969,6 +1322,119 @@ class SecSaxsData:
             return None
         else:
             return self.beamline_info.name
+
+    def get_data_info(self):
+        """ssd.get_data_info()
+
+        Returns a machine-readable summary of the dataset characteristics.
+        Useful for automated diagnostics: an AI agent can call this to understand
+        the data without reading plots.
+
+        Returns
+        -------
+        info : DataInfo (namedtuple)
+            A namedtuple with the following fields:
+
+            - ``n_xr_frames`` (int or None): Number of XR frames
+            - ``n_uv_frames`` (int or None): Number of UV frames
+            - ``uv_peak_wavelength`` (float or None): Wavelength (nm) of max absorbance at the XR peak frame
+            - ``uv_pickat`` (float or None): Current UV pickat setting (default 280 nm)
+            - ``uv_monitor`` (float or None): Alias for ``uv_pickat`` (monitoring wavelength)
+            - ``xr_peak_frame`` (int or None): Frame index of the XR elution peak
+            - ``is_trimmed`` (bool): Whether the data has been trimmed
+            - ``pickat_mismatch`` (bool): True if uv_peak_wavelength differs from uv_pickat by >5 nm
+            - ``has_negative_xr_regions`` (bool): True if anomalous frames are detected
+              (Tier 1: column-sum neg_depth > 3%, OR Tier 2: baseline self-test p < 0.01),
+              indicating that ``set_anomaly_mask()`` should be called
+            - ``negative_xr_fraction`` (float or None): Fraction of XR frames with negative recognition-curve values
+            - ``baseline_selftest_p`` (float or None): p-value from the baseline self-test
+              (Wilcoxon signed-rank). Low values (< 0.01) indicate buffer-frame contamination.
+              None if XR data is absent.
+
+        Examples
+        --------
+        >>> info = ssd.get_data_info()
+        >>> print(info)
+        >>> if info.pickat_mismatch:
+        ...     print(f"Consider using uv_monitor={info.uv_peak_wavelength:.0f}")
+        >>> if info.has_negative_xr_regions:
+        ...     print("Call ssd.set_anomaly_mask() before corrected_copy()")
+        """
+        from collections import namedtuple
+        DataInfo = namedtuple('DataInfo', [
+            'n_xr_frames', 'n_uv_frames',
+            'uv_peak_wavelength', 'uv_pickat', 'uv_monitor',
+            'xr_peak_frame', 'is_trimmed', 'pickat_mismatch',
+            'has_negative_xr_regions', 'negative_xr_fraction',
+            'baseline_selftest_p',
+        ])
+
+        n_xr_frames = self.xr.M.shape[1] if self.xr is not None else None
+        n_uv_frames = self.uv.M.shape[1] if self.uv is not None else None
+
+        xr_peak_frame = None
+        uv_peak_wl = None
+        uv_pickat = None
+        pickat_mismatch = False
+        has_negative_xr = False
+        negative_xr_frac = None
+        selftest_p = None
+
+        if self.xr is not None:
+            xr_icurve = self.xr.get_recognition_curve()
+            xr_peak_frame = int(xr_icurve.x[np.argmax(xr_icurve.y)])
+            # Anomaly detection: use matrix column-sum (sum over all q-rows).
+            # The single-row icurve has noise-level negatives in all datasets;
+            # the full-sum amplifies real anomalous dips above noise.
+            xr_colsum = self.xr.M.sum(axis=0)
+            neg_depth = abs(xr_colsum.min()) / xr_colsum.max() if xr_colsum.max() > 0 else 0
+            negative_xr_frac = float(np.mean(xr_colsum < 0))
+            has_negative_xr = neg_depth > 0.03  # Tier 1: dip >3% of peak height
+
+            # Tier 2: baseline self-test (catches subtle cases like ATP).
+            # Compare per-q-row negative fraction in peak region:
+            # buffer-mean-flat baseline vs endpoint-linear baseline.
+            # If using buffer info makes things worse, buffer frames are contaminated.
+            selftest_p = _baseline_selftest(self.xr.M, xr_icurve)
+            if not has_negative_xr and selftest_p is not None:
+                has_negative_xr = selftest_p < 0.01
+
+        if self.uv is not None:
+            uv_pickat = self.uv.pickat
+            # Find the wavelength of max absorbance at the XR peak frame
+            if xr_peak_frame is not None:
+                mapping = self.get_mapping()
+                uv_icurve = mapping.uv_curve
+                uv_frame = mapping.get_mapped_index(
+                    xr_peak_frame, xr_icurve.x, uv_icurve.x)
+                spectrum = self.uv.M[:, uv_frame]
+                uv_peak_wl = float(self.uv.wavelengths[np.argmax(spectrum)])
+            else:
+                # No XR data; use UV peak frame directly
+                uv_elution = self.uv.M.sum(axis=0)
+                uv_peak_frame = np.argmax(uv_elution)
+                spectrum = self.uv.M[:, uv_peak_frame]
+                uv_peak_wl = float(self.uv.wavelengths[np.argmax(spectrum)])
+
+            if uv_peak_wl is not None and uv_pickat is not None:
+                # Only flag mismatch when absorbance peak is ABOVE pickat wavelength.
+                # Peak below pickat (e.g., 230 nm peptide bond vs 280 nm pickat) is normal for proteins.
+                # Peak above pickat (e.g., 290 nm nucleotide vs 280 nm) signals a non-standard sample.
+                pickat_mismatch = (uv_peak_wl - uv_pickat) > 5
+
+        return DataInfo(
+            n_xr_frames=n_xr_frames,
+            n_uv_frames=n_uv_frames,
+            uv_peak_wavelength=uv_peak_wl,
+            uv_pickat=uv_pickat,
+            uv_monitor=uv_pickat,
+            xr_peak_frame=xr_peak_frame,
+            is_trimmed=self.trimmed,
+            pickat_mismatch=pickat_mismatch,
+            has_negative_xr_regions=has_negative_xr,
+            negative_xr_fraction=negative_xr_frac,
+            baseline_selftest_p=selftest_p,
+        )
 
     def export(self, folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=False):
         """ssd.export(folder, prefix=None, fmt='%.18e', xr_only=False, uv_only=Fals)
