@@ -9,7 +9,17 @@ from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
     'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
+    'rg_score_threshold', 'rg_marker_size', 'rg_cmap',
 }
+
+def _draw_anomaly_bands(decomposition, xr_ax, uv_ax):
+    """Draw shaded vertical bands on XR and UV elution panels for anomalous frames.
+
+    Delegates to the shared AnomalyBands utility for consistent appearance
+    across plot_compact(), plot_components(), and MplMonitor.
+    """
+    from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
+    draw_anomaly_bands_for_ssd(xr_ax, uv_ax, decomposition.ssd)
 
 def create_axes(fig, row_titles=["UV", "XR"]):
     gs = GridSpec(2,10)
@@ -54,16 +64,37 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
     ax.legend()
 
     colorbar = kwargs.get('colorbar', False)
+    reconstructed_rgcurve = kwargs.get('reconstructed_rgcurve', None)
     if rgcurve is None:
         axt = None
     else:
+        # Issue #121: defaults chosen for visibility — low-score points should be
+        # discernible (was: cmap='YlGn' + s=3 made low-score points nearly
+        # invisible and made overlapping high-confidence dots near the peak look
+        # sparse). Override via kwargs if needed.
+        rg_score_threshold = kwargs.get('rg_score_threshold', None)
+        rg_marker_size = kwargs.get('rg_marker_size', 12)
+        rg_cmap = kwargs.get('rg_cmap', 'viridis')
+
         axt = ax.twinx()
         axt.set_ylabel("$R_g$")
-        cm = plt.get_cmap('YlGn')
+        cm = plt.get_cmap(rg_cmap)
         x_ = rgcurve.frames
+        rg_y = rgcurve.rgvalues
+        rg_c = rgcurve.scores
+        if rg_score_threshold is not None:
+            mask = rg_c >= rg_score_threshold
+            x_ = x_[mask]; rg_y = rg_y[mask]; rg_c = rg_c[mask]
         axt.grid(False)
-        sc = axt.scatter(x_, rgcurve.rgvalues, c=rgcurve.scores, s=3, cmap=cm)
+        sc = axt.scatter(x_, rg_y, c=rg_c, s=rg_marker_size, cmap=cm, label="Rg (data)")
         
+        if reconstructed_rgcurve is not None:
+            rx_ = reconstructed_rgcurve.frames
+            ry_ = reconstructed_rgcurve.rgvalues
+            axt.plot(rx_, ry_, color='red', linewidth=1.5, alpha=0.7, label="Rg (model)")
+
+        axt.legend(fontsize=7, loc='upper right')
+
         if colorbar:
             ax.fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
         ymin, ymax = axt.get_ylim()
@@ -166,8 +197,16 @@ def plot_components_impl(decomposition, **kwargs):
 
     # XR Elution Curve
     recognition_curve = decomposition.ssd.xr.get_recognition_curve()
-    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=kwargs.get('rgcurve', None),
+    rgcurve = kwargs.get('rgcurve', None)
+    reconstructed_rgcurve = None
+    if rgcurve is not None:
+        reconstructed_rgcurve = decomposition.compute_reconstructed_rgcurve(debug=debug)
+    axt = plot_elution_curve(ax2, decomposition.xr_icurve, decomposition.xr_ccurves, rgcurve=rgcurve,
+                             reconstructed_rgcurve=reconstructed_rgcurve,
                              recognition_curve=recognition_curve,
+                             rg_score_threshold=kwargs.get('rg_score_threshold', None),
+                             rg_marker_size=kwargs.get('rg_marker_size', 12),
+                             rg_cmap=kwargs.get('rg_cmap', 'viridis'),
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges
@@ -191,6 +230,9 @@ def plot_components_impl(decomposition, **kwargs):
                         alpha = 0.2,
                         )
                     ax.add_patch(p)              
+
+    # Anomaly exclusion bands — show excluded frames as shaded vertical bands
+    _draw_anomaly_bands(decomposition, ax2, ax1)
 
     # UV Absorbance Curves
     if decomposition.uv is not None:

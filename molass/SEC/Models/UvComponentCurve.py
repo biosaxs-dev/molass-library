@@ -40,6 +40,7 @@ class UvComponentCurve(ComponentCurve):
         self.mapping = mapping
         self.xr_ccurve = xr_ccurve
         self.scale = scale
+        self.model = getattr(xr_ccurve, 'model', 'egh')  # inherit model type from XR curve
 
     def get_y(self, x=None):
         """
@@ -87,11 +88,20 @@ class UvComponentCurve(ComponentCurve):
         """
         Returns the scaling factor of the UV component curve.
         
+        Only valid for EGH model where params[0] is the height parameter.
+        
         Returns
         -------
         float
             The scaling factor of the component curve.
+            
+        Raises
+        ------
+        ValueError
+            If the underlying XR curve model is not 'egh'.
         """
+        if self.model != 'egh':
+            raise ValueError(f"get_scale() only valid for EGH model, got '{self.model}'")
         return self.scale * self.xr_ccurve.get_params()[0]
 
     def get_inv_mapped_params(self):

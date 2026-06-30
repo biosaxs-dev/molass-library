@@ -6,8 +6,18 @@ from molass_legacy.RgProcess.RgCurve import RgCurve, make_availability_slices
 from molass_legacy._MOLASS.SerialSettings import get_setting
 
 class LegacyRgCurve(RgCurve):
-    """
-    A class representing a legacy Rg curve.
+    """A class representing a legacy Rg curve.
+
+    Inherits from the legacy ``molass_legacy.RgProcess.RgCurve.RgCurve`` but
+    bypasses ``super().__init__()``.  The following parent attributes that would
+    normally be set by the parent ``__init__`` must therefore be initialized
+    manually here — any future extension of this class or new subclass of
+    ``RgCurve`` must do the same:
+
+    - ``self.ecurve``        — required by ``add_exclspline()``
+    - ``self.excl_spline``   — checked by ``get_rgs_from_trs()`` (lazy build)
+    - ``self.excl_info``     — set by ``add_exclspline()``
+    - ``self.X``             — used by ``get_probabilistic_data()``
     """
 
     def __init__(self, ecurve, rgcurve):
@@ -44,3 +54,8 @@ class LegacyRgCurve(RgCurve):
         xr_restrict_list = get_setting("xr_restrict_list")
         self.rg_trimming = None if xr_restrict_list is None else xr_restrict_list[0]
         self.baseline_type = get_setting("unified_baseline_type")
+        # Required by RgCurve.add_exclspline() (called lazily by get_rgs_from_trs).
+        self.ecurve = ecurve
+        self.excl_spline = None   # built on first call to get_rgs_from_trs()
+        self.excl_info = None
+        self.X = None             # used by get_probabilistic_data()

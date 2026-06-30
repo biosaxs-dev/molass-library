@@ -57,6 +57,18 @@ class UvData(SsMatrixData):
         self.pickat = value
 
     @property
+    def monitor(self):
+        """Monitoring wavelength (nm) — alias for ``pickat``.
+
+        Follows chromatography convention. Equivalent to ``uv_pickat``.
+        """
+        return self.pickat
+
+    @monitor.setter
+    def monitor(self, value):
+        self.pickat = value
+
+    @property
     def wavelengths(self):
         """Wavelength axis in nm (alias for ``iv`` / ``wv``)."""
         return self.iv

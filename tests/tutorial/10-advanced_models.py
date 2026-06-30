@@ -22,16 +22,16 @@ def test_001_plot_compact():
 
 @pytest.mark.order(2)
 @control_matplotlib_plot
-def test_002_optimize_with_model_sdm():
-    sdm_decomposition = decomposition.optimize_with_model('SDM')
+def test_002_upgrade_sdm():
+    sdm_decomposition = decomposition.upgrade('SDM')
     sdm_decomposition.plot_components(title="SDM decomposition of sample4 from EGH result");
 
 @pytest.mark.order(3)
 @control_matplotlib_plot
-def test_003_optimize_with_model_edm():
+def test_003_upgrade_edm():
     import warnings
     # Suppress runtime warnings for this specific test
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
-        edm_decomposition = decomposition.optimize_with_model('EDM')
+        edm_decomposition = decomposition.upgrade('EDM')
         edm_decomposition.plot_components(title="EDM decomposition of sample4 from EGH result");

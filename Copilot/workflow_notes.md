@@ -3,25 +3,49 @@
 Notes for AI assistants (Copilot, etc.) working in this repository across multiple sessions and machines.
 
 ## Terminal tips (VS Code, Windows PowerShell only)
-- `cd repo; git ...` — the tool may strip `cd` in PowerShell, running git in the wrong dir. Use `Push-Location repo; git ...` instead. (Not an issue in bash/zsh.)
-- Multi-line `gh issue create --body "..."` fails in PowerShell due to special chars. Use:
-  ```powershell
-  $body = @"
-  ...body text...
-  "@
-  $body | gh issue create --title "..." --label "enhancement" --body-file -
-  ```
-  In bash, use a heredoc: `gh issue create ... --body-file - <<'EOF'` ... `EOF`
+
+### Multi-repo `git` invocations
+Use `git -C <path> ...` instead of `cd <path>; git ...`. The terminal tool may silently strip `cd` from chained commands in PowerShell, running `git` against the wrong repo. (Not an issue in bash/zsh.)
+
+```powershell
+# ❌ Unreliable
+cd c:\Users\takahashi\GitHub\molass-library; git log -1
+# ✅ Reliable
+git -C c:\Users\takahashi\GitHub\molass-library log -1
+```
+
+### Multi-line `gh issue create` (preferred: temp-file pattern)
+Writing the body to a temp file and passing `--body-file <path>` avoids both (a) PowerShell quoting issues and (b) the VS Code terminal tool's "may be waiting for input" misfire that triggers on stdin pipes.
+
+```powershell
+$body = @'
+...markdown body...
+'@
+Set-Content -Path "$env:TEMP\issue.md" -Value $body -Encoding UTF8
+gh -R biosaxs-dev/molass-library issue create --title "..." --label "enhancement" --body-file "$env:TEMP\issue.md"
+```
+
+Stdin-pipe form (`$body | gh ... --body-file -`) also works but trips the false-input warning on every call.
+In bash, a heredoc is fine: `gh issue create ... --body-file - <<'EOF'` ... `EOF`.
+
+### NEVER use PowerShell text ops on non-ASCII files (CRITICAL)
+`Get-Content` / `.Replace()` / `WriteAllText()` / `Set-Content` (without explicit `-Encoding UTF8`) default to **cp932 (Shift-JIS) on Japanese Windows**. They silently garble UTF-8 multi-byte characters (–, Δ, Å, →, ×, etc.) and **destructively consume adjacent ASCII bytes** — making automated reversal impossible.
+
+Safe alternatives:
+- `replace_string_in_file` tool (VS Code's native edit tool)
+- Python `json` module for `.ipynb` files (explicitly reads/writes UTF-8)
+- `Set-Content -Encoding UTF8` when writing — never read-modify-write text files via PS
 
 ## GitHub Issues
 - Always use `gh` CLI to create issues — do NOT attempt browser-based approaches
+- **Always pass `-R biosaxs-dev/molass-library`** explicitly. `gh` auto-detects the repo from cwd, but in a multi-root workspace cwd is unreliable; explicit `-R` removes the ambiguity. (Same applies for other repos in the workspace — use `-R <owner>/<repo>` always.)
 - Repo: biosaxs-dev/molass-library
 
 ## Issue titling policy
 
 Use the correct prefix to categorize issues:
 
-- **`AI-friendliness:`** — API is confusing specifically for an AI (or any caller without deep context): wrong arg order, silent failures, missing defaults, opaque names. Examples: #47, #49, #28.
+- **`AI-friendliness:`** — anything that makes the *working environment* harder to use without deep context. This includes Python APIs (wrong arg order, silent failures, opaque names) AND tools/extensions/conventions (missing tools, undiscoverable capabilities, broken workflows). Examples: #47, #49, #28; ai-context-vscode missing `canBeReferencedInPrompt`.
 - **`Design:`** — workflow/philosophy issues: separation of concerns, consistency with existing patterns, architectural decisions. Example: #50.
 - **`Enhancement:`** / **`Bug:`** — standard feature additions and bug fixes.
 
@@ -68,3 +92,6 @@ When fixing AI-friendliness issues, follow this pattern per issue:
 
 ### Issues pending (filed, not yet implemented)
 - #50: Design: `allow_negative_peaks` as stored object state — separate baseline recognition from `corrected_copy`
+- #126: AI-friendliness: add `best_fv`/`best_sv` to `mplmonitor_latest.json` — implemented in molass-legacy `MplMonitor._build_monitor_snapshot_json()`
+- #127: AI-friendliness: write `run_complete.json` on optimizer job completion — implemented in molass-legacy `MplMonitor._write_run_complete_json()` + molass-library `RunInfo.run_complete_path` / `load_run_complete()`
+- #128: AI-friendliness: widget title should show best accepted SV, not current snapshot SV — implemented in molass-legacy `JobStatePlot.plot_objective_func()` (add `best_sv` kwarg, update title to `"best SV=XX.X  (cur=YY.Y)"`) + `MplMonitor.update_plot()` (compute `best_sv` from `job_state.fv` and pass through)

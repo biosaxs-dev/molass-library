@@ -30,6 +30,10 @@ class EDM:
             The optimized decomposition.
         """
         debug = kwargs.get('debug', False)
+        # Merge constructor kwargs (e.g. shared_column set by ModelFactory for CEDM)
+        # with call-time kwargs; call-time values take precedence.
+        merged = {**self.kwargs, **kwargs}
+        kwargs = merged
         if debug:
             from importlib import reload
             import molass.SEC.Models.EdmEstimator
@@ -39,11 +43,20 @@ class EDM:
             import molass.SEC.Models.UvOptimizer
             reload(molass.SEC.Models.UvOptimizer)
         from molass.SEC.Models.EdmEstimator import estimate_edm_init_params
-        from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition
+        from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition, refine_edm_per_component
         from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
         init_params = estimate_edm_init_params(decomposition, **kwargs)
+        # Pass 1 (heavy): full shared-column optimisation — finds (t0, u, e, Dz, a, b, cinj).
         new_xr_ccurves = optimize_edm_xr_decomposition(decomposition, init_params, **kwargs)
+        # Pass 2 (lighter): fix shared column (t0, u, e, Dz), refine per-component (a, b, cinj).
+        # b bounds: n_comp < 4 → b ≤ Pass-1 value per component; n_comp >= 4 → hard b ≤ 0.
+        # The n_comp >= 4 cap prevents EDM overflow without restricting 2/3-component systems.
+        # Validated cross-sample (SAMPLE1–4): SAMPLE4 SV -83→+79, SAMPLE2/3 fv dramatically better,
+        # SAMPLE1 neutral (−0.05 SV). Opt-out via refine_per_component=False.
+        if kwargs.get('refine_per_component', True):
+            x, y = decomposition.xr_icurve.get_xy()
+            new_xr_ccurves = refine_edm_per_component(new_xr_ccurves, x, y, **kwargs)
         if decomposition.uv is None:
             new_uv_ccurves = None
         else:

@@ -115,12 +115,18 @@ class ComponentCurve:
         return self.params[1]   # peak position in EGH model, note that this in valid only for EGH model
     
     def get_scale_param(self):
-        """
-        Returns the scale parameter.
+        """Return the area scaling factor.
 
         Returns
         -------
         float
             The scale parameter.
+
+        .. warning::
+            The base implementation returns ``self.params[0]``, which equals
+            the scale **only for EGH** (params layout: ``[H, mu, sigma, tau]``).
+            Subclasses whose ``params[0]`` is not the scale (e.g. LKM and GRM
+            where ``params[0] = Pe``) **must** override this method.
+            See molass-library issue #209.
         """
-        return self.params[0]   # scale in EGH model
+        return self.params[0]   # scale in EGH model — override in non-EGH subclasses!

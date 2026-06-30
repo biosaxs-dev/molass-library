@@ -10,9 +10,11 @@ from molass_legacy.SecSaxs.ElCurve import ElCurve
 def _resolve_neg_peak_exclude(xr):
     """Return a bool array (len = num frames) where True = exclude from LPM anchors.
 
-    Mirrors the same logic as SsMatrixData.get_baseline2d() so that the
+    Mirrors the same logic as SecSaxsData._resolve_neg_peak_exclude() so that the
     ScatteringBaseline in the rigorous path skips the same frames that the
     standard corrected_copy() path skips.
+
+    When auto-detecting, frames where the recognition curve is negative are flagged.
     """
 <<<<<<< HEAD
     if not getattr(xr, 'allow_negative_peaks', False):
@@ -25,8 +27,7 @@ def _resolve_neg_peak_exclude(xr):
 >>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
     jv = xr.jv
     if np_mask is None:
-        rc_y = xr.get_recognition_curve().y
-        return rc_y < 0
+        return xr.get_recognition_curve().y < 0
     elif isinstance(np_mask, slice):
         i_start = np.searchsorted(jv, np_mask.start) if np_mask.start is not None else None
         i_stop  = np.searchsorted(jv, np_mask.stop, side='right') if np_mask.stop is not None else None

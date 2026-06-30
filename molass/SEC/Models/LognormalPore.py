@@ -244,6 +244,24 @@ def sdm_lognormal_pore_gamma_cf(w, N, T, k, me, mp, mu, sigma, Rg, N0, t0, const
     - Mobile phase dispersion (Brownian component)
     - Size exclusion effects (Ksec with Rg)
     
+    **CF structure**::
+    
+        φ(ω) = exp[Z + Z²/(2*N0)]
+        Z = iω*t0 + ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * ((1 - iω*τ_r)^{-k} - 1) dr
+    
+    **Moment formulas** (from meeting doc 2026-01-19):
+    
+        M1 (mean) = t0 + k * ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * τ_r dr
+    
+        M2~ (variance) = k*(k+1) * ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * τ_r² dr
+                         + M1² / N0
+    
+    where n_r = N * Ksec(Rg, r, me) and τ_r = T * Ksec(Rg, r, mp).
+    
+    The variance has two terms:
+    - Altering-zone term: k*(k+1) * ∫... (pore residence heterogeneity)
+    - Dispersive term: M1² / N0 (mobile phase Brownian broadening)
+    
     For special cases:
     - k=1: Reduces to sdm_lognormal_pore_cf (exponential residence)
     - N0→∞: Reduces to GEC with Gamma residence
@@ -311,3 +329,178 @@ def sdm_lognormal_pore_gamma_pdf(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t
     ... )
     """
     return scale*sdm_lognormal_pore_gamma_pdf_impl(x - t0, N, T, k, me, mp, mu, sigma, Rg, N0, 0)
+
+# ============================================================================
+# Fast Gauss-Legendre Versions (for optimizer use)
+#
+# Replace adaptive quad_vec with fixed Gauss-Legendre quadrature and fully
+# vectorized numpy operations.  Typical speedup: 50-100x per PDF call.
+# ============================================================================
+
+def sdm_lognormal_pore_gamma_cf_fast(w, N, T, k, me, mp, mu, sigma, Rg, N0, t0, n_quad=64):
+    """Vectorized Gauss-Legendre version of sdm_lognormal_pore_gamma_cf."""
+    mode = compute_mode(mu, sigma)
+    stdev = compute_stdev(mu, sigma)
+    max_rg = min(PORESIZE_INTEG_LIMIT, mode + 5*stdev)
+
+    if max_rg <= Rg:
+        Z = 1j * w * t0
+        return np.exp(Z + Z**2 / (2 * N0))
+
+    # Gauss-Legendre nodes/weights mapped to [Rg, max_rg]
+    nodes, weights = np.polynomial.legendre.leggauss(n_quad)
+    half = 0.5 * (max_rg - Rg)
+    mid  = 0.5 * (max_rg + Rg)
+    r  = half * nodes + mid       # (n_quad,)
+    wt = half * weights           # (n_quad,)
+
+    # Integrand components at all quadrature nodes
+    g = lognorm.pdf(r, sigma, scale=np.exp(mu))   # (n_quad,)
+    ratio = np.minimum(1.0, Rg / r)               # (n_quad,)
+    n_pore = N * (1 - ratio)**me                   # (n_quad,)
+    theta  = T * (1 - ratio)**mp                   # (n_quad,)
+
+    # Gamma CF: (1 - iw*theta)^(-k) - 1
+    # Broadcast: w (n_w,1) × theta (1,n_quad) → (n_w, n_quad)
+    gamma_term = (1 - 1j * w[:, None] * theta[None, :])**(-k) - 1
+
+    # Weighted sum over quadrature nodes
+    coeffs = g * n_pore * wt                       # (n_quad,)
+    integrated = gamma_term @ coeffs               # (n_w,)
+
+    Z = integrated + 1j * w * t0
+    return np.exp(Z + Z**2 / (2 * N0))
+
+_sdm_lognormal_pore_gamma_pdf_fast_impl = FftInvPdf(sdm_lognormal_pore_gamma_cf_fast)
+
+def sdm_lognormal_pore_gamma_pdf_fast(x, scale, N, T, k, me, mp, mu, sigma, Rg, N0, t0):
+    """Fast version of sdm_lognormal_pore_gamma_pdf using Gauss-Legendre quadrature.
+
+    Applies an adaptive timescale as a performance optimization: by scaling
+    ``(x - t0)`` into the [0, 1023] range, FftInvPdf can use the default N=1024
+    grid rather than auto-resizing to a larger power of 2.  The timescale is
+    capped at DEFAULT_TIMESCALE (0.25) so it never exceeds the mono-model default.
+
+    Safety note: FftInvPdf now auto-resizes its FFT grid whenever the query range
+    exceeds N (see FftUtils.py, issue #181), so this timescale is no longer
+    required for correctness.  It is kept here purely to avoid the 2× FFT cost
+    of the N=2048 fallback during optimization (thousands of PDF evaluations).
+    """
+    from molass.SEC.Models.SdmMonoPore import DEFAULT_TIMESCALE
+    x_shifted_max = np.max(x) - t0
+    ts_safe = (1024 - 1) / x_shifted_max if x_shifted_max > 0 else DEFAULT_TIMESCALE
+    ts = min(DEFAULT_TIMESCALE, ts_safe)
+    return scale * ts * _sdm_lognormal_pore_gamma_pdf_fast_impl(
+        ts * (x - t0), N, ts * T, k, me, mp, mu, sigma, Rg, N0, 0
+    )
+
+
+# --------------------------------------------------------------------------
+# Analytical moments of SDM lognormal-pore gamma distribution
+# --------------------------------------------------------------------------
+# The full elution PDF is expensive to evaluate (~10 ms for len(x)=800).
+# For initial parameter estimation by moment matching we only need the
+# first two moments (M1, Variance), which can be computed analytically by
+# integrating over the pore-size distribution. The integral is evaluated
+# by 64-point Gauss-Legendre quadrature on [Rg, max_rg].
+#
+# Per-call cost: ~50 us (≈200x faster than the full PDF). This makes
+# moment-matching viable inside an inner optimization loop.
+#
+# See molass-researcher 13v_moment_matching_strategy notebook for the
+# benchmark and derivation. Issue #113.
+
+_GL64_NODES, _GL64_WEIGHTS = np.polynomial.legendre.leggauss(64)
+_LOG_2PI_HALF = 0.5 * np.log(2.0 * np.pi)
+
+def _lognorm_pdf_fast(r, mu, sigma):
+    """Hand-rolled lognormal PDF (~6x faster than scipy.stats.lognorm.pdf,
+    bit-identical to ~1e-16 relative error)."""
+    z = (np.log(r) - mu) / sigma
+    return np.exp(-0.5 * z * z - _LOG_2PI_HALF) / (r * sigma)
+
+def sdm_lognormal_model_moments(rg, N, T, N0, t0, k, mu, sigma, me=1.5, mp=1.5):
+    """Compute (M1, Variance) of the SDM lognormal-pore gamma elution model.
+
+    .. note::\n        ``me`` and ``mp`` default to 1.5 (standard SDM SEC exponents).  When
+        using column-fitted values, pass them explicitly — they live at positions
+        2 and 3 of ``SdmColumn.get_params()`` (i.e., ``col.get_params().me``)
+        but are keyword-only here::
+
+            M1, Var = sdm_lognormal_model_moments(
+                rg, N, T, N0, t0, k, mu, sigma,
+                me=ln_env.me, mp=ln_env.mp)  # ln_env from estimate_sdm_lognormal_from_monopore
+
+        ``k`` (gamma shape) is **not** in the ``LognormalEnv`` 8-tuple; use
+        ``col.get_params().k`` from the mono-pore result for moment-matching.
+
+    For a single component with radius of gyration ``rg``, the residence-time
+    distribution is gamma with shape ``k`` and per-pore mean ``n(r)·tau(r)``,
+    weighted by the lognormal pore-size density L(r; mu, sigma).
+
+    Formulas:
+        M1  = t0 + k * I1
+        Var = k * (k + 1) * I2 + M1^2 / N0
+    where
+        I1 = integral over r in [rg, max_rg] of L(r) * n(r) * tau(r) dr
+        I2 = integral over r in [rg, max_rg] of L(r) * n(r) * tau(r)^2 dr
+        n(r)   = N * (1 - rg/r)^me
+        tau(r) = T * (1 - rg/r)^mp
+
+    The variance formula uses the second *raw* moment of the per-pore Gamma
+    distribution (k*(k+1)*theta^2), as appropriate for the compound-Poisson
+    structure of the SDM model.
+
+    Parameters
+    ----------
+    rg : float
+        Radius of gyration of the component (Å).
+    N, T : float
+        SDM column parameters (per-pore plate count and residence time).
+    N0 : float
+        Mobile-phase plate number (governs Gaussian dispersion).
+    t0 : float
+        Dead time / column offset.
+    k : float
+        Gamma shape parameter for residence-time distribution.
+    mu, sigma : float
+        Lognormal pore-size distribution parameters.
+    me, mp : float, optional
+        SEC partition exponents (default 1.5).
+
+    Returns
+    -------
+    (M1, Var) : tuple of float
+        First moment (mean) and central second moment (variance) of
+        the elution profile.
+
+    See Also
+    --------
+    sdm_lognormal_pore_gamma_pdf_fast : full elution PDF computation.
+    """
+    sigma2 = sigma * sigma
+    mode = np.exp(mu - sigma2)
+    stdev = np.exp(mu + 0.5 * sigma2) * np.sqrt(np.exp(sigma2) - 1.0)
+    max_rg = min(PORESIZE_INTEG_LIMIT, mode + 5.0 * stdev)
+    if max_rg <= rg:
+        # All pores excluded: pure mobile-phase Gaussian at t0
+        return t0, t0 * t0 / N0
+
+    half = 0.5 * (max_rg - rg)
+    mid  = 0.5 * (max_rg + rg)
+    r  = half * _GL64_NODES + mid
+    wt = half * _GL64_WEIGHTS
+
+    g = _lognorm_pdf_fast(r, mu, sigma)
+    ratio = np.minimum(1.0, rg / r)
+    one_minus = 1.0 - ratio
+    n_pore = N * one_minus**me
+    theta  = T * one_minus**mp
+
+    coeffs = g * n_pore * wt
+    I1 = np.dot(coeffs, theta)
+    I2 = np.dot(coeffs, theta * theta)
+
+    M1 = t0 + k * I1
+    Var = k * (k + 1.0) * I2 + M1 * M1 / N0
+    return M1, Var

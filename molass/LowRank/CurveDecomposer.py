@@ -7,11 +7,10 @@
 from importlib import reload
 import numpy as np
 from scipy.optimize import minimize
-# recognize_peaks lives in molass-legacy (cross-repo dependency).
-# Algorithm: greedy sequential subtraction — fit tallest peak via argmax,
-# subtract model, repeat on residual. Fragile when peaks merge at high overlap.
-# See molass-legacy/molass_legacy/QuickAnalysis/ModeledPeaks.py for implementation.
-from molass_legacy.QuickAnalysis.ModeledPeaks import recognize_peaks
+# EGH sequential peeling: replaces legacy recognize_peaks.
+# Fits EGH peaks one at a time (argmax → fit → subtract), with area-ratio
+# significance stopping when num_components is None (auto-detect).
+from molass.Peaks.EghPeeler import egh_peel
 from molass.SEC.Models.Simple import egh
 
 TAU_PENALTY_SCALE = 100
@@ -134,11 +133,10 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
     decompargs = kwargs.pop('decompargs', None)
     allow_negative = kwargs.get('allow_negative_peaks', False)
     if decompargs is None:
-        # Default path: sequential peak recognition.
-        # Known limitation: at high overlap (≥19%), the first peak absorbs
-        # signal from both components, giving bad initialization for the optimizer.
-        # Consider using the proportions path (via QuickImplement) for such cases.
-        peak_list = recognize_peaks(x, sy, num_peaks=num_components, exact_num_peaks=num_components, correct=False, allow_negative=allow_negative)
+        # EGH sequential peel: fits EGH peaks one at a time.
+        # When num_components is given, peels exactly that many.
+        # When num_components is None, peels until area significance drops below 2%.
+        peak_list = egh_peel(x, sy, num_components=num_components, debug=debug)
     else:
         if debug:
             import molass.LowRank.ProportionalDecomposer
@@ -148,6 +146,9 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
 
     ret_curves = []
     m = len(peak_list)
+    # When num_components was None (auto-detect), update it from the peel result
+    if num_components is None:
+        num_components = m
     if m > 0:
         assert curve_model == 'EGH'   # currently
         if decompargs is None:

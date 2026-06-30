@@ -1,0 +1,60 @@
+"""
+Rigorous.FunctionCodeUtils
+
+Shared helper for auto-detecting the legacy objective function code
+from a Decomposition's model type and column parameters.
+
+This avoids duplicating the detection logic in RigorousImplement.py
+(launch path) and CurrentStateUtils.py (load path).
+See: https://github.com/biosaxs-dev/molass-library/issues/89
+"""
+
+# Map (pore_dist, rt_dist) → legacy objective function code.
+FUNCTION_CODE_MAP = {
+    ('mono', 'exponential'): 'G1100',    # classic SDM
+    ('mono', 'gamma'):       'G1200',    # SDM-Gamma
+    ('lognormal', 'gamma'):  'G1300',    # SDM-Lognormal-Gamma
+}
+
+
+def detect_function_code(decomposition):
+    """Auto-detect the legacy objective function code.
+
+    Uses the ``pore_dist`` and ``rt_dist`` attributes on the
+    decomposition's ``SdmColumn`` to look up the appropriate
+    legacy objective function class.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        A quick decomposition whose ``xr_ccurves[0]`` carries the
+        model type and (for SDM) the column parameters.
+
+    Returns
+    -------
+    str or None
+        A function code string, or ``None`` to use the default for the model.
+
+        Supported models and their codes:
+
+        - ``'egh'`` → ``None``  (EGH, default G1100 path)
+        - ``'sdm'`` → ``'G1100'`` / ``'G1200'`` / ``'G1300'`` (depends on
+          ``pore_dist`` / ``rt_dist`` on the ``SdmColumn``)
+        - ``'edm'`` → ``None`` (EDM)
+        - ``'cedm'`` → ``'G2020'`` (CEDM — continuous EDM)
+        - ``'lkm'`` → ``'G1400'`` (LKM — Lumped Kinetic Model)
+        - ``'grm'`` → ``'G1500'`` (GRM — General Rate Model)
+    """
+    ccurve = decomposition.xr_ccurves[0]
+    if ccurve.model == "cedm":
+        return 'G2020'
+    if ccurve.model == "lkm":
+        return 'G1400'
+    if ccurve.model == "grm":
+        return 'G1500'
+    if ccurve.model != "sdm":
+        return None
+    column = ccurve.column
+    key = (getattr(column, 'pore_dist', 'mono'),
+           getattr(column, 'rt_dist', 'gamma'))
+    return FUNCTION_CODE_MAP.get(key)
