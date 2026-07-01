@@ -482,12 +482,22 @@ class Decomposition:
         Parameters
         ----------
         ranks : list of int
-            The ranks for each component.
+            The ranks for each component. Must have length equal to ``num_components``.
 
         Returns
         -------
         None
+
+        Raises
+        ------
+        ValueError
+            If the length of ``ranks`` does not match ``num_components``.
         """
+        if len(ranks) != self.num_components:
+            raise ValueError(
+                f"Length of ranks ({len(ranks)}) must match num_components ({self.num_components}). "
+                f"Expected ranks=[r1, r2, ..., r{self.num_components}] where each ri is the rank for component i."
+            )
         self.xr_ranks = ranks
 
     def get_xr_matrices(self, debug=False):
