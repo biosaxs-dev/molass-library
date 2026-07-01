@@ -60,7 +60,7 @@ Several software tools address SEC-SAXS data processing. The proprietary ATSAS s
 
 # Software Design
 
-Molass Library is designed to support sustainable software development through an open framework that enables broad community participation and contribution. This design philosophy prioritizes explicit, readable code over graphical interfaces, making the analysis methodology transparent for both learning and AI-assisted maintenance. We are actively enhancing AI-readiness through systematic usability testing with AI agents and iterative improvements to API discoverability and inline documentation. The architecture emphasizes modularity and clear separation of concerns: elution curve models (EGH, SDM, EDM, etc.) are isolated as parametric functions; low-rank factorization uses standard linear algebra (Moore-Penrose pseudoinverse); and visualization is decoupled from computation. By integrating established packages (NumPy, SciPy, pybaselines, ruptures) rather than reimplementing core functionality, we reduce custom code volume and enhance long-term viability. This approach allows domain researchers to maintain and extend the code using AI-assisted development tools.
+Molass Library is designed to support sustainable software development through an open framework that enables broad community participation and contribution. This design philosophy prioritizes explicit, readable code over graphical interfaces, making the analysis methodology transparent for learning, review, and long-term maintenance. We are actively enhancing AI-readiness through systematic usability testing with AI agents and iterative improvements to API discoverability and inline documentation. The architecture emphasizes modularity and clear separation of concerns: elution curve models (EGH, SDM, EDM, etc.) are isolated as parametric functions; low-rank factorization uses standard linear algebra (Moore-Penrose pseudoinverse); and visualization is decoupled from computation. By integrating established packages (NumPy, SciPy, pybaselines, ruptures) rather than reimplementing core functionality, we reduce custom code volume and enhance long-term viability. This approach allows domain researchers to maintain and extend the code using AI-assisted development tools.
 
 Molass Library maintains a runtime dependency on molass_legacy for rigorous optimization and some computational functions during incremental refactoring. The dependency is invisible to end users—Molass Library provides a clean, Pythonic API while the internal implementation is gradually migrated. This approach allows sustainable development by a small facility-based team: refactoring occurs incrementally when fixing bugs or adding features, rather than through disruptive rewrites.
 
@@ -134,7 +134,7 @@ All AI-generated content was reviewed, validated, and edited by the human author
 
 # Acknowledgements
 
-This work was supported by JSPS KAKENHI Grant Number JP25K07250, and partially by Research Support Project for Life Science and Drug Discovery (Basis for Supporting Innovative Drug Discovery and Life Science Research (BINDS)) from AMED under Grant Number JP25ama121001.
+This work was supported by JSPS KAKENHI Grant Number JP25K07250, and partially by the Research Support Project for Life Science and Drug Discovery (Basis for Supporting Innovative Drug Discovery and Life Science Research (BINDS)) from AMED under Grant Number JP25ama121001.
 
 # References
 
