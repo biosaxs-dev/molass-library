@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>LowRank.ProportionalDecomposer &#8212; Molass Library  documentation</title>
+    <title>LowRank.ProportionalDecomposer &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="LowRank.PositionedDecomposer" href="molass.LowRank.PositionedDecomposer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -616,16 +616,16 @@ function quickly using an analytical formula.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>h</strong> (<em>float</em>) – The height of the EMG function.</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – The standard deviation of the Gaussian component.</p></li>
-<li><p><strong>tau</strong> (<em>float</em>) – The decay constant of the exponential component.</p></li>
+<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The height of the EMG function.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The standard deviation of the Gaussian component.</p></li>
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The decay constant of the exponential component.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The area under the EMG function.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -642,12 +642,12 @@ of the smoothed curve</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
-<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – The area proportions for each peak.</p></li>
-<li><p><strong>tau_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum allowed ratio of tau/sigma for each peak. Default is 0.6.</p></li>
-<li><p><strong>max_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum allowed sigma for each peak. Default is 17.</p></li>
-<li><p><strong>dev_weights</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Weights for the deviation penalties in the optimization.</p></li>
-<li><p><strong>basinhopping</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use basinhopping optimization. Default is False.
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+<li><p><strong>proportions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The area proportions for each peak.</p></li>
+<li><p><strong>tau_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum allowed ratio of tau/sigma for each peak. Default is 0.6.</p></li>
+<li><p><strong>max_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum allowed sigma for each peak. Default is 17.</p></li>
+<li><p><strong>dev_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Weights for the deviation penalties in the optimization.</p></li>
+<li><p><strong>basinhopping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, use basinhopping optimization. Default is False.
 This can help to escape local minima.</p></li>
 </ul>
 </dd>

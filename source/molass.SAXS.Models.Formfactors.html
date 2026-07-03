@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SAXS.Models.Formfactors &#8212; Molass Library  documentation</title>
+    <title>SAXS.Models.Formfactors &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SAXS.Models" href="molass.SAXS.Models.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -625,7 +625,7 @@ This is borrowed from <a class="reference external" href="https://github.com/sci
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f</strong> (<em>callable</em>) – The integrand function. It must accept as many arguments as there are
 integration variables.</p></li>
-<li><p><strong>limits</strong> (<em>list</em><em> of </em><em>tuples</em>) – The integration limits for each variable. Each tuple should contain the
+<li><p><strong>limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>tuples</em>) – The integration limits for each variable. Each tuple should contain the
 lower and upper limits for the corresponding variable.</p></li>
 </ul>
 </dd>
@@ -633,7 +633,7 @@ lower and upper limits for the corresponding variable.</p></li>
 <dd class="field-even"><p><strong>result</strong> – The result of the integration.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or array-like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
 </dd>
 </dl>
 </dd></dl>
@@ -645,15 +645,15 @@ lower and upper limits for the corresponding variable.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – The radius of the sphere.</p></li>
+<li><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The radius of the sphere.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>P</strong> – The form factor intensity of the homogeneous sphere.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or array-like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
 </dd>
 </dl>
 </dd></dl>
@@ -664,13 +664,13 @@ lower and upper limits for the corresponding variable.</p></li>
 <dd><p>Calculate the volume of a sphere.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>R</strong> (<em>float</em>) – The radius of the sphere.</p>
+<dd class="field-odd"><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The radius of the sphere.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>V</strong> – The volume of the sphere.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -682,16 +682,16 @@ lower and upper limits for the corresponding variable.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – The outer radius of the shell.</p></li>
-<li><p><strong>r</strong> (<em>float</em>) – The inner radius of the shell.</p></li>
+<li><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The outer radius of the shell.</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The inner radius of the shell.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>P</strong> – The form factor intensity of the spherical shell.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or array-like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
 </dd>
 </dl>
 </dd></dl>
@@ -703,16 +703,16 @@ lower and upper limits for the corresponding variable.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
-<li><p><strong>epsilon</strong> (<em>float</em>) – The aspect ratio of the ellipsoid.</p></li>
+<li><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The aspect ratio of the ellipsoid.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>P</strong> – The form factor intensity of the ellipsoid of revolution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or array-like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
 </dd>
 </dl>
 </dd></dl>
@@ -724,17 +724,17 @@ lower and upper limits for the corresponding variable.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>q</strong> (<em>float</em><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
-<li><p><strong>a</strong> (<em>float</em>) – The semi-major axis of the ellipsoid.</p></li>
-<li><p><strong>b</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the x-y plane.</p></li>
-<li><p><strong>c</strong> (<em>float</em>) – The semi-minor axis of the ellipsoid in the z direction.</p></li>
+<li><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>array-like</em>) – The scattering vector magnitude.</p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The semi-major axis of the ellipsoid.</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The semi-minor axis of the ellipsoid in the x-y plane.</p></li>
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The semi-minor axis of the ellipsoid in the z direction.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>F</strong> – The form factor intensity of the tri-axial ellipsoid.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or array-like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
 </dd>
 </dl>
 </dd></dl>

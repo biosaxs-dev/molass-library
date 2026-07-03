@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Baseline.BuffitBaseline &#8212; Molass Library  documentation</title>
+    <title>Baseline.BuffitBaseline &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="Baseline.Basesurface" href="molass.Baseline.Basesurface.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -658,8 +658,8 @@ and #26 (XrData default).</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array-like</em>) – Frame indices (jv).</p></li>
 <li><p><strong>y</strong> (<em>array-like</em>) – Intensity elution profile at one q-value.</p></li>
-<li><p><strong>return_also_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return <code class="docutils literal notranslate"><span class="pre">(baseline,</span> <span class="pre">params_dict)</span></code>.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Optional <code class="docutils literal notranslate"><span class="pre">buffer_mask</span></code> (bool array, shape == y.shape),
+<li><p><strong>return_also_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return <code class="docutils literal notranslate"><span class="pre">(baseline,</span> <span class="pre">params_dict)</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Optional <code class="docutils literal notranslate"><span class="pre">buffer_mask</span></code> (bool array, shape == y.shape),
 pre-computed once from the summed elution by <code class="docutils literal notranslate"><span class="pre">SsMatrixData</span></code>.
 If absent or fewer than 2 True entries, falls back to a full-frame
 linear fit.  Passing <code class="docutils literal notranslate"><span class="pre">threshold</span></code> without <code class="docutils literal notranslate"><span class="pre">buffer_mask</span></code> has no

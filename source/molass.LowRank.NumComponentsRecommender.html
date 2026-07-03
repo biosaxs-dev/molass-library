@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>LowRank.NumComponentsRecommender &#8212; Molass Library  documentation</title>
+    <title>LowRank.NumComponentsRecommender &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -591,7 +591,7 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation"><code class="docutils literal notranslate"><span class="pre">Recommendation</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation"><code class="docutils literal notranslate"><span class="pre">Recommendation</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.recommended_k"><code class="docutils literal notranslate"><span class="pre">Recommendation.recommended_k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.reason"><code class="docutils literal notranslate"><span class="pre">Recommendation.reason</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.metrics"><code class="docutils literal notranslate"><span class="pre">Recommendation.metrics</span></code></a></li>
@@ -629,7 +629,7 @@ verified across 7 datasets (SAMPLE1-4 + Apo + ATP + MY) in
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.LowRank.NumComponentsRecommender.Recommendation">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Recommendation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recommended_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.LowRank.NumComponentsRecommender.Recommendation" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <p>Result of <code class="xref py py-meth docutils literal notranslate"><span class="pre">Decomposition.recommend_num_components()</span></code>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="molass.LowRank.NumComponentsRecommender.Recommendation.recommended_k">
@@ -637,7 +637,7 @@ verified across 7 datasets (SAMPLE1-4 + Apo + ATP + MY) in
 <dd><p>The recommended <code class="docutils literal notranslate"><span class="pre">num_components</span></code>. <code class="docutils literal notranslate"><span class="pre">None</span></code> if no fit succeeded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -648,7 +648,7 @@ verified across 7 datasets (SAMPLE1-4 + Apo + ATP + MY) in
 <dd><p>Human-readable justification for the choice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -707,18 +707,18 @@ If neither happens up to <code class="docutils literal notranslate"><span class=
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomp</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – Used only for <code class="docutils literal notranslate"><span class="pre">decomp.ssd</span></code>; the decomposition itself is not modified.</p></li>
-<li><p><strong>k_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum <code class="docutils literal notranslate"><span class="pre">num_components</span></code> to try. Default 3.</p></li>
-<li><p><strong>model</strong> (<em>str</em><em>, </em><em>optional</em>) – Model name passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">Decomposition.upgrade()</span></code>.
+<li><p><strong>k_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum <code class="docutils literal notranslate"><span class="pre">num_components</span></code> to try. Default 3.</p></li>
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Model name passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">Decomposition.upgrade()</span></code>.
 Default <code class="docutils literal notranslate"><span class="pre">'SDM'</span></code>.</p></li>
 <li><p><strong>rgcurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – Rg curve to pass to <code class="docutils literal notranslate"><span class="pre">upgrade</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, computed
 once via <code class="docutils literal notranslate"><span class="pre">decomp.ssd.xr.compute_rgcurve()</span></code>.</p></li>
-<li><p><strong>rt_dist</strong> (<em>str</em><em>, </em><em>optional</em>) – SDM residence-time distribution (<code class="docutils literal notranslate"><span class="pre">'gamma'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>).
+<li><p><strong>rt_dist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – SDM residence-time distribution (<code class="docutils literal notranslate"><span class="pre">'gamma'</span></code> or <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>).
 Forwarded as <code class="docutils literal notranslate"><span class="pre">model_params={'rt_dist':</span> <span class="pre">rt_dist}</span></code>.</p></li>
-<li><p><strong>cond_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
-<li><p><strong>cos_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
-<li><p><strong>amp_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
-<li><p><strong>quiet</strong> (<em>bool</em><em>, </em><em>optional</em>) – Suppress per-fit stdout/stderr from the fitting machinery. Default True.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, do not suppress output and forward <code class="docutils literal notranslate"><span class="pre">debug=True</span></code> downstream.</p></li>
+<li><p><strong>cond_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>cos_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>amp_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Degeneracy thresholds.</p></li>
+<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress per-fit stdout/stderr from the fitting machinery. Default True.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, do not suppress output and forward <code class="docutils literal notranslate"><span class="pre">debug=True</span></code> downstream.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -768,7 +768,7 @@ rigorous optimization.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation"><code class="docutils literal notranslate"><span class="pre">Recommendation</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation"><code class="docutils literal notranslate"><span class="pre">Recommendation</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.recommended_k"><code class="docutils literal notranslate"><span class="pre">Recommendation.recommended_k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.reason"><code class="docutils literal notranslate"><span class="pre">Recommendation.reason</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.LowRank.NumComponentsRecommender.Recommendation.metrics"><code class="docutils literal notranslate"><span class="pre">Recommendation.metrics</span></code></a></li>

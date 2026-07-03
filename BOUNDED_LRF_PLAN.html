@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Bounded LRF Implementation Plan &#8212; Molass Library  documentation</title>
+    <title>Bounded LRF Implementation Plan &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/documentation_options.js?v=423d4ce3"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -591,18 +591,18 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal">Goal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-architecture">Current Architecture</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-architecture">Current Architecture</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-flow-rank-2-case">Data flow (rank-2 case)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-decomposition-currently-stores">What Decomposition currently stores</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-rank-2-is-triggered">How rank=2 is triggered</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#new-variables-required-by-bounded-lrf">New Variables Required by Bounded LRF</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-question-where-do-these-fit">Design Question: Where Do These Fit?</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-question-where-do-these-fit">Design Question: Where Do These Fit?</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-option-b-with-shared-rg">Decision: Option B with shared Rg</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concerned-interaction-points">Concerned Interaction Points</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concerned-interaction-points">Concerned Interaction Points</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qv-propagation">1. <code class="docutils literal notranslate"><span class="pre">qv</span></code> propagation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rg-compute-once-share-approach-b-pre-populate">2. Rg: compute once, share — approach (B) pre-populate</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c1-c2-extraction">3. <code class="docutils literal notranslate"><span class="pre">c1</span></code>, <code class="docutils literal notranslate"><span class="pre">c2</span></code> extraction</a></li>
@@ -612,7 +612,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-copy-with-new-components">7. Impact on <code class="docutils literal notranslate"><span class="pre">copy_with_new_components()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-to-create-modify">Files to Create / Modify</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-to-create-modify">Files to Create / Modify</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-1-boundedlrf-py-core-algorithm">File 1: <code class="docutils literal notranslate"><span class="pre">BoundedLrf.py</span></code> — Core algorithm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-2-lowrankinfo-py-no-change">File 2: <code class="docutils literal notranslate"><span class="pre">LowRankInfo.py</span></code> — No change</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-3-decomposition-py-changes">File 3: <code class="docutils literal notranslate"><span class="pre">Decomposition.py</span></code> changes</a></li>
@@ -1059,18 +1059,18 @@ All bounding orchestration moves to <code class="docutils literal notranslate"><
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal">Goal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-architecture">Current Architecture</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-architecture">Current Architecture</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-flow-rank-2-case">Data flow (rank-2 case)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-decomposition-currently-stores">What Decomposition currently stores</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-rank-2-is-triggered">How rank=2 is triggered</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#new-variables-required-by-bounded-lrf">New Variables Required by Bounded LRF</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-question-where-do-these-fit">Design Question: Where Do These Fit?</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-question-where-do-these-fit">Design Question: Where Do These Fit?</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-option-b-with-shared-rg">Decision: Option B with shared Rg</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concerned-interaction-points">Concerned Interaction Points</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concerned-interaction-points">Concerned Interaction Points</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qv-propagation">1. <code class="docutils literal notranslate"><span class="pre">qv</span></code> propagation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rg-compute-once-share-approach-b-pre-populate">2. Rg: compute once, share — approach (B) pre-populate</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c1-c2-extraction">3. <code class="docutils literal notranslate"><span class="pre">c1</span></code>, <code class="docutils literal notranslate"><span class="pre">c2</span></code> extraction</a></li>
@@ -1080,7 +1080,7 @@ All bounding orchestration moves to <code class="docutils literal notranslate"><
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-copy-with-new-components">7. Impact on <code class="docutils literal notranslate"><span class="pre">copy_with_new_components()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-to-create-modify">Files to Create / Modify</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-to-create-modify">Files to Create / Modify</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-1-boundedlrf-py-core-algorithm">File 1: <code class="docutils literal notranslate"><span class="pre">BoundedLrf.py</span></code> — Core algorithm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-2-lowrankinfo-py-no-change">File 2: <code class="docutils literal notranslate"><span class="pre">LowRankInfo.py</span></code> — No change</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-3-decomposition-py-changes">File 3: <code class="docutils literal notranslate"><span class="pre">Decomposition.py</span></code> changes</a></li>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.Models.SdmMonoPore &#8212; Molass Library  documentation</title>
+    <title>SEC.Models.SdmMonoPore &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SEC.Models.SdmEstimator" href="molass.SEC.Models.SdmEstimator.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -622,14 +622,14 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array_like</em>) – Time array (physical time units).</p></li>
-<li><p><strong>npi</strong> (<em>float</em>) – Mean number of pore entries (Poisson parameter of the compound-Poisson
+<li><p><strong>npi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean number of pore entries (Poisson parameter of the compound-Poisson
 process).  Physical mapping: npi ≈ F * a  (phase ratio × Henry coefficient).</p></li>
-<li><p><strong>tpi</strong> (<em>float</em>) – Mean pore residence time per visit (scale of the exponential distribution).
+<li><p><strong>tpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean pore residence time per visit (scale of the exponential distribution).
 Physical mapping: tpi ≈ t0 / npi  in the k → ∞ LKM limit.</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Mobile-phase plate count (controls Gaussian peak width; σ_mobile ≈ t0/√N0).</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Mean mobile-phase transit time (dead time).  Fix at the known dead time
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile-phase plate count (controls Gaussian peak width; σ_mobile ≈ t0/√N0).</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mean mobile-phase transit time (dead time).  Fix at the known dead time
 when fitting; do not use as a free parameter unless the dead time is unknown.</p></li>
-<li><p><strong>timescale</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Time rescaling factor for the internal FFT grid (default 0.25).
+<li><p><strong>timescale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – <p>Time rescaling factor for the internal FFT grid (default 0.25).
 The FFT grid spans [0, 1024) in scaled coordinates.  The peak should land
 well within [10, 900] on the scaled grid to avoid edge artefacts.
 Rule of thumb:  timescale ≈ 80 / t_R</p>

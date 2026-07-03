@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DensitySpace.VoxelSpace &#8212; Molass Library  documentation</title>
+    <title>DensitySpace.VoxelSpace &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="DensitySpace.Densities" href="molass.DensitySpace.Densities.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -594,7 +594,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl"><code class="docutils literal notranslate"><span class="pre">draw_voxles_as_dots_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.rho"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.rho</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>
@@ -621,13 +621,13 @@
 <dd><p>Create a meshgrid for the electron density space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – The size of the grid along each axis.</p>
+<dd class="field-odd"><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The size of the grid along each axis.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A tuple containing the meshgrid arrays (x, y, z).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -641,12 +641,12 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.11.0)"><em>matplotlib.axes.Axes</em></a>) – The axes to plot on.</p></li>
 <li><p><strong>image</strong> (<em>np.ndarray</em>) – The 3D density array.</p></li>
-<li><p><strong>min_value</strong> (<em>float</em>) – The minimum density value to consider for plotting.</p></li>
-<li><p><strong>colorbar</strong> (<em>bool</em>) – Whether to display a colorbar.</p></li>
-<li><p><strong>limits</strong> (<em>tuple</em><em> or </em><em>None</em>) – The limits for the axes in the form (xlim, ylim, zlim). If
+<li><p><strong>min_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The minimum density value to consider for plotting.</p></li>
+<li><p><strong>colorbar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to display a colorbar.</p></li>
+<li><p><strong>limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> or </em><em>None</em>) – The limits for the axes in the form (xlim, ylim, zlim). If
 None, the limits will be set to the size of the image.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – The alpha value for the dots.</p></li>
-<li><p><strong>s</strong> (<em>float</em>) – The size of the dots.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The alpha value for the dots.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The size of the dots.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -663,9 +663,9 @@ None, the limits will be set to the size of the image.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.11.0)"><em>matplotlib.axes.Axes</em></a>) – The axes to plot on.</p></li>
-<li><p><strong>N</strong> (<em>int</em>) – The size of the grid along each axis.</p></li>
-<li><p><strong>k</strong> (<em>int</em><em> or </em><em>None</em>) – The z value for the plane. If None, it will be set to N//2</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – The alpha value for the plane.</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The size of the grid along each axis.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em>) – The z value for the plane. If None, it will be set to N//2</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The alpha value for the plane.</p></li>
 </ul>
 </dd>
 </dl>
@@ -680,14 +680,14 @@ None, the limits will be set to the size of the image.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rho</strong> (<em>np.ndarray</em>) – 3D density array.</p></li>
-<li><p><strong>min_value</strong> (<em>float</em>) – Minimum density value to include in calculation.</p></li>
+<li><p><strong>min_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Minimum density value to include in calculation.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Radius of gyration.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -695,7 +695,7 @@ None, the limits will be set to the size of the image.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DensitySpace.VoxelSpace.VoxelSpace">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">VoxelSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DensitySpace.VoxelSpace.VoxelSpace" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>VoxelSpace class to handle voxel-based density spaces.
 It can be initialized with a shape or a density array.</p>
 <dl class="py attribute">
@@ -717,7 +717,7 @@ It can be initialized with a shape or a density array.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.11.0)"><em>matplotlib.axes.Axes</em></a>) – The axes to plot on.</p></li>
-<li><p><strong>min_value</strong> (<em>float</em>) – The minimum density value to consider for plotting.</p></li>
+<li><p><strong>min_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The minimum density value to consider for plotting.</p></li>
 </ul>
 </dd>
 </dl>
@@ -731,11 +731,11 @@ It can be initialized with a shape or a density array.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.11.0)"><em>matplotlib.axes.Axes</em></a>) – The axes to plot on.</p></li>
-<li><p><strong>min_value</strong> (<em>float</em>) – The minimum density value to consider for plotting.</p></li>
-<li><p><strong>colorbar</strong> (<em>bool</em>) – Whether to display a colorbar.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – The alpha value for the plots.</p></li>
-<li><p><strong>s</strong> (<em>float</em>) – The size of the dots.</p></li>
-<li><p><strong>k</strong> (<em>int</em><em> or </em><em>None</em>) – The z value for the cross-sectional plane. If None, it will be set to N//2</p></li>
+<li><p><strong>min_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The minimum density value to consider for plotting.</p></li>
+<li><p><strong>colorbar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to display a colorbar.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The alpha value for the plots.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The size of the dots.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em>) – The z value for the cross-sectional plane. If None, it will be set to N//2</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -750,13 +750,13 @@ It can be initialized with a shape or a density array.</p>
 <dd><p>Compute the radius of gyration of the voxel space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>min_value</strong> (<em>float</em>) – Minimum density value to include in calculation.</p>
+<dd class="field-odd"><p><strong>min_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Minimum density value to include in calculation.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The radius of gyration.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -816,7 +816,7 @@ It can be initialized with a shape or a density array.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.draw_voxles_as_dots_impl"><code class="docutils literal notranslate"><span class="pre">draw_voxles_as_dots_impl()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.add_center_plane"><code class="docutils literal notranslate"><span class="pre">add_center_plane()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.compute_rg_impl"><code class="docutils literal notranslate"><span class="pre">compute_rg_impl()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace"><code class="docutils literal notranslate"><span class="pre">VoxelSpace</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.rho"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.rho</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_as_dots"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_as_dots()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DensitySpace.VoxelSpace.VoxelSpace.plot_with_density"><code class="docutils literal notranslate"><span class="pre">VoxelSpace.plot_with_density()</span></code></a></li>

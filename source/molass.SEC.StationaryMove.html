@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.StationaryMove &#8212; Molass Library  documentation</title>
+    <title>SEC.StationaryMove &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SEC.ModelFactory" href="molass.SEC.ModelFactory.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -618,8 +618,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>grain</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain" title="molass.SEC.ColumnElements.NewGrain"><em>NewGrain</em></a>) – The grain to find the nearest wall.</p></li>
-<li><p><strong>px</strong> (<em>float</em>) – The x coordinate of the point.</p></li>
-<li><p><strong>py</strong> (<em>float</em>) – The y coordinate of the point.</p></li>
+<li><p><strong>px</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the point.</p></li>
+<li><p><strong>py</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the point.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -639,18 +639,18 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cx</strong> (<em>float</em>) – The x coordinate of the grain center.</p></li>
-<li><p><strong>cy</strong> (<em>float</em>) – The y coordinate of the grain center.</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – The radius of the grain.</p></li>
-<li><p><strong>r</strong> (<em>float</em>) – The radius of the particle.</p></li>
-<li><p><strong>entry_points</strong> (<em>list</em><em> of </em><em>tuples</em>) – The entry points of the grain.</p></li>
+<li><p><strong>cx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the grain center.</p></li>
+<li><p><strong>cy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the grain center.</p></li>
+<li><p><strong>R</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The radius of the grain.</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The radius of the particle.</p></li>
+<li><p><strong>entry_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>tuples</em>) – The entry points of the grain.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>bpoints</strong> – The boundary points of the grain.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of tuples</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -664,11 +664,11 @@ Formula borrowed from
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<em>float</em>) – The coefficient of x in the line equation.</p></li>
-<li><p><strong>b</strong> (<em>float</em>) – The coefficient of y in the line equation.</p></li>
-<li><p><strong>c</strong> (<em>float</em>) – The constant term in the line equation.</p></li>
-<li><p><strong>x1</strong> (<em>float</em>) – The x coordinate of the point.</p></li>
-<li><p><strong>y1</strong> (<em>float</em>) – The y coordinate of the point.</p></li>
+<li><p><strong>a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The coefficient of x in the line equation.</p></li>
+<li><p><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The coefficient of y in the line equation.</p></li>
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The constant term in the line equation.</p></li>
+<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the point.</p></li>
+<li><p><strong>y1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the point.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -688,19 +688,19 @@ Formula borrowed from
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bpoints</strong> (<em>list</em><em> of </em><em>tuples</em>) – The boundary points defining the walls.</p></li>
-<li><p><strong>wx</strong> (<em>float</em>) – The x coordinate of the last position.</p></li>
-<li><p><strong>wy</strong> (<em>float</em>) – The y coordinate of the last position.</p></li>
-<li><p><strong>nx</strong> (<em>float</em>) – The x coordinate of the new position.</p></li>
-<li><p><strong>ny</strong> (<em>float</em>) – The y coordinate of the new position.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
+<li><p><strong>bpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>tuples</em>) – The boundary points defining the walls.</p></li>
+<li><p><strong>wx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the last position.</p></li>
+<li><p><strong>wy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the last position.</p></li>
+<li><p><strong>nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the new position.</p></li>
+<li><p><strong>ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the new position.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode with additional output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>(mx, my)</strong> – The coordinates of the reflected point, or None if no reflection occurs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple of float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -714,11 +714,11 @@ Formula borrowed from
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>particle</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.Particle" title="molass.SEC.ColumnElements.Particle"><em>Particle</em></a>) – The particle to move.</p></li>
 <li><p><strong>grain</strong> (<a class="reference internal" href="molass.SEC.ColumnElements.html#molass.SEC.ColumnElements.NewGrain" title="molass.SEC.ColumnElements.NewGrain"><em>NewGrain</em></a>) – The grain containing the particle.</p></li>
-<li><p><strong>last_px</strong> (<em>float</em>) – The x coordinate of the last position.</p></li>
-<li><p><strong>last_py</strong> (<em>float</em>) – The y coordinate of the last position.</p></li>
-<li><p><strong>px</strong> (<em>float</em>) – The x coordinate of the proposed new position.</p></li>
-<li><p><strong>py</strong> (<em>float</em>) – The y coordinate of the proposed new position.</p></li>
-<li><p><strong>debug_info</strong> (<em>tuple</em><em> of </em><em>(</em><em>fig</em><em>, </em><em>ax</em><em>)</em><em>, </em><em>optional</em>) – If provided, enables debug mode with the given figure and axes for drawing.</p></li>
+<li><p><strong>last_px</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the last position.</p></li>
+<li><p><strong>last_py</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the last position.</p></li>
+<li><p><strong>px</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The x coordinate of the proposed new position.</p></li>
+<li><p><strong>py</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The y coordinate of the proposed new position.</p></li>
+<li><p><strong>debug_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><em>fig</em><em>, </em><em>ax</em><em>)</em><em>, </em><em>optional</em>) – If provided, enables debug mode with the given figure and axes for drawing.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

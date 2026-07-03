@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DataObjects.UvData &#8212; Molass Library  documentation</title>
+    <title>DataObjects.UvData &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="DataObjects.SsMatrixData" href="molass.DataObjects.SsMatrixData.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wv"><code class="docutils literal notranslate"><span class="pre">UvData.wv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>
@@ -645,7 +645,7 @@ Inherits from SsMatrixData.</p>
 <dd><p>Human-readable alias for <code class="docutils literal notranslate"><span class="pre">iv</span></code> / <code class="docutils literal notranslate"><span class="pre">wv</span></code> — the wavelength axis (nm).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array-like (property)</p>
+<dd class="field-odd"><p>array-like (<a class="reference external" href="https://docs.python.org/3/library/functions.html#property" title="(in Python v3.14)">property</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -656,7 +656,7 @@ Inherits from SsMatrixData.</p>
 <dd><p>Human-readable alias for <code class="docutils literal notranslate"><span class="pre">jv</span></code> — the frame (time) axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array-like (property)</p>
+<dd class="field-odd"><p>array-like (<a class="reference external" href="https://docs.python.org/3/library/functions.html#property" title="(in Python v3.14)">property</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -672,7 +672,7 @@ rows index wavelength, columns index frame number.</p>
 <li><p><strong>iv</strong> (<em>array-like</em>) – The wavelength values corresponding to the spectral (row) axis.</p></li>
 <li><p><strong>jv</strong> (<em>array-like</em><em> or </em><em>None</em>) – The values corresponding to the temporal (column) axis.</p></li>
 <li><p><strong>E</strong> (<em>2D array-like</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The 2D matrix of error values. Default None.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the SsMatrixData constructor.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the SsMatrixData constructor.</p></li>
 </ul>
 </dd>
 </dl>
@@ -713,7 +713,7 @@ rows index wavelength, columns index frame number.</p>
 <dd><p>Return a copy of the SsMatrixData object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>slices</strong> (<em>tuple</em><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
+<dd class="field-odd"><p><strong>slices</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -750,7 +750,7 @@ channels and is not appropriate for peak/buffer classification.</p>
 <dd><p>Returns an i-curve from the UV matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Specifies the wavelength (nm) at which to pick an i-curve.
+<dd class="field-odd"><p><strong>pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – <p>Specifies the wavelength (nm) at which to pick an i-curve.
 The i-curve will be made from self.M[i,:] where
 the picking index i will be determined to satisfy</p>
 <blockquote>
@@ -775,9 +775,9 @@ via SSD(uv_pickat=…)).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pickvalues</strong> (<em>list</em>) – specifies the pickvalues of icurves which are used to detect
+<li><p><strong>pickvalues</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – specifies the pickvalues of icurves which are used to detect
 the flowchange points.</p></li>
-<li><p><strong>return_also_curves</strong> (<em>bool</em>) – If it is False, the method returns only a list of indeces of points.
+<li><p><strong>return_also_curves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If it is False, the method returns only a list of indeces of points.
 If it is True, the method returns a list indeces of points and
 a list of curves which were used to detect the points.</p></li>
 </ul>
@@ -813,13 +813,13 @@ unusable UV data regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – Wavelength (nm) at which to pick the i-curve for baseline fitting.
+<li><p><strong>pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Wavelength (nm) at which to pick the i-curve for baseline fitting.
 If None, uses self.pickat (default 280 nm, or the value set
 via SSD(uv_pickat=…)).</p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The baseline method to use. If None, the method set in
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The baseline method to use. If None, the method set in
 self.baseline_method will be used.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline fitting method.
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline fitting method.
 These will be merged with the default_kwargs defined above.</p></li>
 </ul>
 </dd>
@@ -889,7 +889,7 @@ These will be merged with the default_kwargs defined above.</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData"><code class="docutils literal notranslate"><span class="pre">UvData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wv"><code class="docutils literal notranslate"><span class="pre">UvData.wv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.wavelengths"><code class="docutils literal notranslate"><span class="pre">UvData.wavelengths</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.UvData.UvData.frames"><code class="docutils literal notranslate"><span class="pre">UvData.frames</span></code></a></li>

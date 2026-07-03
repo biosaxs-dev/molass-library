@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.PoreEntryAnimation &#8212; Molass Library  documentation</title>
+    <title>SEC.PoreEntryAnimation &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -622,20 +622,20 @@ entering and exiting pore sectors, accumulating dwell statistics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r_mol</strong> (<em>float</em>) – Molecule radius.</p></li>
-<li><p><strong>R_grain</strong> (<em>float</em>) – Grain radius.</p></li>
-<li><p><strong>num_pores</strong> (<em>int</em>) – Number of pore sectors per grain.  Determines sector half-angle
+<li><p><strong>r_mol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius.</p></li>
+<li><p><strong>R_grain</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Grain radius.</p></li>
+<li><p><strong>num_pores</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of pore sectors per grain.  Determines sector half-angle
 alpha = pi / (2 * num_pores) and Knox pore radius R_p = R_grain * alpha.</p></li>
-<li><p><strong>grain_centers</strong> (<em>list</em><em> of </em><em>(</em><em>float</em><em>, </em><em>float</em><em>)</em><em>, </em><em>optional</em>) – Centre coordinates of each grain.  Defaults to 2+1+2 staggered layout.</p></li>
-<li><p><strong>W</strong> (<em>float</em>) – Simulation box width and height.</p></li>
-<li><p><strong>H</strong> (<em>float</em>) – Simulation box width and height.</p></li>
-<li><p><strong>D</strong> (<em>float</em>) – Diffusion coefficient.</p></li>
-<li><p><strong>dt</strong> (<em>float</em>) – Time step.</p></li>
-<li><p><strong>n_steps</strong> (<em>int</em>) – Number of simulation steps.</p></li>
-<li><p><strong>v_drift</strong> (<em>float</em>) – Downward mobile-phase drift speed (mobile-phase steps only).</p></li>
-<li><p><strong>seed</strong> (<em>int</em>) – Random seed.</p></li>
-<li><p><strong>k_a</strong> (<em>float</em>) – Langmuir adsorption rate (per unit time).  0 = pure SEC (no wall binding).</p></li>
-<li><p><strong>k_d</strong> (<em>float</em>) – Langmuir desorption rate (per unit time).</p></li>
+<li><p><strong>grain_centers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>)</em><em>, </em><em>optional</em>) – Centre coordinates of each grain.  Defaults to 2+1+2 staggered layout.</p></li>
+<li><p><strong>W</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Simulation box width and height.</p></li>
+<li><p><strong>H</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Simulation box width and height.</p></li>
+<li><p><strong>D</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Diffusion coefficient.</p></li>
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Time step.</p></li>
+<li><p><strong>n_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of simulation steps.</p></li>
+<li><p><strong>v_drift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Downward mobile-phase drift speed (mobile-phase steps only).</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Random seed.</p></li>
+<li><p><strong>k_a</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Langmuir adsorption rate (per unit time).  0 = pure SEC (no wall binding).</p></li>
+<li><p><strong>k_d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Langmuir desorption rate (per unit time).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -690,9 +690,9 @@ FuncAnimation with three panels:</p>
 <li><p><strong>seed</strong> – Passed directly to <cite>run_simulation</cite>.</p></li>
 <li><p><strong>k_a</strong> – Passed directly to <cite>run_simulation</cite>.</p></li>
 <li><p><strong>k_d</strong> – Passed directly to <cite>run_simulation</cite>.</p></li>
-<li><p><strong>n_frames</strong> (<em>int</em>) – Number of animation frames (default 200).</p></li>
-<li><p><strong>interval</strong> (<em>int</em>) – Delay between frames in milliseconds (default 40).</p></li>
-<li><p><strong>close_plot</strong> (<em>bool</em>) – If True, close the static figure after building the animation (prevents
+<li><p><strong>n_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of animation frames (default 200).</p></li>
+<li><p><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Delay between frames in milliseconds (default 40).</p></li>
+<li><p><strong>close_plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, close the static figure after building the animation (prevents
 a duplicate static image appearing below the animation in notebooks).</p></li>
 </ul>
 </dd>

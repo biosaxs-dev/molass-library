@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Baseline.UvDiffEffect &#8212; Molass Library  documentation</title>
+    <title>Baseline.UvDiffEffect &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="Baseline.UvBaseline" href="molass.Baseline.UvBaseline.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -591,7 +591,7 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.create_diff_spline"><code class="docutils literal notranslate"><span class="pre">create_diff_spline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.y"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.params"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.params</span></code></a></li>
 </ul>
@@ -681,11 +681,11 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>curve1</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The first curve (usually the original UV curve).</p></li>
 <li><p><strong>curve2</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The second curve (usually the UV curve with pickat applied).</p></li>
-<li><p><strong>fc_slice</strong> (<em>tuple</em>) – A tuple (i, j) representing the slice of the curves to analyze.</p></li>
+<li><p><strong>fc_slice</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – A tuple (i, j) representing the slice of the curves to analyze.</p></li>
 <li><p><strong>diff_spline</strong> (<em>callable</em>) – A callable representing the derivative spline of the first curve.</p></li>
-<li><p><strong>pickat</strong> (<em>int</em><em>, </em><em>optional</em>) – The index at which the pickat was applied. If None, it will be estimated.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, debug information is printed and plots are generated.</p></li>
-<li><p><strong>plot_info</strong> (<em>tuple</em><em>, </em><em>optional</em>) – A tuple containing (fig, ax) for plotting. If None, no plot is generated.</p></li>
+<li><p><strong>pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The index at which the pickat was applied. If None, it will be estimated.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, debug information is printed and plots are generated.</p></li>
+<li><p><strong>plot_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>, </em><em>optional</em>) – A tuple containing (fig, ax) for plotting. If None, no plot is generated.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -769,7 +769,7 @@
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.create_diff_spline"><code class="docutils literal notranslate"><span class="pre">create_diff_spline()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.y"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.y</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Baseline.UvDiffEffect.UvDiffEffect.params"><code class="docutils literal notranslate"><span class="pre">UvDiffEffect.params</span></code></a></li>
 </ul>

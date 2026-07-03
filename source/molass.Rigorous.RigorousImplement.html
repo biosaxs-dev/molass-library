@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Rigorous.RigorousImplement &#8212; Molass Library  documentation</title>
+    <title>Rigorous.RigorousImplement &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="Rigorous.RigorousEghParams" href="molass.Rigorous.RigorousEghParams.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -630,8 +630,8 @@ or original trimming info — all preprocessing is already applied.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The initial decomposition to refine (built on corrected data).</p></li>
 <li><p><strong>rgcurve</strong> (<em>RgComponentCurve</em>) – The Rg component curve to use for refinement.</p></li>
-<li><p><strong>analysis_folder</strong> (<em>str</em><em>, </em><em>optional</em>) – The folder to save analysis results.</p></li>
-<li><p><strong>niter</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>Iteration budget.  Meaning depends on <code class="docutils literal notranslate"><span class="pre">method</span></code>:</p>
+<li><p><strong>analysis_folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The folder to save analysis results.</p></li>
+<li><p><strong>niter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Iteration budget.  Meaning depends on <code class="docutils literal notranslate"><span class="pre">method</span></code>:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">'BH'</span></code>: literal number of Basin-Hopping outer steps (default 20).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'NS'</span></code>: multiplied by 7 000 to form <code class="docutils literal notranslate"><span class="pre">max_ncalls</span></code> for UltraNest
@@ -639,16 +639,16 @@ or original trimming info — all preprocessing is already applied.</p></li>
 </ul>
 <p>Default 20.</p>
 </p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Optimization algorithm: <code class="docutils literal notranslate"><span class="pre">'BH'</span></code> (Basin-Hopping, default) or
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Optimization algorithm: <code class="docutils literal notranslate"><span class="pre">'BH'</span></code> (Basin-Hopping, default) or
 <code class="docutils literal notranslate"><span class="pre">'NS'</span></code> (Nested Sampling / UltraNest).</p></li>
-<li><p><strong>frozen_components</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – 0-based indices of protein components to freeze during optimization.
+<li><p><strong>frozen_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – 0-based indices of protein components to freeze during optimization.
 Their EGH shape parameters, Rg, and UV scale will be held constant
 at the values from the initial decomposition.</p></li>
 <li><p><strong>trimmed_ssd</strong> (<a class="reference internal" href="molass.DataObjects.SecSaxsData.html#molass.DataObjects.SecSaxsData.SecSaxsData" title="molass.DataObjects.SecSaxsData.SecSaxsData"><em>SecSaxsData</em></a><em>, </em><em>optional</em>) – Trimmed but not baseline-corrected SSD.  When provided, the optimizer
 fits against this data (with baseline as a free parameter) instead of
 the corrected data in decomposition.ssd.</p></li>
-<li><p><strong>clear_jobs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), clear existing job folders before starting.</p></li>
-<li><p><strong>in_process</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), run the optimizer <strong>in this Python process</strong> instead
+<li><p><strong>clear_jobs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default), clear existing job folders before starting.</p></li>
+<li><p><strong>in_process</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default), run the optimizer <strong>in this Python process</strong> instead
 of spawning a subprocess.  The library-prepared optimizer (with the
 live dsets, base curves, and spectral vectors built above) is the one
 that runs — no re-derivation from disk, no parent/subprocess divergence.
@@ -656,15 +656,15 @@ Set <code class="docutils literal notranslate"><span class="pre">False</span></c
 GUI; available as an escape hatch for notebook users who need process
 isolation).
 See <code class="docutils literal notranslate"><span class="pre">molass-library/Copilot/DESIGN_split_optimizer_architecture.md</span></code>.</p></li>
-<li><p><strong>monitor</strong> (<em>bool</em><em>, </em><em>optional</em>) – Controls the <code class="docutils literal notranslate"><span class="pre">MplMonitor</span></code> ipywidgets dashboard.  When True
+<li><p><strong>monitor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Controls the <code class="docutils literal notranslate"><span class="pre">MplMonitor</span></code> ipywidgets dashboard.  When True
 (default), a live dashboard is shown whether the run is in-process
 or subprocess.  When False, no dashboard is created — the run
 proceeds silently.  Use <code class="docutils literal notranslate"><span class="pre">monitor=False</span></code> for batch / comparison
 runs (e.g. <code class="docutils literal notranslate"><span class="pre">compare_optimization_paths</span></code>) where the widget is not
 needed.</p></li>
-<li><p><strong>progress</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <strong>Deprecated and ignored</strong> — use <code class="docutils literal notranslate"><span class="pre">monitor=True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code> instead.
+<li><p><strong>progress</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <strong>Deprecated and ignored</strong> — use <code class="docutils literal notranslate"><span class="pre">monitor=True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code> instead.
 Kept in the signature only for backward compatibility.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enable debug mode with additional output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

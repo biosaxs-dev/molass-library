@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DataObjects.XrData &#8212; Molass Library  documentation</title>
+    <title>DataObjects.XrData &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="DataObjects.UvData" href="molass.DataObjects.UvData.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.baseline_method"><code class="docutils literal notranslate"><span class="pre">XrData.baseline_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.xr_pickat"><code class="docutils literal notranslate"><span class="pre">XrData.xr_pickat</span></code></a></li>
@@ -645,7 +645,7 @@ Inherits from SsMatrixData and adds XR-specific functionality.</p>
 Can be overridden by passing <code class="docutils literal notranslate"><span class="pre">baseline_method=...</span></code> to the constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -658,7 +658,7 @@ Can be overridden by passing <code class="docutils literal notranslate"><span cl
 <li><p><strong>iv</strong> (<em>array-like</em>) – The q-values corresponding to the angular (row) axis.</p></li>
 <li><p><strong>jv</strong> (<em>array-like</em><em> or </em><em>None</em>) – The values corresponding to the temporal (column) axis.</p></li>
 <li><p><strong>E</strong> (<em>2D array-like</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The 2D matrix of error values. Default None.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the SsMatrixData constructor.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the SsMatrixData constructor.</p></li>
 </ul>
 </dd>
 </dl>
@@ -674,7 +674,7 @@ Can be overridden by passing <code class="docutils literal notranslate"><span cl
 <dd><p>Return a copy of the SsMatrixData object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>slices</strong> (<em>tuple</em><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
+<dd class="field-odd"><p><strong>slices</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>slices</em><em>, </em><em>optional</em>) – The slices to apply to the iv, jv, and M attributes.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -693,7 +693,7 @@ Can be overridden by passing <code class="docutils literal notranslate"><span cl
 <dd><p>Returns an i-curve from the XR matrix data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – <p>Specifies the value in ssd.qv where to pick an i-curve.
+<dd class="field-odd"><p><strong>pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – <p>Specifies the value in ssd.qv where to pick an i-curve.
 The i-curve will be made from self.M[i,:] where
 the picking index i will be determined to satisfy</p>
 <blockquote>
@@ -764,7 +764,7 @@ unusable XR data regions.</p>
 <dd class="field-even"><p>A pair of indeces (i_start, i_end) to be used as a slice for the angular axis.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(int, int)</p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>)</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -780,14 +780,14 @@ unusable XR data regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – q-value at which to pick the i-curve for baseline fitting.
+<li><p><strong>pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – q-value at which to pick the i-curve for baseline fitting.
 If None, uses self.pickat (default 0.02, or the value set
 via SSD(xr_pickat=…)).</p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The baseline method to be used. If None, the method set in the object will be
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The baseline method to be used. If None, the method set in the object will be
 used.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline computation function.
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the baseline computation function.
 These will be merged with the default_kwargs defined above.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enable debug mode.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -845,12 +845,12 @@ smoothing followed by scipy <code class="docutils literal notranslate"><span cla
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prominence</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum prominence as a fraction of the smoothed curve maximum.
+<li><p><strong>prominence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum prominence as a fraction of the smoothed curve maximum.
 Default 0.005 (0.5 %).</p></li>
-<li><p><strong>distance</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum number of frames between adjacent peaks. Default 20.</p></li>
-<li><p><strong>window_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Savitzky-Golay filter window length (must be odd). Default 31.</p></li>
-<li><p><strong>polyorder</strong> (<em>int</em><em>, </em><em>optional</em>) – Savitzky-Golay filter polynomial order. Default 3.</p></li>
-<li><p><strong>return_properties</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return a tuple <code class="docutils literal notranslate"><span class="pre">(peaks,</span> <span class="pre">properties)</span></code> where
+<li><p><strong>distance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum number of frames between adjacent peaks. Default 20.</p></li>
+<li><p><strong>window_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Savitzky-Golay filter window length (must be odd). Default 31.</p></li>
+<li><p><strong>polyorder</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Savitzky-Golay filter polynomial order. Default 3.</p></li>
+<li><p><strong>return_properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return a tuple <code class="docutils literal notranslate"><span class="pre">(peaks,</span> <span class="pre">properties)</span></code> where
 <em>properties</em> is a dict containing <code class="docutils literal notranslate"><span class="pre">'prominences'</span></code> and
 <code class="docutils literal notranslate"><span class="pre">'peak_heights'</span></code> arrays.  Default False (backward-compatible).</p></li>
 </ul>
@@ -890,7 +890,7 @@ Returned alone when <code class="docutils literal notranslate"><span class="pre"
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple of (Figure, Axes)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a> of (Figure, Axes)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -904,8 +904,8 @@ It uses the first peak in the i-curve to determine the j-curve.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>j</strong> (<em>int</em><em>, </em><em>optional</em>) – The index of the j-curve to use. If None, the peak argument is used.</p></li>
-<li><p><strong>peak</strong> (<em>int</em><em>, </em><em>optional</em>) – This argument is used only if j is None.
+<li><p><strong>j</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The index of the j-curve to use. If None, the peak argument is used.</p></li>
+<li><p><strong>peak</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – This argument is used only if j is None.
 The index of the peak in the i-curve to use. If None, the first peak is used.</p></li>
 </ul>
 </dd>
@@ -969,7 +969,7 @@ The index of the peak in the i-curve to use. If None, the first peak is used.</p
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData"><code class="docutils literal notranslate"><span class="pre">XrData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.qv"><code class="docutils literal notranslate"><span class="pre">XrData.qv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.baseline_method"><code class="docutils literal notranslate"><span class="pre">XrData.baseline_method</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.XrData.XrData.xr_pickat"><code class="docutils literal notranslate"><span class="pre">XrData.xr_pickat</span></code></a></li>

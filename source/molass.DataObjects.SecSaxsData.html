@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DataObjects.SecSaxsData &#8212; Molass Library  documentation</title>
+    <title>DataObjects.SecSaxsData &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="DataObjects.Curve" href="molass.DataObjects.Curve.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.xr"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.xr</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.uv"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.uv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.trimmed</span></code></a></li>
@@ -650,7 +650,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.DataObjects.SecSaxsData.SecSaxsData">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SecSaxsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimmed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trimming</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_bubbles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beamline_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_initialized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv_monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xr_pickat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.DataObjects.SecSaxsData.SecSaxsData" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to represent a SEC-SAXS data object.
 It contains a pair of <a class="reference internal" href="molass.DataObjects.XrData.html#module-molass.DataObjects.XrData" title="molass.DataObjects.XrData"><code class="xref py py-class docutils literal notranslate"><span class="pre">XrData</span></code></a> and <a class="reference internal" href="molass.DataObjects.UvData.html#module-molass.DataObjects.UvData" title="molass.DataObjects.UvData"><code class="xref py py-class docutils literal notranslate"><span class="pre">UvData</span></code></a> objects.
 It also contains the beamline information and mapping information if available.</p>
@@ -683,7 +683,7 @@ It also contains the beamline information and mapping information if available.<
 This attribute is used to avoid minor redundant trimming operations which may cause inconsistency from the algorithmic reasons.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -716,7 +716,7 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dd><p>The time when the object was initialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -727,7 +727,7 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dd><p>The time required for processing the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -738,7 +738,7 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dd><p>The total time required for processing all data. This includes the time required for processing the data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -749,7 +749,7 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dd><p>The list of data files used for the analysis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -760,7 +760,7 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dd><p>The logger object for logging messages.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>logging.Logger</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.14)">logging.Logger</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -770,31 +770,31 @@ This attribute is used to avoid minor redundant trimming operations which may ca
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>folder</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies the folder path where the data are stored.
+<li><p><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the folder path where the data are stored.
 It is required if the data_list parameter is ommitted.</p></li>
-<li><p><strong>object_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list which includes [xr_data, uv_data]
+<li><p><strong>object_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><em>optional</em>) – A list which includes [xr_data, uv_data]
 in this order to be used as corresponding data items.
 It is required if the folder parameter is ommitted.</p></li>
-<li><p><strong>uv_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, only UV data will be loaded
+<li><p><strong>uv_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, only UV data will be loaded
 to suppress unnecessary data access.</p></li>
-<li><p><strong>xr_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, only XR data will be loaded
+<li><p><strong>xr_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, only XR data will be loaded
 to suppress unnecessary data access.</p></li>
-<li><p><strong>trimmed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the data will be treated as trimmed.</p></li>
-<li><p><strong>remove_bubbles</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, bubbles will be removed from the data.</p></li>
+<li><p><strong>trimmed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the data will be treated as trimmed.</p></li>
+<li><p><strong>remove_bubbles</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, bubbles will be removed from the data.</p></li>
 <li><p><strong>beamline_info</strong> (<a class="reference internal" href="molass.DataUtils.Beamline.html#molass.DataUtils.Beamline.BeamlineInfo" title="molass.DataUtils.Beamline.BeamlineInfo"><em>BeamlineInfo</em></a><em>, </em><em>optional</em>) – If specified, the beamline information will be used.</p></li>
 <li><p><strong>mapping</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a><em>, </em><em>optional</em>) – If specified, the mapping information will be used.</p></li>
-<li><p><strong>time_initialized</strong> (<em>float</em><em>, </em><em>optional</em>) – If specified, the time when the object was initialized.
+<li><p><strong>time_initialized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – If specified, the time when the object was initialized.
 If it is None, the time will be set to the time taken for initialization.</p></li>
-<li><p><strong>datafiles</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – If specified, the list of data files used for the analysis.
+<li><p><strong>datafiles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – If specified, the list of data files used for the analysis.
 If it is None, the data files will be set to the list of files loaded from the folder.</p></li>
-<li><p><strong>uv_pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – The wavelength (nm) at which to extract the UV elution profile.
+<li><p><strong>uv_pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The wavelength (nm) at which to extract the UV elution profile.
 Defaults to 280 nm when None. Use 290 for samples like ATP or MY
 where the UV signal is measured at 290 nm.</p></li>
-<li><p><strong>uv_monitor</strong> (<em>float</em><em>, </em><em>optional</em>) – Alias for <code class="docutils literal notranslate"><span class="pre">uv_pickat</span></code>. Follows chromatography convention
+<li><p><strong>uv_monitor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Alias for <code class="docutils literal notranslate"><span class="pre">uv_pickat</span></code>. Follows chromatography convention
 (“monitoring wavelength”). If both are given, <code class="docutils literal notranslate"><span class="pre">uv_monitor</span></code> wins.</p></li>
-<li><p><strong>xr_pickat</strong> (<em>float</em><em>, </em><em>optional</em>) – The q-value (Å⁻¹) at which to extract the XR elution profile.
+<li><p><strong>xr_pickat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The q-value (Å⁻¹) at which to extract the XR elution profile.
 Defaults to 0.02 when None.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -817,7 +817,7 @@ Defaults to 0.02 when None.</p></li>
 <dd class="field-even"><p><strong>has_xr</strong> – True if the XR data is available, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -834,7 +834,7 @@ Defaults to 0.02 when None.</p></li>
 <dd class="field-even"><p><strong>has_uv</strong> – True if the UV data is available, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -846,13 +846,13 @@ Defaults to 0.02 when None.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
-<li><p><strong>view_init</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary which specifies the view_init parameters.
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
+<li><p><strong>view_init</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – A dictionary which specifies the view_init parameters.
 The default is dict(elev=30, azim=-60) as of matplotlib 3.10.</p></li>
-<li><p><strong>view_arrows</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D view arrows are drawn on the 3D plot.
+<li><p><strong>view_arrows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the 2D view arrows are drawn on the 3D plot.
 One of the arrows shows the elutional view, while the other
 shows the spectral view. The default is False.</p></li>
-<li><p><strong>with_2d_section_lines</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the 2D section lines are drawn on the 3D plot.
+<li><p><strong>with_2d_section_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the 2D section lines are drawn on the 3D plot.
 The default is False.</p></li>
 </ul>
 </dd>
@@ -875,11 +875,11 @@ axes: Axes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
-<li><p><strong>baseline</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the baseline will be plotted.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
+<li><p><strong>baseline</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the baseline will be plotted.</p></li>
 <li><p><strong>ratio_curve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a><em>, </em><em>optional</em>) – If specified, the ratio curve will be plotted.</p></li>
-<li><p><strong>moment_lines</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the moment lines will be plotted.</p></li>
-<li><p><strong>align_zero</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, align the zero positions of the UV (twinx) and XR axes.
+<li><p><strong>moment_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the moment lines will be plotted.</p></li>
+<li><p><strong>align_zero</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, align the zero positions of the UV (twinx) and XR axes.
 Default is False so each trace is autoscaled independently and
 fills its own panel — preventing the smaller-amplitude trace
 from appearing near-flat (issue #120).</p></li>
@@ -911,13 +911,13 @@ to trim the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xr_qr</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The angular range (start, stop) to be used for the XR data.
+<li><p><strong>xr_qr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><em>optional</em>) – The angular range (start, stop) to be used for the XR data.
 If it is None, the full range will be used.</p></li>
-<li><p><strong>xr_mt</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The temporal range (start, stop) to be used for the XR data.
+<li><p><strong>xr_mt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><em>optional</em>) – The temporal range (start, stop) to be used for the XR data.
 If it is None, the full range will be used.</p></li>
-<li><p><strong>uv_wr</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The wavelength range to be used for the UV data.
+<li><p><strong>uv_wr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><em>optional</em>) – The wavelength range to be used for the UV data.
 If it is None, the full range will be used.</p></li>
-<li><p><strong>uv_mt</strong> (<em>tuple</em><em> of </em><em>(</em><em>int</em><em>, </em><em>int</em><em>)</em><em>, </em><em>optional</em>) – The temporal range (start, stop) to be used for the UV data.
+<li><p><strong>uv_mt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><em>optional</em>) – The temporal range (start, stop) to be used for the UV data.
 If it is None, the full range will be used.</p></li>
 </ul>
 </dd>
@@ -945,10 +945,10 @@ If it is None, the full range will be used.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>trim</strong> (<a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo"><em>TrimmingInfo</em></a><em> or </em><em>dict</em><em>, </em><em>optional</em>) – The trimming information to be used for the plot.</p></li>
-<li><p><strong>baseline</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, the baseline will be plotted.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
-<li><p><strong>return_fig</strong> (<em>bool</em><em>, </em><em>optional</em>) – If it is True, returns the figure object.</p></li>
+<li><p><strong>trim</strong> (<a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo"><em>TrimmingInfo</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – The trimming information to be used for the plot.</p></li>
+<li><p><strong>baseline</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, the baseline will be plotted.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – If specified, add a super title to the plot.</p></li>
+<li><p><strong>return_fig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If it is True, returns the figure object.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1003,11 +1003,11 @@ of elements uvM and wv.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>trimming</strong> (<a class="reference internal" href="molass.Trimming.TrimmingInfo.html#molass.Trimming.TrimmingInfo.TrimmingInfo" title="molass.Trimming.TrimmingInfo.TrimmingInfo"><em>TrimmingInfo</em></a><em>, </em><em>optional</em>) – If specified, the trimming information will be used for the copy.</p></li>
-<li><p><strong>jranges</strong> (<em>tuple</em><em> of </em><em>(</em><em>double</em><em>, </em><em>double</em><em>)</em><em>, </em><em>optional</em>) – The temporal ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].</p></li>
+<li><p><strong>jranges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><em>double</em><em>, </em><em>double</em><em>)</em><em>, </em><em>optional</em>) – The temporal ranges to apply for trimming in the form of [(start1, end1), (start2, end2)].</p></li>
 <li><p><strong>mapping</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a><em>, </em><em>optional</em>) – If specified, the mapping information will be used for the copy.
 It must be provided if <cite>jranges</cite> is specified.</p></li>
-<li><p><strong>nsigmas</strong> (<em>int</em><em> or </em><em>float</em><em>, </em><em>optional</em>) – If specified, passed to make_trimming() to control the σ-window width.</p></li>
-<li><p><strong>uv_wavelength</strong> (<em>tuple</em><em> of </em><em>(</em><em>float</em><em> or </em><em>None</em><em>, </em><em>float</em><em> or </em><em>None</em><em>)</em><em>, </em><em>optional</em>) – UV wavelength range in nm to include, as <code class="docutils literal notranslate"><span class="pre">(wl_min,</span> <span class="pre">wl_max)</span></code>.
+<li><p><strong>nsigmas</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – If specified, passed to make_trimming() to control the σ-window width.</p></li>
+<li><p><strong>uv_wavelength</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>None</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>None</em><em>)</em><em>, </em><em>optional</em>) – UV wavelength range in nm to include, as <code class="docutils literal notranslate"><span class="pre">(wl_min,</span> <span class="pre">wl_max)</span></code>.
 Use <code class="docutils literal notranslate"><span class="pre">None</span></code> for either end to keep the dataset default
 (<code class="docutils literal notranslate"><span class="pre">None</span></code> on the min side uses the instrument’s usable wavelength start,
 typically ~250 nm; <code class="docutils literal notranslate"><span class="pre">None</span></code> on the max side uses the full upper end).
@@ -1030,7 +1030,7 @@ Example: <code class="docutils literal notranslate"><span class="pre">uv_wavelen
 <p>See also: <a class="reference external" href="https://biosaxs-dev.github.io/molass-tutorial/chapters/04/data_correction.html">Baseline Correction</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>method</strong> (<em>str</em><em> or </em><em>(</em><em>str</em><em>, </em><em>str</em><em>)</em>) – <p>Specifies the baseline method to be used.
+<dd class="field-odd"><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>)</em>) – <p>Specifies the baseline method to be used.
 If it is a string, it will be used for both XR and UV data.
 If it is a tuple of two strings, the first string will be used for XR data
 and the second string will be used for UV data.</p>
@@ -1063,7 +1063,7 @@ If the baseline method is the same for both XR and UV data,
 it returns a single string instead of a tuple.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(str, str)</p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1106,7 +1106,7 @@ signal is not destroyed.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mask</strong> (<em>array-like</em><em> of </em><em>bool</em><em>, </em><em>slice</em><em>, or </em><em>None</em><em>, </em><em>optional</em>) – Frames to exclude.  When a <code class="docutils literal notranslate"><span class="pre">slice</span></code> is given, start/stop are
+<dd class="field-odd"><p><strong>mask</strong> (<em>array-like</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a><em>, or </em><em>None</em><em>, </em><em>optional</em>) – Frames to exclude.  When a <code class="docutils literal notranslate"><span class="pre">slice</span></code> is given, start/stop are
 interpreted as frame numbers.  When <code class="docutils literal notranslate"><span class="pre">None</span></code>, auto-detection
 via <a class="reference internal" href="molass.DataObjects.SsMatrixData.html#molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly" title="molass.DataObjects.SsMatrixData.SsMatrixData.detect_anomaly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">detect_anomaly()</span></code></a>
 is attempted first.</p>
@@ -1116,7 +1116,7 @@ is attempted first.</p>
 <em>mask</em> when an explicit mask was supplied, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>slice or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)">slice</a> or None</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1147,7 +1147,7 @@ subtracting the baseline from the original data.</p>
 instead of computing one via <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_baseline2d()</span></code>.
 <strong>Note</strong>: applies to XR only — the UV baseline is always
 computed internally.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p></li>
 <li><p><strong>**baseline_kwargs</strong> – Additional keyword arguments forwarded to <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_baseline2d()</span></code>
 for both XR and UV.</p></li>
 </ul>
@@ -1216,7 +1216,7 @@ If the mapping information is not available, returns None.</p>
 If the beamline information is not available, returns None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1238,7 +1238,7 @@ rg = ssd_corrected.get_rg_curve()       # library-quality rg_curve</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sd</strong> (<em>SerialData</em>) – Legacy data object.  <code class="docutils literal notranslate"><span class="pre">sd.xray_array</span></code> must be of shape
 <code class="docutils literal notranslate"><span class="pre">(n_q,</span> <span class="pre">n_frames,</span> <span class="pre">3)</span></code> where the last axis holds <code class="docutils literal notranslate"><span class="pre">[q,</span> <span class="pre">I,</span> <span class="pre">E]</span></code>.</p></li>
-<li><p><strong>include_uv</strong> (<em>bool</em>) – Not yet implemented — reserved for Phase 3.  Ignored for now.</p></li>
+<li><p><strong>include_uv</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Not yet implemented — reserved for Phase 3.  Ignored for now.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1267,7 +1267,7 @@ GUI data without re-reading the raw data files.</p>
 <li><p><strong>uv_wv</strong> (<em>ndarray</em><em> or </em><em>None</em>) – UV wavelengths (nm).</p></li>
 <li><p><strong>uv_E</strong> (<em>ndarray</em><em> or </em><em>None</em>) – UV error matrix (rarely used).</p></li>
 <li><p><strong>uv_jv</strong> (<em>ndarray</em><em> or </em><em>None</em>) – UV frame numbers.</p></li>
-<li><p><strong>trimmed</strong> (<em>bool</em>) – Whether this data is already trimmed (sets <code class="docutils literal notranslate"><span class="pre">ssd.trimmed</span></code>).</p></li>
+<li><p><strong>trimmed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether this data is already trimmed (sets <code class="docutils literal notranslate"><span class="pre">ssd.trimmed</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1352,14 +1352,14 @@ are merged into a single component.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>egh_overlap_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – EGH peak pairs with spacing/sigma_sum below this value are merged
+<dd class="field-odd"><p><strong>egh_overlap_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – EGH peak pairs with spacing/sigma_sum below this value are merged
 into one component.  Default 1.3.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Keyword arguments for <code class="docutils literal notranslate"><span class="pre">quick_decomposition()</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1411,9 +1411,9 @@ merged <em>after</em> the automatic options, so they take priority.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
 used to denoise the matrix data.</p></li>
-<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – <p>Specifies the approximate area ratios of the elution peaks.
+<li><p><strong>proportions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – <p>Specifies the approximate area ratios of the elution peaks.
 The values do not need to be normalized; for example,
 <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">1]</span></code>, <code class="docutils literal notranslate"><span class="pre">[0.5,</span> <span class="pre">0.5]</span></code>, and <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">3]</span></code> all produce the same result
 because they are normalized internally.</p>
@@ -1427,25 +1427,25 @@ where the default algorithm may produce unstable results.</p>
 even a rough estimate (e.g., <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">1]</span></code> when the true ratio is <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">1]</span></code>)
 is usually sufficient.</p>
 </p></li>
-<li><p><strong>xr_peakpositions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – <p>Specifies the frame positions where peaks should be pinned.
+<li><p><strong>xr_peakpositions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – <p>Specifies the frame positions where peaks should be pinned.
 Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
 with a strong position constraint. <code class="docutils literal notranslate"><span class="pre">num_components</span></code> is inferred
 from the length if not provided.</p>
 <p>Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">proportions</span></code>.</p>
 </p></li>
-<li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
-<li><p><strong>num_plates</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
-<li><p><strong>tau_limit</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum allowed ratio <code class="docutils literal notranslate"><span class="pre">|tau|</span> <span class="pre">/</span> <span class="pre">sigma</span></code> for positioned decomposition.
+<li><p><strong>ranks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
+<li><p><strong>num_plates</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
+<li><p><strong>tau_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum allowed ratio <code class="docutils literal notranslate"><span class="pre">|tau|</span> <span class="pre">/</span> <span class="pre">sigma</span></code> for positioned decomposition.
 Default 0.6.</p></li>
-<li><p><strong>max_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum allowed Gaussian width (sigma) for positioned decomposition.
+<li><p><strong>max_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum allowed Gaussian width (sigma) for positioned decomposition.
 Default 80.</p></li>
-<li><p><strong>min_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum allowed Gaussian width (sigma) for positioned decomposition.
+<li><p><strong>min_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum allowed Gaussian width (sigma) for positioned decomposition.
 Default 5.</p></li>
-<li><p><strong>allow_negative_peaks</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, allow negative peak heights (H &lt; 0) in the EGH model.
+<li><p><strong>allow_negative_peaks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, allow negative peak heights (H &lt; 0) in the EGH model.
 This enables decomposition of components with negative scattering,
 such as those arising from buffer composition mismatch.
 Default False.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reload internal modules and show diagnostic plots.
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, reload internal modules and show diagnostic plots.
 Default False.</p></li>
 </ul>
 </dd>
@@ -1465,11 +1465,11 @@ Default False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_components</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the number of components which also implies the SVD rank
 used to denoise the matrix data.</p></li>
-<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
-<li><p><strong>ranks</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
-<li><p><strong>num_plates</strong> (<em>int</em><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
+<li><p><strong>proportions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Specifies the proportions to be used for XR data.</p></li>
+<li><p><strong>ranks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the ranks to be used for XR data.</p></li>
+<li><p><strong>num_plates</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Specifies the number of theoretical plates to be used for the optimization constraint.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1487,7 +1487,7 @@ used to denoise the matrix data.</p></li>
 <dd><p>Inspects the inter-particle effect of the SEC-SAXS data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p>
+<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode for more verbose output.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ip_effect_info</strong> – An IpEffectInfo object which contains the inspection result.</p>
@@ -1511,7 +1511,7 @@ used to denoise the matrix data.</p></li>
 If the beamline information is not available, returns None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1529,7 +1529,7 @@ If the beamline information is not available, returns None.</p>
 If the beamline information is not available, returns None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1584,20 +1584,20 @@ None if XR data is absent.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>folder</strong> (<em>str</em>) – Specifies the folder path where the data will be exported.</p></li>
-<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies the filename prefix to be used for the exported data.
+<li><p><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Specifies the folder path where the data will be exported.</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the filename prefix to be used for the exported data.
 If it is None, “<a href="#id2"><span class="problematic" id="id3">PREFIX_</span></a>” will be used.</p></li>
-<li><p><strong>fmt</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies the format to be used for the exported data.
+<li><p><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Specifies the format to be used for the exported data.
 The default is ‘%.18e’.</p></li>
-<li><p><strong>xr_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, only export XR data.</p></li>
-<li><p><strong>uv_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, only export UV data.</p></li>
+<li><p><strong>xr_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, only export XR data.</p></li>
+<li><p><strong>uv_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, only export UV data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>filepath</strong> – The full path of the exported file.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1609,10 +1609,10 @@ The default is ‘%.18e’.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>proportions</strong> (<em>list</em><em> of </em><em>float</em>) – A list of proportions to be used for the varied decompositions.</p></li>
-<li><p><strong>rgcurve</strong> (<em>object</em><em>, </em><em>optional</em>) – A reference to the RG curve to be used for the plot.</p></li>
-<li><p><strong>best</strong> (<em>int</em><em>, </em><em>optional</em>) – number of best results to be highlighted.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enables debug mode.</p></li>
+<li><p><strong>proportions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – A list of proportions to be used for the varied decompositions.</p></li>
+<li><p><strong>rgcurve</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><em>optional</em>) – A reference to the RG curve to be used for the plot.</p></li>
+<li><p><strong>best</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – number of best results to be highlighted.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enables debug mode.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1639,7 +1639,7 @@ axes: Axes</p>
 <dd class="field-even"><p><strong>spectral_vectors</strong> – A list of two numpy arrays which contain the spectral vectors for XR and UV data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of np.ndarray</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1695,7 +1695,7 @@ axes: Axes</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData"><code class="docutils literal notranslate"><span class="pre">SecSaxsData</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.xr"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.xr</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.uv"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.uv</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.DataObjects.SecSaxsData.SecSaxsData.trimmed"><code class="docutils literal notranslate"><span class="pre">SecSaxsData.trimmed</span></code></a></li>

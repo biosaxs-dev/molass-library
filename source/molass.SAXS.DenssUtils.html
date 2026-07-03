@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SAXS.DenssUtils &#8212; Molass Library  documentation</title>
+    <title>SAXS.DenssUtils &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SAXS.DenssTools" href="molass.SAXS.DenssTools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -633,15 +633,15 @@ This function processes the input data and prepares it for DENSS reconstruction.
 <li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
 <li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
 <li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
-<li><p><strong>file</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data file. If None, data is taken from memory.</p></li>
-<li><p><strong>D</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The path to the data file. If None, data is taken from memory.</p></li>
+<li><p><strong>D</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
 from the data.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The regularization parameter. If None, it will be optimized.</p></li>
-<li><p><strong>max_alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum value for alpha during optimization.</p></li>
-<li><p><strong>nes</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of electrons per voxel.</p></li>
-<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
-<li><p><strong>gui</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable GUI mode for optimization.</p></li>
-<li><p><strong>use_memory_data</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use the provided q, a, e arrays instead of reading from file.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The regularization parameter. If None, it will be optimized.</p></li>
+<li><p><strong>max_alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum value for alpha during optimization.</p></li>
+<li><p><strong>nes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The number of electrons per voxel.</p></li>
+<li><p><strong>extrapolate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+<li><p><strong>gui</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enable GUI mode for optimization.</p></li>
+<li><p><strong>use_memory_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, use the provided q, a, e arrays instead of reading from file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -666,10 +666,10 @@ This is a simplified wrapper around fit_data_impl().</p>
 <li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
 <li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
 <li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
-<li><p><strong>D</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
+<li><p><strong>D</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – The maximum dimension (Dmax) of the particle. If None, it will be estimated
 from the data.</p></li>
-<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
-<li><p><strong>return_sasrec</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return the Sasrec object. If False, return qc, Ic, Icerr, D.</p></li>
+<li><p><strong>extrapolate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+<li><p><strong>return_sasrec</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return the Sasrec object. If False, return qc, Ic, Icerr, D.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -714,7 +714,7 @@ It is recommended to use fit_data() instead.</p>
 <li><p><strong>q</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
 <li><p><strong>a</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
 <li><p><strong>e</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
-<li><p><strong>extrapolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
+<li><p><strong>extrapolate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, extrapolate the data to higher q values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -736,13 +736,13 @@ It is recommended to use fit_data() instead.</p>
 This function reads the DATGNOM file and estimates the best Dmax value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – The path to the DATGNOM file.</p>
+<dd class="field-odd"><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The path to the DATGNOM file.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>dmax</strong> – The estimated Dmax value.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -756,13 +756,13 @@ If return_args is True, it returns the parsed arguments instead.
 This function is used to parse command line arguments for DENSS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>return_args</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return the parsed arguments instead of the parser.</p>
+<dd class="field-odd"><p><strong>return_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, return the parsed arguments instead of the parser.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The argument parser or the parsed arguments.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>argparse.ArgumentParser or argparse.Namespace</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.14)">argparse.ArgumentParser</a> or <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.14)">argparse.Namespace</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -778,12 +778,12 @@ This function sets up and runs the DENSS reconstruction process.</p>
 <li><p><strong>qc</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
 <li><p><strong>ac</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
 <li><p><strong>ec</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
-<li><p><strong>dmax</strong> (<em>float</em>) – The maximum dimension (Dmax) of the particle.</p></li>
-<li><p><strong>data_name</strong> (<em>str</em>) – The name of the data set.</p></li>
-<li><p><strong>steps</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of steps for the reconstruction.</p></li>
+<li><p><strong>dmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The maximum dimension (Dmax) of the particle.</p></li>
+<li><p><strong>data_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The name of the data set.</p></li>
+<li><p><strong>steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The maximum number of steps for the reconstruction.</p></li>
 <li><p><strong>progress_cb</strong> (<em>callable</em><em>, </em><em>optional</em>) – A callback function to report progress.</p></li>
-<li><p><strong>use_gpu</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, use GPU acceleration for the reconstruction.</p></li>
-<li><p><strong>gui</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, enable GUI mode for the reconstruction.</p></li>
+<li><p><strong>use_gpu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, use GPU acceleration for the reconstruction.</p></li>
+<li><p><strong>gui</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, enable GUI mode for the reconstruction.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -804,8 +804,8 @@ It prints progress messages to the console.</p>
 <li><p><strong>qc</strong> (<em>np.ndarray</em>) – The q values of the SAXS data.</p></li>
 <li><p><strong>ac</strong> (<em>np.ndarray</em>) – The intensity values of the SAXS data.</p></li>
 <li><p><strong>ec</strong> (<em>np.ndarray</em>) – The error values of the SAXS data.</p></li>
-<li><p><strong>dmax</strong> (<em>float</em>) – The maximum dimension (Dmax) of the particle.</p></li>
-<li><p><strong>infile_name</strong> (<em>str</em>) – The name of the input data file.</p></li>
+<li><p><strong>dmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The maximum dimension (Dmax) of the particle.</p></li>
+<li><p><strong>infile_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The name of the input data file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -819,13 +819,13 @@ This function retrieves the DENSS output folder from the settings.
 If the folder does not exist, it creates it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parent</strong> (<em>object</em><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p>
+<dd class="field-odd"><p><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The path to the DENSS output folder, or None if not set.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -839,8 +839,8 @@ If the folder does not exist, it creates it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>job_id</strong> (<em>int</em><em>, </em><em>optional</em>) – The job ID to append to the folder name. If None, uses ‘000’ and increments if the folder exists.</p></li>
-<li><p><strong>parent</strong> (<em>object</em><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p></li>
+<li><p><strong>job_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The job ID to append to the folder name. If None, uses ‘000’ and increments if the folder exists.</p></li>
+<li><p><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><em>optional</em>) – The parent object to retrieve settings from. If None, uses global settings.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -848,7 +848,7 @@ If the folder does not exist, it creates it.</p>
 is not set.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -861,13 +861,13 @@ This function reads a DENSS log file and extracts lines containing key-value pai
 in the format “Final &lt;key&gt;: &lt;value&gt;”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The path to the DENSS log file.</p>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The path to the DENSS log file.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary containing the extracted key-value pairs.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -881,15 +881,15 @@ a PDB file to an MRC file. It can report progress through a queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_file</strong> (<em>str</em>) – The path to the input PDB file.</p></li>
-<li><p><strong>queue</strong> (<em>multiprocessing.Queue</em><em>, </em><em>optional</em>) – A queue to report progress. If None, no progress is reported.</p></li>
+<li><p><strong>in_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The path to the input PDB file.</p></li>
+<li><p><strong>queue</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.14)"><em>multiprocessing.Queue</em></a><em>, </em><em>optional</em>) – A queue to report progress. If None, no progress is reported.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The path to the generated MRC file, or None if the conversion failed.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> or None</p>
 </dd>
 </dl>
 </dd></dl>

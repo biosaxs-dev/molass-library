@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.Models.GRM &#8212; Molass Library  documentation</title>
+    <title>SEC.Models.GRM &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM"><code class="docutils literal notranslate"><span class="pre">GRM</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM"><code class="docutils literal notranslate"><span class="pre">GRM</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">GRM.optimize_decomposition()</span></code></a></li>
 </ul>
 </li>
@@ -613,7 +613,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.SEC.Models.GRM.GRM">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">GRM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.GRM.GRM" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>General Rate Model (GRM) for SEC data analysis.</p>
 <p>Parameters are estimated via moment-matching from LKM (GrmEstimator) and
 then each component’s scale is refined by NNLS (GrmOptimizer).</p>
@@ -632,11 +632,11 @@ objective function (molass-legacy) to refine all GRM parameters jointly.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – Initial EGH decomposition to upgrade.</p></li>
-<li><p><strong>R_p</strong> (<em>float</em><em>, </em><em>optional</em>) – Particle radius [cm].  Default from SerialSettings or 0.0035 cm.</p></li>
-<li><p><strong>D_eff</strong> (<em>float</em><em>, </em><em>optional</em>) – Effective pore diffusivity [cm²/min].  Default 1e3 (film-only limit).</p></li>
-<li><p><strong>eps_p</strong> (<em>float</em><em>, </em><em>optional</em>) – Intraparticle porosity.  Default 0.0 (non-porous).</p></li>
-<li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Interstitial column porosity.  Default 0.4.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enable verbose output.</p></li>
+<li><p><strong>R_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Particle radius [cm].  Default from SerialSettings or 0.0035 cm.</p></li>
+<li><p><strong>D_eff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Effective pore diffusivity [cm²/min].  Default 1e3 (film-only limit).</p></li>
+<li><p><strong>eps_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Intraparticle porosity.  Default 0.0 (non-porous).</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Interstitial column porosity.  Default 0.4.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Enable verbose output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -681,7 +681,7 @@ objective function (molass-legacy) to refine all GRM parameters jointly.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM"><code class="docutils literal notranslate"><span class="pre">GRM</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM"><code class="docutils literal notranslate"><span class="pre">GRM</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.GRM.GRM.optimize_decomposition"><code class="docutils literal notranslate"><span class="pre">GRM.optimize_decomposition()</span></code></a></li>
 </ul>
 </li>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solvers.DE.SolverDE &#8212; Molass Library  documentation</title>
+    <title>Solvers.DE.SolverDE &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -131,8 +131,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -588,7 +588,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE"><code class="docutils literal notranslate"><span class="pre">SolverDE</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE"><code class="docutils literal notranslate"><span class="pre">SolverDE</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE.minimize"><code class="docutils literal notranslate"><span class="pre">SolverDE.minimize()</span></code></a></li>
 </ul>
 </li>
@@ -629,16 +629,16 @@ async_=True.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.Solvers.DE.SolverDE.SolverDE">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SolverDE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DE/rand/1/bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warm_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.Solvers.DE.SolverDE.SolverDE" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Differential Evolution solver wrapping pymoo DE.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optimizer</strong> (<em>BasicOptimizer</em>) – Fully constructed optimizer that provides <code class="docutils literal notranslate"><span class="pre">minima_callback</span></code>.</p></li>
-<li><p><strong>pop_size</strong> (<em>int</em><em> or </em><em>None</em>) – Population size.  None → max(20, 5 * n_var) (auto-sized).</p></li>
-<li><p><strong>variant</strong> (<em>str</em>) – DE variant string understood by pymoo, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;DE/rand/1/bin&quot;</span></code>.</p></li>
-<li><p><strong>CR</strong> (<em>float</em>) – Crossover probability (0–1).</p></li>
-<li><p><strong>F</strong> (<em>float</em><em> or </em><em>tuple</em>) – Differential weight (mutation factor).  A tuple <code class="docutils literal notranslate"><span class="pre">(F_min,</span> <span class="pre">F_max)</span></code>
+<li><p><strong>pop_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em>) – Population size.  None → max(20, 5 * n_var) (auto-sized).</p></li>
+<li><p><strong>variant</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – DE variant string understood by pymoo, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;DE/rand/1/bin&quot;</span></code>.</p></li>
+<li><p><strong>CR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Crossover probability (0–1).</p></li>
+<li><p><strong>F</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Differential weight (mutation factor).  A tuple <code class="docutils literal notranslate"><span class="pre">(F_min,</span> <span class="pre">F_max)</span></code>
 enables dithering.</p></li>
 </ul>
 </dd>
@@ -653,12 +653,12 @@ enables dithering.</p></li>
 <li><p><strong>objective</strong> (<em>callable</em>) – Objective function f(x) → scalar (wrapped by
 <code class="docutils literal notranslate"><span class="pre">BasicOptimizer.objective_func_wrapper</span></code>).</p></li>
 <li><p><strong>init_params</strong> (<em>ndarray</em>) – Initial parameter vector in normalized [0, 10] space.</p></li>
-<li><p><strong>niter</strong> (<em>int</em>) – Controls evaluation budget: max_fevals = niter * FEVALS_PER_NITER.</p></li>
-<li><p><strong>seed</strong> (<em>int</em>) – RNG seed.</p></li>
+<li><p><strong>niter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Controls evaluation budget: max_fevals = niter * FEVALS_PER_NITER.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – RNG seed.</p></li>
 <li><p><strong>bounds</strong> (<em>ndarray</em><em> of </em><em>shape</em><em> (</em><em>n</em><em>, </em><em>2</em><em>)</em><em>, </em><em>optional</em>) – Per-parameter [lower, upper] bounds in normalized space.
 Defaults to [0, 10] for every parameter.</p></li>
-<li><p><strong>narrow_bounds</strong> (<em>bool</em>) – If True, restrict search to [init_params ± 1.0].</p></li>
-<li><p><strong>show_history</strong> (<em>bool</em>) – Unused (kept for API parity with SolverBH).</p></li>
+<li><p><strong>narrow_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, restrict search to [init_params ± 1.0].</p></li>
+<li><p><strong>show_history</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Unused (kept for API parity with SolverBH).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -668,7 +668,7 @@ Defaults to [0, 10] for every parameter.</p></li>
 <code class="docutils literal notranslate"><span class="pre">.nfev</span></code>— total function evaluations</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>scipy.optimize.OptimizeResult</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult" title="(in SciPy v1.18.0)">scipy.optimize.OptimizeResult</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -706,7 +706,7 @@ Defaults to [0, 10] for every parameter.</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE"><code class="docutils literal notranslate"><span class="pre">SolverDE</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE"><code class="docutils literal notranslate"><span class="pre">SolverDE</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.Solvers.DE.SolverDE.SolverDE.minimize"><code class="docutils literal notranslate"><span class="pre">SolverDE.minimize()</span></code></a></li>
 </ul>
 </li>

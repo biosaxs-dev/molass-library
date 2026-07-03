@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.Models.SdmOptimizer &#8212; Molass Library  documentation</title>
+    <title>SEC.Models.SdmOptimizer &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SEC.Models.SdmMonoPore" href="molass.SEC.Models.SdmMonoPore.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -617,16 +617,16 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The decomposition to optimize.</p></li>
-<li><p><strong>env_params</strong> (<em>tuple</em>) – The environmental parameters (N, T, me, mp, N0, t0, poresize).</p></li>
-<li><p><strong>model_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – The parameters for the SDM model.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the optimization process.</p></li>
+<li><p><strong>env_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – The environmental parameters (N, T, me, mp, N0, t0, poresize).</p></li>
+<li><p><strong>model_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – The parameters for the SDM model.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Additional parameters for the optimization process.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>new_xr_ccurves</strong> – The optimized SDM component curves.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -643,7 +643,7 @@ that is less prone to degeneracy under high component overlap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdm_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – Pass-1 optimised SDM component curves (mono or lognormal pore_dist).</p></li>
+<li><p><strong>sdm_ccurves</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – Pass-1 optimised SDM component curves (mono or lognormal pore_dist).</p></li>
 <li><p><strong>x</strong> (<em>array</em>) – Frame positions (same grid as used by the component curves).</p></li>
 <li><p><strong>y</strong> (<em>array</em>) – Total XR elution curve values to fit.</p></li>
 </ul>
@@ -653,7 +653,7 @@ that is less prone to degeneracy under high component overlap.</p>
 (rg, scale).  The column object is shared across all returned curves.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -666,15 +666,15 @@ that is less prone to degeneracy under high component overlap.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The decomposition to optimize.</p></li>
-<li><p><strong>xr_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – The SDM component curves from the XR decomposition.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the optimization process.</p></li>
+<li><p><strong>xr_ccurves</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – The SDM component curves from the XR decomposition.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Additional parameters for the optimization process.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>new_uv_ccurves</strong> – The optimized UV component curves.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve" title="molass.SEC.Models.UvComponentCurve.UvComponentCurve">UvComponentCurve</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference internal" href="molass.SEC.Models.UvComponentCurve.html#molass.SEC.Models.UvComponentCurve.UvComponentCurve" title="molass.SEC.Models.UvComponentCurve.UvComponentCurve">UvComponentCurve</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -687,8 +687,8 @@ that is less prone to degeneracy under high component overlap.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The decomposition to optimize.</p></li>
-<li><p><strong>env_params</strong> (<em>tuple</em>) – The environmental parameters <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">T,</span> <span class="pre">me,</span> <span class="pre">mp,</span> <span class="pre">N0,</span> <span class="pre">t0,</span> <span class="pre">mu,</span> <span class="pre">sigma)</span></code>.</p></li>
-<li><p><strong>model_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>The parameters for the SDM model.  Recognized keys:</p>
+<li><p><strong>env_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – The environmental parameters <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">T,</span> <span class="pre">me,</span> <span class="pre">mp,</span> <span class="pre">N0,</span> <span class="pre">t0,</span> <span class="pre">mu,</span> <span class="pre">sigma)</span></code>.</p></li>
+<li><p><strong>model_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – <p>The parameters for the SDM model.  Recognized keys:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">ln_pore_sigma</span></code><span class="classifier">float or None (default 0.3)</span></dt><dd><p>Standard deviation of <code class="docutils literal notranslate"><span class="pre">ln(r/r0)</span></code>, held constant during
 optimization (removed from the free-parameter vector).
@@ -707,14 +707,14 @@ and will drift to <code class="docutils literal notranslate"><span class="pre">s
 <p><code class="docutils literal notranslate"><span class="pre">k</span></code> : float (default 2.0)
 <code class="docutils literal notranslate"><span class="pre">rt_dist</span></code> : str (default <code class="docutils literal notranslate"><span class="pre">'gamma'</span></code>)</p>
 </p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the optimization process.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Additional parameters for the optimization process.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>new_xr_ccurves</strong> – The optimized SDM component curves with lognormal pore distribution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve">SdmComponentCurve</a></p>
 </dd>
 </dl>
 </dd></dl>

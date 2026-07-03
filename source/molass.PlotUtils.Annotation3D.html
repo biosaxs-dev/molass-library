@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>PlotUtils.Annotation3D &#8212; Molass Library  documentation</title>
+    <title>PlotUtils.Annotation3D &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="PlotUtils" href="molass.PlotUtils.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D"><code class="docutils literal notranslate"><span class="pre">Annotation3D</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D"><code class="docutils literal notranslate"><span class="pre">Annotation3D</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D.draw"><code class="docutils literal notranslate"><span class="pre">Annotation3D.draw()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D.set"><code class="docutils literal notranslate"><span class="pre">Annotation3D.set()</span></code></a></li>
 </ul>
@@ -624,8 +624,8 @@ be added by defining <em>arrowprops</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<em>str</em>) – The text of the annotation.</p></li>
-<li><p><strong>xy</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em>) – The point <em>(x, y)</em> to annotate. The coordinate system is determined
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The text of the annotation.</p></li>
+<li><p><strong>xy</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>)</em>) – The point <em>(x, y)</em> to annotate. The coordinate system is determined
 by <em>xycoords</em>.</p></li>
 <li><p><strong>xytext</strong> ((float, float), default: <em>xy</em>) – The position <em>(x, y)</em> to place the text at. The coordinate system
 is determined by <em>textcoords</em>.</p></li>
@@ -724,7 +724,7 @@ of one of the above described types.</p></li>
 </table>
 </div>
 </p></li>
-<li><p><strong>arrowprops</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>The properties used to draw a <cite>.FancyArrowPatch</cite> arrow between the
+<li><p><strong>arrowprops</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – <p>The properties used to draw a <cite>.FancyArrowPatch</cite> arrow between the
 positions <em>xy</em> and <em>xytext</em>.  Defaults to None, i.e. no arrow is
 drawn.</p>
 <p>For historical reasons there are two different ways to specify
@@ -809,7 +809,7 @@ right corner. Values &lt;0 and &gt;1 are supported and specify points
 outside the text box. By default (0.5, 0.5), so the starting point
 is centered in the text box.</p>
 </p></li>
-<li><p><strong>annotation_clip</strong> (<em>bool</em><em> or </em><em>None</em><em>, </em><em>default: None</em>) – <p>Whether to clip (i.e. not draw) the annotation when the annotation
+<li><p><strong>annotation_clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>default: None</em>) – <p>Whether to clip (i.e. not draw) the annotation when the annotation
 point <em>xy</em> is outside the Axes area.</p>
 <ul>
 <li><p>If <em>True</em>, the annotation will be clipped when <em>xy</em> is outside
@@ -828,7 +828,7 @@ the Axes and <em>xycoords</em> is ‘data’.</p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://matplotlib.org/stable/users/explain/text/annotations.html#annotations" title="(in Matplotlib v3.11.0)"><span>Annotations</span></a></p>
+<p><a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#annotations" title="(in Python v3.14)"><span>Annotations</span></a></p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="molass.PlotUtils.Annotation3D.Annotation3D.draw">
@@ -965,7 +965,7 @@ zorder: float</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D"><code class="docutils literal notranslate"><span class="pre">Annotation3D</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D"><code class="docutils literal notranslate"><span class="pre">Annotation3D</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D.draw"><code class="docutils literal notranslate"><span class="pre">Annotation3D.draw()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.PlotUtils.Annotation3D.Annotation3D.set"><code class="docutils literal notranslate"><span class="pre">Annotation3D.set()</span></code></a></li>
 </ul>

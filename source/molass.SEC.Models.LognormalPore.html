@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.Models.LognormalPore &#8212; Molass Library  documentation</title>
+    <title>SEC.Models.LognormalPore &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SEC.Models.GEC" href="molass.SEC.Models.GEC.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -663,16 +663,16 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>w</strong> (<em>array</em>) – Frequency array</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Pore interaction scale parameter</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Residence time scale parameter</p></li>
-<li><p><strong>me</strong> (<em>float</em>) – Pore entry exponent</p></li>
-<li><p><strong>mp</strong> (<em>float</em>) – Pore residence exponent</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Log-mean of pore size distribution</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Log-std of pore size distribution</p></li>
-<li><p><strong>Rg</strong> (<em>float</em>) – Molecule radius of gyration (lower integration limit)</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Plate number (mobile phase dispersion parameter)</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Mobile phase hold-up time (drift term)</p></li>
-<li><p><strong>const_rg_limit</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use constant integration limit (default: False)</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction scale parameter</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Residence time scale parameter</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore entry exponent</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore residence exponent</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Log-mean of pore size distribution</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Log-std of pore size distribution</p></li>
+<li><p><strong>Rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius of gyration (lower integration limit)</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Plate number (mobile phase dispersion parameter)</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile phase hold-up time (drift term)</p></li>
+<li><p><strong>const_rg_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Use constant integration limit (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -696,16 +696,16 @@ where Z = [lognormal pore integral] + iω*t0</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array</em>) – Time points</p></li>
-<li><p><strong>scale</strong> (<em>float</em>) – Amplitude scaling factor</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Pore interaction parameters</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Pore interaction parameters</p></li>
-<li><p><strong>me</strong> (<em>float</em>) – Pore interaction parameters</p></li>
-<li><p><strong>mp</strong> (<em>float</em>) – Pore interaction parameters</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Lognormal distribution parameters</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Lognormal distribution parameters</p></li>
-<li><p><strong>Rg</strong> (<em>float</em>) – Molecule radius of gyration</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Plate number</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Mobile phase time</p></li>
+<li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Amplitude scaling factor</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction parameters</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction parameters</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction parameters</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction parameters</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal distribution parameters</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal distribution parameters</p></li>
+<li><p><strong>Rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius of gyration</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Plate number</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile phase time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -725,16 +725,16 @@ where Z = [lognormal pore integral] + iω*t0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<em>float</em><em> or </em><em>array</em>) – Pore radius (integration variable)</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>array</em>) – Pore radius (integration variable)</p></li>
 <li><p><strong>w</strong> (<em>array</em>) – Frequency array</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Pore interaction scale</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Residence time scale (theta parameter for Gamma)</p></li>
-<li><p><strong>k</strong> (<em>float</em>) – Gamma shape parameter (k=1 recovers exponential)</p></li>
-<li><p><strong>me</strong> (<em>float</em>) – Exponents for entry and residence</p></li>
-<li><p><strong>mp</strong> (<em>float</em>) – Exponents for entry and residence</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Lognormal parameters</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Lognormal parameters</p></li>
-<li><p><strong>Rg</strong> (<em>float</em>) – Molecule radius of gyration</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction scale</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Residence time scale (theta parameter for Gamma)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Gamma shape parameter (k=1 recovers exponential)</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Exponents for entry and residence</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Exponents for entry and residence</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal parameters</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal parameters</p></li>
+<li><p><strong>Rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius of gyration</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -759,17 +759,17 @@ residence time heterogeneity (Gamma) and mobile phase dispersion.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>w</strong> (<em>array</em>) – Frequency array</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Pore interaction scale parameter</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Residence time scale parameter (Gamma scale θ)</p></li>
-<li><p><strong>k</strong> (<em>float</em>) – Gamma shape parameter (k=1 → exponential, k&gt;1 → less dispersed)</p></li>
-<li><p><strong>me</strong> (<em>float</em>) – Pore entry exponent</p></li>
-<li><p><strong>mp</strong> (<em>float</em>) – Pore residence exponent</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Log-mean of pore size distribution</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Log-std of pore size distribution</p></li>
-<li><p><strong>Rg</strong> (<em>float</em>) – Molecule radius of gyration</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Plate number (mobile phase dispersion)</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Mobile phase hold-up time</p></li>
-<li><p><strong>const_rg_limit</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use constant integration limit</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction scale parameter</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Residence time scale parameter (Gamma scale θ)</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Gamma shape parameter (k=1 → exponential, k&gt;1 → less dispersed)</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore entry exponent</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore residence exponent</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Log-mean of pore size distribution</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Log-std of pore size distribution</p></li>
+<li><p><strong>Rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius of gyration</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Plate number (mobile phase dispersion)</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile phase hold-up time</p></li>
+<li><p><strong>const_rg_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Use constant integration limit</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -818,17 +818,17 @@ Z = iω*t0 + ∫_{Rg}^∞ L_{μ,σ}(r) * n_r * ((1 - iω*τ_r)^{-k} - 1) dr
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array</em>) – Time points</p></li>
-<li><p><strong>scale</strong> (<em>float</em>) – Amplitude scaling factor</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Pore interaction and time scale parameters</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Pore interaction and time scale parameters</p></li>
-<li><p><strong>k</strong> (<em>float</em>) – Gamma shape parameter</p></li>
-<li><p><strong>me</strong> (<em>float</em>) – Pore entry and residence exponents</p></li>
-<li><p><strong>mp</strong> (<em>float</em>) – Pore entry and residence exponents</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Lognormal distribution parameters</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Lognormal distribution parameters</p></li>
-<li><p><strong>Rg</strong> (<em>float</em>) – Molecule radius of gyration</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Plate number</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Mobile phase time</p></li>
+<li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Amplitude scaling factor</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction and time scale parameters</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore interaction and time scale parameters</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Gamma shape parameter</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore entry and residence exponents</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Pore entry and residence exponents</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal distribution parameters</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal distribution parameters</p></li>
+<li><p><strong>Rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Molecule radius of gyration</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Plate number</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile phase time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -907,16 +907,16 @@ structure of the SDM model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rg</strong> (<em>float</em>) – Radius of gyration of the component (Å).</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – SDM column parameters (per-pore plate count and residence time).</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – SDM column parameters (per-pore plate count and residence time).</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Mobile-phase plate number (governs Gaussian dispersion).</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Dead time / column offset.</p></li>
-<li><p><strong>k</strong> (<em>float</em>) – Gamma shape parameter for residence-time distribution.</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Lognormal pore-size distribution parameters.</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Lognormal pore-size distribution parameters.</p></li>
-<li><p><strong>me</strong> (<em>float</em><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
-<li><p><strong>mp</strong> (<em>float</em><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
+<li><p><strong>rg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Radius of gyration of the component (Å).</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – SDM column parameters (per-pore plate count and residence time).</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – SDM column parameters (per-pore plate count and residence time).</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Mobile-phase plate number (governs Gaussian dispersion).</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Dead time / column offset.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Gamma shape parameter for residence-time distribution.</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal pore-size distribution parameters.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lognormal pore-size distribution parameters.</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -924,7 +924,7 @@ structure of the SDM model.</p>
 the elution profile.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple of float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">

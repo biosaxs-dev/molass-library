@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SEC.Models.SdmEstimator &#8212; Molass Library  documentation</title>
+    <title>SEC.Models.SdmEstimator &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="SEC.Models.SdmComponentCurve" href="molass.SEC.Models.SdmComponentCurve.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -590,7 +590,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv"><code class="docutils literal notranslate"><span class="pre">LognormalEnv</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv"><code class="docutils literal notranslate"><span class="pre">LognormalEnv</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.N"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.N0"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N0</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.T"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.T</span></code></a></li>
@@ -622,7 +622,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="molass.SEC.Models.SdmEstimator.LognormalEnv">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LognormalEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">me</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#molass.SEC.Models.SdmEstimator.LognormalEnv" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <p>Named-tuple form of the lognormal env-params 8-tuple <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">T,</span> <span class="pre">me,</span> <span class="pre">mp,</span> <span class="pre">N0,</span> <span class="pre">t0,</span> <span class="pre">mu,</span> <span class="pre">sigma)</span></code>.</p>
 <p>Returned by <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code> and accepted by
 <code class="docutils literal notranslate"><span class="pre">optimize_sdm_lognormal_xr_decomposition</span></code> as its <code class="docutils literal notranslate"><span class="pre">env_params</span></code> argument.
@@ -690,35 +690,35 @@ Access <code class="docutils literal notranslate"><span class="pre">me</span></c
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The decomposition containing the initial curve and component curves.</p></li>
-<li><p><strong>poresize_bounds</strong> (<em>(</em><em>lo</em><em>, </em><em>hi</em><em>) </em><em>tuple</em><em>, </em><em>optional</em>) – Bounds for the column pore size in Å. Default: (70, 300).
+<li><p><strong>poresize_bounds</strong> (<em>(</em><em>lo</em><em>, </em><em>hi</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>, </em><em>optional</em>) – Bounds for the column pore size in Å. Default: (70, 300).
 Use a narrow window when the column type is known
 (e.g., (75, 80) for Superdex 200).</p></li>
-<li><p><strong>N0</strong> (<em>float</em><em>, </em><em>optional</em>) – If given, the mobile-phase plate number is <strong>fixed</strong> to this value
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – If given, the mobile-phase plate number is <strong>fixed</strong> to this value
 and excluded from the optimization. Use when N0 is known from
 buffer-only runs.</p></li>
-<li><p><strong>N0_bounds</strong> (<em>(</em><em>lo</em><em>, </em><em>hi</em><em>) </em><em>tuple</em><em>, </em><em>optional</em>) – Bounds for N0 when it is a free parameter. Default: (500, 50000).
+<li><p><strong>N0_bounds</strong> (<em>(</em><em>lo</em><em>, </em><em>hi</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>, </em><em>optional</em>) – Bounds for N0 when it is a free parameter. Default: (500, 50000).
 Ignored if <code class="docutils literal notranslate"><span class="pre">N0</span></code> is given.</p></li>
-<li><p><strong>include_M3</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), include the third central moment (cube-root
+<li><p><strong>include_M3</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True (default), include the third central moment (cube-root
 skewness) in the matching objective. This is critical for
 asymmetric peaks; for symmetric peaks it is a near no-op.
 Set False to reproduce the legacy M1+M2-only behaviour.</p></li>
-<li><p><strong>M1_weight</strong> (<em>float</em><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
+<li><p><strong>M1_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
 Defaults follow legacy <code class="docutils literal notranslate"><span class="pre">DispersiveMonopore.guess_params_using_moments</span></code>:
 M1=6.0, M2=2.0, M3=2.0.</p></li>
-<li><p><strong>M2_weight</strong> (<em>float</em><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
+<li><p><strong>M2_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
 Defaults follow legacy <code class="docutils literal notranslate"><span class="pre">DispersiveMonopore.guess_params_using_moments</span></code>:
 M1=6.0, M2=2.0, M3=2.0.</p></li>
-<li><p><strong>M3_weight</strong> (<em>float</em><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
+<li><p><strong>M3_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Weights for the moment-matching objective.
 Defaults follow legacy <code class="docutils literal notranslate"><span class="pre">DispersiveMonopore.guess_params_using_moments</span></code>:
 M1=6.0, M2=2.0, M3=2.0.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print diagnostics and show a debug plot.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, print diagnostics and show a debug plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>(N, T, me, mp, N0, t0, poresize)</strong> – Estimated parameters for the SDM column.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -733,14 +733,14 @@ lognormal parameters (mu, sigma).</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – The decomposition containing the initial curve and component curves.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the estimation process.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Additional parameters for the estimation process.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>(N, T, me, mp, N0, t0, mu, sigma)</strong> – Estimated parameters for the SDM column with lognormal pore distribution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -760,13 +760,13 @@ lognormal parameters (mu, sigma).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mono_ccurves</strong> (<em>list</em><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – Converged mono-pore component curves.</p></li>
+<li><p><strong>mono_ccurves</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> of </em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmComponentCurve" title="molass.SEC.Models.SdmComponentCurve.SdmComponentCurve"><em>SdmComponentCurve</em></a>) – Converged mono-pore component curves.</p></li>
 <li><p><strong>xr_icurve</strong> (<a class="reference internal" href="molass.DataObjects.Curve.html#molass.DataObjects.Curve.Curve" title="molass.DataObjects.Curve.Curve"><em>Curve</em></a>) – The XR integrated elution curve (data).</p></li>
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a><em>, </em><em>optional</em>) – EGH decomposition. When provided, the heuristic init is refined by
 moment matching (see <code class="docutils literal notranslate"><span class="pre">refine_lognormal_params_by_moments</span></code>).
 Recommended for the standard SDM(lognormal) pipeline.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>moment_refine</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, skip the moment-matching refinement step even when
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>moment_refine</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If False, skip the moment-matching refinement step even when
 <code class="docutils literal notranslate"><span class="pre">decomposition</span></code> is given. Default True.</p></li>
 </ul>
 </dd>
@@ -774,7 +774,7 @@ Recommended for the standard SDM(lognormal) pipeline.</p></li>
 <dd class="field-even"><p><strong>(N, T, me, mp, N0, t0_adj, mu, sigma)</strong> – Estimated parameters for the lognormal SDM optimizer.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -802,23 +802,23 @@ the mono-pore stage already constrains them well from M1+M2+M3 matching.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>decomposition</strong> (<a class="reference internal" href="molass.LowRank.Decomposition.html#molass.LowRank.Decomposition.Decomposition" title="molass.LowRank.Decomposition.Decomposition"><em>Decomposition</em></a>) – EGH decomposition providing per-component empirical moments.</p></li>
-<li><p><strong>N</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>T</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>N0</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>t0</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>k</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>mu</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
-<li><p><strong>me</strong> (<em>float</em><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
-<li><p><strong>mp</strong> (<em>float</em><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
-<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, print per-component moment-matching diagnostics.</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>N0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>t0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial guesses (from <code class="docutils literal notranslate"><span class="pre">estimate_sdm_lognormal_from_monopore</span></code>).</p></li>
+<li><p><strong>me</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
+<li><p><strong>mp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – SEC partition exponents (default 1.5).</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, print per-component moment-matching diagnostics.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>(t0, k, mu, sigma)</strong> – Refined parameters. Other inputs (N, T, N0) are returned by the caller.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple of float</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -876,7 +876,7 @@ the mono-pore stage already constrains them well from M1+M2+M3 matching.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv"><code class="docutils literal notranslate"><span class="pre">LognormalEnv</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv"><code class="docutils literal notranslate"><span class="pre">LognormalEnv</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.N"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.N0"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.N0</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#molass.SEC.Models.SdmEstimator.LognormalEnv.T"><code class="docutils literal notranslate"><span class="pre">LognormalEnv.T</span></code></a></li>

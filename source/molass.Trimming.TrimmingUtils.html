@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Trimming.TrimmingUtils &#8212; Molass Library  documentation</title>
+    <title>Trimming.TrimmingUtils &#8212; Molass Library 1.0.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/documentation_options.js?v=423d4ce3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="Trimming.TrimmingInfo" href="molass.Trimming.TrimmingInfo.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="1.0" />
   </head>
   
   
@@ -133,8 +133,8 @@
       
     
     
-    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library  documentation - Home"/>
-    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library  documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-light" alt="Molass Library 1.0.1 documentation - Home"/>
+    <img src="../_static/molamola.png" class="logo__image only-dark pst-js-only" alt="Molass Library 1.0.1 documentation - Home"/>
   
   
 </a></div>
@@ -615,17 +615,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pair1</strong> (<em>tuple</em><em> (</em><em>i</em><em>, </em><a class="reference internal" href="molass.FlowChange.FlowChangeInfo.html#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j" title="molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j"><em>j</em></a><em>)</em>) – The first range (start, stop).</p></li>
-<li><p><strong>pair2</strong> (<em>tuple</em><em> (</em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.k" title="molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.k"><em>k</em></a><em>, </em><em>l</em><em>)</em>) – The second range (start, stop).</p></li>
+<li><p><strong>pair1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> (</em><em>i</em><em>, </em><a class="reference internal" href="molass.FlowChange.FlowChangeInfo.html#molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j" title="molass.FlowChange.FlowChangeInfo.FlowChangeInfo.j"><em>j</em></a><em>)</em>) – The first range (start, stop).</p></li>
+<li><p><strong>pair2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> (</em><a class="reference internal" href="molass.SEC.Models.SdmComponentCurve.html#molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.k" title="molass.SEC.Models.SdmComponentCurve.SdmMonoColumnParams.k"><em>k</em></a><em>, </em><em>l</em><em>)</em>) – The second range (start, stop).</p></li>
 <li><p><strong>judge_info</strong> (<em>any</em>) – Information to judge how to combine the ranges.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em>) – If True, print debug information.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print debug information.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>start, stop</strong> – The combined range (start, stop).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -638,21 +638,21 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ssd</strong> (<em>SampledScatteringData</em>) – The data to be trimmed.</p></li>
-<li><p><strong>xr_qr</strong> (<em>tuple</em><em> (</em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.start" title="molass.Trimming.UsableQrange.UsableQrange.start"><em>start</em></a><em>, </em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.stop" title="molass.Trimming.UsableQrange.UsableQrange.stop"><em>stop</em></a><em>) or </em><em>None</em>) – The q-range for XR data. If None, use the usable q-range.</p></li>
+<li><p><strong>xr_qr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> (</em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.start" title="molass.Trimming.UsableQrange.UsableQrange.start"><em>start</em></a><em>, </em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.stop" title="molass.Trimming.UsableQrange.UsableQrange.stop"><em>stop</em></a><em>) or </em><em>None</em>) – The q-range for XR data. If None, use the usable q-range.</p></li>
 <li><p><strong>xr_mt</strong> (<a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment"><em>Moment</em></a><em> or </em><em>None</em>) – The moment for XR data. If None, compute from the data.</p></li>
-<li><p><strong>uv_wr</strong> (<em>tuple</em><em> (</em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.start" title="molass.Trimming.UsableQrange.UsableQrange.start"><em>start</em></a><em>, </em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.stop" title="molass.Trimming.UsableQrange.UsableQrange.stop"><em>stop</em></a><em>) or </em><em>None</em>) – The w-range for UV data. If None, use the usable w-range.</p></li>
+<li><p><strong>uv_wr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> (</em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.start" title="molass.Trimming.UsableQrange.UsableQrange.start"><em>start</em></a><em>, </em><a class="reference internal" href="molass.Trimming.UsableQrange.html#molass.Trimming.UsableQrange.UsableQrange.stop" title="molass.Trimming.UsableQrange.UsableQrange.stop"><em>stop</em></a><em>) or </em><em>None</em>) – The w-range for UV data. If None, use the usable w-range.</p></li>
 <li><p><strong>uv_mt</strong> (<a class="reference internal" href="molass.Stats.Moment.html#molass.Stats.Moment.Moment" title="molass.Stats.Moment.Moment"><em>Moment</em></a><em> or </em><em>None</em>) – The moment for UV data. If None, compute from the data.</p></li>
 <li><p><strong>uv_fc</strong> (<em>any</em>) – Flow change information for UV data. (Not used in this function)</p></li>
-<li><p><strong>flowchange</strong> (<em>bool</em><em> or </em><em>'auto'</em><em> or </em><em>None</em>) – Whether to consider flow change points. If ‘auto’, determine automatically.</p></li>
+<li><p><strong>flowchange</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> or </em><em>'auto'</em><em> or </em><em>None</em>) – Whether to consider flow change points. If ‘auto’, determine automatically.</p></li>
 <li><p><strong>ip_effect_info</strong> (<em>any</em>) – Information for IP effect. (Not used in this function)</p></li>
-<li><p><strong>nsigmas</strong> (<em>int</em><em> or </em><em>None</em>) – Number of sigmas for moment calculation.
+<li><p><strong>nsigmas</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em>) – Number of sigmas for moment calculation.
 If None, an adaptive default is used: max(TRIMMING_NSIGMAS, n_xr_frames // 75),
 which widens the trimming window for longer datasets to avoid
 over-trimming that can cause downstream peak detection failures.</p></li>
-<li><p><strong>nguiniers</strong> (<em>int</em><em> or </em><em>None</em>) – Number of Guinier points to consider. If None, use default.</p></li>
-<li><p><strong>jranges</strong> (<em>tuple</em><em> of </em><em>tuples</em><em> or </em><em>None</em>) – The j-ranges for XR and UV data. If None, compute from the data.</p></li>
+<li><p><strong>nguiniers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em>) – Number of Guinier points to consider. If None, use default.</p></li>
+<li><p><strong>jranges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><em>tuples</em><em> or </em><em>None</em>) – The j-ranges for XR and UV data. If None, compute from the data.</p></li>
 <li><p><strong>mapping</strong> (<a class="reference internal" href="molass.Mapping.MappingInfo.html#molass.Mapping.MappingInfo.MappingInfo" title="molass.Mapping.MappingInfo.MappingInfo"><em>MappingInfo</em></a><em> or </em><em>None</em>) – The mapping information between XR and UV data. If None, compute if needed.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em>) – If True, print debug information.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print debug information.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -673,14 +673,14 @@ If start or stop is None, use the first or last element of the vector.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>vec</strong> (<em>array-like</em>) – The vector from which to extract values.</p></li>
-<li><p><strong>slice</strong> (<em>slice</em>) – The slice object to convert.</p></li>
+<li><p><strong>slice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a>) – The slice object to convert.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>values</strong> – A list containing the start and stop values corresponding to the slice.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -695,9 +695,9 @@ to correspond to each other based on the mapping information.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ssd</strong> (<em>SampledScatteringData</em>) – The data to be trimmed.</p></li>
-<li><p><strong>xr_jslice</strong> (<em>slice</em>) – The j-slice for XR data.</p></li>
-<li><p><strong>uv_jslice</strong> (<em>slice</em>) – The j-slice for UV data.</p></li>
-<li><p><strong>debug</strong> (<em>bool</em>) – If True, print debug information.</p></li>
+<li><p><strong>xr_jslice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a>) – The j-slice for XR data.</p></li>
+<li><p><strong>uv_jslice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.14)"><em>slice</em></a>) – The j-slice for UV data.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print debug information.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
