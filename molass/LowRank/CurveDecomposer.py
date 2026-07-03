@@ -146,8 +146,11 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
 
     ret_curves = []
     m = len(peak_list)
-    # When num_components was None (auto-detect), update it from the peel result
+    # Update num_components from actual peak count (may differ from requested if peak recognition found fewer)
     if num_components is None:
+        num_components = m
+    elif m < num_components:
+        # Peak recognition found fewer peaks than requested - use actual count to avoid bounds mismatch
         num_components = m
     if m > 0:
         assert curve_model == 'EGH'   # currently
