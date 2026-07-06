@@ -27,14 +27,6 @@ class SsMatrixData:
     baseline_method : str
         The method used for baseline correction. Default is 'linear'.
     allow_negative_peaks : bool
-<<<<<<< HEAD
-        If True, frames in the negative-peak region are excluded from LPM's
-        anchor pool before baseline fitting, preventing contamination from
-        physically real negative-peak frames.  Default False.
-    negative_peak_mask : array-like of bool, slice, or None
-        Explicit mask of frames to exclude from LPM fitting when
-        ``allow_negative_peaks=True``.  If None (default), the mask is
-=======
         Deprecated alias for ``has_anomaly_mask``.
     has_anomaly_mask : bool
         If True, frames in the anomaly region are excluded from LPM's
@@ -46,7 +38,6 @@ class SsMatrixData:
     anomaly_mask : array-like of bool, slice, or None
         Explicit mask of frames to exclude from LPM fitting when
         ``has_anomaly_mask=True``.  If None (default), the mask is
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         derived automatically from the recognition curve (frames where y < 0).
     """
     def __init__(self, M, iv, jv, E=None,
@@ -76,13 +67,8 @@ class SsMatrixData:
         self.E = E      # may be None
         self.moment = moment
         self.baseline_method = baseline_method
-<<<<<<< HEAD
-        self.allow_negative_peaks = allow_negative_peaks
-        self.negative_peak_mask = negative_peak_mask  # None = auto-detect from recognition curve
-=======
         self.has_anomaly_mask = allow_negative_peaks
         self.anomaly_mask = negative_peak_mask  # None = auto-detect from recognition curve
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
 
     @property
     def data(self):
@@ -133,13 +119,8 @@ class SsMatrixData:
                             Ecopy,
                             moment=None,  # note that moment is not copied
                             baseline_method=self.baseline_method,
-<<<<<<< HEAD
-                            allow_negative_peaks=self.allow_negative_peaks,
-                            negative_peak_mask=self.negative_peak_mask,
-=======
                             allow_negative_peaks=self.has_anomaly_mask,
                             negative_peak_mask=self.anomaly_mask,
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
                             )
 
     def get_icurve(self, pickat):
@@ -214,55 +195,26 @@ class SsMatrixData:
         """Get the baseline method for this data object."""
         return self.baseline_method
 
-<<<<<<< HEAD
-    def set_allow_negative_peaks(self, value=True, mask=None):
-        """Declare that this dataset contains physically real negative peaks.
-
-        When True, ``get_baseline2d()`` excludes negative-peak frames from
-=======
     def set_anomaly_mask(self, mask=None):
         """Declare that this dataset contains anomalous frames to exclude from baseline fitting.
 
         When set, ``get_baseline2d()`` excludes the specified frames from
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         LPM's anchor pool before baseline fitting.  LPM itself is unchanged;
         only the frame set it operates on is filtered.
 
         Parameters
         ----------
-<<<<<<< HEAD
-        value : bool, optional
-            Default True.
-=======
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         mask : array-like of bool, slice, or None, optional
             Explicit mask of frames to exclude (True = exclude).  If None
             (default), the mask is derived automatically at fitting time from
             the recognition curve (frames where y < 0).  Use a manual mask
-<<<<<<< HEAD
-            when the negative-peak region is known from domain knowledge
-=======
             when the anomalous region is known from domain knowledge
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
             (e.g. ``mask=slice(1200, 1350)``).  When a ``slice`` is given,
             start and stop are interpreted as **frame numbers** (values in
             ``jv``), not array indices.
 
         Notes
         -----
-<<<<<<< HEAD
-        Both ``allow_negative_peaks`` and ``negative_peak_mask`` are
-        propagated by ``copy()`` and ``corrected_copy()``, so the typical
-        workflow is::
-
-            ssd.set_allow_negative_peaks()            # auto-detect
-            # or:
-            ssd.set_allow_negative_peaks(mask=slice(1200, 1350))  # manual
-            corrected = ssd.corrected_copy()          # mask applied automatically
-        """
-        self.allow_negative_peaks = value
-        self.negative_peak_mask = mask
-=======
         Both ``has_anomaly_mask`` and ``anomaly_mask`` are
         propagated by ``copy()`` and ``corrected_copy()``, so the typical
         workflow is::
@@ -309,7 +261,6 @@ class SsMatrixData:
     @negative_peak_mask.setter
     def negative_peak_mask(self, value):
         self.anomaly_mask = value
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
 
     def detect_anomaly(self, sigma_scale=3.0, buffer_fraction=0.1):
         """Detect the anomalous frame range from the pre-correction recognition curve.
@@ -411,11 +362,7 @@ class SsMatrixData:
             leading and trailing ``k = max(2, int(endpoint_fraction * n))``
             frames.  Only valid for "easy" datasets where the run starts and
             ends in clean buffer.  **Not** the recommended approach for
-<<<<<<< HEAD
-            negative-peak datasets — use ``set_allow_negative_peaks()``
-=======
             negative-peak datasets — use ``set_anomaly_mask()``
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
             instead.  Default ``None`` — standard LPM unchanged.
         method_kwargs : dict, optional
             Additional keyword arguments to pass to the baseline fitting method.
@@ -431,15 +378,9 @@ class SsMatrixData:
         --------
         >>> bl = xr.get_baseline2d()                        # standard LPM
         >>> bl = xr.get_baseline2d(endpoint_fraction=0.15)  # endpoint-anchored (easy datasets only)
-<<<<<<< HEAD
-        >>> xr.set_allow_negative_peaks()                   # auto-detect negative frames, mask from LPM
-        >>> bl = xr.get_baseline2d()                        # LPM with negative-peak frames excluded
-        >>> xr.set_allow_negative_peaks(mask=slice(1200, 1350))  # manual region known from observation
-=======
         >>> xr.set_anomaly_mask()                   # auto-detect negative frames, mask from LPM
         >>> bl = xr.get_baseline2d()                        # LPM with anomalous frames excluded
         >>> xr.set_anomaly_mask(mask=slice(1200, 1350))  # manual region known from observation
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
         """
         from molass.Baseline import Baseline2D
         debug = kwargs.get('debug', False)
@@ -455,17 +396,10 @@ class SsMatrixData:
             endpoint_fraction = kwargs.get('endpoint_fraction', None)
             if endpoint_fraction is not None:
                 default_kwargs['endpoint_fraction'] = endpoint_fraction
-<<<<<<< HEAD
-            elif self.allow_negative_peaks:
-                # Derive exclude mask: frames to remove from LPM's anchor pool.
-                # Use stored mask if provided, else auto-detect from recognition curve.
-                np_mask = self.negative_peak_mask
-=======
             elif self.has_anomaly_mask:
                 # Derive exclude mask: frames to remove from LPM's anchor pool.
                 # Use stored mask if provided, else auto-detect from recognition curve.
                 np_mask = self.anomaly_mask
->>>>>>> 53675d65bb5c75a3c302a9677d2fa94ef773bd9a
                 if np_mask is None:
                     # Auto-detect: frames where the recognition curve is negative
                     rc_y = self.get_recognition_curve().y
