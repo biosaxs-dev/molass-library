@@ -12,7 +12,31 @@
 
 ---
 
-## 📚 Documents to Read
+## � Branching Policy During JOSS Review
+
+**Context**: The repository is under JOSS peer review. The `main` branch must remain stable as a reference point for reviewers.
+
+**Active branch**: `dev/ongoing-work`
+- **Purpose**: All development work during the JOSS review period (any feature, any fix)
+- **Why one branch**: Avoid branch proliferation; single merge after review concludes
+- **Scope**: Not limited to specific features — general development branch for the review period
+
+**Workflow**:
+1. All new commits go to `dev/ongoing-work` (never to `main` during review)
+2. JOSS reviewers see stable `main` (no moving target)
+3. After JOSS acceptance: merge `dev/ongoing-work` → `main` in one PR
+
+**For AI assistants**:
+- When implementing fixes/features: commit to `dev/ongoing-work` (already checked out)
+- Editable install automatically tracks the current branch — just restart kernel after changes
+- No need to create separate feature branches during this period
+
+**Created**: July 6, 2026  
+**Status**: Active until JOSS review concludes
+
+---
+
+## �📚 Documents to Read
 
 | Priority | File | Purpose |
 |----------|------|---------|
