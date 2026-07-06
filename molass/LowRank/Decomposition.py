@@ -113,7 +113,15 @@ class Decomposition:
         Decomposition
             A new Decomposition object with the specified component curves.
         """
-        return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges, **kwargs)
+        new_decomp = Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges, **kwargs)
+        
+        # Preserve expensive cached computations (issue #220)
+        # The Rg curve is a property of the data, not the elution model,
+        # so it should transfer across model upgrades automatically.
+        if hasattr(self, '_rgcurve') and self._rgcurve is not None:
+            new_decomp._rgcurve = self._rgcurve
+        
+        return new_decomp
 
     @property
     def xr_components(self):
