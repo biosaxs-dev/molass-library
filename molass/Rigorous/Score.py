@@ -141,9 +141,9 @@ class Score:
 # Implementation
 # ---------------------------------------------------------------------------
 
-def make_initial_score_impl(decomposition, trimmed_ssd=None,
-                             analysis_folder=None, function_code=None,
-                             debug=False):
+def make_score_impl(decomposition, trimmed_ssd=None,
+                    analysis_folder=None, function_code=None,
+                    debug=False):
     """Set up the rigorous optimizer, evaluate the objective once, return Score.
 
     This mirrors the setup phase of
@@ -297,4 +297,5 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
 
 
 # Backward compatibility
+make_initial_score_impl = make_score_impl
 InitialScoreResult = Score

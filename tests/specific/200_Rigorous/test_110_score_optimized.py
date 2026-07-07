@@ -13,7 +13,7 @@ import tempfile
 import shutil
 from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
-from molass.Rigorous.InitialScore import Score
+from molass.Rigorous.Score import Score
 
 
 @pytest.fixture

@@ -567,7 +567,7 @@ class RunInfo:
         import os
         from molass_legacy.Optimizer.Scripting import get_params
         from molass.Rigorous.CurrentStateUtils import fv_to_sv, list_rigorous_jobs
-        from molass.Rigorous.InitialScore import Score
+        from molass.Rigorous.Score import Score
 
         if self.analysis_folder is None:
             raise ValueError(

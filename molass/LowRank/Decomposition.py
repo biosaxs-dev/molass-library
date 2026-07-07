@@ -1271,8 +1271,8 @@ class Decomposition:
         RunInfo.score : Score at optimized parameters.
         RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
-        from molass.Rigorous.InitialScore import make_initial_score_impl
-        return make_initial_score_impl(
+        from molass.Rigorous.Score import make_score_impl
+        return make_score_impl(
             self, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
