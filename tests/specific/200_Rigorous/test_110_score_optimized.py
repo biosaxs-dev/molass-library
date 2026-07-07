@@ -117,17 +117,28 @@ def test_score_diagnose_works(simple_run_info):
     assert hasattr(d, 'suggestion')
 
 
-def test_score_symmetric_api():
+def test_score_symmetric_api(simple_run_info):
     """Verify Decomposition.score and RunInfo.score have the same return type."""
-    from molass.LowRank.Decomposition import Decomposition
-    from molass.Rigorous.RunInfo import RunInfo
+    run_info = simple_run_info
     
-    # Both should return Score with these methods
-    required_attrs = {'sv', 'fv', 'breakdown', 'plot', 'diagnose', 'print_summary'}
+    # Both should return Score objects with same attributes/methods
+    score_initial = run_info.decomposition.score(run_info.trimmed_ssd)
+    score_optimized = run_info.score()
     
-    score_methods = set(dir(Score))
+    assert isinstance(score_initial, Score)
+    assert isinstance(score_optimized, Score)
+    
+    # Check required attributes on actual instances
+    required_attrs = ['sv', 'fv', 'breakdown']
     for attr in required_attrs:
-        assert attr in score_methods, f"Score missing {attr}"
+        assert hasattr(score_initial, attr), f"score_initial missing {attr}"
+        assert hasattr(score_optimized, attr), f"score_optimized missing {attr}"
+    
+    # Check required methods
+    required_methods = ['plot', 'diagnose', 'print_summary']
+    for method in required_methods:
+        assert hasattr(score_initial, method), f"score_initial missing {method}"
+        assert hasattr(score_optimized, method), f"score_optimized missing {method}"
 
 
 if __name__ == "__main__":
