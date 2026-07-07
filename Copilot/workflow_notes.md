@@ -130,3 +130,35 @@ decomp.optimize_rigorously(monitor=False)  # silent
 - `monitor=False`: Completely silent, no visual feedback
 
 The `progress` parameter is kept in the signature only for backward compatibility but has no effect.
+
+## Memory Maintenance on Code Deprecation (July 2026)
+
+**Principle**: When introducing code deprecations or API refactoring, **always check and update user memory** to prevent AI assistants from using outdated patterns.
+
+**Why this matters**:
+- User memory (`/memories/`) guides AI assistants toward "best practices"
+- Outdated API in memory defeats the purpose of deprecation (smooth migration)
+- Clean memory → AI naturally uses new patterns without prompting
+
+**Workflow Checklist** (execute when deprecating APIs):
+
+1. **Search user memory** for deprecated references:
+   ```bash
+   grep -r "old_method_name\|OldClassName" /memories/
+   ```
+
+2. **Update affected memory files** to new API patterns
+
+3. **Document the change** in memory with date and reason
+
+4. **Consider routing**: Should new pattern be in:
+   - User memory (`/memories/`) — if it's a user preference or workflow pattern
+   - Git docs (`Copilot/*.md`) — if it's API information or project convention
+
+**Recent Example (2026-07-07)**:
+- **Deprecated**: `score_initial()` → `score()`, `score_optimized()` → `score()`, `InitialScoreResult` → `Score`
+- **Memory check**: `grep -r "score_initial\|score_optimized\|InitialScoreResult" /memories/` → No references found ✓
+- **Git docs updated**: This file documents the deprecation with backward-compat aliases
+- **Result**: AI assistants discover new API via git-controlled docs; no stale patterns in personal memory
+
+**Cross-Session Benefit**: This git-controlled section ensures ANY AI assistant working on this repo (even on different machines, different sessions) knows to check memory when deprecating APIs. The user memory cleanup becomes part of the documented workflow, not a one-time ad-hoc task.
