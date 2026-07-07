@@ -1,4 +1,3 @@
-"""
 """Test RunInfo.score() method (formerly score_optimized).
 
 Verifies the symmetric API for visualizing rigorous scores:
