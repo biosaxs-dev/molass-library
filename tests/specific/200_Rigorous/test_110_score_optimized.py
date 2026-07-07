@@ -1,8 +1,8 @@
 """
-Test RunInfo.score_optimized() method.
+"""Test RunInfo.score() method (formerly score_optimized).
 
 Verifies the symmetric API for visualizing rigorous scores:
-  - score_optimized() returns InitialScoreResult
+  - score() returns Score object
   - Has .sv, .fv, .breakdown attributes
   - Has .plot(), .diagnose(), .print_summary() methods
   - Works with jobid parameter
@@ -14,7 +14,7 @@ import tempfile
 import shutil
 from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
-from molass.Rigorous.InitialScore import InitialScoreResult
+from molass.Rigorous.InitialScore import Score
 
 
 @pytest.fixture
@@ -42,15 +42,15 @@ def simple_run_info():
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_score_optimized_returns_initial_score_result(simple_run_info):
-    """score_optimized() returns InitialScoreResult object."""
-    result = simple_run_info.score_optimized()
-    assert isinstance(result, InitialScoreResult)
+def test_score_returns_score_object(simple_run_info):
+    """score() returns Score object."""
+    result = simple_run_info.score()
+    assert isinstance(result, Score)
 
 
-def test_score_optimized_has_required_attributes(simple_run_info):
-    """score_optimized() result has .sv, .fv, .breakdown."""
-    result = simple_run_info.score_optimized()
+def test_score_has_required_attributes(simple_run_info):
+    """score() result has .sv, .fv, .breakdown."""
+    result = simple_run_info.score()
     
     assert hasattr(result, 'sv')
     assert hasattr(result, 'fv')
@@ -63,9 +63,9 @@ def test_score_optimized_has_required_attributes(simple_run_info):
     assert 'scores' in result.breakdown
 
 
-def test_score_optimized_has_visualization_methods(simple_run_info):
-    """score_optimized() result has .plot(), .diagnose(), .print_summary()."""
-    result = simple_run_info.score_optimized()
+def test_score_has_visualization_methods(simple_run_info):
+    """score() result has .plot(), .diagnose(), .print_summary()."""
+    result = simple_run_info.score()
     
     assert hasattr(result, 'plot')
     assert hasattr(result, 'diagnose')
@@ -75,9 +75,9 @@ def test_score_optimized_has_visualization_methods(simple_run_info):
     assert callable(result.print_summary)
 
 
-def test_score_optimized_plot_works(simple_run_info):
-    """score_optimized().plot() produces a matplotlib figure."""
-    result = simple_run_info.score_optimized()
+def test_score_plot_works(simple_run_info):
+    """score().plot() produces a matplotlib figure."""
+    result = simple_run_info.score()
     fig = result.plot(title="Test Optimized Score")
     
     assert fig is not None
@@ -86,25 +86,25 @@ def test_score_optimized_plot_works(simple_run_info):
     assert len(fig.axes) >= 3  # UV, XR, scores panels
 
 
-def test_score_optimized_sv_in_valid_range(simple_run_info):
-    """score_optimized() SV should be in 0-100 range."""
-    result = simple_run_info.score_optimized()
+def test_score_sv_in_valid_range(simple_run_info):
+    """score() SV should be in 0-100 range."""
+    result = simple_run_info.score()
     assert 0 <= result.sv <= 100
 
 
-def test_score_optimized_without_analysis_folder_raises():
-    """score_optimized() raises ValueError when no analysis_folder stored."""
+def test_score_without_analysis_folder_raises():
+    """score() raises ValueError when no analysis_folder stored."""
     from molass.Rigorous.RunInfo import RunInfo
     
     ri = RunInfo(ssd=None, optimizer=None, dsets=None, init_params=None)
     
     with pytest.raises(ValueError, match="No analysis_folder stored"):
-        ri.score_optimized()
+        ri.score()
 
 
-def test_score_optimized_diagnose_works(simple_run_info):
-    """score_optimized().diagnose() returns list of Diagnosis objects."""
-    result = simple_run_info.score_optimized()
+def test_score_diagnose_works(simple_run_info):
+    """score().diagnose() returns list of Diagnosis objects."""
+    result = simple_run_info.score()
     diagnoses = result.diagnose()
     
     assert isinstance(diagnoses, list)
@@ -118,19 +118,17 @@ def test_score_optimized_diagnose_works(simple_run_info):
     assert hasattr(d, 'suggestion')
 
 
-def test_score_optimized_symmetric_with_score_initial():
-    """Verify score_optimized and score_initial have the same API surface."""
+def test_score_symmetric_api():
+    """Verify Decomposition.score and RunInfo.score have the same return type."""
     from molass.LowRank.Decomposition import Decomposition
     from molass.Rigorous.RunInfo import RunInfo
     
-    # Get methods from both classes
-    initial_methods = set(dir(InitialScoreResult))
-    
-    # Both should return InitialScoreResult, so they have the same methods
+    # Both should return Score with these methods
     required_attrs = {'sv', 'fv', 'breakdown', 'plot', 'diagnose', 'print_summary'}
     
+    score_methods = set(dir(Score))
     for attr in required_attrs:
-        assert attr in initial_methods, f"InitialScoreResult missing {attr}"
+        assert attr in score_methods, f"Score missing {attr}"
 
 
 if __name__ == "__main__":

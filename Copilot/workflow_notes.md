@@ -95,3 +95,38 @@ When fixing AI-friendliness issues, follow this pattern per issue:
 - #126: AI-friendliness: add `best_fv`/`best_sv` to `mplmonitor_latest.json` — implemented in molass-legacy `MplMonitor._build_monitor_snapshot_json()`
 - #127: AI-friendliness: write `run_complete.json` on optimizer job completion — implemented in molass-legacy `MplMonitor._write_run_complete_json()` + molass-library `RunInfo.run_complete_path` / `load_run_complete()`
 - #128: AI-friendliness: widget title should show best accepted SV, not current snapshot SV — implemented in molass-legacy `JobStatePlot.plot_objective_func()` (add `best_sv` kwarg, update title to `"best SV=XX.X  (cur=YY.Y)"`) + `MplMonitor.update_plot()` (compute `best_sv` from `job_state.fv` and pass through)
+
+## API deprecations and breaking changes
+
+### Preferred optimization methods (July 2026)
+
+**Use only DE or BH methods** for rigorous optimization:
+- `method='DE'` — Differential Evolution; good for short exploration (niter=5-10), population-based
+- `method='BH'` — Basin-Hopping (default); good for longer refinement runs
+
+Other methods (CMA, NS, MCMC, SMC, NSGA2) are supported but not recommended.
+
+### `optimize_rigorously()` — `progress` parameter deprecated (July 2026)
+
+**NEVER use `progress` parameter** — it is deprecated and ignored.
+
+```python
+# ❌ Wrong: deprecated parameter
+decomp.optimize_rigorously(progress='text')
+decomp.optimize_rigorously(progress='dashboard')
+decomp.optimize_rigorously(progress='none')
+
+# ✅ Correct: use monitor parameter
+decomp.optimize_rigorously(monitor=True)   # shows dashboard
+decomp.optimize_rigorously(monitor=False)  # silent
+```
+
+**Why the change**: The `progress` parameter was overloaded with multiple meanings and created confusion. The new API separates concerns:
+- `monitor=True/False` controls visual feedback (dashboard vs silent)
+- `async_=True/False` controls blocking behavior
+
+**Behavior with `async_=False`** (blocking mode, typical for short runs):
+- `monitor=True`: Cell blocks but shows live dashboard progress
+- `monitor=False`: Completely silent, no visual feedback
+
+The `progress` parameter is kept in the signature only for backward compatibility but has no effect.

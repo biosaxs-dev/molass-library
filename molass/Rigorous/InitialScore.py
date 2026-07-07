@@ -9,7 +9,7 @@ Usage
 -----
 ::
 
-    result = decomp.score_initial(trimmed_ssd=trimmed)
+    result = decomp.score(trimmed_ssd=trimmed)
     print(f"SV = {result.sv:.2f}")
     result.plot(title="Auto EGH initial score")
     result.print_summary()
@@ -27,10 +27,11 @@ from contextlib import redirect_stdout, redirect_stderr, ExitStack
 from importlib import reload
 
 
-class InitialScoreResult:
-    """Result of a single rigorous objective evaluation at initial parameters.
+class Score:
+    """Result of a single rigorous objective evaluation.
 
-    Produced by :meth:`~molass.LowRank.Decomposition.Decomposition.score_initial`.
+    Produced by :meth:`~molass.LowRank.Decomposition.Decomposition.score`
+    and :meth:`~molass.Rigorous.RunInfo.RunInfo.score`.
 
     Attributes
     ----------
@@ -133,7 +134,7 @@ class InitialScoreResult:
             print(f"  [{d.status:7s}] {d.score:35s}: {d.reason}")
 
     def __repr__(self):
-        return f"InitialScoreResult(sv={self.sv:.2f}, fv={self.fv:.4f})"
+        return f"Score(sv={self.sv:.2f}, fv={self.fv:.4f})"
 
 
 # ---------------------------------------------------------------------------
@@ -143,7 +144,7 @@ class InitialScoreResult:
 def make_initial_score_impl(decomposition, trimmed_ssd=None,
                              analysis_folder=None, function_code=None,
                              debug=False):
-    """Set up the rigorous optimizer, evaluate the objective once, return InitialScoreResult.
+    """Set up the rigorous optimizer, evaluate the objective once, return Score.
 
     This mirrors the setup phase of
     :func:`~molass.Rigorous.RigorousImplement.make_rigorous_decomposition_impl`
@@ -289,7 +290,11 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
     from molass.Rigorous.CurrentStateUtils import fv_to_sv
     sv = float(fv_to_sv(fv))
 
-    return InitialScoreResult(
+    return Score(
         fv=fv, sv=sv, breakdown=breakdown,
         optimizer=optimizer, init_params=init_params,
     )
+
+
+# Backward compatibility
+InitialScoreResult = Score

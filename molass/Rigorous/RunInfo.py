@@ -511,18 +511,18 @@ class RunInfo:
 
         return {'fv': float(fv), 'scores': scores}
 
-    def score_optimized(self, jobid=None, debug=False):
+    def score(self, jobid=None, debug=False):
         """Evaluate and visualize the rigorous score at optimized parameters.
 
-        Symmetric counterpart to :meth:`~molass.LowRank.Decomposition.Decomposition.score_initial`.
+        Symmetric counterpart to :meth:`~molass.LowRank.Decomposition.Decomposition.score`.
         Loads the best (or specified) optimized parameters from disk, evaluates
         the objective function, and returns a plottable result object.
 
         Enables natural before/after comparison::
 
-            score_before = decomp.score_initial(trimmed_ssd=trimmed)
+            score_before = decomp.score(trimmed_ssd=trimmed)
             run_info = decomp.optimize_rigorously(...)
-            score_after = run_info.score_optimized()
+            score_after = run_info.score()
 
             score_before.plot(title="Before")
             score_after.plot(title="After")
@@ -537,7 +537,7 @@ class RunInfo:
 
         Returns
         -------
-        InitialScoreResult
+        Score
             Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
             ``.diagnose()``, ``.print_summary()``.
             Use ``.plot(title="...")`` to customize the figure title.
@@ -555,19 +555,19 @@ class RunInfo:
 
             run_egh = decomp_egh.optimize_rigorously(
                 method='DE', niter=5, analysis_folder='temp_analysis_egh')
-            score_opt = run_egh.score_optimized()
+            score_opt = run_egh.score()
             score_opt.plot(title="EGH Optimized")
             score_opt.print_summary()
 
         See Also
         --------
         get_score_breakdown : Returns dict only (no visualization).
-        Decomposition.score_initial : Initial score before optimization.
+        Decomposition.score : Score at initial parameters.
         """
         import os
         from molass_legacy.Optimizer.Scripting import get_params
         from molass.Rigorous.CurrentStateUtils import fv_to_sv, list_rigorous_jobs
-        from molass.Rigorous.InitialScore import InitialScoreResult
+        from molass.Rigorous.InitialScore import Score
 
         if self.analysis_folder is None:
             raise ValueError(
@@ -605,13 +605,22 @@ class RunInfo:
         breakdown = {'fv': fv, 'scores': scores}
         sv = float(fv_to_sv(fv))
 
-        # Wrap in InitialScoreResult (reuses the same visualization logic)
-        result_obj = InitialScoreResult(
+        # Wrap in Score (reuses the same visualization logic)
+        result_obj = Score(
             fv=fv, sv=sv, breakdown=breakdown,
             optimizer=self.optimizer, init_params=params
         )
 
         return result_obj
+
+    def score_optimized(self, *args, **kwargs):
+        """Deprecated alias for :meth:`score`. Use ``.score()`` instead."""
+        import warnings
+        warnings.warn(
+            "score_optimized() is deprecated. Use score() instead.",
+            DeprecationWarning, stacklevel=2
+        )
+        return self.score(*args, **kwargs)
 
     def get_current_curves(self):
         """Return the data and model curves currently shown on the monitor.

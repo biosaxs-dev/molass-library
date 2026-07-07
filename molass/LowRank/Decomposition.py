@@ -1223,8 +1223,8 @@ class Decomposition:
 
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs)
 
-    def score_initial(self, trimmed_ssd=None, analysis_folder=None,
-                      function_code=None, debug=False):
+    def score(self, trimmed_ssd=None, analysis_folder=None,
+              function_code=None, debug=False):
         """Evaluate the rigorous objective function once at initial parameters.
 
         A lightweight alternative to :meth:`optimize_rigorously` when you only
@@ -1236,7 +1236,7 @@ class Decomposition:
         For models other than EGH, call :meth:`upgrade` first::
 
             decomp_sdm = decomp.upgrade(model='SDM')
-            result = decomp_sdm.score_initial(trimmed_ssd=trimmed)
+            result = decomp_sdm.score(trimmed_ssd=trimmed)
 
         Parameters
         ----------
@@ -1251,7 +1251,7 @@ class Decomposition:
 
         Returns
         -------
-        InitialScoreResult
+        Score
             Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
             ``.diagnose()``, ``.print_summary()``.
 
@@ -1259,8 +1259,8 @@ class Decomposition:
         --------
         ::
 
-            result_auto = decomp_auto.score_initial(trimmed_ssd=trimmed)
-            result_prop = decomp_prop.score_initial(trimmed_ssd=trimmed)
+            result_auto = decomp_auto.score(trimmed_ssd=trimmed)
+            result_prop = decomp_prop.score(trimmed_ssd=trimmed)
             result_auto.plot(title="Auto EGH")
             result_prop.plot(title="Proportional 1:1:1:1")
             result_auto.print_summary()
@@ -1268,7 +1268,8 @@ class Decomposition:
         See Also
         --------
         optimize_rigorously : Full BH/NS optimization.
-        RunInfo.get_score_breakdown : Score breakdown after optimization.
+        RunInfo.score : Score at optimized parameters.
+        RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
         from molass.Rigorous.InitialScore import make_initial_score_impl
         return make_initial_score_impl(
@@ -1276,6 +1277,15 @@ class Decomposition:
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
         )
+
+    def score_initial(self, *args, **kwargs):
+        """Deprecated alias for :meth:`score`. Use ``.score()`` instead."""
+        import warnings
+        warnings.warn(
+            "score_initial() is deprecated. Use score() instead.",
+            DeprecationWarning, stacklevel=2
+        )
+        return self.score(*args, **kwargs)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
