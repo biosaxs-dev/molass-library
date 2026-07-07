@@ -511,6 +511,108 @@ class RunInfo:
 
         return {'fv': float(fv), 'scores': scores}
 
+    def score_optimized(self, jobid=None, debug=False):
+        """Evaluate and visualize the rigorous score at optimized parameters.
+
+        Symmetric counterpart to :meth:`~molass.LowRank.Decomposition.Decomposition.score_initial`.
+        Loads the best (or specified) optimized parameters from disk, evaluates
+        the objective function, and returns a plottable result object.
+
+        Enables natural before/after comparison::
+
+            score_before = decomp.score_initial(trimmed_ssd=trimmed)
+            run_info = decomp.optimize_rigorously(...)
+            score_after = run_info.score_optimized()
+
+            score_before.plot(title="Before")
+            score_after.plot(title="After")
+
+        Parameters
+        ----------
+        jobid : str, optional
+            Specific job id to evaluate. If None, uses the best job
+            (lowest ``best_fv``).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        InitialScoreResult
+            Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
+            ``.diagnose()``, ``.print_summary()``.
+            Use ``.plot(title="...")`` to customize the figure title.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored.
+        FileNotFoundError
+            If no completed jobs are found.
+
+        Examples
+        --------
+        ::
+
+            run_egh = decomp_egh.optimize_rigorously(
+                method='DE', niter=5, analysis_folder='temp_analysis_egh')
+            score_opt = run_egh.score_optimized()
+            score_opt.plot(title="EGH Optimized")
+            score_opt.print_summary()
+
+        See Also
+        --------
+        get_score_breakdown : Returns dict only (no visualization).
+        Decomposition.score_initial : Initial score before optimization.
+        """
+        import os
+        from molass_legacy.Optimizer.Scripting import get_params
+        from molass.Rigorous.CurrentStateUtils import fv_to_sv, list_rigorous_jobs
+        from molass.Rigorous.InitialScore import InitialScoreResult
+
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+
+        optimizer_folder = os.path.join(
+            os.path.abspath(self.analysis_folder), "optimized"
+        )
+        jobs_folder = os.path.join(optimizer_folder, "jobs")
+
+        if jobid is None:
+            jobs = list_rigorous_jobs(self.analysis_folder)
+            if not jobs:
+                raise FileNotFoundError(
+                    f"No completed jobs found in {self.analysis_folder}"
+                )
+            best = min(jobs, key=lambda j: j.best_fv)
+            jobid = best.id
+
+        job_folder = os.path.join(jobs_folder, jobid)
+        params = get_params(job_folder, debug=debug)
+
+        # Evaluate objective
+        result = self.optimizer.objective_func(params, return_full=True)
+        fv = float(result[0])
+        score_array = result[1]
+        names = self.optimizer.get_score_names()
+
+        scores = {}
+        for name, val in zip(names, score_array):
+            scores[name] = float(val)
+
+        breakdown = {'fv': fv, 'scores': scores}
+        sv = float(fv_to_sv(fv))
+
+        # Wrap in InitialScoreResult (reuses the same visualization logic)
+        result_obj = InitialScoreResult(
+            fv=fv, sv=sv, breakdown=breakdown,
+            optimizer=self.optimizer, init_params=params
+        )
+
+        return result_obj
+
     def get_current_curves(self):
         """Return the data and model curves currently shown on the monitor.
 
