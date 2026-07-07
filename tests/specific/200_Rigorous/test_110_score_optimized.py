@@ -122,7 +122,7 @@ def test_score_symmetric_api(simple_run_info):
     run_info = simple_run_info
     
     # Both should return Score objects with same attributes/methods
-    score_initial = run_info.decomposition.score(run_info.trimmed_ssd)
+    score_initial = run_info.decomposition.score()  # auto-creates trimmed_ssd
     score_optimized = run_info.score()
     
     assert isinstance(score_initial, Score)
