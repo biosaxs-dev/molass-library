@@ -264,8 +264,15 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     uv_ccurves = []
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        xr_h = xr_ccurve.get_scale_param()
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale / xr_h))
+        # Model-specific UV scaling (see issue #225, #226, #227)
+        # EDM/CEDM/LKM/GRM: estimator stores raw UV scales (embedded scale architecture)
+        # EGH/SDM: estimator stores UV scales × params[0] (explicit scale architecture)
+        if model in ('edm', 'cedm', 'lkm', 'grm'):
+            uv_scale = scale  # Use directly (embedded scale)
+        else:
+            xr_h = xr_ccurve.get_scale_param()
+            uv_scale = scale / xr_h  # Divide to get base scale (explicit scale)
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, uv_scale))
 
     # Preserve the optimizer's Rg values so that
     # compute_reconstructed_rgcurve() matches MplMonitor.
