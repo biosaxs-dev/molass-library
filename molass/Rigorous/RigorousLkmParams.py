@@ -34,7 +34,7 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     xr_params = []
     rg_params = []
     for ccurve in decomposition.xr_ccurves:
-        xr_params.append(ccurve.scale)
+        xr_params.append(ccurve.get_scale_param())  # c_inj for LKM
         rg = getattr(ccurve, 'rg', None)
         rg_params.append(rg if (rg is not None and not np.isnan(rg)) else 30.0)
     xr_params = np.array(xr_params)
