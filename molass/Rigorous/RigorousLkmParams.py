@@ -62,11 +62,12 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     x = decomposition.ssd.xr.get_icurve().x
     init_mappable_range = (x[0], x[-1])
 
-    # ── LKM column params: [Pe, t0, R_0, k_MT_0, R_1, k_MT_1, ...] ─────────
+    # ── LKM column params: [Pe, t0, c_inj, R_0, k_MT_0, R_1, k_MT_1, ...] ──
     ccurve0 = decomposition.xr_ccurves[0]
     Pe = ccurve0.Pe
     t0 = ccurve0.t0
-    lkmcol_params = [Pe, t0]
+    c_inj = ccurve0.c_inj  # Shared injection concentration
+    lkmcol_params = [Pe, t0, c_inj]
     for ccurve in decomposition.xr_ccurves:
         lkmcol_params.append(ccurve.R)
         lkmcol_params.append(ccurve.k_MT)

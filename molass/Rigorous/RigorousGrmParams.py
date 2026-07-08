@@ -64,20 +64,21 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     x = decomposition.ssd.xr.get_icurve().x
     init_mappable_range = (x[0], x[-1])
 
-    # ── GRM column params: [Pe, t0, R_p, D_eff, R_0, k_ext_0, R_1, k_ext_1, ...] ─
+    # ── GRM column params: [Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, R_1, k_ext_1, ...] ─
     ccurve0 = decomposition.xr_ccurves[0]
     Pe    = ccurve0.Pe
     t0    = ccurve0.t0
     R_p   = ccurve0.R_p
     D_eff = ccurve0.D_eff
-    grmcol_params = [Pe, t0, R_p, D_eff]
+    c_inj = ccurve0.c_inj  # Shared injection concentration
+    grmcol_params = [Pe, t0, R_p, D_eff, c_inj]
     for ccurve in decomposition.xr_ccurves:
         grmcol_params.append(ccurve.R)
         grmcol_params.append(ccurve.k_ext)
     grmcol_params = np.array(grmcol_params)
 
     if debug:
-        print("GRM col params (Pe, t0, R_p, D_eff, R_0, k_ext_0, ...):", grmcol_params)
+        print("GRM col params (Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, ...):", grmcol_params)
 
     return np.concatenate([
         xr_params,
