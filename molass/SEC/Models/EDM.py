@@ -60,7 +60,7 @@ class EDM:
         if decomposition.uv is None:
             new_uv_ccurves = None
         else:
-            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
         edm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if debug:

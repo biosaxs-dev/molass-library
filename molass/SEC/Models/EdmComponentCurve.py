@@ -94,3 +94,16 @@ class EdmComponentCurve(ComponentCurve):
             If the peak top x calculation is not implemented for the current model.
         """
         raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+    
+    def get_scale_param(self):
+        """Return the scale parameter for this component curve.
+        
+        For EDM, the scale is c_inj (injection concentration), which is params[6].
+        This overrides ComponentCurve.get_scale_param() which returns params[0].
+        
+        Returns
+        -------
+        float
+            The injection concentration c_inj (params[6]).
+        """
+        return self.params[6]  # c_inj (NOT params[0] which is t0)

@@ -5,8 +5,8 @@ Build the flat initial-params vector for G1500 (GRM rigorous optimizer)
 from a GRM-model decomposition.
 
 grmcol_params layout:
-  [Pe, t0, R_p, D_eff, R_0, k_ext_0, R_1, k_ext_1, ..., R_{nc-1}, k_ext_{nc-1}]
-  Total length: 4 + 2*nc
+  [Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, R_1, k_ext_1, ..., R_{nc-1}, k_ext_{nc-1}]
+  Total length: 5 + 2*nc
 """
 import numpy as np
 
@@ -55,7 +55,10 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     uv_params = []
     for uv_ccurve in decomposition.uv_ccurves:
         uv_params.append(uv_ccurve.scale)
-    uv_params = np.array(uv_params) * xr_params
+    # Unified architecture: convert absolute UV scales to UV/XR ratios (species properties).
+    # The objective computes uv_cy = uv_params * xr_cy, so we need ratios.
+    # uv_ccurve.scale stores absolute UV scale; divide by c_inj to get ratio.
+    uv_params = np.array(uv_params) / xr_params
 
     # ── UV baseline ──────────────────────────────────────────────────────────
     uv_baseparams = baseparams[0]

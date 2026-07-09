@@ -47,7 +47,7 @@ def lkm_linear_cf(w, Pe, t0_s, k_s, R):
 _lkm_pdf_impl = FftInvPdf(lkm_linear_cf)
 
 
-def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
+def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
     """
     PDF of the LKM (Lumped Kinetic Model) elution profile with linear isotherm.
 
@@ -75,6 +75,14 @@ def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
     R : float
         Retention factor  R = t_R / t0 = 1 + F*a
         (F = phase ratio = (1-ε)/ε, a = Henry coefficient).
+    c_inj : float, optional
+        Injection concentration — physical concentration of solute injected at
+        the column inlet (units: mass/volume, e.g. g/L).
+        Default: 1.0 (returns normalized curve).
+    t_inj : float, optional
+        Injection time — duration of the rectangular pulse injection
+        (same time units as ``x`` and ``t0``).
+        Default: 1.0 (returns normalized curve).
     timescale : float or None, optional
         Time rescaling factor for the internal FFT grid.
         If ``None`` (default), chosen automatically as ``80 / (t0 * R)``,
@@ -85,9 +93,11 @@ def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
     Returns
     -------
     ndarray
-        Normalised PDF evaluated at each point in ``x``  (integral ≈ 1).
-        Multiply by the peak area (c_inj × t_inj) to obtain absolute
-        concentration units.
+        LKM elution curve evaluated at each point in ``x``.
+        The integral over ``x`` equals approximately ``c_inj × t_inj``
+        (zeroth moment, see Qamar 2014, Andersson 2022).
+        With default parameters (c_inj=1.0, t_inj=1.0), returns a normalized
+        PDF (integral ≈ 1).
 
     Notes
     -----
@@ -126,6 +136,11 @@ def lkm_pdf(x, Pe, t0, k_MT, R, timescale=None):
     >>> t = np.linspace(0.1, 20.0, 500)
     >>> y = lkm_pdf(t, Pe=500, t0=2.0, k_MT=1.667, R=4.0)
     >>> np.trapz(y, t)   # ≈ 1.0
+    >>>
+    >>> # With injection parameters:
+    >>> y_phys = lkm_pdf(t, Pe=500, t0=2.0, k_MT=1.667, R=4.0, c_inj=0.5, t_inj=2.0)
+    >>> np.trapz(y_phys, t)  # ≈ 1.0 (c_inj × t_inj = 0.5 × 2.0)
     """
     ts = 80.0 / (t0 * R) if timescale is None else timescale
-    return ts * _lkm_pdf_impl(ts * x, Pe, ts * t0, k_MT / ts, R)
+    pdf_normalized = ts * _lkm_pdf_impl(ts * x, Pe, ts * t0, k_MT / ts, R)
+    return c_inj * t_inj * pdf_normalized

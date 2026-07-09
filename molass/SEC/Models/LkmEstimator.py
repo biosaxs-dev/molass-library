@@ -42,6 +42,7 @@ K_MT_MAX = 5000.0    # clamp when kinetics term is negligible (Pe-dominated peak
 PE_MIN   = 10.0
 PE_MAX   = 20000.0   # cap at physically reasonable SEC range; BH can explore higher
 T0_FRAC  = 0.98      # t0 must be < T0_FRAC * min(tR)
+K_LKM    = 0.1       # c_inj calibration constant (same as EDM's value)
 
 
 # ── Internal helpers ─────────────────────────────────────────────────────────
@@ -119,7 +120,7 @@ def _initial_t0_guess(moment_list):
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def estimate_lkm_init_params(decomposition, **kwargs):
+def estimate_lkm_init_params(decomposition, t_inj=1.0, **kwargs):
     """
     Estimate LKM initial parameters from EGH component moments.
 
@@ -132,6 +133,8 @@ def estimate_lkm_init_params(decomposition, **kwargs):
     ----------
     decomposition : Decomposition
         Decomposition whose ``xr_ccurves`` hold the EGH component curves.
+    t_inj : float, optional
+        Injection time (default 1.0). Used to compute c_inj from total area.
     debug : bool, optional
         If True, print diagnostics (default False).
 
@@ -147,6 +150,10 @@ def estimate_lkm_init_params(decomposition, **kwargs):
         Retention factor per component (R_i = tR_i / t0 ≥ 1).
     scale_list : list of float
         Area scale per component (integral of EGH component curve).
+    c_inj : float
+        Injection concentration (shared across all components), computed from
+        total area using: c_inj = total_area × K_LKM × (1.0 / t_inj).
+        K_LKM = 0.1 (calibration constant, same as EDM).
 
     Notes
     -----
@@ -239,4 +246,11 @@ def estimate_lkm_init_params(decomposition, **kwargs):
         for i, (tR, R, k_MT) in enumerate(zip(tR_list, R_list, k_MT_list)):
             print(f"  comp {i+1}: tR={tR:.1f}  R={R:.3f}  k_MT={k_MT:.4f}")
 
-    return Pe_opt, t0_opt, k_MT_list, R_list, scale_list
+    # ── Estimate c_inj from total area (shared across all components) ─────────
+    total_area = sum(scale_list)
+    c_inj = total_area * K_LKM * (1.0 / t_inj)
+
+    if debug:
+        print(f"\nc_inj estimation: total_area={total_area:.3f}  t_inj={t_inj:.2f}  c_inj={c_inj:.4f}")
+
+    return Pe_opt, t0_opt, k_MT_list, R_list, scale_list, c_inj

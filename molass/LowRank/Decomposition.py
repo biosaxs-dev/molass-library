@@ -249,6 +249,42 @@ class Decomposition:
             uv_fractions=uv_frac,
         )
 
+    def get_uv_params(self):
+        """Get UV/XR scale ratios (species properties) for all components.
+
+        The ratios ε_i/k represent species-specific properties:
+        - ε_i = UV extinction coefficient (chromophore content, protein-specific)
+        - k = XR scattering factor (universal, proportional to mass/electron density)
+
+        These ratios are model-independent: they depend only on the molecular
+        species, not on the elution model (EGH, SDM, LKM, GRM, EDM).
+        During model upgrades with preserve_ratios=True, these values should
+        remain constant.
+
+        Returns
+        -------
+        uv_params : list of float, length n_components
+            UV/XR ratio for each component, in the same order as
+            ``get_xr_components()`` and ``get_rgs()``.
+            These are stored as the ``scale`` attribute of each UvComponentCurve.
+
+        Examples
+        --------
+        ::
+
+            decomp_egh = corrected.quick_decomposition()
+            decomp_lkm = decomp_egh.upgrade(model='LKM')
+            
+            # Check ratio preservation (unified architecture)
+            ratios_egh = decomp_egh.get_uv_params()
+            ratios_lkm = decomp_lkm.get_uv_params()
+            
+            for i, (r1, r2) in enumerate(zip(ratios_egh, ratios_lkm)):
+                delta = abs(r1 - r2) / r1 if r1 > 0 else 0
+                print(f"Component {i+1}: {r1:.2f} → {r2:.2f} (Δ={delta:.1%})")
+        """
+        return [uv_cc.scale for uv_cc in self.uv_ccurves]
+
     def get_rg_curve(self):
         """Compute the per-frame Rg curve from the raw XR data.
 

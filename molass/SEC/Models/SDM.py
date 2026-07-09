@@ -97,7 +97,7 @@ class SDM:
             new_uv_ccurves = make_dummy_uv_ccurves(decomposition.ssd, new_xr_ccurves)
         else:
             from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
-            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if pore_dist != 'lognormal':

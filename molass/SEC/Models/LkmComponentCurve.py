@@ -28,15 +28,15 @@ class LkmComponentCurve(ComponentCurve):
         Mass-transfer rate for this component.
     R : float
         Retention factor for this component (R = tR / t0 ≥ 1).
-    scale : float
-        Area scaling factor.
+    c_inj : float
+        Injection concentration (embedded scale parameter).
     rg : float, optional
         Radius of gyration for this component (used by rigorous optimizer).
     """
 
     model = 'lkm'
 
-    def __init__(self, x, Pe, t0, k_MT, R, scale, rg=None):
+    def __init__(self, x, Pe, t0, k_MT, R, c_inj, rg=None, t_inj=1.0):
         """
         Initializes the LkmComponentCurve.
 
@@ -52,10 +52,12 @@ class LkmComponentCurve(ComponentCurve):
             Mass-transfer rate.
         R : float
             Retention factor (R = tR / t0).
-        scale : float
-            Area scale factor.
+        c_inj : float
+            Injection concentration (embedded scale parameter).
         rg : float, optional
             Radius of gyration (stored for downstream Guinier analysis).
+        t_inj : float, optional
+            Injection time (default 1.0).
         """
         from molass.SEC.Models.LkmLinear import lkm_pdf
         self.x = x
@@ -63,13 +65,14 @@ class LkmComponentCurve(ComponentCurve):
         self.t0 = t0
         self.k_MT = k_MT
         self.R = R
-        self.scale = scale
+        self.c_inj = c_inj
+        self.t_inj = t_inj
         self.rg = rg if rg is not None else float('nan')
         self.moment = None
-        self.params = np.array([Pe, t0, k_MT, R, scale])  # flat params for compatibility
+        self.params = np.array([Pe, t0, k_MT, R, c_inj])  # flat params for compatibility
 
         self._lkm_pdf = lkm_pdf
-        self._y = scale * lkm_pdf(x, Pe, t0, k_MT, R)
+        self._y = lkm_pdf(x, Pe, t0, k_MT, R, c_inj=c_inj, t_inj=t_inj)
 
     @property
     def y(self):
@@ -91,14 +94,25 @@ class LkmComponentCurve(ComponentCurve):
         """
         if x is None:
             return self._y
-        return self.scale * self._lkm_pdf(x, self.Pe, self.t0, self.k_MT, self.R)
+        return self._lkm_pdf(x, self.Pe, self.t0, self.k_MT, self.R,
+                             c_inj=self.c_inj, t_inj=self.t_inj)
 
     def get_scale_param(self):
-        return self.scale
+        """Return the scale parameter for this component curve.
+        
+        For LKM, the scale is c_inj (injection concentration).
+        This overrides ComponentCurve.get_scale_param() which returns params[0].
+        
+        Returns
+        -------
+        float
+            The injection concentration c_inj (params[4]).
+        """
+        return self.c_inj
 
     def get_peak_top_x(self):
         return self.x[np.argmax(self._y)]
 
     def get_params(self):
-        """Return (Pe, t0, k_MT, R, scale) as a tuple."""
-        return (self.Pe, self.t0, self.k_MT, self.R, self.scale)
+        """Return (Pe, t0, k_MT, R, c_inj) as a tuple."""
+        return (self.Pe, self.t0, self.k_MT, self.R, self.c_inj)
