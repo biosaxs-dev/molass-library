@@ -165,8 +165,8 @@ class RunInfo:
                     import math
                     best_fv = min(j.best_fv for j in jobs)
                     best_sv = -200 / (1 + math.exp(-1.5 * best_fv)) + 100
-                    n_evals = sum(j.iterations for j in jobs)
-                    parts.append(f"n_evals={n_evals}")
+                    n_callbacks = sum(j.iterations for j in jobs)
+                    parts.append(f"n_callbacks={n_callbacks}")
                     parts.append(f"best_sv={best_sv:.1f}")
             except Exception:
                 pass
@@ -1243,8 +1243,11 @@ class RunInfo:
               ``'completed'``, ``'failed'``, ``'unknown'``.  Derived from
               the manifest's ``status`` field plus any
               ``subprocess_returncode`` available.
-            - ``n_evals`` (int): number of accepted optimizer evaluations
-              recorded in ``callback.txt`` so far.
+            - ``n_callbacks`` (int): number of callback invocations recorded
+              in ``callback.txt`` so far.  For BH this equals the number of
+              hops; for DE it equals the number of new-best improvements found.
+              This is NOT the total number of objective function calls — see
+              ``n_fevals`` (issue #231) for that.
             - ``best_fv`` (float): inverted from ``best_sv`` (matches
               ``check_progress`` arithmetic).
             - ``best_sv`` (float): best score-value-so-far on the 0-100
@@ -1296,15 +1299,15 @@ class RunInfo:
             work_folder = manifest.get("work_folder")
 
         # SV history (cheap; reads callback.txt files only).
-        n_evals = 0
+        n_callbacks = 0
         best_sv = None
         best_fv = None
         if analysis_folder:
             try:
                 from molass.Rigorous.CurrentStateUtils import parse_sv_history
                 svs = parse_sv_history(analysis_folder)
-                n_evals = len(svs)
-                if n_evals:
+                n_callbacks = len(svs)
+                if n_callbacks:
                     import math
                     best_sv = float(svs[-1])
                     # Invert SV = -200/(1+exp(-1.5*fv))+100
@@ -1357,7 +1360,8 @@ class RunInfo:
 
         return {
             "phase": phase,
-            "n_evals": n_evals,
+            "n_callbacks": n_callbacks,
+            "n_evals": n_callbacks,  # deprecated alias, remove in future release (#231)
             "best_fv": best_fv,
             "best_sv": best_sv,
             "elapsed_s": elapsed_s,
@@ -1401,7 +1405,7 @@ class RunInfo:
         -------
         dict
             Keys: ``schema_version``, ``completed_at``, ``best_fv``,
-            ``best_sv``, ``n_evals``, ``n_accepted``, ``analysis_folder``.
+            ``best_sv``, ``n_callbacks``, ``n_accepted``, ``analysis_folder``.
 
         Raises
         ------

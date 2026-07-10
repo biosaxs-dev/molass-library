@@ -53,10 +53,10 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     uv_params = []
     for uv_ccurve in decomposition.uv_ccurves:
         uv_params.append(uv_ccurve.scale)
-    # Unified architecture: convert absolute UV scales to UV/XR ratios (species properties).
-    # The objective computes uv_cy = uv_params * xr_cy, so we need ratios.
-    # uv_ccurve.scale stores absolute UV scale; divide by c_inj to get ratio.
-    uv_params = np.array(uv_params) / xr_params
+    # G1400 computes: uv_cy = uv_w * xr_cy, where xr_cy = c_inj * lkm_norm_pdf.
+    # UvComponentCurve computes: uv_y = scale * xr_cc.y = scale * c_inj * lkm_norm_pdf.
+    # For both to agree, uv_w must equal uv_ccurve.scale directly (no division by c_inj).
+    uv_params = np.array(uv_params)
 
     # ── UV baseline ──────────────────────────────────────────────────────────
     uv_baseparams = baseparams[0]

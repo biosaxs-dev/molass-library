@@ -31,8 +31,13 @@ import numpy as np
 from scipy.optimize import OptimizeResult
 
 # Evaluation budget multiplier: max_fevals = niter * FEVALS_PER_NITER.
-# Matches SolverCMA so niter values are comparable across methods.
-FEVALS_PER_NITER = 200
+# BH's niter counts hops; each hop runs a full Nelder-Mead local optimization
+# which costs ~6,600 evaluations for a 33-parameter GRM problem (measured in
+# experiment 30, molass-researcher).  FEVALS_PER_NITER = 6600 makes niter=100
+# for DE comparable to niter=100 for BH (~660,000 evaluations each).
+# (SolverCMA used 200, copied from CMA, not calibrated against BH.)
+# See: https://github.com/biosaxs-dev/molass-library/issues/229
+FEVALS_PER_NITER = 6600
 
 
 class SolverDE:

@@ -46,9 +46,12 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, 
             preserved_ratios.append(ratio)
         
         # Step 2: Apply ratios to NEW XR scales (from xr_ccurves argument)
+        # Use y.max() instead of get_scale_param(): for LKM, get_scale_param() returns
+        # c_inj (injection concentration), not the actual curve peak height. Using y.max()
+        # is type-independent and correct for both EGH and LKM curves.
         preserved_scales = []
         for ratio, new_xr_cc in zip(preserved_ratios, xr_ccurves):
-            new_scale = ratio * new_xr_cc.get_scale_param()
+            new_scale = ratio * new_xr_cc.y.max()
             preserved_scales.append(new_scale)
         
         if debug:

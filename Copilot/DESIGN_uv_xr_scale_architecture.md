@@ -1,10 +1,32 @@
 # UV-XR Scale Architecture — Design Document
 
-**Version**: 1.0  
-**Date**: 2026-07-09  
-**Status**: Draft — Implementation Required  
+**Version**: 1.1  
+**Date**: 2026-07-10 (updated)  
+**Status**: Partially Implemented — see "Current State" section below  
 **Related Issues**: #228 (Phase 2E incomplete), #227 (Scale architecture)  
 **Migration Plan**: See [MIGRATION_unified_uv_params.md](MIGRATION_unified_uv_params.md) for detailed implementation roadmap
+
+---
+
+## Current State (as of 2026-07-10)
+
+The following were **already implemented** before this document was written (prior session):
+- `G1400.py` (LKM): uses `c_inj=1.0` (normalized PDF) and `uv_cy = uv_w * xr_cy` ✅
+- `G1500.py` (GRM): uses `c_inj=1.0` (normalized PDF) and `uv_cy = uv_w * xr_cy` ✅
+- `UvOptimizer.py`: `preserve_ratios=True` path implemented; LKM/GRM upgrade calls use it ✅
+
+The following **new bugs were found and fixed on 2026-07-10** (during 29g/29h investigation):
+
+| Bug | File | Description | Fix |
+|-----|------|-------------|-----|
+| LKM UV scale | `RigorousLkmParams.py` | `uv_params = uv_cc.scale / c_inj` (wrong division) | Remove `/ xr_params` |
+| GRM UV scale | `RigorousGrmParams.py` | Same pattern as LKM | Remove `/ xr_params` |
+| GRM R-ordering | `G1500.py` | `grmcol_params[4::2]` extracted `[c_inj, k_ext_0, ...]` instead of R values | Changed to `[5::2]` |
+| UvOptimizer Step 2 | `UvOptimizer.py` | Used `get_scale_param()` (returns c_inj for LKM/GRM) to scale new ratios | Changed to `y.max()` |
+
+**Evidence from 29h notebook (post-fix)**:
+- GRM initial SV: **78.29** (was -100.00 with R-ordering bug + UV scale bug)
+- UV parameter consistency: all components ratio = **1.000000** (plot_components ↔ score.plot now match)
 
 ---
 
@@ -12,7 +34,7 @@
 
 UV and XR channels measure the same underlying concentration profiles but with different response factors. XR has a **universal** scale factor (same for all proteins), while UV has **species-specific** extinction coefficients. This physical distinction requires UV curves to be **derived** from XR curves via preserved scale ratios, not independently fitted.
 
-**Current bug:** `upgrade()` re-fits UV scales from scratch, violating the species-independence principle. UV/XR ratios change by 22× during EGH→LKM upgrade when they should remain constant.
+**Status (2026-07-10):** The `preserve_ratios=True` path is now implemented in `UvOptimizer.py` and is used by LKM/GRM upgrades. UV/XR ratios are preserved. The 22× ratio change described below was caused by bugs in `RigorousLkmParams.py`/`RigorousGrmParams.py` (dividing UV scales by c_inj) and a Step 2 error in `UvOptimizer.py` — all now fixed.
 
 ---
 

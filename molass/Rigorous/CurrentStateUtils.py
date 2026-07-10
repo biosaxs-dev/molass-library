@@ -567,7 +567,7 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     -------
     dict or None
         Progress data dict when there are evaluations to report; ``None``
-        otherwise.  Keys: ``label``, ``n_evals``, ``best_fv``, ``best_sv``,
+        otherwise.  Keys: ``label``, ``n_callbacks``, ``best_fv``, ``best_sv``,
         ``sv_best_so_far`` (full list), ``timestamp`` (ISO 8601 UTC).
 
     Examples
@@ -621,7 +621,9 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     from datetime import datetime, timezone
     snapshot = {
         "label": label,
-        "n_evals": len(sv_so_far),
+        "n_callbacks": len(sv_so_far),
+        "n_evals": len(sv_so_far),  # deprecated alias (#231)
+        "num_evals": len(sv_so_far),  # legacy key kept for existing snapshots
         "best_fv": float(best_fv),
         "best_sv": float(best_sv),
         "sv_best_so_far": sv_so_far,

@@ -1214,9 +1214,19 @@ class Decomposition:
                 raise ValueError("Cannot specify both trimmed_ssd and uncorrected_ssd")
             trimmed_ssd = kwargs.pop('uncorrected_ssd')
         # model is auto-detected from decomposition.xr_ccurves[0].model in RigorousImplement.
-        # If the user passes model= explicitly (e.g. model='GRM'), silently discard it here —
-        # the decomposition's component curves are authoritative.
-        kwargs.pop('model', None)
+        # Passing model= explicitly is an error: the decomposition's component curves are
+        # authoritative. To use a different column model, call upgrade() first.
+        # See: https://github.com/biosaxs-dev/molass-library/issues/230
+        if 'model' in kwargs:
+            model_val = kwargs.pop('model')
+            raise TypeError(
+                f"optimize_rigorously() does not accept model={model_val!r}. "
+                f"The elution model is determined by the decomposition itself "
+                f"(currently '{self.model}'). "
+                f"To use a different column model, call "
+                f"decomp.upgrade(model={model_val!r}) first, "
+                f"then call optimize_rigorously() on the upgraded decomposition."
+            )
         # Remaining kwargs are solver-specific hyperparameters (e.g. de_pop_size, de_variant).
         # Pass them through as solver_kwargs without raising TypeError — adding a new solver
         # no longer requires changing this signature (molass-library#204).

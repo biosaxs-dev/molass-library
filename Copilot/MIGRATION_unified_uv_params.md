@@ -1,9 +1,25 @@
 # Migration Plan: Unified UV Parameters Architecture
 
-**Version**: 1.0  
-**Date**: 2026-07-09  
-**Status**: Proposed  
+**Version**: 1.1  
+**Date**: 2026-07-10 (updated)  
+**Status**: Partially Implemented — see status annotations on each Phase  
 **Related**: DESIGN_uv_xr_scale_architecture.md, ASSESSMENT_uv_params_across_models.md, Issue #228
+
+---
+
+## Implementation Status Summary (2026-07-10)
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Phase 1a: G1400 (LKM) | `uv_cy = uv_w * xr_cy`, `c_inj=1.0` | ✅ Done (prior session) |
+| Phase 1b: G1500 (GRM) | Same + R-ordering index `4::2`→`5::2` | ✅ Done (2026-07-10) |
+| Phase 1c: G1100 (SDM) | `uv_cy = uv_ratio * xr_cy` | ⏳ Pending |
+| Phase 2: Legacy estimators | Convert uv_w → ratios | ⏳ Pending |
+| Phase 3: Param layout docs | Docstring updates | ⏳ Pending |
+| Phase 5: UvOptimizer | `preserve_ratios` parameter | ✅ Done (prior session) — Step 2 bug fixed 2026-07-10 |
+| Phase 6: Model upgrades | LKM/GRM pass `preserve_ratios=True` | ✅ Done (prior session) |
+| RigorousLkmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
+| RigorousGrmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
 
 ---
 
@@ -78,18 +94,20 @@ for xr_w, r_, uv_ratio in zip(xr_params, rho, uv_params):
 
 ---
 
-#### File 2: `molass_legacy/ObjectiveFunctions/G1400.py` (LKM)
+#### File 2: `molass_legacy/ObjectiveFunctions/G1400.py` (LKM) ✅ DONE
 
-**Current code** (lines 84-91):
+**Actual current code** (already implemented — prior session):
 ```python
 for i, (xr_w, rg_, uv_w) in enumerate(zip(xr_params, rg_params, uv_params)):
     negative_penalty += min(0, xr_w) ** 2 + min(0, uv_w) ** 2
     R_i    = lkmcol_params[3 + 2 * i]
     k_MT_i = lkmcol_params[3 + 2 * i + 1]
-    pd_cy  = lkm_pdf(x, Pe, t0, k_MT_i, R_i, c_inj=c_inj, t_inj=1.0)
+    pd_cy  = lkm_pdf(x, Pe, t0, k_MT_i, R_i, c_inj=1.0, t_inj=1.0)  # normalized
     xr_cy  = xr_w * pd_cy
-    uv_cy  = uv_w * pd_cy
+    uv_cy  = uv_w * xr_cy  # ratio × XR already in place
 ```
+
+**Additional fix (2026-07-10):** `RigorousLkmParams.py` was dividing `uv_params` by `xr_params` (= c_inj) before passing to G1400. Fixed: `uv_params = np.array(uv_params)` (no division).
 
 **Target code**:
 ```python
@@ -104,9 +122,9 @@ for i, (xr_w, rg_, uv_ratio) in enumerate(zip(xr_params, rg_params, uv_params)):
 
 ---
 
-#### File 3: `molass_legacy/ObjectiveFunctions/G1500.py` (GRM)
+#### File 3: `molass_legacy/ObjectiveFunctions/G1500.py` (GRM) ✅ DONE
 
-**Current code** (lines 96-107):
+**Actual current code** (already implemented — prior session, plus 2026-07-10 fix):
 ```python
 for i, (xr_w, rg_, uv_w) in enumerate(zip(xr_params, rg_params, uv_params)):
     negative_penalty += min(0, xr_w) ** 2 + min(0, uv_w) ** 2
@@ -114,10 +132,14 @@ for i, (xr_w, rg_, uv_w) in enumerate(zip(xr_params, rg_params, uv_params)):
     k_ext_i = grmcol_params[5 + 2 * i + 1]
     a_star_i = (R_i - 1.0) / F_ratio
     pd_cy = grm_pdf(x, Pe, t0, k_ext_i, R_p, D_eff, a_star_i, F_ratio,
-                   c_inj=c_inj, t_inj=1.0)
+                   c_inj=1.0, t_inj=1.0)  # normalized
     xr_cy  = xr_w * pd_cy
-    uv_cy  = uv_w * pd_cy
+    uv_cy  = uv_w * xr_cy  # ratio × XR already in place
 ```
+
+**Additional fixes (2026-07-10):**
+- `RigorousGrmParams.py` was dividing `uv_params` by `xr_params` (= c_inj). Fixed: `uv_params = np.array(uv_params)` (no division).
+- **R-ordering index bug**: `grmcol_params[4::2]` extracted `[c_inj, k_ext_0, ...]` instead of `[R_0, R_1, ...]`. Fixed: `grmcol_params[5::2]`. The wrong index caused `order_penalty ≈ 4224` (dominated fv, SV=-100). With fix: `order_penalty=0`, SV=78.29.
 
 **Target code**:
 ```python

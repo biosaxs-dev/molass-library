@@ -86,18 +86,18 @@ new_uv_ccurves = optimize_uv_decomposition(
 
 #### Rigorous optimization (legacy)
 
-**File**: `molass_legacy/ObjectiveFunctions/G1400.py`
+**File**: `molass_legacy/ObjectiveFunctions/G1400.py` ✅ ALREADY FIXED (prior session)
 
-**Lines 88-91**:
+**Actual current code**:
 ```python
-pd_cy = lkm_pdf(x, Pe, t0, k_MT_i, R_i, c_inj=c_inj, t_inj=1.0)
+pd_cy = lkm_pdf(x, Pe, t0, k_MT_i, R_i, c_inj=1.0, t_inj=1.0)  # normalized
 xr_cy = xr_w * pd_cy
-uv_cy = uv_w * pd_cy
+uv_cy = uv_w * xr_cy  # ratio × XR
 ```
 
-**Architecture**: **Explicit scale (A)** + **Double-scaling issue**
-- `xr_params` = `[xr_w_0, xr_w_1, ..., xr_w_n]` (explicit scales)
-- `uv_params` = `[uv_w_0, uv_w_1, ..., uv_w_n]` (explicit scales)
+**Architecture**: **Explicit scale (A)** — no double-scaling (c_inj=1.0 removes it)
+- `xr_params` = `[xr_w_0, xr_w_1, ..., xr_w_n]` = c_inj values (explicit scales)
+- `uv_params` = `[uv_w_0, uv_w_1, ..., uv_w_n]` = UV/XR ratios (= `uv_cc.scale` directly)
 - UV/XR ratio = `uv_w_i / xr_w_i`
 - **Problem**: `lkm_pdf()` with `c_inj` already includes concentration scaling
   - `pd_cy = c_inj × (kinetic_pdf)`
@@ -126,22 +126,23 @@ new_uv_ccurves = optimize_uv_decomposition(...)
 
 #### Rigorous optimization (legacy)
 
-**File**: `molass_legacy/ObjectiveFunctions/G1500.py`
+**File**: `molass_legacy/ObjectiveFunctions/G1500.py` ✅ FIXED (2026-07-10)
 
-**Lines 103-107**:
+**Actual current code**:
 ```python
 pd_cy = grm_pdf(x, Pe, t0, k_ext_i, R_p, D_eff, a_star_i, F_ratio,
-               c_inj=c_inj, t_inj=1.0)
+               c_inj=1.0, t_inj=1.0)  # normalized
 xr_cy = xr_w * pd_cy
-uv_cy = uv_w * pd_cy
+uv_cy = uv_w * xr_cy  # ratio × XR
 ```
 
-**Architecture**: **Explicit scale (A)** + **Double-scaling issue**
-- Same pattern as LKM
-- `grm_pdf()` with `c_inj` already embeds concentration scaling
-- Additional `xr_w` multiplier creates redundancy
+**Architecture**: **Explicit scale (A)** — no double-scaling (c_inj=1.0)
+- `uv_params` = UV/XR ratios = `uv_cc.scale` values directly ✓
 
-**Status**: ⚠️ **Double-scaling** — Same issue as LKM
+**Status**: ✅ **Fixed (2026-07-10)** — Three bugs corrected:
+1. `RigorousGrmParams.py`: divided UV scales by c_inj → removed division
+2. `G1500.py` R-ordering: `grmcol_params[4::2]` extracted wrong elements (c_inj + k_ext instead of R values) → changed to `grmcol_params[5::2]`. Effect: `order_penalty ≈ 4224` → `0`, SV=-100 → 78.29
+3. `UvOptimizer.py` Step 2: used `get_scale_param()` (= c_inj) instead of `y.max()` for ratio scaling → changed to `y.max()`
 
 ---
 
