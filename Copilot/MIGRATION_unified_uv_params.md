@@ -7,7 +7,7 @@
 
 ---
 
-## Implementation Status Summary (2026-07-10)
+## Implementation Status Summary (2026-07-13)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -21,6 +21,14 @@
 | RigorousLkmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
 | RigorousGrmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
 | RigorousSdmParams fix | Remove `/ xr_params` division (Phase 1c) | ✅ Done (2026-07-13) |
+| Debug print cleanup | Remove `_refine_uv_scales` debug block from BasicOptimizer.py | ✅ Done (2026-07-13) |
+| SolverDE x0 clamp | Clamp `init_params` to bounds before scipy DE (molass-library#TBD) | ✅ Done (2026-07-13) |
+
+**Known issue**: `KT_BOUND=(500,2000)` is too narrow for some datasets (SAMPLE1 SDM gives K=228.4 < 500).
+Tracked as [molass-legacy#84](https://github.com/biosaxs-dev/molass-legacy/issues/84).
+
+**Reload note**: `RigorousImplement.py` does NOT reload `G14xx/G15xx/G12xx` objective functions.
+After commits to G1xxx files, notebooks require kernel restart to pick up changes.
 
 ---
 
