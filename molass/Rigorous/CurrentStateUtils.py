@@ -131,8 +131,9 @@ def construct_decomposition_from_results(run_info, **kwargs):
     else:
         x = uv_icurve.x
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        xr_h = xr_ccurve.get_scale_param()
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale/xr_h))
+        # Phase 1c: uv_params are UV/XR ratios (ε_i/k).  Pass ratio directly —
+        # UvComponentCurve.get_y() = scale * xr_ccurve.get_y() handles the rest.
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale))
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 
@@ -264,12 +265,12 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     uv_ccurves = []
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        # Unified architecture (issue #228): all models now store UV/XR ratios in uv_params.
-        # Convert ratio to absolute UV scale: uv_scale = ratio × xr_scale
-        # For all models: uv_params are ratios (species properties ε_i/k).
-        xr_scale = xr_ccurve.get_scale_param()
-        uv_scale = scale * xr_scale  # ratio → absolute scale
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, uv_scale))
+        # Unified architecture (issue #228): uv_params stores UV/XR ratios (ε_i/k).
+        # UvComponentCurve.get_y() = self.scale * xr_ccurve.get_y(), where
+        # xr_ccurve.get_y() already returns the absolute XR curve (scale embedded).
+        # Therefore self.scale must be the ratio directly — NOT ratio × xr_scale.
+        # (Multiplying by xr_scale here would double-count it: ratio×xr_scale×xr_scale×PDF.)
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale))
 
     # Preserve the optimizer's Rg values so that
     # compute_reconstructed_rgcurve() matches MplMonitor.
