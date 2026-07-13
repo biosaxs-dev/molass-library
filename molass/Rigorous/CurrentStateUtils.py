@@ -130,10 +130,18 @@ def construct_decomposition_from_results(run_info, **kwargs):
         x = xr_icurve.x
     else:
         x = uv_icurve.x
+    # G0346/G0367 (EGH): uv_params[k] = absolute UV peak height H_uv.
+    # G1100-G1500 (SDM/LKM/GRM/EDM, Phase 1c): uv_params[k] = UV/XR ratio.
+    # UvComponentCurve.scale must always be the ratio, so convert for EGH.
+    _func_code = optimizer.get_function_code()
+    _egh_uv = _func_code in ('G0346', 'G0367')
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        # Phase 1c: uv_params are UV/XR ratios (ε_i/k).  Pass ratio directly —
-        # UvComponentCurve.get_y() = scale * xr_ccurve.get_y() handles the rest.
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale))
+        if _egh_uv:
+            xr_h = xr_ccurve.get_scale_param()
+            ratio = scale / xr_h if xr_h > 0 else scale
+        else:
+            ratio = scale
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, ratio))
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 
@@ -264,13 +272,18 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
         x = xr_icurve.x
 
     uv_ccurves = []
+    # G0346/G0367 (EGH): uv_params[k] = absolute UV peak height H_uv.
+    # G1100-G1500 (SDM/LKM/GRM/EDM, Phase 1c): uv_params[k] = UV/XR ratio.
+    # UvComponentCurve.scale must always be the ratio, so convert for EGH.
+    _func_code = optimizer.get_function_code()
+    _egh_uv = _func_code in ('G0346', 'G0367')
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        # Unified architecture (issue #228): uv_params stores UV/XR ratios (ε_i/k).
-        # UvComponentCurve.get_y() = self.scale * xr_ccurve.get_y(), where
-        # xr_ccurve.get_y() already returns the absolute XR curve (scale embedded).
-        # Therefore self.scale must be the ratio directly — NOT ratio × xr_scale.
-        # (Multiplying by xr_scale here would double-count it: ratio×xr_scale×xr_scale×PDF.)
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale))
+        if _egh_uv:
+            xr_h = xr_ccurve.get_scale_param()
+            ratio = scale / xr_h if xr_h > 0 else scale
+        else:
+            ratio = scale
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, ratio))
 
     # Preserve the optimizer's Rg values so that
     # compute_reconstructed_rgcurve() matches MplMonitor.
