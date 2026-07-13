@@ -134,6 +134,12 @@ class SolverDE:
             return False
 
         # ── run scipy differential_evolution ─────────────────────────────────
+        # Clamp x0 to bounds: scipy DE strictly rejects x0 outside bounds,
+        # while SolverBH silently accepts it. The clamped starting point is
+        # the nearest feasible point, which is still a valid warm start.
+        bounds_lo = np.array([b[0] for b in bounds_list])
+        bounds_hi = np.array([b[1] for b in bounds_list])
+        init_params_clamped = np.clip(init_params, bounds_lo, bounds_hi)
         result = differential_evolution(
             objective,
             bounds_list,
@@ -146,7 +152,7 @@ class SolverDE:
             callback=callback_wrapper,
             polish=False,  # no local refinement (keep pure DE behavior)
             init='latinhypercube',
-            x0=init_params,  # warm start from initial params
+            x0=init_params_clamped,  # warm start (clamped to bounds)
             atol=0,
             tol=0.01,
             updating='immediate',
