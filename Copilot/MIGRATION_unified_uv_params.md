@@ -23,6 +23,7 @@
 | RigorousSdmParams fix | Remove `/ xr_params` division (Phase 1c) | ✅ Done (2026-07-13) |
 | Debug print cleanup | Remove `_refine_uv_scales` debug block from BasicOptimizer.py | ✅ Done (2026-07-13) |
 | SolverDE x0 clamp | Clamp `init_params` to bounds before scipy DE (molass-library#TBD) | ✅ Done (2026-07-13) |
+| EGH UV scale fix | `CurrentStateUtils`: G0346 uv_params = absolute H_uv; divide by H_xr to get ratio | ✅ Done (2026-07-13) |
 
 **Known issue**: `KT_BOUND=(500,2000)` is too narrow for some datasets (SAMPLE1 SDM gives K=228.4 < 500).
 Tracked as [molass-legacy#84](https://github.com/biosaxs-dev/molass-legacy/issues/84).
