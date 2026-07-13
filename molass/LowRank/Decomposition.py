@@ -120,7 +120,11 @@ class Decomposition:
         # so it should transfer across model upgrades automatically.
         if hasattr(self, '_rgcurve') and self._rgcurve is not None:
             new_decomp._rgcurve = self._rgcurve
-        
+        else:
+            # Lazy fallback: store parent reference so get_rg_curve() can
+            # inherit the result without recomputing (same XR data).
+            new_decomp._parent = self
+
         return new_decomp
 
     @property
@@ -319,7 +323,12 @@ class Decomposition:
             plt.show()
         """
         if getattr(self, '_rgcurve', None) is None:
-            self._rgcurve = self.xr.compute_rgcurve()
+            parent = getattr(self, '_parent', None)
+            if parent is not None:
+                # Inherit from parent decomposition — same XR data, no recomputation.
+                self._rgcurve = parent.get_rg_curve()
+            else:
+                self._rgcurve = self.xr.compute_rgcurve()
         # NOTE: the cached Rg curve lives on this Decomposition object (_rgcurve),
         # NOT on self.ssd.  self.ssd._rgcurve is always None because self.ssd is a
         # fresh object created during quick_decomposition().  Always read from
@@ -1317,6 +1326,19 @@ class Decomposition:
         RunInfo.score : Score at optimized parameters.
         RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
+        if getattr(self, '_rgcurve', None) is None:
+            # Check whether lazy parent propagation will supply it without
+            # a real computation (same XR data, already cached upstream).
+            _parent = getattr(self, '_parent', None)
+            _parent_has_cache = _parent is not None and getattr(_parent, '_rgcurve', None) is not None
+            if not _parent_has_cache:
+                import warnings
+                warnings.warn(
+                    "Rg curve not pre-computed on this Decomposition. "
+                    "score() will compute it now (one Guinier fit per frame). "
+                    "Pre-compute once with: decomp.get_rg_curve()",
+                    UserWarning, stacklevel=2,
+                )
         from molass.Rigorous.Score import make_score_impl
         return make_score_impl(
             self, trimmed_ssd=trimmed_ssd,
