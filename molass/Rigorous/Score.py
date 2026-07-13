@@ -75,10 +75,15 @@ class Score:
 
         Returns
         -------
-        matplotlib.figure.Figure
+        PlotResult
+            A :class:`~molass.PlotUtils.PlotResult.PlotResult` with ``.fig``
+            and ``.axes`` attributes.  Returning ``PlotResult`` (not a raw
+            ``Figure``) avoids the double-display that occurs in Jupyter when
+            a function both creates a figure and returns it.
         """
         import matplotlib.pyplot as plt
         from molass_legacy.Optimizer.JobStatePlot import plot_objective_func
+        from molass.PlotUtils.PlotResult import PlotResult
 
         fig, axes = plt.subplots(ncols=3, figsize=(18, 4.5))
         ax1, ax2, ax3 = axes
@@ -92,7 +97,7 @@ class Score:
         # plot_objective_func evaluates objective_func(params, plot=True) internally
         self.optimizer.objective_func(self.init_params, plot=True, axis_info=axis_info)
         fig.tight_layout()
-        return fig
+        return PlotResult(fig, axes)
 
     # ------------------------------------------------------------------
     # Score analysis
