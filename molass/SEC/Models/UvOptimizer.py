@@ -39,25 +39,14 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, 
 
     # Extract preserved ratios from previous decomposition if requested
     if preserve_ratios:
-        # Step 1: Compute UV/XR ratios from PREVIOUS decomposition (species properties ε_i/k)
-        preserved_ratios = []
-        for uv_cc, xr_cc in zip(decomposition.uv_ccurves, decomposition.xr_ccurves):
-            ratio = uv_cc.scale / xr_cc.get_scale_param()
-            preserved_ratios.append(ratio)
-        
-        # Step 2: Apply ratios to NEW XR scales (from xr_ccurves argument)
-        # Use y.max() instead of get_scale_param(): for LKM, get_scale_param() returns
-        # c_inj (injection concentration), not the actual curve peak height. Using y.max()
-        # is type-independent and correct for both EGH and LKM curves.
-        preserved_scales = []
-        for ratio, new_xr_cc in zip(preserved_ratios, xr_ccurves):
-            new_scale = ratio * new_xr_cc.y.max()
-            preserved_scales.append(new_scale)
+        # uv_cc.scale IS the ε_i/k ratio: UV_i(t) = scale * XR_i(mapping.inv(t))
+        # It is a species property — directly preserved, unchanged by model upgrade.
+        # No division by get_scale_param() or multiplication by y.max() is needed.
+        preserved_scales = [uv_cc.scale for uv_cc in decomposition.uv_ccurves]
         
         if debug:
-            ratio_str = '[' + ', '.join(f'{r:.3g}' for r in preserved_ratios) + ']'
             scale_str = '[' + ', '.join(f'{s:.3g}' for s in preserved_scales) + ']'
-            print(f'[UV] preserve_ratios=True: ratios={ratio_str} → scales={scale_str}')
+            print(f'[UV] preserve_ratios=True: preserved scales (ε_i/k)={scale_str}')
 
     def objective_function(params):
         if preserve_ratios:
