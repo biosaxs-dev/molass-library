@@ -13,13 +13,14 @@
 |-------|-------------|--------|
 | Phase 1a: G1400 (LKM) | `uv_cy = uv_w * xr_cy`, `c_inj=1.0` | ✅ Done (prior session) |
 | Phase 1b: G1500 (GRM) | Same + R-ordering index `4::2`→`5::2` | ✅ Done (2026-07-10) |
-| Phase 1c: G1100 (SDM) | `uv_cy = uv_ratio * xr_cy` | ⏳ Pending |
+| Phase 1c: G1200/G1100/G1300 (SDM) | `uv_cy = uv_ratio * xr_cy` | ✅ Done (2026-07-13) |
 | Phase 2: Legacy estimators | Convert uv_w → ratios | ⏳ Pending |
 | Phase 3: Param layout docs | Docstring updates | ⏳ Pending |
 | Phase 5: UvOptimizer | `preserve_ratios` parameter | ✅ Done (prior session) — Step 2 bug fixed 2026-07-10 |
 | Phase 6: Model upgrades | LKM/GRM pass `preserve_ratios=True` | ✅ Done (prior session) |
 | RigorousLkmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
 | RigorousGrmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
+| RigorousSdmParams fix | Remove `/ xr_params` division (Phase 1c) | ✅ Done (2026-07-13) |
 
 ---
 
@@ -66,7 +67,7 @@ uv_cy = uv_params[i] * xr_cy    # ← Unified: ratio × XR curve
 
 ### Phase 1: Legacy Objective Functions (molass-legacy)
 
-#### File 1: `molass_legacy/ObjectiveFunctions/G1100.py` (SDM)
+#### File 1: `molass_legacy/ObjectiveFunctions/G1100.py` (SDM) ✅ DONE (2026-07-13)
 
 **Current code** (lines 93-98):
 ```python
@@ -91,6 +92,20 @@ for xr_w, r_, uv_ratio in zip(xr_params, rho, uv_params):
 ```
 
 **Variable rename**: `uv_w` → `uv_ratio` (clarifies meaning, not strictly necessary)
+
+---
+
+#### File 1b: `molass_legacy/ObjectiveFunctions/G1200.py` (SDM mono+gamma) ✅ DONE (2026-07-13)
+
+Same fix as G1100: `uv_cy = uv_w * pd_cy` → `uv_cy = uv_ratio * xr_cy`. Also removed `_refine_uv_scales` workaround.
+
+Also: `RigorousSdmParams.py` fixed 2026-07-13 — removed `/ xr_params` division. Covers all SDM variants (G1100/G1200/G1300 share this init-params builder).
+
+---
+
+#### File 1c: `molass_legacy/ObjectiveFunctions/G1300.py` (SDM lognormal+gamma) ✅ DONE (2026-07-13)
+
+Same fix: `uv_cy = uv_w * pd_cy` → `uv_cy = uv_ratio * xr_cy`.
 
 ---
 
