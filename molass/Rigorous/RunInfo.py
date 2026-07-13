@@ -172,6 +172,61 @@ class RunInfo:
                 pass
         return f"RunInfo({', '.join(parts)})"
 
+    @property
+    def best_params(self):
+        """Best parameter vector found across all completed jobs in this run.
+
+        Scans ``analysis_folder/optimized/jobs/*/callback.txt``, finds the
+        global minimum ``fv`` across all jobs, and returns the corresponding
+        parameter vector as a NumPy array.
+
+        Returns ``None`` if no completed jobs are found (e.g. run not yet
+        started, or all callback files are empty).
+
+        Typical use: seed a follow-up optimizer from the result of a prior run::
+
+            seed = run_bh.best_params
+            run_de = decomp.optimize_rigorously(
+                method='DE', niter=5,
+                analysis_folder='temp_de_from_bh',
+                seed_params=seed, ...
+            )
+        """
+        if self.analysis_folder is None:
+            return None
+        import os
+        jobs_dir = os.path.join(self.analysis_folder, "optimized", "jobs")
+        if not os.path.isdir(jobs_dir):
+            return None
+        try:
+            from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
+            from molass_legacy.Optimizer.Scripting import get_params
+        except ImportError:
+            return None
+        best_fv = None
+        best_job = None
+        for job_name in sorted(os.listdir(jobs_dir)):
+            job_dir = os.path.join(jobs_dir, job_name)
+            cb_file = os.path.join(job_dir, "callback.txt")
+            if not os.path.isfile(cb_file):
+                continue
+            try:
+                fv_list, _ = read_callback_txt_impl(cb_file)
+                if not fv_list:
+                    continue
+                job_best = min(entry[1] for entry in fv_list)
+                if best_fv is None or job_best < best_fv:
+                    best_fv = job_best
+                    best_job = job_dir
+            except Exception:
+                continue
+        if best_job is None:
+            return None
+        try:
+            return get_params(best_job)
+        except Exception:
+            return None
+
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)
         if debug:

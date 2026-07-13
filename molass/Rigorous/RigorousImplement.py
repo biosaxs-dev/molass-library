@@ -162,7 +162,7 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -429,10 +429,25 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                                **(solver_kwargs or {}))
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
+        # seed_params: user-supplied override (e.g. seed DE from a prior BH result).
+        # Takes priority over both the estimator-derived init and the resume path.
+        if seed_params is not None:
+            import numpy as _np
+            _seed = _np.asarray(seed_params)
+            if len(_seed) == len(init_params):
+                init_params = _seed
+            else:
+                import warnings as _w
+                _w.warn(
+                    f"seed_params length {len(_seed)} does not match "
+                    f"estimator-derived length {len(init_params)}. "
+                    "Ignoring seed_params and using estimator-derived init.",
+                    UserWarning, stacklevel=4,
+                )
         # When resuming (clear_jobs=False), override with the best params found
         # across previous jobs — starting from the best known point is almost
         # always better than starting from the initial decomp params (#169).
-        if not clear_jobs:
+        elif not clear_jobs:
             _resume_init = _load_best_init_params(analysis_folder, init_params)
             if _resume_init is not None:
                 init_params = _resume_init

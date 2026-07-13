@@ -1050,6 +1050,7 @@ class Decomposition:
                             ns_narrow_bounds=True,
                             ns_adaptive_nsteps=False,
                             ns_nsteps=None,
+                            seed_params=None,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -1164,6 +1165,23 @@ class Decomposition:
             behaviour for unattended in-process runs.
         debug : bool, optional
             If True, enable debug mode.
+        seed_params : array-like or None, optional
+            Explicit initial parameter vector to use instead of the
+            estimator-derived one.  Useful for seeding one optimizer from
+            the result of another (e.g. running DE from the BH best)::
+
+                seed = run_bh.best_params
+                run_de = decomp.optimize_rigorously(
+                    method='DE', niter=5,
+                    analysis_folder='temp_de_from_bh',
+                    seed_params=seed,
+                )
+
+            The length of ``seed_params`` must match the estimator-derived
+            vector for the current model and number of components; a mismatch
+            triggers a ``UserWarning`` and falls back to the estimator-derived
+            init.  When ``seed_params`` is provided it takes precedence over
+            the ``clear_jobs=False`` resume path.
 
         Returns
         -------
@@ -1276,7 +1294,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
               function_code=None, debug=False):
