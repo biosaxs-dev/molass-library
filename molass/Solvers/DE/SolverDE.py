@@ -61,12 +61,13 @@ class SolverDE:
     """
 
     def __init__(self, optimizer, pop_size=None, strategy="best1bin",
-                 recombination=0.7, mutation=0.5):
+                 recombination=0.7, mutation=0.5, tol=None):
         self.optimizer = optimizer
         self._pop_size = pop_size if pop_size is not None else 15
         self.strategy = strategy
         self.recombination = recombination
         self.mutation = mutation
+        self._tol = tol if tol is not None else 0.01   # convergence tolerance (default matches scipy)
 
     def minimize(self, objective, init_params, niter=100, seed=1234,
                  bounds=None, narrow_bounds=False, show_history=False):
@@ -154,7 +155,7 @@ class SolverDE:
             init='latinhypercube',
             x0=init_params_clamped,  # warm start (clamped to bounds)
             atol=0,
-            tol=0.01,
+            tol=self._tol,
             updating='immediate',
             workers=1,  # single-threaded for compatibility with callback
         )
