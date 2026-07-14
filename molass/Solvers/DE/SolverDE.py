@@ -141,6 +141,36 @@ class SolverDE:
         bounds_lo = np.array([b[0] for b in bounds_list])
         bounds_hi = np.array([b[1] for b in bounds_list])
         init_params_clamped = np.clip(init_params, bounds_lo, bounds_hi)
+
+        # ── population initialization ─────────────────────────────────────────
+        # When seed_params was supplied to optimize_rigorously(), RigorousImplement
+        # sets optimizer._de_use_tight_init=True to signal that the entire population
+        # should be concentrated near init_params_clamped (the seed).
+        #
+        # This uses scipy's init=array feature (explicitly documented for this use
+        # case: "create a tight bunch of initial guesses in a location where the
+        # solution is known to exist").
+        #
+        # tight_scale=0.1 → σ = 0.1 × 10 = 1.0 in normalized [0,10] space.
+        # For a 29-parameter SDM problem with K-bounds [68.5, 913.6], σ_K ≈ 84.5
+        # physical units — keeps most members within the correct-assignment basin
+        # near the BH seed while still allowing DE to refine.
+        #
+        # Member 0 is additionally forced to exact init_params_clamped via x0=,
+        # ensuring the seed itself is always in the initial population.
+        use_tight = getattr(self.optimizer, '_de_use_tight_init', False)
+        tight_scale = getattr(self.optimizer, '_de_tight_scale', 0.1)
+
+        if use_tight:
+            rng_tight = np.random.default_rng(seed)
+            tight_pop = (init_params_clamped
+                         + tight_scale * 10.0
+                         * rng_tight.standard_normal((actual_popsize, n)))
+            tight_pop = np.clip(tight_pop, bounds_lo, bounds_hi)
+            init_arg = tight_pop   # shape (pop_size, n) — scipy honours this directly
+        else:
+            init_arg = 'latinhypercube'
+
         result = differential_evolution(
             objective,
             bounds_list,
@@ -152,8 +182,8 @@ class SolverDE:
             seed=seed,
             callback=callback_wrapper,
             polish=False,  # no local refinement (keep pure DE behavior)
-            init='latinhypercube',
-            x0=init_params_clamped,  # warm start (clamped to bounds)
+            init=init_arg,
+            x0=init_params_clamped,  # always set member 0 = seed (even for tight init)
             atol=0,
             tol=self._tol,
             updating='immediate',
@@ -161,14 +191,3 @@ class SolverDE:
         )
 
         return result
-        self._xu = xu
-        self._seed = seed
-        self._warm_sigma = warm_sigma
-
-    def _do(self, problem, n_samples, **kwargs):
-        rng = np.random.default_rng(self._seed)
-        noise = rng.normal(0.0, self._warm_sigma,
-                           size=(n_samples, len(self._init)))
-        X = np.clip(self._init + noise, self._xl, self._xu)
-        X[0] = self._init           # member 0 = exact warm start
-        return X

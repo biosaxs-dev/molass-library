@@ -1040,6 +1040,30 @@ class Decomposition:
         _, baseparams = make_basecurves_from_decomposition(self)
         return len(self.make_rigorous_initparams(baseparams))
 
+    def get_rigorous_initparams(self):
+        """Return the estimator-derived initial parameter vector for rigorous optimization.
+
+        Equivalent to what :meth:`optimize_rigorously` computes internally before
+        starting the optimizer.  Useful for seeding one optimizer from the
+        decomposition's own estimates (no prior BH/CMA run required)::
+
+            init_params = decomp_sdm.get_rigorous_initparams()
+            run_de = decomp_sdm.optimize_rigorously(
+                method='DE', seed_params=init_params, ...
+            )
+
+        Works for all supported models (EGH, SDM, EDM, CEDM, LKM, GRM).
+
+        Returns
+        -------
+        np.ndarray
+            Flat parameter vector (same shape as ``best_params`` on a completed
+            :class:`~molass.Rigorous.RunInfo.RunInfo`).
+        """
+        from molass.Rigorous.LegacyBridgeUtils import make_basecurves_from_decomposition
+        _, baseparams = make_basecurves_from_decomposition(self)
+        return self.make_rigorous_initparams(baseparams)
+
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
                             frozen_param_groups=None,
