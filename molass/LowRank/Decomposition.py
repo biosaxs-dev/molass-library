@@ -1075,6 +1075,7 @@ class Decomposition:
                             ns_adaptive_nsteps=False,
                             ns_nsteps=None,
                             seed_params=None,
+                            constraints=None,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -1318,7 +1319,7 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
               function_code=None, debug=False):

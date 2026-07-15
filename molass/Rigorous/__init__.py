@@ -23,3 +23,4 @@ from .RunRegistry import (
     write_run_manifest,
     update_run_manifest,
 )
+from .LumpingConstraint import LumpingConstraint
