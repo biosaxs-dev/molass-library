@@ -1,8 +1,8 @@
 # Migration Plan: Unified UV Parameters Architecture
 
-**Version**: 1.1  
-**Date**: 2026-07-10 (updated)  
-**Status**: Partially Implemented — see status annotations on each Phase  
+**Version**: 1.2  
+**Date**: 2026-07-16 (updated)  
+**Status**: Complete — all phases implemented  
 **Related**: DESIGN_uv_xr_scale_architecture.md, ASSESSMENT_uv_params_across_models.md, Issue #228
 
 ---
@@ -14,8 +14,8 @@
 | Phase 1a: G1400 (LKM) | `uv_cy = uv_w * xr_cy`, `c_inj=1.0` | ✅ Done (prior session) |
 | Phase 1b: G1500 (GRM) | Same + R-ordering index `4::2`→`5::2` | ✅ Done (2026-07-10) |
 | Phase 1c: G1200/G1100/G1300 (SDM) | `uv_cy = uv_ratio * xr_cy` | ✅ Done (2026-07-13) |
-| Phase 2: Legacy estimators | Convert uv_w → ratios | ⏳ Pending |
-| Phase 3: Param layout docs | Docstring updates | ⏳ Pending |
+| Phase 2: Legacy estimators | Convert uv_w → ratios | ✅ Done (2026-07-13) |
+| Phase 3: Param layout docs | Docstring updates | ✅ Done (2026-07-16) |
 | Phase 5: UvOptimizer | `preserve_ratios` parameter | ✅ Done (prior session) — Step 2 bug fixed 2026-07-10 |
 | Phase 6: Model upgrades | LKM/GRM pass `preserve_ratios=True` | ✅ Done (prior session) |
 | RigorousLkmParams fix | Remove `/ xr_params` (c_inj division) | ✅ Done (2026-07-10) |
