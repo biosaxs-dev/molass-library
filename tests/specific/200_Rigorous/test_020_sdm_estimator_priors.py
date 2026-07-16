@@ -15,6 +15,8 @@ import pytest
 class _FakeCurve:
     def __init__(self, x, y):
         self._x, self._y = x, y
+        # Public .x / .y needed by SdmEstimator._proxy_rgs_from_peak_frames
+        self.x, self.y = x, y
     def get_xy(self):
         return self._x, self._y
 

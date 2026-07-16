@@ -1571,6 +1571,7 @@ class RunInfo:
         obj._async_thread = None
         obj._async_error = None
         obj._stop_event = threading.Event()
+        obj._subprocess_process = None
 
         # Restore work_folder from manifest (may be None for very early runs).
         wf = manifest.get("work_folder")
