@@ -90,7 +90,9 @@ def construct_decomposition_from_results(run_info, **kwargs):
                             pass
             time.sleep(1)
  
-    print(f"Loading current decomposition from optimizer folder: {optimizer_folder}")
+    debug = kwargs.get('debug', False)
+    if debug:
+        print(f"Loading current decomposition from optimizer folder: {optimizer_folder}")
     jobid = kwargs.get('jobid', None)
     if jobid is None:
         jobs_folder = os.path.join(optimizer_folder, "jobs")
@@ -99,7 +101,8 @@ def construct_decomposition_from_results(run_info, **kwargs):
         jobid = jobids[-1]
     
     job_result_folder = os.path.join(optimizer_folder, "jobs", jobid)
-    print(f"Using job id: {jobid}, folder: {job_result_folder}")
+    if debug:
+        print(f"Using job id: {jobid}, folder: {job_result_folder}")
 
     ssd = run_info.ssd
     xr_icurve = ssd.xr.get_icurve()
