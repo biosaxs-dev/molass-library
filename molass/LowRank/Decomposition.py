@@ -1311,9 +1311,8 @@ class Decomposition:
                 raise ValueError(f"free_components {sorted(invalid)} out of range [0, {n_protein})")
             frozen_components = sorted(all_indices - free_set)
 
-        if debug:
-            import molass.Rigorous.RigorousImplement
-            reload(molass.Rigorous.RigorousImplement)
+        import molass.Rigorous.RigorousImplement
+        reload(molass.Rigorous.RigorousImplement)
         from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
         if rgcurve is None:
