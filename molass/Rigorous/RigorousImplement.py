@@ -453,6 +453,26 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 init_params = _resume_init
         optimizer.prepare_for_optimization(init_params)
 
+        # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#215).
+        # DE's randomised population can push two components into the same elution
+        # zone, producing a degenerate collapsed solution.  When the user has not
+        # explicitly provided constraints, build one automatically from the
+        # decomposition's current peak positions.  Pass constraints=[] to opt out.
+        if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
+            import warnings as _w
+            from molass.Rigorous.LumpingConstraint import LumpingConstraint as _LC
+            _auto_lc = _LC(decomposition)
+            constraints = [_auto_lc]
+            _w.warn(
+                "optimize_rigorously(method='DE') automatically applied "
+                "LumpingConstraint to prevent component collapse "
+                f"(boundaries={_auto_lc.boundaries.tolist()}, "
+                f"ref_labels={_auto_lc.ref_labels}). "
+                "Pass constraints=[] to opt out.",
+                UserWarning,
+                stacklevel=3,
+            )
+
         # Inject pluggable constraint hooks (e.g. LumpingConstraint).
         # Constraints survive module reloads because _constraints is an
         # instance attribute; BasicOptimizer.compute_fv reads it via
