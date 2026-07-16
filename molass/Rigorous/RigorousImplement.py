@@ -354,7 +354,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
         import warnings as _w
         from molass.Rigorous.LumpingConstraint import LumpingConstraint as _LC
-        _lc_source = getattr(decomposition, '_parent', decomposition)
+        # Prefer _source_decomp (set by copy_with_new_components on every upgrade)
+        # over decomposition itself.  EGH source curves give more reliable peak
+        # positions for zone boundaries than physics-model (SDM/EDM/LKM) curves.
+        # _parent is a fallback for paths that bypass copy_with_new_components.
+        _lc_source = getattr(decomposition, '_source_decomp',
+                             getattr(decomposition, '_parent', decomposition))
         _auto_lc = _LC(_lc_source)
         constraints = [_auto_lc]
         _w.warn(

@@ -125,6 +125,12 @@ class Decomposition:
             # inherit the result without recomputing (same XR data).
             new_decomp._parent = self
 
+        # Always track the EGH source decomposition so that auto-constraints
+        # (e.g. LumpingConstraint) can use curve-fit peak positions rather than
+        # physics-model positions that may differ slightly after upgrade().
+        # Used by optimize_rigorously(method='DE') in RigorousImplement.py.
+        new_decomp._source_decomp = self
+
         return new_decomp
 
     @property
