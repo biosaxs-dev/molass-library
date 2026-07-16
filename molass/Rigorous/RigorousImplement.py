@@ -568,21 +568,21 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             import molass.Rigorous.RunInfo as _run_info_mod
             _run_info_mod._active_inprocess = None
 
+        # Clear the jobs subfolder so _allocate_work_folder() always picks
+        # jobs/000 on the next call, for BOTH async and sync (async_=False)
+        # in-process paths. (#132 followup, fix for issue #236)
+        if clear_jobs:
+            import shutil as _shutil
+            _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+            if os.path.isdir(_jobs_dir):
+                for _entry in os.listdir(_jobs_dir):
+                    _ep = os.path.join(_jobs_dir, _entry)
+                    if os.path.isdir(_ep):
+                        _shutil.rmtree(_ep)
+            os.makedirs(_jobs_dir, exist_ok=True)
+
         if async_:
             import threading
-
-            # Clear the jobs subfolder BEFORE starting the thread so that
-            # _allocate_work_folder() picks jobs/000 instead of accumulating
-            # jobs/001, /002, ... across repeated runs. (#132 followup)
-            if clear_jobs:
-                import shutil as _shutil
-                _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
-                if os.path.isdir(_jobs_dir):
-                    for _entry in os.listdir(_jobs_dir):
-                        _ep = os.path.join(_jobs_dir, _entry)
-                        if os.path.isdir(_ep):
-                            _shutil.rmtree(_ep)
-                os.makedirs(_jobs_dir, exist_ok=True)
 
             _thread = threading.Thread(target=_run_in_process, daemon=True)
             run_info._async_thread = _thread

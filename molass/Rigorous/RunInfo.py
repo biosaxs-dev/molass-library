@@ -454,6 +454,9 @@ class RunInfo:
         )
         jobs = list_rigorous_jobs(self.analysis_folder)
         best = min(jobs, key=lambda j: j.best_fv)
+        # Remember which job was loaded so callers can inspect it via
+        # run_info.loaded_job without parsing stdout. (issue #237)
+        self._loaded_job = best.id
         decomp = self.decomposition
         if decomp is None:
             raise ValueError(
@@ -470,6 +473,11 @@ class RunInfo:
         result.fv = best.best_fv
         result.sv = float(fv_to_sv(best.best_fv))
         return result
+
+    @property
+    def loaded_job(self):
+        """Job name (e.g. ``'025'``) most recently loaded by :meth:`load_best`. ``None`` until called."""
+        return getattr(self, '_loaded_job', None)
 
     def get_score_breakdown(self, jobid=None, debug=False):
         """Evaluate the objective function and return individual score components.

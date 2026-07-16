@@ -134,6 +134,16 @@ class Decomposition:
         return new_decomp
 
     @property
+    def source_decomp(self):
+        """The EGH decomposition this was upgraded from, or ``None`` if not an upgrade result.
+
+        Set automatically by :meth:`copy_with_new_components` when :meth:`upgrade` is called.
+        Useful for recovering EGH-based peak positions after a physics-model upgrade
+        changes the curve shapes (e.g. for :class:`~molass.Rigorous.LumpingConstraint`).
+        """
+        return getattr(self, '_source_decomp', None)
+
+    @property
     def xr_components(self):
         """Alias for ``xr_ccurves`` — the XR **elution-curve** parameter objects.
 
