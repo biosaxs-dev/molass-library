@@ -85,6 +85,10 @@ class GrmComponentCurve(ComponentCurve):
         """Return the x-position of the PDF maximum (mode)."""
         return self.x[np.argmax(self._y)]
 
+    def get_peak_top_x(self):
+        """Return the frame number at the peak maximum (implements ComponentCurve API)."""
+        return self.get_peak_position()
+
     def get_scale_param(self):
         """Return the embedded scale parameter c_inj (overrides base-class params[0] which is Pe)."""
         return self.params[8]  # c_inj position

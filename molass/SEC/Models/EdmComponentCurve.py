@@ -85,15 +85,9 @@ class EdmComponentCurve(ComponentCurve):
         return edm_impl(x, *self.params)
     
     def get_peak_top_x(self):
-        """
-        Returns the x value at the peak top.
-
-        Raises
-        ------
-        NotImplementedError
-            If the peak top x calculation is not implemented for the current model.
-        """
-        raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+        """Return the frame number at the peak maximum."""
+        import numpy as np
+        return float(self.x[np.argmax(self.get_y())])
     
     def get_scale_param(self):
         """Return the scale parameter for this component curve.
