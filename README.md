@@ -12,6 +12,14 @@ Continuous integration tests run on:
 
 **Requirements:** Python 3.12, 3.13, or 3.14
 
+**Linux (Ubuntu/Debian) prerequisites:**
+
+Before installing on Linux, ensure system build tools are available (needed to compile C extensions such as `ultranest`):
+
+```
+sudo apt install build-essential python3-dev
+```
+
 To install this package, use pip as follows:
 
 ```
@@ -36,6 +44,8 @@ For a hands-on introduction, see the tutorial's [Quick Start](https://biosaxs-de
 ```python
 pytest tests/tutorial/01-quick_start.py -v
 ```
+
+> **Note:** Running tests requires the development install. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 The [molass-beginner](https://github.com/biosaxs-dev/molass-beginner) repository provides an interactive onboarding experience in VS Code Agent mode.
 
