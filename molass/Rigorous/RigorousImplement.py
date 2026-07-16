@@ -344,6 +344,38 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if _dry_run:
         return None
 
+    # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
+    # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
+    # warnings.simplefilter("ignore") and would swallow this warning silently.
+    # Use the EGH parent decomposition (_parent) as the boundary source when
+    # available: EGH curves have direct curve-fit peak positions, while upgraded
+    # SDM/EDM curves derive peaks from a physics model that may shift them
+    # slightly, producing different (worse) zone boundaries.
+    if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
+        import warnings as _w
+        from molass.Rigorous.LumpingConstraint import LumpingConstraint as _LC
+        _lc_source = getattr(decomposition, '_parent', decomposition)
+        _auto_lc = _LC(_lc_source)
+        constraints = [_auto_lc]
+        _w.warn(
+            "optimize_rigorously(method='DE') automatically applied "
+            "LumpingConstraint to prevent component collapse "
+            f"(boundaries={_auto_lc.boundaries.tolist()}, "
+            f"ref_labels={_auto_lc.ref_labels}). "
+            "Pass constraints=[] to opt out.",
+            UserWarning,
+            stacklevel=3,
+        )
+
+    # When constraints are active, disable DE's tol-based early convergence.
+    # LumpingConstraint reshapes the fitness landscape so the population-range
+    # convergence metric fires quickly once all members land in the valid zone,
+    # stopping DE after only ~10-20 callbacks instead of the full niter budget.
+    # tol=0 means std(energies) <= 0, which never fires on floating-point data.
+    if constraints and method == 'DE':
+        solver_kwargs = dict(solver_kwargs or {})
+        solver_kwargs.setdefault('de_tol', 0)
+
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
     # baseline fitting, optimizer construction, parameter preparation)
@@ -452,37 +484,6 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             if _resume_init is not None:
                 init_params = _resume_init
         optimizer.prepare_for_optimization(init_params)
-
-        # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
-        # DE's randomised population can push two components into the same elution
-        # zone, producing a degenerate collapsed solution.  When the user has not
-        # explicitly provided constraints, build one automatically from the
-        # decomposition's current peak positions.  Pass constraints=[] to opt out.
-        if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
-            import warnings as _w
-            from molass.Rigorous.LumpingConstraint import LumpingConstraint as _LC
-            _auto_lc = _LC(decomposition)
-            constraints = [_auto_lc]
-            _w.warn(
-                "optimize_rigorously(method='DE') automatically applied "
-                "LumpingConstraint to prevent component collapse "
-                f"(boundaries={_auto_lc.boundaries.tolist()}, "
-                f"ref_labels={_auto_lc.ref_labels}). "
-                "Pass constraints=[] to opt out.",
-                UserWarning,
-                stacklevel=3,
-            )
-
-        # When constraints are active, disable DE's tol-based early convergence.
-        # LumpingConstraint reshapes the fitness landscape (penalty spikes at zone
-        # boundaries), which causes the population range metric to drop quickly once
-        # all candidates are in the valid zone — often after just 10-20 callbacks.
-        # With tol=0 DE runs the full maxiter budget, giving the optimizer time to
-        # refine the solution within the constrained region.
-        # tol=0 means std(energies) <= 0, which never fires on floating-point data.
-        if constraints and method == 'DE':
-            solver_kwargs = dict(solver_kwargs or {})
-            solver_kwargs.setdefault('de_tol', 0)
 
         # Inject pluggable constraint hooks (e.g. LumpingConstraint).
         # Constraints survive module reloads because _constraints is an
