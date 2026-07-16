@@ -80,15 +80,17 @@ def get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params):
     from molass.SEC.Models.LkmComponentCurve import LkmComponentCurve
     xr_params   = separated_params[0]   # scales per component
     rg_params   = separated_params[2]   # Rg per component
-    lkmcol      = separated_params[-1]  # [Pe, t0, R_0, k_MT_0, R_1, k_MT_1, ...]
+    lkmcol      = separated_params[-1]  # [Pe, t0, c_inj, R_0, k_MT_0, R_1, k_MT_1, ...]
     Pe = lkmcol[0]
     t0 = lkmcol[1]
+    # lkmcol[2] = c_inj (shared injection concentration) — skip, not needed here.
+    # Each component's scale is already in xr_params[i].
     x  = xr_icurve.x
     nc = len(xr_params)
     xr_ccurves = []
     for i in range(nc):
-        R_i    = lkmcol[2 + 2 * i]
-        k_MT_i = lkmcol[2 + 2 * i + 1]
+        R_i    = lkmcol[3 + 2 * i]   # fix: was 2 + 2*i (skipped c_inj at index 2)
+        k_MT_i = lkmcol[3 + 2 * i + 1]
         xr_ccurves.append(LkmComponentCurve(x, Pe, t0, k_MT_i, R_i, xr_params[i], rg=rg_params[i]))
     return xr_ccurves
 
@@ -97,11 +99,13 @@ def get_grm_xr_ccurves(optimizer, xr_icurve, separated_params):
     from molass.SEC.Models.GrmComponentCurve import GrmComponentCurve
     xr_params = separated_params[0]   # scales per component
     rg_params = separated_params[2]   # Rg per component
-    grmcol    = separated_params[-1]  # [Pe, t0, R_p, D_eff, R_0, k_ext_0, ...]
+    grmcol    = separated_params[-1]  # [Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, ...]
     Pe    = grmcol[0]
     t0    = grmcol[1]
     R_p   = grmcol[2]
     D_eff = grmcol[3]
+    # grmcol[4] = c_inj (shared injection concentration) — skip, not needed here.
+    # Each component's scale is already in xr_params[i].
     x     = xr_icurve.x
     nc    = len(xr_params)
     # Reconstruct shared a_star as mean over components  (R_i = 1 + F*a_star)
@@ -112,8 +116,8 @@ def get_grm_xr_ccurves(optimizer, xr_icurve, separated_params):
         F_ratio = 1.5   # fallback default
     xr_ccurves = []
     for i in range(nc):
-        R_i     = grmcol[4 + 2 * i]
-        k_ext_i = grmcol[4 + 2 * i + 1]
+        R_i     = grmcol[5 + 2 * i]   # fix: was 4 + 2*i (skipped c_inj at index 4)
+        k_ext_i = grmcol[5 + 2 * i + 1]
         a_star_i = (R_i - 1.0) / F_ratio
         xr_ccurves.append(GrmComponentCurve(
             x, Pe, t0, R_p, D_eff, a_star_i, F_ratio,
