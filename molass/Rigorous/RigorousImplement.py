@@ -453,7 +453,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 init_params = _resume_init
         optimizer.prepare_for_optimization(init_params)
 
-        # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#215).
+        # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
         # DE's randomised population can push two components into the same elution
         # zone, producing a degenerate collapsed solution.  When the user has not
         # explicitly provided constraints, build one automatically from the
@@ -472,6 +472,17 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 UserWarning,
                 stacklevel=3,
             )
+
+        # When constraints are active, disable DE's tol-based early convergence.
+        # LumpingConstraint reshapes the fitness landscape (penalty spikes at zone
+        # boundaries), which causes the population range metric to drop quickly once
+        # all candidates are in the valid zone — often after just 10-20 callbacks.
+        # With tol=0 DE runs the full maxiter budget, giving the optimizer time to
+        # refine the solution within the constrained region.
+        # tol=0 means std(energies) <= 0, which never fires on floating-point data.
+        if constraints and method == 'DE':
+            solver_kwargs = dict(solver_kwargs or {})
+            solver_kwargs.setdefault('de_tol', 0)
 
         # Inject pluggable constraint hooks (e.g. LumpingConstraint).
         # Constraints survive module reloads because _constraints is an
