@@ -372,11 +372,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             stacklevel=3,
         )
 
-    # When constraints are active, disable DE's tol-based early convergence.
-    # LumpingConstraint reshapes the fitness landscape so the population-range
-    # convergence metric fires quickly once all members land in the valid zone,
-    # stopping DE after only ~10-20 callbacks instead of the full niter budget.
-    # tol=0 means std(energies) <= 0, which never fires on floating-point data.
+    # When constraints are active, disable DE's tol-based early convergence:
+    # penalty terms reshape the fitness landscape so std(energies) fires too early.
     if constraints and method == 'DE':
         solver_kwargs = dict(solver_kwargs or {})
         solver_kwargs.setdefault('de_tol', 0)

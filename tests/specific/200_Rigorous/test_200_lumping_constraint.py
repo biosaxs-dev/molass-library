@@ -121,3 +121,8 @@ class TestLumpingConstraintImport:
         # C0: 90 inside [60.5, 128.5] → 0
         expected = 0.2 * (0.0 + 29.5 + 54.5)
         assert penalty == pytest.approx(expected)
+
+
+# TestViolationMethod (issue #235) removed: Lampinen replacement rule was
+# investigated (experiments 31k, 31l) and soft penalty is the better default.
+# violation() / bind_optimizer() were removed from LumpingConstraint.
