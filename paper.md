@@ -77,7 +77,7 @@ Molass Library is built on robust scientific Python libraries, including NumPy, 
 * **pybaselines** [@pybaselines] for advanced baseline correction
 * **ruptures** [@TRUONG2020107299] for change point detection
 * **scipy.signal.find_peaks** for peak recognition
-* **scikit-learn** for grouping peaks by k-means
+* **scikit-learn** for grouping peaks by the k-means algorithm
 
 By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter) to Jupyter-based scripting further streamlines reproducibility and collaboration.
 
