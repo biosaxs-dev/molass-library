@@ -47,7 +47,7 @@ Analysis of SEC-SAXS data is inherently multi-step and complex. A typical workfl
 2. Background subtraction
 3. Trimming of data
 4. Baseline correction
-5. Low rank factorization
+5. Low-rank factorization
 6. Radius of gyration (*R*~g~) estimation – Guinier plot [@Guinier_1939]
 7. Folding state estimation – Kratky plot [@Kratky_1963]
 8. Electron density calculation 
@@ -77,13 +77,13 @@ Molass Library is built on robust scientific Python libraries, including NumPy, 
 * **pybaselines** [@pybaselines] for advanced baseline correction
 * **ruptures** [@TRUONG2020107299] for change point detection
 * **scipy.signal.find_peaks** for peak recognition
-* **scikit-learn** for grouping peaks by k-means algorithm
+* **scikit-learn** for grouping peaks by k-means
 
 By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter) to Jupyter-based scripting further streamlines reproducibility and collaboration.
 
 # Theoretical Foundation
 
-A central feature of Molass Library is its implementation of **low rank factorization** using elution curve models, enabling decomposition of overlapping chromatographic peaks, a common challenge in SEC-SAXS analysis. The decomposition is formulated as:
+A central feature of Molass Library is its implementation of **low-rank factorization** using elution curve models, enabling decomposition of overlapping chromatographic peaks, a common challenge in SEC-SAXS analysis. The decomposition is formulated as:
 
 $$ M = P \cdot C \qquad (1) $$
 
