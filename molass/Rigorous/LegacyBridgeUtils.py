@@ -100,7 +100,7 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
                 return self.n_components
  
         editor = DummyEditor(num_components)
-        if model == "SDM":
+        if model.startswith("SDM"):
             ecurve = dsets[0][0]
             t0upper_bound = estimate_t0upper_bound(ecurve)
             optimizer.params_type.get_estimator(editor, t0_upper_bound=t0upper_bound, debug=debug)
