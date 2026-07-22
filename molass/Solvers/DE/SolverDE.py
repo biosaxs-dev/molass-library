@@ -30,6 +30,21 @@
 import numpy as np
 from scipy.optimize import differential_evolution, OptimizeResult
 
+# Map from OptStrategyDialog GUI label format → scipy accepted format.
+# The GUI dialog stores labels like "DE/best/1/bin" in SerialSettings, but
+# scipy.optimize.differential_evolution expects "best1bin".
+# Any string not in this map is passed through unchanged (already scipy format).
+_STRATEGY_MAP = {
+    "DE/best/1/bin":          "best1bin",
+    "DE/best/1/exp":          "best1exp",
+    "DE/rand/1/bin":          "rand1bin",
+    "DE/rand/1/exp":          "rand1exp",
+    "DE/best/2/bin":          "best2bin",
+    "DE/rand/2/bin":          "rand2bin",
+    "DE/rand/2/exp":          "rand2exp",
+    "DE/currenttobest/1/bin": "currenttobest1bin",
+}
+
 # Evaluation budget multiplier: max_fevals = niter * FEVALS_PER_NITER.
 # BH's niter counts hops; each hop runs a full Nelder-Mead local optimization
 # which costs ~6,600 evaluations for a 33-parameter GRM problem (measured in
@@ -64,7 +79,7 @@ class SolverDE:
                  recombination=0.7, mutation=0.5, tol=None):
         self.optimizer = optimizer
         self._pop_size = pop_size if pop_size is not None else 15
-        self.strategy = strategy
+        self.strategy = _STRATEGY_MAP.get(strategy, strategy)  # normalize GUI label → scipy format
         self.recombination = recombination
         self.mutation = mutation
         self._tol = tol if tol is not None else 0.01   # convergence tolerance (default matches scipy)
