@@ -59,6 +59,12 @@ def make_ssd_from_corrected_sd(corrected_sd):
     return ssd
 
 
+# Neutral alias — works with any SerialData, corrected or not.
+# Use this when passing uncorrected sd (e.g. self.sd in PeakEditor._build_library_decomposition)
+# so the call site is self-documenting. (molass-library#242)
+make_ssd_from_sd = make_ssd_from_corrected_sd
+
+
 def decomposition_from_optimizer_params(fullopt, params, base_decomp):
     """Build a library Decomposition from a legacy optimizer + flat params vector.
 
