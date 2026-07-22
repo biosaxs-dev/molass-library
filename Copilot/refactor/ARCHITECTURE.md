@@ -56,6 +56,34 @@ by one with `ssd` equivalents.
 
 ---
 
+## Verification framework: GuiSimUtils
+
+Each migration step must be verifiable without opening Tkinter. The canonical tool is:
+
+```python
+from molass_legacy.Test.GuiSimUtils import MockEditor, SimpleLrfSource, evaluate_init
+```
+
+- **`MockEditor`** — provides exactly the `PeakEditor` interface that legacy estimators
+  expect, without a `SerialData` object or a Tkinter window. Works for all models.
+- **`SimpleLrfSource`** — wraps a library `Decomposition` into the `peak_params_set`
+  interface that `get_peak_params_advanced` reads.
+- **`evaluate_init(optimizer, init_params, label)`** — calls `prepare_for_optimization`
+  + `objective_func`, prints fv/SV/sigmas/seccol/Rgs.
+
+**Workflow for each refactoring step**:
+1. Run the legacy GUI path via `MockEditor` + legacy estimator → record SV
+2. Run the library path directly (e.g., `decomp.make_rigorous_initparams()`) → record SV
+3. If both SVs match within ±2, the migration is consistent
+
+**Notebooks** (in `molass-researcher/experiments/33_gui_consistency/`):
+- `33a_egh_model.ipynb` ✅ — EGH consistency (template for the series)
+- `33b_sdm_model.ipynb` — SDM consistency
+- `33c_lkm_model.ipynb` — LKM consistency
+- `33x_gui_simulation.ipynb` — EGH debug history / prototype reference
+
+---
+
 ## Subprocess parity (orthogonal issue)
 
 The GUI always uses `in_process=False` (subprocess via `BackRunner`). The subprocess
