@@ -296,14 +296,19 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
     mu = np.log(effective_poresize)
     sigma = 0.3
 
+    # T/k parameterization correction (molass-legacy#88 / Issue #???):
+    # SDM(mono) stores T as the Gamma MEAN (= k_mono × theta_mono).
+    # SDM(lognormal) optimizer treats T as the Gamma SCALE (mean = k_optimizer × T_ln).
+    # For matching peak positions: k_optimizer × T_ln = T_mono  →  T_ln = T_mono / k_optimizer.
+    # Use k_optimizer=2.0 (lognormal optimizer's default k_init), NOT k (the mono k which can differ).
+    k_for_shift = 2.0   # matches lognormal optimizer default k_init
+    T_ln = T / k_for_shift   # Gamma scale for lognormal optimizer
+
     # Create a test lognormal PDF with the dominant component to find peak position.
-    # Use k=2.0 (the lognormal optimizer's default k_init) for the shift computation,
-    # NOT the mono k (which may differ, e.g. k=1.4 when rgcurve anchors the mono fit).
-    # Using mono k here causes a wrong shift that derails the lognormal optimizer init.
+    # Use T_ln (not T_mono) so the test PDF peak matches the mono peak, giving shift≈0.
     x_data, y_data = xr_icurve.get_xy()
     rg_dominant = mono_ccurves[0].rg
-    k_for_shift = 2.0   # matches lognormal optimizer default k_init
-    col_test = SdmColumn([N, T, me, mp, x0, tI, N0, mu, sigma, k_for_shift],
+    col_test = SdmColumn([N, T_ln, me, mp, x0, tI, N0, mu, sigma, k_for_shift],
                          pore_dist='lognormal', rt_dist=column.rt_dist)
     cc_test = SdmComponentCurve(x_data, col_test, rg_dominant, scale=1.0)
     cy_test = cc_test.get_y()
@@ -317,19 +322,20 @@ def estimate_sdm_lognormal_from_monopore(mono_ccurves, xr_icurve, **kwargs):
     if debug:
         print(f"Lognormal from mono-pore: poresize_stored={poresize_stored:.1f}, rg_based={rg_based:.1f}")
         print(f"  effective_poresize={effective_poresize:.1f} (geometric mean), mu={mu:.4f}")
+        print(f"  T_mono={T:.4f}, k_for_shift={k_for_shift}, T_ln=T_mono/k={T_ln:.4f}")
         print(f"  PDF peak={pdf_peak:.0f}, data peak={data_peak:.0f}, shift={shift:.0f}")
         print(f"  x0: {x0:.1f} → {x0 + shift:.1f}, t0_adj={t0_adj:.1f}")
 
     # Optional: refine (t0, k, mu, sigma) by moment matching against EGH.
-    # Significantly improves init quality when EGH decomposition is available.
+    # Pass T_ln (Gamma scale) so moment-matching uses the correct parameterization.
     decomposition = kwargs.get('decomposition', None)
     moment_refine = kwargs.get('moment_refine', True)
     if decomposition is not None and moment_refine:
         t0_adj, k, mu, sigma = refine_lognormal_params_by_moments(
-            decomposition, N, T, N0, t0_adj, k, mu, sigma,
+            decomposition, N, T_ln, N0, t0_adj, k, mu, sigma,
             me=me, mp=mp, debug=debug)
 
-    return LognormalEnv(N, T, me, mp, N0, t0_adj, mu, sigma)
+    return LognormalEnv(N, T_ln, me, mp, N0, t0_adj, mu, sigma)
 
 
 def refine_lognormal_params_by_moments(
