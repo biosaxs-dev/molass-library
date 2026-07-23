@@ -37,7 +37,9 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
         import molass_legacy.SecTheory.SecEstimator
         reload(molass_legacy.SecTheory.SecEstimator)
     from molass_legacy.SecTheory.SecEstimator import guess_initial_secparams
-    Npc, rp, tI, t0, P, m = guess_initial_secparams(xr_params, rg_params, poresize=70)
+    from molass_legacy._MOLASS.SerialSettings import get_setting
+    poresize = get_setting('poresize') or 70
+    Npc, rp, tI, t0, P, m = guess_initial_secparams(xr_params, rg_params, poresize=poresize)
     seccol_params = np.array([Npc, rp, tI, t0, P, m])
 
     return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, (a, b), uv_params, uv_baseparams, init_mappable_range, seccol_params])

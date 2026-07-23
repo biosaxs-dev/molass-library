@@ -10,6 +10,32 @@ from molass.SEC.Models.SdmMonoPore import (
 )
 
 
+def _adaptive_anchor_scale(egh_peak_frames, initial_error, model_params):
+    """Compute the position-anchor scale shared by both SDM optimizers.
+
+    A full inter-lump drift (shifting one component by ``lump_sep`` frames) costs
+    exactly ``initial_error`` — as expensive as going from a perfect fit to a
+    completely wrong one.  This prevents component drift regardless of the
+    absolute data amplitude or frame rate.
+
+    Parameters
+    ----------
+    egh_peak_frames : array-like
+        Peak frame of each EGH component (used to determine ``lump_sep``).
+    initial_error : float
+        Fitting error at the initial parameter guess.  Use ``np.sum(y**2)``
+        (total data energy, an upper bound) when the exact initial-model error
+        is not already computed.
+    model_params : dict or None
+        If ``'position_anchor_scale'`` is present, that value overrides the
+        adaptive default.
+    """
+    if model_params is not None and 'position_anchor_scale' in model_params:
+        return float(model_params['position_anchor_scale'])
+    _lump_sep = max(float(np.max(egh_peak_frames) - np.min(egh_peak_frames)), 1.0)
+    return float(initial_error) / (_lump_sep ** 2)
+
+
 def _proxy_rgs_from_peak_frames(decomposition, poresize_ref=100.0,
                                 rho_min=0.15, rho_max=0.35):
     """Build Rg proxies from peak-frame order when Guinier Rg is disabled."""
@@ -118,10 +144,12 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         return scales
 
     # EGH peak frames are used as a soft position constraint in the objective.
-    # Scale: ~1e-5 is enough to overcome the ~0.037 advantage of the degenerate solution
-    # (where both components collapse to the same frame) over the separated solution.
+    # Scale: adaptive via _adaptive_anchor_scale — a full inter-lump drift costs
+    # np.sum(y**2) (data energy, upper bound on initial error).  The mono
+    # optimizer does not compute an explicit model-based initial_error, so
+    # data energy is used as a conservative proxy (always >= actual initial_error).
     egh_peak_frames = np.array([c.x[c.y.argmax()] for c in decomposition.xr_ccurves], dtype=float)
-    position_anchor_scale = model_params.get('position_anchor_scale', 1e-5) if model_params else 1e-5
+    position_anchor_scale = _adaptive_anchor_scale(egh_peak_frames, np.sum(y**2), model_params)
 
     def objective_function(params, return_cy_list=False, plot=False):
         N_, T_, x0_, tI_, N0_, k_ = params[0:6]
@@ -581,11 +609,13 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
             Upper bound on sigma when it is free.
         ``k`` : float (default 2.0)
         ``rt_dist`` : str (default ``'gamma'``)
-        ``position_anchor_scale`` : float (default 1e-5)
+        ``position_anchor_scale`` : float (default adaptive)
             Weight for the soft position-anchor penalty that keeps each
             component's intensity-weighted centroid near its initial EGH
             peak frame.  Prevents component drift across group boundaries
-            (the "lumping" problem).  Increase if drift still occurs.
+            (the "lumping" problem).  Computed by ``_adaptive_anchor_scale``
+            so a full inter-lump drift costs exactly ``initial_error``.
+            Override if the default is too aggressive or too weak.
     kwargs : dict
         Additional parameters for the optimization process.
 
@@ -600,7 +630,10 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         import molass.SEC.Models.SdmComponentCurve
         reload(molass.SEC.Models.SdmComponentCurve)
     from .SdmComponentCurve import SdmColumn, SdmComponentCurve
-    from molass.SEC.Models.LognormalPore import sdm_lognormal_pore_gamma_pdf_fast
+    from molass.SEC.Models.LognormalPore import (
+        sdm_lognormal_pore_gamma_pdf_fast,
+        sdm_lognormal_model_moments,
+    )
     progress = kwargs.get('progress', False)
 
     num_components = decomposition.num_components
@@ -675,11 +708,12 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     rg_penalty_scale = rg_penalty_weight * initial_error
 
     # EGH peak frames — anchor for position penalty (prevents drift across lump boundaries).
-    # Analogous to the position_anchor in optimize_sdm_xr_decomposition.
-    # Scale calibrated so a 25-frame crossing costs ~0.006 (comparable to the ~0.037
-    # degenerate-solution advantage observed for the mono-pore case).
+    # Scale: adaptive via _adaptive_anchor_scale — a full inter-lump drift costs
+    # exactly initial_error.  Both SDM optimizers use the same helper; the only
+    # difference is that lognormal passes the exact model-based initial_error while
+    # mono uses np.sum(y**2) as a conservative proxy.
     egh_peak_frames = np.array([c.x[c.y.argmax()] for c in decomposition.xr_ccurves], dtype=float)
-    position_anchor_scale = model_params.get('position_anchor_scale', 1e-5) if model_params else 1e-5
+    position_anchor_scale = _adaptive_anchor_scale(egh_peak_frames, initial_error, model_params)
 
     def objective_function(params):
         N_, T_, x0_, tI_, N0_, k_, mu_ = params[0:7]
@@ -723,13 +757,16 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         ty = np.sum(cy_list, axis=0)
         # Penalize Rg deviation from Guinier values (prevents Rg drift in lognormal model)
         rg_penalty = rg_penalty_scale * np.sum(((rgv_ - rgv) / rgv) ** 2)
-        # Position anchor: intensity-weighted centroid of each component must stay near
-        # its initial EGH peak frame.  This prevents the second component from drifting
-        # from lump-1 into lump-2 even when Rg penalties are insufficient (the "lumping"
-        # problem).  Centroid is a smooth function → safe for Nelder-Mead.
+        # Position anchor: theoretical mean retention time M_1 (amplitude-independent).
+        # Formula (Dispersive Lognormalpore Gamma row, Summary of Stochastic Models):
+        #   M_1 = t_0 + k * I1,  I1 = ∫ L_{μ,σ}(r) N(1-Rg/r)^me T(1-Rg/r)^mp dr
+        # Position in original frame = tI + M_1.
+        # Unifies with the mono optimizer formula x0 + N*(1-ρ)^me*T*(1-ρ)^mp.
+        # Amplitude-independent → robust when scale → 0; ~50 µs per component.
         positions_ = np.array([
-            np.dot(x, cy) / max(float(np.sum(cy)), 1e-12)
-            for cy in cy_list
+            tI_ + sdm_lognormal_model_moments(rg_, N_, T_, N0_, t0_, k_, mu_, sigma_,
+                                              me=me, mp=mp)[0]
+            for rg_ in rgv_
         ], dtype=float)
         position_penalty = np.sum((positions_ - egh_peak_frames) ** 2) * position_anchor_scale
         error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty + position_penalty

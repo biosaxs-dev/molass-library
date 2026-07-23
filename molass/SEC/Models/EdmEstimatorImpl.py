@@ -6,7 +6,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from molass_legacy.KekLib.BasicUtils import Struct
 from molass_legacy.Models.ElutionModelUtils import compute_4moments
-from molass_legacy.Models.RateTheory.EDM import MIN_CINJ, MAX_CINJ, edm_impl
+from molass_legacy.Models.RateTheory.EDM import MIN_C_INJ as MIN_CINJ, MAX_C_INJ as MAX_CINJ, edm_impl
 from molass.SEC.Models.Simple import egh
 
 save_reg_data_fh = None
