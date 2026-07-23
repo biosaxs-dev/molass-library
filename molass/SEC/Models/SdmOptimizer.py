@@ -602,27 +602,42 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     xr_icurve = decomposition.xr_icurve
     x, y = xr_icurve.get_xy()
     N, T, me, mp, N0, t0, mu_init, sigma_init = env_params
-    rgv = np.asarray(decomposition.get_rgs())
+    # Use proxy Rg from peak frames by default — consistent with optimize_sdm_xr_decomposition.
+    # Guinier Rg values are unreliable for overlapping peaks (near-identical values anchor the
+    # optimizer in a degenerate basin where all components have the same elution curve).
+    use_guinier_rgs = kwargs.get('use_guinier_rgs', False)
+    if model_params is not None:
+        use_guinier_rgs = model_params.get('use_guinier_rgs', use_guinier_rgs)
+    if use_guinier_rgs:
+        rgv = np.asarray(decomposition.get_rgs())
+    else:
+        rgv = _proxy_rgs_from_peak_frames(decomposition)
 
     # ln_pore_sigma default: 0.3 — std-dev of ln(r/r0), invariant to unit choice.
     # Free sigma (None) is underdetermined for num_components=1 and drifts to sigma_max.
     _LN_PORE_SIGMA_DEFAULT = 0.3
+    # With proxy Rg, disable the Rg anchor penalty — proxy values are just starting points.
+    _default_rg_penalty = 1.0 if use_guinier_rgs else 0.0
     if model_params is None:
         k_init = 2.0
         rt_dist = 'gamma'
-        rg_penalty_weight = 1.0
+        rg_penalty_weight = _default_rg_penalty
         sigma_max = 0.8
         min_rg_gap = 0.5
         ln_pore_sigma = _LN_PORE_SIGMA_DEFAULT
         nm_maxiter = None
+        mu_max = 8.0   # Issue #243: upper bound on mu (log poresize); 8.0 = exp(8)≈2981Å (no constraint)
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
-        rg_penalty_weight = model_params.get('rg_penalty_weight', 1.0)
+        rg_penalty_weight = model_params.get('rg_penalty_weight', _default_rg_penalty)
         sigma_max = model_params.get('sigma_max', 0.8)
         min_rg_gap = model_params.get('min_rg_gap', 0.5)  # Å — minimum required Rg gap between components
         ln_pore_sigma = model_params.get('ln_pore_sigma', _LN_PORE_SIGMA_DEFAULT)
         nm_maxiter = model_params.get('maxiter', None)
+        # mu_max: constrains poresize from above to avoid degenerate K_SEC compression.
+        # Recommended: ln(3 × Rg_max) so poresize ≤ 3×Rg_max (Issue #243).
+        mu_max = model_params.get('mu_max', 8.0)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -667,7 +682,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
 
         if sigma_ < 0.01 or sigma_ > sigma_max:
             return 1e20
-        if mu_ < 1.0 or mu_ > 8.0:
+        if mu_ < 1.0 or mu_ > mu_max:   # mu_max from model_params (Issue #243)
             return 1e20
 
         # Rg ordering penalty (Rg should be descending)
@@ -731,7 +746,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         bounds += [(0.999, 1.001)]  # k fixed at 1.0
     else:
         bounds += [(0.5, 10.0)]     # k free for gamma
-    bounds += [(2.0, 8.0)]          # mu
+    bounds += [(2.0, min(mu_max, 8.0))]   # mu — mu_max constrains poresize from above (Issue #243)
     if ln_pore_sigma is None:
         bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
     bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]
