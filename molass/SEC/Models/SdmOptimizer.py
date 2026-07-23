@@ -581,6 +581,11 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
             Upper bound on sigma when it is free.
         ``k`` : float (default 2.0)
         ``rt_dist`` : str (default ``'gamma'``)
+        ``position_anchor_scale`` : float (default 1e-5)
+            Weight for the soft position-anchor penalty that keeps each
+            component's intensity-weighted centroid near its initial EGH
+            peak frame.  Prevents component drift across group boundaries
+            (the "lumping" problem).  Increase if drift still occurs.
     kwargs : dict
         Additional parameters for the optimization process.
 
@@ -669,6 +674,13 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     # Rg penalty scale: initial_error means 100% relative deviation costs ~initial_error
     rg_penalty_scale = rg_penalty_weight * initial_error
 
+    # EGH peak frames — anchor for position penalty (prevents drift across lump boundaries).
+    # Analogous to the position_anchor in optimize_sdm_xr_decomposition.
+    # Scale calibrated so a 25-frame crossing costs ~0.006 (comparable to the ~0.037
+    # degenerate-solution advantage observed for the mono-pore case).
+    egh_peak_frames = np.array([c.x[c.y.argmax()] for c in decomposition.xr_ccurves], dtype=float)
+    position_anchor_scale = model_params.get('position_anchor_scale', 1e-5) if model_params else 1e-5
+
     def objective_function(params):
         N_, T_, x0_, tI_, N0_, k_, mu_ = params[0:7]
         if ln_pore_sigma is None:
@@ -711,7 +723,16 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         ty = np.sum(cy_list, axis=0)
         # Penalize Rg deviation from Guinier values (prevents Rg drift in lognormal model)
         rg_penalty = rg_penalty_scale * np.sum(((rgv_ - rgv) / rgv) ** 2)
-        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty
+        # Position anchor: intensity-weighted centroid of each component must stay near
+        # its initial EGH peak frame.  This prevents the second component from drifting
+        # from lump-1 into lump-2 even when Rg penalties are insufficient (the "lumping"
+        # problem).  Centroid is a smooth function → safe for Nelder-Mead.
+        positions_ = np.array([
+            np.dot(x, cy) / max(float(np.sum(cy)), 1e-12)
+            for cy in cy_list
+        ], dtype=float)
+        position_penalty = np.sum((positions_ - egh_peak_frames) ** 2) * position_anchor_scale
+        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty + position_penalty
         _eval_count[0] += 1
         n = _eval_count[0]
         if debug and n % 50 == 0:
