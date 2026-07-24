@@ -33,10 +33,9 @@ htmlcov*
 temp*/
 
 *.png
-*.gif
 
 *.pdf
 *.txt
-
+*.gif
 # VS Code version (auto-updated by vscode-version-recorder extension)
 .github/vscode-version.txt
