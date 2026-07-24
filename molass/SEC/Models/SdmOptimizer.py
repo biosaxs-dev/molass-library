@@ -665,6 +665,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         ln_pore_sigma = _LN_PORE_SIGMA_DEFAULT
         nm_maxiter = None
         mu_max = 8.0   # Issue #243: upper bound on mu (log poresize); 8.0 = exp(8)≈2981Å (no constraint)
+        mu_min = 2.0   # lower bound; 2.0 = exp(2)≈7.4Å (effectively no constraint)
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
@@ -676,6 +677,10 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         # mu_max: constrains poresize from above to avoid degenerate K_SEC compression.
         # Recommended: ln(3 × Rg_max) so poresize ≤ 3×Rg_max (Issue #243).
         mu_max = model_params.get('mu_max', 8.0)
+        # mu_min: lower bound on pore size — pore must be larger than the proteins.
+        # Recommended: ln(poresize_bounds[0]) from column spec, or ln(Rg_max) as fallback.
+        # Without this, the optimizer can find degenerate poresize≈Rg_max solutions.
+        mu_min = model_params.get('mu_min', 2.0)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -728,7 +733,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
 
         if sigma_ < 0.01 or sigma_ > sigma_max:
             return 1e20
-        if mu_ < 1.0 or mu_ > mu_max:   # mu_max from model_params (Issue #243)
+        if mu_ < mu_min or mu_ > mu_max:   # mu_min/mu_max from model_params (Issue #243)
             return 1e20
 
         # Rg ordering penalty (Rg should be descending)
@@ -793,18 +798,24 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     initial_guess += scales_init
 
     # Bounds
+    # x0/tI lower bound: max(0, t0 - 50) prevents the optimizer from drifting to
+    # negative dead-time solutions (x0 < 0), which produce zero-intensity model curves
+    # and Kratky_smoothness = -inf.  Stage 2 (optimize_sdm_xr_decomposition) already
+    # enforces x0 >= 0; Stage 4 should use the same physics-based constraint.
+    # A 50-frame slack is kept to allow slight downward drift from Stage 2's estimate.
+    _x0_lo = max(0.0, t0 - 50.0)
     bounds = [
-        (100, 5000),              # N
-        (1e-3, 5),                # T
-        (t0 - 1000, t0 + 1000),  # x0
-        (t0 - 1000, t0 + 1000),  # tI
+        (100, 5000),                  # N
+        (1e-3, 5),                    # T
+        (_x0_lo, t0 + 1000),          # x0 — dead time must be non-negative
+        (_x0_lo, t0 + 1000),          # tI — injection time must be non-negative
         (500, 50000),             # N0
     ]
     if rt_dist == 'exponential':
         bounds += [(0.999, 1.001)]  # k fixed at 1.0
     else:
         bounds += [(0.5, 10.0)]     # k free for gamma
-    bounds += [(2.0, min(mu_max, 8.0))]   # mu — mu_max constrains poresize from above (Issue #243)
+    bounds += [(mu_min, min(mu_max, 8.0))]   # mu — mu_min/mu_max constrain poresize range (Issue #243)
     if ln_pore_sigma is None:
         bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
     bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]
