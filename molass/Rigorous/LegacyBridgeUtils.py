@@ -167,6 +167,7 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # producing ~4% difference from the EGH-fitted curves used by the in-process path.
     # Exporting y-values here lets OptDataSets.get_dsets_impl override after loading from disk.
     np.save(os.path.join(optimizer_folder, 'ip_xr_elcurve_y.npy'), dsets[0][0].y)
+    np.save(os.path.join(optimizer_folder, 'ip_xr_elcurve_x.npy'), dsets[0][0].x)
     np.save(os.path.join(optimizer_folder, 'ip_uv_elcurve_y.npy'), dsets[2][0].y)
     # Export UV x-axis (frame numbers) so subprocess can align the UV curve with the correct
     # frame range.  With the SSD-native prepare_rg_curve path the in-process UV curve spans
