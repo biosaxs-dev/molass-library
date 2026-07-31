@@ -168,6 +168,12 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
     # Exporting y-values here lets OptDataSets.get_dsets_impl override after loading from disk.
     np.save(os.path.join(optimizer_folder, 'ip_xr_elcurve_y.npy'), dsets[0][0].y)
     np.save(os.path.join(optimizer_folder, 'ip_uv_elcurve_y.npy'), dsets[2][0].y)
+    # Export UV x-axis (frame numbers) so subprocess can align the UV curve with the correct
+    # frame range.  With the SSD-native prepare_rg_curve path the in-process UV curve spans
+    # ~2249 UV-native absolute frames, while the legacy subprocess loads only ~645 frames
+    # (trimmed to match the XR window).  Without this export the ip_uv_elcurve_y override
+    # causes a length mismatch → ValueError in InterpolatedUnivariateSpline.
+    np.save(os.path.join(optimizer_folder, 'ip_uv_elcurve_x.npy'), dsets[2][0].x)
     # Export in-process data matrices and error matrix so subprocess uses the same corrected
     # 2D data (molass-legacy#39).  The subprocess loads D/U via sd.get_xr/uv_data_separate_ly()
     # (legacy correction) which differs from molass-library ssd.xr.M / ssd.uv.M.
