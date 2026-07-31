@@ -53,6 +53,31 @@ by one with `ssd` equivalents.
 **Completed steps**:
 - `PeakEditor` / `JobStateCanvas`: "Complementary View" replaced by library `plot_components_impl`
   (Jun 2026 — see `DESIGN_complementary_view_refactor.md`)
+- `PeakEditor.prepare_rg_curve`: replaced `make_ssd_from_sd(self.sd)` (0-based jv) with
+  `SSD(in_folder).trimmed_copy()` (absolute jv from filenames) — molass-legacy commit `ea94c36d`
+
+### Design principle: absolute frame coordinates
+
+**Principle (established 2026-07-31)**: Frame numbers (coordinates) must always reflect the
+original untrimmed dataset's file numbering — not relative to any trimmed sub-range.
+
+**Rationale**: When a trimmed or processed SSD is passed between components, each component
+should be able to refer to the same physical frame using the same number. 0-based jv
+introduces implicit offsets that cause frame mismatches (root cause of the SSD-native fix
+and the EghEstimator UV height bug, see 33m).
+
+**Current state vs. goal**:
+
+| Component | Current state | Goal |
+|-----------|--------------|------|
+| `molass-library` SSD | ✅ absolute jv from filenames | Already correct |
+| `molass-legacy` SerialData | 0-based `jvector` + `start_file_no` offset | Convert to absolute at load time |
+| `molass-legacy` DataSet | 0-based `xr_ex` (compatibility alias `jvector` added #90) | Absolute at construction |
+| `make_ssd_from_sd` bridge | `np.arange` (always 0-based) | Use `start_file_no` offset, or eliminate |
+| Trim/restrict info | 0-based offsets | Absolute frame numbers |
+
+**When to act**: Apply this principle one component at a time when a relevant fix or feature
+touches that component. Do not refactor speculatively.
 
 ---
 
