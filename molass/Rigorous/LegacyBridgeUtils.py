@@ -58,7 +58,8 @@ def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False
     ssd = data_ssd if data_ssd is not None else decomposition.ssd
     xr_only = not ssd.has_uv()
     sd = SdProxy(ssd)
-    baseline_type = 1
+    from molass_legacy._MOLASS.SerialSettings import get_setting
+    baseline_type = get_setting('unified_baseline_type') or 1
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
 def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, function_code=None, debug=False):
