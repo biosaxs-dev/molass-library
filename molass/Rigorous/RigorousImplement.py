@@ -402,7 +402,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _original_in_folder = _get_in_folder_raw()
 
     with _stack:
-        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug)
+        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, export_npy=not in_process)
 
         # Drop a breadcrumb so external observers can find this run even
         # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.
