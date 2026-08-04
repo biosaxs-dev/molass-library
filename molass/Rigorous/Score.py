@@ -148,7 +148,7 @@ class Score:
 
 def make_score_impl(decomposition, trimmed_ssd=None,
                     analysis_folder=None, function_code=None,
-                    debug=False):
+                    debug=False, progress_cb=None):
     """Set up the rigorous optimizer, evaluate the objective once, return Score.
 
     This mirrors the setup phase of
@@ -186,6 +186,7 @@ def make_score_impl(decomposition, trimmed_ssd=None,
             decomposition, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
+            progress_cb=progress_cb,
         )
     finally:
         if _tmp_dir is not None:
@@ -196,7 +197,7 @@ def make_score_impl(decomposition, trimmed_ssd=None,
 
 
 def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
-                              function_code, debug):
+                              function_code, debug, progress_cb=None):
     """Inner implementation (analysis_folder is always provided)."""
     import numpy as np
     from molass.Rigorous.RigorousImplement import _apply_anomaly_interpolation
@@ -241,7 +242,7 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
 
     with _stack:
         dsets, basecurves, baseparams, exported = prepare_rigorous_folders(
-            decomposition, decomposition.get_rg_curve(),
+            decomposition, decomposition.get_rg_curve(progress_cb=progress_cb),
             analysis_folder=analysis_folder,
             data_ssd=trimmed_ssd, debug=debug,
         )
