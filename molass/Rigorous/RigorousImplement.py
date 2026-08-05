@@ -162,7 +162,7 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -402,7 +402,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _original_in_folder = _get_in_folder_raw()
 
     with _stack:
-        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, export_npy=not in_process)
+        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, export_npy=not in_process, pipeline_recipe=pipeline_recipe)
 
         # Drop a breadcrumb so external observers can find this run even
         # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.

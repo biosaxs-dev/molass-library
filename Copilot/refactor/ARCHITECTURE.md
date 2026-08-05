@@ -1,23 +1,31 @@
 # Architecture: Repository Role Separation
 
 **Source**: Rule 13 of `Copilot/copilot-guidelines.md`  
-**Last updated**: Jun 2026
+**Last updated**: Aug 2026
 
 ---
 
 ## Target dependency direction
 
 ```
-Target:  molass-legacy (GUI) → molass-library (computation)
-Current: molass-library imports from molass-legacy  (interim state)
+Original plan:  molass-library (computation) ← molass-legacy (GUI)
+New perspective: molass-library (computation) ← molass-gui (GUI, clean Tkinter)
+                                               molass-legacy (bridge/legacy → archive)
 ```
 
-- **`molass-legacy`** — maintained for the **tkinter GUI** and as a **historical record**.
-  The GUI should be actively maintained. Legacy-only code not called by any GUI or library
-  path can be left as-is for reference.
+The original plan expected molass-legacy to become the long-term GUI home after shedding its
+computation. That changed in Aug 2026 when **molass-gui** was created as a clean Tkinter GUI.
+molass-legacy is no longer the future GUI; it is now a transitional bridge/dependency that
+gradually shrinks as its computation migrates to molass-library.
+
+- **`molass-gui`** — the **new GUI layer** (clean Tkinter, no computation). Calls
+  `optimize_rigorously()` and receives `RunInfo` back. Has no subprocess infrastructure.
+- **`molass-legacy`** — a **transitional bridge**: its tkinter GUI remains in maintenance mode;
+  its optimizer infrastructure (BasicOptimizer, BackRunner, InProcessRunner, subprocess entry
+  points) is the target of Level C migration to molass-library. Legacy-only code not called
+  by any active path can be left as-is for reference.
 - **`molass-library`** — the home for **all active computational code**: models, estimators,
-  optimizers, data objects, and algorithms. Any computation shared across GUI and notebook
-  API belongs here.
+  optimizers, data objects, algorithms, and eventually **all subprocess infrastructure**.
 
 **When to act**: Refactoring should happen incrementally — when a relevant need arises
 (fixing a bug, adding a feature, unifying a duplicated algorithm). Do not refactor
@@ -31,9 +39,25 @@ speculatively. Each step must leave both repos in a working state.
 |---|---|---|
 | **A — Estimators** | Legacy estimators delegate to library for all init logic | ✅ Complete (SDM, EDM, CEDM, EGH peak recognition) |
 | **B — Physical models** | `egh`, `edm_impl`, SDM/LKM model equations moved to library | ⏳ Not started |
-| **C — Optimizer** | `BasicOptimizer`, `InProcessRunner` moved to library | ⏳ Not started — requires circular-import surgery |
+| **C — Optimizer** | All optimizer infrastructure moved to library (see below) | ⏳ Not started — requires circular-import surgery |
 
 Levels B and C require careful circular-import analysis before execution.
+
+### Level C scope (updated Aug 2026)
+
+Under the new perspective, Level C covers the full subprocess infrastructure — not just
+`BasicOptimizer` and `InProcessRunner`, but all subprocess entry points:
+
+| Component | Current location | Level C target |
+|-----------|-----------------|----------------|
+| `BasicOptimizer` | molass-legacy | molass-library |
+| `InProcessRunner` | molass-legacy | molass-library |
+| `BackRunner` | molass-legacy | molass-library |
+| `optimizer.py` (subprocess entry) | molass-legacy | molass-library |
+| `optimizer_recipe.py` (recipe entry) | molass-legacy | molass-library |
+
+`optimizer_recipe.py` (added Aug 2026, Option E recipe-based subprocess) was written using
+only molass-library API for the SSD pipeline, making its eventual migration straightforward.
 
 ---
 
@@ -111,8 +135,13 @@ from molass_legacy.Test.GuiSimUtils import MockEditor, SimpleLrfSource, evaluate
 
 ## Subprocess parity (orthogonal issue)
 
-The GUI always uses `in_process=False` (subprocess via `BackRunner`). The subprocess
+The legacy GUI always uses `in_process=False` (subprocess via `BackRunner`). The subprocess
 re-derives data from disk, bypassing the library's prepared data. This causes a ~5–6 SV
 gap for new solvers (DE, NSGA2).
+
+**Option E (Aug 2026)**: molass-gui uses a recipe-based subprocess (`optimizer_recipe.py`)
+that rebuilds SSD from recipe parameters rather than legacy SD + .npy patches. This avoids
+the parity problem entirely for new GUI users. The checkbox is opt-in; in_process=True
+remains the default for notebook users.
 
 See `PLAN_subprocess_parity.md` for the full analysis and fix options.

@@ -305,7 +305,7 @@ class Decomposition:
         """
         return [uv_cc.scale for uv_cc in self.uv_ccurves]
 
-    def get_rg_curve(self):
+    def get_rg_curve(self, progress_cb=None):
         """Compute the per-frame Rg curve from the raw XR data.
 
         Runs a Guinier fit on every elution frame independently and returns
@@ -342,14 +342,9 @@ class Decomposition:
             parent = getattr(self, '_parent', None)
             if parent is not None:
                 # Inherit from parent decomposition — same XR data, no recomputation.
-                self._rgcurve = parent.get_rg_curve()
+                self._rgcurve = parent.get_rg_curve(progress_cb=progress_cb)
             else:
-                self._rgcurve = self.xr.compute_rgcurve()
-        # NOTE: the cached Rg curve lives on this Decomposition object (_rgcurve),
-        # NOT on self.ssd.  self.ssd._rgcurve is always None because self.ssd is a
-        # fresh object created during quick_decomposition().  Always read from
-        # decomposition._rgcurve, never from decomposition.ssd._rgcurve.
-        # (molass-library #202)
+                self._rgcurve = self.ssd.get_rg_curve(progress_cb=progress_cb)
         return self._rgcurve
 
     def compute_reconstructed_rgcurve(self, debug=False):
@@ -1102,6 +1097,7 @@ class Decomposition:
                             ns_nsteps=None,
                             seed_params=None,
                             constraints=None,
+                            pipeline_recipe=None,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -1308,6 +1304,8 @@ class Decomposition:
         # Remaining kwargs are solver-specific hyperparameters (e.g. de_pop_size, de_variant).
         # Pass them through as solver_kwargs without raising TypeError — adding a new solver
         # no longer requires changing this signature (molass-library#204).
+        # pipeline_recipe must be extracted before the kwargs catch-all to avoid
+        # leaking it into solver_kwargs → set_optimizer_settings → set_setting.
         solver_kwargs = kwargs if kwargs else None
 
         if frozen_components is not None and free_components is not None:
@@ -1344,10 +1342,10 @@ class Decomposition:
         if rgcurve is None:
             rgcurve = self.ssd.xr.compute_rgcurve()
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
-              function_code=None, debug=False):
+              function_code=None, debug=False, progress_cb=None):
         """Evaluate the rigorous objective function once at initial parameters.
 
         A lightweight alternative to :meth:`optimize_rigorously` when you only
@@ -1395,11 +1393,11 @@ class Decomposition:
         RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
         if getattr(self, '_rgcurve', None) is None:
-            # Check whether lazy parent propagation will supply it without
-            # a real computation (same XR data, already cached upstream).
+            # Check whether lazy parent propagation or ssd cache will supply it.
             _parent = getattr(self, '_parent', None)
             _parent_has_cache = _parent is not None and getattr(_parent, '_rgcurve', None) is not None
-            if not _parent_has_cache:
+            _ssd_has_cache = getattr(self.ssd, '_rgcurve', None) is not None
+            if not _parent_has_cache and not _ssd_has_cache:
                 import warnings
                 warnings.warn(
                     "Rg curve not pre-computed on this Decomposition. "
@@ -1412,6 +1410,7 @@ class Decomposition:
             self, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
+            progress_cb=progress_cb,
         )
 
     def score_initial(self, *args, **kwargs):
