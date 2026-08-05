@@ -633,6 +633,14 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             if os.path.isdir(_jobs_dir):
                 shutil.rmtree(_jobs_dir)
 
+        if monitor:
+            import warnings as _w
+            _w.warn(
+                "monitor=True has no effect when in_process=False (subprocess mode). "
+                "Track progress via run_info.sv_history or run_info.live_status().",
+                UserWarning, stacklevel=4,
+            )
+
         runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
         # Mirror MplMonitor.run_impl: ensure optimizer is prepared before launch.
         # (already done above in `optimizer.prepare_for_optimization(init_params)`)

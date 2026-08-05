@@ -76,6 +76,16 @@ class RunInfo:
         """
         self._stop_event.set()
 
+    def stop(self):
+        """Stop the run: cooperative signal for in_process=True, SIGTERM for subprocess."""
+        self.request_stop()
+        p = self._subprocess_process
+        if p is not None:
+            try:
+                p.terminate()
+            except Exception:
+                pass
+
     @property
     def is_alive(self):
         """``True`` while the background optimizer is still running.
