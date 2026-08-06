@@ -45,6 +45,8 @@ def create_optimizer_from_recipe(work_folder, class_code):
     from molass.DataObjects import SecSaxsData as SSD
 
     n_components = recipe.get('num_components', 3)
+    model = recipe.get('model', 'egh').lower()
+    method = recipe.get('method', 'bh').lower()
     trim_params = recipe.get('trim_params', {})
     baseline_params = recipe.get('baseline_params', {})
     decomp_params = dict(recipe.get('decomp_params', {}))
@@ -54,9 +56,21 @@ def create_optimizer_from_recipe(work_folder, class_code):
     ssd_trimmed = ssd.trimmed_copy(**trim_params)
     ssd_corrected = ssd_trimmed.corrected_copy(**baseline_params)
     decomp = ssd_corrected.quick_decomposition(**decomp_params)
+    egh_decomp = decomp  # keep EGH source for LumpingConstraint boundaries
+    if model != 'egh':
+        decomp = decomp.upgrade(model=model)
 
     # Pre-cache so score() doesn't recompute Guinier per frame.
     decomp.get_rg_curve()
     score = decomp.score(trimmed_ssd=ssd_trimmed)
+
+    # Mirror parent's LumpingConstraint auto-application for DE with 3+ components.
+    # The parent applies it to its own optimizer; the subprocess must do the same.
+    if method == 'de' and n_components >= 3:
+        try:
+            from molass.Rigorous.LumpingConstraint import LumpingConstraint
+            score.optimizer._constraints = [LumpingConstraint(egh_decomp)]
+        except Exception:
+            pass
 
     return score

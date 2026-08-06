@@ -1180,9 +1180,14 @@ class Decomposition:
             spawning a subprocess.  Avoids the parent/subprocess data-derivation
             divergence (see issues #117 / #119) and keeps the optimizer running
             against the same library-prepared data the parent already holds in
-            memory.  Set ``False`` to use the legacy subprocess path (required
-            by the tkinter GUI; available as an escape hatch for notebook users
-            who need process isolation).
+            memory.  Set ``False`` to use the recipe-based subprocess path.
+
+            **Subprocess lifecycle** (``in_process=False``):
+
+            * Subprocess is a separate OS process — not killed by kernel interrupt (SIGINT).
+            * Kernel restart (SIGTERM): ``atexit`` handler terminates it automatically.
+            * Force-kill (SIGKILL): subprocess orphaned; cleaned up on next run.
+            * Explicit stop: ``run_info.stop()``.
         monitor : bool, optional
             Controls the ``MplMonitor`` ipywidgets dashboard.  When True
             (default), a live dashboard is shown whether the run is
@@ -1340,7 +1345,7 @@ class Decomposition:
         from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
         if rgcurve is None:
-            rgcurve = self.ssd.xr.compute_rgcurve()
+            rgcurve = self.get_rg_curve()  # cached; avoids redundant Guinier fit on repeated calls (#248)
 
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
 
@@ -1385,6 +1390,18 @@ class Decomposition:
             result_auto.plot(title="Auto EGH")
             result_prop.plot(title="Proportional 1:1:1:1")
             result_auto.print_summary()
+
+        Notes
+        -----
+        **rgcurve**: ``score()`` does not accept ``rgcurve`` as a keyword
+        argument.  Pre-compute and cache it by calling
+        ``decomp.get_rg_curve()`` *before* ``score()``; the cached value is
+        then picked up automatically.  Without pre-caching, ``score()``
+        emits a ``UserWarning`` and runs one Guinier fit per frame, which
+        is slow.  Example::
+
+            decomp.get_rg_curve()          # caches on decomp
+            result = decomp.score(trimmed_ssd=trimmed)
 
         See Also
         --------

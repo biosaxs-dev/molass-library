@@ -19,6 +19,7 @@ import os
 import numpy as np
 from importlib import reload
 
+
 def _set_identity_restrict_lists(ssd):
     """Set identity (full-range) restrict_lists for already-exported data.
 
@@ -162,6 +163,19 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
+def _build_auto_recipe(decomposition, method='BH'):
+    """Build a minimal recipe dict from a decomposition for backward-compat auto-construction."""
+    model = decomposition.xr_ccurves[0].model  # 'egh', 'sdm', 'lkm', etc.
+    return {
+        "num_components": decomposition.num_components,
+        "model": model,
+        "method": method.lower(),
+        "decomp_params": {},
+        "trim_params": {},
+        "baseline_params": {},
+    }
+
+
 def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
     """
     Make a rigorous decomposition using a given RG curve.
@@ -200,9 +214,23 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         of spawning a subprocess.  The library-prepared optimizer (with the
         live dsets, base curves, and spectral vectors built above) is the one
         that runs — no re-derivation from disk, no parent/subprocess divergence.
-        Set ``False`` to use the legacy subprocess path (required by the tkinter
-        GUI; available as an escape hatch for notebook users who need process
-        isolation).
+        Set ``False`` to use the recipe-based subprocess path, which rebuilds
+        the SSD pipeline inside the subprocess from ``recipe.json``.
+
+        **Subprocess lifecycle** (``in_process=False``):
+
+        * The subprocess is an independent OS process.  It is **not** killed
+          by a Jupyter kernel interrupt (SIGINT).
+        * On normal kernel restart (SIGTERM) an ``atexit`` handler terminates
+          the subprocess automatically.
+        * On force-kill (SIGKILL) the subprocess becomes an orphan and
+          continues until it finishes.  The next ``optimize_rigorously()``
+          call creates a new ``MplMonitor`` which reads
+          ``active_processes.json`` and terminates the orphan.
+        * To stop a running subprocess explicitly::
+
+              run_info.stop()   # cooperative signal + p.terminate()
+
         See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
     monitor : bool, optional
         Controls the ``MplMonitor`` ipywidgets dashboard.  When True
@@ -344,6 +372,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if _dry_run:
         return None
 
+    # Capture user-supplied constraints before auto-apply may add LumpingConstraint.
+    _original_user_constraints = constraints
+
     # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
     # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
     # warnings.simplefilter("ignore") and would swallow this warning silently.
@@ -378,6 +409,38 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         solver_kwargs = dict(solver_kwargs or {})
         solver_kwargs.setdefault('de_tol', 0)
 
+    # #249: warn when USER-supplied constraints cannot be transferred to recipe subprocess.
+    # Only fires for constraints the caller passed explicitly — not auto-applied LumpingConstraint
+    # (which is handled via method in recipe.json, so no warning needed for that case).
+    # PLACEMENT: must be ABOVE `with _stack:` — the stack suppresses all warnings.
+    _user_constraints = constraints  # at this point only user-supplied constraints remain
+    # After the DE auto-apply block, constraints may include auto-added LumpingConstraint;
+    # we track whether the user originally passed anything non-None and non-empty.
+    if not in_process and _original_user_constraints:
+        import warnings as _w
+        _w.warn(
+            "optimize_rigorously(in_process=False): explicit constraints= are applied to the "
+            "parent optimizer but are NOT transferred to the recipe subprocess. "
+            "Use in_process=True to ensure constraints are active during optimization.",
+            UserWarning,
+            stacklevel=3,
+        )
+
+    # Step 3: auto-construct recipe when subprocess path is used without one.
+    # PLACEMENT: must be ABOVE `with _stack:` — the stack suppresses all warnings.
+    if not in_process and pipeline_recipe is None:
+        import warnings as _w
+        _w.warn(
+            "optimize_rigorously(in_process=False) without pipeline_recipe is deprecated. "
+            "The legacy ip_*.npy export path will be removed in a future release. "
+            "Prefer in_process=True (the default), or pass pipeline_recipe=... explicitly. "
+            "A recipe is being auto-constructed for this run using default trim/baseline/decomp "
+            "parameters. If you used non-default parameters, supply pipeline_recipe= explicitly.",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        pipeline_recipe = _build_auto_recipe(decomposition, method)
+
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
     # baseline fitting, optimizer construction, parameter preparation)
@@ -402,7 +465,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _original_in_folder = _get_in_folder_raw()
 
     with _stack:
-        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, export_npy=not in_process, pipeline_recipe=pipeline_recipe)
+        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, pipeline_recipe=pipeline_recipe)
 
         # Drop a breadcrumb so external observers can find this run even
         # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.
@@ -614,124 +677,108 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
 
         return run_info
 
-    if not monitor:
-        # Subprocess path WITHOUT MplMonitor.  Used by batch / comparison
-        # runs (e.g. compare_optimization_paths) where the live ipywidgets
-        # dashboard is not needed and would re-introduce the matplotlib /
-        # widget fragility we are trying to escape with split-architecture.
-        if debug:
-            import molass_legacy.Optimizer.BackRunner
-            reload(molass_legacy.Optimizer.BackRunner)
-        from molass_legacy.Optimizer.BackRunner import BackRunner
+    # Subprocess path: always BackRunner (recipe mode via Step 3/4).
+    # monitor=True adds an external watcher dashboard (Step 5);
+    # monitor=False returns immediately for batch/comparison runs.
+    if debug:
+        import molass_legacy.Optimizer.BackRunner
+        reload(molass_legacy.Optimizer.BackRunner)
+    from molass_legacy.Optimizer.BackRunner import BackRunner
 
-        # When clear_jobs=True, remove all existing job folders so BackRunner
-        # starts at job 000 (BackRunner.get_work_folder() just picks the next
-        # empty slot and would skip non-empty folders from a previous run).
-        if clear_jobs:
-            import shutil
-            _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
-            if os.path.isdir(_jobs_dir):
-                shutil.rmtree(_jobs_dir)
+    if clear_jobs:
+        import shutil
+        _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+        if os.path.isdir(_jobs_dir):
+            shutil.rmtree(_jobs_dir)
 
-        if monitor:
-            import warnings as _w
-            _w.warn(
-                "monitor=True has no effect when in_process=False (subprocess mode). "
-                "Track progress via run_info.sv_history or run_info.live_status().",
-                UserWarning, stacklevel=4,
-            )
-
-        runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
-        # Mirror MplMonitor.run_impl: ensure optimizer is prepared before launch.
-        # (already done above in `optimizer.prepare_for_optimization(init_params)`)
-        runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts,
-                   debug=debug)
-        # Breadcrumb: now that the runner has a working_folder + subprocess
-        # PID, expose them so external observers can find the live run.
-        try:
-            from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
-            sub_pid = getattr(runner.process, "pid", None)
-            write_run_manifest(
-                runner.working_folder,
-                role="work",
-                method=method, niter=niter,
-                in_process=False, monitor=False,
-                analysis_folder=analysis_folder,
-                subprocess_pid=sub_pid,
-                status="running",
-            )
-            update_run_manifest(
-                analysis_folder,
-                work_folder=runner.working_folder,
-                subprocess_pid=sub_pid,
-                status="running",
-            )
-        except Exception:
-            pass
-        # Return immediately — do NOT block on runner.process.wait().
-        # load_best() polls the filesystem and returns as soon as the first
-        # result lands on disk.  run_info.wait() can be used to block until
-        # all iterations complete (issue #189).
-        if debug:
-            import molass.Rigorous.RunInfo
-            reload(molass.Rigorous.RunInfo)
-        from molass.Rigorous.RunInfo import RunInfo
-        run_info = RunInfo(
-            ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
-            init_params=init_params, monitor=None,
-            analysis_folder=analysis_folder, decomposition=decomposition,
-            rgcurve=rgcurve,
+    runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
+    runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts, debug=debug)
+    try:
+        from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
+        sub_pid = getattr(runner.process, "pid", None)
+        write_run_manifest(
+            runner.working_folder,
+            role="work",
+            method=method, niter=niter,
+            in_process=False, monitor=monitor,
+            analysis_folder=analysis_folder,
+            subprocess_pid=sub_pid,
+            status="running",
         )
-        run_info.work_folder = runner.working_folder
-        run_info._subprocess_process = runner.process
-        return run_info
-
-    monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
-
-    # Wire dsets to monitor so the Export Data button can work (issue #96)
-    monitor.dsets = dsets
-
-    # Display rendering uses the parent optimizer (issues #118, #128, #129).
-    #
-    # History:
-    #   #118 originally introduced `monitor_optimizer` (a subprocess-equivalent
-    #        optimizer built via `create_optimizer_from_job`) so the monitor's
-    #        on-screen per-snapshot SV would match callback.txt SV.
-    #   #128 changed the panel title to show `best_sv` (aggregated from
-    #        callback.txt by MplMonitor) instead of the per-snapshot SV.
-    #        The per-snapshot SV computed inside `plot_objective_func` is now
-    #        discarded — only the plot rendering still uses `display_optimizer`.
-    #   #129 the subprocess-equivalent optimizer renders curves in the
-    #        original frame-number domain (its disk-loaded dsets), while the
-    #        parent uses the trimmed (0..N-1) domain that the EGH parameters
-    #        in `init_params` are expressed in. Mixing them shifted the UV /
-    #        Rg / Xray panels off-axis. Patching `xr_curve.x` / `uv_curve.x`
-    #        on the monitor optimizer is unsafe because `objective_func`
-    #        reads them at every evaluation — see Fix #21 / G0346.objective_func.
-    #
-    # Resolution: leave `monitor_optimizer = None` so `MplMonitor` falls back
-    # to the parent `optimizer` for plot rendering. The title still shows
-    # `best_sv` from callback.txt (#128), so #118's user-visible guarantee
-    # is preserved without the coordinate-system conflict.
-    monitor.monitor_optimizer = None
-
-    # Pass anomaly mask to monitor for consistent band display
-    from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
-    jv, mask = get_anomaly_mask_from_ssd(decomposition.ssd)
-    if jv is not None:
-        monitor.anomaly_jv = jv
-        monitor.anomaly_mask = mask
+        update_run_manifest(
+            analysis_folder,
+            work_folder=runner.working_folder,
+            subprocess_pid=sub_pid,
+            status="running",
+        )
+    except Exception:
+        pass
 
     if debug:
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    run_info = RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
-                       init_params=init_params, monitor=monitor,
-                       analysis_folder=analysis_folder, decomposition=decomposition,
-                       rgcurve=rgcurve)
+    run_info = RunInfo(
+        ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+        init_params=init_params, monitor=None,
+        analysis_folder=analysis_folder, decomposition=decomposition,
+        rgcurve=rgcurve,
+    )
+    run_info.work_folder = runner.working_folder
+    run_info._subprocess_process = runner.process
+
+    # Create an empty callback.txt so the watcher fires immediately and falls back
+    # to get_best_params() returning self.init_params (real params) for a correct
+    # initial display — avoids the 3-4 min blank while RecipeRunner rebuilds.
+    # (Writing normalized params would pass them to objective_func without to_real_params
+    # conversion, producing zero curves and wrong scores.)
     try:
-        run_info.work_folder = monitor.working_folder
+        import os as _os
+        _cb_path = _os.path.join(runner.working_folder, 'callback.txt')
+        open(_cb_path, 'w').close()
     except Exception:
         pass
+
+    # Register atexit so the subprocess is terminated on kernel restart (SIGTERM).
+    # SIGKILL force-kills bypass atexit; active_processes.json handles those orphans.
+    try:
+        import atexit as _atexit
+        _proc_ref = runner.process
+        def _terminate_subprocess(_p=_proc_ref):
+            try:
+                if _p.poll() is None:
+                    _p.terminate()
+            except Exception:
+                pass
+        _atexit.register(_terminate_subprocess)
+    except Exception:
+        pass
+
+    if monitor:
+        # Step 5: external watcher — MplMonitor.for_run_info() polls callback.txt
+        # and uses the parent optimizer for UV/XR/Score rendering.
+        # No create_optimizer_from_job() needed (eliminates #117/#119 divergence).
+        if debug:
+            import molass_legacy.Optimizer.MplMonitor
+            reload(molass_legacy.Optimizer.MplMonitor)
+        from molass_legacy.Optimizer.MplMonitor import MplMonitor
+        mon = MplMonitor.for_run_info(
+            run_info, niter=niter,
+            max_trials=max_trials,
+            function_code=function_code,
+            clear_jobs=False,
+        )
+        mon.dsets = dsets
+        mon.monitor_optimizer = None
+        mon.input_folder = _original_in_folder
+        from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
+        _jv, _mask = get_anomaly_mask_from_ssd(decomposition.ssd)
+        if _jv is not None:
+            mon.anomaly_jv = _jv
+            mon.anomaly_mask = _mask
+        mon.create_dashboard()
+        mon.show()
+        mon.start_watching()
+        run_info.monitor = mon
+
     return run_info
