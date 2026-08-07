@@ -47,6 +47,8 @@ def create_optimizer_from_recipe(work_folder, class_code):
     n_components = recipe.get('num_components', 3)
     model = recipe.get('model', 'egh').lower()
     method = recipe.get('method', 'bh').lower()
+    pore_dist = recipe.get('pore_dist', None)
+    ln_pore_sigma = recipe.get('ln_pore_sigma', None)
     trim_params = recipe.get('trim_params', {})
     baseline_params = recipe.get('baseline_params', {})
     decomp_params = dict(recipe.get('decomp_params', {}))
@@ -58,7 +60,12 @@ def create_optimizer_from_recipe(work_folder, class_code):
     decomp = ssd_corrected.quick_decomposition(**decomp_params)
     egh_decomp = decomp  # keep EGH source for LumpingConstraint boundaries
     if model != 'egh':
-        decomp = decomp.upgrade(model=model)
+        upgrade_kwargs = {}
+        if pore_dist is not None:
+            upgrade_kwargs['pore_dist'] = pore_dist
+            if ln_pore_sigma is not None:
+                upgrade_kwargs['model_params'] = {'ln_pore_sigma': ln_pore_sigma}
+        decomp = decomp.upgrade(model=model, **upgrade_kwargs)
 
     # Pre-cache so score() doesn't recompute Guinier per frame.
     decomp.get_rg_curve()
