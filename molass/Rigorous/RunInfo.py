@@ -1222,6 +1222,72 @@ class RunInfo:
         return parse_sv_history(self.analysis_folder)
 
     @property
+    def sv_history_raw(self):
+        """Raw per-evaluation SV trajectory from all ``callback.txt`` files.
+
+        Like :attr:`sv_history` but without the running-minimum accumulation --
+        each entry is the actual SV of that individual trial, including
+        rejected evaluations.  Plot alongside :attr:`sv_history` to see how
+        much the optimizer explores between accepted improvements (BH in
+        particular looks flat on its own since most trials are rejected).
+
+        Returns
+        -------
+        list of float
+            One SV value per evaluation, same length/order as
+            :attr:`sv_history` for the same run.  Empty list if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            import matplotlib.pyplot as plt
+            plt.scatter(range(len(run_info.sv_history_raw)), run_info.sv_history_raw,
+                        s=8, alpha=0.35, label="all evals")
+            plt.plot(run_info.sv_history, lw=1.5, label="best so far")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history_raw
+        return parse_sv_history_raw(self.analysis_folder)
+
+    @property
+    def rg_history(self):
+        """Per-component Rg trajectories from all ``callback.txt`` files.
+
+        Rg is a free optimizer parameter (one column per component), so this
+        is read directly from the same raw ``x=`` vectors :attr:`sv_history`
+        reads ``f=`` from -- not re-derived via Guinier analysis.  Plot
+        alongside :attr:`sv_history` to see whether Rg estimates stabilize as
+        the optimizer converges.
+
+        Returns
+        -------
+        list of list of float
+            One trajectory per component, same length/order as
+            :attr:`sv_history_raw` for the same run.  Empty list if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            for k, traj in enumerate(run_info.rg_history):
+                plt.plot(traj, label=f"component {k+1}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_rg_history
+        return parse_rg_history(self.analysis_folder, self.optimizer)
+
+    @property
     def sv_history_per_job(self):
         """Per-job SV best-so-far trajectories from all ``callback.txt`` files.
 
@@ -1283,16 +1349,68 @@ class RunInfo:
         if not svs:
             print("No SV history found (no callback.txt entries yet).")
             return
+        raw = self.sv_history_raw
         if title is None:
             folder_name = os.path.basename(
                 (self.analysis_folder or "").rstrip("/\\")
             )
             title = f"SV history — {folder_name}"
         fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(svs, lw=1.5)
+        if raw:
+            ax.scatter(range(len(raw)), raw, s=8, alpha=0.35, color="darkorange",
+                       label="all evals")
+        ax.plot(svs, lw=1.5, color="steelblue", label="best so far")
         ax.set_xlabel("evaluation")
-        ax.set_ylabel("best SV so far")
+        ax.set_ylabel("SV")
         ax.set_title(title)
+        ax.legend(loc="lower right", fontsize=8)
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        plt.show()
+
+    def plot_rg_history(self, title=None, figsize=(8, 4)):
+        """Plot per-component Rg trajectories from ``callback.txt``.
+
+        Companion to :meth:`plot_sv_history` -- Rg is a free optimizer
+        parameter, so this shows the raw per-component trajectories directly,
+        not a "best so far" accumulation (see :attr:`rg_history`).
+
+        Parameters
+        ----------
+        title : str, optional
+            Figure title.  Defaults to ``"Rg values — <folder basename>"``.
+        figsize : tuple, optional
+            Matplotlib figure size.  Default ``(8, 4)``.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        ::
+
+            run_sub.plot_rg_history()
+        """
+        import os
+        import matplotlib.pyplot as plt
+
+        traj = self.rg_history
+        if not traj or not traj[0]:
+            print("No Rg history found (no callback.txt entries yet).")
+            return
+        if title is None:
+            folder_name = os.path.basename(
+                (self.analysis_folder or "").rstrip("/\\")
+            )
+            title = f"Rg values — {folder_name}"
+        fig, ax = plt.subplots(figsize=figsize)
+        for k, ys in enumerate(traj):
+            ax.plot(ys, lw=1.2, label=f"component {k+1}")
+        ax.set_xlabel("evaluation")
+        ax.set_ylabel("Rg")
+        ax.set_title(title)
+        ax.legend(loc="best", fontsize=8)
         ax.grid(True, alpha=0.3)
         fig.tight_layout()
         plt.show()

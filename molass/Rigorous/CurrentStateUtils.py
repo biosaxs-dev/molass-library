@@ -496,6 +496,96 @@ def parse_sv_history(analysis_folder):
     return [float(v) for v in sv_so_far]
 
 
+def parse_sv_history_raw(analysis_folder):
+    """Parse all ``callback.txt`` files and return the raw per-evaluation SV trajectory.
+
+    Unlike :func:`parse_sv_history`, no running minimum is applied -- each
+    entry is the actual SV of that individual trial, including rejected
+    (``a=False``) ones.  This is what makes BH's flat "best so far" line look
+    monotonous: most trials are rejected and never move the accumulated
+    value, even though the optimizer is actively exploring between jumps.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+
+    Returns
+    -------
+    list of float
+        One SV value per evaluation, in trial order, not accumulated.
+        Same length and order as :func:`parse_sv_history`'s output for the
+        same folder.  Empty list if no evaluations are recorded yet.
+    """
+    import os, re, math
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return []
+
+    all_fvals = []
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        content = open(cb, encoding="utf-8", errors="replace").read()
+        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
+        all_fvals.extend(fvals)
+
+    return [-200 / (1 + math.exp(-1.5 * fv)) + 100 for fv in all_fvals]
+
+
+def parse_rg_history(analysis_folder, optimizer):
+    """Parse all ``callback.txt`` files and return per-component Rg trajectories.
+
+    Rg is a free parameter in the rigorous optimizer's parametrization (one
+    column per component in the raw ``x=`` vector), not something re-derived
+    from Guinier analysis after the fact -- see ``params_type.get_rg_start_index()``
+    in molass-legacy (``EghParams``, ``SdmParams``, etc.), the same mechanism the
+    legacy PeakEditor dashboard's "Rg Values" panel already relies on.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+    optimizer : BasicOptimizer
+        Needed for ``params_type.get_rg_start_index()`` and ``n_components`` --
+        unlike :func:`parse_sv_history`, Rg column positions are model-specific
+        and can't be derived from the callback file alone.
+
+    Returns
+    -------
+    list of list of float
+        One trajectory per component, each the same length/order as
+        :func:`parse_sv_history_raw`'s output for the same folder (one entry
+        per evaluation -- Rg has no "best so far" concept to accumulate).
+        Empty list if no evaluations are recorded yet.
+    """
+    import os
+    from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return []
+
+    rg_start = optimizer.params_type.get_rg_start_index()
+    n = optimizer.n_components
+    columns = [[] for _ in range(n)]
+
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        _, x_list = read_callback_txt_impl(cb)
+        for x in x_list:
+            for k in range(n):
+                columns[k].append(float(x[rg_start + k]))
+
+    if not columns[0]:
+        return []
+    return columns
+
+
 def parse_sv_history_per_job(analysis_folder):
     """Parse ``callback.txt`` files and return per-job SV best-so-far trajectories.
 
