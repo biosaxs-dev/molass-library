@@ -15,10 +15,17 @@ from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
 from molass.Rigorous.Score import Score
 
+pytestmark = pytest.mark.slow  # every test rebuilds a full DE run via simple_run_info below
+
 
 @pytest.fixture
 def simple_run_info():
-    """Create a minimal rigorous run with DE niter=1 for testing."""
+    """Create a minimal rigorous run with DE niter=1 for testing.
+
+    SLOW: function-scoped, so this real DE optimization run reruns once per
+    test in this file (not cached/shared) -- do not use this file as a quick
+    smoke check for unrelated changes.
+    """
     ssd = SSD(SAMPLE1)
     trimmed = ssd.trimmed_copy()
     corrected = trimmed.corrected_copy()

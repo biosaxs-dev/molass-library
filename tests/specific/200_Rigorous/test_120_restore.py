@@ -15,6 +15,8 @@ from molass.DataObjects import SecSaxsData as SSD
 from molass.Rigorous.RunInfo import restore, RunInfo
 from molass.LowRank.Decomposition import Decomposition
 
+pytestmark = pytest.mark.slow  # optimization_folder below runs a real DE optimization
+
 
 @pytest.fixture(scope="module")
 def corrected_ssd():
@@ -27,7 +29,11 @@ def corrected_ssd():
 
 @pytest.fixture(scope="module")
 def optimization_folder(corrected_ssd):
-    """Run a minimal optimization and return the analysis folder."""
+    """Run a minimal optimization and return the analysis folder.
+
+    SLOW: module-scoped (built once for this file), but still a real DE run
+    (~30-60s), not just optimizer construction.
+    """
     tmpdir = tempfile.mkdtemp(prefix="test_restore_")
     analysis_folder = str(Path(tmpdir) / "test_restore")
     

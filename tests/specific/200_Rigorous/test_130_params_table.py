@@ -9,6 +9,8 @@ from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
 from molass.Rigorous import build_params_table
 
+pytestmark = pytest.mark.slow  # _score_for() below rebuilds a full optimizer per call (~12x in this file)
+
 
 @pytest.fixture(scope="module")
 def base_decomp():
@@ -21,6 +23,7 @@ def base_decomp():
 
 
 def _score_for(base_decomp, model):
+    """SLOW: builds a full legacy optimizer via score() (~30-60s), called once per test/model."""
     decomp, trimmed = base_decomp
     target = decomp if model == 'egh' else decomp.upgrade(model)
     return target.score(trimmed_ssd=trimmed)

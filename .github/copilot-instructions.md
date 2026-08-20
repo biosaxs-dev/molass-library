@@ -143,7 +143,15 @@ pytest tests/tutorial/ -v
 
 # With coverage
 pytest --cov=molass tests/
+
+# Skip slow tests (real optimizer/BH/DE construction, ~30s-several min each)
+pytest -m "not slow" tests/
 ```
+
+Tests marked `@pytest.mark.slow` build a full legacy optimizer and/or run real BH/DE — do not run
+these blindly for a quick check on an unrelated change; see the module docstring/fixture comment
+in each marked file for the specific cost, or write a small standalone script exercising only the
+changed function(s) instead.
 
 ### Test File Naming
 

@@ -77,6 +77,9 @@ pythonpath = [
   ".",
   "../molass-legacy",
 ]
+markers = [
+    "slow: builds a full legacy optimizer and/or runs real BH/DE (~30s-several min per test); skip with -m 'not slow'",
+]
 env = [
     "MOLASS_ENABLE_PLOTS=false",
     "MOLASS_SAVE_PLOTS=false"
