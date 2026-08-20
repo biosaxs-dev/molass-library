@@ -1,8 +1,7 @@
 # DESIGN: Reverse `optimize_rigorously()`'s `in_process` default to `False`
 
-**Status**: Core change implemented (2026-08-20, commit `fc07e50`) -- ripple-effect audit (step 4
-below) not yet done. User explicitly accepted backward-compatibility influence rather than
-gating the change on a full audit first.
+**Status**: Core change implemented and verified (2026-08-20, commit `fc07e50`). See "Status"
+section at the end for what's deliberately left undone.
 **Context**: Follow-up to `DESIGN_split_optimizer_architecture.md` (April 22, 2026) and
 `DESIGN_inprocess_monitor.md` (April 27, 2026). Triggered by a molass-gui "Continue in
 Notebook…" feature discussion that surfaced a real performance/architecture question about
@@ -83,55 +82,46 @@ default), while keeping that document's underlying architectural fix (determinis
 recipe-based subprocess reconstruction, avoiding #117-#119-style divergence) as the
 mechanism that makes subprocess-by-default safe to reinstate.
 
-## Required implementation changes (not yet done)
+## Implementation changes
 
-1. `Decomposition.optimize_rigorously()` (`molass/LowRank/Decomposition.py`): change
-   `in_process=True` → `in_process=False` in the signature.
-2. `make_rigorous_decomposition_impl()` (`molass/Rigorous/RigorousImplement.py`): same
-   default flip; the function's `**kwargs`/default handling needs to auto-construct
-   `pipeline_recipe` (from current decomposition/trim/baseline/model state) when the caller
-   doesn't supply one, matching what `upgraded_view.py` already builds explicitly today —
-   this makes the auto-construct path the *normal* default flow, not a deprecated fallback.
-3. The existing `DeprecationWarning` text ("Prefer `in_process=True` (the default)...") is
-   now backwards and must be rewritten or removed — it was written when `in_process=False`
-   was the legacy/deprecated path; after this change it becomes the default, sanctioned path.
-4. Audit ripple effects before landing:
-   - Tests that assert `in_process=True` as default behavior (e.g.
-     `tests/specific/200_Rigorous/test_090_pattern_a_warning.py`,
-     `test_100_cma_async_fallback.py`) will need updating.
-   - Tutorials/docs (`tests/tutorial/11-rigorous_optimization.py`) and any
-     molass-researcher notebooks relying on the current default's in-process behavior
-     (variables staying alive across cells, no subprocess startup cost) need review.
-   - The CMA async-crash auto-fallback logic (`in_process=True, async_=True` → falls back
-     to `in_process=False`) becomes a no-op once `in_process=False` is already the default —
-     should be simplified/removed rather than left as dead code.
-5. molass-gui side: once the library default matches the GUI's own behavior, the GUI's "Use
-   subprocess" checkbox and the notebook export's explicit `in_process=`/`pipeline_recipe=`
-   parameters can both be simplified/dropped, since both now get the right behavior "for
-   free" from the library default — achieving the original goal (GUI and notebook
-   equivalent, notebook stays simple) without either side needing to fight the library's
-   own default.
+1. ✅ `Decomposition.optimize_rigorously()` (`molass/LowRank/Decomposition.py`): changed
+   `in_process=True` → `in_process=False` in the signature; docstring rewritten.
+2. ✅ `make_rigorous_decomposition_impl()` (`molass/Rigorous/RigorousImplement.py`): same
+   default flip; docstring rewritten. `pipeline_recipe` auto-construction (`_build_auto_recipe`)
+   already existed and is now the normal default flow, not a fallback.
+3. ✅ The old `DeprecationWarning` ("Prefer `in_process=True` (the default)...") was **removed
+   entirely** (not rewritten) — auto-recipe construction is silent now, matching how any other
+   default-parameter behavior works.
+4. ⏳ Ripple-effect audit — checked, not fully resolved:
+   - `test_090_pattern_a_warning.py`, `test_100_cma_async_fallback.py`: **verified unaffected**
+     — the former uses `_dry_run=True` which returns before the auto-recipe code path is ever
+     reached; the latter always passes `in_process=True` explicitly in every case it tests.
+   - `test_110_score_optimized.py`, `test_120_restore.py`: call `optimize_rigorously()` without
+     `in_process=` — **do** now exercise the subprocess path instead of in-process. Already
+     marked `@pytest.mark.slow`; expected to still pass (DE+auto-recipe validated previously)
+     but take longer. **Not re-run** as part of this change (see Status below).
+   - `tests/tutorial/11-rigorous_optimization.py` (`method='NS'`): unaffected — NS already
+     forced `in_process=False` via the existing NS auto-route guard regardless of default.
+   - CMA async-crash auto-fallback and NS auto-route guards: intentionally left in place, not
+     dead code — still matter for anyone who explicitly opts into `in_process=True` with those
+     methods.
+5. ⏳ **Not started**: molass-gui's own "Use subprocess" checkbox / notebook export
+   simplification (the original motivating discussion) — now that the library default matches
+   the GUI's own behavior, both the checkbox and the notebook export's explicit
+   `in_process=`/`pipeline_recipe=` parameters could be simplified/dropped, since both get the
+   right behavior "for free" from the library default. Natural next step if this thread is
+   picked up again.
 
 ## Status
 
-**Core change implemented** (commit `fc07e50`): `Decomposition.optimize_rigorously()` and
-`make_rigorous_decomposition_impl()` now default to `in_process=False`; the `pipeline_recipe`
-auto-construct path no longer emits a `DeprecationWarning` (it's the sanctioned default now).
-Verified end-to-end with real SAMPLE1 data: a call with no `in_process=` specified launches the
-subprocess/auto-recipe path correctly (`run_info._subprocess_process` is set, no
-`DeprecationWarning`, clean `run_info.stop()`).
+**Core change implemented and verified** (commit `fc07e50`): `Decomposition.optimize_rigorously()`
+and `make_rigorous_decomposition_impl()` now default to `in_process=False`; the
+`pipeline_recipe` auto-construct path no longer emits a `DeprecationWarning`. Verified end-to-end
+with real SAMPLE1 data: a call with no `in_process=` specified launches the subprocess/auto-recipe
+path correctly (`run_info._subprocess_process` is set, no `DeprecationWarning`, clean
+`run_info.stop()`).
 
-**Not yet done** (ripple-effect audit, step 4 above):
-- `tests/specific/200_Rigorous/test_110_score_optimized.py` and `test_120_restore.py` call
-  `optimize_rigorously()` without `in_process=` -- they now exercise the subprocess path instead
-  of in-process. Already marked `@pytest.mark.slow`; expect them to take longer (subprocess
-  startup ~3-5s) but they should still pass (DE+auto-recipe was previously validated). Not
-  re-run as part of this change (per user's accepted risk + the project's own "don't run the
-  slow suite blindly" rule) -- flag if either fails next time they're run.
-- `tests/tutorial/11-rigorous_optimization.py` (`method='NS'`) is unaffected: NS already forced
-  `in_process=False` regardless of the default via the existing NS auto-route guard.
-- The CMA async-crash auto-fallback and NS auto-route guards were intentionally left in place
-  (not dead code) -- they still matter for anyone who explicitly opts into `in_process=True` with
-  those methods.
-- molass-gui's own "Use subprocess" checkbox / notebook export simplification (the original
-  motivating goal) not yet revisited in light of this change -- next step if picked up again.
+**Deliberately not done**: re-running `test_110_score_optimized.py`/`test_120_restore.py` to
+confirm they still pass under the subprocess path (per user's accepted risk + the project's own
+"don't run the slow suite blindly" rule) — flag if either fails next time they're run. Item 5
+above (molass-gui side) not started.
