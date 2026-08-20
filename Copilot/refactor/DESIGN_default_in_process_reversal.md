@@ -92,14 +92,24 @@ mechanism that makes subprocess-by-default safe to reinstate.
 3. ✅ The old `DeprecationWarning` ("Prefer `in_process=True` (the default)...") was **removed
    entirely** (not rewritten) — auto-recipe construction is silent now, matching how any other
    default-parameter behavior works.
-4. ⏳ Ripple-effect audit — checked, not fully resolved:
+4. ✅ Ripple-effect audit — actually run, found and fixed a real regression:
    - `test_090_pattern_a_warning.py`, `test_100_cma_async_fallback.py`: **verified unaffected**
      — the former uses `_dry_run=True` which returns before the auto-recipe code path is ever
      reached; the latter always passes `in_process=True` explicitly in every case it tests.
-   - `test_110_score_optimized.py`, `test_120_restore.py`: call `optimize_rigorously()` without
-     `in_process=` — **do** now exercise the subprocess path instead of in-process. Already
-     marked `@pytest.mark.slow`; expected to still pass (DE+auto-recipe validated previously)
-     but take longer. **Not re-run** as part of this change (see Status below).
+   - `test_120_restore.py`: blocked by a **pre-existing, unrelated** collection error
+     (`ImportError: cannot import name 'restore' from molass.Rigorous.RunInfo`) — not caused by
+     this change, not fixed as part of it.
+   - `test_110_score_optimized.py`: **actually run** (not just predicted) — 7 of 8 tests failed
+     with `FileNotFoundError: No completed jobs found`. Root cause: the subprocess branch of
+     `make_rigorous_decomposition_impl()` never checked `async_` at all — it always launched
+     `BackRunner` and returned immediately, unlike the in-process branch's explicit
+     `if async_: (thread) else: (call synchronously)`. So `async_=False` never blocked for
+     subprocess mode, and `simple_run_info.score()` ran before the subprocess had written any
+     completed job. **Fixed** (commit `5cc6a687`): added `if not async_: run_info.wait(timeout=0)`
+     at the end of the subprocess branch, reusing `RunInfo.wait()`'s existing (and already correct)
+     `self._subprocess_process.wait()` handling. Verified with a standalone script (jobs present
+     immediately after return, `run_info.score()` succeeds, SV=82.15) and by re-running the actual
+     test file end-to-end.
    - `tests/tutorial/11-rigorous_optimization.py` (`method='NS'`): unaffected — NS already
      forced `in_process=False` via the existing NS auto-route guard regardless of default.
    - CMA async-crash auto-fallback and NS auto-route guards: intentionally left in place, not
@@ -115,16 +125,11 @@ mechanism that makes subprocess-by-default safe to reinstate.
 
 ## Status
 
-**Core change implemented and verified** (commit `fc07e50`): `Decomposition.optimize_rigorously()`
-and `make_rigorous_decomposition_impl()` now default to `in_process=False`; the
-`pipeline_recipe` auto-construct path no longer emits a `DeprecationWarning`. Verified end-to-end
-with real SAMPLE1 data: a call with no `in_process=` specified launches the subprocess/auto-recipe
-path correctly (`run_info._subprocess_process` is set, no `DeprecationWarning`, clean
-`run_info.stop()`).
+**Fully implemented, verified, and closed** (commits `fc07e50`, `5cc6a687` library;
+`35677d2` molass-gui). The ripple-effect audit was actually executed, not just predicted: running
+`test_110_score_optimized.py` surfaced a real regression (subprocess path ignored `async_=False`,
+causing 7/8 tests to fail with `FileNotFoundError`), which was root-caused and fixed rather than
+worked around. `test_120_restore.py` remains blocked by a pre-existing, unrelated import error
+(not in scope here).
 
-**Deliberately not done**: re-running `test_110_score_optimized.py`/`test_120_restore.py` to
-confirm they still pass under the subprocess path (per user's accepted risk + the project's own
-"don't run the slow suite blindly" rule) — flag if either fails next time they're run.
-
-All 5 implementation items are now complete. This design is closed; reopen only if the
-deliberately-skipped test re-run above ever surfaces a real regression.
+All 5 implementation items are complete. This design is closed.
