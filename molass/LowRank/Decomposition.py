@@ -1134,7 +1134,7 @@ class Decomposition:
                             frozen_param_groups=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, async_=True, progress='dashboard',
+                            in_process=False, monitor=True, async_=True, progress='dashboard',
                             max_trials=0, debug=False, _dry_run=False,
                             ns_narrow_bounds=True,
                             ns_adaptive_nsteps=False,
@@ -1220,13 +1220,18 @@ class Decomposition:
             from the best known point rather than the original decomp params,
             see issue #169).
         in_process : bool, optional
-            If True (default), run the optimizer in this Python process instead of
-            spawning a subprocess.  Avoids the parent/subprocess data-derivation
-            divergence (see issues #117 / #119) and keeps the optimizer running
-            against the same library-prepared data the parent already holds in
-            memory.  Set ``False`` to use the recipe-based subprocess path.
+            If False (default), use the recipe-based subprocess path: the optimizer
+            runs in a separate OS process, isolating it from crashes and from the
+            live-dashboard redraw overhead that competes with the optimizer for
+            CPU/lock time during long runs (rigorous optimization is typically a
+            long-running, dedicated-experiment operation). ``pipeline_recipe`` is
+            auto-constructed when not supplied, making the subprocess reconstruction
+            deterministic (avoids the old parent/subprocess divergence, issues
+            #117/#119). Set ``True`` to run in this Python process instead --
+            useful for short/exploratory runs, or when ``constraints=`` must stay
+            active (constraints are not transferred to the recipe subprocess).
 
-            **Subprocess lifecycle** (``in_process=False``):
+            **Subprocess lifecycle** (``in_process=False``, the default):
 
             * Subprocess is a separate OS process — not killed by kernel interrupt (SIGINT).
             * Kernel restart (SIGTERM): ``atexit`` handler terminates it automatically.

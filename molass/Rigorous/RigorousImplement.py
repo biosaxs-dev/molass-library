@@ -176,7 +176,7 @@ def _build_auto_recipe(decomposition, method='BH'):
     }
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -210,12 +210,16 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     clear_jobs : bool, optional
         If True (default), clear existing job folders before starting.
     in_process : bool, optional
-        If True (default), run the optimizer **in this Python process** instead
-        of spawning a subprocess.  The library-prepared optimizer (with the
-        live dsets, base curves, and spectral vectors built above) is the one
-        that runs — no re-derivation from disk, no parent/subprocess divergence.
-        Set ``False`` to use the recipe-based subprocess path, which rebuilds
-        the SSD pipeline inside the subprocess from ``recipe.json``.
+        If False (default), use the recipe-based subprocess path -- rebuilds the
+        SSD pipeline inside a subprocess from an (auto-constructed, if not
+        supplied) ``pipeline_recipe``. Isolates the optimizer from crashes and
+        from live-dashboard redraw overhead, which matters most for the long,
+        dedicated-experiment runs rigorous optimization is typically used for.
+        Set ``True`` to run in this Python process instead -- the
+        library-prepared optimizer (with the live dsets, base curves, and
+        spectral vectors built above) is the one that runs, with no
+        re-derivation from disk and no parent/subprocess divergence. Useful for
+        short/exploratory runs, or when ``constraints=`` must stay active.
 
         **Subprocess lifecycle** (``in_process=False``):
 
@@ -427,18 +431,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         )
 
     # Step 3: auto-construct recipe when subprocess path is used without one.
-    # PLACEMENT: must be ABOVE `with _stack:` — the stack suppresses all warnings.
+    # This is the normal default flow (in_process=False is now the default),
+    # not a deprecated fallback -- see Copilot/refactor/DESIGN_default_in_process_reversal.md.
     if not in_process and pipeline_recipe is None:
-        import warnings as _w
-        _w.warn(
-            "optimize_rigorously(in_process=False) without pipeline_recipe is deprecated. "
-            "The legacy ip_*.npy export path will be removed in a future release. "
-            "Prefer in_process=True (the default), or pass pipeline_recipe=... explicitly. "
-            "A recipe is being auto-constructed for this run using default trim/baseline/decomp "
-            "parameters. If you used non-default parameters, supply pipeline_recipe= explicitly.",
-            DeprecationWarning,
-            stacklevel=3,
-        )
         pipeline_recipe = _build_auto_recipe(decomposition, method)
 
     # Suppress verbose legacy output unless debug=True.
