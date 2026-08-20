@@ -1,6 +1,8 @@
 # DESIGN: Reverse `optimize_rigorously()`'s `in_process` default to `False`
 
-**Status**: Decision made (2026-08-20) — implementation pending
+**Status**: Core change implemented (2026-08-20, commit `fc07e50`) -- ripple-effect audit (step 4
+below) not yet done. User explicitly accepted backward-compatibility influence rather than
+gating the change on a full audit first.
 **Context**: Follow-up to `DESIGN_split_optimizer_architecture.md` (April 22, 2026) and
 `DESIGN_inprocess_monitor.md` (April 27, 2026). Triggered by a molass-gui "Continue in
 Notebook…" feature discussion that surfaced a real performance/architecture question about
@@ -112,6 +114,24 @@ mechanism that makes subprocess-by-default safe to reinstate.
 
 ## Status
 
-Decision recorded; no code changes made yet. Next session should implement steps 1-4 above,
-starting with a fresh regression baseline (best fv, best SV, wall time) per the original
-split-architecture document's own methodology, before touching the default.
+**Core change implemented** (commit `fc07e50`): `Decomposition.optimize_rigorously()` and
+`make_rigorous_decomposition_impl()` now default to `in_process=False`; the `pipeline_recipe`
+auto-construct path no longer emits a `DeprecationWarning` (it's the sanctioned default now).
+Verified end-to-end with real SAMPLE1 data: a call with no `in_process=` specified launches the
+subprocess/auto-recipe path correctly (`run_info._subprocess_process` is set, no
+`DeprecationWarning`, clean `run_info.stop()`).
+
+**Not yet done** (ripple-effect audit, step 4 above):
+- `tests/specific/200_Rigorous/test_110_score_optimized.py` and `test_120_restore.py` call
+  `optimize_rigorously()` without `in_process=` -- they now exercise the subprocess path instead
+  of in-process. Already marked `@pytest.mark.slow`; expect them to take longer (subprocess
+  startup ~3-5s) but they should still pass (DE+auto-recipe was previously validated). Not
+  re-run as part of this change (per user's accepted risk + the project's own "don't run the
+  slow suite blindly" rule) -- flag if either fails next time they're run.
+- `tests/tutorial/11-rigorous_optimization.py` (`method='NS'`) is unaffected: NS already forced
+  `in_process=False` regardless of the default via the existing NS auto-route guard.
+- The CMA async-crash auto-fallback and NS auto-route guards were intentionally left in place
+  (not dead code) -- they still matter for anyone who explicitly opts into `in_process=True` with
+  those methods.
+- molass-gui's own "Use subprocess" checkbox / notebook export simplification (the original
+  motivating goal) not yet revisited in light of this change -- next step if picked up again.

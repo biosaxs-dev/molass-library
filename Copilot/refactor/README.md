@@ -13,7 +13,7 @@ This folder contains all refactoring plans, design documents, and architecture a
 | Document | Topic | Status |
 |---|---|---|
 | [PLAN_subprocess_parity.md](PLAN_subprocess_parity.md) | GUI subprocess missing ip_*.npy; DE/NSGA2 gap; fix options | Open (#206) |
-| [DESIGN_default_in_process_reversal.md](DESIGN_default_in_process_reversal.md) | Reverse optimize_rigorously()'s in_process default to False | Decision made, implementation pending |
+| [DESIGN_default_in_process_reversal.md](DESIGN_default_in_process_reversal.md) | Reverse optimize_rigorously()'s in_process default to False | Core change implemented; ripple-effect audit pending |
 
 ## Design Documents (completed or in-progress features)
 
