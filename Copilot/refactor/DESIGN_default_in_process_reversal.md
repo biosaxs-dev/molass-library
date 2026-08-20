@@ -1,7 +1,7 @@
 # DESIGN: Reverse `optimize_rigorously()`'s `in_process` default to `False`
 
-**Status**: Core change implemented and verified (2026-08-20, commit `fc07e50`). See "Status"
-section at the end for what's deliberately left undone.
+**Status**: Implemented and closed (2026-08-20, commit `fc07e50` library, `35677d2` molass-gui).
+See "Status" section at the end for the one deliberately-skipped verification step.
 **Context**: Follow-up to `DESIGN_split_optimizer_architecture.md` (April 22, 2026) and
 `DESIGN_inprocess_monitor.md` (April 27, 2026). Triggered by a molass-gui "Continue in
 Notebook…" feature discussion that surfaced a real performance/architecture question about
@@ -105,12 +105,13 @@ mechanism that makes subprocess-by-default safe to reinstate.
    - CMA async-crash auto-fallback and NS auto-route guards: intentionally left in place, not
      dead code — still matter for anyone who explicitly opts into `in_process=True` with those
      methods.
-5. ⏳ **Not started**: molass-gui's own "Use subprocess" checkbox / notebook export
-   simplification (the original motivating discussion) — now that the library default matches
-   the GUI's own behavior, both the checkbox and the notebook export's explicit
-   `in_process=`/`pipeline_recipe=` parameters could be simplified/dropped, since both get the
-   right behavior "for free" from the library default. Natural next step if this thread is
-   picked up again.
+5. ✅ **molass-gui side** (commit `35677d2` in molass-gui, 2026-08-20): removed the "Use
+   subprocess" checkbox (`upgraded_view.py`) and all `use_subprocess`/`in_process=`
+   plumbing from `rigorous_view.py` and `session_context.py` — `optimize_rigorously()` is now
+   called without `in_process=` anywhere in molass-gui, relying entirely on the library
+   default. `pipeline_recipe` is still built explicitly from the GUI's actual choices (more
+   precise than auto-construction) and passed through unchanged. The exported notebook's
+   stale comment (citing the old `in_process=True` default) was also corrected.
 
 ## Status
 
@@ -123,5 +124,7 @@ path correctly (`run_info._subprocess_process` is set, no `DeprecationWarning`, 
 
 **Deliberately not done**: re-running `test_110_score_optimized.py`/`test_120_restore.py` to
 confirm they still pass under the subprocess path (per user's accepted risk + the project's own
-"don't run the slow suite blindly" rule) — flag if either fails next time they're run. Item 5
-above (molass-gui side) not started.
+"don't run the slow suite blindly" rule) — flag if either fails next time they're run.
+
+All 5 implementation items are now complete. This design is closed; reopen only if the
+deliberately-skipped test re-run above ever surfaces a real regression.
