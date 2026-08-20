@@ -116,7 +116,12 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
     
     return optimizer
 
-def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_ssd=None, debug=False, pipeline_recipe=None):
+def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_ssd=None, debug=False, pipeline_recipe=None, progress_cb=None):
+    """
+    progress_cb : callable, optional
+        Optional ``progress_cb(phase: str)`` called before dataset and
+        baseline-curve construction (molass-library#251).
+    """
     from molass_legacy._MOLASS.SerialSettings import get_setting, set_setting
     if analysis_folder is None:
         analysis_folder = get_setting('analysis_folder')
@@ -159,7 +164,11 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
             shutil.rmtree(temp_in_folder)
 
     # make datasets and basecurves
+    if progress_cb is not None:
+        progress_cb("Building datasets")
     dsets = make_dsets_from_decomposition(decomposition, rgcurve, data_ssd=data_ssd, debug=debug)
+    if progress_cb is not None:
+        progress_cb("Building baseline curves")
     basecurves, baseparams = make_basecurves_from_decomposition(decomposition, data_ssd=data_ssd, debug=False)
 
     # Export the Rg curve to rg-curve/ — the single authoritative folder for rg_curve.

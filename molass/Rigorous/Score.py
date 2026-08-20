@@ -22,9 +22,41 @@ from __future__ import annotations
 
 import io
 import os
+import threading
 import warnings
 from contextlib import redirect_stdout, redirect_stderr, ExitStack
 from importlib import reload
+
+_INTERACTIVE_MPL_BACKENDS = (
+    'tkagg', 'qtagg', 'qt5agg', 'qt4agg', 'wxagg', 'gtk3agg', 'gtk4agg', 'macosx',
+)
+
+
+def _warn_if_background_thread(context):
+    """Warn when *context* runs off the main thread with an interactive matplotlib backend.
+
+    ``score()``'s optimizer construction and ``Score.plot()``'s
+    ``objective_func(..., plot=True)`` mutate matplotlib/Tk artists, which must
+    happen on the main thread. Calling either from a background thread while an
+    interactive backend (e.g. TkAgg) is active can crash the whole process
+    (``Tcl_AsyncDelete: async handler deleted by the wrong thread``) instead of
+    raising a catchable exception (molass-library#252).
+    """
+    if threading.current_thread() is threading.main_thread():
+        return
+    try:
+        import matplotlib
+        backend = matplotlib.get_backend().lower()
+    except Exception:
+        return
+    if any(b in backend for b in _INTERACTIVE_MPL_BACKENDS):
+        warnings.warn(
+            f"{context} was called from a background thread while an interactive "
+            f"matplotlib backend ({matplotlib.get_backend()!r}) is active. This can crash "
+            f"the whole process rather than raise a catchable exception. Call it from the "
+            f"main thread instead (e.g. via a Tk 'after' callback).",
+            UserWarning, stacklevel=3,
+        )
 
 
 class Score:
@@ -73,6 +105,11 @@ class Score:
         title : str, optional
             Figure suptitle.  Defaults to ``"Initial score — SV=<value>"``.
 
+        .. warning::
+            **Thread safety**: this mutates matplotlib/Tk artists and is not
+            safe to call from a background thread while an interactive
+            backend (e.g. ``TkAgg``) is active — see :meth:`Decomposition.score`.
+
         Returns
         -------
         PlotResult
@@ -81,6 +118,7 @@ class Score:
             ``Figure``) avoids the double-display that occurs in Jupyter when
             a function both creates a figure and returns it.
         """
+        _warn_if_background_thread("Score.plot()")
         import matplotlib.pyplot as plt
         from molass_legacy.Optimizer.JobStatePlot import plot_objective_func
         from molass.PlotUtils.PlotResult import PlotResult
@@ -202,6 +240,10 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
     import numpy as np
     from molass.Rigorous.RigorousImplement import _apply_anomaly_interpolation
 
+    def _report(phase):
+        if progress_cb is not None:
+            progress_cb(phase)
+
     import molass.Rigorous.LegacyBridgeUtils
     reload(molass.Rigorous.LegacyBridgeUtils)
     import molass.Rigorous.FunctionCodeUtils
@@ -241,10 +283,12 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
     _original_in_folder = _get_in_folder_raw()
 
     with _stack:
+        _report("Computing Rg curve")
         dsets, basecurves, baseparams, exported = prepare_rigorous_folders(
             decomposition, decomposition.get_rg_curve(progress_cb=progress_cb),
             analysis_folder=analysis_folder,
             data_ssd=trimmed_ssd, debug=debug,
+            progress_cb=_report,
         )
 
         data_ssd = trimmed_ssd if trimmed_ssd is not None else decomposition.ssd
@@ -265,10 +309,12 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         model = decomposition.xr_ccurves[0].model
         num_components = decomposition.num_components
 
+
         if function_code is None:
             from molass.Rigorous.FunctionCodeUtils import detect_function_code
             function_code = detect_function_code(decomposition)
 
+        _report("Constructing optimizer")
         optimizer = construct_legacy_optimizer(
             dsets, basecurves, spectral_vectors,
             num_components=num_components, model=model,
@@ -285,6 +331,7 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         init_params = decomposition.make_rigorous_initparams(baseparams)
         optimizer.prepare_for_optimization(init_params)
 
+    _report("Evaluating objective function")
     # Evaluate objective once (outside suppression so exceptions are visible)
     result_full = optimizer.objective_func(init_params, return_full=True)
     fv = float(result_full[0])

@@ -347,6 +347,34 @@ class Decomposition:
                 self._rgcurve = self.ssd.get_rg_curve(progress_cb=progress_cb)
         return self._rgcurve
 
+    @property
+    def has_rg_curve(self):
+        """Whether :meth:`get_rg_curve` would return a cached result without computing.
+
+        Mirrors :meth:`get_rg_curve`'s own lookup order (``self._rgcurve`` →
+        ``_parent`` chain → ``self.ssd``) without triggering any computation.
+        Useful for GUIs/notebooks deciding whether to show a "computing…"
+        indicator before calling :meth:`get_rg_curve`.
+
+        Returns
+        -------
+        bool
+
+        Examples
+        --------
+        ::
+
+            if not decomp.has_rg_curve:
+                show_progress_indicator()
+            rgcurve = decomp.get_rg_curve()
+        """
+        if getattr(self, '_rgcurve', None) is not None:
+            return True
+        parent = getattr(self, '_parent', None)
+        if parent is not None:
+            return parent.has_rg_curve
+        return getattr(self.ssd, '_rgcurve', None) is not None
+
     def compute_reconstructed_rgcurve(self, debug=False):
         """Compute the reconstructed Rg curve as a concentration-weighted average.
 
@@ -1380,6 +1408,14 @@ class Decomposition:
             decomp_sdm = decomp.upgrade(model='SDM')
             result = decomp_sdm.score(trimmed_ssd=trimmed)
 
+        .. warning::
+            **Thread safety**: constructing the optimizer here (and later calling
+            :meth:`Score.plot` with ``plot=True``) is **not** safe to call from a
+            background thread while an interactive matplotlib backend (e.g.
+            ``TkAgg``) is active — it can crash the whole process rather than
+            raise a catchable exception. Call ``score()`` from the main thread
+            in GUI applications.
+
         Parameters
         ----------
         trimmed_ssd : SecSaxsData, optional
@@ -1390,6 +1426,15 @@ class Decomposition:
         function_code : str, optional
             Override auto-detected function code.
         debug : bool, optional
+        progress_cb : callable, optional
+            Optional progress callback, called at a few natural checkpoints
+            during setup: ``progress_cb(phase: str)`` with phase names such as
+            ``"Computing Rg curve"``, ``"Building datasets"``,
+            ``"Building baseline curves"``, ``"Constructing optimizer"``, and
+            ``"Evaluating objective function"``. While the Rg curve is being
+            computed (if not already cached), it is instead called once per
+            frame as ``progress_cb(rg_buffer, j)`` — the same convention as
+            :meth:`get_rg_curve`. Callers distinguish the two by argument count.
 
         Returns
         -------
@@ -1412,9 +1457,10 @@ class Decomposition:
         **rgcurve**: ``score()`` does not accept ``rgcurve`` as a keyword
         argument.  Pre-compute and cache it by calling
         ``decomp.get_rg_curve()`` *before* ``score()``; the cached value is
-        then picked up automatically.  Without pre-caching, ``score()``
-        emits a ``UserWarning`` and runs one Guinier fit per frame, which
-        is slow.  Example::
+        then picked up automatically. Check :attr:`has_rg_curve` beforehand to
+        know whether this would happen without triggering computation.
+        Without pre-caching, ``score()`` emits a ``UserWarning`` and runs one
+        Guinier fit per frame, which is slow.  Example::
 
             decomp.get_rg_curve()          # caches on decomp
             result = decomp.score(trimmed_ssd=trimmed)
@@ -1425,19 +1471,17 @@ class Decomposition:
         RunInfo.score : Score at optimized parameters.
         RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
-        if getattr(self, '_rgcurve', None) is None:
-            # Check whether lazy parent propagation or ssd cache will supply it.
-            _parent = getattr(self, '_parent', None)
-            _parent_has_cache = _parent is not None and getattr(_parent, '_rgcurve', None) is not None
-            _ssd_has_cache = getattr(self.ssd, '_rgcurve', None) is not None
-            if not _parent_has_cache and not _ssd_has_cache:
-                import warnings
-                warnings.warn(
-                    "Rg curve not pre-computed on this Decomposition. "
-                    "score() will compute it now (one Guinier fit per frame). "
-                    "Pre-compute once with: decomp.get_rg_curve()",
-                    UserWarning, stacklevel=2,
-                )
+        from molass.Rigorous.Score import _warn_if_background_thread
+        _warn_if_background_thread("Decomposition.score()")
+
+        if not self.has_rg_curve:
+            import warnings
+            warnings.warn(
+                "Rg curve not pre-computed on this Decomposition. "
+                "score() will compute it now (one Guinier fit per frame). "
+                "Pre-compute once with: decomp.get_rg_curve()",
+                UserWarning, stacklevel=2,
+            )
         from molass.Rigorous.Score import make_score_impl
         return make_score_impl(
             self, trimmed_ssd=trimmed_ssd,
