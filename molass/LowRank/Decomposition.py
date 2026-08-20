@@ -543,18 +543,18 @@ class Decomposition:
             Marker size for the Rg scatter points.  Default is ``12``.
         rg_cmap : str, optional
             Matplotlib colormap name used to colour Rg markers by score.
-            Default is ``'viridis'``.
+            Default is ``'YlGn'``.
         rg_alpha_by_score : bool, optional
             If True, encode the Guinier fit score as marker *alpha* (opacity)
             in addition to colour, so low-score points fade toward transparent
             instead of competing visually with high-confidence ones. Default
-            is ``False`` (opacity is uniform; quality is shown by hue only).
+            is ``True``.
         rg_alpha_power : float, optional
             Only used when ``rg_alpha_by_score=True``. Alpha is computed as
-            ``score ** rg_alpha_power``. Default ``1.0`` is a linear mapping
-            (score 0.3 -> alpha 0.3); values ``> 1`` suppress low/mid scores
-            more aggressively while a perfect score (1.0) always stays fully
-            opaque, since ``1 ** power == 1`` for any power.
+            ``score ** rg_alpha_power``. Default ``2`` suppresses low/mid
+            scores more aggressively than a linear mapping (score 0.3 -> alpha
+            0.09) while a perfect score (1.0) always stays fully opaque, since
+            ``1 ** power == 1`` for any power.
 
             Example::
 

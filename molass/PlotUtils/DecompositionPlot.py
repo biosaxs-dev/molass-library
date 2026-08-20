@@ -79,9 +79,9 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
         # high-confidence ones.
         rg_score_threshold = kwargs.get('rg_score_threshold', None)
         rg_marker_size = kwargs.get('rg_marker_size', 12)
-        rg_cmap = kwargs.get('rg_cmap', 'viridis')
-        rg_alpha_by_score = kwargs.get('rg_alpha_by_score', False)
-        rg_alpha_power = kwargs.get('rg_alpha_power', 1.0)
+        rg_cmap = kwargs.get('rg_cmap', 'YlGn')
+        rg_alpha_by_score = kwargs.get('rg_alpha_by_score', True)
+        rg_alpha_power = kwargs.get('rg_alpha_power', 2)
 
         axt = ax.twinx()
         axt.set_ylabel("$R_g$")
@@ -223,7 +223,9 @@ def plot_components_impl(decomposition, **kwargs):
                              recognition_curve=recognition_curve,
                              rg_score_threshold=kwargs.get('rg_score_threshold', None),
                              rg_marker_size=kwargs.get('rg_marker_size', 12),
-                             rg_cmap=kwargs.get('rg_cmap', 'viridis'),
+                             rg_cmap=kwargs.get('rg_cmap', 'YlGn'),
+                             rg_alpha_by_score=kwargs.get('rg_alpha_by_score', True),
+                             rg_alpha_power=kwargs.get('rg_alpha_power', 2),
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges
