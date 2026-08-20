@@ -776,4 +776,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         mon.start_watching()
         run_info.monitor = mon
 
+    # Unlike the in-process path (which calls _run_in_process() synchronously
+    # when async_=False), BackRunner.run() above always launches the subprocess
+    # without blocking. Mirror the in-process contract here: async_=False must
+    # block until the run completes before returning (molass-library#255).
+    if not async_:
+        run_info.wait(timeout=0)
+
     return run_info
