@@ -1509,9 +1509,15 @@ class RunInfo:
             except Exception:
                 pass
 
-        # Subprocess returncode: prefer the live attribute (set by
-        # RigorousImplement on process.wait()), fall back to manifest.
-        rc = getattr(self, "subprocess_returncode", None)
+        # Subprocess returncode: prefer polling the live Popen object directly
+        # (available for free the moment the process exits -- no need to wait()
+        # or round-trip through the manifest), then the live attribute (only
+        # ever set by reconnect()), then the manifest as a last resort.
+        rc = None
+        if self._subprocess_process is not None:
+            rc = self._subprocess_process.poll()
+        if rc is None:
+            rc = getattr(self, "subprocess_returncode", None)
         sub_pid = None
         if manifest is not None:
             if rc is None:
@@ -1532,10 +1538,37 @@ class RunInfo:
             phase = "completed"
         elif status in ("running", "starting"):
             phase = "running"
+            # Cross-session case: no live Popen (self._subprocess_process is
+            # None, e.g. this RunInfo came from reconnect()), rc unknown, but
+            # the subprocess may have exited long ago without ever updating
+            # the manifest (same root cause as the self-heal below, just
+            # observed from a different process). _is_subprocess_alive() can
+            # still check by pid even without a live Popen handle.
+            if self._subprocess_process is None and sub_pid is not None \
+                    and not self._is_subprocess_alive():
+                phase = "completed"  # best-effort: no rc available to tell completed from failed
         elif status == "pending":
             phase = "pending"
         else:
             phase = "unknown"
+
+        # Self-heal: the subprocess+async_=True+monitor=False path (e.g.
+        # molass-gui's RigorousView) never calls wait(), so the on-disk
+        # manifest can be stuck at status="running" indefinitely even after
+        # the process has actually exited -- nothing else ever writes the
+        # completion. Since we just determined the real phase above from a
+        # live poll() (cheap, already done), persist it now so the next
+        # reconnect() from a different process (or the next poll from this
+        # one) sees the correct status without needing an explicit wait().
+        if phase in ("completed", "failed") and status not in ("completed", "failed") \
+                and work_folder is not None and analysis_folder is not None:
+            try:
+                from molass.Rigorous.RunRegistry import update_run_manifest
+                update_run_manifest(work_folder, status=phase, subprocess_returncode=rc)
+                update_run_manifest(analysis_folder, status=phase, subprocess_returncode=rc)
+                manifest = dict(manifest or {}, status=phase, subprocess_returncode=rc)
+            except Exception:
+                pass
 
         # Elapsed time from manifest start_time (UTC ISO).
         elapsed_s = None
@@ -1762,3 +1795,44 @@ class RunInfo:
             return True
         except (OSError, ProcessLookupError):
             return False
+
+
+def restore(decomposition, analysis_folder, rgcurve=None):
+    """Restore a cross-session ``RunInfo`` handle for a prior rigorous run (issue #222).
+
+    Unified replacement for ``Decomposition.load_best_rigorous_result()``: instead
+    of jumping straight to a ``Decomposition``, this returns a ``RunInfo`` — the
+    same handle type ``optimize_rigorously()`` returns — so cross-session code can
+    use the same ``load_best()``/``live_status()`` interface as a live run.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The ``Decomposition`` that originally launched the run (or an equivalent
+        one built the same way in a new session).
+    analysis_folder : str
+        The ``analysis_folder`` that was passed to ``optimize_rigorously()``.
+    rgcurve : RgCurve, optional
+        Pre-computed Rg curve to attach, avoiding redundant Guinier fitting.
+
+    Returns
+    -------
+    RunInfo
+        A reconstituted handle with ``optimizer``/``dsets``/``init_params`` set
+        to ``None`` (not available cross-session) but ``load_best()`` and
+        ``live_status()`` fully functional.
+
+    Examples
+    --------
+    ::
+
+        decomp = corrected.quick_decomposition(num_components=2)
+        run = restore(decomp, "temp_analysis")
+        result = run.load_best()
+        result.plot_components()
+    """
+    run_info = RunInfo.reconnect(analysis_folder)
+    run_info.decomposition = decomposition
+    run_info.ssd = decomposition.ssd
+    run_info.rgcurve = rgcurve
+    return run_info

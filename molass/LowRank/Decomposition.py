@@ -1507,6 +1507,12 @@ class Decomposition:
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
 
+        .. deprecated::
+            Use :func:`molass.Rigorous.RunInfo.restore` instead — it returns a
+            ``RunInfo`` handle with the same ``load_best()``/``live_status()``
+            interface as a live run, rather than jumping straight to a
+            ``Decomposition``.
+
         Convenience method that combines ``list_rigorous_jobs()`` and
         ``load_rigorous_result()`` into a single call: finds the job
         with the lowest objective function value and reconstructs the
@@ -1547,6 +1553,11 @@ class Decomposition:
             # Fast: skip redundant Guinier fitting by passing rgcurve
             result = decomp.load_best_rigorous_result("temp_analysis", rgcurve=rgcurve)
         """
+        import warnings
+        warnings.warn(
+            "load_best_rigorous_result() is deprecated. Use restore() instead.",
+            DeprecationWarning, stacklevel=2
+        )
         jobs = self.list_rigorous_jobs(analysis_folder)
         if not jobs:
             raise FileNotFoundError(
