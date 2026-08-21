@@ -77,6 +77,14 @@ def create_optimizer_from_recipe(work_folder, class_code):
         try:
             from molass.Rigorous.LumpingConstraint import LumpingConstraint
             score.optimizer._constraints = [LumpingConstraint(egh_decomp)]
+            # Mirror RigorousImplement's de_tol=0 override (issue: constraints reshape
+            # the fitness landscape so scipy DE's std(energies)<=tol*mean fires too early).
+            # 'de_tol' is not in OptimizerSettings.OPT_DEFAULT_SETTINGS, so it never
+            # survives opt_settings.txt serialization to this subprocess — it must be
+            # re-applied here directly against the live SerialSettings singleton, which
+            # optimizer.solve() (called after this function returns) will read from.
+            from molass_legacy._MOLASS.SerialSettings import set_setting
+            set_setting('de_tol', 0)
         except Exception:
             pass
 
