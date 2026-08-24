@@ -20,6 +20,20 @@ import numpy as np
 from importlib import reload
 
 
+def _has_ipython_display():
+    """Return True when running inside a Jupyter/IPython kernel (has ipywidgets
+    display support), False in a plain script or terminal.
+
+    Used to gracefully degrade ``monitor=True`` instead of crashing when the
+    MplMonitor dashboard's ipywidgets/matplotlib calls run outside a notebook.
+    """
+    try:
+        from IPython import get_ipython
+        return get_ipython() is not None
+    except Exception:
+        return False
+
+
 def _set_identity_restrict_lists(ssd):
     """Set identity (full-range) restrict_lists for already-exported data.
 
@@ -370,6 +384,22 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if trimmed_ssd is not None:
         trimmed_ssd = _apply_anomaly_interpolation(trimmed_ssd, corrected_ssd=decomposition.ssd)
 
+    # monitor=True builds an MplMonitor ipywidgets dashboard in THIS process.
+    # Outside a notebook/IPython kernel, ipywidgets/matplotlib display calls
+    # from the async background thread can crash the whole process
+    # (Tcl_AsyncDelete) instead of failing gracefully -- degrade to
+    # monitor=False with a warning rather than crash.  Placed above _dry_run
+    # so tests can verify the warning without running the full pipeline.
+    if monitor and not _has_ipython_display():
+        import warnings as _w
+        _w.warn(
+            "monitor=True has no effect outside a Jupyter/IPython notebook -- "
+            "the live dashboard requires ipywidgets display support. Falling back "
+            "to monitor=False. Pass monitor=False explicitly to silence this warning.",
+            UserWarning, stacklevel=3,
+        )
+        monitor = False
+
     # Dry-run mode: fire all pre-flight checks (above) and return without
     # building the optimizer.  Used by tests to verify warnings and guards
     # without running the full heavy pipeline.  (molass-library#165)
@@ -521,6 +551,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                                **(solver_kwargs or {}))
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
+        # Tracks whether init_params was overridden from a known-good point
+        # (seed_params or resume) rather than the plain estimator-derived
+        # guess -- used below to concentrate DE's population around it
+        # (issue: DE reseeding was a no-op vs BH's, see molass-library#259).
+        _seeded_from_known_point = False
         # seed_params: user-supplied override (e.g. seed DE from a prior BH result).
         # Takes priority over both the estimator-derived init and the resume path.
         if seed_params is not None:
@@ -528,6 +563,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             _seed = _np.asarray(seed_params)
             if len(_seed) == len(init_params):
                 init_params = _seed
+                _seeded_from_known_point = True
             else:
                 import warnings as _w
                 _w.warn(
@@ -543,6 +579,15 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             _resume_init = _load_best_init_params(analysis_folder, init_params)
             if _resume_init is not None:
                 init_params = _resume_init
+                _seeded_from_known_point = True
+        if _seeded_from_known_point and method == 'DE':
+            # Without this, DE's population is built via latinhypercube (full
+            # [0,10] box) regardless of init_params -- only ONE of popsize*n_params
+            # individuals (the x0= member) reflects the seed, so a known-good point
+            # barely influences the search. This concentrates the WHOLE population
+            # around it instead, giving DE the same "polish near the best" behavior
+            # BH already gets from x0 alone. See SolverDE.minimize() / molass-library#259.
+            optimizer._de_use_tight_init = True
         optimizer.prepare_for_optimization(init_params)
 
         # Inject pluggable constraint hooks (e.g. LumpingConstraint).

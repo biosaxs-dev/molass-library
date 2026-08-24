@@ -6,6 +6,76 @@ this function directly, bypassing the subprocess machinery entirely.
 """
 
 
+def rebuild_decomposition_from_recipe(analysis_folder):
+    """Rebuild (ssd, trimmed, decomp, recipe) from an analysis_folder's recipe.json.
+
+    Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
+    pipeline used when the analysis_folder was first created, using recipe.json
+    plus any existing job's in_folder.txt as the source of truth. Shared by
+    create_optimizer_from_recipe (subprocess path) and by session-reconstruction
+    helpers (e.g. CurrentStateUtils.load_analysis_session) that need the initial
+    decomposition without building a full legacy optimizer.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Same value passed to optimize_rigorously(analysis_folder=...).
+
+    Returns
+    -------
+    ssd, trimmed, decomp, recipe
+        ``decomp`` is the initial (estimator) decomposition -- not yet attached
+        to any rigorous-optimization result. Use ``decomp.load_rigorous_result(
+        analysis_folder)`` to attach the best on-disk result.
+    """
+    import os, json
+
+    analysis_folder = os.path.abspath(analysis_folder)
+    optimizer_folder = os.path.join(analysis_folder, "optimized")
+    recipe_file = os.path.join(optimizer_folder, 'recipe.json')
+    if not os.path.exists(recipe_file):
+        raise FileNotFoundError(f"recipe.json not found at {recipe_file}")
+    with open(recipe_file) as f:
+        recipe = json.load(f)
+
+    jobs_folder = os.path.join(optimizer_folder, "jobs")
+    in_folder = None
+    if os.path.isdir(jobs_folder):
+        for jobid in sorted(os.listdir(jobs_folder)):
+            candidate = os.path.join(jobs_folder, jobid, 'in_folder.txt')
+            if os.path.exists(candidate):
+                with open(candidate) as f:
+                    in_folder = f.read().strip()
+                break
+    if in_folder is None:
+        raise FileNotFoundError(f"No in_folder.txt found under any job in {jobs_folder}")
+
+    from molass.DataObjects import SecSaxsData as SSD
+
+    n_components = recipe.get('num_components', 3)
+    model = recipe.get('model', 'egh').lower()
+    pore_dist = recipe.get('pore_dist', None)
+    ln_pore_sigma = recipe.get('ln_pore_sigma', None)
+    trim_params = recipe.get('trim_params', {})
+    baseline_params = recipe.get('baseline_params', {})
+    decomp_params = dict(recipe.get('decomp_params', {}))
+    decomp_params['num_components'] = n_components
+
+    ssd = SSD(in_folder)
+    trimmed = ssd.trimmed_copy(**trim_params)
+    corrected = trimmed.corrected_copy(**baseline_params)
+    decomp = corrected.quick_decomposition(**decomp_params)
+    if model != 'egh':
+        upgrade_kwargs = {}
+        if pore_dist is not None:
+            upgrade_kwargs['pore_dist'] = pore_dist
+            if ln_pore_sigma is not None:
+                upgrade_kwargs['model_params'] = {'ln_pore_sigma': ln_pore_sigma}
+        decomp = decomp.upgrade(model=model, **upgrade_kwargs)
+
+    return ssd, trimmed, decomp, recipe
+
+
 def create_optimizer_from_recipe(work_folder, class_code):
     """Rebuild the SSD pipeline from recipe.json and return a ready optimizer.
 
@@ -22,50 +92,18 @@ def create_optimizer_from_recipe(work_folder, class_code):
         Score object with .sv (initial SV), .optimizer, and .init_params.
         Pass score.optimizer to the solver for optimization.
     """
-    import os, json
-    import numpy as np
+    import os
 
-    # --- locate files ---
     optimizer_folder = os.path.dirname(os.path.dirname(work_folder))  # .../optimized
+    analysis_folder = os.path.dirname(optimizer_folder)
 
-    in_folder_file = os.path.join(work_folder, 'in_folder.txt')
-    if not os.path.exists(in_folder_file):
-        raise FileNotFoundError(f"in_folder.txt not found in {work_folder}")
-    with open(in_folder_file) as f:
-        in_folder = f.read().strip()
-
-    recipe_file = os.path.join(optimizer_folder, 'recipe.json')
-    if os.path.exists(recipe_file):
-        with open(recipe_file) as f:
-            recipe = json.load(f)
-    else:
-        raise FileNotFoundError(f"recipe.json not found at {recipe_file}")
-
-    # --- rebuild SSD pipeline ---
-    from molass.DataObjects import SecSaxsData as SSD
-
+    ssd_trimmed_and_decomp = rebuild_decomposition_from_recipe(analysis_folder)
+    _ssd, ssd_trimmed, decomp, recipe = ssd_trimmed_and_decomp
     n_components = recipe.get('num_components', 3)
-    model = recipe.get('model', 'egh').lower()
     method = recipe.get('method', 'bh').lower()
-    pore_dist = recipe.get('pore_dist', None)
-    ln_pore_sigma = recipe.get('ln_pore_sigma', None)
-    trim_params = recipe.get('trim_params', {})
-    baseline_params = recipe.get('baseline_params', {})
-    decomp_params = dict(recipe.get('decomp_params', {}))
-    decomp_params['num_components'] = n_components
-
-    ssd = SSD(in_folder)
-    ssd_trimmed = ssd.trimmed_copy(**trim_params)
-    ssd_corrected = ssd_trimmed.corrected_copy(**baseline_params)
-    decomp = ssd_corrected.quick_decomposition(**decomp_params)
-    egh_decomp = decomp  # keep EGH source for LumpingConstraint boundaries
-    if model != 'egh':
-        upgrade_kwargs = {}
-        if pore_dist is not None:
-            upgrade_kwargs['pore_dist'] = pore_dist
-            if ln_pore_sigma is not None:
-                upgrade_kwargs['model_params'] = {'ln_pore_sigma': ln_pore_sigma}
-        decomp = decomp.upgrade(model=model, **upgrade_kwargs)
+    # keep the pre-upgrade EGH source for LumpingConstraint boundaries -- same
+    # fallback chain RigorousImplement.py uses (upgrade() sets _source_decomp).
+    egh_decomp = getattr(decomp, '_source_decomp', getattr(decomp, '_parent', decomp))
 
     # Pre-cache so score() doesn't recompute Guinier per frame.
     decomp.get_rg_curve()
@@ -86,6 +124,20 @@ def create_optimizer_from_recipe(work_folder, class_code):
             from molass_legacy._MOLASS.SerialSettings import set_setting
             set_setting('de_tol', 0)
         except Exception:
+            pass
+
+    # Mirror the parent's DE tight-population-init decision for reseeded rounds
+    # (num_jobs / clear_jobs=False): job index > 0 in this analysis_folder means
+    # init_params.txt (loaded by the caller after this function returns) came from
+    # a previous round's best, not the plain estimator guess -- without this, DE's
+    # population is built via latinhypercube regardless, so the reseed only ever
+    # reaches 1 of popsize*n_params individuals (x0=). See molass-library#259.
+    if method == 'de':
+        try:
+            job_index = int(os.path.basename(work_folder.rstrip('/\\')))
+            if job_index > 0:
+                score.optimizer._de_use_tight_init = True
+        except (ValueError, TypeError):
             pass
 
     return score

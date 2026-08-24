@@ -201,11 +201,17 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     # Resolve job id
     if jobid is None:
-        jobids = sorted(d for d in os.listdir(jobs_folder)
-                        if os.path.isdir(os.path.join(jobs_folder, d)))
-        if not jobids:
-            raise FileNotFoundError(f"No job folders found in {jobs_folder}")
-        jobid = jobids[-1]
+        # Skip jobs that only have the single init-params entry (e.g. a round
+        # still starting up, or one interrupted before its first real result) --
+        # same guard as list_rigorous_jobs() (issue #188). Without this, "latest
+        # job" can pick an in-progress/incomplete job and crash deep inside
+        # get_params() with a cryptic IndexError instead of a clear message.
+        valid_jobs = list_rigorous_jobs(analysis_folder)
+        if not valid_jobs:
+            raise FileNotFoundError(
+                f"No completed job (with at least one real result) found in {jobs_folder}"
+            )
+        jobid = valid_jobs[-1].id
 
     job_result_folder = os.path.join(jobs_folder, jobid)
     print(f"Loading rigorous result from job: {jobid}")
@@ -294,6 +300,56 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
                          optimizer_rgs=optimizer_rgs)
+
+
+def load_analysis_session(analysis_folder, jobid=None, debug=False):
+    """Reconstruct a full session from just an ``analysis_folder``.
+
+    Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
+    pipeline used when the analysis_folder was first created (from its
+    ``recipe.json``), then attaches the best rigorous-optimization result found
+    on disk. Use this to resume a GUI/notebook session after a restart, without
+    needing to remember or re-supply the original pipeline parameters.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Same value passed to ``optimize_rigorously(analysis_folder=...)``.
+    jobid : str, optional
+        Specific job id to load. If ``None``, loads the latest job.
+    debug : bool, optional
+        If True, reload modules from disk.
+
+    Returns
+    -------
+    ssd : SecSaxsData
+        The raw loaded data.
+    trimmed : SecSaxsData
+        Trimmed (uncorrected) SSD -- pass as ``trimmed_ssd`` to a further
+        ``optimize_rigorously()`` call to resume.
+    decomp : Decomposition
+        The initial (estimator) decomposition, not yet attached to any result.
+    result : Decomposition
+        The best rigorous-optimization result found on disk.
+    recipe : dict
+        The raw ``recipe.json`` contents (model, num_components, decomp_params, ...).
+
+    Examples
+    --------
+    ::
+
+        from molass.Rigorous.CurrentStateUtils import load_analysis_session
+        ssd, trimmed, decomp, result, recipe = load_analysis_session(analysis_folder)
+        result.plot_components()
+    """
+    if debug:
+        from importlib import reload
+        import molass.Rigorous.RecipeRunner
+        reload(molass.Rigorous.RecipeRunner)
+    from molass.Rigorous.RecipeRunner import rebuild_decomposition_from_recipe
+    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder)
+    result = load_rigorous_result(decomp, analysis_folder, jobid=jobid, debug=debug)
+    return ssd, trimmed, decomp, result, recipe
 
 
 def list_rigorous_jobs(analysis_folder):

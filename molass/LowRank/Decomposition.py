@@ -1142,6 +1142,9 @@ class Decomposition:
                             seed_params=None,
                             constraints=None,
                             pipeline_recipe=None,
+                            num_jobs=1,
+                            on_round_start=None,
+                            stop_check=None,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -1219,6 +1222,30 @@ class Decomposition:
             automatically used as ``init_params`` for the new trial (resuming
             from the best known point rather than the original decomp params,
             see issue #169).
+        num_jobs : int, optional
+            Run ``num_jobs`` full, un-truncated rounds instead of one, each
+            round reseeding ``init_params`` from the best params found across
+            *all* previous rounds (the same mechanism as calling this method
+            repeatedly with ``clear_jobs=(round == 0)``). Default 1 (today's
+            single-round behavior, unchanged).
+
+            Requires ``async_=False`` — the call blocks until every round
+            completes. Validated monotonic/no-regression on real BH and DE
+            runs; see ``molass-researcher/experiments/36_bh_cutomize_trial``.
+            Distinct from ``max_trials`` (which is ``monitor=True``-only and
+            reseeds from just the previous trial's own best, not the global
+            best — see issue #257).
+        on_round_start : callable, optional
+            Only used when ``num_jobs > 1``. Called as
+            ``on_round_start(round_idx, num_jobs, run_info)`` immediately
+            after each round's ``run_info`` becomes available (before that
+            round blocks) — use it to poll/display progress for the round
+            currently in flight, e.g. from a GUI's own polling loop.
+        stop_check : callable, optional
+            Only used when ``num_jobs > 1``. Called with no arguments before
+            each round launches; return a truthy value to abort the remaining
+            rounds (the round already in flight is not interrupted by this --
+            call ``run_info.stop()`` for that).
         in_process : bool, optional
             If False (default), use the recipe-based subprocess path: the optimizer
             runs in a separate OS process, isolating it from crashes and from the
@@ -1395,6 +1422,38 @@ class Decomposition:
 
         if rgcurve is None:
             rgcurve = self.get_rg_curve()  # cached; avoids redundant Guinier fit on repeated calls (#248)
+
+        if num_jobs > 1:
+            if async_:
+                raise ValueError(
+                    "num_jobs > 1 requires async_=False -- each round blocks until it "
+                    "completes (and reseeds the next round from its best params) before "
+                    "returning. For a non-blocking multi-job sequence, loop over "
+                    "optimize_rigorously(clear_jobs=(i == 0), ...) yourself in a background "
+                    "thread instead."
+                )
+            if max_trials:
+                import warnings
+                warnings.warn(
+                    "num_jobs and max_trials both requested -- max_trials's own "
+                    "(per-round, monitor=True only) auto-resume would additionally fire "
+                    "inside each of the num_jobs rounds. Prefer one or the other.",
+                    UserWarning, stacklevel=2,
+                )
+            run_info = None
+            for round_idx in range(num_jobs):
+                if stop_check is not None and stop_check():
+                    break
+                # async_=True internally so run_info exists (for on_round_start) before
+                # this round's wait() blocks -- the overall call still blocks the caller
+                # per the async_=False contract enforced above.
+                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
+                if run_info is None:
+                    return None  # _dry_run=True: pre-flight checks done, nothing to run/wait on
+                if on_round_start is not None:
+                    on_round_start(round_idx, num_jobs, run_info)
+                run_info.wait(timeout=0)
+            return run_info
 
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
 
@@ -1663,6 +1722,39 @@ class Decomposition:
         """
         from molass.Rigorous.CurrentStateUtils import has_rigorous_results as _has
         return _has(analysis_folder)
+
+    @staticmethod
+    def load_analysis_session(analysis_folder, jobid=None, debug=False):
+        """Reconstruct a full session (ssd, trimmed, decomp, result) from just
+        an ``analysis_folder`` -- e.g. to resume a GUI/notebook session after
+        a restart, without needing to remember or re-supply the original
+        pipeline parameters (read back from the folder's ``recipe.json``).
+
+        Parameters
+        ----------
+        analysis_folder : str
+            Same value passed to ``optimize_rigorously(analysis_folder=...)``.
+        jobid : str, optional
+            Specific job id to load. If ``None``, loads the latest job.
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        ssd, trimmed, decomp, result, recipe
+            See :func:`molass.Rigorous.CurrentStateUtils.load_analysis_session`
+            for details on each returned value.
+
+        Examples
+        --------
+        ::
+
+            ssd, trimmed, decomp, result, recipe = Decomposition.load_analysis_session(
+                "temp_analysis_scaffolded")
+            result.plot_components()
+        """
+        from molass.Rigorous.CurrentStateUtils import load_analysis_session as _load
+        return _load(analysis_folder, jobid=jobid, debug=debug)
 
     @staticmethod
     def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):
