@@ -14,11 +14,11 @@ authors:
     corresponding: true
     affiliation: "1,2,3"
 affiliations:
-  - name: Structural Biology Research Center, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK)
+  - name: Structural Biology Research Center, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK), Japan
     index: 1
-  - name: Photon Factory, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK)
+  - name: Photon Factory, Institute of Materials Structure Science, High Energy Accelerator Research Organization (KEK), Japan
     index: 2
-  - name: Life Science Research Infrastructure Group, R&D of Technology and Systems for Synchrotron Radiation Applications Division, RIKEN SPring-8 Center, RIKEN
+  - name: Life Science Research Infrastructure Group, R&D of Technology and Systems for Synchrotron Radiation Applications Division, RIKEN SPring-8 Center, RIKEN, Japan
     index: 3
     ror: 01d1kv753
 date: 2 October 2025
@@ -72,12 +72,12 @@ Molass Library extends this demonstrated impact by converting the legacy GUI-cen
 
 # Notable package dependencies
 
-Molass Library is built on robust scientific Python libraries, including NumPy, SciPy, and Matplotlib. It further integrates:
+Molass Library is built on robust scientific Python libraries, including NumPy [@Harris2020], SciPy [@Virtanen2020], and Matplotlib [@Hunter:2007]. It further integrates:
 
 * **pybaselines** [@pybaselines] for advanced baseline correction
 * **ruptures** [@TRUONG2020107299] for change point detection
 * **scipy.signal.find_peaks** for peak recognition
-* **scikit-learn** for grouping peaks by the k-means algorithm
+* **scikit-learn** [@Pedregosa2011] for grouping peaks by the k-means algorithm
 
 By adopting these well-maintained packages, Molass Library reduces custom code and enhances reliability. The transition from a GUI-based workflow (previously using Tkinter) to Jupyter-based scripting further streamlines reproducibility and collaboration.
 
