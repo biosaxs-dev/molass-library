@@ -120,21 +120,24 @@ def create_optimizer_from_recipe(work_folder, class_code):
         score.optimizer.freeze_param_groups(_frozen_param_groups)
 
     # Mirror parent's LumpingConstraint auto-application for DE with 3+ components.
-    # The parent applies it to its own optimizer; the subprocess must do the same.
-    if method == 'de' and n_components >= 3:
-        try:
-            from molass.Rigorous.LumpingConstraint import LumpingConstraint
-            score.optimizer._constraints = [LumpingConstraint(egh_decomp)]
-            # Mirror RigorousImplement's de_tol=0 override (issue: constraints reshape
-            # the fitness landscape so scipy DE's std(energies)<=tol*mean fires too early).
+    # Condition + consequences come from ConstraintDefaults, the single source
+    # of truth shared with RigorousImplement.py (molass-library#255) -- #253's
+    # bug was exactly a safety override added to one copy of this logic and
+    # not mirrored into the other.
+    try:
+        from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
+        _auto_constraints, _overrides = get_constraint_and_overrides(method, n_components, egh_decomp)
+        if _auto_constraints is not None:
+            score.optimizer._constraints = _auto_constraints
             # 'de_tol' is not in OptimizerSettings.OPT_DEFAULT_SETTINGS, so it never
-            # survives opt_settings.txt serialization to this subprocess — it must be
+            # survives opt_settings.txt serialization to this subprocess -- it must be
             # re-applied here directly against the live SerialSettings singleton, which
             # optimizer.solve() (called after this function returns) will read from.
             from molass_legacy._MOLASS.SerialSettings import set_setting
-            set_setting('de_tol', 0)
-        except Exception:
-            pass
+            for _k, _v in _overrides.items():
+                set_setting(_k, _v)
+    except Exception:
+        pass
 
     # Mirror the parent's DE tight-population-init decision for reseeded rounds
     # (num_jobs / clear_jobs=False): job index > 0 in this analysis_folder means

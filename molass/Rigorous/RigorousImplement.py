@@ -428,23 +428,24 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _original_user_constraints = constraints
 
     # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
+    # Condition + consequences live in ConstraintDefaults so RecipeRunner.py's
+    # subprocess mirror can't drift from this one (molass-library#255).
     # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
     # warnings.simplefilter("ignore") and would swallow this warning silently.
-    # Use the EGH parent decomposition (_parent) as the boundary source when
-    # available: EGH curves have direct curve-fit peak positions, while upgraded
-    # SDM/EDM curves derive peaks from a physics model that may shift them
-    # slightly, producing different (worse) zone boundaries.
     if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
         import warnings as _w
-        from molass.Rigorous.LumpingConstraint import LumpingConstraint as _LC
+        from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
         # Prefer _source_decomp (set by copy_with_new_components on every upgrade)
         # over decomposition itself.  EGH source curves give more reliable peak
         # positions for zone boundaries than physics-model (SDM/EDM/LKM) curves.
         # _parent is a fallback for paths that bypass copy_with_new_components.
         _lc_source = getattr(decomposition, '_source_decomp',
                              getattr(decomposition, '_parent', decomposition))
-        _auto_lc = _LC(_lc_source)
-        constraints = [_auto_lc]
+        constraints, _overrides = get_constraint_and_overrides(
+            method, len(decomposition.xr_ccurves), _lc_source)
+        _auto_lc = constraints[0]
+        solver_kwargs = dict(solver_kwargs or {})
+        solver_kwargs.update(_overrides)
         _w.warn(
             "optimize_rigorously(method='DE') automatically applied "
             "LumpingConstraint to prevent component collapse "
@@ -455,8 +456,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             stacklevel=3,
         )
 
-    # When constraints are active, disable DE's tol-based early convergence:
-    # penalty terms reshape the fitness landscape so std(energies) fires too early.
+    # When constraints are active (auto-applied above, or user-supplied), disable
+    # DE's tol-based early convergence: penalty terms reshape the fitness landscape
+    # so std(energies) fires too early. setdefault is a no-op for the auto-applied
+    # case (already set via get_constraint_and_overrides above).
     if constraints and method == 'DE':
         solver_kwargs = dict(solver_kwargs or {})
         solver_kwargs.setdefault('de_tol', 0)
