@@ -121,27 +121,42 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def _load_best_init_params(analysis_folder, init_params):
-    """Load the best params from previous jobs when resuming (``clear_jobs=False``).
+def find_global_best_params(jobs_dir, init_params=None):
+    """Scan every completed job's ``callback.txt`` under *jobs_dir* and return
+    the global-best params found across the entire job history.
 
-    Scans ``analysis_folder/optimized/jobs/*/callback.txt``, finds the job
-    with the global minimum ``fv``, and returns the corresponding best params.
+    Single source of truth for "reseed from the best point found so far",
+    shared by :func:`_load_best_init_params` (this module's ``clear_jobs=False``
+    resume path) and ``MplMonitor``'s ``max_trials`` auto-resume / "Resume Job"
+    button (molass-legacy) -- before this helper existed, the latter only
+    looked at the single most-recently-completed trial's own state, with no
+    protection against regressing relative to an earlier, better trial
+    (molass-library#257).
 
-    Returns ``None`` if no valid previous jobs are found (so the caller falls
-    back to the original ``decomp``-derived ``init_params``).
+    Parameters
+    ----------
+    jobs_dir : str
+        Path to ``analysis_folder/optimized/jobs``.
+    init_params : array-like, optional
+        When given, a candidate best is only returned if its length matches
+        ``len(init_params)`` -- guards against mismatched runs (e.g. different
+        ``num_components``).
 
-    The length of the returned array is verified against ``init_params`` to
-    guard against mismatched runs (e.g. different ``num_components``).
+    Returns
+    -------
+    best_params : ndarray or None
+    best_fv : float or None
+    best_job : str or None
+        Absolute path to the job folder the best params came from.
     """
-    jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
     if not os.path.isdir(jobs_dir):
-        return None
+        return None, None, None
 
     try:
         from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
         from molass_legacy.Optimizer.Scripting import get_params
     except ImportError:
-        return None
+        return None, None, None
 
     best_fv = None
     best_job = None
@@ -163,18 +178,32 @@ def _load_best_init_params(analysis_folder, init_params):
             continue
 
     if best_job is None:
-        return None
+        return None, None, None
 
     try:
         best = get_params(best_job)
-        if best is not None and len(best) == len(init_params):
-            print(f"Resume: loading best params from {os.path.basename(best_job)} "
-                  f"(fv={best_fv:.4f}) as init_params.")
-            return best
+        if best is not None and (init_params is None or len(best) == len(init_params)):
+            return best, best_fv, best_job
     except Exception:
         pass
 
-    return None
+    return None, None, None
+
+
+def _load_best_init_params(analysis_folder, init_params):
+    """Load the best params from previous jobs when resuming (``clear_jobs=False``).
+
+    Thin wrapper around :func:`find_global_best_params`.  Returns ``None`` if
+    no valid previous jobs are found (so the caller falls back to the original
+    ``decomp``-derived ``init_params``).
+    """
+    jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+    best, best_fv, best_job = find_global_best_params(jobs_dir, init_params)
+    if best is None:
+        return None
+    print(f"Resume: loading best params from {os.path.basename(best_job)} "
+          f"(fv={best_fv:.4f}) as init_params.")
+    return best
 
 
 def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
