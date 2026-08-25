@@ -107,7 +107,17 @@ def create_optimizer_from_recipe(work_folder, class_code):
 
     # Pre-cache so score() doesn't recompute Guinier per frame.
     decomp.get_rg_curve()
-    score = decomp.score(trimmed_ssd=ssd_trimmed)
+    score = decomp.score(trimmed_ssd=ssd_trimmed, function_code=recipe.get('function_code'))
+
+    # Mirror the parent's freeze_components()/freeze_param_groups() calls -- without
+    # this, a recipe-mode subprocess silently rebuilds a fully unfrozen optimizer even
+    # when the caller asked for frozen_components=[...] (molass-library#260).
+    _frozen_components = recipe.get('frozen_components')
+    if _frozen_components is not None:
+        score.optimizer.freeze_components(_frozen_components)
+    _frozen_param_groups = recipe.get('frozen_param_groups')
+    if _frozen_param_groups is not None:
+        score.optimizer.freeze_param_groups(_frozen_param_groups)
 
     # Mirror parent's LumpingConstraint auto-application for DE with 3+ components.
     # The parent applies it to its own optimizer; the subprocess must do the same.

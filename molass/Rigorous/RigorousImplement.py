@@ -177,17 +177,35 @@ def _load_best_init_params(analysis_folder, init_params):
     return None
 
 
-def _build_auto_recipe(decomposition, method='BH'):
-    """Build a minimal recipe dict from a decomposition for backward-compat auto-construction."""
+def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
+                        frozen_param_groups=None, function_code=None, seed_params=None):
+    """Build a recipe dict from a decomposition for backward-compat auto-construction.
+
+    Captures every parameter that affects optimizer construction so that
+    ``RecipeRunner.create_optimizer_from_recipe`` (subprocess path) and
+    ``Decomposition.load_analysis_session()`` (Resume / View Result) don't
+    silently diverge from what the caller actually asked for (issue #260).
+    """
     model = decomposition.xr_ccurves[0].model  # 'egh', 'sdm', 'lkm', etc.
-    return {
+    recipe = {
         "num_components": decomposition.num_components,
         "model": model,
         "method": method.lower(),
         "decomp_params": {},
         "trim_params": {},
         "baseline_params": {},
+        "niter": niter,
     }
+    if frozen_components is not None:
+        recipe["frozen_components"] = list(frozen_components)
+    if frozen_param_groups is not None:
+        recipe["frozen_param_groups"] = list(frozen_param_groups)
+    if function_code is not None:
+        recipe["function_code"] = function_code
+    if seed_params is not None:
+        import numpy as _np
+        recipe["seed_params"] = _np.asarray(seed_params).tolist()
+    return recipe
 
 
 def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
@@ -464,7 +482,19 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # This is the normal default flow (in_process=False is now the default),
     # not a deprecated fallback -- see Copilot/refactor/DESIGN_default_in_process_reversal.md.
     if not in_process and pipeline_recipe is None:
-        pipeline_recipe = _build_auto_recipe(decomposition, method)
+        # Resolve function_code before recipe construction so it round-trips
+        # through recipe.json (issue #260) -- the later detection below becomes
+        # a no-op once this has run.
+        if function_code is None:
+            from .FunctionCodeUtils import detect_function_code
+            function_code = detect_function_code(decomposition)
+        pipeline_recipe = _build_auto_recipe(
+            decomposition, method, niter=niter,
+            frozen_components=frozen_components,
+            frozen_param_groups=frozen_param_groups,
+            function_code=function_code,
+            seed_params=seed_params,
+        )
 
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
