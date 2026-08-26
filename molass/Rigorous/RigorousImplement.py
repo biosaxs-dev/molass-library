@@ -34,6 +34,29 @@ def _has_ipython_display():
         return False
 
 
+# Interactive GUI backends whose widgets may only be touched from the thread
+# that created them -- MplMonitor's background watcher thread draws into
+# whatever backend is active, which crashes the process (e.g. Tcl_AsyncDelete
+# for TkAgg) instead of raising a catchable exception.
+_GUI_BACKENDS = {'tkagg', 'qtagg', 'qt5agg', 'qt4agg', 'wxagg', 'gtk3agg', 'gtk4agg', 'macosx'}
+
+
+def _is_interactive_gui_backend():
+    """Return True when matplotlib's active backend is a main-thread-only GUI
+    toolkit (Tk/Qt/Wx/GTK/macOS), False for inline/agg/widget backends.
+
+    A real Jupyter/IPython kernel (``_has_ipython_display()`` True) can still
+    end up with a GUI backend active -- e.g. ``%matplotlib inline`` was never
+    run, or the kernel's default wasn't overridden -- so this check is needed
+    in addition to, not instead of, ``_has_ipython_display()``.
+    """
+    try:
+        import matplotlib
+        return matplotlib.get_backend().lower() in _GUI_BACKENDS
+    except Exception:
+        return False
+
+
 def _set_identity_restrict_lists(ssd):
     """Set identity (full-range) restrict_lists for already-exported data.
 
@@ -432,9 +455,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         trimmed_ssd = _apply_anomaly_interpolation(trimmed_ssd, corrected_ssd=decomposition.ssd)
 
     # monitor=True builds an MplMonitor ipywidgets dashboard in THIS process.
-    # Outside a notebook/IPython kernel, ipywidgets/matplotlib display calls
-    # from the async background thread can crash the whole process
-    # (Tcl_AsyncDelete) instead of failing gracefully -- degrade to
+    # Outside a notebook/IPython kernel, or when the active matplotlib backend
+    # is an interactive GUI toolkit (Tk/Qt/Wx/GTK), ipywidgets/matplotlib display
+    # calls from the async background thread can crash the whole process
+    # (Tcl_AsyncDelete or similar) instead of failing gracefully -- degrade to
     # monitor=False with a warning rather than crash.  Placed above _dry_run
     # so tests can verify the warning without running the full pipeline.
     if monitor and not _has_ipython_display():
@@ -443,6 +467,20 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             "monitor=True has no effect outside a Jupyter/IPython notebook -- "
             "the live dashboard requires ipywidgets display support. Falling back "
             "to monitor=False. Pass monitor=False explicitly to silence this warning.",
+            UserWarning, stacklevel=3,
+        )
+        monitor = False
+    elif monitor and _is_interactive_gui_backend():
+        import warnings as _w
+        import matplotlib as _mpl
+        _w.warn(
+            f"monitor=True is unsafe with the active matplotlib backend "
+            f"({_mpl.get_backend()!r}) -- MplMonitor's background watcher thread "
+            "draws into it, which can crash the whole process (e.g. "
+            "Tcl_AsyncDelete for TkAgg) instead of failing gracefully. Falling back "
+            "to monitor=False. Run '%matplotlib inline' (or select the ipympl/widget "
+            "backend) before calling optimize_rigorously(monitor=True), or pass "
+            "monitor=False explicitly to silence this warning.",
             UserWarning, stacklevel=3,
         )
         monitor = False
