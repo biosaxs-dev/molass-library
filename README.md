@@ -52,6 +52,7 @@ The [molass-beginner](https://github.com/biosaxs-dev/molass-beginner) repository
 ## Documentation
 
 - **Beginner Onboarding:** https://github.com/biosaxs-dev/molass-beginner — Agent-mode first-run guide, for first-time users
+- **GUI:** https://github.com/biosaxs-dev/molass-gui — Tkinter desktop app, for users who prefer a guided point-and-click workflow over notebooks
 - **Tutorial:** https://biosaxs-dev.github.io/molass-tutorial — practical usage, for beginners
 - **Essence:** https://biosaxs-dev.github.io/molass-essence — theory, for researchers
 - **Technical Report:** https://biosaxs-dev.github.io/molass-technical — technical details, for advanced users
