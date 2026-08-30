@@ -920,10 +920,10 @@ class Decomposition:
 
             Supported models:
 
-            - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
-            - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+            - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/stochastic-theory#stochastic-dispersive-model>`_
+            - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory#equilibrium-dispersive-model>`_
             - ``CEDM``: Continuous EDM (shared-column variant of EDM)
-            - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html>`_
+            - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory>`_
             - ``GRM``: General Rate Model (film mass transfer + intraparticle pore diffusion)
 
         rgcurve : Curve, optional
