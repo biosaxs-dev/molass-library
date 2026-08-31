@@ -113,7 +113,11 @@ class ComponentCurve:
             The x value at the peak top.
         """
         return self.params[1]   # peak position in EGH model, note that this in valid only for EGH model
-    
+
+    def get_peak_position(self):
+        """Alias for get_peak_top_x(). See molass-library#245."""
+        return self.get_peak_top_x()
+
     def get_scale_param(self):
         """Return the area scaling factor.
 

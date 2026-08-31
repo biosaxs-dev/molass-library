@@ -20,7 +20,7 @@ def optimize_grm_xr_decomposition(decomposition, grm_init_params, **kwargs):
         EGH decomposition to upgrade.  Rg values are taken from
         ``decomposition.get_rgs()``.
     grm_init_params : tuple
-        ``(Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext_list, R_list, scale_list)``
+        ``(Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext_list, R_list, c_inj)``
         as returned by :func:`~molass.SEC.Models.GrmEstimator.estimate_grm_init_params`.
 
     Returns
@@ -34,7 +34,7 @@ def optimize_grm_xr_decomposition(decomposition, grm_init_params, **kwargs):
         reload(molass.SEC.Models.GrmComponentCurve)
     from molass.SEC.Models.GrmComponentCurve import GrmComponentCurve
 
-    Pe, t0, R_p, D_eff, a_star_list, F_ratio, k_ext_list, R_list, scale_list = grm_init_params
+    Pe, t0, R_p, D_eff, a_star_list, F_ratio, k_ext_list, R_list, c_inj_est = grm_init_params
 
     xr_icurve = decomposition.xr_icurve
     x, y_obs = xr_icurve.get_xy()
@@ -43,23 +43,28 @@ def optimize_grm_xr_decomposition(decomposition, grm_init_params, **kwargs):
     num_components = decomposition.num_components
 
     # ── Refine per-component scales with NNLS ─────────────────────────────────
+    # Build normalized basis (c_inj=1.0, t_inj=1.0)
     from molass.SEC.Models.GrmLinear import grm_pdf
     B = np.column_stack([
-        grm_pdf(x, Pe, t0, k_ext_list[i], R_p, D_eff, a_star_list[i], F_ratio)
+        grm_pdf(x, Pe, t0, k_ext_list[i], R_p, D_eff, a_star_list[i], F_ratio,
+                c_inj=1.0, t_inj=1.0)
         for i in range(num_components)
     ])
     from scipy.optimize import nnls
     scales_nnls, _ = nnls(B, np.maximum(y_obs, 0))
+    
+    # Convert NNLS scales to c_inj values (these are the actual per-component c_inj)
+    cinj_list = scales_nnls.copy()
 
     for i in range(num_components):
-        if scales_nnls[i] < 1e-10:
-            scales_nnls[i] = scale_list[i]
+        if cinj_list[i] < 1e-10:
+            cinj_list[i] = c_inj_est  # fallback to estimator value
 
     if debug:
         print(f"GRM optimizer: Pe={Pe:.1f}  t0={t0:.2f}")
         for i in range(num_components):
             print(f"  comp {i}: R={R_list[i]:.3f}  k_ext={k_ext_list[i]:.5f}  "
-                  f"scale_est={scale_list[i]:.4f}  scale_nnls={scales_nnls[i]:.4f}")
+                  f"c_inj_est={c_inj_est:.4f}  c_inj_nnls={cinj_list[i]:.4f}")
 
     new_xr_ccurves = []
     for i in range(num_components):
@@ -68,8 +73,9 @@ def optimize_grm_xr_decomposition(decomposition, grm_init_params, **kwargs):
             x, Pe, t0, R_p, D_eff, a_star_list[i], F_ratio,
             k_ext = k_ext_list[i],
             R     = R_list[i],
-            scale = scales_nnls[i],
+            c_inj = cinj_list[i],
             rg    = rg_i,
+            t_inj = 1.0,
         )
         new_xr_ccurves.append(ccurve)
 

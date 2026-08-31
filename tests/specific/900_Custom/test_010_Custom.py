@@ -3,6 +3,7 @@
 """
 import os
 import matplotlib.pyplot as plt
+from molass.Testing import is_interactive
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings

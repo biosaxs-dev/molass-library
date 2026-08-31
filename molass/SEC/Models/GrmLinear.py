@@ -98,7 +98,7 @@ def grm_linear_cf(w, Pe, t0_s, k_ext_s, R_p, D_eff_s, a_star, F_ratio):
 _grm_pdf_impl = FftInvPdf(grm_linear_cf)
 
 
-def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, timescale=None):
+def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, c_inj=1.0, t_inj=1.0, timescale=None):
     """
     PDF of the GRM (General Rate Model) elution profile with linear isotherm.
 
@@ -131,6 +131,10 @@ def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, timescale=None):
         coefficient.  For non-porous particles (eps_p=0): a_star = a_henry.
     F_ratio : float
         Phase ratio  F = (1 - ε) / ε  (ε = interstitial/column porosity).
+    c_inj : float, optional
+        Injection concentration (embedded scale parameter). Default 1.0.
+    t_inj : float, optional
+        Injection duration. Default 1.0.
     timescale : float or None, optional
         Time rescaling factor for the internal FFT grid.
         If ``None`` (default), chosen automatically as
@@ -139,9 +143,8 @@ def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, timescale=None):
     Returns
     -------
     ndarray
-        Normalised PDF evaluated at each point in ``x``  (integral ≈ 1).
-        Multiply by the peak area (c_inj × t_inj) to obtain absolute
-        concentration units.
+        PDF evaluated at each point in ``x``, scaled by c_inj × t_inj.
+        For unit peak area (integral ≈ 1), use c_inj=1.0, t_inj=1.0.
 
     Notes
     -----
@@ -176,8 +179,9 @@ def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, timescale=None):
         ts = 80.0 / (t0 * max(1.0, R_eff))
     else:
         ts = timescale
-    return ts * _grm_pdf_impl(
+    pdf_normalized = ts * _grm_pdf_impl(
         ts * x, Pe, ts * t0,
         k_ext / ts, R_p, D_eff / ts,
         a_star, F_ratio
     )
+    return c_inj * t_inj * pdf_normalized

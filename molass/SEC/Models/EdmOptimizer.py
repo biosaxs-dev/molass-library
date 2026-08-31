@@ -234,6 +234,8 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
 
         # Shared-column bounds; prefer caller-supplied e_bounds over the tight default.
         sc_e_bounds = kwargs.get('e_bounds', (0.2, 0.85))
+        if sc_e_bounds is None:
+            sc_e_bounds = (None, None)  # None means "unbounded" for e
         cinj_min = kwargs.get('cinj_min', 0.05)
 
         # --- analytical init for shared params ---

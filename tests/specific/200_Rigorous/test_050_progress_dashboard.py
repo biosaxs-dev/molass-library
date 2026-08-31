@@ -11,15 +11,20 @@ import pytest
 
 
 def test_unknown_progress_value_raises():
-    """progress='unknown' must raise ValueError with informative message."""
+    """progress='unknown' is silently ignored (deprecated since #159).
+
+    The function must get past the progress guard and fail later on
+    decomposition=None, not at the progress check.
+    """
     from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
-    with pytest.raises(ValueError, match="Unknown progress="):
+    with pytest.raises(Exception) as exc_info:
         make_rigorous_decomposition_impl(
             decomposition=None, rgcurve=None,
             in_process=True, async_=True,
             progress='unknown',
         )
+    assert "progress" not in str(exc_info.value).lower()
 
 
 def test_dashboard_without_in_process_degrades_silently():
@@ -75,14 +80,15 @@ def test_none_progress_passes_validation():
 
 
 def test_decomposition_progress_kwarg_forwarded():
-    """Decomposition.optimize_rigorously forwards progress= to the impl.
+    """Decomposition.optimize_rigorously silently ignores unknown progress= values.
 
-    The 'Unknown progress=' ValueError is raised inside make_rigorous_decomposition_impl.
-    We need analysis_folder!= None to get past the Decomposition-level guard first.
+    progress is deprecated (#159); the function should proceed past the progress
+    check and fail later (on the missing ssd), not at the progress check.
     """
     from molass.LowRank.Decomposition import Decomposition
 
     decomp = object.__new__(Decomposition)
-    with pytest.raises(ValueError, match="Unknown progress="):
+    with pytest.raises(Exception) as exc_info:
         decomp.optimize_rigorously(progress='bad', in_process=True, async_=True,
                                    analysis_folder='dummy')
+    assert "progress" not in str(exc_info.value).lower()

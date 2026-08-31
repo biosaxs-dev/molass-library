@@ -85,12 +85,19 @@ class EdmComponentCurve(ComponentCurve):
         return edm_impl(x, *self.params)
     
     def get_peak_top_x(self):
+        """Return the frame number at the peak maximum."""
+        import numpy as np
+        return float(self.x[np.argmax(self.get_y())])
+    
+    def get_scale_param(self):
+        """Return the scale parameter for this component curve.
+        
+        For EDM, the scale is c_inj (injection concentration), which is params[6].
+        This overrides ComponentCurve.get_scale_param() which returns params[0].
+        
+        Returns
+        -------
+        float
+            The injection concentration c_inj (params[6]).
         """
-        Returns the x value at the peak top.
-
-        Raises
-        ------
-        NotImplementedError
-            If the peak top x calculation is not implemented for the current model.
-        """
-        raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+        return self.params[6]  # c_inj (NOT params[0] which is t0)

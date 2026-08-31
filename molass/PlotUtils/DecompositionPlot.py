@@ -9,7 +9,8 @@ from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
     'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
-    'rg_score_threshold', 'rg_marker_size', 'rg_cmap',
+    'rg_score_threshold', 'rg_marker_size', 'rg_cmap', 'rg_alpha_by_score',
+    'rg_alpha_power',
 }
 
 def _draw_anomaly_bands(decomposition, xr_ax, uv_ax):
@@ -71,10 +72,16 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
         # Issue #121: defaults chosen for visibility — low-score points should be
         # discernible (was: cmap='YlGn' + s=3 made low-score points nearly
         # invisible and made overlapping high-confidence dots near the peak look
-        # sparse). Override via kwargs if needed.
+        # sparse). Override via kwargs if needed.  rg_alpha_by_score=True takes
+        # the opposite stance deliberately: it fades low-score points toward
+        # transparent via the alpha channel (rather than relying on hue alone),
+        # so insignificant points recede instead of competing visually with
+        # high-confidence ones.
         rg_score_threshold = kwargs.get('rg_score_threshold', None)
         rg_marker_size = kwargs.get('rg_marker_size', 12)
-        rg_cmap = kwargs.get('rg_cmap', 'viridis')
+        rg_cmap = kwargs.get('rg_cmap', 'YlGn')
+        rg_alpha_by_score = kwargs.get('rg_alpha_by_score', True)
+        rg_alpha_power = kwargs.get('rg_alpha_power', 2)
 
         axt = ax.twinx()
         axt.set_ylabel("$R_g$")
@@ -86,7 +93,15 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
             mask = rg_c >= rg_score_threshold
             x_ = x_[mask]; rg_y = rg_y[mask]; rg_c = rg_c[mask]
         axt.grid(False)
-        sc = axt.scatter(x_, rg_y, c=rg_c, s=rg_marker_size, cmap=cm, label="Rg (data)")
+        if rg_alpha_by_score:
+            rgba = cm(np.clip(rg_c, 0, 1))
+            # alpha = score ** power: power=1 is linear (score 0.3 -> alpha 0.3);
+            # power>1 suppresses low-mid scores faster while score=1 always stays
+            # alpha=1, since 1**power == 1 regardless of power.
+            rgba[:, 3] = np.clip(rg_c, 0, 1) ** rg_alpha_power
+            sc = axt.scatter(x_, rg_y, c=rgba, s=rg_marker_size, label="Rg (data)")
+        else:
+            sc = axt.scatter(x_, rg_y, c=rg_c, s=rg_marker_size, cmap=cm, label="Rg (data)")
         
         if reconstructed_rgcurve is not None:
             rx_ = reconstructed_rgcurve.frames
@@ -95,7 +110,9 @@ def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=Non
 
         axt.legend(fontsize=7, loc='upper right')
 
-        if colorbar:
+        if colorbar and not rg_alpha_by_score:
+            # Explicit RGBA colors (rg_alpha_by_score=True) aren't a scalar
+            # mappable, so there's no meaningful colorbar to draw for them.
             ax.fig.colorbar(sc, ax=axt, label="$R_g$ Quality", location='bottom')
         ymin, ymax = axt.get_ylim()
         axt.set_ylim(min(0,ymin), ymax*1.5)
@@ -206,7 +223,9 @@ def plot_components_impl(decomposition, **kwargs):
                              recognition_curve=recognition_curve,
                              rg_score_threshold=kwargs.get('rg_score_threshold', None),
                              rg_marker_size=kwargs.get('rg_marker_size', 12),
-                             rg_cmap=kwargs.get('rg_cmap', 'viridis'),
+                             rg_cmap=kwargs.get('rg_cmap', 'YlGn'),
+                             rg_alpha_by_score=kwargs.get('rg_alpha_by_score', True),
+                             rg_alpha_power=kwargs.get('rg_alpha_power', 2),
                              title="XR Elution Curves", ylabel="Scattering Intensity")
 
     # Paired Ranges

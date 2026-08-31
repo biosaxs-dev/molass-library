@@ -12,7 +12,31 @@
 
 ---
 
-## 📚 Documents to Read
+## � Branching Policy During JOSS Review
+
+**Context**: The repository is under JOSS peer review. The `main` branch must remain stable as a reference point for reviewers.
+
+**Active branch**: `dev/ongoing-work`
+- **Purpose**: All development work during the JOSS review period (any feature, any fix)
+- **Why one branch**: Avoid branch proliferation; single merge after review concludes
+- **Scope**: Not limited to specific features — general development branch for the review period
+
+**Workflow**:
+1. All new commits go to `dev/ongoing-work` (never to `main` during review)
+2. JOSS reviewers see stable `main` (no moving target)
+3. After JOSS acceptance: merge `dev/ongoing-work` → `main` in one PR
+
+**For AI assistants**:
+- When implementing fixes/features: commit to `dev/ongoing-work` (already checked out)
+- Editable install automatically tracks the current branch — just restart kernel after changes
+- No need to create separate feature branches during this period
+
+**Created**: July 6, 2026  
+**Status**: Active until JOSS review concludes
+
+---
+
+## �📚 Documents to Read
 
 | Priority | File | Purpose |
 |----------|------|---------|
@@ -119,7 +143,15 @@ pytest tests/tutorial/ -v
 
 # With coverage
 pytest --cov=molass tests/
+
+# Skip slow tests (real optimizer/BH/DE construction, ~30s-several min each)
+pytest -m "not slow" tests/
 ```
+
+Tests marked `@pytest.mark.slow` build a full legacy optimizer and/or run real BH/DE — do not run
+these blindly for a quick check on an unrelated change; see the module docstring/fixture comment
+in each marked file for the specific cost, or write a small standalone script exercising only the
+changed function(s) instead.
 
 ### Test File Naming
 
@@ -456,6 +488,18 @@ Kernel preference: global Python (`py`). Do not create venvs.
 | Jun 2026 | **molass-library#212**: AI-friendliness: `SecSaxsData.recommend_decomposition_options()` — auto-detects peak count and separation via `xr.detect_peaks(return_properties=True)`; returns `{'num_components': n, 'xr_peakpositions': peaks}` for well-separated peaks (separation = min(prominences)/max(peak_heights) ≥ `overlap_threshold=0.3`) or `{'num_components': n, 'proportions': [1]*n}` for overlapping ones; fallback `{'num_components': 2, 'proportions': [1, 1]}` when no peaks found. `SecSaxsData.recommend_decomposition(**kwargs)` is a convenience wrapper that calls the above then `quick_decomposition(**opts)`, with kwargs as overrides. This is the library equivalent of the legacy dialog's "Automatic" peak recognition option. Tests: `test_23`–`test_26` in `tests/generic/010_DataObjects/test_010_SSD.py`. Issue closed. |
 
 | Jun 2026 | **Recommend.py: EGH peeling replaces detect_peaks** — `detect_peaks(prominence=0.005)` returned 12 components for SAMPLE2 (noise oscillations above 0.5% prominence). Replaced with `_count_components_by_egh_peeling()` using `EghPeeler.egh_peel` + cluster-merge. Algorithm: group consecutive EGH peaks where `spacing/sigma_sum < egh_overlap_threshold=1.3` into one component. Key calibration: SAMPLE3 pair (156→194) ratio=1.232; SAMPLE1 min=1.376; SAMPLE2 min=1.423 → safe threshold window (1.232, 1.376). Results: SAMPLE1=3, SAMPLE2=3, SAMPLE3=1, SAMPLE4=2. The `SecSaxsData.recommend_decomposition_options()` method updated to use `egh_overlap_threshold=1.3` (dropped old `overlap_threshold`/`min_prominence` params). Tests test_23–26 pass. |
+
+| Jul 2026 | **molass-library#235 (closed — soft penalty retained)**: Issue title: "DE constraint handling: replace soft penalty with Lampinen's replacement rule (scipy constraints=)". Lampinen's (2002) replacement rule (`scipy.optimize.NonlinearConstraint`) was implemented for LumpingConstraint and compared against soft penalty in experiments 31k/31l. Results (SAMPLE1, SDM, niter=30): soft penalty SV=**85.11** vs Lampinen-LHS SV=72.39 vs Lampinen-tight-init SV=72.39. Root cause: LHS init is ~87% infeasible → Lampinen converges to SDM-initial local basin (SV=72.39) and never escapes. Seeding Lampinen from the penalty optimal reaches 83.40 (1.71 SV loss from minor boundary violation). **Decision**: soft penalty is the better default. All Lampinen code fully reverted: `violation()`/`bind_optimizer()` removed from LumpingConstraint; NonlinearConstraint block removed from SolverDE (no `constraints=` arg in the `differential_evolution()` call). `TestViolationMethod` class removed from tests. 12 tests pass. |
+
+| Jul 2026 | **SolverDE `_STRATEGY_MAP` fix** (molass-library commit `ee32857`): `OptStrategyDialog` stores strategy labels in the form `"DE/best/1/bin"` in SerialSettings. `SolverDE.__init__` was passing this string directly to `scipy.differential_evolution(strategy=...)`, which rejects it with `ValueError: Please select a valid mutation strategy`. Fix: added `_STRATEGY_MAP` dict in `SolverDE` normalizing GUI labels → scipy format (`"DE/best/1/bin"` → `"best1bin"`, 8 entries). Normalization applied in `__init__` via `self.strategy = _STRATEGY_MAP.get(strategy, strategy)`. Verified with reproducer + SolverDE unit tests. Cross-repo: root cause was in molass-library; the crash was triggered by the GUI subprocess (molass-legacy). |
+| Jul 2026 | **PeakEditor SV gap diagnostic (experiments/33_gui_consistency/33b_sdm_model.ipynb)**: GUI initial SV (68.5) vs library (72.4) gap decomposed. Root cause 1 (fixed, molass-legacy commit `464cbee1`): `_build_library_decomposition` used `proportions=[1]*nc` for column models → proportional EGH gave overly wide 2nd component (sigma≈35.9, spanning both peaks) → SDM upgrade produced N≈379 instead of ≈728 → 3.6 SV loss. Fix: removed `proportions` kwarg for all column models. GUI SV improved 68.5 → 68.9 (+0.4 SV, predicted +0.48). Root cause 2: `make_ssd_from_corrected_sd` preserves legacy q-range (6 extra low-q points) → ~3 SV residual gap — closed by molass-legacy#86. Secondary issue (#87, open): `_estimate_mono` fast path computes baseparams from `model_decomp.ssd` (corrected) but optimizer uses `_lib_dsets` (uncorrected) → UV scale ~11% different. |
+| Jul 2026 | **molass-library#242 — `make_ssd_from_sd` neutral alias** (`Bridge/SdAdapter.py`, commit `db2843a`): Added `make_ssd_from_sd = make_ssd_from_corrected_sd`. The original function name implied corrected input only, but it was routinely called with uncorrected data. The neutral alias clarifies semantics — the function wraps any `SerialData` as a library `SecSaxsData` regardless of correction state. molass-legacy PeakEditor import updated in commit `1d790c29`. |
+| Jul 2026 | **molass-legacy#86 fix closes the q-range SV gap** (molass-legacy commit `fb72745b`): `prepare_rg_curve` now uses library pipeline (`make_ssd_from_sd(sd).trimmed_copy().corrected_copy()`). Verified: GUI SV 68.9 → 71.8 (+2.9 SV). The q-range root cause noted in the PeakEditor SV gap diagnostic entry is now closed. Remaining gap ~0.3 SV closed by #87. |
+| Jul 2026 | **molass-legacy#87 — uncorrected baseparams in `_estimate_mono` fast path** (`PeakEditor.py`, `SdmEstimator.py`, commit `7098a0c0`): `_estimate_mono` called `make_basecurves_from_decomposition(model_decomp)` without `data_ssd`, so baseparams were fitted to CORRECTED `model_decomp.ssd` while `_lib_dsets` uses UNCORRECTED data → UV scale ~11% different. Fix: (1) `_build_library_decomposition` stores `self._ssd_uncorrected = ssd_uncorrected` after building it for `_lib_dsets`; (2) `_estimate_mono` reads `_ssd_unc = getattr(editor, '_ssd_uncorrected', None)` and passes it as `data_ssd`. `getattr` fallback preserves backward compatibility with `MockEditor`. Verified: GUI SV 71.8 → 72.1 (+0.3). Library reference (Path A) = 72.4; remaining gap ~0.3 is minor q-range difference (legacy 972 vs library 984 pts) — not worth a separate fix. |
+
+| Jul 2026 | **molass-library#243 — `mu_max` in `optimize_sdm_lognormal_xr_decomposition`** (`SdmOptimizer.py`, commit `f706162`): hardcoded `mu_ > 8.0` guard (poresize > 2981 Å) was far too loose; when the initial T had wrong k-scaling the optimizer drifted mu wildly (e.g. poresize ~165 Å for SAMPLE1 Rg_max=40 Å), compressing all K_SEC values → degenerate basin SV=33.81. Fix: added `mu_max = model_params.get('mu_max', 8.0)` (default 8.0 = no constraint, fully backward compatible). Changed objective guard `mu_ > 8.0` → `mu_ > mu_max`; bounds `(2.0, 8.0)` → `(2.0, min(mu_max, 8.0))`. Recommended caller value: `mu_max = np.log(3 * rg_max)` (Constraint 2 from 33g/33h/33i experiments). Used together with molass-legacy#88 (mono-seeded init). |
+
+| Jul 2026 | **molass-library#244 — `mu_min` for lognormal SDM optimizer** (`SdmOptimizer.py`, commit `a30885c`): `optimize_sdm_lognormal_xr_decomposition` previously had `mu` bounds `(2.0, min(mu_max, 8.0))` — lower bound 2.0 = exp(2.0) = 7.4 Å, effectively no constraint. Optimizer could converge to degenerate `poresize≈Rg_max` (37 Å) instead of the physical 71–80 Å Superdex 200 range, giving SV=59.80 instead of SV≈67. Fix: add `mu_min` parameter to `model_params` dict; bounds become `(mu_min, min(mu_max, 8.0))`. Default `mu_min=2.0` is backward-compatible. Callers pass `mu_min=ln(poresize_bounds[0])` from SerialSettings. Combined with `mu_max=ln(3*Rg_max)` (issue #243), SAMPLE1 now consistently gets `poresize=71.8 Å, SV≈67` (library) and `SV=71` (GUI, sigma=0.1 via Stage 4 free optimization). Previous GUI SV=48.4 (analysis-014 era). |
 
 **Principle**: *Never leave this codebase harder to navigate than you found it. Update this file after each work session with new findings.*
 

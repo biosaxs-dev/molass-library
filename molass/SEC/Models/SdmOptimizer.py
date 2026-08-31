@@ -10,6 +10,32 @@ from molass.SEC.Models.SdmMonoPore import (
 )
 
 
+def _adaptive_anchor_scale(egh_peak_frames, initial_error, model_params):
+    """Compute the position-anchor scale shared by both SDM optimizers.
+
+    A full inter-lump drift (shifting one component by ``lump_sep`` frames) costs
+    exactly ``initial_error`` — as expensive as going from a perfect fit to a
+    completely wrong one.  This prevents component drift regardless of the
+    absolute data amplitude or frame rate.
+
+    Parameters
+    ----------
+    egh_peak_frames : array-like
+        Peak frame of each EGH component (used to determine ``lump_sep``).
+    initial_error : float
+        Fitting error at the initial parameter guess.  Use ``np.sum(y**2)``
+        (total data energy, an upper bound) when the exact initial-model error
+        is not already computed.
+    model_params : dict or None
+        If ``'position_anchor_scale'`` is present, that value overrides the
+        adaptive default.
+    """
+    if model_params is not None and 'position_anchor_scale' in model_params:
+        return float(model_params['position_anchor_scale'])
+    _lump_sep = max(float(np.max(egh_peak_frames) - np.min(egh_peak_frames)), 1.0)
+    return float(initial_error) / (_lump_sep ** 2)
+
+
 def _proxy_rgs_from_peak_frames(decomposition, poresize_ref=100.0,
                                 rho_min=0.15, rho_max=0.35):
     """Build Rg proxies from peak-frame order when Guinier Rg is disabled."""
@@ -118,10 +144,12 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
         return scales
 
     # EGH peak frames are used as a soft position constraint in the objective.
-    # Scale: ~1e-5 is enough to overcome the ~0.037 advantage of the degenerate solution
-    # (where both components collapse to the same frame) over the separated solution.
+    # Scale: adaptive via _adaptive_anchor_scale — a full inter-lump drift costs
+    # np.sum(y**2) (data energy, upper bound on initial error).  The mono
+    # optimizer does not compute an explicit model-based initial_error, so
+    # data energy is used as a conservative proxy (always >= actual initial_error).
     egh_peak_frames = np.array([c.x[c.y.argmax()] for c in decomposition.xr_ccurves], dtype=float)
-    position_anchor_scale = model_params.get('position_anchor_scale', 1e-5) if model_params else 1e-5
+    position_anchor_scale = _adaptive_anchor_scale(egh_peak_frames, np.sum(y**2), model_params)
 
     def objective_function(params, return_cy_list=False, plot=False):
         N_, T_, x0_, tI_, N0_, k_ = params[0:6]
@@ -581,6 +609,13 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
             Upper bound on sigma when it is free.
         ``k`` : float (default 2.0)
         ``rt_dist`` : str (default ``'gamma'``)
+        ``position_anchor_scale`` : float (default adaptive)
+            Weight for the soft position-anchor penalty that keeps each
+            component's intensity-weighted centroid near its initial EGH
+            peak frame.  Prevents component drift across group boundaries
+            (the "lumping" problem).  Computed by ``_adaptive_anchor_scale``
+            so a full inter-lump drift costs exactly ``initial_error``.
+            Override if the default is too aggressive or too weak.
     kwargs : dict
         Additional parameters for the optimization process.
 
@@ -595,34 +630,57 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         import molass.SEC.Models.SdmComponentCurve
         reload(molass.SEC.Models.SdmComponentCurve)
     from .SdmComponentCurve import SdmColumn, SdmComponentCurve
-    from molass.SEC.Models.LognormalPore import sdm_lognormal_pore_gamma_pdf_fast
+    from molass.SEC.Models.LognormalPore import (
+        sdm_lognormal_pore_gamma_pdf_fast,
+        sdm_lognormal_model_moments,
+    )
     progress = kwargs.get('progress', False)
 
     num_components = decomposition.num_components
     xr_icurve = decomposition.xr_icurve
     x, y = xr_icurve.get_xy()
     N, T, me, mp, N0, t0, mu_init, sigma_init = env_params
-    rgv = np.asarray(decomposition.get_rgs())
+    # Use proxy Rg from peak frames by default — consistent with optimize_sdm_xr_decomposition.
+    # Guinier Rg values are unreliable for overlapping peaks (near-identical values anchor the
+    # optimizer in a degenerate basin where all components have the same elution curve).
+    use_guinier_rgs = kwargs.get('use_guinier_rgs', False)
+    if model_params is not None:
+        use_guinier_rgs = model_params.get('use_guinier_rgs', use_guinier_rgs)
+    if use_guinier_rgs:
+        rgv = np.asarray(decomposition.get_rgs())
+    else:
+        rgv = _proxy_rgs_from_peak_frames(decomposition)
 
     # ln_pore_sigma default: 0.3 — std-dev of ln(r/r0), invariant to unit choice.
     # Free sigma (None) is underdetermined for num_components=1 and drifts to sigma_max.
     _LN_PORE_SIGMA_DEFAULT = 0.3
+    # With proxy Rg, disable the Rg anchor penalty — proxy values are just starting points.
+    _default_rg_penalty = 1.0 if use_guinier_rgs else 0.0
     if model_params is None:
         k_init = 2.0
         rt_dist = 'gamma'
-        rg_penalty_weight = 1.0
+        rg_penalty_weight = _default_rg_penalty
         sigma_max = 0.8
         min_rg_gap = 0.5
         ln_pore_sigma = _LN_PORE_SIGMA_DEFAULT
         nm_maxiter = None
+        mu_max = 8.0   # Issue #243: upper bound on mu (log poresize); 8.0 = exp(8)≈2981Å (no constraint)
+        mu_min = 2.0   # lower bound; 2.0 = exp(2)≈7.4Å (effectively no constraint)
     else:
         k_init = model_params.get('k', 2.0)
         rt_dist = model_params.get('rt_dist', 'gamma')
-        rg_penalty_weight = model_params.get('rg_penalty_weight', 1.0)
+        rg_penalty_weight = model_params.get('rg_penalty_weight', _default_rg_penalty)
         sigma_max = model_params.get('sigma_max', 0.8)
         min_rg_gap = model_params.get('min_rg_gap', 0.5)  # Å — minimum required Rg gap between components
         ln_pore_sigma = model_params.get('ln_pore_sigma', _LN_PORE_SIGMA_DEFAULT)
         nm_maxiter = model_params.get('maxiter', None)
+        # mu_max: constrains poresize from above to avoid degenerate K_SEC compression.
+        # Recommended: ln(3 × Rg_max) so poresize ≤ 3×Rg_max (Issue #243).
+        mu_max = model_params.get('mu_max', 8.0)
+        # mu_min: lower bound on pore size — pore must be larger than the proteins.
+        # Recommended: ln(poresize_bounds[0]) from column spec, or ln(Rg_max) as fallback.
+        # Without this, the optimizer can find degenerate poresize≈Rg_max solutions.
+        mu_min = model_params.get('mu_min', 2.0)
 
     if rt_dist == 'exponential':
         k_init = 1.0
@@ -654,6 +712,14 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     # Rg penalty scale: initial_error means 100% relative deviation costs ~initial_error
     rg_penalty_scale = rg_penalty_weight * initial_error
 
+    # EGH peak frames — anchor for position penalty (prevents drift across lump boundaries).
+    # Scale: adaptive via _adaptive_anchor_scale — a full inter-lump drift costs
+    # exactly initial_error.  Both SDM optimizers use the same helper; the only
+    # difference is that lognormal passes the exact model-based initial_error while
+    # mono uses np.sum(y**2) as a conservative proxy.
+    egh_peak_frames = np.array([c.x[c.y.argmax()] for c in decomposition.xr_ccurves], dtype=float)
+    position_anchor_scale = _adaptive_anchor_scale(egh_peak_frames, initial_error, model_params)
+
     def objective_function(params):
         N_, T_, x0_, tI_, N0_, k_, mu_ = params[0:7]
         if ln_pore_sigma is None:
@@ -667,7 +733,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
 
         if sigma_ < 0.01 or sigma_ > sigma_max:
             return 1e20
-        if mu_ < 1.0 or mu_ > 8.0:
+        if mu_ < mu_min or mu_ > mu_max:   # mu_min/mu_max from model_params (Issue #243)
             return 1e20
 
         # Rg ordering penalty (Rg should be descending)
@@ -696,7 +762,19 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
         ty = np.sum(cy_list, axis=0)
         # Penalize Rg deviation from Guinier values (prevents Rg drift in lognormal model)
         rg_penalty = rg_penalty_scale * np.sum(((rgv_ - rgv) / rgv) ** 2)
-        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty
+        # Position anchor: theoretical mean retention time M_1 (amplitude-independent).
+        # Formula (Dispersive Lognormalpore Gamma row, Summary of Stochastic Models):
+        #   M_1 = t_0 + k * I1,  I1 = ∫ L_{μ,σ}(r) N(1-Rg/r)^me T(1-Rg/r)^mp dr
+        # Position in original frame = tI + M_1.
+        # Unifies with the mono optimizer formula x0 + N*(1-ρ)^me*T*(1-ρ)^mp.
+        # Amplitude-independent → robust when scale → 0; ~50 µs per component.
+        positions_ = np.array([
+            tI_ + sdm_lognormal_model_moments(rg_, N_, T_, N0_, t0_, k_, mu_, sigma_,
+                                              me=me, mp=mp)[0]
+            for rg_ in rgv_
+        ], dtype=float)
+        position_penalty = np.sum((positions_ - egh_peak_frames) ** 2) * position_anchor_scale
+        error = np.sum((y - ty) ** 2) + order_penalty + rg_penalty + gap_penalty + position_penalty
         _eval_count[0] += 1
         n = _eval_count[0]
         if debug and n % 50 == 0:
@@ -720,18 +798,24 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     initial_guess += scales_init
 
     # Bounds
+    # x0/tI lower bound: max(0, t0 - 50) prevents the optimizer from drifting to
+    # negative dead-time solutions (x0 < 0), which produce zero-intensity model curves
+    # and Kratky_smoothness = -inf.  Stage 2 (optimize_sdm_xr_decomposition) already
+    # enforces x0 >= 0; Stage 4 should use the same physics-based constraint.
+    # A 50-frame slack is kept to allow slight downward drift from Stage 2's estimate.
+    _x0_lo = max(0.0, t0 - 50.0)
     bounds = [
-        (100, 5000),              # N
-        (1e-3, 5),                # T
-        (t0 - 1000, t0 + 1000),  # x0
-        (t0 - 1000, t0 + 1000),  # tI
+        (100, 5000),                  # N
+        (1e-3, 5),                    # T
+        (_x0_lo, t0 + 1000),          # x0 — dead time must be non-negative
+        (_x0_lo, t0 + 1000),          # tI — injection time must be non-negative
         (500, 50000),             # N0
     ]
     if rt_dist == 'exponential':
         bounds += [(0.999, 1.001)]  # k fixed at 1.0
     else:
         bounds += [(0.5, 10.0)]     # k free for gamma
-    bounds += [(2.0, 8.0)]          # mu
+    bounds += [(mu_min, min(mu_max, 8.0))]   # mu — mu_min/mu_max constrain poresize range (Issue #243)
     if ln_pore_sigma is None:
         bounds += [(0.01, sigma_max)]    # sigma — upper bound prevents degenerate flat curves (Issue #180)
     bounds += [(rg * 0.5, rg * 1.5) for rg in rgv]

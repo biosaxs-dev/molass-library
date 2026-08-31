@@ -4,7 +4,7 @@ SEC.Models.UvOptimizer.py
 import numpy as np
 from scipy.optimize import minimize
 
-def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
+def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, **kwargs):
     """ Optimize the UV decomposition based on the given XR component curves.
 
     Parameters
@@ -13,6 +13,11 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
         The initial decomposition containing the UV initial curve and component curves.
     xr_ccurves : list of UvComponentCurve
         The XR component curves to be used for UV optimization.
+    preserve_ratios : bool, default False
+        If True, preserve UV/XR ratios from the previous decomposition (species property).
+        Only mapping parameters (a, b) are optimized; scales are kept as ratios.
+        This is the correct behavior during model upgrades, where UV/XR ratios
+        should remain constant (species-specific extinction coefficients).
     kwargs : dict
         Additional parameters for the optimization process.
         
@@ -32,10 +37,27 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
     num_components = decomposition.num_components
     x, y = decomposition.uv_icurve.get_xy()
 
+    # Extract preserved ratios from previous decomposition if requested
+    if preserve_ratios:
+        # uv_cc.scale IS the ε_i/k ratio: UV_i(t) = scale * XR_i(mapping.inv(t))
+        # It is a species property — directly preserved, unchanged by model upgrade.
+        # No division by get_scale_param() or multiplication by y.max() is needed.
+        preserved_scales = [uv_cc.scale for uv_cc in decomposition.uv_ccurves]
+        
+        if debug:
+            scale_str = '[' + ', '.join(f'{s:.3g}' for s in preserved_scales) + ']'
+            print(f'[UV] preserve_ratios=True: preserved scales (ε_i/k)={scale_str}')
+
     def objective_function(params):
-        a_, b_ = params[0:2]
+        if preserve_ratios:
+            # Only mapping parameters (a, b) are optimized
+            a_, b_ = params[0:2]
+            scales_ = preserved_scales
+        else:
+            # Full optimization: mapping + scales
+            a_, b_ = params[0:2]
+            scales_ = params[2:2+num_components]
         mapping = Mapping(a_, b_)
-        scales_ = params[2:2+num_components]
         cy_list = []
         for xr_ccurve, scale in zip(xr_ccurves, scales_):
             uv_ccurve = UvComponentCurve(x, mapping, xr_ccurve, scale)
@@ -48,44 +70,65 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, **kwargs):
     mapping = decomposition.mapping
     a, b = mapping.slope, mapping.intercept
 
-    # Physics-based initial scale: ratio of UV to XR amplitude at XR component peak.
-    # Avoids the fixed-scale=1.0 local minimum that arises when model tails create
-    # Hessian cross-coupling (observed: SDM minor component, MY dataset, May 2026).
-    initial_scales = []
-    for xr_ccurve in xr_ccurves:
-        peak_xr_idx = int(np.argmax(xr_ccurve.y))
-        peak_xr_val = float(xr_ccurve.y[peak_xr_idx])
-        peak_xr_frame = float(xr_ccurve.x[peak_xr_idx])
-        # mapping converts XR frame → UV frame (a*xr + b = uv)
-        peak_uv_frame = a * peak_xr_frame + b
-        uv_idx = int(np.argmin(np.abs(x - peak_uv_frame)))
-        uv_val = float(y[uv_idx])
-        s0 = uv_val / peak_xr_val if peak_xr_val > 0 else 1.0
-        initial_scales.append(float(max(s0, 1e-3)))   # no upper clip — ratio can exceed 10
+    if preserve_ratios:
+        # Only optimize mapping parameters
+        initial_guess = [a, b]
+        dx = (x[-1] - x[0])*0.1
+        bounds = [(a*0.8, a*1.2), (b-dx, b+dx)]
+    else:
+        # Full optimization: mapping + scales
+        # Physics-based initial scale: ratio of UV to XR amplitude at XR component peak.
+        # Avoids the fixed-scale=1.0 local minimum that arises when model tails create
+        # Hessian cross-coupling (observed: SDM minor component, MY dataset, May 2026).
+        initial_scales = []
+        for xr_ccurve in xr_ccurves:
+            peak_xr_idx = int(np.argmax(xr_ccurve.y))
+            peak_xr_val = float(xr_ccurve.y[peak_xr_idx])
+            peak_xr_frame = float(xr_ccurve.x[peak_xr_idx])
+            # mapping converts XR frame → UV frame (a*xr + b = uv)
+            peak_uv_frame = a * peak_xr_frame + b
+            uv_idx = int(np.argmin(np.abs(x - peak_uv_frame)))
+            uv_val = float(y[uv_idx])
+            s0 = uv_val / peak_xr_val if peak_xr_val > 0 else 1.0
+            initial_scales.append(float(max(s0, 1e-3)))   # no upper clip — ratio can exceed 10
 
-    if debug:
-        scale_str = '[' + ', '.join(f'{s:.3g}' for s in initial_scales) + ']'
-        print(f'[UV] initial_guess: a={a:.4g}  b={b:.4g}  scales={scale_str}')
+        if debug:
+            scale_str = '[' + ', '.join(f'{s:.3g}' for s in initial_scales) + ']'
+            print(f'[UV] initial_guess: a={a:.4g}  b={b:.4g}  scales={scale_str}')
 
-    initial_guess = [a, b] + initial_scales
-    dx = (x[-1] - x[0])*0.1
-    # Upper bound: 3× the largest initial scale estimate (data-driven, not hard-wired).
-    # The old hard-coded 10.0 cap was too tight when UV/XR amplitude ratio > 10
-    # (e.g. UV ≈ 14 OD, XR ≈ 0.5 counts → ratio ≈ 28), causing optimized scales
-    # to saturate at the bound and uv_params to appear "too small".
-    upper_scale = max(initial_scales) * 3.0
-    bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(1e-3, upper_scale) for _ in range(num_components)]
+        initial_guess = [a, b] + initial_scales
+        dx = (x[-1] - x[0])*0.1
+        # Upper bound: 3× the largest initial scale estimate (data-driven, not hard-wired).
+        # The old hard-coded 10.0 cap was too tight when UV/XR amplitude ratio > 10
+        # (e.g. UV ≈ 14 OD, XR ≈ 0.5 counts → ratio ≈ 28), causing optimized scales
+        # to saturate at the bound and uv_params to appear "too small".
+        upper_scale = max(initial_scales) * 3.0
+        bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(1e-3, upper_scale) for _ in range(num_components)]
+    
+    
     result = minimize(objective_function, initial_guess, bounds=bounds)
 
     if debug:
-        converged_scales = list(result.x[2:])
-        residual_rms = float(np.sqrt(result.fun / len(y))) if len(y) > 0 else float('nan')
-        scale_str = '[' + ', '.join(f'{s:.3g}' for s in converged_scales) + ']'
-        print(f'[UV] converged:     a={result.x[0]:.4g}  b={result.x[1]:.4g}  scales={scale_str}  residual_rms={residual_rms:.4g}')
+        if preserve_ratios:
+            residual_rms = float(np.sqrt(result.fun / len(y))) if len(y) > 0 else float('nan')
+            print(f'[UV] converged:     a={result.x[0]:.4g}  b={result.x[1]:.4g}  (preserved scales)  residual_rms={residual_rms:.4g}')
+        else:
+            converged_scales = list(result.x[2:])
+            residual_rms = float(np.sqrt(result.fun / len(y))) if len(y) > 0 else float('nan')
+            scale_str = '[' + ', '.join(f'{s:.3g}' for s in converged_scales) + ']'
+            print(f'[UV] converged:     a={result.x[0]:.4g}  b={result.x[1]:.4g}  scales={scale_str}  residual_rms={residual_rms:.4g}')
 
     new_mapping = Mapping(*result.x[0:2])
     new_uv_ccurves = []
-    for xr_ccurve, scale in zip(xr_ccurves, result.x[2:]):
+    
+    if preserve_ratios:
+        # Use preserved ratios for all components
+        final_scales = preserved_scales
+    else:
+        # Use optimized scales
+        final_scales = result.x[2:]
+    
+    for xr_ccurve, scale in zip(xr_ccurves, final_scales):
         ccurve = UvComponentCurve(x, new_mapping, xr_ccurve, scale)
         new_uv_ccurves.append(ccurve)
     return new_uv_ccurves

@@ -36,7 +36,7 @@ def optimize_lkm_xr_decomposition(decomposition, lkm_init_params, **kwargs):
         reload(molass.SEC.Models.LkmComponentCurve)
     from molass.SEC.Models.LkmComponentCurve import LkmComponentCurve
 
-    Pe, t0, k_MT_list, R_list, scale_list = lkm_init_params
+    Pe, t0, k_MT_list, R_list, scale_list, c_inj_est = lkm_init_params
 
     xr_icurve = decomposition.xr_icurve
     x, y_obs = xr_icurve.get_xy()
@@ -46,9 +46,10 @@ def optimize_lkm_xr_decomposition(decomposition, lkm_init_params, **kwargs):
 
     # ── Refine per-component scales with NNLS ─────────────────────────────────
     # Build a basis matrix B where each column is lkm_pdf for one component.
+    # Use c_inj=1.0, t_inj=1.0 to get normalized PDF (integral ≈ 1).
     from molass.SEC.Models.LkmLinear import lkm_pdf
     B = np.column_stack([
-        lkm_pdf(x, Pe, t0, k_MT_list[i], R_list[i])
+        lkm_pdf(x, Pe, t0, k_MT_list[i], R_list[i], c_inj=1.0, t_inj=1.0)
         for i in range(num_components)
     ])
     # Non-negative least squares to find optimal scales
@@ -60,11 +61,14 @@ def optimize_lkm_xr_decomposition(decomposition, lkm_init_params, **kwargs):
         if scales_nnls[i] < 1e-10:
             scales_nnls[i] = scale_list[i]
 
+    # Convert scales to per-component c_inj values (with t_inj=1.0, c_inj = scale)
+    cinj_list = scales_nnls.copy()
+
     if debug:
         print(f"LKM optimizer: Pe={Pe:.1f}  t0={t0:.2f}")
         for i in range(num_components):
             print(f"  comp {i}: R={R_list[i]:.3f}  k_MT={k_MT_list[i]:.4f}  "
-                  f"scale_est={scale_list[i]:.4f}  scale_nnls={scales_nnls[i]:.4f}")
+                  f"scale_est={scale_list[i]:.4f}  c_inj_nnls={cinj_list[i]:.4f}")
 
     new_xr_ccurves = []
     for i in range(num_components):
@@ -73,8 +77,9 @@ def optimize_lkm_xr_decomposition(decomposition, lkm_init_params, **kwargs):
             x, Pe, t0,
             k_MT  = k_MT_list[i],
             R     = R_list[i],
-            scale = scales_nnls[i],
+            c_inj = cinj_list[i],
             rg    = rg_i,
+            t_inj = 1.0,
         )
         new_xr_ccurves.append(ccurve)
 

@@ -22,6 +22,7 @@ This folder contains all refactoring plans, design documents, and architecture a
 | [DESIGN_complementary_view_refactor.md](DESIGN_complementary_view_refactor.md) | Replace legacy ComplementaryView with plot_components | ✅ Implemented Jun 2026 |
 | [DESIGN_inprocess_monitor.md](DESIGN_inprocess_monitor.md) | MplMonitor for in-process runs | ✅ Implemented |
 | [DESIGN_terminate_inprocess.md](DESIGN_terminate_inprocess.md) | Terminate button for in-process runs | ✅ Implemented |
+| [DESIGN_default_in_process_reversal.md](DESIGN_default_in_process_reversal.md) | Reverse optimize_rigorously()'s in_process default to False | ✅ Implemented |
 
 ## How to use this folder
 

@@ -19,6 +19,44 @@ import os
 import numpy as np
 from importlib import reload
 
+
+def _has_ipython_display():
+    """Return True when running inside a Jupyter/IPython kernel (has ipywidgets
+    display support), False in a plain script or terminal.
+
+    Used to gracefully degrade ``monitor=True`` instead of crashing when the
+    MplMonitor dashboard's ipywidgets/matplotlib calls run outside a notebook.
+    """
+    try:
+        from IPython import get_ipython
+        return get_ipython() is not None
+    except Exception:
+        return False
+
+
+# Interactive GUI backends whose widgets may only be touched from the thread
+# that created them -- MplMonitor's background watcher thread draws into
+# whatever backend is active, which crashes the process (e.g. Tcl_AsyncDelete
+# for TkAgg) instead of raising a catchable exception.
+_GUI_BACKENDS = {'tkagg', 'qtagg', 'qt5agg', 'qt4agg', 'wxagg', 'gtk3agg', 'gtk4agg', 'macosx'}
+
+
+def _is_interactive_gui_backend():
+    """Return True when matplotlib's active backend is a main-thread-only GUI
+    toolkit (Tk/Qt/Wx/GTK/macOS), False for inline/agg/widget backends.
+
+    A real Jupyter/IPython kernel (``_has_ipython_display()`` True) can still
+    end up with a GUI backend active -- e.g. ``%matplotlib inline`` was never
+    run, or the kernel's default wasn't overridden -- so this check is needed
+    in addition to, not instead of, ``_has_ipython_display()``.
+    """
+    try:
+        import matplotlib
+        return matplotlib.get_backend().lower() in _GUI_BACKENDS
+    except Exception:
+        return False
+
+
 def _set_identity_restrict_lists(ssd):
     """Set identity (full-range) restrict_lists for already-exported data.
 
@@ -106,27 +144,42 @@ def _apply_anomaly_interpolation(uncorrected_ssd, corrected_ssd=None):
 
     return ssd
 
-def _load_best_init_params(analysis_folder, init_params):
-    """Load the best params from previous jobs when resuming (``clear_jobs=False``).
+def find_global_best_params(jobs_dir, init_params=None):
+    """Scan every completed job's ``callback.txt`` under *jobs_dir* and return
+    the global-best params found across the entire job history.
 
-    Scans ``analysis_folder/optimized/jobs/*/callback.txt``, finds the job
-    with the global minimum ``fv``, and returns the corresponding best params.
+    Single source of truth for "reseed from the best point found so far",
+    shared by :func:`_load_best_init_params` (this module's ``clear_jobs=False``
+    resume path) and ``MplMonitor``'s ``max_trials`` auto-resume / "Resume Job"
+    button (molass-legacy) -- before this helper existed, the latter only
+    looked at the single most-recently-completed trial's own state, with no
+    protection against regressing relative to an earlier, better trial
+    (molass-library#257).
 
-    Returns ``None`` if no valid previous jobs are found (so the caller falls
-    back to the original ``decomp``-derived ``init_params``).
+    Parameters
+    ----------
+    jobs_dir : str
+        Path to ``analysis_folder/optimized/jobs``.
+    init_params : array-like, optional
+        When given, a candidate best is only returned if its length matches
+        ``len(init_params)`` -- guards against mismatched runs (e.g. different
+        ``num_components``).
 
-    The length of the returned array is verified against ``init_params`` to
-    guard against mismatched runs (e.g. different ``num_components``).
+    Returns
+    -------
+    best_params : ndarray or None
+    best_fv : float or None
+    best_job : str or None
+        Absolute path to the job folder the best params came from.
     """
-    jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
     if not os.path.isdir(jobs_dir):
-        return None
+        return None, None, None
 
     try:
         from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
         from molass_legacy.Optimizer.Scripting import get_params
     except ImportError:
-        return None
+        return None, None, None
 
     best_fv = None
     best_job = None
@@ -148,21 +201,66 @@ def _load_best_init_params(analysis_folder, init_params):
             continue
 
     if best_job is None:
-        return None
+        return None, None, None
 
     try:
         best = get_params(best_job)
-        if best is not None and len(best) == len(init_params):
-            print(f"Resume: loading best params from {os.path.basename(best_job)} "
-                  f"(fv={best_fv:.4f}) as init_params.")
-            return best
+        if best is not None and (init_params is None or len(best) == len(init_params)):
+            return best, best_fv, best_job
     except Exception:
         pass
 
-    return None
+    return None, None, None
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=True, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None):
+def _load_best_init_params(analysis_folder, init_params):
+    """Load the best params from previous jobs when resuming (``clear_jobs=False``).
+
+    Thin wrapper around :func:`find_global_best_params`.  Returns ``None`` if
+    no valid previous jobs are found (so the caller falls back to the original
+    ``decomp``-derived ``init_params``).
+    """
+    jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+    best, best_fv, best_job = find_global_best_params(jobs_dir, init_params)
+    if best is None:
+        return None
+    print(f"Resume: loading best params from {os.path.basename(best_job)} "
+          f"(fv={best_fv:.4f}) as init_params.")
+    return best
+
+
+def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
+                        frozen_param_groups=None, function_code=None, seed_params=None):
+    """Build a recipe dict from a decomposition for backward-compat auto-construction.
+
+    Captures every parameter that affects optimizer construction so that
+    ``RecipeRunner.create_optimizer_from_recipe`` (subprocess path) and
+    ``Decomposition.load_analysis_session()`` (Resume / View Result) don't
+    silently diverge from what the caller actually asked for (issue #260).
+    """
+    model = decomposition.xr_ccurves[0].model  # 'egh', 'sdm', 'lkm', etc.
+    recipe = {
+        "num_components": decomposition.num_components,
+        "model": model,
+        "method": method.lower(),
+        "decomp_params": {},
+        "trim_params": {},
+        "baseline_params": {},
+        "niter": niter,
+    }
+    if frozen_components is not None:
+        recipe["frozen_components"] = list(frozen_components)
+    if frozen_param_groups is not None:
+        recipe["frozen_param_groups"] = list(frozen_param_groups)
+    if function_code is not None:
+        recipe["function_code"] = function_code
+    if seed_params is not None:
+        import numpy as _np
+        recipe["seed_params"] = _np.asarray(seed_params).tolist()
+    return recipe
+
+
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -196,13 +294,31 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     clear_jobs : bool, optional
         If True (default), clear existing job folders before starting.
     in_process : bool, optional
-        If True (default), run the optimizer **in this Python process** instead
-        of spawning a subprocess.  The library-prepared optimizer (with the
-        live dsets, base curves, and spectral vectors built above) is the one
-        that runs — no re-derivation from disk, no parent/subprocess divergence.
-        Set ``False`` to use the legacy subprocess path (required by the tkinter
-        GUI; available as an escape hatch for notebook users who need process
-        isolation).
+        If False (default), use the recipe-based subprocess path -- rebuilds the
+        SSD pipeline inside a subprocess from an (auto-constructed, if not
+        supplied) ``pipeline_recipe``. Isolates the optimizer from crashes and
+        from live-dashboard redraw overhead, which matters most for the long,
+        dedicated-experiment runs rigorous optimization is typically used for.
+        Set ``True`` to run in this Python process instead -- the
+        library-prepared optimizer (with the live dsets, base curves, and
+        spectral vectors built above) is the one that runs, with no
+        re-derivation from disk and no parent/subprocess divergence. Useful for
+        short/exploratory runs, or when ``constraints=`` must stay active.
+
+        **Subprocess lifecycle** (``in_process=False``):
+
+        * The subprocess is an independent OS process.  It is **not** killed
+          by a Jupyter kernel interrupt (SIGINT).
+        * On normal kernel restart (SIGTERM) an ``atexit`` handler terminates
+          the subprocess automatically.
+        * On force-kill (SIGKILL) the subprocess becomes an orphan and
+          continues until it finishes.  The next ``optimize_rigorously()``
+          call creates a new ``MplMonitor`` which reads
+          ``active_processes.json`` and terminates the orphan.
+        * To stop a running subprocess explicitly::
+
+              run_info.stop()   # cooperative signal + p.terminate()
+
         See ``molass-library/Copilot/DESIGN_split_optimizer_architecture.md``.
     monitor : bool, optional
         Controls the ``MplMonitor`` ipywidgets dashboard.  When True
@@ -338,11 +454,117 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if trimmed_ssd is not None:
         trimmed_ssd = _apply_anomaly_interpolation(trimmed_ssd, corrected_ssd=decomposition.ssd)
 
+    # monitor=True builds an MplMonitor ipywidgets dashboard in THIS process.
+    # Outside a notebook/IPython kernel, or when the active matplotlib backend
+    # is an interactive GUI toolkit (Tk/Qt/Wx/GTK), ipywidgets/matplotlib display
+    # calls from the async background thread can crash the whole process
+    # (Tcl_AsyncDelete or similar) instead of failing gracefully -- degrade to
+    # monitor=False with a warning rather than crash.  Placed above _dry_run
+    # so tests can verify the warning without running the full pipeline.
+    if monitor and not _has_ipython_display():
+        import warnings as _w
+        _w.warn(
+            "monitor=True has no effect outside a Jupyter/IPython notebook -- "
+            "the live dashboard requires ipywidgets display support. Falling back "
+            "to monitor=False. Pass monitor=False explicitly to silence this warning.",
+            UserWarning, stacklevel=3,
+        )
+        monitor = False
+    elif monitor and _is_interactive_gui_backend():
+        import warnings as _w
+        import matplotlib as _mpl
+        _w.warn(
+            f"monitor=True is unsafe with the active matplotlib backend "
+            f"({_mpl.get_backend()!r}) -- MplMonitor's background watcher thread "
+            "draws into it, which can crash the whole process (e.g. "
+            "Tcl_AsyncDelete for TkAgg) instead of failing gracefully. Falling back "
+            "to monitor=False. Run '%matplotlib inline' (or select the ipympl/widget "
+            "backend) before calling optimize_rigorously(monitor=True), or pass "
+            "monitor=False explicitly to silence this warning.",
+            UserWarning, stacklevel=3,
+        )
+        monitor = False
+
     # Dry-run mode: fire all pre-flight checks (above) and return without
     # building the optimizer.  Used by tests to verify warnings and guards
     # without running the full heavy pipeline.  (molass-library#165)
     if _dry_run:
         return None
+
+    # Capture user-supplied constraints before auto-apply may add LumpingConstraint.
+    _original_user_constraints = constraints
+
+    # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
+    # Condition + consequences live in ConstraintDefaults so RecipeRunner.py's
+    # subprocess mirror can't drift from this one (molass-library#255).
+    # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
+    # warnings.simplefilter("ignore") and would swallow this warning silently.
+    if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
+        import warnings as _w
+        from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
+        # Prefer _source_decomp (set by copy_with_new_components on every upgrade)
+        # over decomposition itself.  EGH source curves give more reliable peak
+        # positions for zone boundaries than physics-model (SDM/EDM/LKM) curves.
+        # _parent is a fallback for paths that bypass copy_with_new_components.
+        _lc_source = getattr(decomposition, '_source_decomp',
+                             getattr(decomposition, '_parent', decomposition))
+        constraints, _overrides = get_constraint_and_overrides(
+            method, len(decomposition.xr_ccurves), _lc_source)
+        _auto_lc = constraints[0]
+        solver_kwargs = dict(solver_kwargs or {})
+        solver_kwargs.update(_overrides)
+        _w.warn(
+            "optimize_rigorously(method='DE') automatically applied "
+            "LumpingConstraint to prevent component collapse "
+            f"(boundaries={_auto_lc.boundaries.tolist()}, "
+            f"ref_labels={_auto_lc.ref_labels}). "
+            "Pass constraints=[] to opt out.",
+            UserWarning,
+            stacklevel=3,
+        )
+
+    # When constraints are active (auto-applied above, or user-supplied), disable
+    # DE's tol-based early convergence: penalty terms reshape the fitness landscape
+    # so std(energies) fires too early. setdefault is a no-op for the auto-applied
+    # case (already set via get_constraint_and_overrides above).
+    if constraints and method == 'DE':
+        solver_kwargs = dict(solver_kwargs or {})
+        solver_kwargs.setdefault('de_tol', 0)
+
+    # #249: warn when USER-supplied constraints cannot be transferred to recipe subprocess.
+    # Only fires for constraints the caller passed explicitly — not auto-applied LumpingConstraint
+    # (which is handled via method in recipe.json, so no warning needed for that case).
+    # PLACEMENT: must be ABOVE `with _stack:` — the stack suppresses all warnings.
+    _user_constraints = constraints  # at this point only user-supplied constraints remain
+    # After the DE auto-apply block, constraints may include auto-added LumpingConstraint;
+    # we track whether the user originally passed anything non-None and non-empty.
+    if not in_process and _original_user_constraints:
+        import warnings as _w
+        _w.warn(
+            "optimize_rigorously(in_process=False): explicit constraints= are applied to the "
+            "parent optimizer but are NOT transferred to the recipe subprocess. "
+            "Use in_process=True to ensure constraints are active during optimization.",
+            UserWarning,
+            stacklevel=3,
+        )
+
+    # Step 3: auto-construct recipe when subprocess path is used without one.
+    # This is the normal default flow (in_process=False is now the default),
+    # not a deprecated fallback -- see Copilot/refactor/DESIGN_default_in_process_reversal.md.
+    if not in_process and pipeline_recipe is None:
+        # Resolve function_code before recipe construction so it round-trips
+        # through recipe.json (issue #260) -- the later detection below becomes
+        # a no-op once this has run.
+        if function_code is None:
+            from .FunctionCodeUtils import detect_function_code
+            function_code = detect_function_code(decomposition)
+        pipeline_recipe = _build_auto_recipe(
+            decomposition, method, niter=niter,
+            frozen_components=frozen_components,
+            frozen_param_groups=frozen_param_groups,
+            function_code=function_code,
+            seed_params=seed_params,
+        )
 
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
@@ -368,7 +590,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     _original_in_folder = _get_in_folder_raw()
 
     with _stack:
-        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug)
+        dsets, basecurves, baseparams, exported = prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=analysis_folder, data_ssd=trimmed_ssd, debug=debug, pipeline_recipe=pipeline_recipe)
 
         # Drop a breadcrumb so external observers can find this run even
         # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.
@@ -429,14 +651,51 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                                **(solver_kwargs or {}))
         # make init_params
         init_params = decomposition.make_rigorous_initparams(baseparams)
+        # Tracks whether init_params was overridden from a known-good point
+        # (seed_params or resume) rather than the plain estimator-derived
+        # guess -- used below to concentrate DE's population around it
+        # (issue: DE reseeding was a no-op vs BH's, see molass-library#259).
+        _seeded_from_known_point = False
+        # seed_params: user-supplied override (e.g. seed DE from a prior BH result).
+        # Takes priority over both the estimator-derived init and the resume path.
+        if seed_params is not None:
+            import numpy as _np
+            _seed = _np.asarray(seed_params)
+            if len(_seed) == len(init_params):
+                init_params = _seed
+                _seeded_from_known_point = True
+            else:
+                import warnings as _w
+                _w.warn(
+                    f"seed_params length {len(_seed)} does not match "
+                    f"estimator-derived length {len(init_params)}. "
+                    "Ignoring seed_params and using estimator-derived init.",
+                    UserWarning, stacklevel=4,
+                )
         # When resuming (clear_jobs=False), override with the best params found
         # across previous jobs — starting from the best known point is almost
         # always better than starting from the initial decomp params (#169).
-        if not clear_jobs:
+        elif not clear_jobs:
             _resume_init = _load_best_init_params(analysis_folder, init_params)
             if _resume_init is not None:
                 init_params = _resume_init
+                _seeded_from_known_point = True
+        if _seeded_from_known_point and method == 'DE':
+            # Without this, DE's population is built via latinhypercube (full
+            # [0,10] box) regardless of init_params -- only ONE of popsize*n_params
+            # individuals (the x0= member) reflects the seed, so a known-good point
+            # barely influences the search. This concentrates the WHOLE population
+            # around it instead, giving DE the same "polish near the best" behavior
+            # BH already gets from x0 alone. See SolverDE.minimize() / molass-library#259.
+            optimizer._de_use_tight_init = True
         optimizer.prepare_for_optimization(init_params)
+
+        # Inject pluggable constraint hooks (e.g. LumpingConstraint).
+        # Constraints survive module reloads because _constraints is an
+        # instance attribute; BasicOptimizer.compute_fv reads it via
+        # getattr(self, '_constraints', []).
+        if constraints:
+            optimizer._constraints = list(constraints)
 
     # run optimization (outside _quiet — subprocess launch message is useful)
     from molass_legacy.Optimizer.Scripting import run_optimizer
@@ -509,21 +768,21 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             import molass.Rigorous.RunInfo as _run_info_mod
             _run_info_mod._active_inprocess = None
 
+        # Clear the jobs subfolder so _allocate_work_folder() always picks
+        # jobs/000 on the next call, for BOTH async and sync (async_=False)
+        # in-process paths. (#132 followup, fix for issue #236)
+        if clear_jobs:
+            import shutil as _shutil
+            _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+            if os.path.isdir(_jobs_dir):
+                for _entry in os.listdir(_jobs_dir):
+                    _ep = os.path.join(_jobs_dir, _entry)
+                    if os.path.isdir(_ep):
+                        _shutil.rmtree(_ep)
+            os.makedirs(_jobs_dir, exist_ok=True)
+
         if async_:
             import threading
-
-            # Clear the jobs subfolder BEFORE starting the thread so that
-            # _allocate_work_folder() picks jobs/000 instead of accumulating
-            # jobs/001, /002, ... across repeated runs. (#132 followup)
-            if clear_jobs:
-                import shutil as _shutil
-                _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
-                if os.path.isdir(_jobs_dir):
-                    for _entry in os.listdir(_jobs_dir):
-                        _ep = os.path.join(_jobs_dir, _entry)
-                        if os.path.isdir(_ep):
-                            _shutil.rmtree(_ep)
-                os.makedirs(_jobs_dir, exist_ok=True)
 
             _thread = threading.Thread(target=_run_in_process, daemon=True)
             run_info._async_thread = _thread
@@ -558,116 +817,115 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
 
         return run_info
 
-    if not monitor:
-        # Subprocess path WITHOUT MplMonitor.  Used by batch / comparison
-        # runs (e.g. compare_optimization_paths) where the live ipywidgets
-        # dashboard is not needed and would re-introduce the matplotlib /
-        # widget fragility we are trying to escape with split-architecture.
-        if debug:
-            import molass_legacy.Optimizer.BackRunner
-            reload(molass_legacy.Optimizer.BackRunner)
-        from molass_legacy.Optimizer.BackRunner import BackRunner
+    # Subprocess path: always BackRunner (recipe mode via Step 3/4).
+    # monitor=True adds an external watcher dashboard (Step 5);
+    # monitor=False returns immediately for batch/comparison runs.
+    if debug:
+        import molass_legacy.Optimizer.BackRunner
+        reload(molass_legacy.Optimizer.BackRunner)
+    from molass_legacy.Optimizer.BackRunner import BackRunner
 
-        # When clear_jobs=True, remove all existing job folders so BackRunner
-        # starts at job 000 (BackRunner.get_work_folder() just picks the next
-        # empty slot and would skip non-empty folders from a previous run).
-        if clear_jobs:
-            import shutil
-            _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
-            if os.path.isdir(_jobs_dir):
-                shutil.rmtree(_jobs_dir)
+    if clear_jobs:
+        import shutil
+        _jobs_dir = os.path.join(analysis_folder, "optimized", "jobs")
+        if os.path.isdir(_jobs_dir):
+            shutil.rmtree(_jobs_dir)
 
-        runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
-        # Mirror MplMonitor.run_impl: ensure optimizer is prepared before launch.
-        # (already done above in `optimizer.prepare_for_optimization(init_params)`)
-        runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts,
-                   debug=debug)
-        # Breadcrumb: now that the runner has a working_folder + subprocess
-        # PID, expose them so external observers can find the live run.
-        try:
-            from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
-            sub_pid = getattr(runner.process, "pid", None)
-            write_run_manifest(
-                runner.working_folder,
-                role="work",
-                method=method, niter=niter,
-                in_process=False, monitor=False,
-                analysis_folder=analysis_folder,
-                subprocess_pid=sub_pid,
-                status="running",
-            )
-            update_run_manifest(
-                analysis_folder,
-                work_folder=runner.working_folder,
-                subprocess_pid=sub_pid,
-                status="running",
-            )
-        except Exception:
-            pass
-        # Return immediately — do NOT block on runner.process.wait().
-        # load_best() polls the filesystem and returns as soon as the first
-        # result lands on disk.  run_info.wait() can be used to block until
-        # all iterations complete (issue #189).
-        if debug:
-            import molass.Rigorous.RunInfo
-            reload(molass.Rigorous.RunInfo)
-        from molass.Rigorous.RunInfo import RunInfo
-        run_info = RunInfo(
-            ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
-            init_params=init_params, monitor=None,
-            analysis_folder=analysis_folder, decomposition=decomposition,
-            rgcurve=rgcurve,
+    runner = BackRunner(xr_only=optimizer.get_xr_only(), shared_memory=False)
+    runner.run(optimizer, init_params, niter=niter, x_shifts=x_shifts, debug=debug)
+    try:
+        from molass.Rigorous.RunRegistry import write_run_manifest, update_run_manifest
+        sub_pid = getattr(runner.process, "pid", None)
+        write_run_manifest(
+            runner.working_folder,
+            role="work",
+            method=method, niter=niter,
+            in_process=False, monitor=monitor,
+            analysis_folder=analysis_folder,
+            subprocess_pid=sub_pid,
+            status="running",
         )
-        run_info.work_folder = runner.working_folder
-        run_info._subprocess_process = runner.process
-        return run_info
-
-    monitor = run_optimizer(optimizer, init_params, niter=niter, x_shifts=x_shifts, clear_jobs=clear_jobs)
-
-    # Wire dsets to monitor so the Export Data button can work (issue #96)
-    monitor.dsets = dsets
-
-    # Display rendering uses the parent optimizer (issues #118, #128, #129).
-    #
-    # History:
-    #   #118 originally introduced `monitor_optimizer` (a subprocess-equivalent
-    #        optimizer built via `create_optimizer_from_job`) so the monitor's
-    #        on-screen per-snapshot SV would match callback.txt SV.
-    #   #128 changed the panel title to show `best_sv` (aggregated from
-    #        callback.txt by MplMonitor) instead of the per-snapshot SV.
-    #        The per-snapshot SV computed inside `plot_objective_func` is now
-    #        discarded — only the plot rendering still uses `display_optimizer`.
-    #   #129 the subprocess-equivalent optimizer renders curves in the
-    #        original frame-number domain (its disk-loaded dsets), while the
-    #        parent uses the trimmed (0..N-1) domain that the EGH parameters
-    #        in `init_params` are expressed in. Mixing them shifted the UV /
-    #        Rg / Xray panels off-axis. Patching `xr_curve.x` / `uv_curve.x`
-    #        on the monitor optimizer is unsafe because `objective_func`
-    #        reads them at every evaluation — see Fix #21 / G0346.objective_func.
-    #
-    # Resolution: leave `monitor_optimizer = None` so `MplMonitor` falls back
-    # to the parent `optimizer` for plot rendering. The title still shows
-    # `best_sv` from callback.txt (#128), so #118's user-visible guarantee
-    # is preserved without the coordinate-system conflict.
-    monitor.monitor_optimizer = None
-
-    # Pass anomaly mask to monitor for consistent band display
-    from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
-    jv, mask = get_anomaly_mask_from_ssd(decomposition.ssd)
-    if jv is not None:
-        monitor.anomaly_jv = jv
-        monitor.anomaly_mask = mask
+        update_run_manifest(
+            analysis_folder,
+            work_folder=runner.working_folder,
+            subprocess_pid=sub_pid,
+            status="running",
+        )
+    except Exception:
+        pass
 
     if debug:
         import molass.Rigorous.RunInfo
         reload(molass.Rigorous.RunInfo)
     from molass.Rigorous.RunInfo import RunInfo
-    run_info = RunInfo(ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
-                       init_params=init_params, monitor=monitor,
-                       analysis_folder=analysis_folder, decomposition=decomposition,
-                       rgcurve=rgcurve)
+    run_info = RunInfo(
+        ssd=decomposition.ssd, optimizer=optimizer, dsets=dsets,
+        init_params=init_params, monitor=None,
+        analysis_folder=analysis_folder, decomposition=decomposition,
+        rgcurve=rgcurve,
+    )
+    run_info.work_folder = runner.working_folder
+    run_info._subprocess_process = runner.process
+
+    # Create an empty callback.txt so the watcher fires immediately and falls back
+    # to get_best_params() returning self.init_params (real params) for a correct
+    # initial display — avoids the 3-4 min blank while RecipeRunner rebuilds.
+    # (Writing normalized params would pass them to objective_func without to_real_params
+    # conversion, producing zero curves and wrong scores.)
     try:
-        run_info.work_folder = monitor.working_folder
+        import os as _os
+        _cb_path = _os.path.join(runner.working_folder, 'callback.txt')
+        open(_cb_path, 'w').close()
     except Exception:
         pass
+
+    # Register atexit so the subprocess is terminated on kernel restart (SIGTERM).
+    # SIGKILL force-kills bypass atexit; active_processes.json handles those orphans.
+    try:
+        import atexit as _atexit
+        _proc_ref = runner.process
+        def _terminate_subprocess(_p=_proc_ref):
+            try:
+                if _p.poll() is None:
+                    _p.terminate()
+            except Exception:
+                pass
+        _atexit.register(_terminate_subprocess)
+    except Exception:
+        pass
+
+    if monitor:
+        # Step 5: external watcher — MplMonitor.for_run_info() polls callback.txt
+        # and uses the parent optimizer for UV/XR/Score rendering.
+        # No create_optimizer_from_job() needed (eliminates #117/#119 divergence).
+        if debug:
+            import molass_legacy.Optimizer.MplMonitor
+            reload(molass_legacy.Optimizer.MplMonitor)
+        from molass_legacy.Optimizer.MplMonitor import MplMonitor
+        mon = MplMonitor.for_run_info(
+            run_info, niter=niter,
+            max_trials=max_trials,
+            function_code=function_code,
+            clear_jobs=False,
+        )
+        mon.dsets = dsets
+        mon.monitor_optimizer = None
+        mon.input_folder = _original_in_folder
+        from molass.PlotUtils.AnomalyBands import get_anomaly_mask_from_ssd
+        _jv, _mask = get_anomaly_mask_from_ssd(decomposition.ssd)
+        if _jv is not None:
+            mon.anomaly_jv = _jv
+            mon.anomaly_mask = _mask
+        mon.create_dashboard()
+        mon.show()
+        mon.start_watching()
+        run_info.monitor = mon
+
+    # Unlike the in-process path (which calls _run_in_process() synchronously
+    # when async_=False), BackRunner.run() above always launches the subprocess
+    # without blocking. Mirror the in-process contract here: async_=False must
+    # block until the run completes before returning (molass-library#255).
+    if not async_:
+        run_info.wait(timeout=0)
+
     return run_info

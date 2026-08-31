@@ -37,15 +37,17 @@ class GrmComponentCurve(ComponentCurve):
         External film mass-transfer coefficient for this component [length/time].
     R : float
         Retention factor for this component (R = tR/t0 = 1 + F*a_star).
-    scale : float
-        Area scaling factor.
+    c_inj : float
+        Injection concentration (embedded scale parameter).
     rg : float, optional
         Radius of gyration for this component.
+    t_inj : float, optional
+        Injection duration. Default 1.0.
     """
 
     model = 'grm'
 
-    def __init__(self, x, Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext, R, scale, rg=None):
+    def __init__(self, x, Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext, R, c_inj, rg=None, t_inj=1.0):
         from molass.SEC.Models.GrmLinear import grm_pdf
         self.x       = x
         self.Pe      = Pe
@@ -56,13 +58,14 @@ class GrmComponentCurve(ComponentCurve):
         self.F_ratio = F_ratio
         self.k_ext   = k_ext
         self.R       = R
-        self.scale   = scale
+        self.c_inj   = c_inj
+        self.t_inj   = t_inj
         self.rg      = rg if rg is not None else float('nan')
         self.moment  = None
-        self.params  = np.array([Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext, R, scale])
+        self.params  = np.array([Pe, t0, R_p, D_eff, a_star, F_ratio, k_ext, R, c_inj])
 
         self._grm_pdf = grm_pdf
-        self._y = scale * grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio)
+        self._y = grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, c_inj=c_inj, t_inj=t_inj)
 
     @property
     def y(self):
@@ -71,8 +74,9 @@ class GrmComponentCurve(ComponentCurve):
     def get_y(self, x=None):
         if x is None:
             return self._y
-        return self.scale * self._grm_pdf(x, self.Pe, self.t0, self.k_ext,
-                                          self.R_p, self.D_eff, self.a_star, self.F_ratio)
+        return self._grm_pdf(x, self.Pe, self.t0, self.k_ext,
+                            self.R_p, self.D_eff, self.a_star, self.F_ratio,
+                            c_inj=self.c_inj, t_inj=self.t_inj)
 
     def get_xy(self):
         return self.x, self._y
@@ -81,6 +85,11 @@ class GrmComponentCurve(ComponentCurve):
         """Return the x-position of the PDF maximum (mode)."""
         return self.x[np.argmax(self._y)]
 
+    def get_peak_top_x(self):
+        """Return the frame number at the peak maximum (implements ComponentCurve API)."""
+        return self.get_peak_position()
+
     def get_scale_param(self):
-        """Return the area scaling factor (overrides base-class params[0] which is Pe)."""
+        """Return the embedded scale parameter c_inj (overrides base-class params[0] which is Pe)."""
+        return self.params[8]  # c_inj position
         return self.scale

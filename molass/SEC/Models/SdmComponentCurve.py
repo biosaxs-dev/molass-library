@@ -171,15 +171,9 @@ class SdmComponentCurve(ComponentCurve):
         return self.scale * self._pdf_func(_x, *self.params)
     
     def get_peak_top_x(self):
-        """
-        Returns the x value at the peak top.
-
-        Raises
-        ------
-        NotImplementedError
-            Peak top x calculation is not implemented for SDM model.
-        """
-        raise NotImplementedError("Peak top x calculation is not implemented for SDM model.")
+        """Return the frame number at the peak maximum."""
+        import numpy as np
+        return float(self.x[np.argmax(self.get_y())])
     
     def get_scale_param(self):
         """

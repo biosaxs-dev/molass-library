@@ -1,7 +1,8 @@
 # Project Status — molass-library
 
-**Last Updated**: May 8, 2026  
-**Current version**: 0.9.5
+**Last Updated**: July 6, 2026  
+**Current version**: 0.9.5  
+**Active branch**: `dev/ongoing-work` (all development during JOSS review)
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,13 +12,24 @@
 
 ## 🎯 Current Task
 
-**molass-library#195 fixed ✅ — SDM lognormal `upgrade()` failure when `rgcurve` is passed**  
-Two linked bugs caused the optimizer to converge at 2D residual≈0.981 instead of ≈0.21:
-- Fix 1 (`SdmEstimator.py`): use `k=2.0` (not mono k) for shift test peak in `estimate_sdm_lognormal_from_monopore`  
-- Fix 2 (`SDM.py`): strip `rgcurve` from the kwargs passed to the mono stage in the lognormal pipeline  
-Verified in `molass-researcher/experiments/22_legacy_support/22e_sample1_sdm_comparison.ipynb`.  
+**AI-friendliness: preserve `_rgcurve` in `copy_with_new_components()` — in progress** (branch `dev/ongoing-work`)
 
-Next: commit these fixes and consider next candidates — Kratky preprocessing (P6+), NS in-process crash root-cause, or JOSS paper revision.
+**Problem**: `upgrade()` causes redundant Rg curve computation (5× for 5-model comparison notebook). Root cause: `copy_with_new_components()` creates a fresh `Decomposition` object without transferring cached `_rgcurve` attribute.
+
+**Solution implemented**: Added `_rgcurve` preservation in `molass/LowRank/Decomposition.py::copy_with_new_components()`:
+```python
+if hasattr(self, '_rgcurve') and self._rgcurve is not None:
+    new_decomp._rgcurve = self._rgcurve
+```
+
+**Commit**: `f0e8f6e` — "AI-friendliness: preserve _rgcurve in copy_with_new_components"
+
+**Testing**: Notebook `molass-researcher/experiments/29_five_model_approach/29a_sample1_five_models.ipynb` ready to test. After kernel restart, verify that all 5 model upgrades reuse the same cached `rgcurve` object.
+
+**Next steps**: 
+1. Test the fix in notebook
+2. If successful, continue with five-model comparison experiment
+3. Consider opening formal issue (#168) for expensive-object caching pattern documentation
 
 ---
 

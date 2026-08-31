@@ -5,8 +5,8 @@ Build the flat initial-params vector for G1500 (GRM rigorous optimizer)
 from a GRM-model decomposition.
 
 grmcol_params layout:
-  [Pe, t0, R_p, D_eff, R_0, k_ext_0, R_1, k_ext_1, ..., R_{nc-1}, k_ext_{nc-1}]
-  Total length: 4 + 2*nc
+  [Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, R_1, k_ext_1, ..., R_{nc-1}, k_ext_{nc-1}]
+  Total length: 5 + 2*nc
 """
 import numpy as np
 
@@ -36,7 +36,7 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     xr_params = []
     rg_params = []
     for ccurve in decomposition.xr_ccurves:
-        xr_params.append(ccurve.scale)
+        xr_params.append(ccurve.get_scale_param())  # c_inj for GRM
         rg = getattr(ccurve, 'rg', None)
         rg_params.append(rg if (rg is not None and not np.isnan(rg)) else 30.0)
     xr_params = np.array(xr_params)
@@ -55,7 +55,10 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     uv_params = []
     for uv_ccurve in decomposition.uv_ccurves:
         uv_params.append(uv_ccurve.scale)
-    uv_params = np.array(uv_params) * xr_params
+    # G1500 computes: uv_cy = uv_w * xr_cy, where xr_cy = c_inj * grm_norm_pdf.
+    # UvComponentCurve computes: uv_y = scale * xr_cc.y = scale * c_inj * grm_norm_pdf.
+    # For both to agree, uv_w must equal uv_ccurve.scale directly (no division by c_inj).
+    uv_params = np.array(uv_params)
 
     # ── UV baseline ──────────────────────────────────────────────────────────
     uv_baseparams = baseparams[0]
@@ -64,20 +67,21 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     x = decomposition.ssd.xr.get_icurve().x
     init_mappable_range = (x[0], x[-1])
 
-    # ── GRM column params: [Pe, t0, R_p, D_eff, R_0, k_ext_0, R_1, k_ext_1, ...] ─
+    # ── GRM column params: [Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, R_1, k_ext_1, ...] ─
     ccurve0 = decomposition.xr_ccurves[0]
     Pe    = ccurve0.Pe
     t0    = ccurve0.t0
     R_p   = ccurve0.R_p
     D_eff = ccurve0.D_eff
-    grmcol_params = [Pe, t0, R_p, D_eff]
+    c_inj = ccurve0.c_inj  # Shared injection concentration
+    grmcol_params = [Pe, t0, R_p, D_eff, c_inj]
     for ccurve in decomposition.xr_ccurves:
         grmcol_params.append(ccurve.R)
         grmcol_params.append(ccurve.k_ext)
     grmcol_params = np.array(grmcol_params)
 
     if debug:
-        print("GRM col params (Pe, t0, R_p, D_eff, R_0, k_ext_0, ...):", grmcol_params)
+        print("GRM col params (Pe, t0, R_p, D_eff, c_inj, R_0, k_ext_0, ...):", grmcol_params)
 
     return np.concatenate([
         xr_params,

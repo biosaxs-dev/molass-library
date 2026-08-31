@@ -62,6 +62,6 @@ class LKM:
         else:
             from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
             new_uv_ccurves = optimize_uv_decomposition(
-                decomposition, new_xr_ccurves, **kwargs)
+                decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
 
         return decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)

@@ -34,7 +34,7 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     xr_params = []
     rg_params = []
     for ccurve in decomposition.xr_ccurves:
-        xr_params.append(ccurve.scale)
+        xr_params.append(ccurve.get_scale_param())  # c_inj for LKM
         rg = getattr(ccurve, 'rg', None)
         rg_params.append(rg if (rg is not None and not np.isnan(rg)) else 30.0)
     xr_params = np.array(xr_params)
@@ -53,7 +53,10 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     uv_params = []
     for uv_ccurve in decomposition.uv_ccurves:
         uv_params.append(uv_ccurve.scale)
-    uv_params = np.array(uv_params) * xr_params
+    # G1400 computes: uv_cy = uv_w * xr_cy, where xr_cy = c_inj * lkm_norm_pdf.
+    # UvComponentCurve computes: uv_y = scale * xr_cc.y = scale * c_inj * lkm_norm_pdf.
+    # For both to agree, uv_w must equal uv_ccurve.scale directly (no division by c_inj).
+    uv_params = np.array(uv_params)
 
     # ── UV baseline ──────────────────────────────────────────────────────────
     uv_baseparams = baseparams[0]
@@ -62,11 +65,12 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     x = decomposition.ssd.xr.get_icurve().x
     init_mappable_range = (x[0], x[-1])
 
-    # ── LKM column params: [Pe, t0, R_0, k_MT_0, R_1, k_MT_1, ...] ─────────
+    # ── LKM column params: [Pe, t0, c_inj, R_0, k_MT_0, R_1, k_MT_1, ...] ──
     ccurve0 = decomposition.xr_ccurves[0]
     Pe = ccurve0.Pe
     t0 = ccurve0.t0
-    lkmcol_params = [Pe, t0]
+    c_inj = ccurve0.c_inj  # Shared injection concentration
+    lkmcol_params = [Pe, t0, c_inj]
     for ccurve in decomposition.xr_ccurves:
         lkmcol_params.append(ccurve.R)
         lkmcol_params.append(ccurve.k_MT)

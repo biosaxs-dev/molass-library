@@ -195,9 +195,9 @@ def test_check_progress_returns_dict():
         from molass.Rigorous import check_progress
         result = check_progress(af)
         assert isinstance(result, dict)
-        for key in ("label", "n_evals", "best_fv", "best_sv", "sv_best_so_far", "timestamp"):
+        for key in ("label", "n_callbacks", "best_fv", "best_sv", "sv_best_so_far", "timestamp"):
             assert key in result, f"missing key: {key}"
-        assert result["n_evals"] == 20   # 2 jobs × 10 evals each
+        assert result["n_callbacks"] == 20   # 2 jobs × 10 evals each
         assert isinstance(result["best_sv"], float)
         assert -200 < result["best_sv"] < 100
 
@@ -225,9 +225,9 @@ def test_check_progress_snapshot_content():
         snap_path = os.path.join(os.path.abspath(af), "optimized", "progress_snapshot.json")
         on_disk = json.load(open(snap_path, encoding="utf-8"))
         # Returned dict and on-disk JSON must agree
-        assert on_disk["n_evals"] == returned["n_evals"]
+        assert on_disk["n_callbacks"] == returned["n_callbacks"]
         assert abs(on_disk["best_sv"] - returned["best_sv"]) < 1e-9
-        assert len(on_disk["sv_best_so_far"]) == on_disk["n_evals"]
+        assert len(on_disk["sv_best_so_far"]) == on_disk["n_callbacks"]
         assert "T" in on_disk["timestamp"]  # ISO 8601 includes "T"
 
 
@@ -245,7 +245,7 @@ def test_load_progress_snapshot_via_run_info():
         ri.check_progress(write_snapshot=True)
         snap = ri.load_progress_snapshot()
         assert isinstance(snap, dict)
-        assert snap["n_evals"] == 20
+        assert snap["n_callbacks"] == 20
         assert -200 < snap["best_sv"] < 100
 
 

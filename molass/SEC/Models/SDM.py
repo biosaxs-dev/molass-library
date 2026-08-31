@@ -76,9 +76,16 @@ class SDM:
             mono_kwargs = {k: v for k, v in kwargs.items() if k != 'progress'}
             mono_ccurves = optimize_sdm_xr_decomposition(
                 decomposition, mono_env, model_params=mono_model_params, **mono_kwargs)
+            # Skip moment matching when ln_pore_sigma is explicitly fixed via model_params.
+            # With the T_ln correction (T_ln = T_mono/k_optimizer), moment matching needs to
+            # double k to match M1, which destabilizes mu and causes component collapse.
+            # The molass-legacy#88 path never uses moment matching; align behavior here.
+            ln3_kwargs = dict(kwargs)
+            if model_params is not None and 'ln_pore_sigma' in model_params:
+                ln3_kwargs['moment_refine'] = False
             env_params = estimate_sdm_lognormal_from_monopore(
                 mono_ccurves, decomposition.xr_icurve,
-                decomposition=decomposition, **kwargs)
+                decomposition=decomposition, **ln3_kwargs)
             # Do NOT pass mono-pore k to lognormal — the models have different
             # parameterizations and the same k produces very different shapes.
             # Let the lognormal optimizer use its default k=2.0 (Issue #108).
@@ -97,7 +104,7 @@ class SDM:
             new_uv_ccurves = make_dummy_uv_ccurves(decomposition.ssd, new_xr_ccurves)
         else:
             from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
-            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, **kwargs)
+            new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
         sdm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
 
         if pore_dist != 'lognormal':

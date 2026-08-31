@@ -22,10 +22,11 @@ def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
     a, b = decomposition.ssd.get_mapping()
 
     # UV initial parameters
-    uv_params = []
-    for uv_ccurve in decomposition.uv_ccurves:
-        uv_params.append(uv_ccurve.scale)
-    uv_params = np.array(uv_params) * xr_params
+    # uv_ccurve.scale IS the ε_i/k ratio (Phase 1c): UV_i(t) = scale * XR_i(mapping.inv(t))
+    # G1200 objective uses: uv_cy = uv_w * xr_cy, so these ratios are used directly.
+    # No division by xr_params needed — that was correct only before Phase 1c when
+    # uv_ccurve.scale stored an absolute UV amplitude (not yet a ratio).
+    uv_params = np.array([uv_ccurve.scale for uv_ccurve in decomposition.uv_ccurves])
 
     # UV baseline parameters
     uv_baseparams = baseparams[0]

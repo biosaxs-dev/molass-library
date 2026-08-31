@@ -5,7 +5,7 @@ Estimate GRM (General Rate Model) initial parameters from EGH component moments.
 
 Strategy
 --------
-1. Run the LKM estimator to get (Pe, t0, k_MT_i, R_i, scale_i).
+1. Run the LKM estimator to get (Pe, t0, k_MT_i, R_i, scale_i, c_inj).
 2. Apply the moment-matching relationship (Qamar 2014, App C) to convert k_MT_i
    into k_ext_i, keeping all other parameters identical:
 
@@ -77,12 +77,12 @@ def estimate_grm_init_params(decomposition, **kwargs):
     F_ratio : float     (1-eps)/eps                  (shared)
     k_ext_list : list of float    per component
     R_list : list of float        per component
-    scale_list : list of float    per component
+    c_inj : float       injection concentration (embedded scale)
     """
     debug = kwargs.get('debug', False)
 
     from molass.SEC.Models.LkmEstimator import estimate_lkm_init_params
-    Pe, t0, k_MT_list, R_list, scale_list = estimate_lkm_init_params(
+    Pe, t0, k_MT_list, R_list, scale_list, c_inj = estimate_lkm_init_params(
         decomposition, **kwargs)
 
     R_p_def, D_eff_def, eps_p_def, F_def = _get_grm_column_settings()
@@ -116,4 +116,4 @@ def estimate_grm_init_params(decomposition, **kwargs):
             print(f"  comp {i}: R={R_i:.3f}  k_ext={k_ext_i:.5f}  "
                   f"k_MT_eff={k_MT_eff:.4f}  a_star={a_star_i:.4f}  scale={scale_i:.4f}")
 
-    return Pe, t0, R_p, D_eff, a_star_list, F_ratio, k_ext_list, R_list, scale_list
+    return Pe, t0, R_p, D_eff, a_star_list, F_ratio, k_ext_list, R_list, c_inj

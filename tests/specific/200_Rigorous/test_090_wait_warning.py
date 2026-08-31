@@ -20,6 +20,7 @@ def _make_fake_run_info():
     t.join()
     run_info._async_thread = t
     run_info._async_error = None
+    run_info._subprocess_process = None
     # Wire wait() to the real implementation
     run_info.wait = lambda **kw: RunInfo.wait(run_info, **kw)
     return run_info

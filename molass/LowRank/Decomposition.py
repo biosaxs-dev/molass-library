@@ -113,7 +113,35 @@ class Decomposition:
         Decomposition
             A new Decomposition object with the specified component curves.
         """
-        return Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges, **kwargs)
+        new_decomp = Decomposition(self.ssd, self.xr_icurve, xr_ccurves, self.uv_icurve, uv_ccurves, self.mapped_curve, self.paired_ranges, **kwargs)
+        
+        # Preserve expensive cached computations (issue #220)
+        # The Rg curve is a property of the data, not the elution model,
+        # so it should transfer across model upgrades automatically.
+        if hasattr(self, '_rgcurve') and self._rgcurve is not None:
+            new_decomp._rgcurve = self._rgcurve
+        else:
+            # Lazy fallback: store parent reference so get_rg_curve() can
+            # inherit the result without recomputing (same XR data).
+            new_decomp._parent = self
+
+        # Always track the EGH source decomposition so that auto-constraints
+        # (e.g. LumpingConstraint) can use curve-fit peak positions rather than
+        # physics-model positions that may differ slightly after upgrade().
+        # Used by optimize_rigorously(method='DE') in RigorousImplement.py.
+        new_decomp._source_decomp = self
+
+        return new_decomp
+
+    @property
+    def source_decomp(self):
+        """The EGH decomposition this was upgraded from, or ``None`` if not an upgrade result.
+
+        Set automatically by :meth:`copy_with_new_components` when :meth:`upgrade` is called.
+        Useful for recovering EGH-based peak positions after a physics-model upgrade
+        changes the curve shapes (e.g. for :class:`~molass.Rigorous.LumpingConstraint`).
+        """
+        return getattr(self, '_source_decomp', None)
 
     @property
     def xr_components(self):
@@ -241,7 +269,43 @@ class Decomposition:
             uv_fractions=uv_frac,
         )
 
-    def get_rg_curve(self):
+    def get_uv_params(self):
+        """Get UV/XR scale ratios (species properties) for all components.
+
+        The ratios ε_i/k represent species-specific properties:
+        - ε_i = UV extinction coefficient (chromophore content, protein-specific)
+        - k = XR scattering factor (universal, proportional to mass/electron density)
+
+        These ratios are model-independent: they depend only on the molecular
+        species, not on the elution model (EGH, SDM, LKM, GRM, EDM).
+        During model upgrades with preserve_ratios=True, these values should
+        remain constant.
+
+        Returns
+        -------
+        uv_params : list of float, length n_components
+            UV/XR ratio for each component, in the same order as
+            ``get_xr_components()`` and ``get_rgs()``.
+            These are stored as the ``scale`` attribute of each UvComponentCurve.
+
+        Examples
+        --------
+        ::
+
+            decomp_egh = corrected.quick_decomposition()
+            decomp_lkm = decomp_egh.upgrade(model='LKM')
+            
+            # Check ratio preservation (unified architecture)
+            ratios_egh = decomp_egh.get_uv_params()
+            ratios_lkm = decomp_lkm.get_uv_params()
+            
+            for i, (r1, r2) in enumerate(zip(ratios_egh, ratios_lkm)):
+                delta = abs(r1 - r2) / r1 if r1 > 0 else 0
+                print(f"Component {i+1}: {r1:.2f} → {r2:.2f} (Δ={delta:.1%})")
+        """
+        return [uv_cc.scale for uv_cc in self.uv_ccurves]
+
+    def get_rg_curve(self, progress_cb=None):
         """Compute the per-frame Rg curve from the raw XR data.
 
         Runs a Guinier fit on every elution frame independently and returns
@@ -275,13 +339,41 @@ class Decomposition:
             plt.show()
         """
         if getattr(self, '_rgcurve', None) is None:
-            self._rgcurve = self.xr.compute_rgcurve()
-        # NOTE: the cached Rg curve lives on this Decomposition object (_rgcurve),
-        # NOT on self.ssd.  self.ssd._rgcurve is always None because self.ssd is a
-        # fresh object created during quick_decomposition().  Always read from
-        # decomposition._rgcurve, never from decomposition.ssd._rgcurve.
-        # (molass-library #202)
+            parent = getattr(self, '_parent', None)
+            if parent is not None:
+                # Inherit from parent decomposition — same XR data, no recomputation.
+                self._rgcurve = parent.get_rg_curve(progress_cb=progress_cb)
+            else:
+                self._rgcurve = self.ssd.get_rg_curve(progress_cb=progress_cb)
         return self._rgcurve
+
+    @property
+    def has_rg_curve(self):
+        """Whether :meth:`get_rg_curve` would return a cached result without computing.
+
+        Mirrors :meth:`get_rg_curve`'s own lookup order (``self._rgcurve`` →
+        ``_parent`` chain → ``self.ssd``) without triggering any computation.
+        Useful for GUIs/notebooks deciding whether to show a "computing…"
+        indicator before calling :meth:`get_rg_curve`.
+
+        Returns
+        -------
+        bool
+
+        Examples
+        --------
+        ::
+
+            if not decomp.has_rg_curve:
+                show_progress_indicator()
+            rgcurve = decomp.get_rg_curve()
+        """
+        if getattr(self, '_rgcurve', None) is not None:
+            return True
+        parent = getattr(self, '_parent', None)
+        if parent is not None:
+            return parent.has_rg_curve
+        return getattr(self.ssd, '_rgcurve', None) is not None
 
     def compute_reconstructed_rgcurve(self, debug=False):
         """Compute the reconstructed Rg curve as a concentration-weighted average.
@@ -451,7 +543,23 @@ class Decomposition:
             Marker size for the Rg scatter points.  Default is ``12``.
         rg_cmap : str, optional
             Matplotlib colormap name used to colour Rg markers by score.
-            Default is ``'viridis'``.
+            Default is ``'YlGn'``.
+        rg_alpha_by_score : bool, optional
+            If True, encode the Guinier fit score as marker *alpha* (opacity)
+            in addition to colour, so low-score points fade toward transparent
+            instead of competing visually with high-confidence ones. Default
+            is ``True``.
+        rg_alpha_power : float, optional
+            Only used when ``rg_alpha_by_score=True``. Alpha is computed as
+            ``score ** rg_alpha_power``. Default ``2`` suppresses low/mid
+            scores more aggressively than a linear mapping (score 0.3 -> alpha
+            0.09) while a perfect score (1.0) always stays fully opaque, since
+            ``1 ** power == 1`` for any power.
+
+            Example::
+
+                decomp.plot_components(rgcurve=rgcurve, rg_cmap='YlGn',
+                                       rg_alpha_by_score=True, rg_alpha_power=2.5)
 
         Returns
         -------
@@ -812,10 +920,10 @@ class Decomposition:
 
             Supported models:
 
-            - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/stochastic-theory.html#stochastic-dispersive-model>`_
-            - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html#equilibrium-dispersive-model>`_
+            - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/stochastic-theory#stochastic-dispersive-model>`_
+            - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory#equilibrium-dispersive-model>`_
             - ``CEDM``: Continuous EDM (shared-column variant of EDM)
-            - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/chapters/60/kinetic-theory.html>`_
+            - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory>`_
             - ``GRM``: General Rate Model (film mass transfer + intraparticle pore diffusion)
 
         rgcurve : Curve, optional
@@ -997,16 +1105,46 @@ class Decomposition:
         _, baseparams = make_basecurves_from_decomposition(self)
         return len(self.make_rigorous_initparams(baseparams))
 
+    def get_rigorous_initparams(self):
+        """Return the estimator-derived initial parameter vector for rigorous optimization.
+
+        Equivalent to what :meth:`optimize_rigorously` computes internally before
+        starting the optimizer.  Useful for seeding one optimizer from the
+        decomposition's own estimates (no prior BH/CMA run required)::
+
+            init_params = decomp_sdm.get_rigorous_initparams()
+            run_de = decomp_sdm.optimize_rigorously(
+                method='DE', seed_params=init_params, ...
+            )
+
+        Works for all supported models (EGH, SDM, EDM, CEDM, LKM, GRM).
+
+        Returns
+        -------
+        np.ndarray
+            Flat parameter vector (same shape as ``best_params`` on a completed
+            :class:`~molass.Rigorous.RunInfo.RunInfo`).
+        """
+        from molass.Rigorous.LegacyBridgeUtils import make_basecurves_from_decomposition
+        _, baseparams = make_basecurves_from_decomposition(self)
+        return self.make_rigorous_initparams(baseparams)
+
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,
                             frozen_param_groups=None,
                             trimmed_ssd=None,
                             clear_jobs=True, function_code=None,
-                            in_process=True, monitor=True, async_=True, progress='dashboard',
+                            in_process=False, monitor=True, async_=True, progress='dashboard',
                             max_trials=0, debug=False, _dry_run=False,
                             ns_narrow_bounds=True,
                             ns_adaptive_nsteps=False,
                             ns_nsteps=None,
+                            seed_params=None,
+                            constraints=None,
+                            pipeline_recipe=None,
+                            num_jobs=1,
+                            on_round_start=None,
+                            stop_check=None,
                             **kwargs):
         """
         Perform a rigorous decomposition.
@@ -1084,14 +1222,48 @@ class Decomposition:
             automatically used as ``init_params`` for the new trial (resuming
             from the best known point rather than the original decomp params,
             see issue #169).
+        num_jobs : int, optional
+            Run ``num_jobs`` full, un-truncated rounds instead of one, each
+            round reseeding ``init_params`` from the best params found across
+            *all* previous rounds (the same mechanism as calling this method
+            repeatedly with ``clear_jobs=(round == 0)``). Default 1 (today's
+            single-round behavior, unchanged).
+
+            Requires ``async_=False`` — the call blocks until every round
+            completes. Validated monotonic/no-regression on real BH and DE
+            runs; see ``molass-researcher/experiments/36_bh_cutomize_trial``.
+            Distinct from ``max_trials`` (which is ``monitor=True``-only and
+            reseeds from just the previous trial's own best, not the global
+            best — see issue #257).
+        on_round_start : callable, optional
+            Only used when ``num_jobs > 1``. Called as
+            ``on_round_start(round_idx, num_jobs, run_info)`` immediately
+            after each round's ``run_info`` becomes available (before that
+            round blocks) — use it to poll/display progress for the round
+            currently in flight, e.g. from a GUI's own polling loop.
+        stop_check : callable, optional
+            Only used when ``num_jobs > 1``. Called with no arguments before
+            each round launches; return a truthy value to abort the remaining
+            rounds (the round already in flight is not interrupted by this --
+            call ``run_info.stop()`` for that).
         in_process : bool, optional
-            If True (default), run the optimizer in this Python process instead of
-            spawning a subprocess.  Avoids the parent/subprocess data-derivation
-            divergence (see issues #117 / #119) and keeps the optimizer running
-            against the same library-prepared data the parent already holds in
-            memory.  Set ``False`` to use the legacy subprocess path (required
-            by the tkinter GUI; available as an escape hatch for notebook users
-            who need process isolation).
+            If False (default), use the recipe-based subprocess path: the optimizer
+            runs in a separate OS process, isolating it from crashes and from the
+            live-dashboard redraw overhead that competes with the optimizer for
+            CPU/lock time during long runs (rigorous optimization is typically a
+            long-running, dedicated-experiment operation). ``pipeline_recipe`` is
+            auto-constructed when not supplied, making the subprocess reconstruction
+            deterministic (avoids the old parent/subprocess divergence, issues
+            #117/#119). Set ``True`` to run in this Python process instead --
+            useful for short/exploratory runs, or when ``constraints=`` must stay
+            active (constraints are not transferred to the recipe subprocess).
+
+            **Subprocess lifecycle** (``in_process=False``, the default):
+
+            * Subprocess is a separate OS process — not killed by kernel interrupt (SIGINT).
+            * Kernel restart (SIGTERM): ``atexit`` handler terminates it automatically.
+            * Force-kill (SIGKILL): subprocess orphaned; cleaned up on next run.
+            * Explicit stop: ``run_info.stop()``.
         monitor : bool, optional
             Controls the ``MplMonitor`` ipywidgets dashboard.  When True
             (default), a live dashboard is shown whether the run is
@@ -1121,6 +1293,23 @@ class Decomposition:
             behaviour for unattended in-process runs.
         debug : bool, optional
             If True, enable debug mode.
+        seed_params : array-like or None, optional
+            Explicit initial parameter vector to use instead of the
+            estimator-derived one.  Useful for seeding one optimizer from
+            the result of another (e.g. running DE from the BH best)::
+
+                seed = run_bh.best_params
+                run_de = decomp.optimize_rigorously(
+                    method='DE', niter=5,
+                    analysis_folder='temp_de_from_bh',
+                    seed_params=seed,
+                )
+
+            The length of ``seed_params`` must match the estimator-derived
+            vector for the current model and number of components; a mismatch
+            triggers a ``UserWarning`` and falls back to the estimator-derived
+            init.  When ``seed_params`` is provided it takes precedence over
+            the ``clear_jobs=False`` resume path.
 
         Returns
         -------
@@ -1180,12 +1369,24 @@ class Decomposition:
                 raise ValueError("Cannot specify both trimmed_ssd and uncorrected_ssd")
             trimmed_ssd = kwargs.pop('uncorrected_ssd')
         # model is auto-detected from decomposition.xr_ccurves[0].model in RigorousImplement.
-        # If the user passes model= explicitly (e.g. model='GRM'), silently discard it here —
-        # the decomposition's component curves are authoritative.
-        kwargs.pop('model', None)
+        # Passing model= explicitly is an error: the decomposition's component curves are
+        # authoritative. To use a different column model, call upgrade() first.
+        # See: https://github.com/biosaxs-dev/molass-library/issues/230
+        if 'model' in kwargs:
+            model_val = kwargs.pop('model')
+            raise TypeError(
+                f"optimize_rigorously() does not accept model={model_val!r}. "
+                f"The elution model is determined by the decomposition itself "
+                f"(currently '{self.model}'). "
+                f"To use a different column model, call "
+                f"decomp.upgrade(model={model_val!r}) first, "
+                f"then call optimize_rigorously() on the upgraded decomposition."
+            )
         # Remaining kwargs are solver-specific hyperparameters (e.g. de_pop_size, de_variant).
         # Pass them through as solver_kwargs without raising TypeError — adding a new solver
         # no longer requires changing this signature (molass-library#204).
+        # pipeline_recipe must be extracted before the kwargs catch-all to avoid
+        # leaking it into solver_kwargs → set_optimizer_settings → set_setting.
         solver_kwargs = kwargs if kwargs else None
 
         if frozen_components is not None and free_components is not None:
@@ -1215,18 +1416,49 @@ class Decomposition:
                 raise ValueError(f"free_components {sorted(invalid)} out of range [0, {n_protein})")
             frozen_components = sorted(all_indices - free_set)
 
-        if debug:
-            import molass.Rigorous.RigorousImplement
-            reload(molass.Rigorous.RigorousImplement)
+        import molass.Rigorous.RigorousImplement
+        reload(molass.Rigorous.RigorousImplement)
         from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
         if rgcurve is None:
-            rgcurve = self.ssd.xr.compute_rgcurve()
+            rgcurve = self.get_rg_curve()  # cached; avoids redundant Guinier fit on repeated calls (#248)
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs)
+        if num_jobs > 1:
+            if async_:
+                raise ValueError(
+                    "num_jobs > 1 requires async_=False -- each round blocks until it "
+                    "completes (and reseeds the next round from its best params) before "
+                    "returning. For a non-blocking multi-job sequence, loop over "
+                    "optimize_rigorously(clear_jobs=(i == 0), ...) yourself in a background "
+                    "thread instead."
+                )
+            if max_trials:
+                import warnings
+                warnings.warn(
+                    "num_jobs and max_trials both requested -- max_trials's own "
+                    "(per-round, monitor=True only) auto-resume would additionally fire "
+                    "inside each of the num_jobs rounds. Prefer one or the other.",
+                    UserWarning, stacklevel=2,
+                )
+            run_info = None
+            for round_idx in range(num_jobs):
+                if stop_check is not None and stop_check():
+                    break
+                # async_=True internally so run_info exists (for on_round_start) before
+                # this round's wait() blocks -- the overall call still blocks the caller
+                # per the async_=False contract enforced above.
+                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
+                if run_info is None:
+                    return None  # _dry_run=True: pre-flight checks done, nothing to run/wait on
+                if on_round_start is not None:
+                    on_round_start(round_idx, num_jobs, run_info)
+                run_info.wait(timeout=0)
+            return run_info
 
-    def score_initial(self, trimmed_ssd=None, analysis_folder=None,
-                      function_code=None, debug=False):
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
+
+    def score(self, trimmed_ssd=None, analysis_folder=None,
+              function_code=None, debug=False, progress_cb=None):
         """Evaluate the rigorous objective function once at initial parameters.
 
         A lightweight alternative to :meth:`optimize_rigorously` when you only
@@ -1238,7 +1470,15 @@ class Decomposition:
         For models other than EGH, call :meth:`upgrade` first::
 
             decomp_sdm = decomp.upgrade(model='SDM')
-            result = decomp_sdm.score_initial(trimmed_ssd=trimmed)
+            result = decomp_sdm.score(trimmed_ssd=trimmed)
+
+        .. warning::
+            **Thread safety**: constructing the optimizer here (and later calling
+            :meth:`Score.plot` with ``plot=True``) is **not** safe to call from a
+            background thread while an interactive matplotlib backend (e.g.
+            ``TkAgg``) is active — it can crash the whole process rather than
+            raise a catchable exception. Call ``score()`` from the main thread
+            in GUI applications.
 
         Parameters
         ----------
@@ -1250,10 +1490,19 @@ class Decomposition:
         function_code : str, optional
             Override auto-detected function code.
         debug : bool, optional
+        progress_cb : callable, optional
+            Optional progress callback, called at a few natural checkpoints
+            during setup: ``progress_cb(phase: str)`` with phase names such as
+            ``"Computing Rg curve"``, ``"Building datasets"``,
+            ``"Building baseline curves"``, ``"Constructing optimizer"``, and
+            ``"Evaluating objective function"``. While the Rg curve is being
+            computed (if not already cached), it is instead called once per
+            frame as ``progress_cb(rg_buffer, j)`` — the same convention as
+            :meth:`get_rg_curve`. Callers distinguish the two by argument count.
 
         Returns
         -------
-        InitialScoreResult
+        Score
             Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
             ``.diagnose()``, ``.print_summary()``.
 
@@ -1261,26 +1510,67 @@ class Decomposition:
         --------
         ::
 
-            result_auto = decomp_auto.score_initial(trimmed_ssd=trimmed)
-            result_prop = decomp_prop.score_initial(trimmed_ssd=trimmed)
+            result_auto = decomp_auto.score(trimmed_ssd=trimmed)
+            result_prop = decomp_prop.score(trimmed_ssd=trimmed)
             result_auto.plot(title="Auto EGH")
             result_prop.plot(title="Proportional 1:1:1:1")
             result_auto.print_summary()
 
+        Notes
+        -----
+        **rgcurve**: ``score()`` does not accept ``rgcurve`` as a keyword
+        argument.  Pre-compute and cache it by calling
+        ``decomp.get_rg_curve()`` *before* ``score()``; the cached value is
+        then picked up automatically. Check :attr:`has_rg_curve` beforehand to
+        know whether this would happen without triggering computation.
+        Without pre-caching, ``score()`` emits a ``UserWarning`` and runs one
+        Guinier fit per frame, which is slow.  Example::
+
+            decomp.get_rg_curve()          # caches on decomp
+            result = decomp.score(trimmed_ssd=trimmed)
+
         See Also
         --------
         optimize_rigorously : Full BH/NS optimization.
-        RunInfo.get_score_breakdown : Score breakdown after optimization.
+        RunInfo.score : Score at optimized parameters.
+        RunInfo.get_score_breakdown : Score breakdown as dict (no visualization).
         """
-        from molass.Rigorous.InitialScore import make_initial_score_impl
-        return make_initial_score_impl(
+        from molass.Rigorous.Score import _warn_if_background_thread
+        _warn_if_background_thread("Decomposition.score()")
+
+        if not self.has_rg_curve:
+            import warnings
+            warnings.warn(
+                "Rg curve not pre-computed on this Decomposition. "
+                "score() will compute it now (one Guinier fit per frame). "
+                "Pre-compute once with: decomp.get_rg_curve()",
+                UserWarning, stacklevel=2,
+            )
+        from molass.Rigorous.Score import make_score_impl
+        return make_score_impl(
             self, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
+            progress_cb=progress_cb,
         )
+
+    def score_initial(self, *args, **kwargs):
+        """Deprecated alias for :meth:`score`. Use ``.score()`` instead."""
+        import warnings
+        warnings.warn(
+            "score_initial() is deprecated. Use score() instead.",
+            DeprecationWarning, stacklevel=2
+        )
+        return self.score(*args, **kwargs)
 
     def load_best_rigorous_result(self, analysis_folder, rgcurve=None, debug=False):
         """Load the best rigorous optimization result from disk.
+
+        .. deprecated::
+            Use :func:`molass.Rigorous.RunInfo.restore` instead — it returns a
+            ``RunInfo`` handle with the same ``load_best()``/``live_status()``
+            interface as a live run, rather than jumping straight to a
+            ``Decomposition``.
 
         Convenience method that combines ``list_rigorous_jobs()`` and
         ``load_rigorous_result()`` into a single call: finds the job
@@ -1322,6 +1612,11 @@ class Decomposition:
             # Fast: skip redundant Guinier fitting by passing rgcurve
             result = decomp.load_best_rigorous_result("temp_analysis", rgcurve=rgcurve)
         """
+        import warnings
+        warnings.warn(
+            "load_best_rigorous_result() is deprecated. Use restore() instead.",
+            DeprecationWarning, stacklevel=2
+        )
         jobs = self.list_rigorous_jobs(analysis_folder)
         if not jobs:
             raise FileNotFoundError(
@@ -1427,6 +1722,39 @@ class Decomposition:
         """
         from molass.Rigorous.CurrentStateUtils import has_rigorous_results as _has
         return _has(analysis_folder)
+
+    @staticmethod
+    def load_analysis_session(analysis_folder, jobid=None, debug=False):
+        """Reconstruct a full session (ssd, trimmed, decomp, result) from just
+        an ``analysis_folder`` -- e.g. to resume a GUI/notebook session after
+        a restart, without needing to remember or re-supply the original
+        pipeline parameters (read back from the folder's ``recipe.json``).
+
+        Parameters
+        ----------
+        analysis_folder : str
+            Same value passed to ``optimize_rigorously(analysis_folder=...)``.
+        jobid : str, optional
+            Specific job id to load. If ``None``, loads the latest job.
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        ssd, trimmed, decomp, result, recipe
+            See :func:`molass.Rigorous.CurrentStateUtils.load_analysis_session`
+            for details on each returned value.
+
+        Examples
+        --------
+        ::
+
+            ssd, trimmed, decomp, result, recipe = Decomposition.load_analysis_session(
+                "temp_analysis_scaffolded")
+            result.plot_components()
+        """
+        from molass.Rigorous.CurrentStateUtils import load_analysis_session as _load
+        return _load(analysis_folder, jobid=jobid, debug=debug)
 
     @staticmethod
     def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):

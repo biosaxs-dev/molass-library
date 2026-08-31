@@ -76,6 +76,16 @@ class RunInfo:
         """
         self._stop_event.set()
 
+    def stop(self):
+        """Stop the run: cooperative signal for in_process=True, SIGTERM for subprocess."""
+        self.request_stop()
+        p = self._subprocess_process
+        if p is not None:
+            try:
+                p.terminate()
+            except Exception:
+                pass
+
     @property
     def is_alive(self):
         """``True`` while the background optimizer is still running.
@@ -165,12 +175,67 @@ class RunInfo:
                     import math
                     best_fv = min(j.best_fv for j in jobs)
                     best_sv = -200 / (1 + math.exp(-1.5 * best_fv)) + 100
-                    n_evals = sum(j.iterations for j in jobs)
-                    parts.append(f"n_evals={n_evals}")
+                    n_callbacks = sum(j.iterations for j in jobs)
+                    parts.append(f"n_callbacks={n_callbacks}")
                     parts.append(f"best_sv={best_sv:.1f}")
             except Exception:
                 pass
         return f"RunInfo({', '.join(parts)})"
+
+    @property
+    def best_params(self):
+        """Best parameter vector found across all completed jobs in this run.
+
+        Scans ``analysis_folder/optimized/jobs/*/callback.txt``, finds the
+        global minimum ``fv`` across all jobs, and returns the corresponding
+        parameter vector as a NumPy array.
+
+        Returns ``None`` if no completed jobs are found (e.g. run not yet
+        started, or all callback files are empty).
+
+        Typical use: seed a follow-up optimizer from the result of a prior run::
+
+            seed = run_bh.best_params
+            run_de = decomp.optimize_rigorously(
+                method='DE', niter=5,
+                analysis_folder='temp_de_from_bh',
+                seed_params=seed, ...
+            )
+        """
+        if self.analysis_folder is None:
+            return None
+        import os
+        jobs_dir = os.path.join(self.analysis_folder, "optimized", "jobs")
+        if not os.path.isdir(jobs_dir):
+            return None
+        try:
+            from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
+            from molass_legacy.Optimizer.Scripting import get_params
+        except ImportError:
+            return None
+        best_fv = None
+        best_job = None
+        for job_name in sorted(os.listdir(jobs_dir)):
+            job_dir = os.path.join(jobs_dir, job_name)
+            cb_file = os.path.join(job_dir, "callback.txt")
+            if not os.path.isfile(cb_file):
+                continue
+            try:
+                fv_list, _ = read_callback_txt_impl(cb_file)
+                if not fv_list:
+                    continue
+                job_best = min(entry[1] for entry in fv_list)
+                if best_fv is None or job_best < best_fv:
+                    best_fv = job_best
+                    best_job = job_dir
+            except Exception:
+                continue
+        if best_job is None:
+            return None
+        try:
+            return get_params(best_job)
+        except Exception:
+            return None
 
     def get_current_decomposition(self, **kwargs):
         debug = kwargs.get('debug', False)
@@ -399,6 +464,9 @@ class RunInfo:
         )
         jobs = list_rigorous_jobs(self.analysis_folder)
         best = min(jobs, key=lambda j: j.best_fv)
+        # Remember which job was loaded so callers can inspect it via
+        # run_info.loaded_job without parsing stdout. (issue #237)
+        self._loaded_job = best.id
         decomp = self.decomposition
         if decomp is None:
             raise ValueError(
@@ -415,6 +483,11 @@ class RunInfo:
         result.fv = best.best_fv
         result.sv = float(fv_to_sv(best.best_fv))
         return result
+
+    @property
+    def loaded_job(self):
+        """Job name (e.g. ``'025'``) most recently loaded by :meth:`load_best`. ``None`` until called."""
+        return getattr(self, '_loaded_job', None)
 
     def get_score_breakdown(self, jobid=None, debug=False):
         """Evaluate the objective function and return individual score components.
@@ -510,6 +583,117 @@ class RunInfo:
             scores[name] = float(val)
 
         return {'fv': float(fv), 'scores': scores}
+
+    def score(self, jobid=None, debug=False):
+        """Evaluate and visualize the rigorous score at optimized parameters.
+
+        Symmetric counterpart to :meth:`~molass.LowRank.Decomposition.Decomposition.score`.
+        Loads the best (or specified) optimized parameters from disk, evaluates
+        the objective function, and returns a plottable result object.
+
+        Enables natural before/after comparison::
+
+            score_before = decomp.score(trimmed_ssd=trimmed)
+            run_info = decomp.optimize_rigorously(...)
+            score_after = run_info.score()
+
+            score_before.plot(title="Before")
+            score_after.plot(title="After")
+
+        Parameters
+        ----------
+        jobid : str, optional
+            Specific job id to evaluate. If None, uses the best job
+            (lowest ``best_fv``).
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Score
+            Has ``.sv``, ``.fv``, ``.breakdown``, ``.plot()``,
+            ``.diagnose()``, ``.print_summary()``.
+            Use ``.plot(title="...")`` to customize the figure title.
+
+        Raises
+        ------
+        ValueError
+            If no ``analysis_folder`` was stored.
+        FileNotFoundError
+            If no completed jobs are found.
+
+        Examples
+        --------
+        ::
+
+            run_egh = decomp_egh.optimize_rigorously(
+                method='DE', niter=5, analysis_folder='temp_analysis_egh')
+            score_opt = run_egh.score()
+            score_opt.plot(title="EGH Optimized")
+            score_opt.print_summary()
+
+        See Also
+        --------
+        get_score_breakdown : Returns dict only (no visualization).
+        Decomposition.score : Score at initial parameters.
+        """
+        import os
+        from molass_legacy.Optimizer.Scripting import get_params
+        from molass.Rigorous.CurrentStateUtils import fv_to_sv, list_rigorous_jobs
+        from molass.Rigorous.Score import Score
+
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+
+        optimizer_folder = os.path.join(
+            os.path.abspath(self.analysis_folder), "optimized"
+        )
+        jobs_folder = os.path.join(optimizer_folder, "jobs")
+
+        if jobid is None:
+            jobs = list_rigorous_jobs(self.analysis_folder)
+            if not jobs:
+                raise FileNotFoundError(
+                    f"No completed jobs found in {self.analysis_folder}"
+                )
+            best = min(jobs, key=lambda j: j.best_fv)
+            jobid = best.id
+
+        job_folder = os.path.join(jobs_folder, jobid)
+        params = get_params(job_folder, debug=debug)
+
+        # Evaluate objective
+        result = self.optimizer.objective_func(params, return_full=True)
+        fv = float(result[0])
+        score_array = result[1]
+        names = self.optimizer.get_score_names()
+
+        scores = {}
+        for name, val in zip(names, score_array):
+            scores[name] = float(val)
+
+        breakdown = {'fv': fv, 'scores': scores}
+        sv = float(fv_to_sv(fv))
+
+        # Wrap in Score (reuses the same visualization logic)
+        result_obj = Score(
+            fv=fv, sv=sv, breakdown=breakdown,
+            optimizer=self.optimizer, init_params=params
+        )
+
+        return result_obj
+
+    def score_optimized(self, *args, **kwargs):
+        """Deprecated alias for :meth:`score`. Use ``.score()`` instead."""
+        import warnings
+        warnings.warn(
+            "score_optimized() is deprecated. Use score() instead.",
+            DeprecationWarning, stacklevel=2
+        )
+        return self.score(*args, **kwargs)
 
     def get_current_curves(self):
         """Return the data and model curves currently shown on the monitor.
@@ -1038,6 +1222,72 @@ class RunInfo:
         return parse_sv_history(self.analysis_folder)
 
     @property
+    def sv_history_raw(self):
+        """Raw per-evaluation SV trajectory from all ``callback.txt`` files.
+
+        Like :attr:`sv_history` but without the running-minimum accumulation --
+        each entry is the actual SV of that individual trial, including
+        rejected evaluations.  Plot alongside :attr:`sv_history` to see how
+        much the optimizer explores between accepted improvements (BH in
+        particular looks flat on its own since most trials are rejected).
+
+        Returns
+        -------
+        list of float
+            One SV value per evaluation, same length/order as
+            :attr:`sv_history` for the same run.  Empty list if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            import matplotlib.pyplot as plt
+            plt.scatter(range(len(run_info.sv_history_raw)), run_info.sv_history_raw,
+                        s=8, alpha=0.35, label="all evals")
+            plt.plot(run_info.sv_history, lw=1.5, label="best so far")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_sv_history_raw
+        return parse_sv_history_raw(self.analysis_folder)
+
+    @property
+    def rg_history(self):
+        """Per-component Rg trajectories from all ``callback.txt`` files.
+
+        Rg is a free optimizer parameter (one column per component), so this
+        is read directly from the same raw ``x=`` vectors :attr:`sv_history`
+        reads ``f=`` from -- not re-derived via Guinier analysis.  Plot
+        alongside :attr:`sv_history` to see whether Rg estimates stabilize as
+        the optimizer converges.
+
+        Returns
+        -------
+        list of list of float
+            One trajectory per component, same length/order as
+            :attr:`sv_history_raw` for the same run.  Empty list if no
+            evaluations have been recorded yet.
+
+        Examples
+        --------
+        ::
+
+            for k, traj in enumerate(run_info.rg_history):
+                plt.plot(traj, label=f"component {k+1}")
+        """
+        if self.analysis_folder is None:
+            raise ValueError(
+                "No analysis_folder stored in this RunInfo. "
+                "Pass analysis_folder= to optimize_rigorously()."
+            )
+        from molass.Rigorous.CurrentStateUtils import parse_rg_history
+        return parse_rg_history(self.analysis_folder, self.optimizer)
+
+    @property
     def sv_history_per_job(self):
         """Per-job SV best-so-far trajectories from all ``callback.txt`` files.
 
@@ -1099,16 +1349,68 @@ class RunInfo:
         if not svs:
             print("No SV history found (no callback.txt entries yet).")
             return
+        raw = self.sv_history_raw
         if title is None:
             folder_name = os.path.basename(
                 (self.analysis_folder or "").rstrip("/\\")
             )
             title = f"SV history — {folder_name}"
         fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(svs, lw=1.5)
+        if raw:
+            ax.scatter(range(len(raw)), raw, s=8, alpha=0.35, color="darkorange",
+                       label="all evals")
+        ax.plot(svs, lw=1.5, color="steelblue", label="best so far")
         ax.set_xlabel("evaluation")
-        ax.set_ylabel("best SV so far")
+        ax.set_ylabel("SV")
         ax.set_title(title)
+        ax.legend(loc="lower right", fontsize=8)
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        plt.show()
+
+    def plot_rg_history(self, title=None, figsize=(8, 4)):
+        """Plot per-component Rg trajectories from ``callback.txt``.
+
+        Companion to :meth:`plot_sv_history` -- Rg is a free optimizer
+        parameter, so this shows the raw per-component trajectories directly,
+        not a "best so far" accumulation (see :attr:`rg_history`).
+
+        Parameters
+        ----------
+        title : str, optional
+            Figure title.  Defaults to ``"Rg values — <folder basename>"``.
+        figsize : tuple, optional
+            Matplotlib figure size.  Default ``(8, 4)``.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        ::
+
+            run_sub.plot_rg_history()
+        """
+        import os
+        import matplotlib.pyplot as plt
+
+        traj = self.rg_history
+        if not traj or not traj[0]:
+            print("No Rg history found (no callback.txt entries yet).")
+            return
+        if title is None:
+            folder_name = os.path.basename(
+                (self.analysis_folder or "").rstrip("/\\")
+            )
+            title = f"Rg values — {folder_name}"
+        fig, ax = plt.subplots(figsize=figsize)
+        for k, ys in enumerate(traj):
+            ax.plot(ys, lw=1.2, label=f"component {k+1}")
+        ax.set_xlabel("evaluation")
+        ax.set_ylabel("Rg")
+        ax.set_title(title)
+        ax.legend(loc="best", fontsize=8)
         ax.grid(True, alpha=0.3)
         fig.tight_layout()
         plt.show()
@@ -1132,8 +1434,11 @@ class RunInfo:
               ``'completed'``, ``'failed'``, ``'unknown'``.  Derived from
               the manifest's ``status`` field plus any
               ``subprocess_returncode`` available.
-            - ``n_evals`` (int): number of accepted optimizer evaluations
-              recorded in ``callback.txt`` so far.
+            - ``n_callbacks`` (int): number of callback invocations recorded
+              in ``callback.txt`` so far.  For BH this equals the number of
+              hops; for DE it equals the number of new-best improvements found.
+              This is NOT the total number of objective function calls — see
+              ``n_fevals`` (issue #231) for that.
             - ``best_fv`` (float): inverted from ``best_sv`` (matches
               ``check_progress`` arithmetic).
             - ``best_sv`` (float): best score-value-so-far on the 0-100
@@ -1185,15 +1490,15 @@ class RunInfo:
             work_folder = manifest.get("work_folder")
 
         # SV history (cheap; reads callback.txt files only).
-        n_evals = 0
+        n_callbacks = 0
         best_sv = None
         best_fv = None
         if analysis_folder:
             try:
                 from molass.Rigorous.CurrentStateUtils import parse_sv_history
                 svs = parse_sv_history(analysis_folder)
-                n_evals = len(svs)
-                if n_evals:
+                n_callbacks = len(svs)
+                if n_callbacks:
                     import math
                     best_sv = float(svs[-1])
                     # Invert SV = -200/(1+exp(-1.5*fv))+100
@@ -1204,9 +1509,15 @@ class RunInfo:
             except Exception:
                 pass
 
-        # Subprocess returncode: prefer the live attribute (set by
-        # RigorousImplement on process.wait()), fall back to manifest.
-        rc = getattr(self, "subprocess_returncode", None)
+        # Subprocess returncode: prefer polling the live Popen object directly
+        # (available for free the moment the process exits -- no need to wait()
+        # or round-trip through the manifest), then the live attribute (only
+        # ever set by reconnect()), then the manifest as a last resort.
+        rc = None
+        if self._subprocess_process is not None:
+            rc = self._subprocess_process.poll()
+        if rc is None:
+            rc = getattr(self, "subprocess_returncode", None)
         sub_pid = None
         if manifest is not None:
             if rc is None:
@@ -1227,10 +1538,37 @@ class RunInfo:
             phase = "completed"
         elif status in ("running", "starting"):
             phase = "running"
+            # Cross-session case: no live Popen (self._subprocess_process is
+            # None, e.g. this RunInfo came from reconnect()), rc unknown, but
+            # the subprocess may have exited long ago without ever updating
+            # the manifest (same root cause as the self-heal below, just
+            # observed from a different process). _is_subprocess_alive() can
+            # still check by pid even without a live Popen handle.
+            if self._subprocess_process is None and sub_pid is not None \
+                    and not self._is_subprocess_alive():
+                phase = "completed"  # best-effort: no rc available to tell completed from failed
         elif status == "pending":
             phase = "pending"
         else:
             phase = "unknown"
+
+        # Self-heal: the subprocess+async_=True+monitor=False path (e.g.
+        # molass-gui's RigorousView) never calls wait(), so the on-disk
+        # manifest can be stuck at status="running" indefinitely even after
+        # the process has actually exited -- nothing else ever writes the
+        # completion. Since we just determined the real phase above from a
+        # live poll() (cheap, already done), persist it now so the next
+        # reconnect() from a different process (or the next poll from this
+        # one) sees the correct status without needing an explicit wait().
+        if phase in ("completed", "failed") and status not in ("completed", "failed") \
+                and work_folder is not None and analysis_folder is not None:
+            try:
+                from molass.Rigorous.RunRegistry import update_run_manifest
+                update_run_manifest(work_folder, status=phase, subprocess_returncode=rc)
+                update_run_manifest(analysis_folder, status=phase, subprocess_returncode=rc)
+                manifest = dict(manifest or {}, status=phase, subprocess_returncode=rc)
+            except Exception:
+                pass
 
         # Elapsed time from manifest start_time (UTC ISO).
         elapsed_s = None
@@ -1246,7 +1584,8 @@ class RunInfo:
 
         return {
             "phase": phase,
-            "n_evals": n_evals,
+            "n_callbacks": n_callbacks,
+            "n_evals": n_callbacks,  # deprecated alias, remove in future release (#231)
             "best_fv": best_fv,
             "best_sv": best_sv,
             "elapsed_s": elapsed_s,
@@ -1290,7 +1629,7 @@ class RunInfo:
         -------
         dict
             Keys: ``schema_version``, ``completed_at``, ``best_fv``,
-            ``best_sv``, ``n_evals``, ``n_accepted``, ``analysis_folder``.
+            ``best_sv``, ``n_callbacks``, ``n_accepted``, ``analysis_folder``.
 
         Raises
         ------
@@ -1401,6 +1740,7 @@ class RunInfo:
         obj._async_thread = None
         obj._async_error = None
         obj._stop_event = threading.Event()
+        obj._subprocess_process = None
 
         # Restore work_folder from manifest (may be None for very early runs).
         wf = manifest.get("work_folder")
@@ -1455,3 +1795,44 @@ class RunInfo:
             return True
         except (OSError, ProcessLookupError):
             return False
+
+
+def restore(decomposition, analysis_folder, rgcurve=None):
+    """Restore a cross-session ``RunInfo`` handle for a prior rigorous run (issue #222).
+
+    Unified replacement for ``Decomposition.load_best_rigorous_result()``: instead
+    of jumping straight to a ``Decomposition``, this returns a ``RunInfo`` — the
+    same handle type ``optimize_rigorously()`` returns — so cross-session code can
+    use the same ``load_best()``/``live_status()`` interface as a live run.
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        The ``Decomposition`` that originally launched the run (or an equivalent
+        one built the same way in a new session).
+    analysis_folder : str
+        The ``analysis_folder`` that was passed to ``optimize_rigorously()``.
+    rgcurve : RgCurve, optional
+        Pre-computed Rg curve to attach, avoiding redundant Guinier fitting.
+
+    Returns
+    -------
+    RunInfo
+        A reconstituted handle with ``optimizer``/``dsets``/``init_params`` set
+        to ``None`` (not available cross-session) but ``load_best()`` and
+        ``live_status()`` fully functional.
+
+    Examples
+    --------
+    ::
+
+        decomp = corrected.quick_decomposition(num_components=2)
+        run = restore(decomp, "temp_analysis")
+        result = run.load_best()
+        result.plot_components()
+    """
+    run_info = RunInfo.reconnect(analysis_folder)
+    run_info.decomposition = decomposition
+    run_info.ssd = decomposition.ssd
+    run_info.rgcurve = rgcurve
+    return run_info

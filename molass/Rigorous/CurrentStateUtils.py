@@ -90,7 +90,9 @@ def construct_decomposition_from_results(run_info, **kwargs):
                             pass
             time.sleep(1)
  
-    print(f"Loading current decomposition from optimizer folder: {optimizer_folder}")
+    debug = kwargs.get('debug', False)
+    if debug:
+        print(f"Loading current decomposition from optimizer folder: {optimizer_folder}")
     jobid = kwargs.get('jobid', None)
     if jobid is None:
         jobs_folder = os.path.join(optimizer_folder, "jobs")
@@ -99,7 +101,8 @@ def construct_decomposition_from_results(run_info, **kwargs):
         jobid = jobids[-1]
     
     job_result_folder = os.path.join(optimizer_folder, "jobs", jobid)
-    print(f"Using job id: {jobid}, folder: {job_result_folder}")
+    if debug:
+        print(f"Using job id: {jobid}, folder: {job_result_folder}")
 
     ssd = run_info.ssd
     xr_icurve = ssd.xr.get_icurve()
@@ -130,9 +133,18 @@ def construct_decomposition_from_results(run_info, **kwargs):
         x = xr_icurve.x
     else:
         x = uv_icurve.x
+    # G0346/G0367 (EGH): uv_params[k] = absolute UV peak height H_uv.
+    # G1100-G1500 (SDM/LKM/GRM/EDM, Phase 1c): uv_params[k] = UV/XR ratio.
+    # UvComponentCurve.scale must always be the ratio, so convert for EGH.
+    _func_code = optimizer.get_function_code()
+    _egh_uv = _func_code in ('G0346', 'G0367')
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        xr_h = xr_ccurve.get_scale_param()
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale/xr_h))
+        if _egh_uv:
+            xr_h = xr_ccurve.get_scale_param()
+            ratio = scale / xr_h if xr_h > 0 else scale
+        else:
+            ratio = scale
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, ratio))
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 
@@ -189,11 +201,17 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     # Resolve job id
     if jobid is None:
-        jobids = sorted(d for d in os.listdir(jobs_folder)
-                        if os.path.isdir(os.path.join(jobs_folder, d)))
-        if not jobids:
-            raise FileNotFoundError(f"No job folders found in {jobs_folder}")
-        jobid = jobids[-1]
+        # Skip jobs that only have the single init-params entry (e.g. a round
+        # still starting up, or one interrupted before its first real result) --
+        # same guard as list_rigorous_jobs() (issue #188). Without this, "latest
+        # job" can pick an in-progress/incomplete job and crash deep inside
+        # get_params() with a cryptic IndexError instead of a clear message.
+        valid_jobs = list_rigorous_jobs(analysis_folder)
+        if not valid_jobs:
+            raise FileNotFoundError(
+                f"No completed job (with at least one real result) found in {jobs_folder}"
+            )
+        jobid = valid_jobs[-1].id
 
     job_result_folder = os.path.join(jobs_folder, jobid)
     print(f"Loading rigorous result from job: {jobid}")
@@ -263,9 +281,18 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
         x = xr_icurve.x
 
     uv_ccurves = []
+    # G0346/G0367 (EGH): uv_params[k] = absolute UV peak height H_uv.
+    # G1100-G1500 (SDM/LKM/GRM/EDM, Phase 1c): uv_params[k] = UV/XR ratio.
+    # UvComponentCurve.scale must always be the ratio, so convert for EGH.
+    _func_code = optimizer.get_function_code()
+    _egh_uv = _func_code in ('G0346', 'G0367')
     for xr_ccurve, scale in zip(xr_ccurves, uv_params):
-        xr_h = xr_ccurve.get_scale_param()
-        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, scale / xr_h))
+        if _egh_uv:
+            xr_h = xr_ccurve.get_scale_param()
+            ratio = scale / xr_h if xr_h > 0 else scale
+        else:
+            ratio = scale
+        uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, ratio))
 
     # Preserve the optimizer's Rg values so that
     # compute_reconstructed_rgcurve() matches MplMonitor.
@@ -273,6 +300,56 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
 
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
                          optimizer_rgs=optimizer_rgs)
+
+
+def load_analysis_session(analysis_folder, jobid=None, debug=False):
+    """Reconstruct a full session from just an ``analysis_folder``.
+
+    Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
+    pipeline used when the analysis_folder was first created (from its
+    ``recipe.json``), then attaches the best rigorous-optimization result found
+    on disk. Use this to resume a GUI/notebook session after a restart, without
+    needing to remember or re-supply the original pipeline parameters.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Same value passed to ``optimize_rigorously(analysis_folder=...)``.
+    jobid : str, optional
+        Specific job id to load. If ``None``, loads the latest job.
+    debug : bool, optional
+        If True, reload modules from disk.
+
+    Returns
+    -------
+    ssd : SecSaxsData
+        The raw loaded data.
+    trimmed : SecSaxsData
+        Trimmed (uncorrected) SSD -- pass as ``trimmed_ssd`` to a further
+        ``optimize_rigorously()`` call to resume.
+    decomp : Decomposition
+        The initial (estimator) decomposition, not yet attached to any result.
+    result : Decomposition
+        The best rigorous-optimization result found on disk.
+    recipe : dict
+        The raw ``recipe.json`` contents (model, num_components, decomp_params, ...).
+
+    Examples
+    --------
+    ::
+
+        from molass.Rigorous.CurrentStateUtils import load_analysis_session
+        ssd, trimmed, decomp, result, recipe = load_analysis_session(analysis_folder)
+        result.plot_components()
+    """
+    if debug:
+        from importlib import reload
+        import molass.Rigorous.RecipeRunner
+        reload(molass.Rigorous.RecipeRunner)
+    from molass.Rigorous.RecipeRunner import rebuild_decomposition_from_recipe
+    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder)
+    result = load_rigorous_result(decomp, analysis_folder, jobid=jobid, debug=debug)
+    return ssd, trimmed, decomp, result, recipe
 
 
 def list_rigorous_jobs(analysis_folder):
@@ -475,6 +552,96 @@ def parse_sv_history(analysis_folder):
     return [float(v) for v in sv_so_far]
 
 
+def parse_sv_history_raw(analysis_folder):
+    """Parse all ``callback.txt`` files and return the raw per-evaluation SV trajectory.
+
+    Unlike :func:`parse_sv_history`, no running minimum is applied -- each
+    entry is the actual SV of that individual trial, including rejected
+    (``a=False``) ones.  This is what makes BH's flat "best so far" line look
+    monotonous: most trials are rejected and never move the accumulated
+    value, even though the optimizer is actively exploring between jumps.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+
+    Returns
+    -------
+    list of float
+        One SV value per evaluation, in trial order, not accumulated.
+        Same length and order as :func:`parse_sv_history`'s output for the
+        same folder.  Empty list if no evaluations are recorded yet.
+    """
+    import os, re, math
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return []
+
+    all_fvals = []
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        content = open(cb, encoding="utf-8", errors="replace").read()
+        fvals = [float(m) for m in re.findall(r"^f=([\-\d.eE+]+)", content, re.MULTILINE)]
+        all_fvals.extend(fvals)
+
+    return [-200 / (1 + math.exp(-1.5 * fv)) + 100 for fv in all_fvals]
+
+
+def parse_rg_history(analysis_folder, optimizer):
+    """Parse all ``callback.txt`` files and return per-component Rg trajectories.
+
+    Rg is a free parameter in the rigorous optimizer's parametrization (one
+    column per component in the raw ``x=`` vector), not something re-derived
+    from Guinier analysis after the fact -- see ``params_type.get_rg_start_index()``
+    in molass-legacy (``EghParams``, ``SdmParams``, etc.), the same mechanism the
+    legacy PeakEditor dashboard's "Rg Values" panel already relies on.
+
+    Parameters
+    ----------
+    analysis_folder : str
+        Root folder for optimizer output (contains ``optimized/jobs/``).
+    optimizer : BasicOptimizer
+        Needed for ``params_type.get_rg_start_index()`` and ``n_components`` --
+        unlike :func:`parse_sv_history`, Rg column positions are model-specific
+        and can't be derived from the callback file alone.
+
+    Returns
+    -------
+    list of list of float
+        One trajectory per component, each the same length/order as
+        :func:`parse_sv_history_raw`'s output for the same folder (one entry
+        per evaluation -- Rg has no "best so far" concept to accumulate).
+        Empty list if no evaluations are recorded yet.
+    """
+    import os
+    from molass_legacy.Optimizer.StateSequence import read_callback_txt_impl
+
+    jobs_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs")
+    if not os.path.isdir(jobs_folder):
+        return []
+
+    rg_start = optimizer.params_type.get_rg_start_index()
+    n = optimizer.n_components
+    columns = [[] for _ in range(n)]
+
+    for jobid in sorted(os.listdir(jobs_folder)):
+        cb = os.path.join(jobs_folder, jobid, "callback.txt")
+        if not os.path.exists(cb):
+            continue
+        _, x_list = read_callback_txt_impl(cb)
+        for x in x_list:
+            for k in range(n):
+                columns[k].append(float(x[rg_start + k]))
+
+    if not columns[0]:
+        return []
+    return columns
+
+
 def parse_sv_history_per_job(analysis_folder):
     """Parse ``callback.txt`` files and return per-job SV best-so-far trajectories.
 
@@ -563,7 +730,7 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     -------
     dict or None
         Progress data dict when there are evaluations to report; ``None``
-        otherwise.  Keys: ``label``, ``n_evals``, ``best_fv``, ``best_sv``,
+        otherwise.  Keys: ``label``, ``n_callbacks``, ``best_fv``, ``best_sv``,
         ``sv_best_so_far`` (full list), ``timestamp`` (ISO 8601 UTC).
 
     Examples
@@ -617,7 +784,9 @@ def check_progress(run_info_or_folder, label=None, write_snapshot=False):
     from datetime import datetime, timezone
     snapshot = {
         "label": label,
-        "n_evals": len(sv_so_far),
+        "n_callbacks": len(sv_so_far),
+        "n_evals": len(sv_so_far),  # deprecated alias (#231)
+        "num_evals": len(sv_so_far),  # legacy key kept for existing snapshots
         "best_fv": float(best_fv),
         "best_sv": float(best_sv),
         "sv_best_so_far": sv_so_far,

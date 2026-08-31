@@ -18,6 +18,7 @@ class LegacyRgCurve(RgCurve):
     - ``self.excl_spline``   — checked by ``get_rgs_from_trs()`` (lazy build)
     - ``self.excl_info``     — set by ``add_exclspline()``
     - ``self.X``             — used by ``get_probabilistic_data()``
+    - ``self.logger``        — used by ``add_exclspline()`` for warnings
     """
 
     def __init__(self, ecurve, rgcurve):
@@ -59,3 +60,5 @@ class LegacyRgCurve(RgCurve):
         self.excl_spline = None   # built on first call to get_rgs_from_trs()
         self.excl_info = None
         self.X = None             # used by get_probabilistic_data()
+        import logging
+        self.logger = logging.getLogger(__name__)  # used by add_exclspline() warnings
