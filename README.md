@@ -1,5 +1,9 @@
 <h1 align="center"><a href="https://biosaxs-dev.github.io/molass-library"><img src="docs/_static/molass-title.png" width="300"></a></h1>
 
+<p align="center">
+<a href="https://doi.org/10.21105/joss.10403"><img src="https://joss.theoj.org/papers/10.21105/joss.10403/status.svg" alt="DOI"></a>
+</p>
+
 Molass Library is a rewrite of [MOLASS](https://pfwww.kek.jp/saxs/MOLASSE.html), a tool for the analysis of SEC-SAXS experiment data currently hosted at the Japanese synchrotron radiation facilities, [Photon Factory](https://pfwww.kek.jp/saxs/MOLASSE.html) and [SPring-8](https://www.riken.jp/en/research/labs/rsc/rd_ts_sra/life_sci_res_infrastruct/index.html)
 
 ## Tested Platforms
@@ -58,6 +62,29 @@ The [molass-beginner](https://github.com/biosaxs-dev/molass-beginner) repository
 - **Technical Report:** https://biosaxs-dev.github.io/molass-technical — technical details, for advanced users
 - **Reference:** https://biosaxs-dev.github.io/molass-library — function reference, for coding
 - **Legacy Repository:** https://github.com/biosaxs-dev/molass-legacy — legacy code
+
+## Citation
+
+If you use Molass Library in your research, please cite the JOSS paper:
+
+> Takahashi, M., & Shimizu, N. (2026). Molass Library: A Python Package for SEC-SAXS Data Analysis. *Journal of Open Source Software*, 11(124), 10403. https://doi.org/10.21105/joss.10403
+
+```bibtex
+@article{Takahashi2026,
+  doi = {10.21105/joss.10403},
+  url = {https://doi.org/10.21105/joss.10403},
+  year = {2026},
+  publisher = {The Open Journal},
+  volume = {11},
+  number = {124},
+  pages = {10403},
+  author = {Masatsuyo Takahashi and Nobutaka Shimizu},
+  title = {Molass Library: A Python Package for SEC-SAXS Data Analysis},
+  journal = {Journal of Open Source Software}
+}
+```
+
+See also [`CITATION.cff`](CITATION.cff) for citing the software itself.
 
 ## Community
 
