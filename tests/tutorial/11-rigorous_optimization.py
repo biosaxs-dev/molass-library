@@ -30,7 +30,9 @@ def test_002_rigorous_optimization():
     run_info = decomposition.optimize_rigorously(rgcurve=rgcurve, analysis_folder="temp_analysis_egh", method='NS', niter=20)
     current_decomposition = run_info.get_current_decomposition(wait_for_first_results=True)
     current_decomposition.plot_components(title="Rigorous Optimization Result", rgcurve=rgcurve)
-    run_info.monitor.terminate()
+    if run_info.monitor is not None:
+        # monitor is None outside a Jupyter/IPython kernel (e.g. under pytest/CI)
+        run_info.monitor.terminate()
 
 @pytest.mark.order(3)
 def test_003_has_rigorous_results():
