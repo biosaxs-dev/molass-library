@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "molass"
-version = "1.0.7"
+version = "1.0.8"
 
 dependencies = [
   "numpy",
@@ -19,7 +19,6 @@ dependencies = [
   "psutil",
   "seaborn",
   "numba",
-  "ruptures",
   "learnsaxs",
   "mrcfile",
   "ipywidgets",

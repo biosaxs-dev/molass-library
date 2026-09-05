@@ -5,7 +5,7 @@
 """
 import numpy as np
 from scipy.stats import linregress
-import ruptures as rpt
+from molass.Geometric.ChangePointDetection import Dynp
 
 class Linesegment:
     """A class representing a line segment defined by linear regression.
@@ -91,7 +91,7 @@ def get_segments(x, y, breakpoints=None, n_bkps=2):
         A tuple containing the list of breakpoints and the list of Linesegment objects.
     """
     if breakpoints is None:
-        algo = rpt.Dynp(model="l1", min_size=10).fit(y)
+        algo = Dynp(model="l1", min_size=10).fit(y)
         breakpoints = algo.predict(n_bkps=n_bkps)
     
     segments = []
