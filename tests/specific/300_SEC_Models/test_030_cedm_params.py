@@ -182,3 +182,33 @@ def test_func_importer_returns_g2020():
     assert cls is not None, "import_objective_function('G2020') returned None"
     from molass_legacy.ObjectiveFunctions.G2020 import G2020
     assert cls is G2020
+
+
+# ---------------------------------------------------------------------------
+# ModelFactory 'edm'/'cedm' parity (molass-library#262)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("model_name", ["edm", "cedm", "EDM", "CEDM"])
+def test_model_factory_defaults_shared_column_true(model_name):
+    """'edm' and 'cedm' (any case) must produce identical shared_column
+    default, so the dispatch string no longer implies they diverge."""
+    from molass.SEC.ModelFactory import create_model
+    model = create_model(model_name)
+    assert model.kwargs.get('shared_column') is True
+
+
+def test_model_factory_edm_cedm_kwargs_identical():
+    """'edm' and 'cedm' must produce observably identical constructor
+    kwargs, not just identical eventual behavior three call-layers down."""
+    from molass.SEC.ModelFactory import create_model
+    edm_model = create_model('edm')
+    cedm_model = create_model('cedm')
+    assert edm_model.kwargs == cedm_model.kwargs
+
+
+def test_model_factory_explicit_shared_column_still_overridable():
+    """Explicit shared_column kwarg must still take precedence over the
+    default for both 'edm' and 'cedm'."""
+    from molass.SEC.ModelFactory import create_model
+    model = create_model('edm', shared_column=False)
+    assert model.kwargs.get('shared_column') is False
