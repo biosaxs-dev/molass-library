@@ -191,6 +191,15 @@ Related infrastructure shipped alongside #133:
 | Component | Where | Purpose |
 |-----------|-------|---------|
 | `RunRegistry` (`read_manifest`, `locate_recent_runs`, `write_run_manifest`, `update_run_manifest`) | `molass.Rigorous` | Disk-side `RUN_MANIFEST.json` breadcrumbs in both `analysis_folder` and `work_folder` |
+
+### Newly filed (September 9, 2026)
+
+Discovered while reviewing paper-1.tex (molass-papers) for a "CEDM" wording removal:
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#262](https://github.com/biosaxs-dev/molass-library/issues/262) | `ModelFactory.create_model()` only defaulted `shared_column=True` for `'cedm'`, not `'edm'`, even though the real default (in `EdmOptimizer`/`EdmEstimatorImpl`) already treats both identically — the asymmetry falsely implied the two model names still diverge in behavior | ✅ Done (closed) |
+
 | `ComparisonResult.live_status()` | `molass.Rigorous.ComparePaths` | Convenience wrapper over the per-path `RunInfo.live_status()` |
 | `aicKernelEval` tool | [ai-context-vscode](https://github.com/freesemt/ai-context-vscode) v0.3.0 | External-observer access to live kernel state — composes with `live_status()` for one-tool-call run probes |
 
