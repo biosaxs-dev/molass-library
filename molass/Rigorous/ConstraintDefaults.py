@@ -1,6 +1,6 @@
 """Rigorous.ConstraintDefaults
 
-Single source of truth for the auto-applied DE/LumpingConstraint condition and
+Single source of truth for the auto-applied LumpingConstraint condition and
 its accompanying solver-setting overrides (issue #255).  Before this module
 existed, RigorousImplement.py (parent process) and RecipeRunner.py
 (subprocess) each independently re-derived
@@ -8,6 +8,13 @@ existed, RigorousImplement.py (parent process) and RecipeRunner.py
 #253's bug was exactly a safety override (``de_tol=0``) added alongside this
 condition in the parent's copy but not mirrored into the subprocess's copy.
 Both callers now go through :func:`get_constraint_and_overrides` instead.
+
+The constraint itself applies uniformly to any method (BH or DE) and any
+model (EGH/SDM/EDM/CEDM/LKM/GRM) with 3+ components -- component collapse is
+not a DE-specific failure mode, and the boundaries are always derived from
+the pre-upgrade EGH source, independent of the later model choice. Only the
+accompanying ``de_tol=0`` override is DE-specific (works around a scipy DE
+convergence-check quirk that doesn't apply to BH).
 """
 
 
@@ -36,10 +43,12 @@ def get_constraint_and_overrides(method, n_components, decomp):
         SerialSettings overrides to apply alongside the constraints (e.g.
         ``{'de_tol': 0}``); empty when nothing was auto-applied.
     """
-    if method.upper() == 'DE' and n_components >= 3:
+    if n_components >= 3:
         from molass.Rigorous.LumpingConstraint import LumpingConstraint
         constraint = LumpingConstraint(decomp)
-        # Penalty terms reshape the fitness landscape so scipy DE's
-        # std(energies) <= tol*mean early-convergence check fires too soon.
-        return [constraint], {'de_tol': 0}
+        if method.upper() == 'DE':
+            # Penalty terms reshape the fitness landscape so scipy DE's
+            # std(energies) <= tol*mean early-convergence check fires too soon.
+            return [constraint], {'de_tol': 0}
+        return [constraint], {}
     return None, {}

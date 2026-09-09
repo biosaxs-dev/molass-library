@@ -119,7 +119,7 @@ def create_optimizer_from_recipe(work_folder, class_code):
     if _frozen_param_groups is not None:
         score.optimizer.freeze_param_groups(_frozen_param_groups)
 
-    # Mirror parent's LumpingConstraint auto-application for DE with 3+ components.
+    # Mirror parent's LumpingConstraint auto-application (any method, 3+ components).
     # Condition + consequences come from ConstraintDefaults, the single source
     # of truth shared with RigorousImplement.py (molass-library#255) -- #253's
     # bug was exactly a safety override added to one copy of this logic and

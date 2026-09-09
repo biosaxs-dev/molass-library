@@ -494,12 +494,13 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # Capture user-supplied constraints before auto-apply may add LumpingConstraint.
     _original_user_constraints = constraints
 
-    # Auto-apply LumpingConstraint for DE with 3+ components (molass-library#234).
-    # Condition + consequences live in ConstraintDefaults so RecipeRunner.py's
-    # subprocess mirror can't drift from this one (molass-library#255).
+    # Auto-apply LumpingConstraint for any method with 3+ components
+    # (molass-library#234, extended to BH). Condition + consequences live in
+    # ConstraintDefaults so RecipeRunner.py's subprocess mirror can't drift
+    # from this one (molass-library#255).
     # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
     # warnings.simplefilter("ignore") and would swallow this warning silently.
-    if constraints is None and method == 'DE' and len(decomposition.xr_ccurves) >= 3:
+    if constraints is None and len(decomposition.xr_ccurves) >= 3:
         import warnings as _w
         from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
         # Prefer _source_decomp (set by copy_with_new_components on every upgrade)
@@ -514,7 +515,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         solver_kwargs = dict(solver_kwargs or {})
         solver_kwargs.update(_overrides)
         _w.warn(
-            "optimize_rigorously(method='DE') automatically applied "
+            f"optimize_rigorously(method='{method}') automatically applied "
             "LumpingConstraint to prevent component collapse "
             f"(boundaries={_auto_lc.boundaries.tolist()}, "
             f"ref_labels={_auto_lc.ref_labels}). "

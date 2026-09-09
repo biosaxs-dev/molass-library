@@ -1,10 +1,11 @@
 """Tests for ConstraintDefaults.get_constraint_and_overrides (issue #255).
 
-Single source of truth for the auto-applied DE/LumpingConstraint condition
+Single source of truth for the auto-applied LumpingConstraint condition
 and its accompanying solver-setting overrides, shared by RigorousImplement.py
 (parent process) and RecipeRunner.py (subprocess) so a future safety override
 can't be added to one copy and forgotten in the other (as happened with
-de_tol in #253).
+de_tol in #253). Applies uniformly to BH and DE; only the de_tol override
+is DE-specific.
 """
 import io
 import contextlib
@@ -34,11 +35,17 @@ def test_no_auto_apply_below_three_components():
     assert overrides == {}
 
 
-def test_no_auto_apply_for_non_de_method():
+def test_auto_apply_for_bh_three_plus_components():
+    """BH gets the same collapse-prevention constraint as DE (issue: unify
+    across methods) -- but not the DE-specific de_tol override."""
     from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
+    from molass.Rigorous.LumpingConstraint import LumpingConstraint
     decomp = _make_decomp(3)
+
     constraints, overrides = get_constraint_and_overrides('BH', 3, decomp)
-    assert constraints is None
+
+    assert isinstance(constraints, list) and len(constraints) == 1
+    assert isinstance(constraints[0], LumpingConstraint)
     assert overrides == {}
 
 
