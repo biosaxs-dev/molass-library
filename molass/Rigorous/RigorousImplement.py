@@ -498,9 +498,16 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # (molass-library#234, extended to BH). Condition + consequences live in
     # ConstraintDefaults so RecipeRunner.py's subprocess mirror can't drift
     # from this one (molass-library#255).
+    # pipeline_recipe['auto_constraint']=False opts out even when the other
+    # conditions hold -- for callers (e.g. molass-gui) whose decomposition's
+    # peak positions come from a low-confidence internal fallback (not a
+    # choice the end user actually made) rather than real evidence. Absent
+    # or True (the default) preserves existing behavior for plain script/
+    # notebook callers, who wrote proportions=... (or nothing) themselves.
     # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
     # warnings.simplefilter("ignore") and would swallow this warning silently.
-    if constraints is None and len(decomposition.xr_ccurves) >= 3:
+    _auto_constraint_ok = pipeline_recipe is None or pipeline_recipe.get('auto_constraint', True)
+    if constraints is None and _auto_constraint_ok and len(decomposition.xr_ccurves) >= 3:
         import warnings as _w
         from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
         # Prefer _source_decomp (set by copy_with_new_components on every upgrade)
