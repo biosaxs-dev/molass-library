@@ -25,8 +25,15 @@ rightmost components are also bounded.
 Algorithm
 ---------
 1. K-means clusters the initial peak positions into *n_groups* groups, where
-   ``n_groups = len(decomp.xr_icurve.get_peaks())``.
+   ``n_groups = len(decomp.xr_ccurves)`` (one bucket per component) by
+   default. A smaller ``n_groups`` may be passed explicitly to deliberately
+   allow several components to share one wide bucket (e.g. genuinely
+   unresolved sub-peaks) -- but that also removes any protection against
+   those components collapsing onto each other, so it is not the default.
 2. Natural group boundaries are midpoints between sorted K-means centroids.
+   With ``n_groups == n_components`` this reduces to one boundary per pair
+   of adjacent initial peak positions -- no two components ever start out
+   sharing a bucket.
 3. Escape-zone boundaries extend ``escape_margin`` frames beyond the outermost
    peaks — ensuring all components have a bounded region (no open-ended group).
 4. Reference labels are assigned from this extended boundary set; real
@@ -73,8 +80,9 @@ def _compute_boundaries(decomp, n_groups=None, escape_margin=None):
     decomp : Decomposition
         Initial decomposition from which to derive peak positions.
     n_groups : int or None
-        Number of component groups.  Defaults to
-        ``len(decomp.xr_icurve.get_peaks())``.
+        Number of component groups.  Defaults to ``len(decomp.xr_ccurves)``
+        (one bucket per component -- see module docstring for why detected
+        curve-peak-count is not used as the default).
     escape_margin : float or None
         Frames to extend beyond outermost peak positions for escape zones.
         Defaults to half the mean centroid spacing.
@@ -90,7 +98,7 @@ def _compute_boundaries(decomp, n_groups=None, escape_margin=None):
 
     peak_positions = [float(cc.x[np.argmax(cc.y)]) for cc in decomp.xr_ccurves]
     if n_groups is None:
-        n_groups = len(decomp.xr_icurve.get_peaks())
+        n_groups = len(decomp.xr_ccurves)
 
     km = KMeans(n_clusters=n_groups, random_state=0, n_init='auto')
     km.fit(np.array(peak_positions).reshape(-1, 1))
@@ -121,8 +129,8 @@ class LumpingConstraint:
         The initial decomposition.  Used to determine reference peak
         positions and group boundaries via K-means.
     n_groups : int or None
-        Number of component groups.  Default: auto-detected from
-        ``decomp.xr_icurve.get_peaks()``.
+        Number of component groups.  Default: ``len(decomp.xr_ccurves)``
+        (one bucket per component).
     escape_margin : float or None
         Extra frames beyond the outermost peaks for escape zones.
         Default: half the mean inter-centroid spacing.
