@@ -24,12 +24,17 @@ def test_001_quick_decomposition():
 @control_matplotlib_plot
 def test_002_rigorous_optimization():
     from time import sleep
+    from molass.LowRank.Decomposition import Decomposition
     global run_info, decomposition, rgcurve
     if 'decomposition' not in globals():
         test_001_quick_decomposition()
     run_info = decomposition.optimize_rigorously(rgcurve=rgcurve, analysis_folder="temp_analysis_egh", method='NS', niter=20)
     current_decomposition = run_info.get_current_decomposition(wait_for_first_results=True)
     current_decomposition.plot_components(title="Rigorous Optimization Result", rgcurve=rgcurve)
+    # wait_for_first_results only guarantees the init-params entry; wait for a real
+    # (2nd) entry too, so terminating the monitor below doesn't race with the optimizer
+    # and leave temp_analysis_egh without the "at least one real result" (issue #188).
+    Decomposition.wait_for_rigorous_results("temp_analysis_egh", timeout=120, poll_interval=1)
     if run_info.monitor is not None:
         # monitor is None outside a Jupyter/IPython kernel (e.g. under pytest/CI)
         run_info.monitor.terminate()
