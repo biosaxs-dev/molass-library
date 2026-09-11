@@ -44,6 +44,12 @@ PE_MAX   = 20000.0   # cap at physically reasonable SEC range; BH can explore hi
 T0_FRAC  = 0.98      # t0 must be < T0_FRAC * min(tR)
 K_LKM    = 0.1       # c_inj calibration constant (same as EDM's value)
 
+# Same physical floor as molass-legacy's PenaltyUtils.compute_lkm_mass_transfer_penalty
+# (see molass-library/Copilot/refactor/DESIGN_lkm_mass_transfer_floor.md): clamping the
+# *initial* k_MT guess here keeps BH/DE from starting already inside the region that
+# constraint penalizes, instead of relying on the penalty alone to drag it back.
+MT_FLOOR_TOLERANCE = 1.5
+
 
 # ── Internal helpers ─────────────────────────────────────────────────────────
 
@@ -89,6 +95,14 @@ def _k_MT_from_kappa2(t0, Pe, tR, kappa2):
     R    = tR / t0
     k_MT = 2 * t0 * (R - 1) / kinetics_var
     return float(np.clip(k_MT, 0.01, K_MT_MAX))
+
+
+def _k_mt_floor(t0, R, Pe, tolerance=MT_FLOOR_TOLERANCE):
+    """Minimum k_MT keeping sigma within `tolerance` x the axial-only baseline.
+
+    k_MT_floor = (R-1)*Pe / ((tolerance^2-1)*t0*R^2)
+    """
+    return (R - 1.0) * Pe / ((tolerance**2 - 1.0) * t0 * R**2)
 
 
 def _initial_t0_guess(moment_list):
@@ -237,6 +251,7 @@ def estimate_lkm_init_params(decomposition, t_inj=1.0, **kwargs):
         tR   = m1
         R    = tR / t0_opt
         k_MT = _k_MT_from_kappa2(t0_opt, Pe_opt, tR, m2c)
+        k_MT = max(k_MT, _k_mt_floor(t0_opt, R, Pe_opt))  # start BH/DE inside the feasible region
         k_MT_list.append(k_MT)
         R_list.append(R)
         scale_list.append(scale)

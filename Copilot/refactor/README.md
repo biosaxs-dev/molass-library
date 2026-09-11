@@ -23,6 +23,8 @@ This folder contains all refactoring plans, design documents, and architecture a
 | [DESIGN_inprocess_monitor.md](DESIGN_inprocess_monitor.md) | MplMonitor for in-process runs | ✅ Implemented |
 | [DESIGN_terminate_inprocess.md](DESIGN_terminate_inprocess.md) | Terminate button for in-process runs | ✅ Implemented |
 | [DESIGN_default_in_process_reversal.md](DESIGN_default_in_process_reversal.md) | Reverse optimize_rigorously()'s in_process default to False | ✅ Implemented |
+| [DESIGN_runinfo_restore_consistency.md](DESIGN_runinfo_restore_consistency.md) | RunInfo construction patterns; restore()/load_best() consistency requirements | 🔬 Open design question |
+| [DESIGN_lkm_mass_transfer_floor.md](DESIGN_lkm_mass_transfer_floor.md) | LKM component-broadening fix: k_MT floor derived from transfer function, penalty term | ✅ Implemented, needs real-run validation |
 
 ## How to use this folder
 
