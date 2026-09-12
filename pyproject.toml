@@ -60,6 +60,9 @@ classifiers = [
 excel = [
   "pywin32"
 ]
+dropbox = [
+  "dropbox"
+]
 testing = [
   "pytest",
   "pytest-cov",

@@ -31,6 +31,11 @@ pip install -U molass
 pip install molass_data  # Sample datasets for tutorials and testing
 ```
 
+If your data lives in Dropbox, `pip install molass[dropbox]` adds an
+API-based local cache (`molass.DataUtils.sync_dropbox_folder`) that avoids
+the repeated re-downloads that can happen when reading directly from a
+Dropbox-desktop-synced folder. See `molass/DataUtils/DropboxSync.py` for setup.
+
 For development (requires `molass-legacy` as a sibling directory):
 
 ```
