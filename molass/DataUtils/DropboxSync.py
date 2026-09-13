@@ -43,7 +43,11 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
+
+
+def _report(on_status: Optional[Callable[[str], None]], msg: str) -> None:
+    on_status(msg) if on_status else print(msg)
 
 _CRED_FILE = Path.home() / ".molass" / "dropbox_credentials.json"
 _DEFAULT_CACHE_ROOT = Path.home() / ".molass" / "dropbox_cache"
@@ -160,10 +164,12 @@ def _zip_sync(dbx, dropbox_path: str, local_root: Path) -> None:
         shutil.move(str(src), str(local_root))
 
 
-def _per_file_sync(dbx, dropbox_path: str, local_root: Path, entries: list) -> None:
+def _per_file_sync(dbx, dropbox_path: str, local_root: Path, entries: list,
+                    on_status: Optional[Callable[[str], None]] = None) -> None:
     """Fallback for folders too big for the zip endpoint: download file by
     file, skipping any whose local content already matches."""
     local_root.mkdir(parents=True, exist_ok=True)
+    total = sum(1 for e in entries if getattr(e, "content_hash", None) is not None)
     n_downloaded = n_skipped = 0
     for entry in entries:
         if getattr(entry, "content_hash", None) is None:
@@ -174,13 +180,16 @@ def _per_file_sync(dbx, dropbox_path: str, local_root: Path, entries: list) -> N
 
         if local_path.exists() and _local_content_hash(local_path) == entry.content_hash:
             n_skipped += 1
-            continue
-        dbx.files_download_to_file(str(local_path), entry.path_lower)
-        n_downloaded += 1
-    print(f"  per-file fallback: {n_downloaded} downloaded, {n_skipped} up to date")
+        else:
+            dbx.files_download_to_file(str(local_path), entry.path_lower)
+            n_downloaded += 1
+        done = n_downloaded + n_skipped
+        if done % 10 == 0 or done == total:
+            _report(on_status, f"  downloading: {done}/{total} ({n_downloaded} downloaded, {n_skipped} up to date)")
 
 
-def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, force: bool = False) -> str:
+def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, force: bool = False,
+                on_status: Optional[Callable[[str], None]] = None) -> str:
     """
     Mirror a Dropbox folder into a local cache. Returns the local path to
     use as SecSaxsData input. Downloads the whole folder in one request
@@ -198,6 +207,9 @@ def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, f
         Reuse an existing client instead of building one from credentials.
     force : bool, optional
         Re-download even if the local cache signature already matches.
+    on_status : callable, optional
+        Called with a one-line progress string instead of printing to
+        stdout -- lets a GUI route progress into its own status display.
     """
     dropbox = _require_dropbox()
     dbx = get_client(dbx)
@@ -209,18 +221,19 @@ def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, f
     state = _load_sync_state(local_root)
 
     if not force and local_root.exists() and state.get("signature") == signature:
-        print(f"sync_folder({dropbox_path!r}): up to date -> {local_root}")
+        _report(on_status, f"sync_folder({dropbox_path!r}): up to date -> {local_root}")
         return str(local_root)
 
+    _report(on_status, f"sync_folder({dropbox_path!r}): downloading…")
     try:
         _zip_sync(dbx, dropbox_path, local_root)
-        print(f"sync_folder({dropbox_path!r}): synced via bulk zip -> {local_root}")
+        _report(on_status, f"sync_folder({dropbox_path!r}): synced via bulk zip -> {local_root}")
     except dropbox.exceptions.ApiError as e:
         if isinstance(e.error, dropbox.files.DownloadZipError) and (
             e.error.is_too_large() or e.error.is_too_many_files()
         ):
-            print(f"sync_folder({dropbox_path!r}): folder too large for bulk zip, falling back to per-file")
-            _per_file_sync(dbx, dropbox_path, local_root, entries)
+            _report(on_status, f"sync_folder({dropbox_path!r}): folder too large for bulk zip, falling back to per-file")
+            _per_file_sync(dbx, dropbox_path, local_root, entries, on_status=on_status)
         else:
             raise
 
