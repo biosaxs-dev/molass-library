@@ -516,8 +516,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         # _parent is a fallback for paths that bypass copy_with_new_components.
         _lc_source = getattr(decomposition, '_source_decomp',
                              getattr(decomposition, '_parent', decomposition))
+        _constraint_weight = pipeline_recipe.get('constraint_weight') if pipeline_recipe else None
         constraints, _overrides = get_constraint_and_overrides(
-            method, len(decomposition.xr_ccurves), _lc_source)
+            method, len(decomposition.xr_ccurves), _lc_source, weight=_constraint_weight)
         _auto_lc = constraints[0]
         solver_kwargs = dict(solver_kwargs or {})
         solver_kwargs.update(_overrides)

@@ -18,7 +18,7 @@ convergence-check quirk that doesn't apply to BH).
 """
 
 
-def get_constraint_and_overrides(method, n_components, decomp):
+def get_constraint_and_overrides(method, n_components, decomp, weight=None):
     """Return the constraints and solver-setting overrides auto-applied for
     this ``(method, n_components)`` combination.
 
@@ -34,18 +34,26 @@ def get_constraint_and_overrides(method, n_components, decomp):
         curves give more reliable peak positions than physics-model curves)
         -- see the ``_source_decomp``/``_parent`` fallback chain used by both
         callers.
+    weight : float, optional
+        Per-frame penetration penalty passed to ``LumpingConstraint``. When
+        ``None`` (default), uses ``LumpingConstraint``'s own default (0.2),
+        calibrated for confident, independently-detected peak positions. Pass
+        a smaller value (e.g. 0.01) when the reference positions come from a
+        low-confidence fallback (e.g. an equal-area-split decomposition) --
+        still blocks gross collapse/drift, without over-penalizing legitimate
+        refinement near an unconfirmed default (molass-gui#AI-friendliness).
 
     Returns
     -------
     constraints : list or None
-        ``[LumpingConstraint(decomp)]`` when auto-applied, else ``None``.
+        ``[LumpingConstraint(decomp, weight=weight)]`` when auto-applied, else ``None``.
     settings_overrides : dict
         SerialSettings overrides to apply alongside the constraints (e.g.
         ``{'de_tol': 0}``); empty when nothing was auto-applied.
     """
     if n_components >= 3:
         from molass.Rigorous.LumpingConstraint import LumpingConstraint
-        constraint = LumpingConstraint(decomp)
+        constraint = LumpingConstraint(decomp) if weight is None else LumpingConstraint(decomp, weight=weight)
         if method.upper() == 'DE':
             # Penalty terms reshape the fitness landscape so scipy DE's
             # std(energies) <= tol*mean early-convergence check fires too soon.

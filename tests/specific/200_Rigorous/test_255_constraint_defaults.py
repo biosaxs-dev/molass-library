@@ -67,3 +67,26 @@ def test_method_case_insensitive():
     constraints, overrides = get_constraint_and_overrides('de', 3, decomp)
     assert constraints is not None
     assert overrides == {'de_tol': 0}
+
+
+def test_default_weight_when_not_specified():
+    """molass-gui#3: omitting weight must preserve LumpingConstraint's own default (0.2),
+    calibrated for confident, independently-detected peak positions."""
+    from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
+    from molass.Rigorous.LumpingConstraint import DEFAULT_WEIGHT
+    decomp = _make_decomp(3)
+
+    constraints, _ = get_constraint_and_overrides('BH', 3, decomp)
+
+    assert constraints[0].weight == DEFAULT_WEIGHT
+
+
+def test_custom_weight_is_applied():
+    """molass-gui#3: callers (e.g. the equal-split-fallback path) can loosen the
+    constraint via weight instead of disabling it via auto_constraint=False."""
+    from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
+    decomp = _make_decomp(3)
+
+    constraints, _ = get_constraint_and_overrides('BH', 3, decomp, weight=0.01)
+
+    assert constraints[0].weight == 0.01

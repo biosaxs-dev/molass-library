@@ -130,7 +130,9 @@ def create_optimizer_from_recipe(work_folder, class_code):
     try:
         if recipe.get('auto_constraint', True):
             from molass.Rigorous.ConstraintDefaults import get_constraint_and_overrides
-            _auto_constraints, _overrides = get_constraint_and_overrides(method, n_components, egh_decomp)
+            _constraint_weight = recipe.get('constraint_weight')
+            _auto_constraints, _overrides = get_constraint_and_overrides(
+                method, n_components, egh_decomp, weight=_constraint_weight)
             if _auto_constraints is not None:
                 score.optimizer._constraints = _auto_constraints
                 # 'de_tol' is not in OptimizerSettings.OPT_DEFAULT_SETTINGS, so it never
