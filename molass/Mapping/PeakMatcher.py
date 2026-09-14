@@ -3,7 +3,6 @@
 """
 import numpy as np
 from itertools import combinations
-from scipy.stats import linregress
 
 def combination_pairs(m, n):
     assert m != n
@@ -16,41 +15,54 @@ def combination_pairs(m, n):
         else:
             yield less_indeces, list(c)
 
-def evaluate_matching(xr_x, uv_x, xr_peaks, uv_peaks):
+def get_smoothed_curve_y(curve):
+    """Fit a smooth (EGH, negative-clipped) reconstruction of a curve's y-values, for
+    shape comparison. Clipping negatives before the fit avoids raw baseline noise
+    skewing the reconstruction (see EcoCas3 investigation, molass-library#270).
+    """
+    from molass.DataObjects.Curve import Curve
+    from molass.Stats.EghMoment import EghMoment
+    clipped = Curve(curve.x, np.clip(curve.y, 0, None), type='i')
+    return EghMoment(clipped).get_y_()
+
+def compute_shape_correlation(xr_curve, uv_curve, xr_peaks, uv_peaks, xr_y_smooth, uv_y_smooth):
+    """Score a candidate peak-subset match by how well the two curves' shapes agree once
+    mapped, instead of by peak-height agreement -- prominence is not preserved across
+    UV/XR channels when components have different extinction ratios, which made the old
+    height-weighted scoring pick the wrong correspondence for EcoCas3 (molass-library#270).
+
+    Maps uv_curve onto xr_curve's frame axis using a candidate slope/intercept fit
+    through the given peak pair(s), then compares the two (independently normalized)
+    smoothed curves by Pearson correlation over their overlapping region.
+    """
+    xr_x = xr_curve.x
+    uv_x = uv_curve.x
     x = xr_x[xr_peaks]
     y = uv_x[uv_peaks]
-    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    slope, intercept = np.polyfit(x, y, 1)
 
-    mapped_xr_ends = []
-    for px in xr_x[[0, -1]]:
-        mapped_xr_ends.append(px*slope + intercept)
-    uv_minx = max(uv_x[0], mapped_xr_ends[0])
-    uv_maxx = min(uv_x[-1], mapped_xr_ends[1])
-    # y = ax + b
-    # x = (y - b)/a
-    a_ = 1/slope
-    b_ = -intercept/slope
-    mapped_uv_ends = []
-    for px in uv_minx, uv_maxx:
-        mapped_uv_ends.append(px*a_ + b_)
-    xr_minx = max(xr_x[0], mapped_uv_ends[0])
-    xr_maxx = max(xr_x[-1], mapped_uv_ends[1])
-    covered_ratio = (xr_maxx - xr_minx)/(xr_x[-1] - xr_x[0])
-    score = 1/covered_ratio
+    mapped_uv_x = (uv_x - intercept) / slope
+    lo = max(xr_x[0], mapped_uv_x[0])
+    hi = min(xr_x[-1], mapped_uv_x[-1])
+    if hi <= lo:
+        return -np.inf
 
-    if len(x) > 2:
-        score *= p_value
-    else:
-        # do not use p_value since it is zero
-        pass
-
-    return score
+    grid = np.linspace(lo, hi, 500)
+    xr_on_grid = np.interp(grid, xr_x, xr_y_smooth)
+    uv_on_grid = np.interp(grid, mapped_uv_x, uv_y_smooth)
+    if xr_on_grid.max() <= 0 or uv_on_grid.max() <= 0:
+        return -np.inf
+    xr_n = xr_on_grid / xr_on_grid.max()
+    uv_n = uv_on_grid / uv_on_grid.max()
+    return np.corrcoef(xr_n, uv_n)[0, 1]
 
 def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False):
     """
     Select matching peaks between XR and UV curves.
 
-    For the evaluation using the weights, see the debugging info by using BSA_DATA.
+    Scores each candidate peak-subset correspondence by whole-shape correlation after
+    mapping (see `compute_shape_correlation`), not by peak-height agreement -- see
+    molass-library#270 for why the latter is unreliable.
 
     Parameters
     ----------
@@ -70,29 +82,22 @@ def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False):
     tuple
         A tuple containing the selected matching peaks for XR and UV curves.
     """
-    xr_x = xr_curve.x
-    xr_y = xr_curve.y
-    uv_x = uv_curve.x
-    uv_y = uv_curve.y
     if debug:
         print("len(xr_peaks)=", len(xr_peaks))
         print("len(uv_peaks)=", len(uv_peaks))
     xr_peaks = np.asarray(xr_peaks)
     uv_peaks = np.asarray(uv_peaks)
-    xr_weights = xr_y[xr_peaks]
-    xr_weights = xr_weights / np.sum(xr_weights)
-    uv_weights = uv_y[uv_peaks]
-    uv_weights = uv_weights / np.sum(uv_weights)
+    xr_y_smooth = get_smoothed_curve_y(xr_curve)
+    uv_y_smooth = get_smoothed_curve_y(uv_curve)
 
     # evaluate all the combination pairs
     score_recs = []
     for index1, index2 in combination_pairs(len(xr_peaks), len(uv_peaks)):
-        score = evaluate_matching(xr_x, uv_x, xr_peaks[index1], uv_peaks[index2])
-        score *= 1/(np.sum(xr_weights[index1]) * np.sum(uv_weights[index2]))
+        corr = compute_shape_correlation(xr_curve, uv_curve, xr_peaks[index1], uv_peaks[index2], xr_y_smooth, uv_y_smooth)
         if debug:
-            print(index1, index2, score)
-        score_recs.append((index1, index2, score))
-    
-    score_recs = sorted(score_recs, key=lambda x: x[2])
-    index1, index2, score = score_recs[0]   # the record with smallest p_value
+            print(index1, index2, corr)
+        score_recs.append((index1, index2, corr))
+
+    score_recs = sorted(score_recs, key=lambda x: x[2], reverse=True)
+    index1, index2, corr = score_recs[0]   # the record with highest shape correlation
     return xr_peaks[index1], uv_peaks[index2]
