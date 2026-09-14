@@ -42,8 +42,14 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
 from typing import Callable, Optional
+
+# folders beyond this count are evicted (oldest last_used first) after each
+# sync_folder() call; pass max_cached_folders=None to disable eviction
+_DEFAULT_MAX_CACHED_FOLDERS = 10
+_STATE_SUFFIX = ".dropbox_sync_state.json"
 
 
 def _report(on_status: Optional[Callable[[str], None]], msg: str) -> None:
@@ -119,6 +125,39 @@ def _save_sync_state(local_root: Path, state: dict) -> None:
     _state_file_for(local_root).write_text(json.dumps(state, indent=2))
 
 
+def _all_cached_folders(cache_root: Path) -> list[tuple[Path, dict]]:
+    """Return (local_root, state) for every folder currently cached under cache_root."""
+    results = []
+    if not cache_root.exists():
+        return results
+    for state_file in cache_root.rglob(f"*{_STATE_SUFFIX}"):
+        local_root = state_file.parent / state_file.name[: -len(_STATE_SUFFIX)]
+        if local_root.exists():
+            try:
+                state = json.loads(state_file.read_text())
+            except (json.JSONDecodeError, OSError):
+                state = {}
+            results.append((local_root, state))
+    return results
+
+
+def _evict_lru(cache_root: Path, max_folders: int, keep: Path,
+               on_status: Optional[Callable[[str], None]] = None) -> None:
+    """Delete least-recently-used cached folders beyond max_folders. `keep`
+    (the folder just synced) is never evicted."""
+    import shutil
+
+    others = [(p, s) for p, s in _all_cached_folders(cache_root) if p != keep]
+    n_to_evict = len(others) + 1 - max_folders  # +1 accounts for `keep`
+    if n_to_evict <= 0:
+        return
+    others.sort(key=lambda ps: ps[1].get("last_used", 0))
+    for local_root, _ in others[:n_to_evict]:
+        _report(on_status, f"evicting cached folder (LRU, cap={max_folders}): {local_root}")
+        shutil.rmtree(local_root, ignore_errors=True)
+        _state_file_for(local_root).unlink(missing_ok=True)
+
+
 def _list_all(dbx, dropbox_path: str) -> list:
     entries = []
     result = dbx.files_list_folder(dropbox_path, recursive=True)
@@ -189,7 +228,8 @@ def _per_file_sync(dbx, dropbox_path: str, local_root: Path, entries: list,
 
 
 def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, force: bool = False,
-                on_status: Optional[Callable[[str], None]] = None) -> str:
+                on_status: Optional[Callable[[str], None]] = None,
+                max_cached_folders: Optional[int] = _DEFAULT_MAX_CACHED_FOLDERS) -> str:
     """
     Mirror a Dropbox folder into a local cache. Returns the local path to
     use as SecSaxsData input. Downloads the whole folder in one request
@@ -210,6 +250,10 @@ def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, f
     on_status : callable, optional
         Called with a one-line progress string instead of printing to
         stdout -- lets a GUI route progress into its own status display.
+    max_cached_folders : int, optional
+        After syncing, evict the least-recently-used cached folders (by a
+        `last_used` timestamp) beyond this count. The folder just synced is
+        always kept. Pass None to disable eviction. Default 10.
     """
     dropbox = _require_dropbox()
     dbx = get_client(dbx)
@@ -221,6 +265,10 @@ def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, f
     state = _load_sync_state(local_root)
 
     if not force and local_root.exists() and state.get("signature") == signature:
+        state["last_used"] = time.time()
+        _save_sync_state(local_root, state)
+        if max_cached_folders is not None:
+            _evict_lru(cache_root_path, max_cached_folders, keep=local_root, on_status=on_status)
         _report(on_status, f"sync_folder({dropbox_path!r}): up to date -> {local_root}")
         return str(local_root)
 
@@ -238,7 +286,10 @@ def sync_folder(dropbox_path: str, cache_root: Optional[str] = None, dbx=None, f
             raise
 
     state["signature"] = signature
+    state["last_used"] = time.time()
     _save_sync_state(local_root, state)
+    if max_cached_folders is not None:
+        _evict_lru(cache_root_path, max_cached_folders, keep=local_root, on_status=on_status)
     return str(local_root)
 
 
