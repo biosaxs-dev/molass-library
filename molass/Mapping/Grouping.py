@@ -42,8 +42,12 @@ def get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks,
     Get peaks that can be grouped for mapping.
     This function is a placeholder and should be implemented based on specific criteria for grouping peaks.
     """
-    xr_positions = xr_curve.x[xr_peaks]/xr_curve.x[-1]
-    uv_positions = uv_curve.x[uv_peaks]/uv_curve.x[-1]
+    # normalize by each curve's own frame range (not just x[-1]); curves can start
+    # at a nonzero offset (e.g. after trimming), and dividing by x[-1] alone skews
+    # positions when xr/uv offsets differ, causing KMeans to cluster the wrong peaks
+    # together (see EcoCas3 investigation, molass-workspace WORKSPACE_STATUS.md)
+    xr_positions = (xr_curve.x[xr_peaks] - xr_curve.x[0])/(xr_curve.x[-1] - xr_curve.x[0])
+    uv_positions = (uv_curve.x[uv_peaks] - uv_curve.x[0])/(uv_curve.x[-1] - uv_curve.x[0])
     points = np.concatenate([xr_positions, uv_positions])
     X = points.reshape((len(points), 1))
     kmeans = KMeans(n_clusters=num_groups, random_state=0).fit(X)
