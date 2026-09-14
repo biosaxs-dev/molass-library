@@ -5,6 +5,8 @@ Decompose.Partner.py
 import numpy as np
 from scipy.optimize import minimize
 
+VERY_SMALL_VALUE = 1e-10
+
 def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
     """
     Guess initial parameters for decomposition based on partner parameters.
@@ -79,6 +81,9 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
     uv_ccurves = []
     for scale, xr_ccurve in zip(result.x, xr_ccurves):
         xr_h = xr_ccurve.get_params()[0]
-        uv_ccurves.append(UvComponentCurve(x, mapping_, xr_ccurve, scale/xr_h))
+        # degenerate (near-zero height) XR component, e.g. from an empty proportional slice:
+        # xr_ccurve.get_y() is ~0 everywhere too, so a zero ratio is the consistent fallback
+        ratio = scale / xr_h if abs(xr_h) > VERY_SMALL_VALUE else 0.0
+        uv_ccurves.append(UvComponentCurve(x, mapping_, xr_ccurve, ratio))
 
     return uv_ccurves
