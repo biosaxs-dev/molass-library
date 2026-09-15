@@ -3,8 +3,14 @@ name: Tests
 on:
   push:
     branches: [main]
+    paths:
+      - 'molass/**'
+      - 'tests/tutorial/**'
   pull_request:
     branches: [main]
+    paths:
+      - 'molass/**'
+      - 'tests/tutorial/**'
   workflow_dispatch:
 
 jobs:
