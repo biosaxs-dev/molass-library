@@ -10,6 +10,8 @@ from scipy.optimize import minimize
 VERY_SMALL_VALUE = 1e-10
 TAU_RATIO_LIMIT = 0.5
 TAU_PENALTY_SCALE = 1e5
+SIGNAL_THRESHOLD_RATIO = 0.2
+MIN_SIGNAL_POINTS = 5
 
 def safe_log10(x):
     """Compute the base-10 logarithm of x, ensuring numerical stability.
@@ -113,6 +115,42 @@ def estimate_initial_params(x, y, moment, allow_negative=False):
     result = minimize(objective, x0=initial_params, method='Nelder-Mead', bounds=bounds)
     return result.x
 
+def restrict_to_signal(x, y, amp_ref, threshold_ratio=SIGNAL_THRESHOLD_RATIO, min_points=MIN_SIGNAL_POINTS):
+    """
+    Restrict (x, y) to the sub-region where |y| exceeds a fraction of a reference amplitude.
+
+    A proportional slice can span a long stretch of near-zero background alongside only a
+    small piece of real signal (e.g. when num_components exceeds the true peak count).
+    Computing a moment/EGH fit over the whole slice in that case anchors the mean/std on
+    the background instead of the real peak, which then boxes the joint optimizer's bounds
+    away from the true peak location entirely. Restricting to the signal-bearing sub-region
+    avoids this.
+
+    Parameters
+    ----------
+    x, y : array-like
+        The x and y values of the slice.
+    amp_ref : float
+        Reference amplitude (typically the full curve's peak height) that `threshold_ratio`
+        is relative to -- using a slice-local reference would be circular for slices that
+        contain no real signal at all.
+    threshold_ratio : float, optional
+        Points with |y| below `threshold_ratio * amp_ref` are excluded. Default 0.2.
+    min_points : int, optional
+        Minimum number of points required to accept the restriction; falls back to the
+        unrestricted (x, y) otherwise -- e.g. a slice that is genuinely pure background
+        rather than a partial peak. Default 5.
+
+    Returns
+    -------
+    x, y : array-like
+        The restricted (or, on fallback, original) arrays.
+    """
+    mask = np.abs(y) > threshold_ratio * amp_ref
+    if np.count_nonzero(mask) < min_points:
+        return x, y
+    return x[mask], y[mask]
+
 def debug_plot(ax, x, xslices, plot_params):
     """
     Plot the initial decomposition parameters for debugging.
@@ -171,8 +209,10 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
         debug_ax = None
     proportions = np.asarray(proportions)/np.sum(proportions)
     xslices = get_proportional_slices(x, y, proportions, debug_ax=debug_ax)
-    moments = [Moment(x[s], y[s]) for s in xslices]
-    initial_params = np.array([estimate_initial_params(x[s], y[s], m, allow_negative=allow_negative_peaks) for s, m in zip(xslices, moments)])
+    amp_ref = np.max(np.abs(y))
+    signal_xy = [restrict_to_signal(x[s], y[s], amp_ref) for s in xslices]
+    moments = [Moment(xr, yr) for xr, yr in signal_xy]
+    initial_params = np.array([estimate_initial_params(xr, yr, m, allow_negative=allow_negative_peaks) for (xr, yr), m in zip(signal_xy, moments)])
     initial_params[:,0] *= 0.8
 
     if debug:
