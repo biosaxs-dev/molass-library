@@ -2,14 +2,9 @@
 Guinier.RgEstimator.py
 """
 import logging
-import types
 import numpy as np
 from scipy.stats import linregress
-from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier, SMALL_Q2_BOUNDARY
-from molass_legacy.GuinierAnalyzer.SimpleGuinierScore import (
-    MIN_GUINIER_SIZE, compute_rg, compute_end_consistency, compute_fwd_consistency,
-    evaluate_guinier_interval,
-)
+from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 from .SimpleFallback import SimpleFallback
 
 logger = logging.getLogger(__name__)
@@ -26,51 +21,6 @@ _DENSS_SCORE_CAP = 0.5
 # last-resort path; a saturated (clipped) value carries no real magnitude
 # information at all and is scored 0.
 _FALLBACK_SCORE_CAP = 0.2
-
-def _unthrottled_evaluate_interval(self, i, start, stop_a, qrg_limit, qrg_allow):
-    """Verbatim copy of SimpleGuinier.evaluate_interval with the 'stop after the
-    first 4 valid candidates' throttle removed. That throttle sweeps candidate
-    stops in decreasing order from `stop_a` and can break before ever reaching a
-    shorter window that `evaluate_guinier_interval` would actually score higher
-    (see molass-researcher experiments/38_guinier_analysis/38d, traced exactly for
-    a real frame: the sweep broke after 4 candidates well before the far-better
-    window at a much smaller `stop`)."""
-    qrg_limit_ = qrg_limit + qrg_allow
-    for stop in range(stop_a, start + MIN_GUINIER_SIZE, -1):
-        if stop - start < MIN_GUINIER_SIZE:
-            break
-        x_ = self.x2[start:stop]
-        y_ = self.log_y[start:stop]
-        slope, intercept, r_value, p_value, stderr = reg_result = linregress(x_, y_)
-        candidate_rec = None
-        if slope <= 0:
-            rg = compute_rg(slope)
-            qrg = self.x[stop - 1] * rg
-            if qrg < qrg_limit_ or self.anim_data:
-                end_consistency = compute_end_consistency(start, stop, self.x2, self.log_y)
-                fwd_consistency = compute_fwd_consistency(start, stop, self.x2, self.log_y)
-                spline_rg = None
-                if self.worst_quality:
-                    spline_slope = (self.log_sy[start] - self.log_sy[stop - 1]) / (x_[0] - x_[-1])
-                    spline_rg = compute_rg(spline_slope)
-                interval_score, score_vector, score_array = evaluate_guinier_interval(
-                    self.basic_quality, self.px, self.dx, rg, stop - start, r_value,
-                    end_consistency, fwd_consistency, spline_rg, return_vector=True)
-                candidate_rec = [i, start, stop, reg_result, rg, end_consistency, interval_score, score_vector]
-            else:
-                interval_score = 0
-        else:
-            interval_score = 0
-            qrg = 999
-
-        if qrg < qrg_limit_ and candidate_rec is not None:
-            if self.score is None or interval_score > self.score:
-                self.score = interval_score
-                self.candidate = candidate_rec
-            if x_[0] < SMALL_Q2_BOUNDARY:
-                if self.smallq_score is None or interval_score > self.smallq_score:
-                    self.smallq_score = interval_score
-                    self.smallq_candidate = candidate_rec
 
 def _guinier_fit_with_quality(data, ne):
     """Same window-shifting logic as DENSS's ``calc_rg_I0_by_guinier``, reimplemented
@@ -101,8 +51,10 @@ class RgEstimator(SimpleGuinier):
 
     1. ``SimpleGuinier`` (legacy, strict qRg<1.3 validity check) -- tried first.
     2. A relaxed, in-place retry of the same legacy fit: widen the qRg limit to
-       ``_RELAXED_QRG_LIMIT`` *and* remove `evaluate_interval`'s 4-candidate
-       search throttle (see ``_unthrottled_evaluate_interval``). Accepted only
+       ``_RELAXED_QRG_LIMIT`` *and* pass ``max_candidates=None`` to disable
+       `guinier_interval`'s per-`start` candidate-count throttle (molass-legacy
+       issue #100), so a shorter, better-scoring window isn't skipped just
+       because a longer one at the same `start` was found first. Accepted only
        if it also clears both failure checks. See molass-researcher
        experiments/38_guinier_analysis/38d: validated on a full 1233-frame
        dataset -- 5/7 recovered frames improved to a more physically plausible
@@ -146,11 +98,19 @@ class RgEstimator(SimpleGuinier):
             if not self._try_relaxed_legacy():
                 if not self._try_denss_guinier(data):
                     self._try_fallback(data)
+        # SimpleGuinier's own null-result path (too few points, or an exception
+        # during quality evaluation) never assigns guinier_start/guinier_stop at
+        # all -- if every fallback above also failed to set them, plotting code
+        # that reads these attributes would hit a bare AttributeError instead of
+        # a checkable None (molass-library issue #269).
+        if not hasattr(self, 'guinier_start'):
+            self.guinier_start = None
+        if not hasattr(self, 'guinier_stop'):
+            self.guinier_stop = None
 
     def _try_relaxed_legacy(self):
         try:
-            self.evaluate_interval = types.MethodType(_unthrottled_evaluate_interval, self)
-            self.guinier_interval(qrg_limit=_RELAXED_QRG_LIMIT)
+            self.guinier_interval(qrg_limit=_RELAXED_QRG_LIMIT, max_candidates=None)
             if self.Rg is None or self.Rg == 0 or self.score == 0:
                 return False
             self.rg_source = 'legacy_relaxed'

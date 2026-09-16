@@ -2,8 +2,11 @@
 Decompose.Partner.py
 """
 
+import logging
 import numpy as np
 from scipy.optimize import minimize
+
+logger = logging.getLogger(__name__)
 
 VERY_SMALL_VALUE = 1e-10
 
@@ -83,7 +86,12 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
         xr_h = xr_ccurve.get_params()[0]
         # degenerate (near-zero height) XR component, e.g. from an empty proportional slice:
         # xr_ccurve.get_y() is ~0 everywhere too, so a zero ratio is the consistent fallback
-        ratio = scale / xr_h if abs(xr_h) > VERY_SMALL_VALUE else 0.0
+        if abs(xr_h) > VERY_SMALL_VALUE:
+            ratio = scale / xr_h
+        else:
+            ratio = 0.0
+            logger.debug("decompose_from_partner: component %d has near-zero xr_h=%g; "
+                         "falling back to ratio=0.0", len(uv_ccurves), xr_h)
         uv_ccurves.append(UvComponentCurve(x, mapping_, xr_ccurve, ratio))
 
     return uv_ccurves

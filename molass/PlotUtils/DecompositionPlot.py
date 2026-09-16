@@ -132,6 +132,11 @@ def make_guinier_plot(ax, qv, xr_components, title=None):
         sg = xr_component.get_guinier_object()
         pv = sg.y_
         sg_list.append(sg)
+        if sg.guinier_start is None:
+            # known, expected failure mode: no Guinier-valid signal in this
+            # component (all estimators in RgEstimator's fallback chain gave
+            # up) -- not an unexpected error, so skip without logging noise.
+            continue
         try:
             start = sg.guinier_start
             stop = sg.guinier_stop

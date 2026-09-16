@@ -210,3 +210,32 @@ Discovered while debugging `in_process=False` in molass-researcher experiment 16
 | [#159](https://github.com/biosaxs-dev/molass-library/issues/159) | Auto-degrade `progress='dashboard'` when `in_process=False` instead of raising `ValueError` | ✅ Done (bdb8697) |
 
 2. **Simplify `molass-researcher` 01c workarounds** — the notebook `experiments/01_shimizu_averaging/01c_comparison_analysis.ipynb` previously contained manual workarounds for issues #1 and #3. Now that fixes are in place, consider revisiting `01c` to replace workarounds with the cleaner API calls. This is optional (the workarounds work), but it keeps the research notebook idiomatic.
+
+### Newly filed (September 16, 2026)
+
+Discovered during new-dataset triage (EcoCas3 / Plk1, Sept 14) and the Guinier `RgEstimator` investigation (molass-researcher #38, Sept 16):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#267](https://github.com/biosaxs-dev/molass-library/issues/267) | `MappingInfo.plot_diagnostics()` — one-call XR/UV peak-matching visualization | ✅ Done (closed) |
+| [#268](https://github.com/biosaxs-dev/molass-library/issues/268) | Log the degenerate-component fallback in `Decompose/Partner.py` | ✅ Done (closed) |
+| [#269](https://github.com/biosaxs-dev/molass-library/issues/269) | `RgEstimator` should set explicit `None` sentinels instead of relying on `AttributeError` | ✅ Done (closed) |
+| [#272](https://github.com/biosaxs-dev/molass-library/issues/272) | `RgCurveUtils` should use `RgEstimator` instead of bare `SimpleGuinier` | ✅ Done (closed) |
+| [#273](https://github.com/biosaxs-dev/molass-library/issues/273) | Surface `rg_source`/`score`/`saturated` in `component_quality_scores()`/`diagnose()` | ✅ Done (closed) |
+| [molass-legacy#99](https://github.com/biosaxs-dev/molass-legacy/issues/99) | Name and document `evaluate_interval`'s candidate-count search throttle | ✅ Done (closed) |
+| [molass-legacy#100](https://github.com/biosaxs-dev/molass-legacy/issues/100) | Allow `evaluate_interval`'s candidate-count throttle to be parameterized | ✅ Done (closed) |
+| [molass-legacy#101](https://github.com/biosaxs-dev/molass-legacy/issues/101) | Add docstrings to `make_cadidate_pairs`/`evaluate_interval`/`guinier_interval` | ✅ Done (closed) |
+
+**#272/#273 details**: `RgCurveUtils.compute_rgcurve_info()`/`compute_rg_curve_from_arrays()` now
+construct `RgEstimator` instead of bare `SimpleGuinier` — verified this recovers all 8/1233 `NaN`
+frames on the real `Y17AH20N` dataset via the actual `SecSaxsData.get_rg_curve()` call (not just
+a notebook replica). `component_quality_scores()` now hard-gates on `RgEstimator.saturated` (a
+saturated fallback Rg is a finite number, not `nan`, so the old `isnan` gate alone missed it) and
+discounts non-`'legacy'`/`'legacy_relaxed'` `rg_source` values by a fixed confidence factor
+(`_RG_SOURCE_CONFIDENCE`), best-effort via `decomp.get_guinier_objects()` with a safe fallback to
+unchanged behavior if unavailable.
+
+**#100 details**: `SimpleGuinier.evaluate_interval`/`guinier_interval` (molass-legacy) now accept
+`max_candidates` (default `MAX_INTERVAL_CANDIDATES=4`, preserving existing behavior exactly);
+`RgEstimator._try_relaxed_legacy` calls `guinier_interval(max_candidates=None)` directly instead
+of maintaining a ~40-line verbatim duplicate of the sweep logic.

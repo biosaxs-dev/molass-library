@@ -27,9 +27,9 @@ def compute_rg_curve_from_arrays(D, qv, E, jv=None, progress_cb=None):
     """Compute a library-quality RgCurve directly from numpy arrays.
 
     This is the array-level entry point that makes rg_curve computation
-    independent of SSD or SD.  It uses the same SimpleGuinier pipeline as
-    ``compute_rgcurve_info`` / ``XrData.compute_rgcurve``, but accepts raw
-    arrays instead of an ``XrData`` object.
+    independent of SSD or SD.  It uses the same ``RgEstimator`` graceful-
+    degradation pipeline as ``compute_rgcurve_info`` / ``XrData.compute_rgcurve``,
+    but accepts raw arrays instead of an ``XrData`` object.
 
     This function is used by ``BackRunner.run()`` to compute and export the
     library rg_curve for LEG-GUI subprocess runs, closing the Guinier_deviation
@@ -53,7 +53,7 @@ def compute_rg_curve_from_arrays(D, qv, E, jv=None, progress_cb=None):
     RgCurve
         Library ``molass.Guinier.RgCurve.RgCurve`` object.
     """
-    from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+    from molass.Guinier.RgEstimator import RgEstimator
     from molass.Guinier.RgCurve import construct_rgcurve_from_list
 
     n_frames = D.shape[1]
@@ -62,7 +62,7 @@ def compute_rg_curve_from_arrays(D, qv, E, jv=None, progress_cb=None):
     rg_buffer = np.zeros(n_frames)
     rginfo_list = []
     for j in tqdm(range(n_frames)):
-        sg = SimpleGuinier(np.array([qv, D[:, j], E[:, j]]).T)
+        sg = RgEstimator(np.array([qv, D[:, j], E[:, j]]).T)
         rg = sg.Rg
         if rg is not None and rg > 0:
             rg_buffer[j] = rg
@@ -76,7 +76,10 @@ def compute_rg_curve_from_arrays(D, qv, E, jv=None, progress_cb=None):
 def compute_rgcurve_info(xrdata, progress_cb=None):
     """
     Computes Rg curve information from XR data.
-    It uses the SimpleGuinier class to compute Rg values for each j-curve in the XR data.
+    It uses ``RgEstimator`` (a graceful-degradation wrapper around
+    ``SimpleGuinier``, falling back to a relaxed retry, DENSS, or a heuristic
+    fit -- see ``molass.Guinier.RgEstimator``) to compute Rg values for each
+    j-curve in the XR data.
     
     Parameters
     ----------
@@ -95,7 +98,7 @@ def compute_rgcurve_info(xrdata, progress_cb=None):
     rginfo_list : list of tuples
         A list of tuples where each tuple contains (index, SimpleGuinier result).
     """
-    from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
+    from molass.Guinier.RgEstimator import RgEstimator
     qv = xrdata.qv
     xrM = xrdata.M
     xrE = xrdata.E
@@ -104,7 +107,7 @@ def compute_rgcurve_info(xrdata, progress_cb=None):
     rg_buffer = np.zeros(n_frames)  # running buffer for progress_cb
     rginfo_list = []
     for j in tqdm(range(n_frames)):
-        sg = SimpleGuinier(np.array([qv, xrM[:,j], xrE[:,j]]).T)
+        sg = RgEstimator(np.array([qv, xrM[:,j], xrE[:,j]]).T)
         rg = sg.Rg
         if rg is not None and rg > 0:
             rg_buffer[j] = rg

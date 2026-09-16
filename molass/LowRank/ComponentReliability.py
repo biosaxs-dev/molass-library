@@ -12,7 +12,15 @@ The score combines two signals:
     are likely noise artifacts.
 
 Special cases:
-  - If Guinier fitting failed (Rg is ``nan``): score = 0.0.
+  - If Guinier fitting failed (Rg is ``nan``), or the Rg came from
+    ``RgEstimator``'s last-resort fallback in its *saturated* (clipped, no
+    real magnitude information) state: score = 0.0. Note that a saturated
+    fallback Rg is a finite number, not ``nan`` -- this case is only caught by
+    checking ``RgEstimator.saturated`` (see molass-library issue #273).
+  - Otherwise, a non-``'legacy'``/``'legacy_relaxed'`` ``rg_source`` (i.e. the
+    Rg was recovered via DENSS or a non-saturated heuristic fallback rather
+    than a fully qRg-validated fit) discounts the score by a fixed confidence
+    factor -- see ``_RG_SOURCE_CONFIDENCE``.
   - If there is only one component: Rg distinctiveness is inapplicable; score
     is determined by proportion alone.
 
@@ -30,6 +38,18 @@ _PROP_FULL = 0.05
 _W_RG = 0.7
 _W_PROP = 0.3
 
+# Confidence discount applied per RgEstimator.rg_source (see molass-library
+# #273): a fully qRg-validated legacy fit is trusted at face value; a Rg
+# recovered via DENSS (no qRg check at all) or the heuristic fallback (in its
+# non-saturated state) is real but less certain, so component reliability is
+# discounted accordingly. Unknown/missing rg_source defaults to full trust.
+_RG_SOURCE_CONFIDENCE = {
+    'legacy': 1.0,
+    'legacy_relaxed': 1.0,
+    'denss': 0.8,
+    'fallback': 0.6,
+}
+
 
 def _rg_score(rg_i, other_valid_rgs):
     """Rg distinctiveness score in [0, 1] for component i."""
@@ -40,6 +60,25 @@ def _rg_score(rg_i, other_valid_rgs):
         for rg_j in other_valid_rgs
     )
     return min(1.0, nearest_sep / _RG_SEP_FULL)
+
+
+def _confidence_and_saturation(decomp, n):
+    """Best-effort per-component (confidence_factor, saturated) pairs derived
+    from each component's RgEstimator (``rg_source``/``saturated`` -- see
+    molass-library #273). Falls back to full confidence / not-saturated for
+    any component (or entirely) if guinier objects are unavailable, so callers
+    without a real ``Decomposition`` (e.g. tests using a stub) are unaffected.
+    """
+    try:
+        guinier_objects = decomp.get_guinier_objects()
+        if len(guinier_objects) != n:
+            raise ValueError("guinier_objects length mismatch")
+    except Exception:
+        return [1.0] * n, [False] * n
+    confidences = [_RG_SOURCE_CONFIDENCE.get(getattr(sg, 'rg_source', 'legacy'), 1.0)
+                   for sg in guinier_objects]
+    saturations = [bool(getattr(sg, 'saturated', False)) for sg in guinier_objects]
+    return confidences, saturations
 
 
 def component_quality_scores(decomp):
@@ -75,14 +114,17 @@ def component_quality_scores(decomp):
     rgs = decomp.get_rgs()
     proportions = decomp.get_proportions()
     n = len(rgs)
+    confidences, saturations = _confidence_and_saturation(decomp, n)
 
     scores = []
     for i in range(n):
         rg_i = rgs[i]
         prop_i = float(proportions[i])
 
-        # Hard gate: Guinier failed
-        if math.isnan(rg_i):
+        # Hard gate: Guinier failed outright, or the Rg is a saturation
+        # artifact from RgEstimator's last-resort fallback (a clipped value
+        # carrying no real magnitude information at all).
+        if math.isnan(rg_i) or saturations[i]:
             scores.append(0.0)
             continue
 
@@ -90,13 +132,13 @@ def component_quality_scores(decomp):
 
         if n == 1:
             # Cannot assess Rg uniqueness with a single component
-            scores.append(round(prop_s, 4))
+            scores.append(round(prop_s * confidences[i], 4))
             continue
 
-        other_valid = [rgs[j] for j in range(n) if j != i and not math.isnan(rgs[j])]
+        other_valid = [rgs[j] for j in range(n) if j != i and not math.isnan(rgs[j]) and not saturations[j]]
         rg_s = _rg_score(rg_i, other_valid)
 
-        score = _W_RG * rg_s + _W_PROP * prop_s
+        score = (_W_RG * rg_s + _W_PROP * prop_s) * confidences[i]
         scores.append(round(score, 4))
 
     return scores

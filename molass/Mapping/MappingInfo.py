@@ -43,6 +43,63 @@ class MappingInfo:
     
     def __str__(self):
         return self.__repr__()
+
+    def plot_diagnostics(self, title=None):
+        """
+        Visualize the XR/UV peak matching behind this mapping: XR and UV curves
+        with their detected peaks marked, plus an overlay (UV mapped onto the XR
+        frame axis via this mapping) so a mismatched peak pairing -- e.g. XR's
+        tallest peak matched to a minor UV shoulder instead of UV's actual
+        dominant peak -- is visible in one call (see molass-library issue #267).
+
+        Parameters
+        ----------
+        title : str, optional
+            Figure-level title.
+
+        Returns
+        -------
+        fig, axes : matplotlib Figure and (3,) array of Axes
+        """
+        import matplotlib.pyplot as plt
+
+        fig, axes = plt.subplots(ncols=3, figsize=(15, 4))
+        if title is not None:
+            fig.suptitle(title)
+        ax1, ax2, ax3 = axes
+
+        xr_x, xr_y = self.xr_curve.x, self.xr_curve.y
+        uv_x, uv_y = self.uv_curve.x, self.uv_curve.y
+
+        ax1.set_title("XR curve")
+        ax1.plot(xr_x, xr_y)
+        ax1.plot(xr_x[self.xr_peaks], xr_y[self.xr_peaks], 'o', color='C1')
+        for k, p in enumerate(self.xr_peaks):
+            ax1.annotate(str(k), (xr_x[p], xr_y[p]))
+
+        ax2.set_title("UV curve")
+        ax2.plot(uv_x, uv_y)
+        ax2.plot(uv_x[self.uv_peaks], uv_y[self.uv_peaks], 'o', color='C1')
+        for k, p in enumerate(self.uv_peaks):
+            ax2.annotate(str(k), (uv_x[p], uv_y[p]))
+
+        ax3.set_title("Overlay (UV mapped to XR frame axis)")
+        mapped_uv_x = (uv_x - self.intercept) / self.slope
+        ax3n = ax3.twinx()
+        ax3.plot(xr_x, xr_y, color='C0', label='XR')
+        ax3.plot(xr_x[self.xr_peaks], xr_y[self.xr_peaks], 'o', color='C0')
+        ax3n.plot(mapped_uv_x, uv_y, color='C1', alpha=0.7, label='UV (mapped)')
+        mapped_uv_peak_x = (uv_x[self.uv_peaks] - self.intercept) / self.slope
+        ax3n.plot(mapped_uv_peak_x, uv_y[self.uv_peaks], 'o', color='C1')
+        for k, (mapped_uv_x_k, xr_x_k) in enumerate(zip(mapped_uv_peak_x, xr_x[self.xr_peaks])):
+            ax3.annotate(f"xr{k}", (xr_x_k, xr_y[self.xr_peaks[k]]))
+            ax3n.annotate(f"uv{k}", (mapped_uv_x_k, uv_y[self.uv_peaks[k]]))
+        ax3.set_xlabel("XR frame")
+        ax3.legend(loc='upper left')
+        ax3n.legend(loc='upper right')
+
+        fig.tight_layout()
+        return fig, axes
     
     def __iter__(self):
         """Allow unpacking of MappingInfo to (slope, intercept)."""

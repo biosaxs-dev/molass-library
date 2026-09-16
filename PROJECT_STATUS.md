@@ -35,6 +35,42 @@ if hasattr(self, '_rgcurve') and self._rgcurve is not None:
 
 ## 🎯 Recent Work
 
+### September 16, 2026 (AI-friendliness follow-through) — 8 issues filed and closed same-day (molass-legacy #99-#101, molass-library #267-269, #272-273)
+
+Assessed AI-friendliness friction from the Guinier `RgEstimator` investigation (molass-researcher
+#38) plus three pending items from the Sept 14 EcoCas3/Plk1 triage, filed GitHub issues for all of
+them, and fixed all 8 in the same session:
+
+- **molass-legacy#99/#101** (documentation-only): named the previously-unnamed "stop after 4
+  candidates" throttle in `evaluate_interval` as `MAX_INTERVAL_CANDIDATES`, and added docstrings
+  to `make_cadidate_pairs`/`evaluate_interval`/`guinier_interval` explaining the two-tier
+  `wide_allow` vs `qrg_allow` leniency scheme.
+- **molass-legacy#100**: `evaluate_interval`/`guinier_interval` now accept `max_candidates`
+  (default preserves exact prior behavior). `RgEstimator._try_relaxed_legacy` (from the #38d fix
+  earlier today) now calls `guinier_interval(max_candidates=None)` directly instead of maintaining
+  a ~40-line verbatim duplicate of the sweep logic that would have silently drifted out of sync.
+- **molass-library#269**: `RgEstimator.__init__` now guarantees `guinier_start`/`guinier_stop`
+  exist as `None` sentinels even when every fallback stage fails (`SimpleGuinier`'s own
+  null-result path never assigned them at all). `PlotUtils/DecompositionPlot.py::make_guinier_plot`
+  now checks `sg.guinier_start is None` explicitly instead of relying on a caught `AttributeError`.
+- **molass-library#272**: `RgCurveUtils.compute_rgcurve_info()`/`compute_rg_curve_from_arrays()`
+  now construct `RgEstimator` instead of bare `SimpleGuinier`. Verified end-to-end on the real
+  `Y17AH20N` dataset via `SecSaxsData.get_rg_curve()`: 8/1233 `NaN` frames → 0/1233.
+- **molass-library#273**: `component_quality_scores()` now hard-gates on `RgEstimator.saturated`
+  (a saturated fallback Rg is a finite clipped number, not `nan`, so the old `isnan`-only gate
+  missed it) and discounts non-`'legacy'`/`'legacy_relaxed'` `rg_source` values via a fixed
+  confidence factor, read best-effort from `decomp.get_guinier_objects()` (falls back to unchanged
+  behavior if unavailable — verified safe against the existing mock-based test).
+- **molass-library#268**: `Decompose/Partner.py`'s degenerate-component (near-zero `xr_h`)
+  fallback now logs the component index via `logger.debug(...)`.
+- **molass-library#267**: new `MappingInfo.plot_diagnostics()` — one call renders XR curve, UV
+  curve, and an overlay (UV mapped onto the XR frame axis) with all peaks numbered, so a mismatch
+  like the EcoCas3 case is visible without importing internal `estimate_mapping_impl(debug=True)`.
+
+**Testing**: `tests/generic/200_LRF/test_030_get_rgs.py`, `tests/generic/010_DataObjects/test_010_SSD.py`,
+`tests/tutorial/05-lrf.py` (13 tests), and the full `tests/tutorial/ -m "not slow"` suite (63 tests)
+all pass. `MappingInfo.plot_diagnostics()` smoke-tested on `SAMPLE1`.
+
 ### September 16, 2026 (yet later) — relaxed-legacy retry stage: fixes window-selection bias, not just qRg strictness (molass-researcher #38d)
 
 **Problem found while investigating the 7 large-particle frames recovered via DENSS** (`38d_relaxed_simpleguinier.ipynb`):
