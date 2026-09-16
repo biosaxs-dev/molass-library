@@ -189,8 +189,13 @@ def estimate_rg_simply(data, rg_range=None, min_num_points=5, q_rg_limit=1.3, in
     I0 = np.exp(coeffs[1])
     
     # Ensure Rg is within bounds
+    Rg_final_raw = Rg_final
     Rg_final = np.clip(Rg_final, min_rg, max_rg)
-    
+    # flag saturation: the returned Rg is a clip artifact, not a real fit result
+    # (see molass-researcher experiments/38_guinier_analysis for why this matters --
+    # a saturated Rg silently masks the true, larger particle size)
+    saturated = bool(Rg_final_raw != Rg_final)
+
     # Compute final R² for quality assessment
     final_r_squared = compute_r_squared(qw2_final, lnI_final, weights_final)
     
@@ -203,7 +208,8 @@ def estimate_rg_simply(data, rg_range=None, min_num_points=5, q_rg_limit=1.3, in
         'q_max': q_final.max(),
         'n_points': len(q_final),
         'q_rg_max': (q_final * Rg_final).max(),
-        'r_squared': final_r_squared
+        'r_squared': final_r_squared,
+        'saturated': saturated,
     }
 
 class SimpleFallback:

@@ -35,6 +35,140 @@ if hasattr(self, '_rgcurve') and self._rgcurve is not None:
 
 ## 🎯 Recent Work
 
+### September 16, 2026 (yet later) — relaxed-legacy retry stage: fixes window-selection bias, not just qRg strictness (molass-researcher #38d)
+
+**Problem found while investigating the 7 large-particle frames recovered via DENSS** (`38d_relaxed_simpleguinier.ipynb`):
+even a *successful* DENSS recovery (`score` capped at 0.5) can pick a materially worse Rg than a
+window `SimpleGuinier` itself would have scored higher, if only it had been allowed to see it.
+Traced to two independent, compounding causes:
+1. The base `qrg_limit=1.3` genuinely excludes these frames — even the better candidate windows
+   have `qRg` in 1.4–1.8, confirming 38b/38c's original finding.
+2. **New**: `SimpleGuinier.evaluate_interval`'s "stop after the first 4 valid candidates" search
+   throttle can end a per-`start` sweep before it ever reaches a shorter, better-scoring window —
+   not a scoring-formula defect (`evaluate_guinier_interval` already ranks the better window
+   higher whenever both are actually evaluated), but a search limitation. Traced exactly for one
+   real frame: the sweep tried stops 26, 25, 24, 23 (in that order, decreasing from the widest
+   qRg-valid stop) then broke, never reaching a `stop` 12 steps further down where the far
+   better-scoring window lived.
+
+**Fix implemented** in `molass/Guinier/RgEstimator.py`: a new `_try_relaxed_legacy()` stage,
+inserted between the strict legacy pass and the DENSS fallback. It monkeypatches the *same*
+`SimpleGuinier` instance's `evaluate_interval` with `_unthrottled_evaluate_interval` (a verbatim
+copy with only the 4-candidate break removed) and retries `guinier_interval(qrg_limit=1.8)` in
+place — no new dependency, no change to `molass-legacy`. Accepted only if it also clears both
+failure checks (`Rg>0` and `score>0`); new `rg_source='legacy_relaxed'` value.
+
+Validated on the full 1233-frame `Y17AH20N` dataset before implementing: 5/7 previously-DENSS-recovered
+frames improved to a Rg consistent with an independently-decomposed component's Rg (e.g.
+86.9→135.1 Å, 92.7→109.2 Å), 2/7 unchanged (no regression), all 3 known spurious-noise frames
+(152, 343, 932) bit-for-bit unchanged, and zero frames outside the narrow retry trigger were
+touched anywhere in the dataset. Re-verified against the actual implemented class: all 7 frames
+now resolve via `rg_source='legacy_relaxed'` with scores ≈0.99–1.0 (vs. DENSS's capped 0.5).
+Existing test suite (`tests/generic/200_LRF/test_030_get_rgs.py`,
+`tests/generic/010_DataObjects/test_010_SSD.py`, 31 tests) passes unchanged.
+
+**Still open**: same deferred items as below (`SimpleGuinier` upstream fix, `Sasrec`/peak-method
+debugging, wiring `rg_source`/`score` into `component_quality_scores()`/`diagnose()`, and using
+`RgEstimator` in `RgCurveUtils`'s whole-elution curve computation).
+
+### September 16, 2026 — Guinier `RgEstimator` fallback chain + saturation flag (issue candidate, from molass-researcher #38)
+
+**Problem** (fully investigated in `molass-researcher/experiments/38_guinier_analysis/`,
+notebooks 38a/38b): legacy `SimpleGuinier` rejects any candidate window with qRg>1.3 with zero
+tolerance once `basic_quality>0.5`. For large particles whose q-range naturally has few usable
+low-q points, this rejects fits that are actually about as good as achievable (confirmed by a
+Feigin & Svergun 1987 literature review and a from-scratch bias/variance Monte Carlo study on
+both smoothed and raw experimental noise — see 38b). The old fallback (`SimpleFallback`) then
+silently clipped the result to its hard-coded `MAX_RG=100`, producing a misleading Rg with no
+indication it was a saturation artifact.
+
+**Fix implemented** in `molass/Guinier/RgEstimator.py` and `SimpleFallback.py`:
+1. `RgEstimator` now tries, in order: legacy `SimpleGuinier` → DENSS's `calc_rg_I0_by_guinier`
+   (already vendored in `molass/SAXS/denss/core.py`, no qRg check) → `SimpleFallback` (clipped
+   heuristic, last resort).
+2. New `RgEstimator.rg_source` attribute (`'legacy'` / `'denss'` / `'fallback'`).
+3. New `RgEstimator.saturated` attribute — True only when `rg_source=='fallback'` and the
+   returned Rg sits exactly at `SimpleFallback`'s clip boundary. `estimate_rg_simply()` in
+   `SimpleFallback.py` now returns a `'saturated'` key accordingly.
+
+Verified on the motivating case (`analysis-013` component 1): Rg went from a clipped, misleading
+`100.0` to a physically plausible `129.99` (`rg_source='denss'`), while an unrelated
+already-working component was unaffected (`rg_source='legacy'`, same Rg as before). Existing
+tests (`tests/generic/200_LRF/test_030_get_rgs.py`, `tests/generic/010_DataObjects/test_010_SSD.py`)
+pass unchanged.
+
+**Future improvement possibilities (not yet implemented, deferred from the same investigation)**:
+- Give `SimpleGuinier` itself a graceful-degradation path (relax `qrg_allow` up to ~1.8–2.0 when
+  no strict candidate exists, tagging the result's confidence) instead of only patching around it
+  in `RgEstimator`. Bigger change — touches legacy code "tuned against many real datasets" — needs
+  careful regression testing before attempting.
+- DENSS's `calc_rg_by_guinier_peak` (Kratky-peak method) and `Sasrec` (regularized indirect
+  Fourier transform / GNOM-equivalent, already vendored) both failed out-of-the-box on real
+  exported component curves in the 38b investigation (implausible ~5 Å peak-method result;
+  `Sasrec` diverged, likely due to `alpha=0` hardcoded in `estimate_dmax` and/or a mismatch
+  between the optimizer's propagated error column and what `Sasrec`'s regularized fit expects).
+  Worth its own debugging notebook — `Sasrec` is the theoretically "correct" long-term answer
+  per the literature review, but isn't trustworthy yet on this kind of data.
+- Surface `rg_source`/`saturated` through `component_quality_scores()`/`diagnose()` so a
+  low-confidence Rg (DENSS-lax or fallback-clipped) is visible in the optimizer's diagnostics,
+  not just on the `RgEstimator` object itself.
+
+### September 16, 2026 (later same day) — `RgEstimator.score` fix + whole-elution validation (molass-researcher #38c)
+
+**Problem found while validating the fix above** (`molass-researcher/experiments/38_guinier_analysis/38c_rgcurve_before_after.ipynb`):
+swapping `RgEstimator` for `SimpleGuinier` in the *whole-elution* Rg curve (`get_rg_curve()`,
+still `SimpleGuinier`-only today — that swap itself is not yet made) recovered all 8/1233 `NaN`
+frames in the real `Y17AH20N` dataset, 7 via DENSS right on the elution peak's leading shoulder
+(Rg≈116–128 Å) and 1 via the fallback clip (an isolated, likely genuinely bad frame) — a clean
+independent confirmation of the 38b root cause on raw data. But all 8 recovered points carried
+`score=0.000`, inherited from the failed legacy attempt — exactly the gap flagged above.
+
+**Fix implemented**: `RgEstimator` now assigns a real, capped confidence score on both fallback
+paths instead of leaving `self.score` at 0:
+- `rg_source='denss'`: `score = min(_DENSS_SCORE_CAP=0.5, r_value**2)` — computed via a small
+  local reimplementation of DENSS's window-shifting logic (`_guinier_fit_with_quality()`) since
+  `calc_rg_I0_by_guinier()` itself only returns `(Rg, I0)`, not `r_value`.
+- `rg_source='fallback'`: `score = 0.0` if `saturated` (a clipped value has no real magnitude
+  information), else `min(_FALLBACK_SCORE_CAP=0.2, r_squared)` from `SimpleFallback`'s own
+  `estimate_rg_simply()` result.
+
+Re-verified on both the two-component case (component_1: `score=0.500`, component_2 unaffected
+at `score=0.751`) and the full 1233-frame `Y17AH20N` re-run (7 denss frames now `score=0.500`,
+the 1 saturated fallback frame correctly `score=0.000`) — cleanly distinguishing "recovered, real
+answer, lower confidence" from "genuinely bad frame" by score alone.
+
+**Still open**: wiring `rg_source`/`score` into `component_quality_scores()`/`diagnose()`, and
+making `RgCurveUtils.compute_rgcurve_info()`/`compute_rg_curve_from_arrays()` use `RgEstimator`
+instead of bare `SimpleGuinier` for the whole-elution curve (currently only demonstrated in the
+38c notebook, not applied to the library).
+
+### September 16, 2026 (later still) — spurious-fit-on-noise trigger (`score == 0`) fix (molass-researcher #38c)
+
+**Problem found while eyeballing the 38c whole-elution curve for outliers**: two buffer-region
+frames (343, 932 — both pure noise, no real particle, confirmed by direct plotting) stood out far
+above the rest by deviation from their local neighborhood. Frame 343 failed cleanly as expected
+(`Rg=0` → fallback chain → `Rg=100`, `saturated`). Frame 932 did not: legacy `SimpleGuinier`
+coincidentally found a "valid" negative-slope window in 10 noise points (enabled by `qrg_allow`
+*increasing* as `basic_quality`→0, meant to rescue noisy-but-real signals) and returned a
+confident-looking `Rg=104.6` with `score` computed as **exactly 0.0** — bypassing the
+`Rg is None or Rg == 0` fallback trigger entirely since `Rg` was nonzero.
+
+Verified directly (before implementing anything) that routing frame 932 through the existing
+fallback chain actually helps: DENSS's simpler fixed-window search does *not* find the same
+coincidental dip (fails cleanly, matching frame 343), and `SimpleFallback` lands on the same
+`Rg=100, saturated=True` for both frames — a consistent, honest "no signal here" answer instead
+of one frame looking spuriously more confident than the other.
+
+**Fix implemented**: `RgEstimator.__init__` now also triggers the fallback chain when
+`self.score == 0` (in addition to `Rg is None or Rg == 0`). Threshold chosen as exact `0.0` (not
+some small epsilon) based on measured impact on the full `Y17AH20N` dataset: only 4/1225 legacy
+frames hit `score == 0` exactly, vs. 76 at `1e-3`, 264 at `0.02`, 507 at `0.1` — ordinary
+low-but-real fits have *some* nonzero score, so `== 0` is narrowly targeted at genuine
+coincidental-noise fits without reprocessing large numbers of legitimately-poor-but-real legacy
+results. Verified: frames 343 and 932 now both converge to `Rg=100.0, score=0.0, saturated=True`;
+the original component_1/component_2 case (38b) is unaffected; existing test suite (31 tests)
+still passes.
+
 ### May 8, 2026 — molass-legacy#52: duplicate dashboard panel fix + ATP/MY experiment notebooks (16d–16g)
 
 **molass-legacy changes** (v0.6.0 → v0.6.1):
