@@ -217,6 +217,7 @@ Discovered during new-dataset triage (EcoCas3 / Plk1, Sept 14) and the Guinier `
 
 | GitHub Issue | Description | Status |
 |-------------|-------------|--------|
+| [#274](https://github.com/biosaxs-dev/molass-library/issues/274) | Guinier `RgEstimator`: large-particle qRg rejection, spurious noise fits, and window-selection bias (filed retroactively -- fix already implemented) | ✅ Done (closed) |
 | [#267](https://github.com/biosaxs-dev/molass-library/issues/267) | `MappingInfo.plot_diagnostics()` — one-call XR/UV peak-matching visualization | ✅ Done (closed) |
 | [#268](https://github.com/biosaxs-dev/molass-library/issues/268) | Log the degenerate-component fallback in `Decompose/Partner.py` | ✅ Done (closed) |
 | [#269](https://github.com/biosaxs-dev/molass-library/issues/269) | `RgEstimator` should set explicit `None` sentinels instead of relying on `AttributeError` | ✅ Done (closed) |

@@ -107,7 +107,7 @@ Existing test suite (`tests/generic/200_LRF/test_030_get_rgs.py`,
 debugging, wiring `rg_source`/`score` into `component_quality_scores()`/`diagnose()`, and using
 `RgEstimator` in `RgCurveUtils`'s whole-elution curve computation).
 
-### September 16, 2026 — Guinier `RgEstimator` fallback chain + saturation flag (issue candidate, from molass-researcher #38)
+### September 16, 2026 — Guinier `RgEstimator` fallback chain + saturation flag (issue [#274](https://github.com/biosaxs-dev/molass-library/issues/274), filed retroactively, from molass-researcher #38)
 
 **Problem** (fully investigated in `molass-researcher/experiments/38_guinier_analysis/`,
 notebooks 38a/38b): legacy `SimpleGuinier` rejects any candidate window with qRg>1.3 with zero
