@@ -812,6 +812,92 @@ def clean_up_data(Iq):
     """
     return Iq[(~np.isclose(Iq[:, 1], 0)) & (~np.isclose(Iq[:, 2], 0))]
 
+def clean_low_q_artifacts(q, I, err, window_size=10, z_threshold=3.0, slope_limit_neg=-5.0, slope_limit_pos=2.0,
+                          buffer=4):
+    """
+    Scans backwards to trim beam stop artifacts.
+
+    Args:
+        window_size: Increased to 10 to be 'stiffer' against smooth artifacts.
+        z_threshold: Decreased to 3.0 to be slightly stricter on outliers.
+        slope_limit_neg: Rejects sharp UPTURNS (Leakage).
+        slope_limit_pos: Rejects sharp DOWNTURNS (Shadowing).
+        buffer: If a cut is found, discard this many EXTRA points to be safe.
+    """
+    # Safety: need enough points
+    if len(q) < window_size * 3:
+        return np.column_stack((q, I, err))
+
+    start_search_idx = min(20, len(q) // 5)
+    first_good_index = 0
+    cut_found = False
+
+    for i in range(start_search_idx, 0, -1):
+        # 1. Define window (look ahead)
+        train_q = q[i: i + window_size]
+        train_I = I[i: i + window_size]
+
+        valid_mask = train_I > 0
+        if np.sum(valid_mask) < 3: continue
+
+        # 2. Fit Polynomial (Smoothness Check)
+        try:
+            coeffs = np.polyfit(train_q[valid_mask], np.log(train_I[valid_mask]), 2)
+            poly2 = np.poly1d(coeffs)
+        except:
+            continue
+
+        target_q = q[i - 1]
+        actual_I = I[i - 1]
+
+        if actual_I <= 0:
+            first_good_index = i
+            cut_found = True
+            break
+
+        pred_log_I = poly2(target_q)
+        actual_log_I = np.log(actual_I)
+        residual = abs(actual_log_I - pred_log_I)
+
+        # 3. Physics Check: Slope limits
+        # We check the slope between current point (i-1) and next (i)
+        if q[i - 1] > 0 and q[i] > 0:
+            d_logI = np.log(I[i]) - np.log(I[i - 1])
+            d_logQ = np.log(q[i]) - np.log(q[i - 1])
+            local_slope = d_logI / d_logQ
+
+            # Reject Leakage (Wall Rising to Left)
+            if local_slope < slope_limit_neg:
+                first_good_index = i
+                cut_found = True
+                break
+
+            # Reject Shadow (Wall Falling to Left / Rising to Right)
+            # Interference usually has slope < 1.0. Shadows are steeper.
+            if local_slope > slope_limit_pos:
+                first_good_index = i
+                cut_found = True
+                break
+
+        # 4. Residual Check
+        if residual > (z_threshold * 0.1):
+            first_good_index = i
+            cut_found = True
+            break
+
+    # --- The Safety Buffer ---
+    # If we found a bad region, the "edge" is often tainted.
+    # Move the start index forward by 'buffer' amount.
+    if cut_found:
+        first_good_index = min(first_good_index + buffer, len(q) - 1)
+
+    # Iq_clean = np.column_stack((
+    #     q[first_good_index:],
+    #     I[first_good_index:],
+    #     err[first_good_index:]
+    # ))
+
+    return first_good_index
 
 def calc_rg_I0_by_guinier(Iq, nb=None, ne=None):
     """calculate Rg, I(0) by fitting Guinier equation to data.
@@ -885,103 +971,296 @@ def direct_I2P(q, I, D=None):
     P = np.zeros(len(r))
     for ri in range(len(r)):
         qrsinqr = q * r[ri] * np.sin(q * r[ri])
-        # molass-fork: np.trapz removed in NumPy 2.0; np.trapezoid is the replacement
         P[ri] += np.trapezoid(qrsinqr * I, q)
     return r, 1 / (2 * np.pi ** 2) * P
 
 
 def P2Rg(r, P):
-    # molass-fork: np.trapz removed in NumPy 2.0; np.trapezoid is the replacement
     num = np.trapezoid(r ** 2 * P, r)
     denom = 2 * np.trapezoid(P, r)
     rg2 = num / denom
     return rg2 ** 0.5
 
 
-def estimate_dmax(Iq, dmax=None, clean_up=True):
-    """Attempt to roughly estimate Dmax directly from data."""
-    # first, clean up the data
+def estimate_rough_alpha(Iq, D, sasrec_class):
+    """
+    Unconditional L-Curve Optimizer for Dmax estimation.
+
+    Prioritizes structural smoothness over raw chi2 fit. During the Dmax
+    search, testing incorrect D values will naturally yield terrible chi2
+    values. Forcing a good chi2 on a bad D box causes catastrophic noise
+    artifacts. This forces a smooth envelope no matter what.
+    """
+    alphas = np.linspace(-15, 15, 61)
+
+    try:
+        sas = sasrec_class(Iq, D=D, alpha=0, extrapolate=False)
+        C_data = sas.Ct_data()
+        G = sas.Gmn()
+        Y = sas.Y
+        B_T_data = sas.B_data.T
+        B_T_full = sas.B.T
+        I_obs = sas.I_data
+        I_err = sas.Ierr_data
+        nq_minus_1 = sas.nq_data - 1
+
+        q_max_data = sas.q_data.max()
+        extrap_mask = sas.q > q_max_data
+        has_extrap = np.sum(extrap_mask) >= 3
+    except:
+        return 0.0
+
+    results = []
+
+    for alpha_exp in alphas:
+        try:
+            alpha = 10. ** alpha_exp
+            C = C_data + alpha * G
+            c = np.linalg.solve(C, Y)
+
+            Ic_data = 2.0 * np.dot(B_T_data, c)
+            residuals = (I_obs - Ic_data) / I_err
+            chi2 = np.sum(residuals ** 2) / nq_minus_1
+            regul = np.dot(c, np.dot(G, c))
+
+            if has_extrap:
+                Ic_full = 2.0 * np.dot(B_T_full, c)
+                I_extrap = Ic_full[extrap_mask]
+                extrap_rough = np.sum(np.diff(I_extrap, n=2) ** 2)
+            else:
+                extrap_rough = 1e-100
+
+            if chi2 > 0 and regul > 0 and extrap_rough > 0:
+                results.append((alpha_exp, chi2, regul, extrap_rough))
+        except:
+            continue
+
+    if not results: return 0.0
+
+    results = np.array(results)
+    alphas_arr = results[:, 0]
+    chi2_arr = results[:, 1]
+    regul_arr = results[:, 2]
+    extrap_rough_arr = results[:, 3]
+
+    log_chi2 = np.log10(chi2_arr)
+    log_regul = np.log10(regul_arr)
+    log_extrap_rough = np.log10(extrap_rough_arr)
+
+    def normalize(arr):
+        rng = arr.max() - arr.min()
+        if rng == 0: return np.zeros_like(arr)
+        return (arr - arr.min()) / rng
+
+    norm_chi2 = normalize(log_chi2)
+    norm_regul = normalize(log_regul)
+    norm_extrap_rough = normalize(log_extrap_rough)
+
+    # 50/50 Split L-Curve
+    combined_roughness = 0.5 * norm_regul + 0.5 * norm_extrap_rough
+    dist = np.sqrt(norm_chi2 ** 2 + combined_roughness ** 2)
+
+    # UNCONDITIONAL MINIMUM - We do not check chi2 thresholds here!
+    best_idx = np.argmin(dist)
+
+    opt_alpha_exp = alphas_arr[best_idx]
+
+    # --- QUADRATIC SUB-GRID INTERPOLATION ---
+    if 0 < best_idx < len(dist) - 1:
+        y1 = dist[best_idx - 1]
+        y2 = dist[best_idx]
+        y3 = dist[best_idx + 1]
+        h = alphas_arr[1] - alphas_arr[0]
+
+        denominator = y1 - 2 * y2 + y3
+        if denominator > 0:
+            shift = - (h / 2.0) * ((y3 - y1) / denominator)
+            shift = max(min(shift, h / 2.0), -h / 2.0)
+            opt_alpha_exp += shift
+
+    return 10. ** opt_alpha_exp
+
+
+def estimate_dmax(Iq, dmax=None, clean_up=True, plot=False, n_steps=15, _is_second_pass=False):
+    """
+    Robust Dmax estimator (V18 - Simplified Shannon-Only Limit).
+
+    Removes the Rg-based clamps, which fail on aggregated samples where
+    the Guinier approximation is invalid. Relies purely on lobe decomposition
+    and the absolute physical Shannon limit (pi / q_min).
+    """
     if clean_up:
         Iq = clean_up_data(Iq)
+
     q = Iq[:, 0]
     I = Iq[:, 1]
     nq = len(q)
+
+    # --- FUNDAMENTAL SHANNON LIMIT ---
+    q_min = np.min(q[q > 0])
+    D_shannon_limit = 2 * np.pi / q_min
+
+    # --- Step 1: Progressive AIC Search ---
     if dmax is None:
-        # first, estimate a very rough rg from the first 20 data points
         nmax = 20
         try:
-            rg, I0 = calc_rg_I0_by_guinier(Iq, ne=nmax)
+            rg_guinier, I0_guinier = calc_rg_I0_by_guinier(Iq, ne=nmax)
         except:
-            rg = calc_rg_by_guinier_peak(Iq, exp=1, ne=100)
-        # next, dmax is roughly 3.5*rg for most particles
-        # so calculate P(r) using a larger dmax, say twice as large, so 7*rg
-        D = 7 * rg
+            rg_guinier = calc_rg_by_guinier_peak(Iq, exp=1, ne=100)
+
+        D_min = 1.5 * rg_guinier
+
+        # Broad search boundaries capped by Shannon limit
+        D_limit_1 = min(4.0 * rg_guinier, D_shannon_limit)
+        D_limit_2 = min(12.0 * rg_guinier, D_shannon_limit)
+
+        current_max = D_limit_1
         dmax_given = False
     else:
-        # allow user to give an initial estimate of Dmax
-        # multiply by 2 to allow for enough large r values
-        D = 2 * dmax
+        D_min = 0.5 * dmax
+        current_max = min(2.0 * dmax, D_shannon_limit)
+        D_limit_2 = current_max
         dmax_given = True
-    # create a calculated q range for Sasrec for low q out to q=0
-    qmin = np.min(q)
-    dq = (q.max() - q.min()) / (q.size - 1)
-    nqc = int(qmin / dq)
-    qc = np.concatenate(([0.0], np.arange(nqc) * dq + (qmin - nqc * dq), q))
-    # run Sasrec to perform IFT
-    sasrec = Sasrec(Iq[:nq // 2], D, qc=None, alpha=0.0, extrapolate=False)
-    # if the rg estimate was way off, it would screw up Dmax estimate
-    # but the sasrec rg should be more accurate, even with a screwed up guinier estimate
-    # so run it again, but this time with the Dmax = 7*sasrec.rg
-    # only do this if rg is significantly different
-    if not dmax_given:  # rg only exists if Dmax was not given initially
-        if np.abs(sasrec.rg - rg) > 0.2 * sasrec.rg:
-            sasrec = Sasrec(Iq[:nq // 2], D=7 * sasrec.rg, qc=None, alpha=0.0, extrapolate=False)
-    # lets test a bunch of different dmax's on a logarithmic spacing
-    # then see where chi2 is minimal. that at least gives us a good ball park of Dmax
-    # the main problem is that we don't know the scale even remotely, or the units,
-    # so we need to check many orders of magnitude
-    Ds = np.logspace(.1, np.log10(2 * 7 * sasrec.rg), 10)
-    chi2 = np.zeros(len(Ds))
-    for i in range(len(Ds)):
-        sasrec = Sasrec(Iq[:nq // 2], D=Ds[i], qc=None, alpha=0.0, extrapolate=False)
-        chi2[i] = sasrec.calc_chi2()
-    order = np.argsort(chi2)
-    D = 2 * np.interp(2 * chi2.min(), chi2[order], Ds[order])
-    # one final time with new D and full q range
-    sasrec = Sasrec(Iq, D=D, qc=None, alpha=0.0, extrapolate=False)
-    # now filter the P(r) curve for estimating Dmax better
-    qmax = 2 * np.pi / D
-    # qmax_fraction = 0.5
-    r, Pfilt, sigrfilt = filter_P(sasrec.r, sasrec.P, sasrec.Perr, qmax=qmax)  # qmax_fraction*Iq[:,0].max())
-    # import matplotlib.pyplot as plt
-    # plt.plot(sasrec.r,sasrec.r*0,'k--')
-    # plt.plot(sasrec.r, sasrec.P,'b-')
-    # plt.plot(r,Pfilt,'r-')
-    # estimate D as the first position where P becomes less than 0.01*P.max(), after P.max()
-    Pargmax = Pfilt.argmax()
-    # catch cases where the P(r) plot goes largely negative at large r values,
-    # as this indicates repulsion. Set the new Pargmax, which is really just an
-    # identifier for where to begin searching for Dmax, to be any P value whose
-    # absolute value is greater than at least 10% of Pfilt.max. The large 10% is to
-    # avoid issues with oscillations in P(r).
-    argmax_threshold = 0.05
-    above_idx = np.where((np.abs(Pfilt) > argmax_threshold * Pfilt.max()) & (r > r[Pargmax]))
-    Pargmax = np.max(above_idx)
-    dmax_threshold = (0.01 * Pfilt.max())
-    near_zero_idx = np.where((np.abs(Pfilt[Pargmax:]) < dmax_threshold))[0]
-    near_zero_idx += Pargmax
-    D_idx = near_zero_idx[0]
-    D = r[D_idx]
-    sasrec.D = np.copy(D)
-    # plt.plot(sasrec.r,sasrec.r*0+argmax_threshold*Pfilt.max(),'g--')
-    # plt.plot(sasrec.r,sasrec.r*0-argmax_threshold*Pfilt.max(),'g--')
-    # plt.plot(sasrec.r,sasrec.r*0+dmax_threshold,'r--')
-    # plt.axvline(D,c='r')
-    # plt.plot()
-    # plt.show()
-    # exit()
-    sasrec.update()
-    return D, sasrec
+        rg_guinier = dmax / 3.0
+
+    best_D_broad = D_min
+
+    for pass_num in range(2):
+        Ds = np.logspace(np.log10(D_min), np.log10(current_max), n_steps)
+        scores = np.zeros(len(Ds))
+
+        for i in range(len(Ds)):
+            try:
+                sasrec = Sasrec(Iq[:nq // 2], D=Ds[i], qc=None, alpha=0.0, extrapolate=False)
+                chi2_val = sasrec.calc_chi2()
+                q_max_fit = sasrec.q.max()
+                k = Ds[i] * q_max_fit / np.pi
+                n_pts = len(sasrec.I_data)
+                rss = chi2_val * (n_pts - k)
+                if rss <= 1e-12: rss = 1e-12
+                scores[i] = n_pts * np.log(rss / n_pts) + 2 * k
+            except:
+                scores[i] = np.inf
+
+        min_score = np.min(scores)
+        threshold = min_score + 3.0
+        valid_indices = np.where(scores <= threshold)[0]
+        best_idx = np.max(valid_indices)
+        best_D_broad = Ds[best_idx]
+
+        if (best_idx >= n_steps - 2) and (current_max < D_limit_2) and (not dmax_given):
+            D_min = current_max
+            current_max = D_limit_2
+            n_steps = 10
+            continue
+        else:
+            break
+
+    D_broad = best_D_broad
+
+    # --- Step 2: Estimate Alpha ---
+    try:
+        temp_sas = Sasrec(Iq, D=D_broad, alpha=0)
+        if hasattr(temp_sas, 'optimize_alpha'):
+            rough_alpha = temp_sas.optimize_alpha(quiet=True)
+        else:
+            rough_alpha = estimate_rough_alpha(Iq, D_broad, Sasrec)
+    except:
+        rough_alpha = estimate_rough_alpha(Iq, D_broad, Sasrec)
+
+    # --- Step 3: OVERSMOOTHING (x10) ---
+    smooth_alpha = rough_alpha * 50.0
+    sasrec = Sasrec(Iq, D=D_broad, qc=None, alpha=smooth_alpha, extrapolate=True)
+    P_smooth = sasrec.P
+    r = sasrec.r
+
+    # --- Step 4: LOBE DECOMPOSITION ---
+    Pmax = P_smooth.max()
+    Pargmax = P_smooth.argmax()
+
+    signs = np.sign(P_smooth)
+    diffs = np.diff(signs)
+    zero_crossings = np.where(diffs != 0)[0]
+    lobe_boundaries = np.concatenate(([0], zero_crossings, [len(r) - 1]))
+
+    final_idx = len(r) - 1
+
+    main_lobe_idx = 0
+    for i in range(len(lobe_boundaries) - 1):
+        start = lobe_boundaries[i]
+        end = lobe_boundaries[i + 1]
+        if start <= Pargmax <= end:
+            main_lobe_idx = i
+            break
+
+    tail_start = int(0.85 * len(r))
+    noise_sigma = np.std(P_smooth[tail_start:]) if tail_start < len(r) else 0.0
+    significance_threshold = max(3.0 * noise_sigma, 0.015 * Pmax)
+
+    for i in range(main_lobe_idx + 1, len(lobe_boundaries) - 1):
+        start = lobe_boundaries[i]
+        end = lobe_boundaries[i + 1]
+        lobe_segment = P_smooth[start:end]
+        lobe_max = np.max(np.abs(lobe_segment))
+        lobe_mean = np.mean(np.abs(lobe_segment))
+
+        if lobe_max < significance_threshold:
+            final_idx = start
+            break
+        if lobe_mean < 0.3 * significance_threshold:
+            final_idx = start
+            break
+        if end >= len(r) - 2:
+            if lobe_max < 0.15 * Pmax:
+                final_idx = start
+                break
+        continue
+
+        # Interpolate Zero Crossing
+    if final_idx < len(r) - 1:
+        y1 = P_smooth[final_idx]
+        y2 = P_smooth[final_idx + 1]
+        x1 = r[final_idx]
+        x2 = r[final_idx + 1]
+        if y1 != y2:
+            D_candidate = x1 + (0 - y1) * (x2 - x1) / (y2 - y1)
+        else:
+            D_candidate = x1
+    else:
+        D_candidate = r[-1]
+
+    # --- Step 5: FINAL CLAMP (Shannon Only) ---
+    # Trust the candidate, but cap it at the Broad Search or Shannon Limit
+    D_final = min(D_candidate, D_broad, D_shannon_limit)
+
+    # --- AUTOMATIC REFINEMENT PASS ---
+    if not _is_second_pass and (D_final < 0.75 * D_broad):
+        return estimate_dmax(Iq, dmax=D_final, clean_up=False, plot=plot, n_steps=n_steps, _is_second_pass=True)
+
+    # --- PLOTTING ---
+    if plot:
+        try:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(10, 6))
+            plt.plot(r, P_smooth, 'b-', lw=2, label='Oversmoothed P(r)')
+            plt.fill_between(r, 0, P_smooth, alpha=0.1, color='b')
+
+            plt.axhline(significance_threshold, color='g', linestyle=':', label='Structural Floor (1.5%)')
+            plt.axhline(-significance_threshold, color='g', linestyle=':')
+
+            plt.axvline(D_shannon_limit, color='m', linestyle='--', label=f'Shannon Limit: {D_shannon_limit:.1f}')
+            plt.axvline(D_final, color='r', lw=2, label=f'Final Dmax: {D_final:.1f}')
+
+            pass_str = "(Pass 2)" if _is_second_pass else "(Pass 1)"
+            plt.title(f"{pass_str} Dmax Est (Final={D_final:.1f})")
+            plt.legend()
+            plt.grid(True, alpha=0.3)
+            plt.show()
+        except ImportError:
+            pass
+
+    sasrec = Sasrec(Iq, D=D_final, qc=None, alpha=0.0, extrapolate=False)
+    return D_final, sasrec
 
 
 def filter_P(r, P, sigr=None, qmax=0.5, cutoff=0.75, qmin=0.0, cutoffmin=1.25):
@@ -1204,8 +1483,7 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
         Idata = np.concatenate((Idata, Iextend[1:]))
 
     # create list of qbin indices just in region of data for later F scaling
-    # molass-fork: np.in1d removed in NumPy 2.0; np.isin is the replacement
-    qbin_args = np.isin(qbinsc, qdata)
+    qbin_args = np.isin(qbinsc, qdata, assume_unique=True)
     qba = qbin_args  # just for brevity when using it later
     # set qba bins outside of scaling region to false.
     # start with bins in corners
@@ -1348,12 +1626,11 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
     my_logger.info('Random seed: %i', seed)
 
     if not quiet:
-        using_GPUs = "     using GPUs" if DENSS_GPU else ""
         if gui:
-            my_logger.info("\n Step     Chi2     Rg    Support Volume" + using_GPUs)
+            my_logger.info("\n Step     Chi2     Rg    Support Volume")
             my_logger.info(" ----- --------- ------- --------------")
         else:
-            print("\n Step     Chi2     Rg    Support Volume" + using_GPUs)
+            print("\n Step     Chi2     Rg    Support Volume")
             print(" ----- --------- ------- --------------")
 
     if PYFFTW:
@@ -1477,25 +1754,31 @@ def reconstruct_abinitio_from_scattering_profile(q, I, sigq, dmax, qraw=None, Ir
                 newrho = newrho_total / len(rotations)
             else:
                 if ncs_axis == 1:
-                    axes = (1, 2)  # longest
+                    axes = (1, 2)  # Principal axis is 0
+                    perp_axes = (0, 2)  # Perpendicular axis is 1
                 if ncs_axis == 2:
-                    axes = (0, 2)  # middle
+                    axes = (0, 2)  # Principal axis is 1
+                    perp_axes = (0, 1)  # Perpendicular axis is 2
                 if ncs_axis == 3:
-                    axes = (0, 1)  # shortest
+                    axes = (0, 1)  # Principal axis is 2
+                    perp_axes = (1, 2)  # Perpendicular axis is 0
+
                 degrees = 360. / ncs
                 newrho_total = np.copy(newrho)
+
                 if ncs_type == "dihedral":
-                    # first, rotate original about perpendicular axis by 180
-                    # then apply n-fold cyclical rotation
-                    d2fold = ndimage.rotate(newrho, 180, axes=axes, reshape=False)
+                    # Pass the perpendicular axes here
+                    d2fold = ndimage.rotate(newrho, 180, axes=perp_axes, reshape=False)
                     newrhosym = np.copy(newrho) + d2fold
                     newrhosym /= 2.0
                     newrho_total = np.copy(newrhosym)
                 else:
                     newrhosym = np.copy(newrho)
+
                 for nrot in range(1, ncs):
                     sym = ndimage.rotate(newrhosym, degrees * nrot, axes=axes, reshape=False)
                     newrho_total += np.copy(sym)
+
                 newrho = newrho_total / ncs
 
             # run shrinkwrap after ncs averaging to get new support
@@ -2735,7 +3018,6 @@ class Sasrec(object):
     def __init__(self, Iq, D, qc=None, r=None, nr=None, alpha=0.0, ne=2, extrapolate=True):
         debug = False
         if debug:
-            import logging
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = None
@@ -2811,8 +3093,6 @@ class Sasrec(object):
         self.rg = self.Ish2rg()
         self.E = self.Et()
         self.rgerr = self.rgerrf()
-        if self.logger is not None:
-            self.logger.info("Radius of gyration (Rg): %.3f +/- %.3f Å" % (self.rg, self.rgerr))
         self.avgr = self.Ish2avgr()
         self.avgrerr = self.avgrerrf()
         self.Q = self.Ish2Q()
@@ -2857,79 +3137,137 @@ class Sasrec(object):
         self.qc = np.hstack((self.qc, qce))
 
     def optimize_alpha(self, quiet=False, gui=False):
-        """Scan alpha values to find optimal alpha"""
-        ideal_chi2 = self.calc_chi2()
-        al = []
-        chi2 = []
-        #here, alphas are actually the exponents, since the range can
-        #vary from 10^-20 upwards of 10^20. This should cover nearly all likely values
-        alphas = np.arange(-30,30.,2)
-        i = 0
-        nalphas = len(alphas)
+        """
+        High-Resolution L-Curve Optimizer (The Extrapolation Cliff).
+        Trusts the extrapolated baseline as the ultimate indicator of smoothing.
+        Bypasses P(r) roughness to definitively prevent oversmoothing on clean data.
+        """
+        C_data = self.Ct_data()
+        G = self.Gmn()
+        Y = self.Y
+
+        B_T_data = self.B_data.T
+        B_T_full = self.B.T
+
+        I_obs = self.I_data
+        I_err = self.Ierr_data
+        nq_minus_1 = self.nq_data - 1
+
+        q_max_data = self.q_data.max()
+        extrap_mask = self.q > q_max_data
+        has_extrap = np.sum(extrap_mask) >= 3
+
+        alphas = np.linspace(-15, 15, 121)
+        chi2_list, regul_list, al_list = [], [], []
+        min_extrap_list, extrap_rough_list = [], []
+
         if gui:
             my_logger = logging.getLogger()
-        for alpha in alphas:
-            i += 1
-            if not quiet:
+        for i, alpha_exp in enumerate(alphas):
+            if not quiet and i % 10 == 0:
+                msg = f"Scanning Alpha... {i / len(alphas):.0%}"
                 if gui:
-                    my_logger.info("\rScanning alphas... {:.0%} complete".format(i*1./nalphas))
+                    my_logger.info(msg)
                 else:
-                    sys.stdout.write("\rScanning alphas... {:.0%} complete".format(i*1./nalphas))
+                    sys.stdout.write(f"\r{msg}")
                     sys.stdout.flush()
             try:
-                self.alpha = 10. ** alpha
-                # self.update()
-                # don't run the full update, just update the Ins with the new alpha for speed
-                # then run the full update at the end
-                # updating alpha just updates C, so all steps from C to In calculation need to be run
-                self.C = self.Ct2()
-                self.Cinv = np.linalg.inv(self.C)
-                self.In = np.linalg.solve(self.C, self.Y)
+                alpha = 10. ** alpha_exp
+                C = C_data + alpha * G
+                try:
+                    c = np.linalg.solve(C, Y)
+                except np.linalg.LinAlgError:
+                    continue
+
+                Ic_data = 2.0 * np.dot(B_T_data, c)
+                residuals = (I_obs - Ic_data) / I_err
+                chi2_val = np.sum(residuals ** 2) / nq_minus_1
+                regul_val = np.dot(c, np.dot(G, c))
+
+                if has_extrap:
+                    Ic_full = 2.0 * np.dot(B_T_full, c)
+                    I_extrap = Ic_full[extrap_mask]
+                    min_extrap = np.min(I_extrap)
+                    extrap_rough = np.sum(np.diff(I_extrap, n=2) ** 2)
+                else:
+                    min_extrap = 0.0
+                    extrap_rough = 1e-100
+
+                if chi2_val > 0 and regul_val > 0 and extrap_rough > 0:
+                    chi2_list.append(chi2_val)
+                    regul_list.append(regul_val)
+                    al_list.append(alpha_exp)
+                    min_extrap_list.append(min_extrap)
+                    extrap_rough_list.append(extrap_rough)
             except:
                 continue
-            chi2value = self.calc_chi2()
-            al.append(alpha)
-            chi2.append(chi2value)
-        al = np.array(al)
-        chi2 = np.array(chi2)
-        print()
-        # find optimal alpha value based on where chi2 begins to rise, to 10% above the ideal chi2
-        # interpolate between tested alphas to find more precise value
-        x = np.linspace(al[0], al[-1], 1000)
-        y = np.interp(x, al, chi2)
-        use_sigmoid = True
-        if use_sigmoid:
-            chif = 1.01
-            # try and use a sigmoid fit
-            # guess the midpoint of the sigmoid
-            chi2_mid = (chi2.max() - chi2.min()) / 2
-            idx = find_nearest_i(chi2_mid, y)
-            al_mid = x[idx]
-            # guess the min, max, etc.
-            L = max(chi2)
-            b = min(chi2)
-            x0_guess = al_mid
-            k_guess = np.median(al)
-            p0 = [x0_guess, k_guess]
-            # constrain b and L, only fit x0 and k
-            popt, pcov = optimize.curve_fit(lambda x, x0, k: sigmoid(x, x0, k, b, L), al, chi2, p0, method='dogbox')
-            fit = sigmoid(x, popt[0], popt[1], b, L)
-            # find the value of the sigmoid closest to 1.1*ideal_chi2
-            # minimum of the sigmoid is b parameter, which can be taken from popt
-            opt_alpha_exponent = sigmoid_find_x_value_given_y(chif * b, popt[0], popt[1], b, L)
+
+        if not quiet: print()
+        if not chi2_list: return self.alpha
+
+        chi2_arr = np.array(chi2_list)
+        regul_arr = np.array(regul_list)
+        al_arr = np.array(al_list)
+        min_extrap_arr = np.array(min_extrap_list)
+        extrap_rough_arr = np.array(extrap_rough_list)
+
+        log_chi2 = np.log10(chi2_arr)
+        log_regul = np.log10(regul_arr)
+        log_extrap_rough = np.log10(extrap_rough_arr)
+
+        def normalize(arr):
+            rng = arr.max() - arr.min()
+            if rng == 0: return np.zeros_like(arr)
+            return (arr - arr.min()) / rng
+
+        norm_chi2 = normalize(log_chi2)
+        norm_regul = normalize(log_regul)
+        norm_extrap_rough = normalize(log_extrap_rough)
+
+        # --- THE EXTRAPOLATION CLIFF ---
+        # If extrapolation exists, we rely on it 100%. If not, we fall back to P(r) roughness.
+        if has_extrap:
+            roughness_metric = norm_extrap_rough
         else:
-            chif = 1.1
-            # take the maximum alpha value (x) where the chi2 just starts to rise above ideal
-            try:
-                ali = np.argmax(x[y <= chif * ideal_chi2])
-            except:
-                # if it fails, it may mean that the lowest alpha value of 10^-20 is still too large, so just take that.
-                ali = 0
-            # set the optimal alpha to be 10^alpha, since we were actually using exponents
-            # also interpolate between the two neighboring alpha values, to get closer to the chif*ideal_chi2
-            opt_alpha_exponent = np.interp(chif * ideal_chi2, [y[ali], y[ali - 1]], [x[ali], x[ali - 1]])
-        opt_alpha = 10.0 ** (opt_alpha_exponent)
-        self.alpha = opt_alpha
+            roughness_metric = norm_regul
+
+        # L1 Norm (Manhattan Distance) naturally finds the sharpest corner of the cliff
+        dist = norm_chi2 + roughness_metric
+        best_idx = np.argmin(dist)
+
+        # Because the cliff stops the drift natively, we can use a wide safety net
+        # to allow aggregates to smooth out their baselines safely.
+        min_chi2 = np.min(chi2_arr)
+        safety_threshold = max(2.0 * min_chi2, min_chi2 + 1.0)
+
+        min_raw_I = np.min(I_obs)
+        negativity_tolerance = min(-1e-5 * np.max(I_obs), min_raw_I)
+
+        valid_mask = (chi2_arr <= safety_threshold) & (min_extrap_arr >= negativity_tolerance)
+
+        if not valid_mask[best_idx]:
+            valid_indices = np.where(valid_mask)[0]
+            if len(valid_indices) > 0:
+                best_idx = valid_indices[-1]
+            else:
+                best_idx = np.argmin(chi2_arr)
+
+        opt_alpha_exp = al_arr[best_idx]
+
+        # QUADRATIC SUB-GRID INTERPOLATION
+        if 0 < best_idx < len(dist) - 1:
+            y1 = dist[best_idx - 1]
+            y2 = dist[best_idx]
+            y3 = dist[best_idx + 1]
+            h = al_arr[1] - al_arr[0]
+
+            denominator = y1 - 2 * y2 + y3
+            if denominator > 0:
+                shift = - (h / 2.0) * ((y3 - y1) / denominator)
+                shift = max(min(shift, h / 2.0), -h / 2.0)
+                opt_alpha_exp += shift
+
+        self.alpha = 10. ** opt_alpha_exp
         self.update()
         return self.alpha
 
@@ -3041,6 +3379,20 @@ class Sasrec(object):
         alpha = self.alpha
         gmn = self.Gmn()
         return alpha * gmn + 2 * np.einsum('ij,kj->ik', Bm / Ierr ** 2, Bn)
+
+    def Ct_data(self):
+        """
+        Calculate the unregularized C matrix (Data term only).
+        Replaces the slow summation part of Ct2.
+        """
+        # Weighted B matrix: B_w = B / sigma
+        # FIX: Use self.B_data (experimental points only) to match self.Ierr_data dimensions.
+        # self.B contains extrapolated points which causes the shape mismatch.
+        B_w = self.B_data / self.Ierr_data
+
+        # C_data = 2 * B_w * B_w.T
+        # Result is (N, N)
+        return 2.0 * np.dot(B_w, B_w.T)
 
     def Ish2Iq(self):
         """Calculate I(q) from intensities at Shannon points."""
@@ -4336,7 +4688,7 @@ class PDB2MRC(object):
         if not self.quiet: print('Finished in vacuo density.')
 
     def calculate_excluded_volume(self, quiet=False):
-        if not self.quiet: print('Calculating excluded volume...')
+        # if not self.quiet: print('Calculating excluded volume...')
         if self.exvol_type == "gaussian":
             # generate excluded volume assuming gaussian dummy atoms
             # this function outputs in electron count units
@@ -4362,7 +4714,7 @@ class PDB2MRC(object):
             # self.rho_exvol = ndimage.gaussian_filter(self.supportexvol*1.0,sigma=sigma,mode='wrap')
             self.rho_exvol = 1.0 * self.supportexvol
             self.rho_exvol *= ne / self.rho_exvol.sum()  # put in electron count units
-        if not self.quiet: print('Finished excluded volume.')
+        # if not self.quiet: print('Finished excluded volume.')
 
     def calculate_hydration_shell(self):
         if not self.quiet: print('Calculating hydration shell...')
@@ -4571,7 +4923,20 @@ class PDB2MRC(object):
             self.bounds[2:, 0] = 0
             self.bounds[2:, 1] = np.inf
             self.params = np.append(self.params, self.radii_sf)
-            self.penalty_weights = np.append(self.penalty_weights, np.ones(len(self.param_names[2:])))
+
+            # Determine how many weights we need to add
+            num_radii_params = len(self.param_names[2:])
+            num_provided_weights = len(self.penalty_weights)
+
+            # If the user provided weights for [rho0, shell, atom1, atom2...], use them.
+            # Otherwise, append 1.0 for the missing radii parameters.
+            if num_provided_weights < len(self.param_names):
+                missing_count = len(self.param_names) - num_provided_weights
+                extra_weights = np.ones(missing_count)
+                self.penalty_weights = np.append(self.penalty_weights, extra_weights)
+            else:
+                # If the user provided enough (or too many), slice it to match param_names
+                self.penalty_weights = np.array(self.penalty_weights[:len(self.param_names)])
 
         if not self.fit_all:
             # disable all fitting if requested

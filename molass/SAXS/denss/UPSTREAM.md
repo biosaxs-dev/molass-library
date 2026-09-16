@@ -6,7 +6,8 @@ used by molass for ab-initio 3D reconstruction.
 ## Source
 
 - Upstream: https://github.com/tdgrant1/denss
-- Vendored version: **DENSS v1.8.7** (see `_version.py`)
+- Vendored version: **DENSS v1.8.8** (see `_version.py`; not yet tagged upstream as of this
+  sync — corresponds to upstream commit `5009b1c`, "update version number to 1.8.8")
 - License: GPL v3 (preserved; see upstream `LICENSE`)
 
 ## Local modifications
@@ -35,20 +36,29 @@ Select-String -Path *.py -Pattern "molass-fork:"
 
 1. **Import path adjustment** — `denss.resources` → `molass.SAXS.denss.resources`
    (required because we vendor under `molass/SAXS/denss/`).
-2. **GUI/progress hooks** — added `progress_cb`, `gui` kwargs and an
-   optional `self.logger` for integration with the molass GUI.
-3. **`optimize_alpha(qmax)` floor** — `qmax = max(0.1, qmax)` to avoid
-   degenerate low-qmax behavior on truncated profiles.
+2. **GUI/progress hooks**, split across three call sites (corrected 2026-09-16 — previously
+   this entry conflated the functions involved):
+   - `reconstruct_abinitio_from_scattering_profile(...)` — added `progress_cb=None` kwarg,
+     invoked once per iteration as `progress_cb(j, chi[j], rg[j], supportV[j])`.
+   - `Sasrec.optimize_alpha(quiet=False)` — added `gui=False` kwarg; when `True`, routes the
+     progress message through a `logging.getLogger()` instance instead of `sys.stdout.write`.
+     Re-homed onto the new upstream L-curve algorithm on 2026-09-16 (see "Catch-up procedure"
+     below) since the old algorithm it was originally written against no longer exists upstream.
+   - `Sasrec.estimate_Vp_etal(...)` — added `qmax = max(0.1, qmax)` floor (previously
+     mislabeled in this file as belonging to `optimize_alpha`) plus an `if self.logger is not
+     None: self.logger.info(...)` call. `self.logger` on `Sasrec` is set in `__init__` from a
+     hardcoded `debug = False` flag, so in practice it is always `None` today (dead but
+     harmless code, kept for parity with the pre-2026-09-16 vendored copy).
+3. **`write_mrc` explicit `float()` conversion** — `a, b, c = float(side[0]), float(side[1]),
+   float(side[2])` instead of passing `side`/1-element numpy arrays directly to
+   `struct.pack('<fff', ...)` (Python 3.14 no longer accepts implicit numpy-array-to-float).
 4. **NumPy 2.0 / Python 3.14 compatibility** (April 2026):
    - `np.in1d(..., assume_unique=True)` → `np.isin(...)`
      (`np.in1d` removed in NumPy 2.0).
    - `np.trapz(...)` → `np.trapezoid(...)` (3 sites in `direct_I2P`, `P2Rg`)
      (`np.trapz` removed in NumPy 2.0).
-   - `write_mrc`: explicit `float()` conversion of `side` values before
-     `struct.pack('<fff', a, b, c)` (Python 3.14's `struct.pack` no longer
-     accepts 1-element NumPy arrays implicitly).
 
-All #4 fixes are also applicable upstream (see `tdgrant1/denss` `denss/core.py`
+All #3-#4 fixes are also applicable upstream (see `tdgrant1/denss` `denss/core.py`
 as of 2026-04-21 — none have been applied there).
 
 ## Known caveats about the baseline
@@ -64,9 +74,25 @@ as of 2026-04-21 — none have been applied there).
   was simply skipped during that import, has not been verified. Worth
   checking on the next refresh.
 
+## Sync history
+
+- **2026-09-16** — v1.8.7 → v1.8.8 (upstream commit `5009b1c`). Notable upstream changes:
+  new BIC-based auto Dmax/alpha estimator (`estimate_rough_alpha`, rewritten `optimize_alpha`),
+  new `clean_low_q_artifacts` beam-stop trimming helper, dihedral symmetry bug fix. Performed
+  via `denss-update/denss_update.ipynb` (see below) rather than the old `update-denss.py` /
+  `update-custom-codes.py` scripts, which were stale (hardcoded pre-restructure upstream paths
+  like `bin/`, `saxstats/scriptsbin`). Caught and fixed one real gap during this sync: the
+  `write_mrc` float() conversion (item 3 above) was initially dropped from the merge despite
+  being flagged by the notebook's own marker-listing cell — a reminder that a diagnostic
+  finding something is not the same as it being acted on.
+  Follow-up not done in this pass: evaluate porting the new BIC Dmax/alpha estimator into
+  `molass/SAXS/DmaxEstimation.py` (design decision, tracked separately).
+
 ## Catch-up procedure
 
-When refreshing against a new upstream release:
+The steps below are now largely carried out by `denss-update/denss_update.ipynb` (a shared
+human/AI notebook workflow) rather than by hand. The manual description is kept here as the
+authoritative reference for what the notebook automates:
 
 1. Note the current upstream commit/tag in this file.
 2. Replace `core-orig.py` / `options-orig.py` with the new upstream files.

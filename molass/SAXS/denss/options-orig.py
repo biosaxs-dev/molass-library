@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# molass-fork: DO NOT EDIT --- pristine upstream baseline (see UPSTREAM.md "Known caveats")
-# molass-fork: for diffing against the working copy (options.py).
+# molass-fork: DO NOT EDIT --- pristine upstream baseline (DENSS v1.8.8) for diffing
+# molass-fork: against the working copy (options.py). See UPSTREAM.md.
 
 import os, argparse
 import numpy as np

@@ -101,7 +101,8 @@ def main():
         Iq[:,0] *= 0.1
 
     if args.n1 is None:
-        n1 = 0
+        # n1 = 0
+        n1 = denss.clean_low_q_artifacts(Iq[:,0], Iq[:,1], Iq[:,2], window_size=6, z_threshold=5.0)
     else:
         n1 = args.n1
     if args.n2 is None:
@@ -116,7 +117,7 @@ def main():
         #note that denss.estimate_dmax does NOT extrapolate
         #the high q data, even though by default
         #denss.Sasrec does extrapolate.
-        D, sasrec = denss.estimate_dmax(Iq, clean_up=True)
+        D, sasrec = denss.estimate_dmax(Iq[n1:n2], clean_up=True)
     else:
         D = args.dmax
 
@@ -162,20 +163,6 @@ def main():
     nshc = qmaxc/(np.pi/D)
     print("Number of experimental Shannon channels: %d"%(nsh))
     print("Number of calculated Shannon channels: %d"%(nshc))
-    if (nsh > 500) or (nshc>500):
-        print("WARNING: Nsh > 500. Calculation may take a while. Please double check Dmax is accurate.")
-        #give the user a few seconds to cancel with CTRL-C
-        waittime = 10
-        try:
-            for i in range(waittime+1):
-                sys.stdout.write("\rTo cancel, press CTRL-C in the next %d seconds. "%(waittime-i))
-                sys.stdout.flush()
-                time.sleep(1)
-            print()
-        except KeyboardInterrupt:
-            print("Canceling...")
-            exit()
-
 
     #calculate chi2 when alpha=0, to get the best possible chi2 for reference
     sasrec = denss.Sasrec(Iq[n1:n2], D, qc=qc, r=r, nr=args.nr, ne=nes, alpha=0.0, extrapolate=args.extrapolate)
