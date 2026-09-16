@@ -87,6 +87,19 @@ as of 2026-04-21 — none have been applied there).
   finding something is not the same as it being acted on.
   Follow-up not done in this pass: evaluate porting the new BIC Dmax/alpha estimator into
   `molass/SAXS/DmaxEstimation.py` (design decision, tracked separately).
+- **2026-09-16 (follow-up)** — evaluated and ported. See
+  `molass-researcher/experiments/39_denss_study/39a_dmax_alpha_estimator.ipynb` for the analysis:
+  the new estimator's "BIC" is actually AIC's penalty term; its computed alpha never reaches the
+  caller (discarded, returned `sasrec` is always `alpha=0.0`); and it is ~14x slower than the old
+  algorithm on one real profile, traced to a `hasattr(temp_sas, 'optimize_alpha')` check in
+  upstream's `estimate_dmax` that is always `True` (so the expensive full 121-point
+  `Sasrec.optimize_alpha` runs instead of the lighter 61-point `estimate_rough_alpha` that looks
+  purpose-built for that call site) — worth reporting upstream. `DmaxEstimation.estimate_dmax`
+  now wraps `denss.core.estimate_dmax` directly instead of carrying its own frozen pre-1.8.8
+  copy; `illustrate_dmax` (the GUI Dmax panel) now plots the oversmoothed P(r) the new algorithm
+  actually bases its Dmax cutoff on, reconstructed via `estimate_rough_alpha` since
+  `core.estimate_dmax` doesn't return it. Note for GUI responsiveness: the panel is now ~14x
+  slower per the timing above.
 
 ## Catch-up procedure
 
