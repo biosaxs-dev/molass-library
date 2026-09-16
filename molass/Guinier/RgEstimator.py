@@ -28,8 +28,12 @@ def _guinier_fit_with_quality(data, ne):
     meaningful ``score`` -- ``calc_rg_I0_by_guinier`` itself only returns (Rg, I0)."""
     nb = 0
     while True:
-        slope, intercept, r_value, p_value, stderr = linregress(
-            data[nb:ne, 0] ** 2, np.log(data[nb:ne, 1]))
+        # buffer-region frames routinely have non-positive intensities in this
+        # window -- np.log(negative/zero) is an expected step towards the
+        # ValueError below, not a real problem; silence the RuntimeWarning noise.
+        with np.errstate(invalid='ignore', divide='ignore'):
+            slope, intercept, r_value, p_value, stderr = linregress(
+                data[nb:ne, 0] ** 2, np.log(data[nb:ne, 1]))
         if slope < 0:
             break
         nb += 1
@@ -109,6 +113,14 @@ class RgEstimator(SimpleGuinier):
             self.guinier_stop = None
 
     def _try_relaxed_legacy(self):
+        # guinier_interval()/make_cadidate_pairs() read self.worst_quality, which is
+        # only ever set inside evaluate_basic_quality(). That method is skipped
+        # entirely when SimpleGuinier.__init__ takes its set_guinier_null_result()
+        # branch (too little data) -- and that branch also resets basic_quality to
+        # 0, so checking "basic_quality is None" here does NOT reliably detect this
+        # case. Check the actual attribute the retry depends on instead.
+        if not hasattr(self, 'worst_quality'):
+            return False
         try:
             self.guinier_interval(qrg_limit=_RELAXED_QRG_LIMIT, max_candidates=None)
             if self.Rg is None or self.Rg == 0 or self.score == 0:
@@ -116,7 +128,10 @@ class RgEstimator(SimpleGuinier):
             self.rg_source = 'legacy_relaxed'
             return True
         except Exception:
-            logger.warning("Relaxed legacy Guinier retry failed.", exc_info=True)
+            # expected/common on buffer-region frames (no real particle signal) --
+            # debug, not warning, so default logging stays quiet; still traceable
+            # with exc_info=True when DEBUG is enabled.
+            logger.debug("Relaxed legacy Guinier retry failed.", exc_info=True)
             return False
 
     def _try_denss_guinier(self, data):
@@ -135,7 +150,7 @@ class RgEstimator(SimpleGuinier):
             self.score = min(_DENSS_SCORE_CAP, r_value ** 2)
             return True
         except Exception:
-            logger.warning("DENSS Guinier fallback failed.", exc_info=True)
+            logger.debug("DENSS Guinier fallback failed.", exc_info=True)
             return False
 
     def _try_fallback(self, data):
@@ -153,4 +168,4 @@ class RgEstimator(SimpleGuinier):
             r_squared = result.get('r_squared', 0.0)
             self.score = 0.0 if self.saturated else min(_FALLBACK_SCORE_CAP, r_squared)
         except Exception:
-            logger.warning("Fallback Rg estimation failed.", exc_info=True)
+            logger.debug("Fallback Rg estimation failed.", exc_info=True)

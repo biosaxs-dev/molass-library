@@ -16,7 +16,10 @@ def compute_rg(qw2, lnI, weights):
     lnIw = W @ lnI
     coeffs, residuals, rank, s = np.linalg.lstsq(Aw, lnIw, rcond=None)
     slope = coeffs[0]
-    Rg = np.sqrt(-3 * slope)
+    # a positive slope (no real Guinier region) is expected on buffer-region
+    # frames -- sqrt(-3*slope) then yields nan by design, not a computation error.
+    with np.errstate(invalid='ignore'):
+        Rg = np.sqrt(-3 * slope)
     return Rg
 
 def compute_r_squared(qw2, lnI, weights):
