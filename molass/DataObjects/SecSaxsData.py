@@ -1102,7 +1102,7 @@ class SecSaxsData:
         return self.quick_decomposition(**opts)
 
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
+        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, use_plate_penalty=False, **kwargs)
 
         Performs a quick decomposition of the SEC-SAXS data.
 
@@ -1151,7 +1151,18 @@ class SecSaxsData:
             Specifies the ranks to be used for XR data.
 
         num_plates : int, optional
-            Specifies the number of theoretical plates to be used for the optimization constraint.
+            Fallback plate count for the plate-count self-consistency penalty
+            (see ``use_plate_penalty``); ignored unless ``use_plate_penalty=True``.
+            Applies only to the ``proportions`` path. Default 14400.
+
+        use_plate_penalty : bool, optional
+            If True, adds a Martin-Synge plate-count self-consistency penalty
+            to the ``proportions`` (proportional) decomposition path. Helps some
+            datasets (more components, more even proportions) but can hurt others
+            (e.g. cases with inherently less stable per-component Rg estimation) --
+            not safe as an always-on default, so opt-in. Ignored (no effect, no
+            warning) when ``xr_peakpositions`` is used instead of ``proportions``.
+            Default False.
 
         tau_limit : float, optional
             Maximum allowed ratio ``|tau| / sigma`` for positioned decomposition.
