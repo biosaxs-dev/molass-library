@@ -12,6 +12,20 @@ TAU_RATIO_LIMIT = 0.5
 TAU_PENALTY_SCALE = 1e5
 SIGNAL_THRESHOLD_RATIO = 0.2
 MIN_SIGNAL_POINTS = 5
+# mirrors molass_legacy.ObjectiveFunctions.G0346's TAU_BOUND_RATIO setting (default 0.65):
+# |tau| <= sigma*TAU_BOUND_RATIO. Kept as a local constant so this module stays legacy-free.
+TAU_BOUND_RATIO = 0.65
+# Martin-Synge plate theory self-consistency: mu_i = N*w_i - tI, w_i=sqrt(sigma_i**2+tau_i**2).
+# N is self-estimated per-evaluation (exact solve at num_components=2, least-squares OLS at
+# num_components>=3), clamped >=0 (width shouldn't shrink as retention grows). Self-estimation
+# is a free rider when it succeeds -- the residual is always ~0 at num_components=2, and only
+# mildly informative just above -- so it never distorts a dataset whose components are already
+# mutually consistent under SOME plate count. Only when self-estimation fails (near-identical
+# widths -> N undefined, or a negative width/retention correlation -> N clamped to 0) does it
+# fall back to a fixed N=sqrt(num_plates), which is a genuine constant and yields a real,
+# non-degenerate penalty (see molass-researcher 40_initial_penalties math discussion).
+PLATE_PENALTY_SCALE = 1.0
+DEFAULT_NUM_PLATES = 14400
 
 def safe_log10(x):
     """Compute the base-10 logarithm of x, ensuring numerical stability.
@@ -176,7 +190,7 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False):
+def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, use_plate_penalty=False, num_plates=None):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
@@ -190,6 +204,17 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
     debug : bool, optional
         If True, enable debug mode to visualize the decomposition process.
         Default is False.
+    use_plate_penalty : bool, optional
+        If True, add a Martin-Synge plate-count self-consistency penalty (see
+        PLATE_PENALTY_SCALE comment below). Verified to help some datasets (e.g. more
+        even proportions across many components) but hurt others (e.g. Y17's 3-component
+        case, where per-component Rg estimation is inherently less stable) -- not safe as
+        an always-on default, so opt-in. Default is False.
+    num_plates : int, optional
+        Fallback plate count used only when self-estimating N fails (near-identical
+        component widths, or a negative width/retention correlation). See
+        DEFAULT_NUM_PLATES / the plate_penalty comment in this module for details.
+        Default is None (uses DEFAULT_NUM_PLATES=14400). Ignored if use_plate_penalty=False.
 
     Returns
     -------
@@ -255,17 +280,48 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
     def total_objective(params_all, debug_ax=None, return_props=False):
         cy_list = []
         areas = []
+        tau_violation = 0.0
+        mus = []
+        ws = []
         for params in params_all.reshape(shape):
+            m, s, t = params[1:4]
             cy = egh(x, *params)
             cy_list.append(cy)
             areas.append(np.sum(cy))
+            # keep the joint fit's own tau consistent with its own sigma, not just the
+            # initial slice's std (see molass-library#264 / the tau bound box below)
+            tau_violation += max(0, abs(t) - TAU_BOUND_RATIO * s) ** 2
+            mus.append(m)
+            ws.append(np.hypot(s, t))
         ty = np.sum(cy_list, axis=0)
         props = np.array(areas)/np.sum(areas)
         if return_props:
             return props
         if debug_ax is not None:
             debug_ax.plot(x, ty, color='red', alpha=0.3)
-        return safe_log10(np.sum((ty - y) ** 2)) + 0.1 * safe_log10(np.sum((props - proportions)**2))
+
+        # shared-plate-count self-consistency (opt-in, see use_plate_penalty docstring):
+        # self-estimate N (exact at num_components=2, least-squares at num_components>=3);
+        # fall back to a fixed N when that estimate is undefined or unphysical (see
+        # PLATE_PENALTY_SCALE comment above).
+        plate_penalty = 0.0
+        if use_plate_penalty:
+            mu_arr = np.array(mus)
+            w_arr = np.array(ws)
+            w_var = np.var(w_arr)
+            N_fallback = np.sqrt(num_plates if num_plates is not None else DEFAULT_NUM_PLATES)
+            if w_var > VERY_SMALL_VALUE:
+                N_star = np.cov(w_arr, mu_arr, bias=True)[0, 1] / w_var
+                N_use = N_star if N_star > 0 else N_fallback
+            else:
+                N_use = N_fallback
+            c_use = np.mean(mu_arr) - N_use * np.mean(w_arr)
+            plate_penalty = np.var(mu_arr - (N_use * w_arr + c_use))
+
+        return (safe_log10(np.sum((ty - y) ** 2))
+                + 0.1 * safe_log10(np.sum((props - proportions)**2))
+                + 0.1 * safe_log10(1 + TAU_PENALTY_SCALE * tau_violation)
+                + 0.1 * safe_log10(1 + PLATE_PENALTY_SCALE * plate_penalty))
 
     if debug:
         scaled_params = initial_params.copy()

@@ -1185,7 +1185,7 @@ class SecSaxsData:
         # Validate kwargs to catch typos early (issue #64)
         _KNOWN_KWARGS = {
             'proportions', 'xr_peakpositions', 'debug',
-            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates',
+            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates', 'use_plate_penalty',
             'allow_negative_peaks',
             'ranks', 'randomize', 'seed', 'global_opt',
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',

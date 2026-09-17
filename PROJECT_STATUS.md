@@ -1,8 +1,8 @@
 # Project Status — molass-library
 
-**Last Updated**: July 6, 2026  
+**Last Updated**: September 17, 2026  
 **Current version**: 0.9.5  
-**Active branch**: `dev/ongoing-work` (all development during JOSS review)
+**Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
 > **Chat session rules**: See [Copilot/copilot-guidelines.md](Copilot/copilot-guidelines.md)  
@@ -11,6 +11,28 @@
 ---
 
 ## 🎯 Current Task
+
+**Issue #264 (proportional EGH decomposition broadness) — opt-in mitigation implemented, issue re-scoped and left open**
+
+**Status**: ✅ This task complete (2026-09-17). Root cause (inflated per-slice moment `std`
+used as sigma bound ceiling) still unaddressed — see issue for the 3 unimplemented
+candidate directions.
+
+**What was done**: `Decompose/Proportional.py` gained (1) always-on `TAU_BOUND_RATIO=0.65`
+(fixes tau/sigma asymmetry, unrelated to #264's broadness) and (2) opt-in
+`use_plate_penalty=False` — Martin-Synge plate-count self-consistency, threaded through
+`QuickImplement.py` and `quick_decomposition(proportions=..., use_plate_penalty=True,
+num_plates=14400)`. Tested on 4 real datasets: helps SAMPLE5 (#264's case: broadness ratio
+~3.9x→2.73x) and EcoCas3, hurts Y17AH20N's 3-component case — kept opt-in, not default.
+Full writeup: comment on [molass-library#264](https://github.com/biosaxs-dev/molass-library/issues/264),
+and `/memories/repo/plate-consistency-penalty-issue-264.md` (molass-researcher machine).
+
+**Next steps**: pick one of #264's original candidate fixes (restrict moment window /
+shared-width bound / weighted moment) to address the root cause directly.
+
+---
+
+## 🎯 Prior Task (superseded/stale — branch reference outdated, may already be resolved)
 
 **AI-friendliness: preserve `_rgcurve` in `copy_with_new_components()` — in progress** (branch `dev/ongoing-work`)
 
