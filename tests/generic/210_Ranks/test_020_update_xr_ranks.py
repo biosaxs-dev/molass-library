@@ -38,6 +38,28 @@ def test_get_xr_matrices_with_ranks():
     # P shape: (n_q, n_components) where n_components=3
     assert P.shape[1] == 3
     assert Pe.shape[1] == 3
-    
-    # n_q from SAMPLE3 XR data
+
+
+def test_update_xr_ranks_invalidates_cached_guinier_state():
+    """update_xr_ranks must reset guinier_objects/bounded_lrf_info/_shape_analysis
+    (molass-library#276) -- otherwise a prior get_guinier_objects() call (under
+    the old ranks) leaves stale Rg values that get_xr_matrices()'s Bounded LRF
+    path would silently reuse as its fit seed instead of recomputing."""
+    ssd3 = SSD(SAMPLE3)
+    d = ssd3.quick_decomposition()
+
+    assert d.num_components == 3
+    d.get_guinier_objects()  # populate caches under the default (all rank-1) state
+    assert d.guinier_objects is not None
+
+    d.update_xr_ranks([2, 1, 1])
+    assert d.guinier_objects is None
+    assert d.bounded_lrf_info is None
+    assert d._shape_analysis is None
+
+    # get_xr_matrices() must recompute guinier_objects fresh, not find a stale
+    # non-None cache and skip past the Bounded LRF seeding step.
+    M, C, P, Pe = d.get_xr_matrices()
+    assert d.guinier_objects is not None
+    assert d.bounded_lrf_info is not None
     assert P.shape[0] == M.shape[0]

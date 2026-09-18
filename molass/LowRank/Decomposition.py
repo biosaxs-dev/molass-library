@@ -682,6 +682,16 @@ class Decomposition:
         Default ranks are one for each component which means that interparticle interactions are not considered.
         This method allows the user to set different ranks for each component.
 
+        Also invalidates ``guinier_objects``, ``bounded_lrf_info``, and any
+        cached shape-analysis result (see :meth:`get_shape_analysis`), since
+        all three are derived from ``get_xr_matrices()``'s output under the
+        *previous* ranks. Without this, a prior call to e.g.
+        ``get_guinier_objects()`` (made under the old ranks) would leave
+        stale, wrong-rank Rg values cached -- and ``get_xr_matrices()``'s
+        Bounded LRF path guards on ``self.guinier_objects is None``, so it
+        would silently reuse that stale state as its fit seed instead of
+        recomputing (molass-library#276).
+
         Parameters
         ----------
         ranks : list of int
@@ -702,6 +712,9 @@ class Decomposition:
                 f"Expected ranks=[r1, r2, ..., r{self.num_components}] where each ri is the rank for component i."
             )
         self.xr_ranks = ranks
+        self.guinier_objects = None
+        self.bounded_lrf_info = None
+        self._shape_analysis = None
 
     def get_xr_matrices(self, debug=False):
         """
