@@ -269,6 +269,101 @@ class Decomposition:
             uv_fractions=uv_frac,
         )
 
+    def get_lrf_residual(self, debug=False):
+        """Relative Frobenius-norm LRF reconstruction residual ``||M - PC|| / ||M||``.
+
+        A cheap, general-purpose decomposition-quality signal, independent of
+        any shape/Kratky diagnostic. Found (molass-researcher experiment 41c)
+        to reliably worsen for objectively bad decompositions (under-fitting/
+        merging real components, or a bad local optimum) even in cases where
+        other per-component diagnostics look unremarkable -- use alongside
+        :meth:`get_shape_analysis`'s ``peak_spread``, not instead of it; the
+        two were found to catch *different* kinds of problems.
+
+        Returns
+        -------
+        float
+
+        Examples
+        --------
+        ::
+
+            residual = decomp.get_lrf_residual()
+            if residual > 0.1:
+                print("Decomposition fit looks questionable -- check num_components/proportions")
+        """
+        M, C, P = self.get_xr_matrices(debug=debug)[0:3]
+        return float(np.linalg.norm(M - P @ C) / np.linalg.norm(M))
+
+    def get_shape_analysis(self, debug=False):
+        """Compute a components x reference-shapes Kratky match-score analysis.
+
+        Classifies each XR component's dimensionless Kratky curve against a
+        small, fixed library of reference shapes (sphere, two ellipsoid
+        eccentricities, two cylinder aspect ratios, a flexible Gaussian
+        chain), returning a heuristic *relative* match score per shape plus a
+        coarse category label -- see :mod:`molass.Kratky.ShapeAnalysis` for
+        the full design rationale and important caveats (these are similarity
+        scores, not validated structural fits, and should be read alongside
+        :meth:`get_lrf_residual`).
+
+        Cached on first call.
+
+        Returns
+        -------
+        molass.Kratky.ShapeAnalysis.ShapeAnalysisResult
+
+        Examples
+        --------
+        ::
+
+            result = decomp.get_shape_analysis()
+            print(result)
+            plot_result = decomp.plot_shape_analysis()
+        """
+        if getattr(self, '_shape_analysis', None) is None:
+            if debug:
+                from importlib import reload
+                import molass.Kratky.ShapeAnalysis
+                reload(molass.Kratky.ShapeAnalysis)
+            from molass.Kratky.ShapeAnalysis import compute_shape_match_scores
+
+            qv = self.xr.qv
+            _, _, P = self.get_xr_matrices(debug=debug)[0:3]
+            sg_list = [c.get_guinier_object() for c in self.get_xr_components()]
+            self._shape_analysis = compute_shape_match_scores(qv, P, sg_list)
+        return self._shape_analysis
+
+    def plot_shape_analysis(self, ax=None, debug=False, **kwargs):
+        """Plot the :meth:`get_shape_analysis` result as a components x shapes heatmap.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+        debug : bool, optional
+        **kwargs
+            Passed to :func:`molass.Kratky.ShapeAnalysis.plot_shape_analysis`.
+
+        Returns
+        -------
+        PlotResult
+
+        Examples
+        --------
+        ::
+
+            plot_result = decomp.plot_shape_analysis()
+            plot_result.fig.show()
+        """
+        if debug:
+            from importlib import reload
+            import molass.Kratky.ShapeAnalysis
+            reload(molass.Kratky.ShapeAnalysis)
+        from molass.Kratky.ShapeAnalysis import plot_shape_analysis as _plot_shape_analysis
+
+        result = self.get_shape_analysis(debug=debug)
+        return _plot_shape_analysis(result, ax=ax, **kwargs)
+
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.
 

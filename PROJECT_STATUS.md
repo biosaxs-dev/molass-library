@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: September 17, 2026  
+**Last Updated**: September 18, 2026  
 **Current version**: 0.9.5  
 **Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
@@ -11,6 +11,38 @@
 ---
 
 ## 🎯 Current Task
+
+**Kratky-plot shape-match diagnostic (`molass/Kratky/`) — new feature, complete**
+
+**Status**: ✅ Complete (2026-09-18).
+
+**What was done**: New `molass/Kratky/` package providing a relative shape-match-score
+heatmap for Kratky-plot analysis, replacing the unreliable `molass-legacy`
+`Kratky_smoothness` score investigated in `molass-researcher/experiments/41_smoothing_kratky_plot/`.
+
+- `FormFactors.py` — Pedersen (1997) form factors only (sphere, ellipsoid, cylinder,
+  Gaussian chain).
+- `ShapeLibrary.py` — single source of truth (`get_model_shapes()`, 6 `ShapeSpec` entries)
+  shared by both scoring and icon rendering, so they can never drift out of column-order
+  sync.
+- `ShapeAnalysis.py` — peak finding (`kratky_peak_qrg`), qualitative classification
+  (`classify_shape_category`), relative match scoring (`compute_shape_match_scores`), and
+  `plot_shape_analysis()` (heatmap + optional column-aligned 3D shape-key row via a shared
+  `n_shapes`-column `GridSpec` with a dedicated colorbar column).
+- `ShapeKey.py` — cached (`lru_cache`), rasterized 3D icon strip (one icon per shape,
+  no per-icon titles — redundant with the heatmap's xticklabels).
+- `Decomposition.get_lrf_residual()`, `get_shape_analysis()`, `plot_shape_analysis()` —
+  new public API, cached per-instance.
+- Tests: `tests/specific/920_Kratky/test_010_ShapeAnalysis.py` (7 tests, all passing).
+- Consumed by `molass-gui`'s new "Shape Analysis…" button (`rigorous_view.py`,
+  `shape_analysis_dialog.py`) — confirmed working by the user against a real
+  analysis folder.
+
+**Next steps**: none pending for this feature.
+
+---
+
+## 🎯 Prior Task
 
 **Issue #264 (proportional EGH decomposition broadness) — opt-in mitigation implemented, issue re-scoped and left open**
 
