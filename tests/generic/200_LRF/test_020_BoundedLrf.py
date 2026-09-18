@@ -110,9 +110,40 @@ def test_040_rank1_unchanged():
     assert len(info) == 0
 
 
+def test_050_bounded_lrf_info_repr_is_concise():
+    """BoundedLrfInfo's repr must summarize (not dump the full bq_* arrays) --
+    dict-style field access must still work unchanged (molass-library#276
+    follow-up)."""
+    from molass.LowRank.BoundedLrf import apply_bounded_lrf
+
+    qv, aq, bq, c1_arr, c2_arr, C_full, P_full, M, E, R = make_synthetic_rank2()
+
+    class MockGuinier:
+        def __init__(self, Rg):
+            self.Rg = Rg
+
+    guinier_objects = [MockGuinier(35)]
+    ranks = [2]
+
+    _, info = apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects)
+    entry = info[0]
+
+    # dict-style access still works exactly as before
+    assert isinstance(entry['K'], float)
+    assert isinstance(entry['bq_coerced'], np.ndarray)
+
+    r = repr(entry)
+    assert r.startswith("BoundedLrfInfo(")
+    assert "K=" in r and "L=" in r and "R=" in r and "Rg=" in r
+    # the raw array values must NOT appear in the repr (only their shape)
+    assert "bq_coerced=<array" in r
+    assert str(entry['bq_coerced'][0]) not in r
+
+
 if __name__ == "__main__":
     test_010_coerce_bounds_clips()
     test_020_conservation()
     test_030_apply_bounded_lrf()
     test_040_rank1_unchanged()
+    test_050_bounded_lrf_info_repr_is_concise()
     print("All tests passed.")

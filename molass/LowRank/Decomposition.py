@@ -692,6 +692,19 @@ class Decomposition:
         would silently reuse that stale state as its fit seed instead of
         recomputing (molass-library#276).
 
+        .. note::
+            This only affects :meth:`get_xr_matrices`/:meth:`get_xr_components`
+            and anything built on them (:meth:`plot_components`,
+            :meth:`plot_shape_analysis`, :meth:`get_shape_analysis`). It has
+            **no effect** on ``optimize_rigorously()``'s live BH/DE search --
+            the rigorous optimizer's own internal engine reconstructs P
+            independently and has no awareness of ranks/Bounded LRF at all.
+            Calling this *before* ``optimize_rigorously()`` only changes the
+            initial seed it's given; calling it on an already-optimized
+            result (e.g. from ``load_analysis_session()``) is a pure post-hoc
+            diagnostic on that result's elution curves, not a change to any
+            optimized parameter.
+
         Parameters
         ----------
         ranks : list of int
@@ -846,6 +859,46 @@ class Decomposition:
             ret_components.append(XrComponent(icurve_array, jcurve_array, ccurve))
 
         return ret_components
+
+    def export_xr_components(self, folder, debug=False):
+        """
+        Write each XR component's scattering curve to ``<folder>/component_{i+1}.dat``.
+
+        Same format/convention as the tutorial's "How to Export" section
+        (``quick_start.ipynb``) and the GUI's "Export Data…" button: a plain
+        ``np.savetxt`` of the ``(q, I, error)`` columns from
+        :meth:`get_xr_components`'s ``get_jcurve_array()``. Reflects whatever
+        ranks are currently set via :meth:`update_xr_ranks` (Bounded LRF
+        corrections included), since it reads from :meth:`get_xr_components`.
+
+        Parameters
+        ----------
+        folder : str
+            Destination folder. Created if it doesn't already exist.
+        debug : bool, optional
+            Passed through to :meth:`get_xr_components`.
+
+        Returns
+        -------
+        paths : list of str
+            The written file paths, one per component, in component order.
+
+        Examples
+        --------
+        ::
+
+            decomp.export_xr_components(r"C:\\path\\to\\export_folder")
+        """
+        import os
+        os.makedirs(folder, exist_ok=True)
+
+        components = self.get_xr_components(debug=debug)
+        paths = []
+        for i, comp in enumerate(components):
+            path = os.path.join(folder, f"component_{i + 1}.dat")
+            np.savetxt(path, comp.get_jcurve_array())
+            paths.append(path)
+        return paths
 
     def get_scattering_profiles(self, debug=False):
         """

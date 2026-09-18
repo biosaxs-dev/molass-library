@@ -15,6 +15,30 @@ from bisect import bisect_right
 from molass.SAXS.Theory.SolidSphere import phi
 
 
+class BoundedLrfInfo(dict):
+    """Per-component Bounded LRF diagnostic info.
+
+    A plain ``dict`` subclass -- every existing usage pattern (``info['K']``,
+    ``.items()``, ``.get()``, iteration, ``k in info``, ...) keeps working
+    exactly as before. The only difference is ``repr()``: printing this
+    (e.g. inspecting ``decomp.bounded_lrf_info`` in a notebook) shows only
+    the scalar fields (K, L, R, Rg) and the *shape* of the array fields
+    (``bq_bounds``, ``bq_original``, ``bq_coerced``), instead of dumping the
+    full arrays -- which can otherwise be hundreds of lines for a single
+    component. Index into the fields directly to get the raw arrays.
+    """
+    _ARRAY_KEYS = ('bq_bounds', 'bq_original', 'bq_coerced')
+
+    def __repr__(self):
+        parts = [f"{k}={self[k]:.4g}" for k in ('K', 'L', 'R', 'Rg') if k in self]
+        for k in self._ARRAY_KEYS:
+            if k in self:
+                v = self[k]
+                shape = v[0].shape if isinstance(v, tuple) else v.shape
+                parts.append(f"{k}=<array {shape}>")
+        return f"BoundedLrfInfo({', '.join(parts)})"
+
+
 def estimate_KL(qv, aq, bq, Rg, c1):
     """
     Estimate the hard-sphere model parameters K and L.
@@ -159,8 +183,13 @@ def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
     P_truncated : ndarray, shape (num_q, num_components)
         Corrected spectral factors (A columns only), ready for downstream use.
     info : dict
-        Keyed by component index; each value is a dict with diagnostic fields
-        K, L, R, Rg, bq_bounds, bq_original, bq_coerced.
+        Keyed by component index; each value is a :class:`BoundedLrfInfo`
+        (a plain ``dict`` subclass -- all existing ``info[k]['K']``-style
+        access keeps working) with fields K, L, R, Rg, bq_bounds,
+        bq_original, bq_coerced. Its ``repr()`` is concise (K/L/R/Rg plus
+        array shapes only) so printing ``decomp.bounded_lrf_info`` for a
+        quick look doesn't dump the full arrays -- index into the fields
+        directly (e.g. ``info[k]['bq_coerced']``) to get the raw data.
     """
     num_components = len(ranks)
     P_out = P_full.copy()
@@ -189,12 +218,12 @@ def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
         P_out[:, k] = aq_corrected
         P_out[:, b_col] = bq_coerced
 
-        info[k] = {
-            'K': K, 'L': L, 'R': R, 'Rg': Rg,
-            'bq_bounds': bq_bounds,
-            'bq_original': bq,
-            'bq_coerced': bq_coerced,
-        }
+        info[k] = BoundedLrfInfo(
+            K=K, L=L, R=R, Rg=Rg,
+            bq_bounds=bq_bounds,
+            bq_original=bq,
+            bq_coerced=bq_coerced,
+        )
 
     P_truncated = P_out[:, :num_components]
     return P_truncated, info
