@@ -1,7 +1,7 @@
 # Project Status — molass-library
 
 **Last Updated**: September 18, 2026  
-**Current version**: 0.9.5  
+**Current version**: 1.1.0  
 **Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
 > **Conventions and architecture**: See [.github/copilot-instructions.md](.github/copilot-instructions.md)  
@@ -11,6 +11,36 @@
 ---
 
 ## 🎯 Current Task
+
+**Issue #276 — `update_xr_ranks()` cache-invalidation bug — fixed**
+
+**Status**: ✅ Complete (2026-09-18).
+
+**What was done**: Found while doing interactive rank-2 (Bounded LRF /
+interparticle-effect) diagnostics on a real dataset in
+`molass-researcher/experiments/42_analysis027_component4_rank2/42a_component4_guinier_check.ipynb`.
+`Decomposition.update_xr_ranks()` only set `self.xr_ranks`; it never reset
+`self.guinier_objects` / `self.bounded_lrf_info` / `self._shape_analysis`. Both
+`get_guinier_objects()` and `get_xr_matrices()`'s Bounded LRF path guard on
+`self.guinier_objects is None`, so calling `get_guinier_objects()` (an
+innocuous, commonly-used accessor) *before* `update_xr_ranks()` silently left
+stale, wrong-rank Rg values as the Bounded LRF fit seed — reproduced
+concretely: two call orders on the same analysis-027 restore gave different
+fitted `K`/`L`/`R` and provably different corrected `P` columns
+(`np.allclose` → `False`), with no error or warning either way.
+
+**Fix**: `update_xr_ranks()` now resets `self.guinier_objects = None`,
+`self.bounded_lrf_info = None`, and `self._shape_analysis = None` whenever
+ranks are set. Regression test added
+(`tests/generic/210_Ranks/test_020_update_xr_ranks.py::test_update_xr_ranks_invalidates_cached_guinier_state`).
+Verified: both call orders now produce identical `bounded_lrf_info` and
+identical corrected `P` columns. Commit `f017c47`, issue closed.
+
+**Next steps**: none pending.
+
+---
+
+## 🎯 Prior Task
 
 **Kratky-plot shape-match diagnostic (`molass/Kratky/`) — new feature, complete**
 
