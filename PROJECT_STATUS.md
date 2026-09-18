@@ -36,6 +36,21 @@ ranks are set. Regression test added
 Verified: both call orders now produce identical `bounded_lrf_info` and
 identical corrected `P` columns. Commit `f017c47`, issue closed.
 
+**Follow-up (issue #277, same session)**: three smaller AI-friendliness items
+found while fixing #276, all fixed together:
+- `BoundedLrfInfo(dict)` subclass — concise `repr()` (K/L/R/Rg + array shapes
+  only) instead of dumping the full `bq_bounds`/`bq_original`/`bq_coerced`
+  arrays; fully backward-compatible (`info[k]['K']`, `.items()`, etc. unchanged).
+- `update_xr_ranks()` docstring now states explicitly that it has no effect
+  on `optimize_rigorously()`'s live search (rank/Bounded-LRF-blind internal
+  engine — only the initial seed benefits).
+- New `Decomposition.export_xr_components(folder)` — `molass_gui`'s
+  `export_component_data()` now delegates to it instead of duplicating the
+  `np.savetxt` loop.
+
+Commits `10532e1` (molass-library), `8626b02` (molass-gui). 4 new tests, all
+passing. Issue closed.
+
 **Next steps**: none pending.
 
 ---
