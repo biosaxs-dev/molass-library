@@ -7,6 +7,16 @@ get_ready_for_numba()
 from pybaselines import Baseline2D as _Baseline2D
 from importlib import reload
 
+def _update_params(func, params, data, **kwargs):
+    """
+    Local copy of pybaselines.two_d.optimizers._update_params (private API,
+    removed in pybaselines>=1.3.0). See molass-library issue #278.
+    """
+    baseline, baseline_params = func(data, **kwargs)
+    for key, val in baseline_params.items():
+        params[key].append(val)
+    return baseline
+
 def individual_axes_impl(self, data, axes, method, method_kwargs, baseline_func):
     """
     Implementation of the LPM baseline fitting for 2D data
@@ -41,18 +51,17 @@ def individual_axes_impl(self, data, axes, method, method_kwargs, baseline_func)
 
     from collections import defaultdict
     from functools import partial
-    from pybaselines.two_d.optimizers import _check_scalar, _update_params
 
     assert method in ['linear', 'uvdiff', 'integral', 'buffit']
 
-    axes, scalar_axes = _check_scalar(axes, 2, fill_scalar=False, dtype=int)
-    if scalar_axes:
-        axes = [axes]
-        num_axes = 1
-    else:
+    # local replacement for pybaselines.two_d.optimizers._check_scalar (private API, see issue #278)
+    axes = np.atleast_1d(axes).astype(int)
+    num_axes = len(axes)
+    if num_axes == 2:
         if axes[0] == axes[1]:
             raise ValueError('Fitting the same axis twice is not allowed')
-        num_axes = 2
+    elif num_axes > 2:
+        raise ValueError('Fitting more than two axes is not allowed')
     if (
         method_kwargs is None
         or (not isinstance(method_kwargs, dict) and len(method_kwargs) == 0)
