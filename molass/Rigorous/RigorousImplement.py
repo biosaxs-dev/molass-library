@@ -623,6 +623,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
 
         # Drop a breadcrumb so external observers can find this run even
         # while the kernel is busy.  See molass/Rigorous/RunRegistry.py.
+        # 'phase' is a finer-grained, purely diagnostic complement to
+        # 'status' (starting/running/completed/failed) -- narrows down where
+        # a mid-setup crash happened without needing live print-tracing.
         try:
             from molass.Rigorous.RunRegistry import write_run_manifest
             write_run_manifest(
@@ -634,6 +637,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
                 monitor=monitor,
                 analysis_folder=analysis_folder,
                 status="starting",
+                phase="folders_prepared",
             )
         except Exception:
             pass
@@ -666,6 +670,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         if function_code is None:
             from .FunctionCodeUtils import detect_function_code
             function_code = detect_function_code(decomposition)
+
+        try:
+            from molass.Rigorous.RunRegistry import update_run_manifest
+            update_run_manifest(analysis_folder, phase="constructing_optimizer")
+        except Exception:
+            pass
 
         optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, function_code=function_code, debug=debug)
         optimizer.set_xr_only(not data_ssd.has_uv())
@@ -718,6 +728,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             # BH already gets from x0 alone. See SolverDE.minimize() / molass-library#259.
             optimizer._de_use_tight_init = True
         optimizer.prepare_for_optimization(init_params)
+
+        try:
+            from molass.Rigorous.RunRegistry import update_run_manifest
+            update_run_manifest(analysis_folder, phase="optimizer_ready")
+        except Exception:
+            pass
 
         # Inject pluggable constraint hooks (e.g. LumpingConstraint).
         # Constraints survive module reloads because _constraints is an
