@@ -20,6 +20,22 @@ import numpy as np
 from importlib import reload
 
 
+def _debug_print(msg):
+    """Print *msg* straight to the real stderr, bypassing this module's own
+    stdout/stderr suppression.
+
+    ``make_rigorous_decomposition_impl()``'s ``with _stack:`` block redirects
+    ``sys.stdout``/``sys.stderr`` to an ``io.StringIO()`` whenever ``debug`` is
+    falsy (the default) -- any ``print(..., flush=True)`` placed inside that
+    block, or in code it calls (``prepare_rigorous_folders``, ``BackRunner``,
+    etc.), is silently swallowed: no error, no output, easy to mistake for
+    "execution stopped here" when it didn't. Use this helper instead of
+    ``print()`` for any temporary diagnostic in or downstream of that scope.
+    """
+    import sys
+    print(msg, file=sys.__stderr__, flush=True)
+
+
 def _has_ipython_display():
     """Return True when running inside a Jupyter/IPython kernel (has ipywidgets
     display support), False in a plain script or terminal.
@@ -582,6 +598,10 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # are not actionable for the caller.
     # Note: always suppresses (not gated by quiet option) because the noise
     # from the rigorous pipeline is never useful in normal operation.
+    # If you need a temporary diagnostic print anywhere in or below this
+    # block, use _debug_print() (module-level, above) -- plain print() is
+    # silently swallowed here, in prepare_rigorous_folders(), and in
+    # BackRunner.run(), which all run inside/after this suppression.
     import io, warnings as _warnings
     from contextlib import redirect_stdout, redirect_stderr, ExitStack
 
