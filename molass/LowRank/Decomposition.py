@@ -131,6 +131,12 @@ class Decomposition:
         # Used by optimize_rigorously(method='DE') in RigorousImplement.py.
         new_decomp._source_decomp = self
 
+        # xr_ranks is a per-component choice, not a per-model one -- carry it
+        # across upgrade() the same way _rgcurve is carried (component count
+        # is unchanged by upgrade(), so the length always still matches).
+        if self.xr_ranks is not None:
+            new_decomp.xr_ranks = self.xr_ranks
+
         return new_decomp
 
     @property

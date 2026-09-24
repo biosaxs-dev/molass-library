@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: September 18, 2026  
+**Last Updated**: September 24, 2026  
 **Current version**: 1.1.0  
 **Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
@@ -11,6 +11,41 @@
 ---
 
 ## 🎯 Current Task
+
+**xr_ranks propagation through the GUI pipeline (molass-gui rank-2 support) — complete**
+
+**Status**: ✅ Complete (2026-09-24).
+
+**What was done**: `Decomposition.update_xr_ranks()` (rank-2/Bounded LRF, issue #276
+above) was previously only usable ad hoc, post-hoc on an already-loaded rigorous
+result — setting it earlier in the pipeline (quick/upgraded decomposition) never
+survived to a later reload. Three small propagation fixes, so a rank choice made
+once in molass-gui's QuickView carries through automatically:
+- `Decomposition.copy_with_new_components()` (used by `upgrade()`) now forwards
+  `xr_ranks` the same way it already forwards `_rgcurve`.
+- `CurrentStateUtils.load_rigorous_result()` gained an explicit `xr_ranks=` override
+  param; falls back to `decomp.xr_ranks` when not given, so a value already on the
+  passed-in `decomp` carries through to the freshly-reconstructed result.
+- `RecipeRunner.rebuild_decomposition_from_recipe()` applies `recipe['xr_ranks']`
+  if present, so it survives a restart/"Open Existing Analysis" reload too.
+
+molass-gui side (separate repo, same session): QuickView gained an optional "Ranks"
+entry + Apply button (blank by default, never touches `xr_ranks` unless used);
+RigorousView gained a "Set Ranks…" override dialog for the post-hoc/discovery-driven
+case (matches the original notebook workflow); both propagate into
+`pipeline_recipe['xr_ranks']`/`recipe.json` and into exported notebooks.
+
+**Unrelated but found+fixed in the same session**: a real `Tcl_AsyncDelete` crash in
+molass-gui, root-caused to `plt.close()` alone not guaranteeing Tk teardown happens
+on the main thread (reference cycles + deferred GC) — fixed with `gc.collect()`
+right after, same pattern as molass-legacy's `OurTkinter.py::Dialog.destroy()`. See
+[biosaxs-dev/molass-gui#4](https://github.com/biosaxs-dev/molass-gui/issues/4).
+
+**Next steps**: none pending.
+
+---
+
+## 🎯 Prior Task
 
 **Issue #276 — `update_xr_ranks()` cache-invalidation bug — fixed**
 

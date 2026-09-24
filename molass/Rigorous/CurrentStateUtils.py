@@ -148,7 +148,7 @@ def construct_decomposition_from_results(run_info, **kwargs):
     return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
 
 
-def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debug=False):
+def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_ranks=None, debug=False):
     """Load a rigorous optimization result from disk without launching a subprocess.
 
     This is the static result viewer: it reads the saved parameter vector from
@@ -171,6 +171,12 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
     rgcurve : RgCurve, optional
         Pre-computed Rg curve.  When provided, skips the expensive per-frame
         Guinier fitting that ``ssd.xr.compute_rgcurve()`` would perform.
+    xr_ranks : list of int, optional
+        Explicit per-component rank override for the returned result (see
+        :meth:`Decomposition.update_xr_ranks`). When ``None`` (the default),
+        falls back to ``decomp.xr_ranks`` if that was already set -- so a
+        rank choice made earlier in the pipeline (quick/upgraded decomposition)
+        carries through automatically without callers having to repeat it.
     debug : bool, optional
         If True, reload modules from disk.
 
@@ -298,8 +304,12 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, debu
     # compute_reconstructed_rgcurve() matches MplMonitor.
     optimizer_rgs = np.asarray(separated_params[2], dtype=float)
 
-    return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
-                         optimizer_rgs=optimizer_rgs)
+    result = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
+                           optimizer_rgs=optimizer_rgs)
+    ranks = xr_ranks if xr_ranks is not None else getattr(decomp, 'xr_ranks', None)
+    if ranks is not None:
+        result.update_xr_ranks(list(ranks))
+    return result
 
 
 def load_analysis_session(analysis_folder, jobid=None, debug=False):

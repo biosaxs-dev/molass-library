@@ -73,6 +73,10 @@ def rebuild_decomposition_from_recipe(analysis_folder):
                 upgrade_kwargs['model_params'] = {'ln_pore_sigma': ln_pore_sigma}
         decomp = decomp.upgrade(model=model, **upgrade_kwargs)
 
+    xr_ranks = recipe.get('xr_ranks')
+    if xr_ranks is not None:
+        decomp.update_xr_ranks(xr_ranks)
+
     return ssd, trimmed, decomp, recipe
 
 
