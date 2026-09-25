@@ -1102,7 +1102,7 @@ class SecSaxsData:
         return self.quick_decomposition(**opts)
 
     def quick_decomposition(self, num_components=None, ranks=None, **kwargs):
-        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, use_plate_penalty=False, **kwargs)
+        """ssd.quick_decomposition(num_components=None, proportions=None, xr_peakpositions=None, ranks=None, num_plates=None, **kwargs)
 
         Performs a quick decomposition of the SEC-SAXS data.
 
@@ -1151,18 +1151,12 @@ class SecSaxsData:
             Specifies the ranks to be used for XR data.
 
         num_plates : int, optional
-            Fallback plate count for the plate-count self-consistency penalty
-            (see ``use_plate_penalty``); ignored unless ``use_plate_penalty=True``.
-            Applies only to the ``proportions`` path. Default 14400.
-
-        use_plate_penalty : bool, optional
-            If True, adds a Martin-Synge plate-count self-consistency penalty
-            to the ``proportions`` (proportional) decomposition path. Helps some
-            datasets (more components, more even proportions) but can hurt others
-            (e.g. cases with inherently less stable per-component Rg estimation) --
-            not safe as an always-on default, so opt-in. Ignored (no effect, no
-            warning) when ``xr_peakpositions`` is used instead of ``proportions``.
-            Default False.
+            Fallback plate count used to seed the Martin-Synge plate-theory
+            estimation (shared injection time and plate count, from which each
+            component's Gaussian width is derived -- see
+            ``molass.SEC.Models.MartinSynge``) when self-estimation from the
+            component-wise (tR, sigma) pairs is degenerate. Applies only to the
+            ``proportions`` path. Default 14400.
 
         tau_limit : float, optional
             Maximum allowed ratio ``|tau| / sigma`` for positioned decomposition.
@@ -1196,7 +1190,7 @@ class SecSaxsData:
         # Validate kwargs to catch typos early (issue #64)
         _KNOWN_KWARGS = {
             'proportions', 'xr_peakpositions', 'debug',
-            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates', 'use_plate_penalty',
+            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates',
             'allow_negative_peaks',
             'ranks', 'randomize', 'seed', 'global_opt',
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',

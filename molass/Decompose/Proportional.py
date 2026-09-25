@@ -5,27 +5,40 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 from molass.Stats.Moment import Moment
 from molass.SEC.Models.Simple import egh
+from molass.SEC.Models.MartinSynge import compute_sigma, tI_bounds, N_LOWER_BOUND, N_UPPER_BOUND
 from scipy.optimize import minimize
 
 VERY_SMALL_VALUE = 1e-10
-TAU_RATIO_LIMIT = 0.5
 TAU_PENALTY_SCALE = 1e5
 SIGNAL_THRESHOLD_RATIO = 0.2
 MIN_SIGNAL_POINTS = 5
 # mirrors molass_legacy.ObjectiveFunctions.G0346's TAU_BOUND_RATIO setting (default 0.65):
 # |tau| <= sigma*TAU_BOUND_RATIO. Kept as a local constant so this module stays legacy-free.
 TAU_BOUND_RATIO = 0.65
-# Martin-Synge plate theory self-consistency: mu_i = N*w_i - tI, w_i=sqrt(sigma_i**2+tau_i**2).
-# N is self-estimated per-evaluation (exact solve at num_components=2, least-squares OLS at
-# num_components>=3), clamped >=0 (width shouldn't shrink as retention grows). Self-estimation
-# is a free rider when it succeeds -- the residual is always ~0 at num_components=2, and only
-# mildly informative just above -- so it never distorts a dataset whose components are already
-# mutually consistent under SOME plate count. Only when self-estimation fails (near-identical
-# widths -> N undefined, or a negative width/retention correlation -> N clamped to 0) does it
-# fall back to a fixed N=sqrt(num_plates), which is a genuine constant and yields a real,
-# non-degenerate penalty (see molass-researcher 40_initial_penalties math discussion).
-PLATE_PENALTY_SCALE = 1.0
-DEFAULT_NUM_PLATES = 14400
+# components must stay in elution order; mirrors LowRank.CurveDecomposer's mean_order_penalty.
+MEAN_ORDER_PENALTY_SCALE = 1e5
+# the order penalty alone only forbids crossing (a negative gap) -- it does NOT forbid two
+# components converging to the exact same tR (a zero gap), which is a real, observed
+# failure mode (component collapse, confirmed empirically 2026-09-25: Y17AH20N
+# proportions=[6,2,1,1] converges two of its four components to identical params). This
+# ratio sets a required minimum gap, relative to the smallest gap already present in the
+# Stage-1 naive slice means (so it doesn't force separation wider than the slicing itself
+# suggests, but does forbid full collapse).
+MIN_SEPARATION_RATIO = 0.3
+# hard floor on the Martin-Synge-derived sigma, in units of frame spacing: no real
+# chromatographic peak is sub-multi-frame narrow. Without this, nothing stops sigma from
+# collapsing toward zero (with tau compensating) once tR drifts close to tI -- confirmed
+# empirically in molass-researcher/experiments/43_martin_synge_constraint (2026-09-25).
+SIGMA_MIN_PENALTY_SCALE = 1e5
+SIGMA_MIN_FRAMES = 3.0
+# Stage 2 tries a full fit from each of these plate-count candidates and keeps whichever
+# gives the lowest objective, rather than a single Nelder-Mead run from one seed. A single
+# run (with or without log-N reparameterization or basinhopping restarts) was repeatedly
+# unable to reliably escape a bad-scale local optimum -- confirmed empirically the good,
+# low-residual solution scores far lower on the SAME objective, so this is a search
+# failure, not a formulation problem (molass-researcher/experiments/43_martin_synge_constraint,
+# 2026-09-25). Costs ~5-10x one Nelder-Mead run (still ~1-2s per candidate).
+DEFAULT_N_CANDIDATES = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
 def safe_log10(x):
     """Compute the base-10 logarithm of x, ensuring numerical stability.
@@ -90,44 +103,35 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     xslices.append(slice(start, stop))
     return xslices
 
-def estimate_initial_params(x, y, moment, allow_negative=False):
+def moment_match_initial_params(y, moment, allow_negative=False):
     """
-    Estimate initial parameters for the egh function based on the given data and moment.
+    Set the initial EGH parameters to exactly match a slice's own (mean, std) moments --
+    mu=mean, sigma=std, tau=0 (no skew moment is available to solve for tau, so it starts
+    at 0, established here before Martin-Synge or any joint fit touches it). A direct
+    assignment, not an optimization: replaces the previous per-slice Nelder-Mead sub-fit,
+    which could hand the joint fit an already-inconsistent nonzero tau as its seed.
 
     Parameters
     ----------
-    x : array-like
-        The x values of the data.
     y : array-like
-        The y values of the data.
+        The y values of the slice (signal-restricted).
     moment : Moment
-        The moment object containing statistical information about the data.
+        The moment object containing statistical information about the slice.
     allow_negative : bool, optional
-        If True, allow negative peak heights. Default is False.
+        If True, allow a negative peak height when the slice's extremum is negative.
+        Default is False.
 
     Returns
     -------
     params : array-like
-        The estimated parameters for the egh function: (height, mean, std, tau).
+        The initial parameters for the egh function: (height, mean, std, tau=0).
     """
     mean, std = moment.get_meanstd()
-
-    def objective(params):
-        cy = egh(x, *params)
-        return (np.log10(np.sum((cy - y) ** 2))
-                + np.log10(max(VERY_SMALL_VALUE, TAU_PENALTY_SCALE* min(0, TAU_RATIO_LIMIT - abs(params[3]/params[2]))**2))
-                )
-
-    # Minimize the objective function
-    h = np.max(y)
-    initial_params = h, mean, std, 0.0
-    max_std = 2 * std
     if allow_negative:
-        bounds = [(-2*abs(h), 2*abs(h)), (mean-std, mean+std), (0, max_std), (-std, +std)]
+        h = y[np.argmax(np.abs(y))]
     else:
-        bounds = [(0, 2*h), (mean-std, mean+std), (0, max_std), (-std, +std)]
-    result = minimize(objective, x0=initial_params, method='Nelder-Mead', bounds=bounds)
-    return result.x
+        h = np.max(y)
+    return np.array([h, mean, std, 0.0])
 
 def restrict_to_signal(x, y, amp_ref, threshold_ratio=SIGNAL_THRESHOLD_RATIO, min_points=MIN_SIGNAL_POINTS):
     """
@@ -190,10 +194,15 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, use_plate_penalty=False, num_plates=None):
+def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, num_plates=None):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
+
+    Sigma (Gaussian width) is not fit independently per component -- it is derived from
+    a shared injection time and plate count via Martin-Synge plate theory (see
+    molass.SEC.Models.MartinSynge): sigma_i = (tR_i - tI) / sqrt(N). This is why the
+    later-eluting component cannot be narrower than the theory allows (molass-library#264).
 
     Parameters
     ----------
@@ -204,25 +213,20 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
     debug : bool, optional
         If True, enable debug mode to visualize the decomposition process.
         Default is False.
-    use_plate_penalty : bool, optional
-        If True, add a Martin-Synge plate-count self-consistency penalty (see
-        PLATE_PENALTY_SCALE comment below). Verified to help some datasets (e.g. more
-        even proportions across many components) but hurt others (e.g. Y17's 3-component
-        case, where per-component Rg estimation is inherently less stable) -- not safe as
-        an always-on default, so opt-in. Default is False.
     num_plates : int, optional
-        Fallback plate count used only when self-estimating N fails (near-identical
-        component widths, or a negative width/retention correlation). See
-        DEFAULT_NUM_PLATES / the plate_penalty comment in this module for details.
-        Default is None (uses DEFAULT_NUM_PLATES=14400). Ignored if use_plate_penalty=False.
+        Extra plate-count candidate added to Stage 2's grid search (see
+        DEFAULT_N_CANDIDATES), in case a known/expected value isn't already spanned by
+        the default grid. Default is None (uses DEFAULT_N_CANDIDATES only).
 
     Returns
     -------
     result : OptimizeResult
-        The result of the optimization containing the optimized parameters.            
+        The result of the optimization containing the optimized (H, tR, sigma, tau)
+        parameters per component (sigma reconstructed from the fitted tI, N).
     """
 
     x, y = icurve.get_xy()
+    dx = float(np.median(np.diff(x)))
 
     if debug:
         import matplotlib.pyplot as plt
@@ -237,62 +241,52 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
     amp_ref = np.max(np.abs(y))
     signal_xy = [restrict_to_signal(x[s], y[s], amp_ref) for s in xslices]
     moments = [Moment(xr, yr) for xr, yr in signal_xy]
-    initial_params = np.array([estimate_initial_params(xr, yr, m, allow_negative=allow_negative_peaks) for (xr, yr), m in zip(signal_xy, moments)])
-    initial_params[:,0] *= 0.8
+    initial_params = np.array([moment_match_initial_params(yr, m, allow_negative=allow_negative_peaks) for (xr, yr), m in zip(signal_xy, moments)])
 
     if debug:
         debug_plot(ax1, x, xslices, initial_params)
 
     num_components = len(proportions)
-    shape = (num_components, 4)
+    method = 'Nelder-Mead'
+    # Stage-1 slices are contiguous and non-overlapping, so their naive means are already
+    # strictly increasing -- their smallest gap sets the minimum-separation floor below.
+    min_separation = MIN_SEPARATION_RATIO * np.min(np.diff(initial_params[:,1])) if num_components > 1 else 0.0
 
-    def scale_objective(scales, debug_ax=None):
-        cy_list = []
-        for k, h in enumerate(scales):
-            params = initial_params[k].copy()
-            params[0] = h
-            cy = egh(x, *params)
-            cy_list.append(cy)
-        ty = np.sum(cy_list, axis=0)
-        if debug_ax is not None:
-            debug_ax.plot(x, ty, linestyle=':', color='red')
-        return np.sum((ty - y) ** 2)
-
-    bounds = []
-    scale_bounds = []
+    # shared plate-theory parameters come first (tI, N), followed by each component's
+    # own (H, tR, tau); sigma is never a free parameter -- see module docstring.
+    tI_lo, tI_hi = tI_bounds(initial_params[:,1])
+    bounds = [(tI_lo, tI_hi), (N_LOWER_BOUND, N_UPPER_BOUND)]
     for i in range(num_components):
         if allow_negative_peaks:
             h_abs = abs(initial_params[i, 0])
             bounds.append((-2*h_abs, 2*h_abs))
-            scale_bounds.append((-2*h_abs, 2*h_abs))
         else:
             bounds.append((0, 2*initial_params[i, 0]))
-            scale_bounds.append((0, 2*initial_params[i, 0]))
-        moment = moments[i]
-        mean, std = moment.get_meanstd()
+        mean, std = moments[i].get_meanstd()
         bounds.append((mean-std, mean+std))
-        bounds.append((0, 2*std))
         bounds.append((-std, +std))
 
-    method = 'Nelder-Mead'
-    result1 = minimize(scale_objective, x0=initial_params[:,0], method=method, bounds=scale_bounds)
-
     def total_objective(params_all, debug_ax=None, return_props=False):
+        tI, N = params_all[0], params_all[1]
         cy_list = []
         areas = []
         tau_violation = 0.0
-        mus = []
-        ws = []
-        for params in params_all.reshape(shape):
-            m, s, t = params[1:4]
-            cy = egh(x, *params)
+        sigma_min_violation = 0.0
+        tR_list = []
+        sigma_min = SIGMA_MIN_FRAMES * dx
+        for h, tR, t in params_all[2:].reshape(num_components, 3):
+            s_raw = compute_sigma(tR, tI, N)
+            s = max(s_raw, VERY_SMALL_VALUE)
+            # penalize (not silently clip) sigma collapsing toward zero -- see
+            # SIGMA_MIN_PENALTY_SCALE comment above
+            sigma_min_violation += max(0, sigma_min - s_raw) ** 2
+            cy = egh(x, h, tR, s, t)
             cy_list.append(cy)
             areas.append(np.sum(cy))
-            # keep the joint fit's own tau consistent with its own sigma, not just the
-            # initial slice's std (see molass-library#264 / the tau bound box below)
+            # keep tau a bounded modification of the plate-derived sigma, not
+            # a co-equal width parameter (see molass-library#264 discussion)
             tau_violation += max(0, abs(t) - TAU_BOUND_RATIO * s) ** 2
-            mus.append(m)
-            ws.append(np.hypot(s, t))
+            tR_list.append(tR)
         ty = np.sum(cy_list, axis=0)
         props = np.array(areas)/np.sum(areas)
         if return_props:
@@ -300,38 +294,43 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
         if debug_ax is not None:
             debug_ax.plot(x, ty, color='red', alpha=0.3)
 
-        # shared-plate-count self-consistency (opt-in, see use_plate_penalty docstring):
-        # self-estimate N (exact at num_components=2, least-squares at num_components>=3);
-        # fall back to a fixed N when that estimate is undefined or unphysical (see
-        # PLATE_PENALTY_SCALE comment above).
-        plate_penalty = 0.0
-        if use_plate_penalty:
-            mu_arr = np.array(mus)
-            w_arr = np.array(ws)
-            w_var = np.var(w_arr)
-            N_fallback = np.sqrt(num_plates if num_plates is not None else DEFAULT_NUM_PLATES)
-            if w_var > VERY_SMALL_VALUE:
-                N_star = np.cov(w_arr, mu_arr, bias=True)[0, 1] / w_var
-                N_use = N_star if N_star > 0 else N_fallback
-            else:
-                N_use = N_fallback
-            c_use = np.mean(mu_arr) - N_use * np.mean(w_arr)
-            plate_penalty = np.var(mu_arr - (N_use * w_arr + c_use))
+        # components must stay in elution order AND meaningfully separated -- nothing else
+        # enforces either (see MIN_SEPARATION_RATIO comment above)
+        gaps = np.diff(tR_list) if num_components > 1 else np.array([])
+        mean_order_penalty = np.sum(np.maximum(0, min_separation - gaps) ** 2)
 
         return (safe_log10(np.sum((ty - y) ** 2))
                 + 0.1 * safe_log10(np.sum((props - proportions)**2))
-                + 0.1 * safe_log10(1 + TAU_PENALTY_SCALE * tau_violation)
-                + 0.1 * safe_log10(1 + PLATE_PENALTY_SCALE * plate_penalty))
+                + 0.1 * safe_log10(1 + MEAN_ORDER_PENALTY_SCALE * mean_order_penalty)
+                + 0.1 * safe_log10(1 + SIGMA_MIN_PENALTY_SCALE * sigma_min_violation)
+                + 0.1 * safe_log10(1 + TAU_PENALTY_SCALE * tau_violation))
+
+    # grid search over candidate plate counts -- see DEFAULT_N_CANDIDATES comment above
+    # for why a single Nelder-Mead run from one seed is not reliable enough here.
+    N_candidates = DEFAULT_N_CANDIDATES if num_plates is None else sorted(set(DEFAULT_N_CANDIDATES) | {num_plates})
+    best_fun, result2 = None, None
+    for N_cand in N_candidates:
+        sqrtN_cand = np.sqrt(N_cand)
+        tI_cand = np.mean(initial_params[:,1] - sqrtN_cand*initial_params[:,2])
+        tI_cand = min(max(tI_cand, tI_lo), tI_hi)
+        x0_cand = np.concatenate([[tI_cand, float(N_cand)], initial_params[:, [0, 1, 3]].flatten()])
+        result_cand = minimize(total_objective, x0=x0_cand, method=method, bounds=bounds)
+        if best_fun is None or result_cand.fun < best_fun:
+            best_fun, result2 = result_cand.fun, result_cand
 
     if debug:
-        scaled_params = initial_params.copy()
-        scaled_params[:, 0] = result1.x
-        total_objective(scaled_params.flatten(), debug_ax=ax1)
-        props = total_objective(scaled_params.flatten(), return_props=True)
-        print(props)
-
-    result2 = minimize(total_objective, x0=initial_params.flatten(), method=method, bounds=bounds)
-    if debug:
+        total_objective(result2.x, debug_ax=ax1)
         props = total_objective(result2.x, return_props=True)
         print(props)
+
+    # reconstruct the classic (H, tR, sigma, tau)-per-component flat layout that callers
+    # (e.g. LowRank.QuickImplement) expect -- sigma is derived from the fitted tI, N.
+    tI_final, N_final = result2.x[0], result2.x[1]
+    comp_final = result2.x[2:].reshape(num_components, 3)
+    classic_params = np.empty((num_components, 4))
+    classic_params[:, 0] = comp_final[:, 0]
+    classic_params[:, 1] = comp_final[:, 1]
+    classic_params[:, 2] = compute_sigma(comp_final[:, 1], tI_final, N_final)
+    classic_params[:, 3] = comp_final[:, 2]
+    result2.x = classic_params.flatten()
     return result2

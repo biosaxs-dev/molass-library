@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: September 24, 2026  
+**Last Updated**: September 25, 2026  
 **Current version**: 1.1.0  
 **Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
@@ -12,7 +12,124 @@
 
 ## 🎯 Current Task
 
+**Issue #264 — Martin-Synge EGH seeding — root cause actually fixed (after a false start)**
+
+**Status**: ✅ `Decompose/Proportional.py` complete and validated (2026-09-25).
+`LowRank/CurveDecomposer.py`'s default (non-proportional) path deliberately deferred as a
+separate follow-up (see below) -- it changes the numeric output of the most-used
+`quick_decomposition()` call with no arguments at all, so it needs its own review pass.
+
+**Important correction**: the first version of this fix (hard `(tI, N)` reparameterization
+alone, posted to #264 and closed same-day) was validated only against SAMPLE5 and was
+**broken for other datasets** -- SAMPLE1 fit its data at only 9% (SSE/energy=0.91,
+near-delta-function sigma with tau compensating), discovered only when asked to plot the
+fitted curve against the raw data rather than just checking the broadness ratio. A/B
+confirmed via `git stash` that this was a real regression, not pre-existing. Two follow-up
+attempts (rescaling the free parameter to `sqrt(N)`; freezing `(tI, N)` outright) each fixed
+one dataset while breaking another (SAMPLE5 collapsed to duplicate components; Y17AH20N
+stayed broken either way) -- see
+`molass-researcher/experiments/43_martin_synge_constraint/43a_param_extraction.ipynb` for
+the full trail. **Lesson for future sessions on this file**: always check absolute fit
+quality (fitted-sum vs. raw data, e.g. SSE/signal-energy) against multiple real datasets,
+not just one dataset's broadness ratio, before considering any change here validated.
+
+**Final design** (two-stage, all issues resolved):
+1. **Stage 1 -- exact moment match, no optimization.** Each proportional slice's own
+   `(mean, std)` (from `Moment`) is used directly as the EGH seed: `mu=mean`, `sigma=std`,
+   `tau=0` (no skew moment available, so tau starts at 0 rather than from a per-slice
+   Nelder-Mead sub-fit that could hand Stage 2 an already-inconsistent tau). Replaces the
+   old `estimate_initial_params()` (removed) with `moment_match_initial_params()`.
+2. **Stage 2 -- joint fit with hard structural constraints, not soft-only penalties.**
+   Shared `(tI, N)` (Martin-Synge, `molass/SEC/Models/MartinSynge.py`) still jointly fit
+   with per-component `(H, tR, tau)`; `sigma_i = (tR_i - tI)/sqrt(N)` still derived, never
+   independently bounded. Two penalty terms added on top of the existing `TAU_BOUND_RATIO`
+   tau/sigma bound: a `tR`-order penalty (mirrors `LowRank.CurveDecomposer`'s existing
+   `mean_order_penalty`, since nothing else stopped components from crossing elution order),
+   and -- the actual fix for the SAMPLE1/Y17 collapse -- a **hard floor on sigma**
+   (`SIGMA_MIN_FRAMES=3.0` frame-widths; penalized via `SIGMA_MIN_PENALTY_SCALE`, not
+   silently clipped to `VERY_SMALL_VALUE` as before). The silent epsilon-clip was the actual
+   root enabler of the collapse: it let the optimizer treat "shrink sigma to ~0, let tau do
+   all the shape work" as a perfectly legal, sometimes lower-cost solution.
+
+**Result, SSE/signal-energy (fitted sum vs. raw data), validated directly from the library**:
+
+| dataset | before this fix | after |
+|---|---|---|
+| SAMPLE1 | 0.9071 (near-delta-function sigma) | **0.0218** |
+| SAMPLE5 (#264's own case) | 0.0208 | 0.0365 (still excellent) |
+| Y17AH20N | 0.5241 | **0.0144** |
+
+All three now fit well with one consistent design -- no more per-dataset whack-a-mole.
+
+**Tests**: `tests/generic/200_LRF/test_060_proportional_degenerate.py`,
+`tests/tutorial/05-lrf.py` (all 13 ordered tests), `tests/tutorial/10-advanced_models.py`,
+`tests/tutorial/11-rigorous_optimization.py` -- 21/21 pass.
+
+**Design discussion** (full reasoning chain, worth re-reading before touching this area
+again): chat session 2026-09-25, starting from issue #264, converging through Martin-Synge
+first principles (N=(tR/sigma)**2, injection time is unmeasured and must be estimated, plate
+count is a column property so sharing it across components is physically motivated, tau is a
+secondary modification not co-equal with sigma), discovering and root-causing the regression,
+and validating the final two-stage design in
+`molass-researcher/experiments/43_martin_synge_constraint/`.
+
+**Second correction, same day**: the "final" fix above was itself still not robust -- a
+*slightly* different proportions vector on the same Y17AH20N dataset (`[6,2,1.2,0.8]`
+instead of `[6,2,1,1]`) reproduced the exact same collapse (SSE/energy=0.91). Root-caused to
+the ORIGINAL, still-not-fully-fixed #264 diagnosis (cumulative-area slicing gives the
+smallest-proportion component a huge background-dominated slice, inflating its raw moment),
+now poisoning `estimate_tI_N`'s regression into a wrong-scale `N` fallback. Two more attempts
+(capping the outlier std; then also rejecting degenerate regression results) each fixed one
+case while breaking another already-working one -- reverted both. Direct evaluation proved
+the good, low-residual solution scores far lower on the *same* objective (confirmed: this is
+a **search failure**, not a landscape/formulation problem) -- yet neither `sqrt(N)`/`log(N)`
+reparameterization nor `basinhopping` (30-iter multi-start) could reliably reach it; log(N)
+even broke the previously-working `[6,2,1,1]` case outright. What actually worked: a
+**deterministic grid search** over `DEFAULT_N_CANDIDATES = [100, 300, 1000, 3000, 10000,
+30000, 100000]` -- a full Nelder-Mead run from each, keeping the lowest-objective result.
+Fixes all 4 known cases (SAMPLE1 0.0134, SAMPLE5 0.0252, Y17 `[6,2,1,1]` 0.0143, Y17
+`[6,2,1.2,0.8]` 0.0191), ~5-10x cost per call (7 candidates) but **no measurable full-suite
+slowdown** (235s vs 239s before -- rigorous-optimization/NS tests dominate total runtime).
+`estimate_tI_N()` no longer used by `Proportional.py` (dead in this file, still exported by
+`MartinSynge.py`); `num_plates` kwarg now adds an extra grid candidate instead of seeding a
+single regression. Also removed now-fully-dead `scale_objective`/`result1` pre-fit stage
+(confirmed via inspection it never affected the final result even before today, only an
+unused debug preview).
+
+**New, not-yet-investigated finding**: in the `[6,2,1,1]` case, two of the four requested
+components converged to *identical* params (same tR/sigma/H) -- the aggregate curve fit is
+still excellent (SSE/energy=0.0143) since duplicating a component just doubles its density
+at one point, but semantically this is a 3-component decomposition masquerading as 4
+(component collapse). Not new to this fix (a general decomposition risk), not yet
+investigated for this specific case.
+
+**Resolved, same day**: reproduced by the user in a real GUI-exported notebook session, then
+fixed. Root cause: the `tR`-order penalty only forbade *negative* gaps (crossing), not
+*zero* gaps (two components landing on the exact same point) -- `min(0, gap)**2` is 0
+whenever `gap>=0`, so full collapse was never penalized at all. Fix: replaced with a
+per-adjacent-pair **minimum-separation** penalty, `MIN_SEPARATION_RATIO=0.3` times the
+smallest gap already present in Stage 1's naive (contiguous, non-overlapping) slice means --
+adaptive to each dataset's own scale rather than a fixed frame count. Result: collapse
+eliminated (4 distinct components, min gap 38.6) **and fit quality improved** on 2 of 4 known
+cases (Y17 `[6,2,1,1]` SSE/energy 0.0143→0.0064; Y17 `[6,2,1.2,0.8]` 0.0191→0.0123),
+unchanged on the other 2 (SAMPLE1, SAMPLE5). 21/21 tests still pass.
+
+**Next steps**:
+1. Post a further corrected update to #264 with the full journey (two regressions found and
+   fixed after the original closing comment, plus the component-collapse fix) -- the
+   previous "corrected" comment claimed more robustness than it actually had.
+2. Apply the same design to `LowRank/CurveDecomposer.py`'s default (peak-recognition) path,
+   which has the same anti-pattern (separate, weaker, opt-in `num_plates` soft penalty,
+   silent sigma epsilon-clip, no minimum-separation guard) -- larger blast radius (affects
+   every un-parameterized `quick_decomposition()` call), needs its own test-suite pass
+   before changing the default.
+
+---
+
+## 🎯 Prior Task
+
 **xr_ranks propagation through the GUI pipeline (molass-gui rank-2 support) — complete**
+
 
 **Status**: ✅ Complete (2026-09-24).
 
