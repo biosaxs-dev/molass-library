@@ -635,7 +635,11 @@ def parse_rg_history(analysis_folder, optimizer):
         return []
 
     rg_start = optimizer.params_type.get_rg_start_index()
-    n = optimizer.n_components
+    # optimizer.n_components = num_components + 1 (legacy convention: includes
+    # a baseline pseudo-component); every params_type's rg block has exactly
+    # n_components - 1 real per-component entries (see e.g. EghParams/SdmParams/
+    # CedmParams.get_parameter_names -- nc = n_components - 1).
+    n = optimizer.n_components - 1
     columns = [[] for _ in range(n)]
 
     for jobid in sorted(os.listdir(jobs_folder)):
