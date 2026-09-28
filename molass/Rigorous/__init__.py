@@ -11,6 +11,7 @@ from .CurrentStateUtils import (
     check_progress,
     read_convergence_data,
     plot_convergence,
+    try_fast_rg_curve,
 )
 from .ComparePaths import (
     compare_optimization_paths,

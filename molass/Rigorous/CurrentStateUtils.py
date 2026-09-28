@@ -656,6 +656,67 @@ def parse_rg_history(analysis_folder, optimizer):
     return columns
 
 
+def try_fast_rg_curve(decomp, analysis_folder, debug=False):
+    """Cache ``decomp``'s Rg curve from a previous run's ``rg-curve/`` export.
+
+    ``Decomposition.get_rg_curve()`` runs one Guinier fit per elution frame --
+    the heaviest step when restoring a completed rigorous-optimization result
+    (Open Existing Analysis / a restored notebook). But that same per-frame
+    Rg curve was already computed and exported to ``analysis_folder/optimized/
+    rg-curve/`` the first time this analysis ran (see
+    ``LegacyBridgeUtils.prepare_rigorous_folders``), and the legacy subprocess
+    already reloads it from there (``RgCurveProxy``, ~0.01s) instead of
+    recomputing on every job. This does the same reload for library callers:
+    on success, ``decomp._rgcurve`` is populated so both ``decomp.get_rg_curve()``
+    and ``decomp.score()`` (which calls it internally) pick up the cached value
+    for free -- no code at the call site needs to change.
+
+    Parameters
+    ----------
+    decomp : Decomposition
+        The (freshly rebuilt, not-yet-scored) decomposition to cache onto --
+        typically the ``decomp`` returned by ``rebuild_decomposition_from_recipe``.
+    analysis_folder : str
+        Same value passed to ``optimize_rigorously(analysis_folder=...)``.
+    debug : bool, optional
+        If True, reload modules from disk.
+
+    Returns
+    -------
+    bool
+        True if the cached curve was found and loaded (fast path taken).
+        False if no usable export was found -- callers should fall back to
+        ``decomp.get_rg_curve()`` (the slow, always-correct path).
+
+    Examples
+    --------
+    ::
+
+        ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder)
+        if not try_fast_rg_curve(decomp, analysis_folder):
+            decomp.get_rg_curve()  # fall back to the full per-frame Guinier fit
+        score = decomp.score(trimmed_ssd=trimmed)  # picks up the cached curve either way
+    """
+    try:
+        from molass_legacy.RgProcess.RgCurve import check_rg_folder
+        from molass_legacy.RgProcess.RgCurveProxy import RgCurveProxy
+        from molass.Rigorous.LegacyBridgeUtils import _make_elcurve
+        from molass.Guinier.RgCurveUtils import get_connected_curve_info
+        from molass.Guinier.RgCurve import RgCurve
+
+        rg_curve_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "rg-curve")
+        if not check_rg_folder(rg_curve_folder):
+            return False
+
+        xr_curve = _make_elcurve(*decomp.ssd.xr.get_icurve().get_xy())
+        proxy = RgCurveProxy(xr_curve, rg_curve_folder)
+        indeces, _, rgvalues, scores, _ = get_connected_curve_info(proxy)
+        decomp._rgcurve = RgCurve(indeces, rgvalues, scores)
+        return True
+    except Exception:
+        return False
+
+
 def parse_sv_history_per_job(analysis_folder):
     """Parse ``callback.txt`` files and return per-job SV best-so-far trajectories.
 
