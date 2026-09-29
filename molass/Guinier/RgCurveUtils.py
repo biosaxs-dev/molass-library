@@ -10,16 +10,27 @@ from tqdm.auto import tqdm
 
 # Workaround: scipy.stats._axis_nan_policy_wrapper calls inspect.getfullargspec
 # on every linregress call. In Python 3.13 this is very slow. Cache it.
-_orig_getfullargspec = inspect.getfullargspec
-_getfullargspec_cache = {}
+#
+# Guarded with an idempotency marker (_is_molass_cached_wrapper) because this module
+# is reloaded during interactive development (molass.reload_all(), issue #283).
+# Without the guard, importlib.reload() re-executes this file in the SAME module
+# __globals__ dict (not a fresh one) -- so "_orig_getfullargspec = inspect.getfullargspec"
+# captures the ALREADY-patched wrapper as the new "original". Since the old wrapper
+# function object shares that same __globals__ (its name lookups are dynamic, not
+# frozen at definition time), it ends up calling itself once its own captured names
+# are rebound by the reload -- RecursionError, discovered via a real reload_all() run.
+if not getattr(inspect.getfullargspec, '_is_molass_cached_wrapper', False):
+    _orig_getfullargspec = inspect.getfullargspec
+    _getfullargspec_cache = {}
 
-@functools.wraps(_orig_getfullargspec)
-def _cached_getfullargspec(func):
-    if func not in _getfullargspec_cache:
-        _getfullargspec_cache[func] = _orig_getfullargspec(func)
-    return _getfullargspec_cache[func]
+    @functools.wraps(_orig_getfullargspec)
+    def _cached_getfullargspec(func):
+        if func not in _getfullargspec_cache:
+            _getfullargspec_cache[func] = _orig_getfullargspec(func)
+        return _getfullargspec_cache[func]
+    _cached_getfullargspec._is_molass_cached_wrapper = True
 
-inspect.getfullargspec = _cached_getfullargspec
+    inspect.getfullargspec = _cached_getfullargspec
 
 ADD_ALL_RESULTS = True
 

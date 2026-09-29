@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 VERY_SMALL_VALUE = 1e-10
 
-def map_params_to_partner(icurve, mapping, source_params, inverse=False):
+def map_params_to_partner(icurve, mapping, source_params, direction='xr_to_uv'):
     """
     Map classic EGH params (H, tR, sigma, tau) from one curve's frame axis onto
     `icurve`'s frame axis, keeping shape (tR, sigma, tau) fixed under the affine mapping
@@ -32,11 +32,11 @@ def map_params_to_partner(icurve, mapping, source_params, inverse=False):
         slope/intercept affine mapping between XR and UV frame axes.
     source_params : array-like, shape (n, 4)
         Source (H, tR, sigma, tau) params, in the SOURCE curve's frame units.
-    inverse : bool, optional
-        False (default): source is XR, target (`icurve`) is UV --
-        ``tR_uv = slope * tR_xr + intercept``.
-        True: source is UV, target (`icurve`) is XR --
-        ``tR_xr = (tR_uv - intercept) / slope``.
+    direction : {'xr_to_uv', 'uv_to_xr'}, optional
+        'xr_to_uv' (default): source is XR, target (`icurve`) is UV -- uses
+        ``mapping.xr_to_uv()``. 'uv_to_xr': source is UV, target (`icurve`) is XR --
+        uses ``mapping.uv_to_xr()``. Names match the ``MappingInfo`` methods used
+        internally, rather than an unlabeled boolean.
 
     Returns
     -------
@@ -51,8 +51,11 @@ def map_params_to_partner(icurve, mapping, source_params, inverse=False):
     from molass.SEC.Models.Simple import egh
     from molass.Decompose.RatioBounds import compute_ratio_bounds
 
+    if direction not in ('xr_to_uv', 'uv_to_xr'):
+        raise ValueError("direction must be 'xr_to_uv' or 'uv_to_xr', got %r" % (direction,))
+
     source_params = np.asarray(source_params)
-    if inverse:
+    if direction == 'uv_to_xr':
         tR = mapping.uv_to_xr(source_params[:, 1])
         scale_factor = 1.0 / mapping.slope
     else:
@@ -115,7 +118,7 @@ def decompose_from_partner(icurve, mapping, xr_ccurves, debug=False):
     from molass.Mapping.Mapping import Mapping
 
     source_params = np.array([ccurve.get_params() for ccurve in xr_ccurves])
-    initial_params, temp_params = map_params_to_partner(icurve, mapping, source_params, inverse=False)
+    initial_params, temp_params = map_params_to_partner(icurve, mapping, source_params, direction='xr_to_uv')
 
     if debug:
         from molass.SEC.Models.Simple import egh

@@ -54,7 +54,7 @@ def make_component_curves_with_uv_proportions(ssd, num_components, proportions, 
                                           allow_negative_peaks=allow_negative_peaks, num_plates=num_plates)
     uv_classic_params = uv_result.x.reshape(num_components, 4)
 
-    _, xr_classic_params = map_params_to_partner(xr_icurve, mapping, uv_classic_params, inverse=True)
+    _, xr_classic_params = map_params_to_partner(xr_icurve, mapping, uv_classic_params, direction='uv_to_xr')
     xr_ccurves = [ComponentCurve(xr_icurve.x, params) for params in xr_classic_params]
 
     # rebuild UvComponentCurve tied to the new xr_ccurves -- required by the rest of the
