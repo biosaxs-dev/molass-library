@@ -40,7 +40,14 @@ from scipy.optimize import minimize
 # ── Constants ────────────────────────────────────────────────────────────────
 K_MT_MAX = 5000.0    # clamp when kinetics term is negligible (Pe-dominated peak)
 PE_MIN   = 10.0
-PE_MAX   = 20000.0   # cap at physically reasonable SEC range; BH can explore higher
+PE_MAX   = 2000.0    # cap for the moment-matching init estimate; BH can explore higher.
+                      # (was 20000 -- too high: the kappa2/kappa3 cumulant approximation
+                      # this estimator relies on breaks down badly near that bound; see
+                      # R_MAX below and molass-library issue #285.)
+R_MAX    = 20.0       # cap on retention factor (tR/t0) for the init estimate, keeping
+                      # (t0, Pe) out of the region where the cumulant approximation is
+                      # invalid -- issue #285 measured R up to ~850 there, giving an
+                      # actual component curve ~3x narrower than the matched moments.
 T0_FRAC  = 0.98      # t0 must be < T0_FRAC * min(tR)
 K_LKM    = 0.1       # c_inj calibration constant (same as EDM's value)
 
@@ -232,7 +239,7 @@ def estimate_lkm_init_params(decomposition, t_inj=1.0, **kwargs):
 
     x0     = [np.log(t0_0), np.log(Pe_0)]
     bounds = [
-        (np.log(1.0),                   np.log(T0_FRAC * tR_min)),
+        (np.log(tR_min / R_MAX),        np.log(T0_FRAC * tR_min)),
         (np.log(PE_MIN),                np.log(PE_MAX)),
     ]
 
