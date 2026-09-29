@@ -1139,6 +1139,26 @@ class SecSaxsData:
             even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
             is usually sufficient.
 
+        xslices : list of slice, optional
+            Precomputed slices over the XR icurve's frame axis, used instead of deriving
+            them from the XR icurve itself. Applies only to the ``proportions`` path.
+            Use this for cross-channel slicing when XR baseline noise causes area-based
+            slicing to miss small features (e.g. shoulders) that are much clearer in the
+            UV icurve -- build boundaries on UV with
+            ``molass.Decompose.Proportional.compute_proportional_boundaries()``, remap them
+            to XR frames with ``ssd.get_mapping().uv_to_xr()``, then build slices with
+            ``molass.Decompose.Proportional.slices_from_boundaries()``. Default None
+            (slice the XR icurve itself, original behavior).
+
+        proportions_source : {'xr', 'uv'}, optional
+            Which channel's icurve the ``proportions`` fit is performed on. Default
+            ``'xr'`` (fit on XR, derive UV as XR's partner -- original behavior). ``'uv'``
+            instead fits fully on the UV icurve -- usually much better signal-to-noise for
+            small features such as shoulders next to a dominant peak -- and derives XR as
+            UV's partner (mapping shape, refitting only heights). XR remains the shape
+            used by the rest of the pipeline (LRF, Rg/Guinier analysis, rigorous
+            optimization) either way.
+
         xr_peakpositions : list of float, optional
             Specifies the frame positions where peaks should be pinned.
             Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
@@ -1196,7 +1216,7 @@ class SecSaxsData:
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',
             'curve_model', 'smoothing', 'decompargs', 'peakpositions',
             'smooth_uv', 'consistent_uv', 'ip_effect_info',
-            'rgcurve',
+            'rgcurve', 'xslices', 'proportions_source',
         }
         unknown = set(kwargs) - _KNOWN_KWARGS
         if unknown:

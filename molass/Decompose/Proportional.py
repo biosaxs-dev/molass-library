@@ -54,6 +54,86 @@ def safe_log10(x):
         logarithm of zero or negative values."""
     return np.log10(np.maximum(x, VERY_SMALL_VALUE))
 
+def compute_proportional_boundaries(x, y, proportions, debug_ax=None):
+    """
+    Compute the interior x-value cut points that split (x, y) into cumulative-area
+    slices matching the given proportions.
+
+    Split out of get_proportional_slices() so the boundaries can be derived from one
+    curve (e.g. a low-noise UV icurve, where the true peak shape is much less obscured
+    by baseline noise than in XR) and then applied to a *different* curve via
+    slices_from_boundaries() -- after converting units with, e.g.,
+    ``MappingInfo.uv_to_xr()``. See molass-library issue #269 (cross-channel
+    proportional slicing).
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the data.
+    y : array-like
+        The y values of the data.
+    proportions : array-like
+        The proportions for each component. Should sum to 1.
+    debug_ax : matplotlib.axes.Axes, optional
+        An optional axis for debugging plots. If provided, the cumulative curve and slice boundaries
+        will be plotted on this axis.
+
+    Returns
+    -------
+    ndarray
+        Interior cut points (length ``len(proportions) - 1``), in the same x-units as `x`.
+
+    See also
+    --------
+    slices_from_boundaries : converts these boundaries into slice objects over any curve's x.
+    get_proportional_slices : the original one-step (boundaries + slicing) convenience function.
+    """
+    proportions = np.asarray(proportions)
+    proportions = proportions / proportions.sum()
+
+    nny = y.copy()
+    nny[nny < 0] = 0   # always clip for cumulative-area slicing (initialization only)
+    cy = np.cumsum(nny)
+
+    cp = np.cumsum(proportions)*cy[-1]
+    spline = UnivariateSpline(cy[nny > 0], x[nny > 0], s=0)
+    xp = spline(cp)
+
+    if debug_ax is not None:
+        debug_ax.plot(x, cy)
+        for y_, x_ in zip(cp, xp):
+            debug_ax.axhline(y_, color='gray', linestyle=':', alpha=0.5)
+            debug_ax.axvline(x_, color='gray', linestyle=':', alpha=0.5)
+
+    return xp[:-1]
+
+def slices_from_boundaries(x, boundaries):
+    """
+    Convert interior x-value cut points into a list of slices over `x`.
+
+    Parameters
+    ----------
+    x : array-like
+        The x values of the curve to be sliced.
+    boundaries : array-like
+        Interior cut points, in the same x-units as `x` (e.g. from
+        compute_proportional_boundaries(), possibly remapped to a different curve's
+        x-axis via MappingInfo.xr_to_uv() / uv_to_xr()).
+
+    Returns
+    -------
+    list of slice
+        A list of slices covering `x`, split at the given boundaries.
+    """
+    xslices = []
+    start = 0
+    for x_ in boundaries:
+        stop = int(np.searchsorted(x, x_))
+        xslices.append(slice(start, stop))
+        start = stop
+    xslices.append(slice(start, None))
+    return xslices
+
 def get_proportional_slices(x, y, proportions, debug_ax=None):
     """
     Get slices of x and y based on the specified proportions.
@@ -75,33 +155,14 @@ def get_proportional_slices(x, y, proportions, debug_ax=None):
     -------
     list of slice
         A list of slices corresponding to the proportional areas of each component.
+
+    See also
+    --------
+    compute_proportional_boundaries, slices_from_boundaries : the two steps this composes,
+        exposed separately for cross-channel slicing (boundaries from one curve, applied to another).
     """
-    proportions = np.asarray(proportions)
-    proportions = proportions / proportions.sum()
-
-    nny = y.copy()
-    nny[nny < 0] = 0   # always clip for cumulative-area slicing (initialization only)
-    cy = np.cumsum(nny)
-
-    cp = np.cumsum(proportions)*cy[-1]
-    spline = UnivariateSpline(cy[nny > 0], x[nny > 0], s=0)
-    xp = spline(cp)
-
-    if debug_ax is not None:
-        debug_ax.plot(x, cy)
-        for y_, x_ in zip(cp, xp):
-            debug_ax.axhline(y_, color='gray', linestyle=':', alpha=0.5)
-            debug_ax.axvline(x_, color='gray', linestyle=':', alpha=0.5)
-
-    xslices = []
-    start = 0
-    for x_ in xp[:-1]:
-        stop = int(np.searchsorted(x, x_))
-        xslices.append(slice(start, stop))
-        start = stop
-    stop = None
-    xslices.append(slice(start, stop))
-    return xslices
+    boundaries = compute_proportional_boundaries(x, y, proportions, debug_ax=debug_ax)
+    return slices_from_boundaries(x, boundaries)
 
 def moment_match_initial_params(y, moment, allow_negative=False):
     """
@@ -194,7 +255,7 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, num_plates=None):
+def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, num_plates=None, xslices=None):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
@@ -217,6 +278,14 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
         Extra plate-count candidate added to Stage 2's grid search (see
         DEFAULT_N_CANDIDATES), in case a known/expected value isn't already spanned by
         the default grid. Default is None (uses DEFAULT_N_CANDIDATES only).
+    xslices : list of slice, optional
+        Precomputed slices over `icurve`'s x-axis, used instead of deriving them from
+        `icurve` itself via get_proportional_slices(). Use this for cross-channel
+        slicing -- e.g. compute boundaries on a cleaner curve (typically UV, which is
+        far less affected by baseline noise than XR) with
+        compute_proportional_boundaries(), remap them with
+        MappingInfo.uv_to_xr()/xr_to_uv(), then build slices with
+        slices_from_boundaries(). Default None (slice `icurve` itself, original behavior).
 
     Returns
     -------
@@ -237,7 +306,8 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
     else:
         debug_ax = None
     proportions = np.asarray(proportions)/np.sum(proportions)
-    xslices = get_proportional_slices(x, y, proportions, debug_ax=debug_ax)
+    if xslices is None:
+        xslices = get_proportional_slices(x, y, proportions, debug_ax=debug_ax)
     amp_ref = np.max(np.abs(y))
     signal_xy = [restrict_to_signal(x[s], y[s], amp_ref) for s in xslices]
     moments = [Moment(xr, yr) for xr, yr in signal_xy]

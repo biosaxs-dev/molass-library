@@ -60,6 +60,17 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
         The number of components to decompose into.
     proportions : list of float
         The proportions for each component.
+    xslices : list of slice, optional (via kwargs)
+        Precomputed slices over the XR icurve's x-axis, passed through to
+        decompose_proportionally() -- see molass.Decompose.Proportional for
+        cross-channel slicing (e.g. deriving boundaries from the UV icurve).
+    proportions_source : {'xr', 'uv'}, optional (via kwargs)
+        Which channel's icurve the proportional fit runs on. Default ``'xr'`` (original
+        behavior: fit on XR, then derive UV as XR's partner). ``'uv'`` instead fits fully
+        on the UV icurve (usually much better signal-to-noise for small features) and
+        derives XR as UV's partner -- see molass.Decompose.UvFirst. XR remains the primary
+        shape source used by the rest of the pipeline either way; this only changes which
+        channel the proportional *fit* is performed against.
     """
 
     assert len(proportions) == num_components, "Length of proportions must be equal to num_components."
@@ -69,6 +80,17 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     proportions = proportions/np.sum(proportions)
 
     debug = kwargs.get('debug', False)
+
+    if kwargs.get('proportions_source', 'xr') == 'uv':
+        if debug:
+            import molass.Decompose.UvFirst
+            reload(molass.Decompose.UvFirst)
+        from molass.Decompose.UvFirst import make_component_curves_with_uv_proportions
+        allow_negative = kwargs.get('allow_negative_peaks', False)
+        num_plates = kwargs.get('num_plates', None)
+        return make_component_curves_with_uv_proportions(ssd, num_components, proportions, debug=debug,
+                                                           allow_negative_peaks=allow_negative, num_plates=num_plates)
+
     if debug:
         import molass.Decompose.Proportional
         reload(molass.Decompose.Proportional)
@@ -88,7 +110,8 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     xr_icurve = ssd.xr.get_icurve()
     allow_negative = kwargs.get('allow_negative_peaks', False)
     num_plates = kwargs.get('num_plates', None)
-    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug, allow_negative_peaks=allow_negative, num_plates=num_plates)
+    xslices = kwargs.get('xslices', None)
+    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug, allow_negative_peaks=allow_negative, num_plates=num_plates, xslices=xslices)
     xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
 
     # Create UV curves

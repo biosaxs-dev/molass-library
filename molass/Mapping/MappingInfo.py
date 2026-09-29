@@ -38,6 +38,42 @@ class MappingInfo:
         self.xr_curve = xr_curve
         self.uv_curve = uv_curve
 
+    def xr_to_uv(self, x):
+        """Convert XR frame number(s) to the corresponding UV frame number(s).
+
+        Applies ``uv = slope * xr + intercept`` -- consolidates the formula
+        duplicated inline across the codebase (e.g. anomaly-band mapping,
+        trimming) into one place.
+
+        Parameters
+        ----------
+        x : float or array-like
+            XR frame number(s).
+
+        Returns
+        -------
+        float or ndarray
+            The corresponding UV frame number(s).
+        """
+        return self.slope * np.asarray(x) + self.intercept
+
+    def uv_to_xr(self, x):
+        """Convert UV frame number(s) to the corresponding XR frame number(s).
+
+        Inverse of :meth:`xr_to_uv`: ``xr = (uv - intercept) / slope``.
+
+        Parameters
+        ----------
+        x : float or array-like
+            UV frame number(s).
+
+        Returns
+        -------
+        float or ndarray
+            The corresponding XR frame number(s).
+        """
+        return (np.asarray(x) - self.intercept) / self.slope
+
     def __repr__(self):
         return f"MappingInfo(slope=%.3g, intercept=%.3g, xr_peaks=..., uv_peaks=..., xr_moment=..., uv_moment=...)" % (self.slope, self.intercept)
     

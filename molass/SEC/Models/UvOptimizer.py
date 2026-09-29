@@ -98,12 +98,15 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, 
 
         initial_guess = [a, b] + initial_scales
         dx = (x[-1] - x[0])*0.1
-        # Upper bound: 3× the largest initial scale estimate (data-driven, not hard-wired).
-        # The old hard-coded 10.0 cap was too tight when UV/XR amplitude ratio > 10
-        # (e.g. UV ≈ 14 OD, XR ≈ 0.5 counts → ratio ≈ 28), causing optimized scales
-        # to saturate at the bound and uv_params to appear "too small".
-        upper_scale = max(initial_scales) * 3.0
-        bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(1e-3, upper_scale) for _ in range(num_components)]
+        # Shared band from the group's own initial-scale statistics (median + k*MAD in
+        # log space, single-ratio factor fallback for one component) -- unifies with
+        # molass.Decompose.Partner.map_params_to_partner()'s height-refit bound
+        # (molass-library#271). Replaces the old ad hoc "1e-3 floor, 3x-of-max upper"
+        # pair, which used a fixed absolute floor and didn't adapt to the group's own
+        # spread.
+        from molass.Decompose.RatioBounds import compute_ratio_bounds
+        lower_scale, upper_scale = compute_ratio_bounds(initial_scales)
+        bounds = [(a*0.8, a*1.2), (b-dx, b+dx)] + [(lower_scale, upper_scale) for _ in range(num_components)]
     
     
     result = minimize(objective_function, initial_guess, bounds=bounds)
