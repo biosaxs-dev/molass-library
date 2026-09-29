@@ -101,7 +101,7 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, 
         # Shared band from the group's own initial-scale statistics (median + k*MAD in
         # log space, single-ratio factor fallback for one component) -- unifies with
         # molass.Decompose.Partner.map_params_to_partner()'s height-refit bound
-        # (molass-library#271). Replaces the old ad hoc "1e-3 floor, 3x-of-max upper"
+        # (molass-library#281). Replaces the old ad hoc "1e-3 floor, 3x-of-max upper"
         # pair, which used a fixed absolute floor and didn't adapt to the group's own
         # spread.
         from molass.Decompose.RatioBounds import compute_ratio_bounds

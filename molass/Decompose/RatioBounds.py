@@ -5,7 +5,7 @@ Shared "prevent collapse via group consistency" bound for per-component ratios (
 UV/XR height ratios). Given one ratio per component, returns a single [lower, upper]
 band -- robust median + k*MAD in log space when there's more than one component,
 or a fixed symmetric factor around the lone value otherwise (no group to compare
-against -- see molass-library issue #271 discussion).
+against -- see molass-library issue #281).
 
 Calibrated using SAMPLE1's default (XR-first) 3-component decomposition: its ratios
 spanned 2.22-4.98 (median 3.37, MAD(log ratio)=0.389) purely from real per-species

@@ -19,7 +19,7 @@ def map_params_to_partner(icurve, mapping, source_params, inverse=False):
     This is the shared core of decompose_from_partner() (the default, XR-shape-to-UV
     direction) -- factored out so the same "map shape, refit heights only" logic can also
     run in reverse (UV-shape-to-XR), for cases where UV has much better signal-to-noise
-    for small features than XR (see molass-library issue #270,
+    for small features than XR (see molass-library issue #282,
     Decompose.UvFirst.make_component_curves_with_uv_proportions()). The XR-first flow
     remains the default/primary path; this only adds a reusable, direction-agnostic
     primitive.
@@ -46,7 +46,7 @@ def map_params_to_partner(icurve, mapping, source_params, inverse=False):
         has heights jointly optimized against `icurve`'s actual data (shape unchanged).
         Heights are hard-bounded via molass.Decompose.RatioBounds.compute_ratio_bounds()
         applied to the initial height/source-height ratios, so a weak component can no
-        longer collapse toward zero or flip sign during the refit (molass-library#271).
+        longer collapse toward zero or flip sign during the refit (molass-library#281).
     """
     from molass.SEC.Models.Simple import egh
     from molass.Decompose.RatioBounds import compute_ratio_bounds
