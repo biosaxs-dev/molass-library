@@ -220,33 +220,26 @@ def estimate_mapping_impl(xr_curve, uv_curve, debug=False):
     if debug:
         print(f"Peaks: xr_peaks={xr_peaks}, uv_peaks={uv_peaks}")
 
-    if len(xr_peaks) == len(uv_peaks):
-        """
-        note that
-            there can be cases where you need to discard minor peaks
-            and select matching peaks from the remaining ones.
-            e.g.,
-            suppose a pair of set of three peaks between which 
-            first (_, 1, 2)
-               (0, 1, _)
-        """
-        pass
-    else:
-        from importlib import reload
-        import molass.Mapping.PeakMatcher
-        reload(molass.Mapping.PeakMatcher)
-        from molass.Mapping.PeakMatcher import select_matching_peaks
-        xr_peaks, uv_peaks = select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=debug)
-        if debug:
-            import matplotlib.pyplot as plt
-            print("xr_peaks=", xr_peaks)
-            print("uv_peaks=", uv_peaks)
-            fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10,4))
-            fig.suptitle("selected matching peaks")
-            for ax, curve, peaks in [(ax1, uv_curve, uv_peaks), (ax2, xr_curve, xr_peaks)]:
-                ax.plot(curve.x, curve.y)
-                ax.plot(curve.x[peaks], curve.y[peaks], 'o')
-            plt.show()
+    # Always run the shape-correlation matcher, even when raw peak counts already
+    # agree: equal counts can still hide a case where a peak on EACH side has no
+    # counterpart in the other channel (e.g. one species with no UV signal plus one
+    # spurious/noise UV peak) -- KMeans grouping alone can't recognize that and will
+    # force a wrong 1:1 pairing. See EcoCas3, molass-library#270.
+    from importlib import reload
+    import molass.Mapping.PeakMatcher
+    reload(molass.Mapping.PeakMatcher)
+    from molass.Mapping.PeakMatcher import select_matching_peaks
+    xr_peaks, uv_peaks = select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=debug)
+    if debug:
+        import matplotlib.pyplot as plt
+        print("xr_peaks=", xr_peaks)
+        print("uv_peaks=", uv_peaks)
+        fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10,4))
+        fig.suptitle("selected matching peaks")
+        for ax, curve, peaks in [(ax1, uv_curve, uv_peaks), (ax2, xr_curve, xr_peaks)]:
+            ax.plot(curve.x, curve.y)
+            ax.plot(curve.x[peaks], curve.y[peaks], 'o')
+        plt.show()
 
     try:
         return estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=debug)

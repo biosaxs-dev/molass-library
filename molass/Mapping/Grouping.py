@@ -15,19 +15,15 @@ def get_groupable_peaks(xr_curve, uv_curve, just_return_peaks=False, debug=False
     uv_peaks = np.array(uv_curve.get_peaks(debug=debug))
     if just_return_peaks:
         return xr_peaks, uv_peaks
-    if len(xr_peaks) != len(uv_peaks):
-        # raw peak counts already disagree -- hand off directly to
-        # PeakMatcher.select_matching_peaks (shape-correlation scored) rather than risk
-        # KMeans silently forcing an incorrect equal-count match before it ever gets a
-        # chance to run, which is what happened for EcoCas3 (molass-library#270)
-        return xr_peaks, uv_peaks
-    num_groups = max(len(xr_peaks), len(uv_peaks))
-    if num_groups > 3:
-        # as in protein5 where grouping is not applicable
-        ret_xr_peaks, ret_uv_peaks = xr_peaks, uv_peaks
-    else:
-        success, ret_xr_peaks, ret_uv_peaks = get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=debug)
-    return ret_xr_peaks, ret_uv_peaks
+    # Hand off raw peaks directly to PeakMatcher.select_matching_peaks (shape-
+    # correlation scored, molass-library#270), rather than pre-reducing them here
+    # with KMeans: KMeans's same-channel tie-break (pick the taller/more prominent
+    # peak when a cluster holds two same-channel peaks) is exactly the kind of
+    # cross-channel-prominence assumption that picks the wrong peak for EcoCas3 --
+    # e.g. it dropped XR's 740 (correct, adjacent to UV's 739) in favor of the
+    # taller-but-unrelated XR 628, before select_matching_peaks ever got a chance to
+    # evaluate the correct pairing by shape correlation instead.
+    return xr_peaks, uv_peaks
 
 def get_groupable_peaks_impl(xr_curve, uv_curve, num_groups, xr_peaks, uv_peaks, debug=False):
     """
