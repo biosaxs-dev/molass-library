@@ -155,10 +155,10 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
 
             uv_jslice = slice(start, stop)
 
-            if mapping is None:
-                if get_molass_options('mapped_trimming'):
-                    xr_jslice, uv_jslice, mapping = make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=debug)
-                    ssd.mapping = mapping
+            if get_molass_options('mapped_trimming'):
+                xr_jslice, uv_jslice, mapping = make_mapped_trimming_info(
+                    ssd, xr_jslice, uv_jslice, mapping=mapping, debug=debug)
+                ssd.mapping = mapping
     else:
         # jranges is specified
         if len(jranges) != 2 or len(jranges[0]) != 2 or len(jranges[1]) != 2:
@@ -218,12 +218,18 @@ def slice_to_values(vec, slice_):
         A list containing the start and stop values corresponding to the slice.
     """
     values = []
+    n = len(vec)
     for i, j in (slice_.start, 0), (slice_.stop, -1):
         k = j if i is None else i
+        # a slice computed against a differently-sized curve (e.g. a caller-
+        # supplied mapping cached from a wider/narrower domain, #287) can be
+        # out of range here -- clamp to the nearest valid index instead of
+        # raising IndexError
+        k = max(-n, min(k, n - 1))
         values.append(vec[k])
     return values
 
-def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
+def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, mapping=None, debug=False):
     """ Create mapped trimming slices for XR and UV data.
     In mapped trimming, the trimming ranges of XR and UV data are adjusted
     to correspond to each other based on the mapping information.
@@ -236,6 +242,10 @@ def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
         The j-slice for XR data.
     uv_jslice : slice
         The j-slice for UV data.
+    mapping : MappingInfo, optional
+        Mapping to use for the intersection. If None, estimated from `ssd`
+        (see molass-library#287 -- a caller-supplied mapping used to be
+        silently ignored here).
     debug : bool
         If True, print debug information.
         
@@ -248,7 +258,8 @@ def make_mapped_trimming_info(ssd, xr_jslice, uv_jslice, debug=False):
     mapping : MappingInfo
         The mapping information between XR and UV data.
     """
-    mapping = ssd.estimate_mapping(debug=debug) 
+    if mapping is None:
+        mapping = ssd.estimate_mapping(debug=debug)
 
     xr_x = mapping.xr_curve.x
     xr_ends = slice_to_values(xr_x, xr_jslice)

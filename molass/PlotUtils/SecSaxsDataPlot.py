@@ -221,6 +221,11 @@ def plot_compact_impl(ssd, **kwargs):
     ax2 = fig.add_subplot(gs[0, 1])
     m = xr_curve.get_max_i()
     n = mapping.get_mapped_index(m, xr_curve.x, uv_curve.x)
+    # m/n come from mapping's cached curves, which can be stale (e.g. a wider
+    # domain) relative to ssd's current matrices after re-trimming -- clamp so a
+    # stale index degrades to the nearest valid frame instead of raising (#286)
+    m = min(max(m, 0), ssd.xr.M.shape[1] - 1)
+    n = min(max(n, 0), ssd.uv.M.shape[1] - 1)
     uv_jcurve = ssd.uv.get_jcurve(j=n)
     ax2.plot(uv_jcurve.x, uv_jcurve.y, color="C0", label="UV Absorbance at j=%d" % n)
     uv_jslice = trim.uv_slices[0]
