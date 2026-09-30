@@ -25,6 +25,7 @@ import os
 import threading
 import warnings
 from contextlib import redirect_stdout, redirect_stderr, ExitStack
+from dataclasses import dataclass, field
 from importlib import reload
 
 _INTERACTIVE_MPL_BACKENDS = (
@@ -65,6 +66,16 @@ class Score:
     Produced by :meth:`~molass.LowRank.Decomposition.Decomposition.score`
     and :meth:`~molass.Rigorous.RunInfo.RunInfo.score`.
 
+    ``Score`` bundles two things with different lifecycles: a plain numeric
+    result (``fv``, ``sv``, ``breakdown``, ``params``) and a reference to the
+    (possibly heavyweight, possibly live) optimizer that produced it. The
+    numeric part is safe to store, log, or compare over time; ``optimizer`` is
+    not -- it may be a disposable one-shot evaluator (from ``decomp.score()``)
+    or a live, run-attached instance (from ``run_info.score()``), and touching
+    it from a background thread is unsafe (see :func:`_warn_if_background_thread`).
+    Use :meth:`snapshot` to get just the safe, comparable part when you don't
+    need ``.plot()``/``.optimizer`` (e.g. for a score-history list).
+
     Attributes
     ----------
     fv : float
@@ -75,17 +86,56 @@ class Score:
         ``{'fv': float, 'scores': {name: value, ...}}`` — same structure
         as :meth:`~molass.Rigorous.RunInfo.RunInfo.get_score_breakdown`.
     optimizer : legacy optimizer object
-        Fully constructed and prepared at ``init_params``.
-    init_params : ndarray
-        Physical parameter vector used for the evaluation.
+        Fully constructed and prepared at ``params``. Needed by :meth:`plot`;
+        also handed off by callers that continue optimizing from here (e.g.
+        :func:`~molass.Rigorous.RecipeRunner.create_optimizer_from_recipe`).
+    params : ndarray
+        Physical parameter vector used for the evaluation. Named ``params``
+        (not ``init_params``) because it isn't always an initial guess --
+        :meth:`~molass.Rigorous.RunInfo.RunInfo.score` uses it for the
+        *optimized* parameters. ``.init_params`` remains as a deprecated alias.
+    source : str or None
+        Which producer created this score -- ``'decomp'`` (from
+        ``Decomposition.score()``, current/pre-optimization parameters) or
+        ``'rigorous'`` (from ``RunInfo.score()``, best optimized parameters).
+        ``None`` if not specified by the caller.
     """
 
-    def __init__(self, fv, sv, breakdown, optimizer, init_params):
+    def __init__(self, fv, sv, breakdown, optimizer, params=None, source=None, init_params=None):
+        if params is None:
+            params = init_params
         self.fv = fv
         self.sv = sv
         self.breakdown = breakdown
         self.optimizer = optimizer
-        self.init_params = init_params
+        self.params = params
+        self.source = source
+
+    @property
+    def init_params(self):
+        """Deprecated alias for :attr:`params`. Use ``.params`` instead."""
+        warnings.warn(
+            "Score.init_params is deprecated (the name is misleading when the "
+            "score reflects optimized, not initial, parameters). Use .params instead.",
+            DeprecationWarning, stacklevel=2,
+        )
+        return self.params
+
+    def snapshot(self):
+        """Return a plain, optimizer-free snapshot of this score.
+
+        Safe to store in a list/DataFrame, compare, diff, or pickle -- unlike
+        ``Score`` itself, which carries a reference to the (possibly live,
+        possibly heavyweight) optimizer that produced it.
+
+        Returns
+        -------
+        ScoreSnapshot
+        """
+        return ScoreSnapshot(
+            fv=self.fv, sv=self.sv, breakdown=self.breakdown,
+            params=self.params, source=self.source,
+        )
 
     # ------------------------------------------------------------------
     # Visual
@@ -133,7 +183,7 @@ class Score:
         fig.suptitle(_title, fontsize=13)
 
         # plot_objective_func evaluates objective_func(params, plot=True) internally
-        self.optimizer.objective_func(self.init_params, plot=True, axis_info=axis_info)
+        self.optimizer.objective_func(self.params, plot=True, axis_info=axis_info)
         fig.tight_layout()
         return PlotResult(fig, axes)
 
@@ -168,7 +218,8 @@ class Score:
 
     def print_summary(self):
         """Print SV, breakdown table, and diagnosis to stdout."""
-        print(f"SV = {self.sv:.2f}  (fv = {self.fv:.4f})")
+        source_suffix = f"  [source={self.source}]" if self.source else ""
+        print(f"SV = {self.sv:.2f}  (fv = {self.fv:.4f}){source_suffix}")
         print("\nScore breakdown:")
         for k, v in self.breakdown['scores'].items():
             print(f"  {k:35s}: {v:+.4f}")
@@ -177,7 +228,28 @@ class Score:
             print(f"  [{d.status:7s}] {d.score:35s}: {d.reason}")
 
     def __repr__(self):
-        return f"Score(sv={self.sv:.2f}, fv={self.fv:.4f})"
+        src = f", source={self.source!r}" if self.source else ""
+        return f"Score(sv={self.sv:.2f}, fv={self.fv:.4f}{src})"
+
+
+@dataclass(frozen=True)
+class ScoreSnapshot:
+    """Plain, optimizer-free snapshot of a :class:`Score`.
+
+    Produced by :meth:`Score.snapshot`. Holds only comparable/loggable data
+    (numbers, a dict, a params array, a source label) -- no reference to any
+    optimizer, so it's safe to store in a list/DataFrame for a score-history,
+    compare across runs, or pickle.
+    """
+    fv: float
+    sv: float
+    breakdown: dict
+    params: object
+    source: str | None = field(default=None)
+
+    def __repr__(self):
+        src = f", source={self.source!r}" if self.source else ""
+        return f"ScoreSnapshot(sv={self.sv:.2f}, fv={self.fv:.4f}{src})"
 
 
 # ---------------------------------------------------------------------------
@@ -345,7 +417,7 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
 
     return Score(
         fv=fv, sv=sv, breakdown=breakdown,
-        optimizer=optimizer, init_params=init_params,
+        optimizer=optimizer, params=init_params, source='decomp',
     )
 
 

@@ -1696,6 +1696,15 @@ class Decomposition:
             decomp.get_rg_curve()          # caches on decomp
             result = decomp.score(trimmed_ssd=trimmed)
 
+        **Live code reload**: each call rebuilds the legacy optimizer via
+        ``import_objective_function()``, which reloads both
+        ``molass_legacy.Optimizer.BasicOptimizer`` and the model's
+        ``ObjectiveFunctions`` module (e.g. ``G0346``) from disk every time.
+        Edits to either file take effect on the *next* call to ``score()`` (or
+        ``optimize_rigorously()``) with no kernel restart needed -- but this
+        also means ``score()`` is not cheap to call repeatedly just to "poll"
+        a value; each call re-imports and re-executes those modules.
+
         See Also
         --------
         optimize_rigorously : Full BH/NS optimization.

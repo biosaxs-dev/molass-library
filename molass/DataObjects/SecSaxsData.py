@@ -9,6 +9,10 @@ from importlib import reload
 import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
 
+# Below this mapped-coverage ratio, trimmed_copy() warns that XR/UV frame
+# ranges diverged too much (see the warning in trimmed_copy() for details).
+TRIMMED_COVERAGE_WARN_RATIO = 0.7
+
 def _baseline_selftest(M, recognition_curve):
     """Baseline self-test: detect buffer-frame contamination.
 
@@ -375,11 +379,22 @@ class SecSaxsData:
 
         See Also
         --------
-        ssd.copy()        
+        ssd.copy()
+        ssd.trimmed_copy() : Applies this trimming (or computes it internally
+            when not given explicitly) to produce the trimmed SSD.
+
+        Notes
+        -----
+        Pass ``debug=True`` to plot the raw peaks found in each channel, the
+        peak-matching decision used to build the XR/UV mapping, and the
+        final chosen slices -- useful for diagnosing why ``trimmed_copy()``
+        chose a narrower-than-expected range for one channel (see also the
+        ``UserWarning`` that :meth:`trimmed_copy` emits in that situation).
 
         Examples
         --------
         >>> trim = ssd.make_trimming()
+        >>> trim_dbg = ssd.make_trimming(debug=True)  # plots peaks/mapping/slices
         """
         debug = kwargs.get('debug', False)
         if debug:
@@ -497,6 +512,15 @@ class SecSaxsData:
         -------
         SecSaxsData
             A trimmed copy of the SSD object with the specified trimming specification applied.
+
+        Warns
+        -----
+        UserWarning
+            If XR and UV end up covering very different frame ranges after
+            trimming/mapping (mapped coverage ratio below
+            :data:`TRIMMED_COVERAGE_WARN_RATIO`). See :meth:`make_trimming`
+            with ``debug=True`` to inspect why a given range was chosen
+            (raw peaks, the peak-matching decision, and the final slices).
         """
         start_time = time()
         from molass.Global.Quiet import suppress_if_quiet
@@ -524,6 +548,31 @@ class SecSaxsData:
                            datafiles=self.datafiles)
         result.time_required = time() - start_time
         result.time_required_total = self.time_required_total + result.time_required
+
+        # Sanity check (molass-library#270 follow-up): warn when XR and UV end up
+        # covering very different frame ranges after trimming/mapping -- this can
+        # silently inflate UV_LRF_residual/UV_2D_fitting during optimize_rigorously()
+        # by extrapolating UV data into frames it doesn't really cover.
+        if result.xr is not None and result.uv is not None and trimming.mapping is not None:
+            from molass.Mapping.SimpleMapper import compute_mapping_coverage
+            mp = trimming.mapping
+            try:
+                coverage = compute_mapping_coverage(result.xr.jv, result.uv.jv, mp.slope, mp.intercept)
+            except Exception:
+                coverage = None
+            if coverage is not None and coverage < TRIMMED_COVERAGE_WARN_RATIO:
+                import warnings
+                warnings.warn(
+                    f"XR and UV cover very different frame ranges after trimming "
+                    f"(mapped coverage ratio={coverage:.2f}; XR: {len(result.xr.jv)} frames, "
+                    f"UV: {len(result.uv.jv)} frames). This can inflate UV_LRF_residual/"
+                    f"UV_2D_fitting scores during optimize_rigorously() by extrapolating "
+                    f"UV data into frames it doesn't really cover (see molass-library#270). "
+                    f"Inspect with ssd.make_trimming(debug=True), or pass an explicit "
+                    f"mapping= to trimmed_copy() if the auto-estimated one looks wrong.",
+                    UserWarning, stacklevel=2,
+                )
+
         return result
 
     def set_baseline_method(self, method):

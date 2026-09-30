@@ -63,6 +63,17 @@ def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
 def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, function_code=None, debug=False):
+    """Build a legacy rigorous optimizer instance for the given model.
+
+    Notes
+    -----
+    Every call reloads ``molass_legacy.Optimizer.BasicOptimizer`` and the
+    model's ``ObjectiveFunctions`` module (e.g. ``G0346``) from disk via
+    ``import_objective_function()``, regardless of ``debug``. Edits to either
+    file take effect on the next call with no kernel restart required -- but
+    this also means repeated calls are not cheap (each one re-imports and
+    re-executes those modules).
+    """
     from molass_legacy.Optimizer.OptimizerUtils import get_function_code, MODEL_NAME_DICT
     from molass_legacy.Optimizer.FuncImporter import import_objective_function
     if function_code is None:

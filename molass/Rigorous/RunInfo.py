@@ -681,7 +681,7 @@ class RunInfo:
         # Wrap in Score (reuses the same visualization logic)
         result_obj = Score(
             fv=fv, sv=sv, breakdown=breakdown,
-            optimizer=self.optimizer, init_params=params
+            optimizer=self.optimizer, params=params, source='rigorous',
         )
 
         return result_obj
