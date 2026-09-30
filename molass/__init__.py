@@ -116,5 +116,38 @@ def requires(version):
             f"Please upgrade: pip install --upgrade molass"
         )
 
+def context_path():
+    """Return the absolute path to CONTEXT.md, the AI-assistant context file
+    shipped inside this package.
+
+    Unlike a source repository's ``.github/copilot-instructions.md``, this
+    file ships with the installed package itself, so it stays current for
+    whichever version is installed -- useful when working in a project that
+    only depends on ``molass`` rather than developing it.
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> import molass
+    >>> molass.context_path()
+    '.../site-packages/molass/CONTEXT.md'
+    """
+    return os.path.join(os.path.dirname(__file__), "CONTEXT.md")
+
+def print_context():
+    """Print CONTEXT.md (see :func:`context_path`) to stdout."""
+    with open(context_path(), encoding="utf-8") as fh:
+        text = fh.read()
+    try:
+        print(text)
+    except UnicodeEncodeError:
+        # e.g. cp932 consoles on Japanese Windows can't encode en-dashes/arrows;
+        # fall back to a safe, lossy print rather than crashing.
+        import sys
+        print(text.encode(sys.stdout.encoding or "ascii", errors="replace").decode(sys.stdout.encoding or "ascii"))
+
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
 from molass.Dev.ReloadAll import reload_all  # noqa: E402

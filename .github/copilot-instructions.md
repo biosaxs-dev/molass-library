@@ -30,82 +30,26 @@
 
 | Priority | File | Purpose |
 |----------|------|---------|
-| ⭐ 1 | `README.md` | Project overview & entry points |
-| ⭐ 2 | `Copilot/copilot-guidelines.md` | Project policies and user-type rules |
-| ⭐ 3 | `Copilot/workflow_notes.md` | AI workflow notes: issue patterns, terminal tips, issue history |
-| 4 | `pyproject.toml` | Package version, dependencies, test config |
-| 5 | `tests/tutorial/01-quick_start.py` | Canonical usage example (start here for API) |
-| 6 | `tests/tutorial/05-lrf.py` | Low-rank factorization (LRF) tutorial |
-| 7 | `tests/tutorial/11-rigorous_optimization.py` | Rigorous optimization tutorial |
+| ⭐ 1 | [`molass/CONTEXT.md`](../molass/CONTEXT.md) | Architecture, canonical usage, and current API conventions — **also shipped inside the pip package** (`molass.context_path()`), so update this one first for anything a package *user*'s AI assistant would need, not just a repo developer |
+| ⭐ 2 | `README.md` | Project overview & entry points |
+| ⭐ 3 | `Copilot/copilot-guidelines.md` | Project policies and user-type rules |
+| ⭐ 4 | `Copilot/workflow_notes.md` | AI workflow notes: issue patterns, terminal tips, issue history |
+| 5 | `pyproject.toml` | Package version, dependencies, test config |
+| 6 | `tests/tutorial/01-quick_start.py` | Canonical usage example (start here for API) |
+| 7 | `tests/tutorial/05-lrf.py` | Low-rank factorization (LRF) tutorial |
+| 8 | `tests/tutorial/11-rigorous_optimization.py` | Rigorous optimization tutorial |
 
 ---
 
 ## 🏗️ Architecture Overview
 
-### What Molass Does
-
-Molass decomposes SEC-SAXS data: the measured 2D matrix $M$ (q-values × elution frames) is factored into scattering profiles $P$ and elution curves $C$ via $M \approx PC$.
-
-The data flows through three main stages:
-
-```
-Raw data folder / molass_data sample
-        ↓
-   SecSaxsData (DataObjects/)          ← Load, trim, correct
-        ↓
-   quick_decomposition()               ← Low-rank factorization (LRF)
-        ↓
-   Decomposition object (LowRank/)     ← Holds xr_ccurves, uv_ccurves, components
-        ↓
-   make_rigorous_decomposition()       ← (Optional) Physics-constrained refinement
-        ↓
-   Reports / DENSS                     ← Output
-```
-
-### Key Packages
-
-| Package | Role |
-|---------|------|
-| `DataObjects/` | Core data containers: `SecSaxsData`, `XrData`, `UvData`, `SsMatrixData`, `Curve` |
-| `LowRank/` | Matrix factorization engine: `Decomposition`, `CurveDecomposer`, `CoupledAdjuster`, `QuickImplement` |
-| `Rigorous/` | Physics-constrained optimization (EGH/SDM/EDM elution models + Rg-consistency); bridges to `molass-legacy` |
-| `SEC/Models/` | Column elution models: `EDM.py`, `SDM.py`, `Simple.py` (+ Gaussian, lognormal pore distributions) |
-| `Guinier/` | Rg estimation: `RgEstimator`, `RgCurve`, `RgCurveUtils` |
-| `Peaks/` | Peak recognition: `Recognizer`, `PeakSimilarity` |
-| `Decompose/` | Helper utilities for decomposition variants (proportional, XR-only) |
-| `Global/` | Global optimization options (`Options.py`) |
-| `Baseline/` | Baseline correction |
-| `Trimming/` | Data trimming |
-| `SAXS/` | DENSS integration (`DenssTools`), MRC viewer (`MrcViewer`) |
-| `Shapes/` | Geometric shapes for scattering models (`Ellipsoid`, `Sphere`) |
-| `Testing/` | Test infrastructure (`control_matplotlib_plot` decorator, etc.) |
-| `Legacy/` | Bridge to `molass-legacy` package |
-
-### Important Relationships
-
-- **`molass-legacy`** is a required dependency (installed separately). The `Rigorous/` module bridges to it heavily via `LegacyBridgeUtils.py`. Do not assume all optimization logic is in `molass-library`.
-- **`molass_data`** is a separate data package (not in this repo) that provides test samples (`SAMPLE1`–`SAMPLE4`).
-- **Dual-channel design**: `SecSaxsData` carries both XR (X-ray) and UV data. Many methods have `xr_only` variants. REGALS uses SAXS only; Molass uses UV + SAXS (information asymmetry — document when comparing).
-- **EDM `e` parameter**: In `molass_legacy/SecTheory/Edm.py`, `e` (default 0.4) is **V₀/(V₀+Vp)** — the mobile-phase fraction of the *accessible* volume only. Solid bead volume is entirely outside the EDM mass balance. This is **not** the standard chromatographic total porosity ε_T=(V₀+Vp)/V_column. The phase ratio `F=(1-e)/e = Vp/V₀` directly. In the 2D column simulation (`SEC/ColumnSimulation.py`, rs=0.0381, ~42 grains): V₀≈0.109, Vp≈0.096, V_solid≈0.096 → e≈0.53, F≈0.88. The Henry coefficient `a = K_SEC × (Vp/V₀)`; default a=1.5 requires Vp/V₀≥1.5 (beyond the simulation geometry).
-
-### The Canonical Usage Pattern
-
-```python
-from molass_data import SAMPLE1
-from molass.DataObjects import SecSaxsData as SSD
-
-ssd = SSD(SAMPLE1)                        # Load raw data
-trimmed = ssd.trimmed_copy()              # Trim to SEC peak region
-corrected = trimmed.corrected_copy()      # Baseline correction
-decomposition = corrected.quick_decomposition()   # LRF (P0+–P5+ relevant here)
-decomposition.plot_components()           # Inspect result
-```
-
-Rigorous refinement (optional, bridges to molass-legacy):
-```python
-from molass.Rigorous import make_rigorous_decomposition
-result = make_rigorous_decomposition(decomposition, rgcurve)
-```
+See [`molass/CONTEXT.md`](../molass/CONTEXT.md) — "What molass does", "Key
+packages", "Important relationships", and "Canonical usage". That file is
+kept deliberately compact and ships inside the pip package itself, so it's
+the single source of truth for this content; don't duplicate it here. Add
+new architecture-level facts there, not in this file, unless they are
+repo-development-only (e.g. reference a research repo outside this package,
+or a historical issue number a package user wouldn't have context for).
 
 ---
 
@@ -169,7 +113,7 @@ Always check tutorial tests first before reading implementation internals.
 
 ### 2. Module Reload Pattern
 
-Many internal modules use `importlib.reload()` at the top of functions (e.g., `QuickImplement.py`, `RigorousImplement.py`). This is intentional for development convenience. Do not remove these when editing unless explicitly asked.
+Many internal modules use `importlib.reload()` at the top of functions (e.g., `QuickImplement.py`, `RigorousImplement.py`). This is intentional for development convenience — edits take effect on the next call with no kernel restart. Do not remove these when editing unless explicitly asked. (The package-user-facing implication of this — `score()`/`optimize_rigorously()` reload the legacy optimizer modules on every call — is documented in `molass/CONTEXT.md`.)
 
 ### 3. Types of Users
 
@@ -183,6 +127,10 @@ When analyzing or improving decomposition quality, frame analysis in terms of tr
 - See `modeling-vs-model_free/R_CENTRIC_FRAMEWORK.md` for full framework
 
 ### 5. Decomposition Call Chain (traced Feb 19, 2026)
+
+The user-facing takeaway of this ("prefer `proportions=` when peaks overlap
+heavily") is in `molass/CONTEXT.md`. The rest of this section is the deep
+internal trace, kept here for repo development.
 
 Two distinct code paths exist for `quick_decomposition()`:
 
@@ -252,22 +200,10 @@ The research repo defines 7 positive criteria for method evaluation. When improv
 
 ### 8. Expensive-Object Caching Pattern (May 2026)
 
-When a method produces an expensive computed object (like `RgCurve`), follow this three-layer pattern:
+See [`molass/CONTEXT.md`](../molass/CONTEXT.md) § "Expensive-object caching" for the `get_<noun>()` convention itself (package-user-facing, kept there).
 
-1. **`get_<noun>()`** on the highest-level object the user already holds signals "cached, safe to call repeatedly". It computes on first call and returns the cached result thereafter.
-2. **Downstream methods** (`quick_decomposition`, `optimize_rigorously`, etc.) accept it as an optional parameter. If passed, they use it; if omitted, they compute it internally. No required parameters added.
-3. **Naming**: `get_rg_curve()` (with underscore, `get_` prefix) — not `compute_rgcurve()`. The `get_` prefix is the convention for cached accessors; `compute_` means "always runs".
-
-**Canonical workflow** (no redundant computation):
-```python
-rgcurve = corrected.get_rg_curve()                      # once, cached on corrected
-decomp   = corrected.quick_decomposition(rgcurve=rgcurve)  # injected → cached in decomp
-run_cma  = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
-run_bh   = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
-```
-
-**Implemented so far**: `SecSaxsData.get_rg_curve()`, `Decomposition.get_rg_curve()` (issue #168).  
-**When adding new expensive objects** (e.g. `baseline2d`, `peak_positions`): apply the same pattern.
+**Implemented so far**: `SecSaxsData.get_rg_curve()`, `Decomposition.get_rg_curve()` (issue #168).
+**When adding new expensive objects** (e.g. `baseline2d`, `peak_positions`): apply the same pattern, and update `CONTEXT.md` too if it changes the public convention.
 
 ### 9. Version Convention
 
@@ -277,34 +213,11 @@ run_bh   = decomp.optimize_rigorously(rgcurve=rgcurve, ...)
 
 ### 10. Rigorous Optimization Internals (Issue #107)
 
-**Score Value (SV)**: The optimizer's raw objective `fv` is converted to a 0–100 scale for display:
-```
-SV = -200 / (1 + exp(-1.5 * fv)) + 100
-```
-Thresholds: **≥80 Good**, **60–80 Fair**, **<60 Poor**. Defined in `molass_legacy/Optimizer/FvScoreConverter.py` (`convert_score()`), aliased as `fv_to_sv()` in `molass/Rigorous/CurrentStateUtils.py`.
-
-**Split architecture (Phase 4, April 2026)**: `optimize_rigorously()` now defaults to `in_process=True`. Two paths exist:
-
-| | In-process (default, `in_process=True`) | Subprocess (`in_process=False`) |
-|---|---|---|
-| Who uses it | Notebook / library API | Legacy tkinter GUI |
-| Optimizer source | Parent's prepared object (live dsets, base curves, spectral vectors) | Re-derived from disk via `OptimizerInput` |
-| Parent/subprocess divergence | Impossible — one process | Structural — two independent derivation pipelines (issues #117, #119) |
-| Crash isolation | None (kernel dies on segfault) | Yes (subprocess isolated) |
-| Key file | `molass_legacy/Optimizer/InProcessRunner.py` | `molass_legacy/Optimizer/BackRunner.py` |
-
-Design rationale: see `molass-library/Copilot/DESIGN_split_optimizer_architecture.md`.
-
-**callback.txt format**: Both paths write the same format. Each optimizer evaluation appends:
-```
-t=<timestamp>
-x=
-[param_0 param_1 ... param_n]    ← may span multiple lines for long arrays
-f=<fv_value>
-a=<True|False>                   ← accepted by optimizer
-c=<evaluation_count>
-```
-Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
+See [`molass/CONTEXT.md`](../molass/CONTEXT.md) § "Rigorous optimization: Score
+Value (SV)" for the SV formula/thresholds, the in-process vs subprocess
+distinction, `live_status()`, `get_current_curves()`, and `diagnose()` —
+package-user-facing, kept there. The rest of this section is repo-development
+detail (bug archaeology, performance analysis) that a package user doesn't need.
 
 **SV consistency across methods (verified April 2026)**: SV is on the same scale for both Basin-Hopping (`bh`) and Nested Sampling (`ultranest`). The reason:
 - UltraNest internally receives `-fv` as its log-likelihood (`my_likelihood` in `SolverUltraNest.py` returns `-fv`). This negation is entirely internal; UltraNest maximises it, which is equivalent to minimising `fv`.
@@ -314,19 +227,7 @@ Parse `f=` lines with: `re.finditer(r'^f=([\-\d.eE+]+)', content, re.MULTILINE)`
 
 **Widget title vs best accepted SV (issue #128)**: The `MplMonitor` widget title (panel 3) now shows `"best SV=XX.X  (cur=YY.Y)"`. `best SV` is `convert_score(min(job_state.fv[:, 1]))` — the global min over all **accepted** NS callbacks. `cur` is the SV of the params being rendered at that snapshot. These can differ: UltraNest live-point proposals can temporarily visit higher-SV regions that are never accepted, making the `cur` value mislead upward relative to the converged best.
 
-**Live run observability stack (April 2026)**: For any in-flight or completed rigorous run, prefer the canonical one-call probe over hand-rolled `sv_history` + `check_progress` + manifest reads:
-
-| Source | Probe |
-|--------|-------|
-| `RunInfo` (single run) | `run.live_status()` (issue #133) |
-| `ComparisonResult` (compare_optimization_paths) | `cmp.live_status()` or `cmp.live_status('subprocess')` |
-| External observer (no notebook cell) | `aicKernelEval(expression="run.live_status()")` (ai-context-vscode#1) |
-
-`live_status()` returns `{phase, n_evals, best_fv, best_sv, elapsed_s, analysis_folder, work_folder, subprocess_pid, subprocess_returncode, manifest}` in one disk read. It composes with `RunRegistry` (`molass.Rigorous.read_manifest`, `locate_recent_runs`) which writes/reads `RUN_MANIFEST.json` breadcrumbs in both `analysis_folder` and `work_folder`. Use these instead of parsing `callback.txt` directly.
-
-**Monitor readability (molass-legacy#31, April 2026)**: `MplMonitor.get_current_curves()` returns the same data currently shown on the dashboard as a plain dict — enabling the AI to reason from the same evidence the human sees on screen. This is the canonical solution for *monitor readability*, a special class of AI-friendliness where the monitor's visual state was previously inaccessible to the AI. The user-facing entry point is `run_info.get_current_curves()`, which delegates to the monitor. Keys: `xr_frames`, `xr_data`, `xr_model`, `xr_components`, `uv_frames`, `uv_data`, `uv_model`, `uv_components`, `sv_history`, `best_sv`, `params`. When the user reports a visual deviation on the dashboard (e.g. "UV component doesn't match the data peak"), call `run_info.get_current_curves()` to get the numeric values and confirm.
-
-**Score diagnosis (molass-library#145, April 2026)**: `run_info.diagnose(breakdown=None)` maps numeric score values to physical interpretations. Calls `get_score_breakdown()` automatically if no breakdown is passed. Returns a list of `Diagnosis(score, status, reason, suggestion)` namedtuples with `status` in `('good', 'fair', 'poor', 'failing')`. Encoded rules: `UV_LRF_residual` near zero → failing UV low-rank fit (model completely misaligned); `UV_2D_fitting / XR_2D_fitting < 0.33` → UV much worse than XR, likely alignment issue; `Guinier_deviation > -0.5` → poor Rg consistency; penalties > 0.1 → physical constraint violated. When `diagnose()` flags a UV issue, its `suggestion` field points to `run_info.get_current_curves()` as the next diagnostic step. Use this whenever `get_score_breakdown()` returns numbers that need interpretation — do NOT rely on domain knowledge from the session context.
+**Monitor readability (molass-legacy#31, April 2026)**: `MplMonitor.get_current_curves()` returns the same data currently shown on the dashboard as a plain dict — enabling the AI to reason from the same evidence the human sees on screen. This is the canonical solution for *monitor readability*, a special class of AI-friendliness where the monitor's visual state was previously inaccessible to the AI. The user-facing entry point (`run_info.get_current_curves()`) is documented in `molass/CONTEXT.md`.
 
 **In-process kernel restart safety (molass-legacy#26, April 2026)**: `optimize_rigorously(in_process=True)` is now safe to interrupt with VS Code "Restart Kernel". Previously, `optimizer.solve()` ran directly on the main thread; UltraNest's back-to-back numpy C calls held the GIL long enough to block `KeyboardInterrupt` delivery, causing the kernel to hang and VS Code to spawn duplicate kernels. Fix: `solve()` runs in a `daemon=True` thread; the main thread loops on `thread.join(timeout=0.05)`, releasing the GIL every 50 ms as an interrupt delivery point. Key file: `molass_legacy/Optimizer/InProcessRunner.py`.
 
