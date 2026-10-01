@@ -1,6 +1,6 @@
 # Project Status — molass-library
 
-**Last Updated**: September 25, 2026  
+**Last Updated**: October 1, 2026  
 **Current version**: 1.1.0  
 **Active branch**: `main` (JOSS review concluded Aug 30, 2026 — `dev/ongoing-work` merged; see .github/copilot-instructions.md Branching Policy)
 
@@ -11,6 +11,64 @@
 ---
 
 ## 🎯 Current Task
+
+**Issue #289 — SEC_conformance centralized to a model-agnostic Martin-Synge formula**
+
+**Status**: ✅ Complete and validated (2026-10-01).
+
+**Problem** (full derivation: `molass-researcher/experiments/46_sec_conformance_fairness`):
+`SEC_conformance` (one of the 7 scores synthesized into the rigorous-optimization Score
+Value, SV) was computed per-model via `ModelParams.compute_comformance()`, and the
+implementations were not comparable:
+- **EGH**: a real fit — MSE between single-pore-theory retention times (from `Npc, rp,
+  tI, t0, P, m`) and actual component retention times.
+- **SDM, LKM, GRM**: unimplemented stubs, `return 0` unconditionally (GRM's stub existed
+  despite `grmcol_params` already containing `R_p`, the exact quantity a real check could
+  use).
+- **CEDM**: always returned `SECCONF_LOWER_BOUND`, i.e. the *best possible* value,
+  regardless of fit quality.
+- **EDM**: an ad hoc stdev-of-peak-heights heuristic, not comparable in meaning/units to
+  EGH's.
+
+Empirically measured on real APO data (GRM vs CEDM, both num_components=1, same BH
+protocol): **~2.08 of a 5.92-point SV gap (35%) was a pure artifact** of this asymmetry,
+not actual fit-quality difference.
+
+**Fix**: replaced all per-model `compute_comformance` with one model-agnostic
+implementation. `BasicOptimizer.compute_comformance(lrf_info)` (molass-legacy) now calls
+the new `molass.SEC.Models.MartinSynge.conformance_score(tR, sigma)` (this repo) — fits
+the classical Martin-Synge plate-theory relation `tR_i = tI + sqrt(N)*sigma_i` to each
+component's post-decomposition moments (`tR` = mean, `sigma` = sqrt(variance), via
+`BasicOptimizer.compute_moments_list` / `molass_legacy.Peaks.MomentsUtils.compute_moments`
+— identical for any elution model, no Rg/pore-size/column params needed). A fixed
+neutral constant is used for `num_components == 1` (no regression possible with one
+point).
+
+**Removed** (now-dead, replaced by the above): `EghParamsBase.compute_comformance`,
+`SimpleSecParams.sec_comformance`/`sec_comformance_fixed_poreexponent`/`conf_method`,
+`BoundedSecParams.bounded_sec_comformance`/`conf_method`, and the `compute_comformance`
+methods on `SdmParams`, `EdmParams` (both definitions), `CedmParams`, `GrmParams`,
+`LkmParams`. `StcParams`/`MonoporeSecParams` (dormant model family — no active G-series
+caller) intentionally left untouched.
+
+**Verified**:
+- New unit tests: `tests/specific/200_Rigorous/test_270_sec_conformance.py` (8/8 pass) —
+  nc=1 neutrality, floor/residual behavior, monotonicity vs. inconsistent moments.
+- `tests/specific/200_Rigorous/test_130_params_table.py` (all 5 models: egh/sdm/cedm/
+  lkm/grm) and `test_260_recipe_schema.py`, `test_060_diagnose.py` — all pass.
+- `tests/tutorial/11-rigorous_optimization.py` (full NS rigorous-optimization run,
+  end-to-end) — 4/4 pass.
+- Real-data regression check: `analysis-061` (GRM) / `analysis-062` (CEDM), both
+  num_components=1 — `SEC_conformance` now `-0.1` for **both** (previously `-0.10` /
+  `-1.35`); a real 3-component dataset (SAMPLE1) across EGH/SDM/GRM now produces three
+  different, sensibly-scaled values (-0.032/-0.443/-0.221) from one shared formula.
+
+**Next**: re-run `molass-researcher/experiments/37_systematic_5x5` to refresh Paper 1's
+SV comparison table under the corrected, fair scoring.
+
+---
+
+## 🎯 Previous Task
 
 **Issue #264 — Martin-Synge EGH seeding — root cause actually fixed (after a false start)**
 

@@ -146,3 +146,85 @@ def tI_bounds(tR):
     upper = np.min(tR) - 0.05 * span
     lower = np.min(tR) - 10 * span
     return lower, upper
+
+
+# ---------------------------------------------------------------------------
+# Model-agnostic SEC_conformance (molass-library/molass-legacy#289)
+# ---------------------------------------------------------------------------
+#
+# Earlier, SEC_conformance (one of the 7 scores synthesized into the rigorous-
+# optimization Score Value) was computed per elution model from model-specific
+# column parameters (e.g. EGH's single-pore theory needed Rg + pore size).
+# Every model but EGH either stubbed this to a constant or special-cased it,
+# making cross-model SV comparisons unfair -- see
+# molass-researcher/experiments/46_sec_conformance_fairness for the full
+# derivation and an empirical measurement of the resulting bias.
+#
+# This replaces that per-model logic with one formula that needs only the
+# post-decomposition *moments* of each component's elution curve (tR = mean,
+# sigma = sqrt(variance) -- see molass_legacy.Peaks.MomentsUtils.compute_moments),
+# which every model produces identically regardless of its internal physics.
+
+SECCONF_LOWER_BOUND = -2.5
+# Intentionally duplicated from molass_legacy.SecTheory.ColumnConstants rather
+# than imported: molass-legacy depends on molass-library, not the reverse.
+BAD_CONFORMANCE_REDUCE = 1e-2
+SEC_PENALTY_SCALE = 1e8
+NEUTRAL_RAW_CONFORMANCE = 0.0
+
+
+def conformance_score(tR, sigma):
+    """Model-agnostic SEC_conformance (raw; the caller applies its own final-scale
+    transform, e.g. BasicOptimizer.compute_comformance's ``*0.5 - 0.1``).
+
+    Fits the shared Martin-Synge plate-theory relation ``tR_i = tI + sqrt(N)*sigma_i``
+    to the given per-component moments via ordinary least squares, and scores the
+    residual on the same log-scale/floor structure historically used by EGH's
+    single-pore-theory ``sec_comformance`` -- but using only ``(tR, sigma)``, so it
+    applies identically to every elution model (no Rg, no pore size, no
+    model-specific column parameters needed).
+
+    Parameters
+    ----------
+    tR : array-like
+        Per-component retention times (first raw moment of each component's
+        elution curve).
+    sigma : array-like
+        Per-component widths (sqrt of the second central moment).
+
+    Returns
+    -------
+    float
+        ``NEUTRAL_RAW_CONFORMANCE`` when fewer than 2 components (no regression
+        is possible with a single point -- neither rewarded nor penalized).
+        Otherwise a log-scaled residual, floored at ``SECCONF_LOWER_BOUND``
+        (best) and reduced (via ``BAD_CONFORMANCE_REDUCE``) when it would
+        otherwise be positive (worst), mirroring the historical EGH formula's
+        scale so synthesize()'s score weighting stays calibrated.
+    """
+    tR = np.asarray(tR, dtype=float)
+    sigma = np.asarray(sigma, dtype=float)
+    if len(tR) < 2:
+        return NEUTRAL_RAW_CONFORMANCE
+
+    slope, intercept = np.polyfit(sigma, tR, 1)   # slope = sqrt(N), intercept = tI
+    model_tR = intercept + slope * sigma
+    residual = float(np.average((model_tR - tR) ** 2))
+
+    # Physical-validity penalty: width must grow with retention (slope > 0),
+    # injection must precede every component's elution (intercept < min(tR)),
+    # and the implied plate count must stay within the same sanity bounds
+    # already used to seed EGH (N_LOWER_BOUND/N_UPPER_BOUND above).
+    N = slope ** 2
+    violation = (
+        min(0.0, slope) ** 2
+        + max(0.0, intercept - np.min(tR)) ** 2
+        + (min(0.0, N - N_LOWER_BOUND) / N_LOWER_BOUND) ** 2
+        + (max(0.0, N - N_UPPER_BOUND) / N_UPPER_BOUND) ** 2
+    )
+
+    total = residual + SEC_PENALTY_SCALE * violation
+    log_conformance = np.log10(total) if total > 0 else SECCONF_LOWER_BOUND
+    if log_conformance > 0:
+        log_conformance *= BAD_CONFORMANCE_REDUCE   # large conformance at early stages can be misleading
+    return max(SECCONF_LOWER_BOUND, log_conformance)
