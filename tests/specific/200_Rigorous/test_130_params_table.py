@@ -1,7 +1,7 @@
 """Test molass.Rigorous.ParamsTable -- model-agnostic "Show Parameters" data extractor.
 
 Promoted from molass-researcher/experiments/34_ssd_rigorous_gui/34k_show_parameters_design.ipynb,
-where it was validated against EGH, SDM, CEDM, LKM and GRM (SAMPLE1).
+where it was validated against EGH, SDM, EDM, LKM and GRM (SAMPLE1).
 """
 import pytest
 import pandas as pd
@@ -29,7 +29,7 @@ def _score_for(base_decomp, model):
     return target.score(trimmed_ssd=trimmed)
 
 
-@pytest.mark.parametrize("model", ["egh", "sdm", "cedm", "lkm", "grm"])
+@pytest.mark.parametrize("model", ["egh", "sdm", "edm", "lkm", "grm"])
 def test_build_params_table_returns_dataframe(base_decomp, model):
     score = _score_for(base_decomp, model)
     df = build_params_table(score.optimizer, score.init_params)
@@ -40,7 +40,7 @@ def test_build_params_table_returns_dataframe(base_decomp, model):
     assert not df["section"].isna().any()
 
 
-@pytest.mark.parametrize("model", ["egh", "sdm", "cedm", "lkm", "grm"])
+@pytest.mark.parametrize("model", ["egh", "sdm", "edm", "lkm", "grm"])
 def test_all_components_present_in_xr_rows(base_decomp, model):
     """Regression guard for the 1D xr_params bug: all 3 components must appear, not just 1."""
     score = _score_for(base_decomp, model)
@@ -51,9 +51,9 @@ def test_all_components_present_in_xr_rows(base_decomp, model):
     assert components == {1, 2, 3}
 
 
-def test_cedm_xr_labels_not_egh_labels(base_decomp):
-    """Regression guard: CEDM's [a, b, c_inj] must not be mislabeled with EGH names."""
-    score = _score_for(base_decomp, "cedm")
+def test_edm_xr_labels_not_egh_labels(base_decomp):
+    """Regression guard: EDM's [a, b, c_inj] must not be mislabeled with EGH names."""
+    score = _score_for(base_decomp, "edm")
     df = build_params_table(score.optimizer, score.init_params)
 
     xr_labels = set(df[df["section"] == "xr"]["label"].unique())

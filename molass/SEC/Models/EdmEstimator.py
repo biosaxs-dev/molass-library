@@ -21,7 +21,7 @@ def estimate_edm_init_params(decomposition, **kwargs):
         If ``a_bounds``, ``b_bounds``, or ``cinj_min`` are not explicitly
         provided in kwargs, they are automatically derived from the EGH
         decomposition parameters via
-        :func:`~molass.SEC.Models.EdmRecommend.suggest_cedm_bounds_from_egh`.
+        :func:`~molass.SEC.Models.EdmRecommend.suggest_edm_bounds_from_egh`.
         
         To disable auto-bounds and use unconstrained optimization, pass
         ``auto_bounds=False``.
@@ -47,9 +47,9 @@ def estimate_edm_init_params(decomposition, **kwargs):
                 from importlib import reload
                 import molass.SEC.Models.EdmRecommend
                 reload(molass.SEC.Models.EdmRecommend)
-            from molass.SEC.Models.EdmRecommend import suggest_cedm_bounds_from_egh
+            from molass.SEC.Models.EdmRecommend import suggest_edm_bounds_from_egh
             
-            suggested = suggest_cedm_bounds_from_egh(
+            suggested = suggest_edm_bounds_from_egh(
                 decomposition,
                 e_assumed=kwargs.get('e_assumed', 0.5),
                 verbose=debug

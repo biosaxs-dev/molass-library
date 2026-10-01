@@ -10,7 +10,7 @@ condition in the parent's copy but not mirrored into the subprocess's copy.
 Both callers now go through :func:`get_constraint_and_overrides` instead.
 
 The constraint itself applies uniformly to any method (BH or DE) and any
-model (EGH/SDM/EDM/CEDM/LKM/GRM) with 3+ components -- component collapse is
+model (EGH/SDM/EDM/LKM/GRM) with 3+ components -- component collapse is
 not a DE-specific failure mode, and the boundaries are always derived from
 the pre-upgrade EGH source, independent of the later model choice. Only the
 accompanying ``de_tol=0`` override is DE-specific (works around a scipy DE

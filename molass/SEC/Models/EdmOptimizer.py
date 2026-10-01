@@ -63,16 +63,12 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             all molecule-size information.  Default False.
 
         shared_column : bool, optional
-            If True, enforce the full constrained-EDM parameterisation where
-            ``t0``, ``u``, ``e``, ``Dz`` are shared column parameters and
-            only ``a`` (K_SEC), ``b``, and ``cinj`` are per-component.
-
-            This is the recommended mode for K_SEC identification.  With
-            over-parameterised (free) EDM, the optimiser can absorb peak
-            position into ``t0``/``u`` and leave ``a`` near zero for all
-            components, making Spearman(Rg, a) meaningless.  With constrained
-            EDM, peak positions are explained solely by ``a``-differences,
-            yielding Spearman(Rg, a) = -1.000 for well-separated SEC data.
+            Always True: this is the only EDM parameterisation molass-library
+            implements, enforcing ``t0``, ``u``, ``e``, ``Dz`` as shared
+            column parameters with only ``a`` (K_SEC), ``b``, and ``cinj``
+            per-component. (The older unconstrained/"free" EDM, which left
+            peak position ambiguous between ``t0``/``u`` and ``a``, has been
+            removed.)
 
             Parameter vector layout::
 
@@ -80,7 +76,7 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
                  a_0, b_0, cinj_0,
                  a_1, b_1, cinj_1, ...]
 
-            Default bounds applied when ``shared_column=True``:
+            Default bounds:
             - ``e_bounds`` → ``(0.2, 0.85)`` (physical SEC total-porosity range)
             - ``cinj_min`` → ``0.05`` (prevents component collapse to zero)
 
@@ -88,8 +84,7 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             - ``e_bounds`` kwarg (same meaning as the top-level kwarg)
             - ``cinj_min`` kwarg
 
-            Default True.  Pass ``False`` to use unconstrained (free) EDM,
-            which is deprecated and will be removed in a future release.
+            Passing ``shared_column=False`` raises ``ValueError``.
 
         suppress_positive_b_warning : bool, optional
             If True, suppress the UserWarning that is issued when any fitted
@@ -134,27 +129,6 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
     position_anchor_scale = kwargs.get('position_anchor_scale', 1e-5)
 
     shape = init_params.shape
-
-    def objective(p, return_cy_list=False):
-        cy_list = []
-        for params in p.reshape(shape):
-            cy = edm_impl(x, *params)
-            cy_list.append(cy)
-        if return_cy_list:
-            return cy_list
-        ty = np.sum(cy_list, axis=0)
-        data_error = np.sum((ty - y) ** 2)
-        # Soft position constraint: penalise deviation of each component's
-        # centroid from the corresponding EGH peak frame.  Using the centroid
-        # (amplitude-independent distribution mean) prevents collapse even
-        # when one component's amplitude approaches zero.
-        position_penalty = 0.0
-        for cy, egh_peak in zip(cy_list, egh_peak_frames):
-            cy_abs_sum = np.sum(np.abs(cy))
-            if cy_abs_sum > 0:
-                centroid = np.sum(cy * x) / cy_abs_sum
-                position_penalty += (centroid - egh_peak) ** 2
-        return data_error + position_penalty * position_anchor_scale
 
     # E_IDX: index of the porosity parameter 'e' in the 7-param vector
     # [t0, u, a, b, e, Dz, cinj]
@@ -209,192 +183,156 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             new_xr_ccurves.append(EdmComponentCurve(x, full_params))
         return new_xr_ccurves
 
-    _unset = object()
-    shared_column = kwargs.get('shared_column', _unset)
-    if shared_column is _unset:
-        shared_column = True  # CEDM is the default; free-EDM is deprecated
-    elif not shared_column:
-        import warnings
-        warnings.warn(
-            "shared_column=False (free-EDM) is deprecated and will be removed in a future release. "
-            "Use the default shared_column=True (constrained-EDM / CEDM) instead.",
-            DeprecationWarning,
-            stacklevel=3,
+    shared_column = kwargs.get('shared_column', True)
+    if not shared_column:
+        raise ValueError(
+            "shared_column=False (free-EDM) has been removed; EDM now always uses "
+            "the constrained/shared-column parameterisation. Drop the shared_column "
+            "kwarg (or pass shared_column=True) to use it."
         )
 
-    if shared_column:
-        # --- Constrained-EDM mode ---
-        # Parameter vector: [t0_sh, u_sh, e_sh, Dz_sh,  a_0,b_0,cinj_0, a_1,b_1,cinj_1, ...]
-        # Shared indices in the 7-param vector: T0=0, U=1, E=4, DZ=5
-        # Per-component indices: A=2, B=3, CINJ=6
-        L_EDM = 30.0  # column length hardcoded in edm_func / edm_impl
-        N_SHARED = 4  # t0, u, e, Dz
-        N_PER_COMP = 3  # a, b, cinj
-        n_comp = shape[0]
+    # --- Constrained-EDM mode ---
+    # Parameter vector: [t0_sh, u_sh, e_sh, Dz_sh,  a_0,b_0,cinj_0, a_1,b_1,cinj_1, ...]
+    # Shared indices in the 7-param vector: T0=0, U=1, E=4, DZ=5
+    # Per-component indices: A=2, B=3, CINJ=6
+    L_EDM = 30.0  # column length hardcoded in edm_func / edm_impl
+    N_SHARED = 4  # t0, u, e, Dz
+    N_PER_COMP = 3  # a, b, cinj
+    n_comp = shape[0]
 
-        # Shared-column bounds; prefer caller-supplied e_bounds over the tight default.
-        sc_e_bounds = kwargs.get('e_bounds', (0.2, 0.85))
-        if sc_e_bounds is None:
-            sc_e_bounds = (None, None)  # None means "unbounded" for e
-        cinj_min = kwargs.get('cinj_min', 0.05)
+    # Shared-column bounds; prefer caller-supplied e_bounds over the tight default.
+    sc_e_bounds = kwargs.get('e_bounds', (0.2, 0.85))
+    if sc_e_bounds is None:
+        sc_e_bounds = (None, None)  # None means "unbounded" for e
+    cinj_min = kwargs.get('cinj_min', 0.05)
 
-        # --- analytical init for shared params ---
-        t0_sh = float(init_params[:, 0].min())
-        # u_sh: choose so that the void time is ~10% shorter than the fastest peak delay
-        peak_delay = float(egh_peak_frames.min()) - t0_sh
-        if peak_delay <= 0:
-            peak_delay = 1.0  # guard
-        void_time = peak_delay / 1.1  # leave 10% head-room so all a_init > 0
-        u_sh = L_EDM / void_time
-        Dz_sh = float(init_params[:, 5].mean())  # DZ_IDX = 5
+    # --- analytical init for shared params ---
+    t0_sh = float(init_params[:, 0].min())
+    # u_sh: choose so that the void time is ~10% shorter than the fastest peak delay
+    peak_delay = float(egh_peak_frames.min()) - t0_sh
+    if peak_delay <= 0:
+        peak_delay = 1.0  # guard
+    void_time = peak_delay / 1.1  # leave 10% head-room so all a_init > 0
+    u_sh = L_EDM / void_time
+    Dz_sh = float(init_params[:, 5].mean())  # DZ_IDX = 5
 
-        # b=0 is the linear-limit start; per-component free-EDM b values are
-        # unreliable (can produce b≪0, causing gam3 overflow).
-        cinj_init = np.maximum(init_params[:, 6], cinj_min)  # CINJ_IDX = 6
+    # b=0 is the linear-limit start; per-component free-EDM b values are
+    # unreliable (can produce b≪0, causing gam3 overflow).
+    cinj_init = np.maximum(init_params[:, 6], cinj_min)  # CINJ_IDX = 6
 
-        # Analytical a_init at e=0.5 (F=1.0 — typical SEC total porosity).
-        # Per-component free-EDM e tends to over-estimate (~0.85, F≈0.17),
-        # forcing a≫1.  Starting at e=0.5 keeps a in the physical K_SEC range.
-        e_sh_init = 0.5
-        F_sh_init = (1.0 - e_sh_init) / e_sh_init  # = 1.0
-        a_init = ((egh_peak_frames - t0_sh) / void_time - 1.0) / max(F_sh_init, 1e-3)
-        a_init = np.maximum(a_init, 0.01)
+    # Analytical a_init at e=0.5 (F=1.0 — typical SEC total porosity).
+    # Per-component free-EDM e tends to over-estimate (~0.85, F≈0.17),
+    # forcing a≫1.  Starting at e=0.5 keeps a in the physical K_SEC range.
+    e_sh_init = 0.5
+    F_sh_init = (1.0 - e_sh_init) / e_sh_init  # = 1.0
+    a_init = ((egh_peak_frames - t0_sh) / void_time - 1.0) / max(F_sh_init, 1e-3)
+    a_init = np.maximum(a_init, 0.01)
 
-        # Bounds
-        # t0: left unconstrained — the optimizer starts from the analytical
-        #     value (t0_sh ≈ free-EDM minimum) and L-BFGS-B follows the gradient.
-        # b:  can be constrained via kwargs (e.g., b_bounds=(-2, 0.5) from
-        #     auto-derived EGH tau analysis).  Default: unconstrained.
-        # a:  can be constrained via kwargs (e.g., a_bounds=(0, 2.5) from
-        #     auto-derived EGH retention analysis).  Default: (0, ∞).
-        
-        # Extract bounds from kwargs (auto-derived in EdmEstimator if not specified)
-        a_bounds_kw = kwargs.get('a_bounds', None)
-        b_bounds_kw = kwargs.get('b_bounds', None)
-        
-        sc_bounds = [
-            (None, None),             # t0_sh: unconstrained (starts at analytical value)
-            (1e-3, None),             # u_sh  — must be positive
-            sc_e_bounds,              # e_sh
-            (1e-6, None),             # Dz_sh — must be positive
+    # Bounds
+    # t0: left unconstrained — the optimizer starts from the analytical
+    #     value (t0_sh ≈ free-EDM minimum) and L-BFGS-B follows the gradient.
+    # b:  can be constrained via kwargs (e.g., b_bounds=(-2, 0.5) from
+    #     auto-derived EGH tau analysis).  Default: unconstrained.
+    # a:  can be constrained via kwargs (e.g., a_bounds=(0, 2.5) from
+    #     auto-derived EGH retention analysis).  Default: (0, ∞).
+    
+    # Extract bounds from kwargs (auto-derived in EdmEstimator if not specified)
+    a_bounds_kw = kwargs.get('a_bounds', None)
+    b_bounds_kw = kwargs.get('b_bounds', None)
+    
+    sc_bounds = [
+        (None, None),             # t0_sh: unconstrained (starts at analytical value)
+        (1e-3, None),             # u_sh  — must be positive
+        sc_e_bounds,              # e_sh
+        (1e-6, None),             # Dz_sh — must be positive
+    ]
+    pc_bounds = []
+    for _ in range(n_comp):
+        # Per-component bounds: apply kwargs overrides if present
+        a_bound = a_bounds_kw if a_bounds_kw is not None else (0.0, None)
+        b_bound = b_bounds_kw if b_bounds_kw is not None else (None, None)
+        pc_bounds += [
+            a_bound,              # a_i   (K_SEC, user or auto-derived bounds)
+            b_bound,              # b_i   (user or auto-derived bounds)
+            (cinj_min, None),     # cinj_i (prevents collapse)
         ]
-        pc_bounds = []
-        for _ in range(n_comp):
-            # Per-component bounds: apply kwargs overrides if present
-            a_bound = a_bounds_kw if a_bounds_kw is not None else (0.0, None)
-            b_bound = b_bounds_kw if b_bounds_kw is not None else (None, None)
-            pc_bounds += [
-                a_bound,              # a_i   (K_SEC, user or auto-derived bounds)
-                b_bound,              # b_i   (user or auto-derived bounds)
-                (cinj_min, None),     # cinj_i (prevents collapse)
-            ]
-        sc_bounds = sc_bounds + pc_bounds
+    sc_bounds = sc_bounds + pc_bounds
+    
+    # Order penalty scale: enforce K_SEC monotonicity (a[0] ≤ a[1] ≤ ...)
+    # In SEC, earlier-eluting components have larger Rg → more excluded → smaller a.
+    # kwargs can override via 'a_order_penalty_scale' (default 1e-3).
+    a_order_penalty_scale = kwargs.get('a_order_penalty_scale', 1e-3)
+
+    def objective_sc(p_flat, return_cy_list=False):
+        t0_v, u_v, e_v, Dz_v = p_flat[:N_SHARED]
+        per_comp = p_flat[N_SHARED:].reshape(n_comp, N_PER_COMP)
+        cy_list = []
+        a_values = []
+        for a_v, b_v, cinj_v in per_comp:
+            a_values.append(a_v)
+            full = np.array([t0_v, u_v, a_v, b_v, e_v, Dz_v, cinj_v])
+            # Replace NaN/Inf (from overflow in pathological regions) with 0
+            # so the position penalty is still applied to out-of-range curves.
+            cy = np.nan_to_num(edm_impl(x, *full), nan=0.0, posinf=0.0, neginf=0.0)
+            cy_list.append(cy)
+        if return_cy_list:
+            return cy_list
+        ty = np.sum(cy_list, axis=0)
+        data_error = np.sum((ty - y) ** 2)
         
-        # Order penalty scale: enforce K_SEC monotonicity (a[0] ≤ a[1] ≤ ...)
-        # In SEC, earlier-eluting components have larger Rg → more excluded → smaller a.
-        # kwargs can override via 'a_order_penalty_scale' (default 1e-3).
-        a_order_penalty_scale = kwargs.get('a_order_penalty_scale', 1e-3)
-
-        def objective_sc(p_flat, return_cy_list=False):
-            t0_v, u_v, e_v, Dz_v = p_flat[:N_SHARED]
-            per_comp = p_flat[N_SHARED:].reshape(n_comp, N_PER_COMP)
-            cy_list = []
-            a_values = []
-            for a_v, b_v, cinj_v in per_comp:
-                a_values.append(a_v)
-                full = np.array([t0_v, u_v, a_v, b_v, e_v, Dz_v, cinj_v])
-                # Replace NaN/Inf (from overflow in pathological regions) with 0
-                # so the position penalty is still applied to out-of-range curves.
-                cy = np.nan_to_num(edm_impl(x, *full), nan=0.0, posinf=0.0, neginf=0.0)
-                cy_list.append(cy)
-            if return_cy_list:
-                return cy_list
-            ty = np.sum(cy_list, axis=0)
-            data_error = np.sum((ty - y) ** 2)
-            
-            position_penalty = 0.0
-            for cy, egh_peak in zip(cy_list, egh_peak_frames):
-                cy_abs_sum = np.sum(np.abs(cy))
-                if cy_abs_sum > 0:
-                    centroid = np.sum(cy * x) / cy_abs_sum
-                    position_penalty += (centroid - egh_peak) ** 2
-                else:
-                    # Curve is zero everywhere — apply a strong penalty so the
-                    # optimizer does not "hide" a component outside the data range.
-                    position_penalty += (x[-1] - egh_peak) ** 2
-            
-            # Order penalty: penalize when a[i] > a[i+1] (wrong order)
-            # Components are ordered by EGH peak position (early → late elution).
-            # SEC principle: early elution → larger Rg → smaller K_SEC (a).
-            # So a[0] ≤ a[1] ≤ ... ≤ a[n-1] is the expected ordering.
-            order_penalty = 0.0
-            for i in range(n_comp - 1):
-                if a_values[i] > a_values[i+1]:
-                    # Wrong order: penalize the squared violation
-                    order_penalty += (a_values[i] - a_values[i+1]) ** 2
-            
-            return (data_error + 
-                    position_penalty * position_anchor_scale +
-                    order_penalty * a_order_penalty_scale)
-
-        # Single optimization from the analytical starting point.
-        # No two-phase, no multi-start — L-BFGS-B from (e=0.5, b=0) follows
-        # the gradient into the physically meaningful basin.  Unconstrained t0
-        # and b allow the EDM curves to take flexible shapes that better fit the
-        # data while still preserving the a-value ordering (K_SEC identifiability).
-        per_comp_init = np.column_stack([a_init, np.zeros(n_comp), cinj_init]).flatten()
-        p0_sc = np.concatenate([np.array([t0_sh, u_sh, e_sh_init, Dz_sh]), per_comp_init])
-
-        result_sc = minimize(objective_sc, p0_sc, bounds=sc_bounds, method='L-BFGS-B',
-                             options={'maxiter': 20000, 'ftol': 1e-14, 'gtol': 1e-9})
-
-        t0_fit, u_fit, e_fit, Dz_fit = result_sc.x[:N_SHARED]
-        per_comp_fit = result_sc.x[N_SHARED:].reshape(n_comp, N_PER_COMP)
-
-        if debug:
-            print(f"  fval={result_sc.fun:.6g}  success={result_sc.success}")
-            print(f"  shared column: t0={t0_fit:.2f}  u={u_fit:.4f}  e={e_fit:.4f}  Dz={Dz_fit:.4f}")
-            for i, (a_v, b_v, cinj_v) in enumerate(per_comp_fit):
-                print(f"  comp {i}: a={a_v:.4f}  b={b_v:.4f}  cinj={cinj_v:.4f}")
-
-        _check_positive_b(per_comp_fit[:, 1],
-                          suppress=kwargs.get('suppress_positive_b_warning', False))
-        new_xr_ccurves = []
-        for a_v, b_v, cinj_v in per_comp_fit:
-            full_params = np.array([t0_fit, u_fit, a_v, b_v, e_fit, Dz_fit, cinj_v])
-            new_xr_ccurves.append(EdmComponentCurve(x, full_params, model='cedm'))
-        return new_xr_ccurves
-
-    # --- Independent-e mode (original behaviour) ---
-    # Build per-parameter bounds: only e (index 4) is physically bounded to [0, 1].
-    # All other parameters (t0, u, a, b, Dz, cinj) are left unbounded.
-    n_params_per_comp = shape[1]
-    if e_bounds is not None:
-        bounds = []
-        for _ in range(shape[0]):
-            for j in range(n_params_per_comp):
-                bounds.append(e_bounds if j == E_IDX else (None, None))
-    else:
-        bounds = None
-
-    result = minimize(objective, init_params.flatten(), bounds=bounds, method='L-BFGS-B')
-    if debug:
-        debug_plot_params(x, y, result.x.reshape(shape), "optimize: after minimize")
-        cy_list_opt = objective(result.x, return_cy_list=True)
-        for i, (cy, egh_peak) in enumerate(zip(cy_list_opt, egh_peak_frames)):
+        position_penalty = 0.0
+        for cy, egh_peak in zip(cy_list, egh_peak_frames):
             cy_abs_sum = np.sum(np.abs(cy))
-            centroid = np.sum(cy * x) / cy_abs_sum if cy_abs_sum > 0 else float('nan')
-            print(f"  Component {i}: centroid={centroid:.1f}  EGH peak={egh_peak:.1f}  diff={centroid - egh_peak:.1f}")
+            if cy_abs_sum > 0:
+                centroid = np.sum(cy * x) / cy_abs_sum
+                position_penalty += (centroid - egh_peak) ** 2
+            else:
+                # Curve is zero everywhere — apply a strong penalty so the
+                # optimizer does not "hide" a component outside the data range.
+                position_penalty += (x[-1] - egh_peak) ** 2
+        
+        # Order penalty: penalize when a[i] > a[i+1] (wrong order)
+        # Components are ordered by EGH peak position (early → late elution).
+        # SEC principle: early elution → larger Rg → smaller K_SEC (a).
+        # So a[0] ≤ a[1] ≤ ... ≤ a[n-1] is the expected ordering.
+        order_penalty = 0.0
+        for i in range(n_comp - 1):
+            if a_values[i] > a_values[i+1]:
+                # Wrong order: penalize the squared violation
+                order_penalty += (a_values[i] - a_values[i+1]) ** 2
+        
+        return (data_error + 
+                position_penalty * position_anchor_scale +
+                order_penalty * a_order_penalty_scale)
 
-    # b is at index 3 in the 7-element free-EDM param vector [t0,u,a,b,e,Dz,cinj]
-    b_fitted_free = result.x.reshape(shape)[:, 3]
-    _check_positive_b(b_fitted_free,
+    # Single optimization from the analytical starting point.
+    # No two-phase, no multi-start — L-BFGS-B from (e=0.5, b=0) follows
+    # the gradient into the physically meaningful basin.  Unconstrained t0
+    # and b allow the EDM curves to take flexible shapes that better fit the
+    # data while still preserving the a-value ordering (K_SEC identifiability).
+    per_comp_init = np.column_stack([a_init, np.zeros(n_comp), cinj_init]).flatten()
+    p0_sc = np.concatenate([np.array([t0_sh, u_sh, e_sh_init, Dz_sh]), per_comp_init])
+
+    result_sc = minimize(objective_sc, p0_sc, bounds=sc_bounds, method='L-BFGS-B',
+                         options={'maxiter': 20000, 'ftol': 1e-14, 'gtol': 1e-9})
+
+    t0_fit, u_fit, e_fit, Dz_fit = result_sc.x[:N_SHARED]
+    per_comp_fit = result_sc.x[N_SHARED:].reshape(n_comp, N_PER_COMP)
+
+    if debug:
+        print(f"  fval={result_sc.fun:.6g}  success={result_sc.success}")
+        print(f"  shared column: t0={t0_fit:.2f}  u={u_fit:.4f}  e={e_fit:.4f}  Dz={Dz_fit:.4f}")
+        for i, (a_v, b_v, cinj_v) in enumerate(per_comp_fit):
+            print(f"  comp {i}: a={a_v:.4f}  b={b_v:.4f}  cinj={cinj_v:.4f}")
+
+    _check_positive_b(per_comp_fit[:, 1],
                       suppress=kwargs.get('suppress_positive_b_warning', False))
     new_xr_ccurves = []
-    for params in result.x.reshape(shape):
-        ccurve = EdmComponentCurve(x, params)
-        new_xr_ccurves.append(ccurve)
+    for a_v, b_v, cinj_v in per_comp_fit:
+        full_params = np.array([t0_fit, u_fit, a_v, b_v, e_fit, Dz_fit, cinj_v])
+        new_xr_ccurves.append(EdmComponentCurve(x, full_params, model='edm'))
     return new_xr_ccurves
+
 
 
 def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
@@ -542,5 +480,5 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
     refined_ccurves = []
     for a_v, b_v, cinj_v in result.x.reshape(n_comp, N_PER_COMP):
         full_params = np.array([t0_fixed, u_fixed, a_v, b_v, e_fixed, Dz_fixed, cinj_v])
-        refined_ccurves.append(EdmComponentCurve(x, full_params, model='cedm'))
+        refined_ccurves.append(EdmComponentCurve(x, full_params, model='edm'))
     return refined_ccurves

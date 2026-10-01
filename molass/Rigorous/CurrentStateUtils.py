@@ -638,7 +638,7 @@ def parse_rg_history(analysis_folder, optimizer):
     # optimizer.n_components = num_components + 1 (legacy convention: includes
     # a baseline pseudo-component); every params_type's rg block has exactly
     # n_components - 1 real per-component entries (see e.g. EghParams/SdmParams/
-    # CedmParams.get_parameter_names -- nc = n_components - 1).
+    # EdmParams.get_parameter_names -- nc = n_components - 1).
     n = optimizer.n_components - 1
     columns = [[] for _ in range(n)]
 

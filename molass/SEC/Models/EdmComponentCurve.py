@@ -58,8 +58,8 @@ class EdmComponentCurve(ComponentCurve):
         params : tuple
             The column parameters (N, T, me, mp, x0, tI, N0, poresize, timescale).
         model : str, optional
-            Model tag.  Use ``'cedm'`` for constrained-EDM curves where
-            t0, u, e, Dz are shared across components (default ``'edm'``).
+            Model tag. Always ``'edm'`` -- t0, u, e, Dz are shared across
+            components (the constrained/shared-column parameterisation).
         """
         self.x = x
         self.params = params

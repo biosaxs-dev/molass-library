@@ -29,7 +29,7 @@ from .ParamsTable import (
     common_param_rows,
     egh_colparam_rows,
     sdm_colparam_rows,
-    cedm_colparam_rows,
+    edm_colparam_rows,
     lkm_colparam_rows,
     grm_colparam_rows,
     build_params_table,

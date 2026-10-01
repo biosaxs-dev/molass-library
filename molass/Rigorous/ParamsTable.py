@@ -4,7 +4,7 @@ Rigorous.ParamsTable.py
 Model-agnostic "Show Parameters" data extractor.
 
 Promoted from molass-researcher/experiments/34_ssd_rigorous_gui/34k_show_parameters_design.ipynb,
-where it was validated against EGH, SDM, CEDM, LKM and GRM (SAMPLE1). Replaces the legacy
+where it was validated against EGH, SDM, EDM, LKM and GRM (SAMPLE1). Replaces the legacy
 per-model ``*ParamsSheet`` classes' hand-built row/col grids with one shared extractor plus
 one small per-model namer for the trailing ``model_colparams`` tuple.
 
@@ -22,7 +22,7 @@ def common_param_rows(xr_params, xr_baseparams, rgs, mapping, uv_params, uv_base
     """Build the model-agnostic rows: xr/rg, xr baseline, uv, uv baseline, mapping, range.
 
     Everything except ``model_colparams`` (see the per-model ``*_colparam_rows`` functions)
-    is identical across EGH/SDM/EDM/CEDM/LKM/GRM.
+    is identical across EGH/SDM/EDM/LKM/GRM.
 
     Parameters
     ----------
@@ -31,7 +31,7 @@ def common_param_rows(xr_params, xr_baseparams, rgs, mapping, uv_params, uv_base
     xr_labels : list of str, optional
         Column names for ``xr_params``. Defaults to EGH's ``[h, mu (tR), sigma, tau]``
         truncated to the actual column count -- pass explicitly for models whose
-        per-component params mean something else (e.g. CEDM's ``[a, b, c_inj]``).
+        per-component params mean something else (e.g. EDM's ``[a, b, c_inj]``).
 
     Returns
     -------
@@ -41,7 +41,7 @@ def common_param_rows(xr_params, xr_baseparams, rgs, mapping, uv_params, uv_base
     rows = []
     xr_params = np.asarray(xr_params)
     if xr_params.ndim == 1:
-        # SDM/EDM/CEDM/LKM/GRM: one scale per component (flat), not an EGH-style
+        # SDM/EDM/LKM/GRM: one scale per component (flat), not an EGH-style
         # (component, param) matrix -- np.atleast_2d would misread this as a
         # single row instead of n rows, silently dropping components 2..n.
         xr_params = xr_params.reshape(-1, 1)
@@ -107,8 +107,8 @@ def sdm_colparam_rows(colparams):
     return rows
 
 
-def cedm_colparam_rows(colparams):
-    """Namer for CEDM's ``model_colparams``: shared ``[t0_sh, u_sh, e_sh, Dz_sh]``."""
+def edm_colparam_rows(colparams):
+    """Namer for EDM's ``model_colparams``: shared ``[t0_sh, u_sh, e_sh, Dz_sh]``."""
     names = ["t0_sh", "u_sh", "e_sh", "Dz_sh"]
     return [{"section": "column", "label": n, "component": None, "value": v}
             for n, v in zip(names, colparams)]
@@ -157,7 +157,6 @@ def grm_colparam_rows(colparams, n_components):
 # correctly defaults to ["h"], so they're omitted here.
 _XR_LABELS_BY_MODEL = {
     "EDM": ["a", "b", "c_inj"],
-    "CEDM": ["a", "b", "c_inj"],
 }
 
 
@@ -193,8 +192,8 @@ def build_params_table(optimizer, params):
         rows += egh_colparam_rows(colparams)
     elif model_name == 'SDM':
         rows += sdm_colparam_rows(colparams)
-    elif model_name in ('EDM', 'CEDM'):
-        rows += cedm_colparam_rows(colparams)
+    elif model_name == 'EDM':
+        rows += edm_colparam_rows(colparams)
     elif model_name == 'LKM':
         rows += lkm_colparam_rows(colparams, optimizer.n_components)
     elif model_name == 'GRM':

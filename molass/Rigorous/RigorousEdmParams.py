@@ -1,45 +1,63 @@
 """
 Rigorous.RigorousEdmParams.py
 
-Build the flat initial-params vector for G2020 (EDM rigorous optimizer)
-from an EDM-model decomposition.
+Builds the G2020 (EDM) initial parameter vector from an EDM Decomposition.
 
-Works through polymorphism: ``ccurve.get_params()`` on an ``EdmComponentCurve``
-returns the 7-element EDM params ``(t0, u, a, b, e, Dz, cinj)`` per component.
-``uv_ccurve.scale`` is the UV/XR peak-height ratio, same as what
-``estimate_uv_weights_from_peaks`` computes in the legacy estimator.
+The EDM parameter layout is:
+    [a_0, b_0, cinj_0, a_1, b_1, cinj_1, ...]   <- xr_params (nc × 3, flattened)
+    xr_baseparams
+    rg_params (nc)
+    mapping (a_mp, b_mp)
+    uv_params (nc)
+    uv_baseparams (5 + num_baseparams)
+    mappable_range (c, d)
+    t0_sh, u_sh, e_sh, Dz_sh                     <- edm_colparams (4)
 """
-import os
 import numpy as np
-from importlib import reload
+
 
 def make_rigorous_initparams_impl(decomposition, baseparams, debug=False):
-    # XR initial parameters
-    xr_params = []
+    # Extract the shared column params from the first component curve.
+    # EdmComponentCurve.params order: (t0, u, a, b, e, Dz, cinj)
+    p0 = decomposition.xr_ccurves[0].params
+    t0_sh, u_sh = p0[0], p0[1]
+    e_sh, Dz_sh = p0[4], p0[5]
+
+    # Per-component (a, b, cinj)
+    xr_abc = []
     for ccurve in decomposition.xr_ccurves:
-        xr_params.append(ccurve.get_params())
-    xr_params = np.array(xr_params)
+        t0, u, a, b, e, Dz, cinj = ccurve.params
+        xr_abc.append((a, b, cinj))
+    xr_abc = np.array(xr_abc)            # shape (nc, 3)
+
     # XR baseline parameters
     xr_baseparams = baseparams[1]
 
     # Rg parameters
     rg_params = decomposition.get_rgs()
 
-    # Mapping parameters
-    a, b = decomposition.ssd.get_mapping()
+    # UV/XR mapping
+    a_mp, b_mp = decomposition.ssd.get_mapping()
 
-    # UV initial parameters
-    uv_params = []
-    for uv_ccurve in decomposition.uv_ccurves:
-        uv_params.append(uv_ccurve.scale)
+    # UV heights
+    uv_params = np.array([uv_ccurve.scale for uv_ccurve in decomposition.uv_ccurves])
 
     # UV baseline parameters
     uv_baseparams = baseparams[0]
 
-    # SecCol parameters
+    # Mappable range
     x = decomposition.ssd.xr.get_icurve().x
     init_mappable_range = (x[0], x[-1])
 
-    # SecCol parameters
-    Tz = np.average(xr_params[:,0])     # not used
-    return np.concatenate([xr_params.flatten(), xr_baseparams, rg_params, (a, b), uv_params, uv_baseparams, init_mappable_range, [Tz]])
+    # Shared column params (appended at the end)
+    edm_colparams = np.array([t0_sh, u_sh, e_sh, Dz_sh])
+
+    if debug:
+        print("RigorousEdmParams: xr_abc =", xr_abc)
+        print("RigorousEdmParams: edm_colparams =", edm_colparams)
+
+    return np.concatenate([
+        xr_abc.flatten(), xr_baseparams, rg_params,
+        (a_mp, b_mp), uv_params, uv_baseparams,
+        init_mappable_range, edm_colparams
+    ])

@@ -1089,7 +1089,7 @@ class Decomposition:
 
             - ``SDM``: `Stochastic Dispersive Model <https://biosaxs-dev.github.io/molass-essence/stochastic-theory#stochastic-dispersive-model>`_
             - ``EDM``: `Equilibrium Dispersive Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory#equilibrium-dispersive-model>`_
-            - ``CEDM``: Continuous EDM (shared-column variant of EDM)
+              (always the constrained/shared-column parameterisation)
             - ``LKM``: `Lumped Kinetic Model <https://biosaxs-dev.github.io/molass-essence/kinetic-theory>`_
             - ``GRM``: General Rate Model (film mass transfer + intraparticle pore diffusion)
 
@@ -1228,12 +1228,6 @@ class Decomposition:
                 reload(molass.Rigorous.RigorousEdmParams)
             from molass.Rigorous.RigorousEdmParams import make_rigorous_initparams_impl
             return make_rigorous_initparams_impl(self, baseparams, debug=debug)
-        elif self.model == 'cedm':
-            if debug:
-                import molass.Rigorous.RigorousCedmParams
-                reload(molass.Rigorous.RigorousCedmParams)
-            from molass.Rigorous.RigorousCedmParams import make_rigorous_initparams_impl
-            return make_rigorous_initparams_impl(self, baseparams, debug=debug)
         elif self.model == 'lkm':
             if debug:
                 import molass.Rigorous.RigorousLkmParams
@@ -1259,7 +1253,7 @@ class Decomposition:
             decomp_lkm = LKM().optimize_decomposition(decomp_egh)
             print(decomp_lkm.get_rigorous_param_count())  # e.g. 30
 
-        Works for all supported models (EGH, SDM, EDM, CEDM, LKM).
+        Works for all supported models (EGH, SDM, EDM, LKM).
 
         Returns
         -------
@@ -1284,7 +1278,7 @@ class Decomposition:
                 method='DE', seed_params=init_params, ...
             )
 
-        Works for all supported models (EGH, SDM, EDM, CEDM, LKM, GRM).
+        Works for all supported models (EGH, SDM, EDM, LKM, GRM).
 
         Returns
         -------

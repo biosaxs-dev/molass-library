@@ -1,17 +1,17 @@
 """
 SEC.Models.EdmRecommend.py
 
-Derive CEDM parameter bounds from well-fitted EGH decomposition.
+Derive EDM parameter bounds from well-fitted EGH decomposition.
 """
 import numpy as np
 
 
-def suggest_cedm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
+def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     """
-    Derive CEDM parameter bounds from fitted EGH decomposition.
+    Derive EDM parameter bounds from fitted EGH decomposition.
     
     This function analyzes the EGH peak positions, asymmetry (tau), and
-    relative heights to recommend physically plausible bounds for CEDM
+    relative heights to recommend physically plausible bounds for EDM
     parameters (a, b, cinj), preventing optimizer collapse to degenerate
     solutions.
     
@@ -80,7 +80,7 @@ def suggest_cedm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     Examples
     --------
     >>> decomp_egh = corrected.quick_decomposition(proportions=[1, 1])
-    >>> bounds = suggest_cedm_bounds_from_egh(decomp_egh, verbose=True)
+    >>> bounds = suggest_edm_bounds_from_egh(decomp_egh, verbose=True)
     >>> # Bounds are auto-applied:
     >>> decomp_edm = decomp_egh.upgrade(model='EDM')
     >>> # Or explicitly override:
@@ -97,7 +97,7 @@ def suggest_cedm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     tau_std = tau_values.std()
     
     # --- 1. Derive a_bounds from retention times ---
-    # CEDM retention: tR_i = t0 + (L/u) * (1 + a_i * F), F = (1-e)/e
+    # EDM retention: tR_i = t0 + (L/u) * (1 + a_i * F), F = (1-e)/e
     L_EDM = 30.0  # hardcoded in edm_impl
     
     # Analytical t0 and u (same logic as EdmOptimizer.py shared_column init)
@@ -148,7 +148,7 @@ def suggest_cedm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     cinj_min = max(0.15, cinj_min)  # absolute floor
     
     if verbose:
-        print("=== CEDM Bounds from EGH ===")
+        print("=== EDM Bounds from EGH ===")
         print(f"  EGH retention times: {tR_values}")
         print(f"  Analytical a values: {a_analytical}")
         print(f"  → a_bounds: {a_bounds}")

@@ -27,12 +27,7 @@ def create_model(model_name, **kwargs):
             reload(molass.SEC.Models.SDM)
         from molass.SEC.Models.SDM import SDM
         return SDM(**kwargs)
-    elif model_name in ('edm', 'cedm'):
-        # 'cedm' is a deprecated alias for 'edm': shared_column=True (CEDM)
-        # is already the unconditional default, enforced downstream in
-        # EdmOptimizer/EdmEstimatorImpl regardless of model_name. Applying
-        # it here too keeps this dispatch point from implying the two
-        # names still diverge (molass-library#262).
+    elif model_name == 'edm':
         if debug:
             import molass.SEC.Models.EDM
             reload(molass.SEC.Models.EDM)   

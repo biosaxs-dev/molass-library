@@ -5,10 +5,10 @@ class EDM:
     """
     Equilibrium Dispersive Model (EDM) for SEC data analysis.
 
-    'CEDM' is a deprecated alias for 'EDM': both model names resolve to the
-    same shared_column=True default. See `shared_column` in
-    `EdmOptimizer.optimize_edm_xr_decomposition` for the authoritative
-    default (molass-library#262).
+    Always uses the constrained/shared-column parameterisation
+    (``shared_column=True``, enforced in
+    ``EdmOptimizer.optimize_edm_xr_decomposition``); the older
+    unconstrained ("free") EDM has been removed.
     """
     def __init__(self, **kwargs):
         """ Initialize the EDM model with given parameters.
@@ -35,9 +35,8 @@ class EDM:
             The optimized decomposition.
         """
         debug = kwargs.get('debug', False)
-        # Merge constructor kwargs (e.g. shared_column defaulted True by
-        # ModelFactory for both 'edm' and 'cedm') with call-time kwargs;
-        # call-time values take precedence.
+        # Merge constructor kwargs (shared_column=True, defaulted by
+        # ModelFactory) with call-time kwargs; call-time values take precedence.
         merged = {**self.kwargs, **kwargs}
         kwargs = merged
         if debug:

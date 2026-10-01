@@ -130,12 +130,12 @@ def guess_multiple_impl(x, y, xr_ccurves, respect_egh=False, debug=False):
     return np.array(final_params_list)
 
 
-def estimate_cedm_shared_params(x, y, xr_ccurves, debug=False, **kwargs):
-    """Canonical estimator for CEDM (G2020) initial parameters.
+def estimate_edm_shared_params(x, y, xr_ccurves, debug=False, **kwargs):
+    """Canonical estimator for EDM (G2020) initial parameters.
 
     Combines rough per-component EDM fitting (:func:`guess_multiple_impl`)
     with a joint shared-column L-BFGS-B optimisation to produce physically
-    meaningful CEDM params with varied ``b`` values and shared column
+    meaningful EDM params with varied ``b`` values and shared column
     parameters.
 
     Parameters
@@ -159,7 +159,7 @@ def estimate_cedm_shared_params(x, y, xr_ccurves, debug=False, **kwargs):
 
     Returns
     -------
-    cedm_colparams : np.ndarray, shape (4,)
+    edm_colparams : np.ndarray, shape (4,)
         Shared column parameters ``[t0_sh, u_sh, e_sh, Dz_sh]``.
     abc_params : np.ndarray, shape (nc, 3)
         Per-component parameters ``[[a_0, b_0, cinj_0], ...]``.
@@ -194,12 +194,12 @@ def estimate_cedm_shared_params(x, y, xr_ccurves, debug=False, **kwargs):
         _MockDecomp(), rough_params, debug=debug, **kwargs
     )
 
-    # Step 4: extract CEDM params — all curves share t0, u, e, Dz
+    # Step 4: extract EDM params — all curves share t0, u, e, Dz
     # params layout: [t0, u, a, b, e, Dz, cinj]
     p0 = new_ccurves[0].params
-    cedm_colparams = np.array([p0[0], p0[1], p0[4], p0[5]])   # [t0_sh, u_sh, e_sh, Dz_sh]
+    edm_colparams = np.array([p0[0], p0[1], p0[4], p0[5]])   # [t0_sh, u_sh, e_sh, Dz_sh]
     abc_params = np.array(
         [[cc.params[2], cc.params[3], cc.params[6]] for cc in new_ccurves]
     )  # (nc, 3): [a_k, b_k, cinj_k]
 
-    return cedm_colparams, abc_params
+    return edm_colparams, abc_params

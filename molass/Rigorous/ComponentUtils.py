@@ -47,7 +47,10 @@ def get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params):
         xr_ccurves.append(SdmComponentCurve(x, column, rg, scale))
     return xr_ccurves
 
-def get_edm_xr_ccurves(optimizer, xr_icurve, separated_params):
+def get_nedm_xr_ccurves(optimizer, xr_icurve, separated_params):
+    """Reconstruct EdmComponentCurve objects for NEDM (G2010, non-constrained
+    EDM; legacy-only, no library ModelFactory entry -- this is only reached
+    via the legacy-optimizer bridge, never via Decomposition.model)."""
     from molass.SEC.Models.EdmComponentCurve import EdmComponentCurve
     xr_params = separated_params[0]  # shape (num_components, 7): (t0, u, a, b, e, Dz, cinj) per component
     x = xr_icurve.x
@@ -56,10 +59,11 @@ def get_edm_xr_ccurves(optimizer, xr_icurve, separated_params):
         xr_ccurves.append(EdmComponentCurve(x, p))
     return xr_ccurves
 
-def get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params):
-    """Reconstruct EdmComponentCurve objects for CEDM (constrained-EDM).
+def get_edm_xr_ccurves(optimizer, xr_icurve, separated_params):
+    """Reconstruct EdmComponentCurve objects for EDM (G2020, constrained/
+    shared-column -- the only EDM variant molass-library implements).
 
-    CEDM stores shared column params (t0, u, e, Dz) as separated_params[7]
+    EDM stores shared column params (t0, u, e, Dz) as separated_params[7]
     and per-component params (a, b, cinj) as separated_params[0] (nc×3).
     Reconstruct the full 7-param vector expected by edm_impl:
         [t0_sh, u_sh, a_k, b_k, e_sh, Dz_sh, cinj_k]
@@ -131,10 +135,10 @@ def get_xr_ccurves(optimizer, xr_icurve, separated_params):
         return get_egh_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'SDM':
         return get_sdm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name in ('EDM', 'CEDM'):   # G2020: constrained EDM (now the standard "EDM")
-        return get_cedm_xr_ccurves(optimizer, xr_icurve, separated_params)
-    elif model_name == 'NEDM':            # G2010: non-constrained EDM
+    elif model_name == 'EDM':              # G2020: constrained EDM (the only "EDM")
         return get_edm_xr_ccurves(optimizer, xr_icurve, separated_params)
+    elif model_name == 'NEDM':            # G2010: non-constrained EDM
+        return get_nedm_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'LKM':
         return get_lkm_xr_ccurves(optimizer, xr_icurve, separated_params)
     elif model_name == 'GRM':

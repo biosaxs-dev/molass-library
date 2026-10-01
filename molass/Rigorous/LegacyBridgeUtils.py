@@ -117,9 +117,7 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
             t0upper_bound = estimate_t0upper_bound(ecurve)
             optimizer.params_type.get_estimator(editor, t0_upper_bound=t0upper_bound, debug=debug)
         elif model == "EDM":
-            optimizer.params_type.get_estimator(editor, developing=True, debug=debug)
-        elif model == "CEDM":
-            pass  # CedmParams uses RigorousCedmParams for init; no legacy estimator needed
+            pass  # EdmParams (G2020) uses RigorousEdmParams for init; no legacy estimator needed
         elif model == "LKM":
             pass  # LkmParams derives bounds from init params directly; no legacy estimator needed
         elif model == "GRM":

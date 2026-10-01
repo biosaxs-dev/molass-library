@@ -1,13 +1,13 @@
 """
-Tests for CEDM (Constrained-EDM) parameter class, model tagging,
+Tests for EDM (constrained/shared-column) parameter class, model tagging,
 and G2020 objective function routing.
 
 Covers:
-  - EdmComponentCurve model tag 'cedm'
+  - EdmComponentCurve model tag 'edm'
   - CedmParams.split_params_simple round-trip
   - CedmParams.make_bounds_mask dimension
   - FunctionCodeUtils.detect_function_code returns 'G2020'
-  - OptimizerUtils.get_function_code('CEDM') returns 'G2020'
+  - OptimizerUtils.get_function_code('EDM') returns 'G2020'
 """
 import numpy as np
 import pytest
@@ -21,11 +21,11 @@ def _make_full_edm_params(t0=100.0, u=1.0, a=1.0, b=0.0, e=0.5, Dz=0.01, cinj=1.
     return np.array([t0, u, a, b, e, Dz, cinj], dtype=float)
 
 
-class _FakeCedmCurve:
-    """Minimal stand-in for EdmComponentCurve with model='cedm'."""
+class _FakeEdmCurve:
+    """Minimal stand-in for EdmComponentCurve with model='edm'."""
     def __init__(self, params):
         self.params = np.asarray(params, dtype=float)
-        self.model = 'cedm'
+        self.model = 'edm'
 
     def get_params(self):
         return self.params
@@ -43,49 +43,28 @@ def test_edm_component_curve_default_model_is_edm():
     assert c.model == 'edm'
 
 
-def test_edm_component_curve_cedm_model():
-    from molass.SEC.Models.EdmComponentCurve import EdmComponentCurve
-    x = np.linspace(50, 200, 10)
-    p = _make_full_edm_params()
-    c = EdmComponentCurve(x, p, model='cedm')
-    assert c.model == 'cedm'
-
-
 # ---------------------------------------------------------------------------
 # FunctionCodeUtils routing
 # ---------------------------------------------------------------------------
 
-def test_detect_function_code_returns_g2020_for_cedm():
+def test_detect_function_code_returns_g2020_for_edm():
     from molass.Rigorous.FunctionCodeUtils import detect_function_code
 
     class _FakeDecomp:
         def __init__(self):
-            self.xr_ccurves = [_FakeCedmCurve(_make_full_edm_params())]
+            self.xr_ccurves = [_FakeEdmCurve(_make_full_edm_params())]
 
     assert detect_function_code(_FakeDecomp()) == 'G2020'
-
-
-def test_detect_function_code_returns_none_for_edm():
-    from molass.Rigorous.FunctionCodeUtils import detect_function_code
-
-    class _FakeEdmCurve:
-        model = 'edm'
-
-    class _FakeDecomp:
-        xr_ccurves = [_FakeEdmCurve()]
-
-    # EDM is not in FUNCTION_CODE_MAP and is not 'cedm' → returns None
-    assert detect_function_code(_FakeDecomp()) is None
 
 
 # ---------------------------------------------------------------------------
 # OptimizerUtils bidirectional lookup
 # ---------------------------------------------------------------------------
 
-def test_model_name_dict_cedm():
+def test_model_name_dict_edm():
     from molass_legacy.Optimizer.OptimizerUtils import MODEL_NAME_DICT, get_function_code
-    assert MODEL_NAME_DICT.get('G2020') == 'CEDM'
-    assert get_function_code('CEDM') == 'G2020'
+    assert MODEL_NAME_DICT.get('G2020') == 'EDM'
+    assert get_function_code('EDM') == 'G2020'
 
 
 # ---------------------------------------------------------------------------
@@ -185,30 +164,51 @@ def test_func_importer_returns_g2020():
 
 
 # ---------------------------------------------------------------------------
-# ModelFactory 'edm'/'cedm' parity (molass-library#262)
+# ModelFactory 'edm' / removed free-EDM coverage
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("model_name", ["edm", "cedm", "EDM", "CEDM"])
+@pytest.mark.parametrize("model_name", ["edm", "EDM"])
 def test_model_factory_defaults_shared_column_true(model_name):
-    """'edm' and 'cedm' (any case) must produce identical shared_column
-    default, so the dispatch string no longer implies they diverge."""
+    """'edm' (any case) must default to shared_column=True."""
     from molass.SEC.ModelFactory import create_model
     model = create_model(model_name)
     assert model.kwargs.get('shared_column') is True
 
 
-def test_model_factory_edm_cedm_kwargs_identical():
-    """'edm' and 'cedm' must produce observably identical constructor
-    kwargs, not just identical eventual behavior three call-layers down."""
+@pytest.mark.parametrize("model_name", ["cedm", "CEDM"])
+def test_model_factory_rejects_cedm(model_name):
+    """'cedm' is no longer a recognized model name; only 'edm' is."""
     from molass.SEC.ModelFactory import create_model
-    edm_model = create_model('edm')
-    cedm_model = create_model('cedm')
-    assert edm_model.kwargs == cedm_model.kwargs
+    with pytest.raises(ValueError, match="Unknown model name"):
+        create_model(model_name)
 
 
 def test_model_factory_explicit_shared_column_still_overridable():
     """Explicit shared_column kwarg must still take precedence over the
-    default for both 'edm' and 'cedm'."""
+    default (validated at actual-optimization time, not construction time)."""
     from molass.SEC.ModelFactory import create_model
     model = create_model('edm', shared_column=False)
     assert model.kwargs.get('shared_column') is False
+
+
+def test_edm_optimizer_shared_column_false_raises():
+    """The free-EDM (shared_column=False) path has been removed."""
+    from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition
+
+    class _FakeICurve:
+        def get_xy(self):
+            return np.linspace(0, 100, 50), np.ones(50)
+
+    class _FakeXrCcurve:
+        def __init__(self):
+            self.x = np.linspace(0, 100, 50)
+            self.y = np.ones(50)
+
+    class _FakeDecomp:
+        num_components = 1
+        xr_icurve = _FakeICurve()
+        xr_ccurves = [_FakeXrCcurve()]
+
+    init_params = _make_full_edm_params().reshape(1, 7)
+    with pytest.raises(ValueError, match="shared_column=False"):
+        optimize_edm_xr_decomposition(_FakeDecomp(), init_params, shared_column=False)

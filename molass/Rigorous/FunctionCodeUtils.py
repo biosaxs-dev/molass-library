@@ -40,13 +40,12 @@ def detect_function_code(decomposition):
         - ``'egh'`` → ``None``  (EGH, default G1100 path)
         - ``'sdm'`` → ``'G1100'`` / ``'G1200'`` / ``'G1300'`` (depends on
           ``pore_dist`` / ``rt_dist`` on the ``SdmColumn``)
-        - ``'edm'`` → ``None`` (EDM)
-        - ``'cedm'`` → ``'G2020'`` (CEDM — continuous EDM)
+        - ``'edm'`` → ``'G2020'`` (EDM — constrained/shared-column)
         - ``'lkm'`` → ``'G1400'`` (LKM — Lumped Kinetic Model)
         - ``'grm'`` → ``'G1500'`` (GRM — General Rate Model)
     """
     ccurve = decomposition.xr_ccurves[0]
-    if ccurve.model == "cedm":
+    if ccurve.model == "edm":
         return 'G2020'
     if ccurve.model == "lkm":
         return 'G1400'

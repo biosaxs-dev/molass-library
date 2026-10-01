@@ -81,18 +81,14 @@ def test_check_positive_b_message_content():
 
 
 # ---------------------------------------------------------------------------
-# Integration tests via optimize_edm_xr_decomposition (free-EDM path)
+# Integration tests via optimize_edm_xr_decomposition (constrained/shared-column path)
 # ---------------------------------------------------------------------------
-# Use shared_column=False (free-EDM) so we can supply init_params with b > 0
-# and the optimizer stays near the positive-b minimum.
-# DeprecationWarning for shared_column=False is expected and filtered out.
-
-_SUPPRESSED_DEPR = pytest.mark.filterwarnings("ignore::DeprecationWarning")
+# shared_column=True is the default (and only supported) mode. The data is
+# generated with b > 0 so the shared-column L-BFGS-B fit converges there too.
 
 
-@_SUPPRESSED_DEPR
-def test_free_edm_warns_when_b_positive():
-    """optimize_edm_xr_decomposition issues UserWarning when fitted b > 0 (free-EDM)."""
+def test_edm_warns_when_b_positive():
+    """optimize_edm_xr_decomposition issues UserWarning when fitted b > 0."""
     x = np.linspace(50, 200, 300)
 
     # Data generated with b = 0.8 (positive) — optimizer should find b > 0
@@ -104,12 +100,11 @@ def test_free_edm_warns_when_b_positive():
     init = np.array([p0])  # init already at true params (b=0.8 > 0)
 
     with pytest.warns(UserWarning, match="b ="):
-        optimize_edm_xr_decomposition(decomp, init, shared_column=False)
+        optimize_edm_xr_decomposition(decomp, init)
 
 
-@_SUPPRESSED_DEPR
-def test_free_edm_no_warning_when_b_zero():
-    """No UserWarning when fitted b ≤ 0 (free-EDM, b=0 init matches linear data)."""
+def test_edm_no_warning_when_b_zero():
+    """No UserWarning when fitted b ≤ 0 (b=0 init/data matches linear limit)."""
     x = np.linspace(50, 200, 300)
 
     # Use b exactly 0 for both data and init — optimizer stays at b=0 (or tiny negative)
@@ -122,12 +117,11 @@ def test_free_edm_no_warning_when_b_zero():
 
     with warnings.catch_warnings():
         warnings.simplefilter("error", UserWarning)
-        optimize_edm_xr_decomposition(decomp, init, shared_column=False)
+        optimize_edm_xr_decomposition(decomp, init)
 
 
-@_SUPPRESSED_DEPR
-def test_free_edm_warning_suppressed():
-    """suppress_positive_b_warning=True silences the warning (free-EDM)."""
+def test_edm_warning_suppressed():
+    """suppress_positive_b_warning=True silences the warning."""
     x = np.linspace(50, 200, 300)
 
     p0 = _make_edm_params(t0=80.0, u=1.0, a=1.0, b=0.8, e=0.5, Dz=0.01, cinj=1.0)
@@ -142,6 +136,5 @@ def test_free_edm_warning_suppressed():
         # Must not raise despite b=0.8 > 0
         optimize_edm_xr_decomposition(
             decomp, init,
-            shared_column=False,
             suppress_positive_b_warning=True,
         )

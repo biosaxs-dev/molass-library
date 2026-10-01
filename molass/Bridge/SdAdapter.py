@@ -71,7 +71,7 @@ def decomposition_from_optimizer_params(fullopt, params, base_decomp):
     This is the model-dependent update path used by
     ``JobStateCanvas._update_decomposition_to_current()``.  It reuses the
     existing ``ComponentUtils.get_xr_ccurves`` dispatch table, which already
-    handles all five models (EGH, SDM, EDM/CEDM, LKM).
+    handles all five models (EGH, SDM, EDM, LKM).
 
     Parameters
     ----------
