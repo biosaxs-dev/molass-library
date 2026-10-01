@@ -4,8 +4,8 @@ and G2020 objective function routing.
 
 Covers:
   - EdmComponentCurve model tag 'edm'
-  - CedmParams.split_params_simple round-trip
-  - CedmParams.make_bounds_mask dimension
+  - EdmParams.split_params_simple round-trip
+  - EdmParams.make_bounds_mask dimension
   - FunctionCodeUtils.detect_function_code returns 'G2020'
   - OptimizerUtils.get_function_code('EDM') returns 'G2020'
 """
@@ -68,15 +68,15 @@ def test_model_name_dict_edm():
 
 
 # ---------------------------------------------------------------------------
-# CedmParams construction and split round-trip
+# EdmParams construction and split round-trip
 # ---------------------------------------------------------------------------
 
-def _make_cedm_vector(nc):
-    """Build a valid CedmParams parameter vector for nc components (nc+1 peaks)."""
-    from molass_legacy.ModelParams.CedmParams import CedmParams, NUM_ELEMENT_PARAMS, NUM_COL_PARAMS
+def _make_edm_vector(nc):
+    """Build a valid EdmParams parameter vector for nc components (nc+1 peaks)."""
+    from molass_legacy.ModelParams.EdmParams import EdmParams, NUM_ELEMENT_PARAMS, NUM_COL_PARAMS
     from molass_legacy.ModelParams.BaselineParams import get_num_baseparams
     nb = get_num_baseparams()
-    cp = CedmParams(nc + 1)   # n_components includes baseline; CedmParams(n_components) where nc = n_components-1
+    cp = EdmParams(nc + 1)   # n_components includes baseline; EdmParams(n_components) where nc = n_components-1
 
     n_real = nc  # actual number of SEC-peaks
     xr_abc = np.tile([0.5, 0.1, 1.0], n_real)              # (a, b, cinj) × nc
@@ -96,8 +96,8 @@ def _make_cedm_vector(nc):
 
 
 @pytest.mark.parametrize("nc", [1, 2, 3])
-def test_cedm_params_split_round_trip(nc):
-    full, cp = _make_cedm_vector(nc)
+def test_edm_params_split_round_trip(nc):
+    full, cp = _make_edm_vector(nc)
     parts = cp.split_params_simple(full)
     xr_abc, xr_base, rgs, (a_mp, b_mp), uv_h, uv_base, (c, d), col = parts
 
@@ -116,9 +116,9 @@ def test_cedm_params_split_round_trip(nc):
 
 
 @pytest.mark.parametrize("nc", [1, 2])
-def test_cedm_params_bounds_mask_length(nc):
-    full, cp = _make_cedm_vector(nc)
-    from molass_legacy.ModelParams.CedmParams import NUM_COL_PARAMS
+def test_edm_params_bounds_mask_length(nc):
+    full, cp = _make_edm_vector(nc)
+    from molass_legacy.ModelParams.EdmParams import NUM_COL_PARAMS
     mask = cp.make_bounds_mask()
     assert len(mask) == cp.num_params + NUM_COL_PARAMS
 
@@ -126,16 +126,16 @@ def test_cedm_params_bounds_mask_length(nc):
     n_xr = nc * 3
     assert np.all(mask[:n_xr]), "xr_abc params must be masked"
 
-    # cedm col params at the end must be all True
+    # edm col params at the end must be all True
     assert np.all(mask[-NUM_COL_PARAMS:]), "col params must be masked"
 
 
 @pytest.mark.parametrize("nc", [1, 2])
-def test_cedm_params_get_param_bounds_length(nc):
-    full, cp = _make_cedm_vector(nc)
+def test_edm_params_get_param_bounds_length(nc):
+    full, cp = _make_edm_vector(nc)
     cp.set_x(np.linspace(50, 200, 50))
     bounds = cp.get_param_bounds(full)
-    from molass_legacy.ModelParams.CedmParams import NUM_COL_PARAMS
+    from molass_legacy.ModelParams.EdmParams import NUM_COL_PARAMS
     assert len(bounds) == cp.num_params + NUM_COL_PARAMS, (
         f"bounds length {len(bounds)} != {cp.num_params + NUM_COL_PARAMS}"
     )
