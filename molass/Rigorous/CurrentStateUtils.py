@@ -69,8 +69,31 @@ def fv_to_sv(fv):
     fv = np.asarray(fv, dtype=float)
     return -200.0 / (1.0 + np.exp(-1.5 * fv)) + 100.0
 
-def construct_decomposition_from_results(run_info, **kwargs):      
-    optimizer_folder = get_setting('optimizer_folder')
+def construct_decomposition_from_results(run_info, **kwargs):
+    """Construct a ``Decomposition`` from the current (live or on-disk) state
+    of a rigorous optimization run. Called via ``run_info.get_current_decomposition()``.
+
+    Intended for monitoring a *currently running* (or just-finished) in-process
+    optimization: it reports the latest job's best parameters, which during an
+    active run means "what the optimizer has found so far," not necessarily
+    the best result across every job ever recorded in this folder. For "the
+    single best completed result," including after a kernel restart or a
+    GUI-exported "restore" notebook, use ``RunInfo.restore(decomp,
+    analysis_folder).load_best()`` instead (see ``RunInfo.reconnect()``'s
+    docstring) -- it selects the best-``fv`` job explicitly rather than the
+    most recently created one.
+
+    Prefers ``run_info.analysis_folder`` to locate the optimizer folder when
+    available, falling back to the ``optimizer_folder`` legacy global setting
+    only when it is not (molass-library#290) -- the global is set as a side
+    effect of launching an in-process run in *this* kernel session, so it can
+    be silently stale or unset for a ``run_info`` reconstructed via
+    ``RunInfo.reconnect()``/``restore()`` in a fresh session.
+    """
+    if run_info.analysis_folder is not None:
+        optimizer_folder = os.path.join(os.path.abspath(run_info.analysis_folder), "optimized")
+    else:
+        optimizer_folder = get_setting('optimizer_folder')
     wait_for_first_results = kwargs.get('wait_for_first_results', False)
     if wait_for_first_results:
         print(f"Waiting for first results in optimizer folder: {optimizer_folder}")

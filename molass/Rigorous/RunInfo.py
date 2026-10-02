@@ -238,6 +238,29 @@ class RunInfo:
             return None
 
     def get_current_decomposition(self, **kwargs):
+        """Construct a ``Decomposition`` reflecting the current (possibly still
+        running) state of this optimization.
+
+        See :func:`molass.Rigorous.CurrentStateUtils.construct_decomposition_from_results`
+        for the full docstring, including when to prefer :meth:`load_best` or
+        :func:`restore` instead (the single best *completed* result, e.g.
+        after a kernel restart or in a GUI-exported "restore" notebook).
+
+        Parameters
+        ----------
+        wait_for_first_results : bool, optional
+            If True, blocks until at least one job result is available.
+        jobid : str, optional
+            Specific job id to load. If None, uses the latest (last sorted)
+            job -- see the docstring linked above for why this differs from
+            :meth:`load_best`'s best-``fv`` selection.
+        debug : bool, optional
+            If True, reload modules from disk.
+
+        Returns
+        -------
+        Decomposition
+        """
         debug = kwargs.get('debug', False)
         if debug:
             from importlib import reload
@@ -470,8 +493,17 @@ class RunInfo:
         decomp = self.decomposition
         if decomp is None:
             raise ValueError(
-                "No decomposition stored in this RunInfo. "
-                "Cannot reconstruct result without the initial decomposition."
+                "No decomposition stored in this RunInfo -- load_best() "
+                "needs the Decomposition that originally launched the run "
+                "(model, component count, baseline) to reconstruct a result.\n"
+                "This typically happens after RunInfo.reconnect() was called "
+                "directly instead of restore(): reconnect() alone has no way "
+                "to recover an arbitrary live Python object from disk.\n"
+                "Fix: build/obtain the original decomp (e.g. via "
+                "rebuild_decomposition_from_recipe()), then use "
+                "molass.Rigorous.RunInfo.restore(decomp, analysis_folder) "
+                "in place of reconnect() -- it attaches decomp automatically "
+                "so load_best() works without further arguments."
             )
         result = load_rigorous_result(
             decomp, self.analysis_folder, jobid=best.id,
@@ -1670,13 +1702,26 @@ class RunInfo:
         state in ``analysis_folder``.  Useful after a kernel restart or an
         accidental cell re-run that destroyed the original live reference.
 
-        The recovered ``RunInfo`` supports all disk-based operations:
-        :meth:`live_status`, :attr:`sv_history`, :meth:`load_best`,
-        :meth:`load_best`, :meth:`plot_sv_history`.
+        The recovered ``RunInfo`` supports all disk-based operations that do
+        not need the original ``Decomposition``: :meth:`live_status`,
+        :attr:`sv_history`, :meth:`plot_sv_history`,
+        :meth:`get_current_decomposition` (monitoring-oriented; see its
+        docstring for how it differs from :meth:`load_best`).
 
-        It does **not** have a live optimizer, so :meth:`get_score_breakdown`
-        and :meth:`diagnose` require the optimizer to be reconstructed
-        separately (not automatic).
+        :meth:`load_best` additionally needs the ``Decomposition`` that
+        originally launched the run (to know the model, component count, and
+        baseline) -- ``reconnect()`` alone cannot supply this, since nothing
+        on disk fully reconstructs an arbitrary live Python object.  If you
+        have one (e.g. rebuilt via ``rebuild_decomposition_from_recipe()``, or
+        just still in scope), prefer the :func:`restore` factory function
+        over calling ``reconnect()`` directly -- it does exactly the three
+        extra steps below in one call, returning a ``RunInfo`` whose
+        :meth:`load_best` works immediately without any further arguments.
+
+        It does **not** have a live optimizer, so :meth:`get_score_breakdown`,
+        :meth:`diagnose`, and :meth:`score` require an optimizer to be
+        reconstructed separately (not automatic) -- see the second example
+        below.
 
         Parameters
         ----------
@@ -1701,14 +1746,37 @@ class RunInfo:
             If no ``RUN_MANIFEST.json`` is found and
             ``raise_if_not_found=True``.
 
+        See Also
+        --------
+        restore : Reconnect *and* attach an existing ``Decomposition`` in one
+            call, so :meth:`load_best` works immediately.
+
         Examples
         --------
-        After a kernel restart::
+        Monitoring only, no ``Decomposition`` needed::
 
             run_info = RunInfo.reconnect(analysis_folder)
             run_info.live_status()
             run_info.plot_sv_history()
+
+        Plotting the restored best result (prefer :func:`restore` when a
+        ``decomp`` is available, rather than calling ``reconnect()`` by
+        itself)::
+
+            from molass.Rigorous.RunInfo import restore
+
+            run_info = restore(decomp, analysis_folder)
             result = run_info.load_best()
+            result.plot_components(rgcurve=run_info.rgcurve)
+
+        Evaluating the score directly (not via :meth:`load_best`) after a
+        bare ``reconnect()`` needs a manually reattached optimizer, since
+        ``reconnect()`` leaves ``optimizer = None``::
+
+            run_info = RunInfo.reconnect(analysis_folder)
+            score_before = decomp.score(trimmed_ssd=trimmed)
+            run_info.optimizer = score_before.optimizer
+            score = run_info.score()
         """
         import os
         import threading
@@ -1805,6 +1873,12 @@ def restore(decomposition, analysis_folder, rgcurve=None):
     same handle type ``optimize_rigorously()`` returns — so cross-session code can
     use the same ``load_best()``/``live_status()`` interface as a live run.
 
+    Thin wrapper over :meth:`RunInfo.reconnect` that additionally attaches
+    ``decomposition`` (and ``rgcurve``) -- prefer this over calling
+    ``reconnect()`` directly whenever the original ``Decomposition`` is
+    available, since :meth:`RunInfo.load_best` needs it and ``reconnect()``
+    alone cannot supply it (molass-library#290).
+
     Parameters
     ----------
     decomposition : Decomposition
@@ -1822,9 +1896,17 @@ def restore(decomposition, analysis_folder, rgcurve=None):
         to ``None`` (not available cross-session) but ``load_best()`` and
         ``live_status()`` fully functional.
 
+    See Also
+    --------
+    RunInfo.reconnect : Lower-level primitive used internally; call it
+        directly instead only for monitoring-only use cases that have no
+        ``Decomposition`` available (``live_status()``, ``sv_history``).
+
     Examples
     --------
     ::
+
+        from molass.Rigorous import restore  # or: from molass.Rigorous.RunInfo import restore
 
         decomp = corrected.quick_decomposition(num_components=2)
         run = restore(decomp, "temp_analysis")

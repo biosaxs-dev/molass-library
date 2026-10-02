@@ -13,6 +13,7 @@ from .CurrentStateUtils import (
     plot_convergence,
     try_fast_rg_curve,
 )
+from .RunInfo import restore
 from .ComparePaths import (
     compare_optimization_paths,
     ComparisonResult,
