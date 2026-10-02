@@ -240,3 +240,17 @@ unchanged behavior if unavailable.
 `max_candidates` (default `MAX_INTERVAL_CANDIDATES=4`, preserving existing behavior exactly);
 `RgEstimator._try_relaxed_legacy` calls `guinier_interval(max_candidates=None)` directly instead
 of maintaining a ~40-line verbatim duplicate of the sweep logic.
+
+### Newly filed (October 2, 2026)
+
+Discovered while debugging a GUI-exported "restored session" notebook in `molass-researcher`
+(`RunInfo.reconnect()` followed by `decomp.plot_components()` silently showing the
+pre-optimization decomposition instead of the restored best result):
+
+| GitHub Issue | Description | Status |
+|-------------|-------------|--------|
+| [#290](https://github.com/biosaxs-dev/molass-library/issues/290) | `RunInfo.reconnect()` leaves no documented path to a plottable, optimized `Decomposition`; `get_current_decomposition()` depends on a possibly-stale global legacy setting and disagrees with `score()` on which job is "current"; `reconnect()` docstring has a duplicate `load_best` entry | ⏳ Open |
+
+**Workaround in the meantime**: `molass.Rigorous.CurrentStateUtils.load_rigorous_result(decomp,
+analysis_folder, rgcurve=...)` — a free function, not yet a documented `RunInfo` method — builds
+a correct, optimized `Decomposition` from disk and is what actually worked.
