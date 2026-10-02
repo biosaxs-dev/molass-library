@@ -249,7 +249,27 @@ pre-optimization decomposition instead of the restored best result):
 
 | GitHub Issue | Description | Status |
 |-------------|-------------|--------|
-| [#290](https://github.com/biosaxs-dev/molass-library/issues/290) | `RunInfo.reconnect()` leaves no documented path to a plottable, optimized `Decomposition`; `get_current_decomposition()` depends on a possibly-stale global legacy setting and disagrees with `score()` on which job is "current"; `reconnect()` docstring has a duplicate `load_best` entry | ⏳ Open |
+| [#290](https://github.com/biosaxs-dev/molass-library/issues/290) | `RunInfo.reconnect()` leaves no documented path to a plottable, optimized `Decomposition`; `get_current_decomposition()` depends on a possibly-stale global legacy setting and disagrees with `score()` on which job is "current"; `reconnect()` docstring has a duplicate `load_best` entry | ✅ Done (closed) |
+
+**#290 details**: root cause was discoverability, not missing functionality --
+`RunInfo.restore()` + `load_best()` already correctly solve "get a plottable
+Decomposition for the best completed result," but `restore()` was not exported
+from `molass.Rigorous`, and `reconnect()`'s own docstring never mentioned it
+exists (and its worked example would itself raise `ValueError` in practice,
+since bare `reconnect()` leaves `self.decomposition = None`). Fixed: exported
+`restore`; rewrote `reconnect()`'s docstring (removed a duplicate `load_best`
+entry, added a correct example using `restore()`, documented the `score()`
+optimizer-reattachment requirement); clearer `load_best()` error message
+pointing to `restore()`; added a docstring to `get_current_decomposition()`
+(previously had none) and made `construct_decomposition_from_results()` prefer
+`run_info.analysis_folder` over the legacy global setting when available
+(molass-library commit [b61738a](https://github.com/biosaxs-dev/molass-library/commit/b61738a)).
+The true root cause of the *original* bad notebook, however, was in
+`molass-gui`: `build_restore_notebook()`'s idle/completed branch manually
+reattached an optimizer to a bare `reconnect()` handle to plot a `Score`
+object, never producing an updated `Decomposition` -- fixed there too, using
+`restore()` + `load_best()` directly
+([molass-gui@7a24e68](https://github.com/biosaxs-dev/molass-gui/commit/7a24e68)).
 
 **Workaround in the meantime**: `molass.Rigorous.CurrentStateUtils.load_rigorous_result(decomp,
 analysis_folder, rgcurve=...)` — a free function, not yet a documented `RunInfo` method — builds
