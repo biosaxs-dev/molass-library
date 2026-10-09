@@ -255,6 +255,21 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     silently diverge from what the caller actually asked for (issue #260).
     """
     model = decomposition.xr_ccurves[0].model  # 'egh', 'sdm', 'lkm', etc.
+    # uv_pickat/xr_pickat: the wavelength (nm) / q-value (A^-1) SSD(...) was
+    # constructed with (see DataObjects.SecSaxsData's uv_pickat/xr_pickat kwargs).
+    # Captured here -- not just in trim_params/baseline_params -- because these
+    # are set at SSD() construction time, before trimming/baseline correction
+    # even happen. Without this, RecipeRunner.rebuild_decomposition_from_recipe()
+    # (the subprocess path AND the Open-Existing-Analysis/notebook-restore path)
+    # would silently rebuild SSD(in_folder) with the library defaults (280 nm /
+    # 0.02 A^-1) instead of whatever non-default value the caller originally
+    # used -- producing a UV/XR elution curve rescaled relative to the one the
+    # decomposition/optimization was actually fit against (molass-gui issue:
+    # "model elution curves don't fit to those of measured data" after
+    # overriding the default UV wavelength in the GUI's Load dialog).
+    ssd = getattr(decomposition, 'ssd', None)
+    uv_pickat = getattr(getattr(ssd, 'uv', None), 'pickat', None)
+    xr_pickat = getattr(getattr(ssd, 'xr', None), 'pickat', None)
     recipe = {
         "num_components": decomposition.num_components,
         "model": model,
@@ -264,6 +279,10 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
         "baseline_params": {},
         "niter": niter,
     }
+    if uv_pickat is not None:
+        recipe["uv_pickat"] = uv_pickat
+    if xr_pickat is not None:
+        recipe["xr_pickat"] = xr_pickat
     if frozen_components is not None:
         recipe["frozen_components"] = list(frozen_components)
     if frozen_param_groups is not None:

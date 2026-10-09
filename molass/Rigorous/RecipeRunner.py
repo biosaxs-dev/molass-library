@@ -60,8 +60,17 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     baseline_params = recipe.get('baseline_params', {})
     decomp_params = dict(recipe.get('decomp_params', {}))
     decomp_params['num_components'] = n_components
+    # uv_pickat/xr_pickat round-trip the wavelength/q-value SSD(...) was
+    # originally constructed with (see _build_auto_recipe) -- omitted (None)
+    # for recipe.json files written before this field existed, which falls
+    # back to the library's own defaults, matching prior behavior exactly.
+    ssd_kwargs = {}
+    if recipe.get('uv_pickat') is not None:
+        ssd_kwargs['uv_pickat'] = recipe['uv_pickat']
+    if recipe.get('xr_pickat') is not None:
+        ssd_kwargs['xr_pickat'] = recipe['xr_pickat']
 
-    ssd = SSD(in_folder)
+    ssd = SSD(in_folder, **ssd_kwargs)
     trimmed = ssd.trimmed_copy(**trim_params)
     corrected = trimmed.corrected_copy(**baseline_params)
     decomp = corrected.quick_decomposition(**decomp_params)
