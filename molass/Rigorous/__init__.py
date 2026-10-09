@@ -14,6 +14,7 @@ from .CurrentStateUtils import (
     try_fast_rg_curve,
 )
 from .RunInfo import restore
+from .RigorousImplement import build_pipeline_recipe
 from .ComparePaths import (
     compare_optimization_paths,
     ComparisonResult,

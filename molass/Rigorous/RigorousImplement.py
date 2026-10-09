@@ -245,6 +245,93 @@ def _load_best_init_params(analysis_folder, init_params):
     return best
 
 
+def build_pipeline_recipe(decomposition, method='BH', model=None, num_components=None,
+                           decomp_params=None, trim_params=None, baseline_params=None,
+                           ssd=None, niter=None, **extra):
+    """Build the common core of a ``pipeline_recipe`` dict (recipe.json).
+
+    Single source of truth for the fields that must survive recipe-based
+    SSD reconstruction (``RecipeRunner.rebuild_decomposition_from_recipe``,
+    used by the subprocess optimizer path, Resume, and Open Existing
+    Analysis / notebook restore). Shared by ``_build_auto_recipe()`` (this
+    module's own auto-construct path) and external recipe builders such as
+    molass-gui's ``UpgradedView`` -- a field captured here is never missed
+    by one caller but not the other (see molass-library#292, which tracked
+    down exactly that: #291's ``uv_pickat``/``xr_pickat`` fix only reached
+    ``_build_auto_recipe()``'s dict, not molass-gui's separate hand-built one).
+
+    Parameters
+    ----------
+    decomposition : Decomposition
+        Supplies ``num_components``/``model`` defaults (below), and --
+        unless ``ssd`` is given -- ``decomposition.ssd`` for
+        ``uv_pickat``/``xr_pickat``.
+    method : str, optional
+        Optimization method ('BH' or 'DE'). Stored lowercased. Default 'BH'.
+    model : str, optional
+        Column model code (e.g. 'egh', 'sdm', 'grm'). Defaults to
+        ``decomposition.xr_ccurves[0].model``.
+    num_components : int, optional
+        Defaults to ``decomposition.num_components``.
+    decomp_params : dict, optional
+        Forwarded to ``quick_decomposition(**decomp_params)`` on reconstruction.
+        Default ``{}``.
+    trim_params : dict, optional
+        Forwarded to ``trimmed_copy(**trim_params)`` on reconstruction.
+        Default ``{}``.
+    baseline_params : dict, optional
+        Forwarded to ``corrected_copy(**baseline_params)`` on reconstruction.
+        Default ``{}``.
+    ssd : SecSaxsData, optional
+        Explicit SSD (or trimmed SSD) to read ``uv_pickat``/``xr_pickat``
+        from, overriding ``decomposition.ssd``. Use this when the caller
+        holds its own, separately-trimmed SSD (e.g. GUI code) that is the
+        authoritative source for these values.
+    niter : int, optional
+        Number of optimizer iterations. Omitted from the recipe if ``None``
+        (not every caller tracks this -- e.g. molass-gui's own recipe
+        doesn't set it).
+    **extra
+        Additional keys merged into the result as-is (e.g. ``pore_dist``,
+        ``auto_constraint``, ``xr_ranks``, ``frozen_components``) -- passed
+        through unchanged, no validation.
+
+    Returns
+    -------
+    dict
+        A JSON-serializable ``pipeline_recipe`` dict.
+    """
+    resolved_model = model if model is not None else decomposition.xr_ccurves[0].model
+    effective_ssd = ssd if ssd is not None else getattr(decomposition, 'ssd', None)
+    recipe = {
+        "num_components": num_components if num_components is not None else decomposition.num_components,
+        "model": resolved_model,
+        "method": method.lower(),
+        "decomp_params": decomp_params if decomp_params is not None else {},
+        "trim_params": trim_params if trim_params is not None else {},
+        "baseline_params": baseline_params if baseline_params is not None else {},
+    }
+    if niter is not None:
+        recipe["niter"] = niter
+    # uv_pickat/xr_pickat: the wavelength (nm) / q-value (A^-1) SSD(...) was
+    # constructed with (see DataObjects.SecSaxsData's uv_pickat/xr_pickat kwargs).
+    # Captured here -- not just in trim_params/baseline_params -- because these
+    # are set at SSD() construction time, before trimming/baseline correction
+    # even happen. Without this, RecipeRunner.rebuild_decomposition_from_recipe()
+    # would silently rebuild SSD(in_folder) with the library defaults (280 nm /
+    # 0.02 A^-1) instead of whatever non-default value the caller originally
+    # used -- producing a UV/XR elution curve rescaled relative to the one the
+    # decomposition/optimization was actually fit against (#291).
+    uv_pickat = getattr(getattr(effective_ssd, 'uv', None), 'pickat', None)
+    xr_pickat = getattr(getattr(effective_ssd, 'xr', None), 'pickat', None)
+    if uv_pickat is not None:
+        recipe["uv_pickat"] = uv_pickat
+    if xr_pickat is not None:
+        recipe["xr_pickat"] = xr_pickat
+    recipe.update(extra)
+    return recipe
+
+
 def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
                         frozen_param_groups=None, function_code=None, seed_params=None):
     """Build a recipe dict from a decomposition for backward-compat auto-construction.
@@ -254,35 +341,7 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     ``Decomposition.load_analysis_session()`` (Resume / View Result) don't
     silently diverge from what the caller actually asked for (issue #260).
     """
-    model = decomposition.xr_ccurves[0].model  # 'egh', 'sdm', 'lkm', etc.
-    # uv_pickat/xr_pickat: the wavelength (nm) / q-value (A^-1) SSD(...) was
-    # constructed with (see DataObjects.SecSaxsData's uv_pickat/xr_pickat kwargs).
-    # Captured here -- not just in trim_params/baseline_params -- because these
-    # are set at SSD() construction time, before trimming/baseline correction
-    # even happen. Without this, RecipeRunner.rebuild_decomposition_from_recipe()
-    # (the subprocess path AND the Open-Existing-Analysis/notebook-restore path)
-    # would silently rebuild SSD(in_folder) with the library defaults (280 nm /
-    # 0.02 A^-1) instead of whatever non-default value the caller originally
-    # used -- producing a UV/XR elution curve rescaled relative to the one the
-    # decomposition/optimization was actually fit against (molass-gui issue:
-    # "model elution curves don't fit to those of measured data" after
-    # overriding the default UV wavelength in the GUI's Load dialog).
-    ssd = getattr(decomposition, 'ssd', None)
-    uv_pickat = getattr(getattr(ssd, 'uv', None), 'pickat', None)
-    xr_pickat = getattr(getattr(ssd, 'xr', None), 'pickat', None)
-    recipe = {
-        "num_components": decomposition.num_components,
-        "model": model,
-        "method": method.lower(),
-        "decomp_params": {},
-        "trim_params": {},
-        "baseline_params": {},
-        "niter": niter,
-    }
-    if uv_pickat is not None:
-        recipe["uv_pickat"] = uv_pickat
-    if xr_pickat is not None:
-        recipe["xr_pickat"] = xr_pickat
+    recipe = build_pipeline_recipe(decomposition, method=method, niter=niter)
     if frozen_components is not None:
         recipe["frozen_components"] = list(frozen_components)
     if frozen_param_groups is not None:
