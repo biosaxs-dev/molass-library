@@ -69,6 +69,22 @@ def fv_to_sv(fv):
     fv = np.asarray(fv, dtype=float)
     return -200.0 / (1.0 + np.exp(-1.5 * fv)) + 100.0
 
+def _rigorous_method_label(optimizer_folder):
+    """Describe how a rigorous result was made, e.g. 'rigorous optimization (BH)'.
+
+    The solver name is read from ``recipe.json`` when present.
+    """
+    label = "rigorous optimization"
+    try:
+        import json
+        with open(os.path.join(optimizer_folder, 'recipe.json')) as f:
+            method = json.load(f).get('method')
+        if method:
+            label += f" ({method.upper()})"
+    except Exception:
+        pass
+    return label
+
 def construct_decomposition_from_results(run_info, **kwargs):
     """Construct a ``Decomposition`` from the current (live or on-disk) state
     of a rigorous optimization run. Called via ``run_info.get_current_decomposition()``.
@@ -168,7 +184,9 @@ def construct_decomposition_from_results(run_info, **kwargs):
         else:
             ratio = scale
         uv_ccurves.append(UvComponentCurve(x, mapping, xr_ccurve, ratio))
-    return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
+    result = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
+    result.method_label = _rigorous_method_label(optimizer_folder)
+    return result
 
 
 def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_ranks=None, debug=False):
@@ -329,6 +347,7 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
 
     result = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
                            optimizer_rgs=optimizer_rgs)
+    result.method_label = _rigorous_method_label(optimizer_folder)
     ranks = xr_ranks if xr_ranks is not None else getattr(decomp, 'xr_ranks', None)
     if ranks is not None:
         result.update_xr_ranks(list(ranks))

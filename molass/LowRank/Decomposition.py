@@ -95,6 +95,9 @@ class Decomposition:
         self.guinier_objects = None
         self.bounded_lrf_info = None
         self.model = xr_ccurves[0].model
+        # Short description of how this decomposition was made (e.g.
+        # 'quick decomposition'); shown by plot_components(title='auto').
+        self.method_label = None
         self._optimizer_rgs = kwargs.get('optimizer_rgs', None)
 
     def copy_with_new_components(self, xr_ccurves, uv_ccurves, **kwargs):
@@ -130,6 +133,7 @@ class Decomposition:
         # physics-model positions that may differ slightly after upgrade().
         # Used by optimize_rigorously(method='DE') in RigorousImplement.py.
         new_decomp._source_decomp = self
+        new_decomp.method_label = f"{self.method_label} + model upgrade" if self.method_label else "model upgrade"
 
         # xr_ranks is a per-component choice, not a per-model one -- carry it
         # across upgrade() the same way _rgcurve is carried (component count
@@ -605,7 +609,15 @@ class Decomposition:
         Parameters
         ----------
         title : str, optional
-            If specified, add a super title to the plot.
+            Super title of the plot. Default ``'auto'`` generates one
+            identifying the dataset (its folder name), the model and how the
+            decomposition was made (quick decomposition, model upgrade, or
+            rigorous optimization with its solver). Pass a string to use your
+            own title, or ``None`` for no title.
+        row_labels : bool, optional
+            If True, show the leftmost column with the "UV" / "XR" row labels.
+            Default is False (column dropped, since the subplot titles already
+            say it). Ignored when *axes* are given.
         fig : matplotlib.figure.Figure, optional
             An existing Figure to draw into. If ``None`` (default), a new
             figure is created automatically.

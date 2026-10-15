@@ -46,7 +46,9 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
     if uv_ccurves is None:
         uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
 
-    return Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
+    decomposition = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
+    decomposition.method_label = "quick decomposition"
+    return decomposition
 
 def make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs):
     """

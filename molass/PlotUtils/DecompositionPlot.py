@@ -8,7 +8,7 @@ from matplotlib.patches import Rectangle
 from molass_legacy.GuinierAnalyzer.SimpleGuinier import SimpleGuinier
 
 ALLOWED_KEYS = {
-    'pairedranges', 'rgcurve', 'title', 'colorbar', 'debug', 'fig', 'axes',
+    'pairedranges', 'rgcurve', 'title', 'row_labels', 'colorbar', 'debug', 'fig', 'axes',
     'rg_score_threshold', 'rg_marker_size', 'rg_cmap', 'rg_alpha_by_score',
     'rg_alpha_power',
 }
@@ -22,21 +22,52 @@ def _draw_anomaly_bands(decomposition, xr_ax, uv_ax):
     from molass.PlotUtils.AnomalyBands import draw_anomaly_bands_for_ssd
     draw_anomaly_bands_for_ssd(xr_ax, uv_ax, decomposition.ssd)
 
-def create_axes(fig, row_titles=["UV", "XR"]):
-    gs = GridSpec(2,10)
-    for i, name in enumerate(row_titles):
-        ax = fig.add_subplot(gs[i,0])
-        ax.set_axis_off()
-        ax.text(0.8, 0.5, name, va="center", ha="center", fontsize=20)
+def create_axes(fig, row_titles=["UV", "XR"], row_labels=True):
+    """Create the 2x3 axes grid.
+
+    With ``row_labels=False`` the leftmost label column (``row_titles``) is dropped.
+    """
+    offset = 1 if row_labels else 0
+    gs = GridSpec(2, 9 + offset)
+    if row_labels:
+        for i, name in enumerate(row_titles):
+            ax = fig.add_subplot(gs[i,0])
+            ax.set_axis_off()
+            ax.text(0.8, 0.5, name, va="center", ha="center", fontsize=20)
     axes = []
     for i in range(2):
         axis_row = []
         for j in range(3):
-            start = 1+3*j
+            start = offset+3*j
             ax = fig.add_subplot(gs[i,start:start+3])
             axis_row.append(ax)
         axes.append(axis_row)
     return np.array(axes)
+
+def make_title_text(ssd, model=None, method_label=None, dataset=None):
+    """Compose a suptitle identifying the dataset, the model and how the result was made.
+
+    ``dataset`` overrides the name derived from ``ssd.datafiles`` (the folder name).
+    """
+    parts = []
+    if dataset is None:
+        datafiles = getattr(ssd, 'datafiles', None)
+        if datafiles:
+            import os
+            dataset = os.path.basename(os.path.dirname(os.path.abspath(datafiles[0])))
+    if dataset:
+        parts.append(dataset)
+    if model:
+        parts.append(f"model: {str(model).upper()}")
+    if method_label:
+        parts.append(f"method: {method_label}")
+    return " | ".join(parts)
+
+def make_auto_title(decomposition):
+    """Build the default suptitle of ``plot_components`` for a Decomposition."""
+    return make_title_text(decomposition.ssd,
+                           getattr(decomposition, 'model', None),
+                           getattr(decomposition, 'method_label', None))
 
 def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=None, **kwargs):
     if title is not None:
@@ -197,7 +228,7 @@ def plot_components_impl(decomposition, **kwargs):
         fig = plt.figure(figsize=(16, 8))
 
     if axes is None:
-        axes = create_axes(fig)
+        axes = create_axes(fig, row_labels=kwargs.get('row_labels', False))
     else:
         axes = np.asarray(axes)
         if axes.ndim != 2 or axes.shape[0] < 2 or axes.shape[1] < 3:
@@ -206,7 +237,9 @@ def plot_components_impl(decomposition, **kwargs):
                 "Use create_axes(fig) or pass axes from plt.subplots(2, 3)."
             )
 
-    title = kwargs.get('title', None)
+    title = kwargs.get('title', 'auto')
+    if title == 'auto':
+        title = make_auto_title(decomposition)
     if title is not None:
         fig.suptitle(title)
 
