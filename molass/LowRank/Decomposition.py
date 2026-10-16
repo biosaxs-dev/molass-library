@@ -231,6 +231,44 @@ class Decomposition:
         return [sv.Rg if sv.Rg is not None else float('nan')
                 for sv in self.get_guinier_objects()]
 
+    def check_sec_order(self, rgcurve=None, tolerance=2.0, compute_rg_curve=False):
+        """Check whether the component Rgs are SEC-conformant.
+
+        In size-exclusion chromatography larger particles elute first, so the component
+        Rgs should decrease with elution order, and each component's Rg should resemble
+        the Rg curve at its peak position. The rigorous objective penalizes reversals
+        with the same tolerance.
+
+        Parameters
+        ----------
+        rgcurve : RgCurve, optional
+            Rg curve to compare against. If omitted, a cached one is used when available
+            (see :attr:`has_rg_curve`); nothing is computed unless ``compute_rg_curve``.
+        tolerance : float, optional
+            Allowed Rg reversal between adjacent components in Å. Default 2.0.
+        compute_rg_curve : bool, optional
+            If True and no Rg curve is cached, compute it (slow: one Guinier fit per frame).
+
+        Returns
+        -------
+        report : molass.LowRank.SecOrder.SecOrderReport
+            ``report.ordered`` (bool, also its truthiness), ``rgs``, ``positions``,
+            ``rg_curve_values`` and ``relative_deviations`` (None without an Rg curve),
+            and ``violations`` as ``(i, i+1, reversal_in_A)``. ``print(report)`` gives a table.
+
+        Examples
+        --------
+        ::
+
+            report = decomp.check_sec_order(rgcurve=rgcurve)
+            print(report)
+            if not report:
+                print(report.violations)
+        """
+        from molass.LowRank.SecOrder import check_sec_order_impl
+        return check_sec_order_impl(self, rgcurve=rgcurve, tolerance=tolerance,
+                                    compute_rg_curve=compute_rg_curve)
+
     def get_channel_consistency(self):
         """Check UV/XR proportion consistency across decomposition channels.
 
