@@ -99,6 +99,7 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
         import molass.Decompose.Partner
         reload(molass.Decompose.Partner)
     from molass.Decompose.Proportional import decompose_proportionally
+    from molass.Decompose.RgOrder import RgOrderPenalty, DEFAULT_RG_ORDER_WEIGHT
     from molass.Decompose.Partner import decompose_from_partner
     from molass.LowRank.ComponentCurve import ComponentCurve
 
@@ -113,7 +114,13 @@ def make_component_curves_with_proportions(ssd, num_components, proportions, **k
     allow_negative = kwargs.get('allow_negative_peaks', False)
     num_plates = kwargs.get('num_plates', None)
     xslices = kwargs.get('xslices', None)
-    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug, allow_negative_peaks=allow_negative, num_plates=num_plates, xslices=xslices)
+    rg_order = None
+    rg_order_weight = kwargs.get('rg_order_weight', DEFAULT_RG_ORDER_WEIGHT)
+    if rg_order_weight > 0 and not allow_negative and ssd.xr.M.shape[1] == len(xr_icurve.x):
+        rg_order = RgOrderPenalty(ssd.xr.M, ssd.xr.qv, num_components, weight=rg_order_weight)
+        if not rg_order.enabled:
+            rg_order = None
+    xr_result = decompose_proportionally(xr_icurve, proportions, debug=debug, allow_negative_peaks=allow_negative, num_plates=num_plates, xslices=xslices, rg_order=rg_order)
     xr_ccurves = get_curves_from_params(xr_result.x, xr_icurve)
 
     # Create UV curves

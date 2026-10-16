@@ -1208,6 +1208,16 @@ class SecSaxsData:
             used by the rest of the pipeline (LRF, Rg/Guinier analysis, rigorous
             optimization) either way.
 
+        rg_order_weight : float, optional
+            Applies only to the ``proportions`` path with ``proportions_source='xr'``.
+            Weight of a soft SEC-order penalty added to the proportional fit: component
+            Rgs (a cheap low-q-decay proxy from the LRF of the trial curves) should
+            decrease with elution order, as in the rigorous objective. This makes the
+            result far less sensitive to tiny input perturbations (trimming slice,
+            platform numerics). Default 0.1; ``0`` restores the elution-curve-only fit.
+            Ignored for a single component and when ``allow_negative_peaks`` is True.
+            See molass-library#295.
+
         xr_peakpositions : list of float, optional
             Specifies the frame positions where peaks should be pinned.
             Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
@@ -1265,7 +1275,7 @@ class SecSaxsData:
             'area_weight', 'sec_constraints', 'data_matrix', 'qv',
             'curve_model', 'smoothing', 'decompargs', 'peakpositions',
             'smooth_uv', 'consistent_uv', 'ip_effect_info',
-            'rgcurve', 'xslices', 'proportions_source',
+            'rgcurve', 'xslices', 'proportions_source', 'rg_order_weight',
         }
         unknown = set(kwargs) - _KNOWN_KWARGS
         if unknown:

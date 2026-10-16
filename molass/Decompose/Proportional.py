@@ -255,7 +255,7 @@ def debug_plot(ax, x, xslices, plot_params):
             ax.axvline(x=sl.stop, color='gray', linestyle=':', alpha=0.5)
         ax.plot(x, egh(x, *params), linestyle=':')
 
-def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, num_plates=None, xslices=None):
+def decompose_proportionally(icurve, proportions, debug=False, allow_negative_peaks=False, num_plates=None, xslices=None, rg_order=None):
     """
     Decompose the given data (x, y) into components based on the specified proportions.
     Each component is modeled using the egh function from molass.SEC.Models.Simple.
@@ -286,8 +286,10 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
         compute_proportional_boundaries(), remap them with
         MappingInfo.uv_to_xr()/xr_to_uv(), then build slices with
         slices_from_boundaries(). Default None (slice `icurve` itself, original behavior).
-
-    Returns
+    rg_order : molass.Decompose.RgOrder.RgOrderPenalty, optional
+        Adds a soft penalty when the component Rgs (a cheap low-q-decay proxy computed
+        from the LRF of the trial curves) are not SEC-ordered, i.e. do not decrease with
+        elution order (molass-library#295). Default None (no penalty, elution curve only).
     -------
     result : OptimizeResult
         The result of the optimization containing the optimized (H, tR, sigma, tau)
@@ -369,11 +371,15 @@ def decompose_proportionally(icurve, proportions, debug=False, allow_negative_pe
         gaps = np.diff(tR_list) if num_components > 1 else np.array([])
         mean_order_penalty = np.sum(np.maximum(0, min_separation - gaps) ** 2)
 
+        # SEC order of the LRF Rgs: the elution curve alone does not constrain it
+        rg_order_term = rg_order.term(cy_list) if rg_order is not None else 0.0
+
         return (safe_log10(np.sum((ty - y) ** 2))
                 + 0.1 * safe_log10(np.sum((props - proportions)**2))
                 + 0.1 * safe_log10(1 + MEAN_ORDER_PENALTY_SCALE * mean_order_penalty)
                 + 0.1 * safe_log10(1 + SIGMA_MIN_PENALTY_SCALE * sigma_min_violation)
-                + 0.1 * safe_log10(1 + TAU_PENALTY_SCALE * tau_violation))
+                + 0.1 * safe_log10(1 + TAU_PENALTY_SCALE * tau_violation)
+                + rg_order_term)
 
     # grid search over candidate plate counts -- see DEFAULT_N_CANDIDATES comment above
     # for why a single Nelder-Mead run from one seed is not reliable enough here.
