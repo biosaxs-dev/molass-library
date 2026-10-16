@@ -23,6 +23,8 @@ def get_ready_for_numba():
 
     if os.path.exists(numba_cache):
         import shutil
-        shutil.rmtree(numba_cache)
-    os.makedirs(numba_cache)
+        # other processes may be starting at the same time and doing the same:
+        # tolerate a directory that disappears or is being removed concurrently (#305)
+        shutil.rmtree(numba_cache, ignore_errors=True)
+    os.makedirs(numba_cache, exist_ok=True)
     IS_READY_FOR_NUMBA = True
