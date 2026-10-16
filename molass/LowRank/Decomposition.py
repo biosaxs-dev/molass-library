@@ -804,13 +804,11 @@ class Decomposition:
         if has_rank2:
             from molass.Guinier.RgEstimator import RgEstimator
 
-            # Step 2a: pre-populate guinier_objects from naïve P
-            if self.guinier_objects is None:
-                guinier_objects = []
-                for i in range(self.num_components):
-                    jcurve_array = np.array([xr.qv, P_[:, i], Pe[:, i]]).T
-                    guinier_objects.append(RgEstimator(jcurve_array))
-                self.guinier_objects = guinier_objects
+            # Step 2a: fit seeds from the naïve P. They are always computed here from the
+            # naïve P (never taken from cached guinier_objects), so that the result does not
+            # depend on call order or on earlier calls (molass-library#294).
+            seed_objects = [RgEstimator(np.array([xr.qv, P_[:, i], Pe[:, i]]).T)
+                            for i in range(self.num_components)]
 
             # Step 2b: reconstruct full C and P (including c² rows/B columns)
             cy_list = [c.get_xy()[1] for c in self.xr_ccurves]
@@ -827,13 +825,17 @@ class Decomposition:
                 reload(molass.LowRank.BoundedLrf)
             from molass.LowRank.BoundedLrf import apply_bounded_lrf
             P_, bounded_info = apply_bounded_lrf(
-                xr.qv, P_full, C_full, ranks, self.guinier_objects)
+                xr.qv, P_full, C_full, ranks, seed_objects)
             self.bounded_lrf_info = bounded_info
 
             # Step 2d: re-propagate error for corrected P
             if xr.E is not None:
                 from molass.LowRank.ErrorPropagate import compute_propagated_error
                 Pe = compute_propagated_error(M_, P_, xr.E)
+
+            # Step 2e: cache the Guinier objects of the corrected P (not the seeds)
+            self.guinier_objects = [RgEstimator(np.array([xr.qv, P_[:, i], Pe[:, i]]).T)
+                                    for i in range(self.num_components)]
 
         return M_, C_, P_, Pe
 
