@@ -207,6 +207,10 @@ class XrData(SsMatrixData):
 
         Returns a Rg-curve which is computed using the Molass standard method.
 
+        .. note::
+            One Guinier fit per frame: roughly one minute for ~1200 frames (about 50 ms per
+            frame on average; measured on one machine). Cache the result and pass it on
+            (e.g. ``quick_decomposition(rgcurve=rgcurve)``) instead of recomputing.
         Parameters
         ----------
         progress_cb : callable or None, optional

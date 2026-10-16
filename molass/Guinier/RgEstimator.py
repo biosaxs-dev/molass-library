@@ -90,6 +90,14 @@ class RgEstimator(SimpleGuinier):
     ``GuinierDeviation``'s quality masking). It is capped well below a fully
     validated legacy score (``_DENSS_SCORE_CAP``, ``_FALLBACK_SCORE_CAP``) to
     reflect the lower confidence of these paths.
+
+    Cost
+    ----
+    About 50 ms per profile on average (a 1232-frame Rg curve takes roughly a minute), but
+    up to ~0.5 s for a single call when the fallback chain engages (measured on one
+    machine, Python 3.14). Do not call it inside an optimizer's inner loop; see
+    ``molass.Decompose.RgOrder`` for a cheap low-q-decay proxy used by the quick
+    decomposition (molass-library#295, #303).
     """
     def __init__(self, data):
         super().__init__(data)
