@@ -1311,6 +1311,7 @@ class Decomposition:
                             clear_jobs=True, function_code=None,
                             in_process=False, monitor=True, async_=True, progress='dashboard',
                             max_trials=0, debug=False, _dry_run=False,
+                            dry_run=False,
                             ns_narrow_bounds=True,
                             ns_adaptive_nsteps=False,
                             ns_nsteps=None,
@@ -1468,6 +1469,12 @@ class Decomposition:
             behaviour for unattended in-process runs.
         debug : bool, optional
             If True, enable debug mode.
+        dry_run : bool, optional
+            If True, run only the pre-flight checks and return ``None`` before any
+            folder, optimizer or subprocess is created: argument validation, the
+            idempotency guard, and the warnings about corrected data, constraints
+            and ``monitor``. Use it to check a launch path cheaply. Default False.
+            ``_dry_run`` is accepted as an alias (backward compatibility).
         seed_params : array-like or None, optional
             Explicit initial parameter vector to use instead of the
             estimator-derived one.  Useful for seeding one optimizer from
@@ -1563,7 +1570,7 @@ class Decomposition:
         # pipeline_recipe must be extracted before the kwargs catch-all to avoid
         # leaking it into solver_kwargs → set_optimizer_settings → set_setting.
         solver_kwargs = kwargs if kwargs else None
-
+        _dry_run = _dry_run or dry_run
         if frozen_components is not None and free_components is not None:
             raise ValueError("Cannot specify both frozen_components and free_components. Use one or the other.")
 
