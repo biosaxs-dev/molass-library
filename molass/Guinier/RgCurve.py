@@ -46,6 +46,12 @@ class RgCurve(Curve):
         numbers, not positional array indices."""
         return self.indeces
 
+    @property
+    def rgs(self):
+        """Rg values in Angstrom (alias for ``rgvalues``); NaN where the Guinier fit failed.
+        ``get_xy()`` returns the same data as ``(frames, rgs)``."""
+        return self.rgvalues
+
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
     """
