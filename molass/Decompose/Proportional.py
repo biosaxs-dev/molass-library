@@ -96,7 +96,19 @@ def compute_proportional_boundaries(x, y, proportions, debug_ax=None):
     cy = np.cumsum(nny)
 
     cp = np.cumsum(proportions)*cy[-1]
-    spline = UnivariateSpline(cy[nny > 0], x[nny > 0], s=0)
+    # tiny positive increments can be lost to floating-point rounding in the cumulative sum,
+    # leaving non-increasing duplicates that UnivariateSpline(s=0) rejects (#307)
+    positive = nny > 0
+    cy_pos, x_pos = cy[positive], x[positive]
+    strictly_increasing = np.concatenate([[True], np.diff(cy_pos) > 0])
+    cy_pos, x_pos = cy_pos[strictly_increasing], x_pos[strictly_increasing]
+    if len(cy_pos) < 4:
+        raise ValueError(
+            f"Cannot compute proportional boundaries: only {len(cy_pos)} usable points with "
+            "a strictly increasing cumulative area (need at least 4). The curve has too few "
+            "positive points; try xr_peakpositions=... or a smaller number of components."
+        )
+    spline = UnivariateSpline(cy_pos, x_pos, s=0)
     xp = spline(cp)
 
     if debug_ax is not None:
