@@ -2,13 +2,18 @@
     Trimming.AnomalyHandler.py
 
     Handling of a UV elution curve whose end is irregular (a dip below the baseline in the last frames),
-    kept out of the default trimming course: ``make_trimming_impl`` only calls
-    :func:`handle_uv_end_anomaly`, which returns its arguments unchanged unless an anomaly is found.
+    kept out of the default course of the mapping and the trimming:
+
+    * the XR/UV mapping (``SecSaxsData.estimate_mapping``) calls :func:`estimate_mapping_handling_anomaly`,
+      which estimates the mapping on the UV curve *without* the anomalous frames -- i.e. the moments are
+      computed after the baseline correction of the cropped curve -- and otherwise is the plain estimation;
+    * the trimming (``make_trimming_impl``) calls :func:`cut_uv_end_anomaly`, which only cuts the UV end
+      slice and returns it unchanged unless an anomaly is found.
 
     Why this matters: the dip tilts the baseline estimate, the baseline-corrected UV curve then gets an
     artifact at its end, and the EGH fit of that curve -- the basis of the XR/UV mapping for a single peak per
     channel -- becomes unstable (20200123_3: slope 1.05 or 1.71 depending on an unrelated default).
-    Excluding the anomalous frames before estimating the mapping gives a stable result (slope 1.050).
+    Correcting the baseline after excluding the anomalous frames gives a stable result (slope 1.050).
 
     Detection is two-staged to avoid false positives on ordinary baseline drift:
 
@@ -80,8 +85,49 @@ def find_uv_end_anomaly(uv_curve):
     return locate_trailing_dip(uv_curve.y)
 
 
-def handle_uv_end_anomaly(ssd, uv_jslice, debug=False):
-    """Exclude an anomalous UV end from the trimming and estimate the XR/UV mapping without it.
+def estimate_mapping_handling_anomaly(xr_curve, uv_curve, debug=False):
+    """Estimate the XR/UV mapping, excluding an anomalous UV end from the estimation.
+
+    Without an anomaly this is :func:`molass.Mapping.SimpleMapper.estimate_mapping_impl`. With one, the
+    mapping is estimated on the UV curve cropped at the start of the anomaly (so that the baseline
+    correction behind the moments of the retry is not distorted by it) and the result still refers to the
+    full UV curve.
+
+    Parameters
+    ----------
+    xr_curve, uv_curve : Curve
+        The XR and UV i-curves.
+    debug : bool, optional
+        If True, print diagnostic information.
+
+    Returns
+    -------
+    mapping : MappingInfo
+    """
+    from molass.Mapping.SimpleMapper import estimate_mapping_impl
+
+    start = find_uv_end_anomaly(uv_curve)
+    if start is None:
+        return estimate_mapping_impl(xr_curve, uv_curve, debug=debug)
+
+    from molass.DataObjects.Curve import Curve
+    from molass.Mapping.MappingInfo import MappingInfo
+
+    n = len(uv_curve.x)
+    warnings.warn(
+        f"UV elution curve has an irregular end (dip below the baseline from frame {int(uv_curve.x[start])} "
+        f"on, {n - start} of {n} frames): excluding it from the XR/UV mapping (and, in trimmed_copy(), "
+        f"from the trimming). "
+        f"Switch off with molass.Global.Options.set_molass_options(anomaly_handling=False).",
+        UserWarning, stacklevel=3,
+    )
+    cropped = Curve(uv_curve.x[:start], np.asarray(uv_curve.y)[:start], type=uv_curve.type)
+    m = estimate_mapping_impl(xr_curve, cropped, debug=debug)
+    return MappingInfo(m.slope, m.intercept, m.xr_peaks, m.uv_peaks, m.xr_moment, m.uv_moment, xr_curve, uv_curve)
+
+
+def cut_uv_end_anomaly(ssd, uv_jslice):
+    """Cut an anomalous UV end from the UV frame slice of the trimming.
 
     Parameters
     ----------
@@ -89,39 +135,18 @@ def handle_uv_end_anomaly(ssd, uv_jslice, debug=False):
         The (untrimmed) data being trimmed.
     uv_jslice : slice
         The UV frame slice computed by the default course.
-    debug : bool, optional
-        If True, print diagnostic information.
 
     Returns
     -------
     uv_jslice : slice
-        ``uv_jslice`` unchanged when there is no anomaly; otherwise its stop is cut to the start of the anomaly.
-    mapping : MappingInfo or None
-        ``None`` when there is no anomaly (the default course then estimates the mapping itself);
-        otherwise the mapping estimated on the UV curve without the anomalous frames, still referring
-        to the full UV curve.
+        ``uv_jslice`` unchanged when there is no anomaly; otherwise its stop is cut to the start of the
+        anomaly. (The mapping is not touched here: ``SecSaxsData.estimate_mapping`` handles the anomaly
+        itself and warns.)
     """
     if ssd.uv is None or ssd.xr is None:
-        return uv_jslice, None
-    uv_curve = ssd.uv.get_icurve()
-    start = find_uv_end_anomaly(uv_curve)
+        return uv_jslice
+    start = find_uv_end_anomaly(ssd.uv.get_icurve())
     if start is None:
-        return uv_jslice, None
-
-    from molass.DataObjects.Curve import Curve
-    from molass.Mapping.MappingInfo import MappingInfo
-    from molass.Mapping.SimpleMapper import estimate_mapping_impl
-
-    n = len(uv_curve.x)
-    warnings.warn(
-        f"UV elution curve has an irregular end (dip below the baseline from frame {int(uv_curve.x[start])} "
-        f"on, {n - start} of {n} frames): excluding it from the trimming and from the XR/UV mapping. "
-        f"Switch off with molass.Global.Options.set_molass_options(anomaly_handling=False).",
-        UserWarning, stacklevel=2,
-    )
-    xr_curve = ssd.xr.get_icurve()
-    cropped = Curve(uv_curve.x[:start], np.asarray(uv_curve.y)[:start], type=uv_curve.type)
-    m = estimate_mapping_impl(xr_curve, cropped, debug=debug)
-    mapping = MappingInfo(m.slope, m.intercept, m.xr_peaks, m.uv_peaks, m.xr_moment, m.uv_moment, xr_curve, uv_curve)
+        return uv_jslice
     stop = start if uv_jslice.stop is None else min(uv_jslice.stop, start)
-    return slice(uv_jslice.start, stop), mapping
+    return slice(uv_jslice.start, stop)

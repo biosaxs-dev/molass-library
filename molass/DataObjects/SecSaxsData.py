@@ -923,7 +923,13 @@ class SecSaxsData:
 
         xr_curve = self.xr.get_icurve()
         uv_curve = self.uv.get_icurve()
-        self.mapping = estimate_mapping_impl(xr_curve, uv_curve, debug=debug)
+        from molass.Global.Options import get_molass_options
+        if get_molass_options('anomaly_handling'):
+            # kept out of the default course: the plain estimation unless the UV curve has an irregular end
+            from molass.Trimming.AnomalyHandler import estimate_mapping_handling_anomaly
+            self.mapping = estimate_mapping_handling_anomaly(xr_curve, uv_curve, debug=debug)
+        else:
+            self.mapping = estimate_mapping_impl(xr_curve, uv_curve, debug=debug)
         return self.mapping
 
     def get_mapping(self):

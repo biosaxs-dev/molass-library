@@ -11,7 +11,7 @@ import pytest
 from molass.DataObjects.Curve import Curve
 from molass.Global.Options import get_molass_options, set_molass_options
 from molass.Trimming.AnomalyHandler import (
-    baseline_tilt, find_uv_end_anomaly, handle_uv_end_anomaly, locate_trailing_dip)
+    baseline_tilt, cut_uv_end_anomaly, estimate_mapping_handling_anomaly, find_uv_end_anomaly, locate_trailing_dip)
 
 N = 800
 
@@ -89,20 +89,40 @@ class _Ssd:
         self.uv = _Data(uv_curve)
 
 
-def test_handler_leaves_normal_data_alone():
+def test_cut_leaves_normal_data_alone():
     uv = Curve(np.arange(N), _gauss(629, 22, 0.2) + _noise(), type='i')
     xr = Curve(np.arange(N), _gauss(563, 12, 0.05) + _noise(1, 0.002), type='i')
     jslice = slice(499, 781)
-    assert handle_uv_end_anomaly(_Ssd(xr, uv), jslice) == (jslice, None)
+    assert cut_uv_end_anomaly(_Ssd(xr, uv), jslice) == jslice
 
 
-def test_handler_cuts_the_anomaly_and_keeps_the_full_curve_in_the_mapping():
+def test_cut_shortens_the_uv_slice_at_the_anomaly_without_touching_the_mapping():
+    uv = _uv_with_dip()
+    xr = Curve(np.arange(N), _gauss(563, 12, 0.05) + _noise(1, 0.002), type='i')
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")            # the mapping side warns; the cut itself is silent
+        jslice = cut_uv_end_anomaly(_Ssd(xr, uv), slice(499, 781))
+        assert cut_uv_end_anomaly(_Ssd(xr, uv), slice(499, None)).stop == jslice.stop
+    assert jslice.start == 499 and 755 <= jslice.stop <= 770
+
+
+def test_mapping_is_the_plain_estimation_without_an_anomaly():
+    from molass.Mapping.SimpleMapper import estimate_mapping_impl
+    uv = Curve(np.arange(N), _gauss(629, 22, 0.2) + _noise(), type='i')
+    xr = Curve(np.arange(N), _gauss(563, 12, 0.05) + _noise(1, 0.002), type='i')
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UserWarning)
+        handled = estimate_mapping_handling_anomaly(xr, uv)
+    plain = estimate_mapping_impl(xr, uv)
+    assert (handled.slope, handled.intercept) == (plain.slope, plain.intercept)
+
+
+def test_mapping_excludes_the_anomaly_and_keeps_the_full_curve():
     uv = _uv_with_dip()
     xr = Curve(np.arange(N), _gauss(563, 12, 0.05) + _noise(1, 0.002), type='i')
     with pytest.warns(UserWarning, match="irregular end"):
-        jslice, mapping = handle_uv_end_anomaly(_Ssd(xr, uv), slice(499, 781))
-    assert jslice.start == 499 and 755 <= jslice.stop <= 770
-    assert mapping is not None and mapping.uv_curve is uv and mapping.slope > 0
+        mapping = estimate_mapping_handling_anomaly(xr, uv)
+    assert mapping.uv_curve is uv and mapping.slope > 0
 
 
 def test_option_is_on_by_default():
@@ -115,6 +135,12 @@ def test_20200123_3_mapping_and_trimming():
     path = os.path.join(get_local_settings()['DATA_ROOT_FOLDER'], "20200123_3")
     if not os.path.exists(path):
         pytest.skip("20200123_3 is not available")
+
+    # the mapping estimation itself is anomaly-aware, not only the trimming
+    with pytest.warns(UserWarning, match="irregular end"):
+        direct = SSD(path).estimate_mapping()
+    assert direct.slope == pytest.approx(1.05, abs=0.02)
+
     ssd = SSD(path)
     with pytest.warns(UserWarning, match="irregular end"):
         trimmed = ssd.trimmed_copy()

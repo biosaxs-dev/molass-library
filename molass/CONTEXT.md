@@ -158,8 +158,9 @@ decision, and the chosen slices for both channels; pass an explicit
 
 **Irregular UV end.** If the UV elution curve ends with a dip below the baseline (falling
 baseline tilt >= 0.2 of the peak height and a dip below the noise band in the last 10 % of
-the frames, as in `20200123_3`), `trimmed_copy()` emits a `UserWarning` and excludes those
-frames from the trimming and from the XR/UV mapping (`molass/Trimming/AnomalyHandler.py`;
+the frames, as in `20200123_3`), the XR/UV mapping is estimated on the UV curve without those
+frames -- `ssd.estimate_mapping()` itself is anomaly-aware, with a `UserWarning` -- and
+`trimmed_copy()` also cuts them from the UV trimming slice (`molass/Trimming/AnomalyHandler.py`;
 data without it is not affected). To observe the anomaly itself (tilted baseline in
 `plot_compact(baseline=True)`, unstable mapping), switch the handling off with
 `molass.Global.Options.set_molass_options(anomaly_handling=False)`.
