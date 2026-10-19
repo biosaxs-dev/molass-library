@@ -39,15 +39,32 @@ def test_build_pipeline_recipe_minimal_defaults():
 
     recipe = build_pipeline_recipe(_DummyDecomp(num_components=3, model='sdm'))
 
+    import molass
     assert recipe == {
         "num_components": 3,
         "model": "sdm",
         "method": "bh",
+        "molass_version": str(molass.__version__),
         "decomp_params": {},
         "trim_params": {},
         "baseline_params": {},
     }
     json.dumps(recipe)
+
+
+def test_build_pipeline_recipe_records_resolved_rg_order_weight():
+    """The default of rg_order_weight is recorded for proportional recipes (#299),
+    an explicit value wins, and recipes without proportions stay untouched."""
+    from molass.Rigorous.RigorousImplement import build_pipeline_recipe
+    from molass.Decompose.RgOrder import DEFAULT_RG_ORDER_WEIGHT
+
+    d = _DummyDecomp()
+    given = {'proportions': [1, 2]}
+    r = build_pipeline_recipe(d, decomp_params=given)
+    assert r['decomp_params'] == {'proportions': [1, 2], 'rg_order_weight': DEFAULT_RG_ORDER_WEIGHT}
+    assert given == {'proportions': [1, 2]}      # caller's dict is not mutated
+    assert build_pipeline_recipe(d, decomp_params={'proportions': [1, 2], 'rg_order_weight': 0})['decomp_params']['rg_order_weight'] == 0
+    assert build_pipeline_recipe(d, decomp_params={'xr_peakpositions': [500]})['decomp_params'] == {'xr_peakpositions': [500]}
 
 
 def test_build_pipeline_recipe_overrides_and_extras():
@@ -68,7 +85,8 @@ def test_build_pipeline_recipe_overrides_and_extras():
     assert recipe['method'] == 'de'
     assert recipe['model'] == 'grm'
     assert recipe['num_components'] == 5
-    assert recipe['decomp_params'] == {'proportions': [1, 2]}
+    from molass.Decompose.RgOrder import DEFAULT_RG_ORDER_WEIGHT
+    assert recipe['decomp_params'] == {'proportions': [1, 2], 'rg_order_weight': DEFAULT_RG_ORDER_WEIGHT}
     assert recipe['niter'] == 7
     assert recipe['pore_dist'] == 'lognormal'
     assert recipe['auto_constraint'] is True

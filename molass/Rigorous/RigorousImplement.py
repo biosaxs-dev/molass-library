@@ -303,11 +303,20 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
     """
     resolved_model = model if model is not None else decomposition.xr_ccurves[0].model
     effective_ssd = ssd if ssd is not None else getattr(decomposition, 'ssd', None)
+    decomp_params = dict(decomp_params) if decomp_params is not None else {}
+    if 'proportions' in decomp_params:
+        # Record the resolved default: otherwise a later change of the library
+        # default silently alters the initial decomposition rebuilt from this
+        # recipe (#299; the default changed with #295).
+        from molass.Decompose.RgOrder import DEFAULT_RG_ORDER_WEIGHT
+        decomp_params.setdefault('rg_order_weight', DEFAULT_RG_ORDER_WEIGHT)
+    import molass
     recipe = {
         "num_components": num_components if num_components is not None else decomposition.num_components,
         "model": resolved_model,
         "method": method.lower(),
-        "decomp_params": decomp_params if decomp_params is not None else {},
+        "molass_version": str(molass.__version__),
+        "decomp_params": decomp_params,
         "trim_params": trim_params if trim_params is not None else {},
         "baseline_params": baseline_params if baseline_params is not None else {},
     }

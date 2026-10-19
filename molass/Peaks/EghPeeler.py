@@ -158,6 +158,10 @@ def egh_peel(x, y, num_components=None, min_area_frac=DEFAULT_MIN_AREA_FRAC,
 
     total_area = np.trapezoid(y, x)
     if total_area <= 0:
+        # An uncorrected curve with an offset baseline can integrate to <= 0 even
+        # though it has a clear peak: fall back to the clipped data the peeling uses (#306).
+        total_area = np.trapezoid(residual, x)
+    if total_area <= 0:
         return []
 
     max_steps = num_components if num_components is not None else MAX_STEPS

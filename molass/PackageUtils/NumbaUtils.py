@@ -21,10 +21,8 @@ def get_ready_for_numba():
     numba_cache = os.path.join(tempfile.gettempdir(), "numba_cache")
     os.environ['NUMBA_CACHE_DIR'] = numba_cache
 
-    if os.path.exists(numba_cache):
-        import shutil
-        # other processes may be starting at the same time and doing the same:
-        # tolerate a directory that disappears or is being removed concurrently (#305)
-        shutil.rmtree(numba_cache, ignore_errors=True)
+    # Do not wipe an existing cache: Numba validates entries against the source
+    # file stamp itself, and deleting the shared directory at every start can pull
+    # the cache out from under another running process (#305).
     os.makedirs(numba_cache, exist_ok=True)
     IS_READY_FOR_NUMBA = True

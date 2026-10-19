@@ -65,3 +65,14 @@ class TestMaxSigmaRatio:
         peaks = egh_peel(self.x, y)
         # Should find 1 peak; no spurious broad fits accepted
         assert len(peaks) >= 1
+
+
+def test_offset_baseline_negative_total_area():
+    """An uncorrected curve whose integral is <= 0 must still be peeled (molass-library#306)."""
+    x = np.arange(800, dtype=float)
+    y = _make_curve(x, [(0.056, 563, 12, 2)]) - 0.0125    # mostly negative, integral < 0
+    assert np.trapezoid(y, x) < 0
+    peaks = egh_peel(x, y, num_components=1)
+    assert len(peaks) == 1
+    assert abs(peaks[0][1] - 563) < 5
+

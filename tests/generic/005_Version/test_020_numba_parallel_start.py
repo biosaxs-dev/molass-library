@@ -7,8 +7,6 @@ CODE = "from molass.PackageUtils.NumbaUtils import get_ready_for_numba; get_read
 
 
 def test_get_ready_for_numba_parallel_processes(tmp_path):
-    # Private TEMP for the children: get_ready_for_numba() wipes <TEMP>/numba_cache, which must not
-    # hit the cache directory that the running pytest process itself uses (flaky baseline tests).
     env = dict(os.environ, TMP=str(tmp_path), TEMP=str(tmp_path), TMPDIR=str(tmp_path))
     procs = [subprocess.Popen([sys.executable, "-c", CODE], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
              for _ in range(8)]
@@ -16,3 +14,14 @@ def test_get_ready_for_numba_parallel_processes(tmp_path):
     for out, err, rc in results:
         assert rc == 0, err[-500:]
         assert "ok" in out
+
+
+def test_get_ready_for_numba_keeps_existing_cache(tmp_path):
+    cache = tmp_path / "numba_cache"
+    cache.mkdir()
+    marker = cache / "marker.nbi"
+    marker.write_text("cache of another running process")
+    env = dict(os.environ, TMP=str(tmp_path), TEMP=str(tmp_path), TMPDIR=str(tmp_path))
+    r = subprocess.run([sys.executable, "-c", CODE], capture_output=True, text=True, env=env, timeout=120)
+    assert r.returncode == 0, r.stderr[-500:]
+    assert marker.exists()

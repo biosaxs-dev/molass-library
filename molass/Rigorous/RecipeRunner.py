@@ -60,6 +60,11 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     baseline_params = recipe.get('baseline_params', {})
     decomp_params = dict(recipe.get('decomp_params', {}))
     decomp_params['num_components'] = n_components
+    if 'molass_version' not in recipe and 'proportions' in decomp_params:
+        # Recipes written before molass_version/rg_order_weight were recorded (#299)
+        # were created when the quick proportional fit had no Rg-order term (#295):
+        # keep rebuilding them that way instead of with today's default.
+        decomp_params.setdefault('rg_order_weight', 0)
     # uv_pickat/xr_pickat round-trip the wavelength/q-value SSD(...) was
     # originally constructed with (see _build_auto_recipe) -- omitted (None)
     # for recipe.json files written before this field existed, which falls

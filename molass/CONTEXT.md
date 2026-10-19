@@ -91,6 +91,25 @@ decomp = corrected.quick_decomposition(rgcurve=rgcurve)
 run_info = decomp.optimize_rigorously(rgcurve=rgcurve, analysis_folder="temp_analysis")
 ```
 
+### Common accessors (cheat-sheet)
+
+| You want | Use |
+|----------|-----|
+| Rg curve (cached) | `corrected.get_rg_curve()` — **not** `corrected.xr.compute_rgcurve` |
+| Rg curve data | `rgcurve.get_xy()` → `(frames, rgs)`; or `.frames` / `.indeces`, `.rgs` / `.rgvalues`, `.scores` |
+| Component Rgs | `decomp.get_rgs()` (call-order independent) |
+| SEC order check | `decomp.check_sec_order()` |
+| Component peak position | `ccurve.get_peak_position()` (same value as `ccurve.get_params()[1]` for EGH) |
+| Component curve data / params | `ccurve.get_xy()` / `ccurve.get_params()` |
+| XR matrices / components | `decomp.get_xr_matrices()` / `decomp.get_xr_components()` |
+| Number of components / ranks | `decomp.num_components` / `decomp.xr_ranks`; set with `decomp.update_xr_ranks([...])` |
+| Trimming / mapping used | `ssd.make_trimming()` / `ssd.get_mapping()` |
+
+**Call costs**: Rg estimation is about 50 ms per frame on average and up to ~0.5 s per
+`RgEstimator` call when its fallback chain engages — fine once per analysis
+(`get_rg_curve()` caches it), far too slow inside an optimizer loop. `Decompose/RgOrder.py`
+contains a private fast low-q proxy for that purpose; it is not a public API.
+
 ---
 
 ## Working conventions worth knowing
