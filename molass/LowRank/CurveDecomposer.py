@@ -85,7 +85,7 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
             - decompargs: dict or None
                 If provided, use these arguments for decomposition instead of peak recognition.
             - tau_limit: float
-                Limit for the tau parameter in the EGH model. Default is 0.5.
+                Limit for the tau parameter in the EGH model. Default is 0.6.
             - area_weight: float
                 Weight for the area proportion penalty in the fitting objective. Default is 0.1.
             - proportions: list of float or None
@@ -159,7 +159,7 @@ def decompose_icurve_impl(icurve, num_components, **kwargs):
             n = len(peak_list[0])
             shape = (m,n)
             max_y = icurve.get_max_xy()[1]
-            tau_limit = kwargs.get('tau_limit', 0.5)
+            tau_limit = kwargs.get('tau_limit', 0.6)
             area_weight = kwargs.get('area_weight', 0.1)
 
             proportions = kwargs.get('proportions', None)
