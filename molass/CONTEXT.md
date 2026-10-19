@@ -104,6 +104,11 @@ run_info = decomp.optimize_rigorously(rgcurve=rgcurve, analysis_folder="temp_ana
 | XR matrices / components | `decomp.get_xr_matrices()` / `decomp.get_xr_components()` |
 | Number of components / ranks | `decomp.num_components` / `decomp.xr_ranks`; set with `decomp.update_xr_ranks([...])` |
 | Trimming / mapping used | `ssd.make_trimming()` / `ssd.get_mapping()` |
+| Initial vs optimized result | `run_info.compare_initial_best()` → `{'initial': {...}, 'best': {...}}` (SV, Rgs, peak positions, SEC order) |
+| Why two machines differ | `molass.environment_report()` (versions, BLAS library + CPU kernel, relevant env vars) |
+
+To add a keyword option to `quick_decomposition()`, add one entry to `molass/LowRank/QuickOptions.py`
+(known-kwargs set, typo warning and docstring entry are derived from it); the value's plumbing stays where it is used.
 
 **Call costs**: Rg estimation is about 50 ms per frame on average and up to ~0.5 s per
 `RgEstimator` call when its fallback chain engages — fine once per analysis

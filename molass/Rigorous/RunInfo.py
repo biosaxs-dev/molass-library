@@ -727,6 +727,55 @@ class RunInfo:
         )
         return self.score(*args, **kwargs)
 
+    def compare_initial_best(self, timeout=15):
+        """Compare the initial (pre-optimization) decomposition with the best optimized one.
+
+        After ``restore()`` / ``RecipeRunner`` the variable ``decomp`` holds the initial
+        decomposition, while :meth:`load_best` returns the optimized one; their Rgs and
+        scores differ, and mixing them up is easy. This puts both side by side.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            Seconds to wait for a first optimized result (passed to :meth:`load_best`).
+            Default 15.
+
+        Returns
+        -------
+        dict
+            ``{'initial': info, 'best': info}`` where each ``info`` is a dict with
+            ``sv`` and ``fv`` (``None`` when the objective cannot be evaluated, e.g. after
+            ``reconnect()``), ``rgs``, ``peak_positions`` and ``sec_ordered``.
+            ``info['job']`` (best only) is the job the result was loaded from.
+
+        Examples
+        --------
+        ::
+
+            cmp = run_info.compare_initial_best()
+            print(cmp['initial']['rgs'], cmp['best']['rgs'])
+        """
+        best = self.load_best(timeout=timeout)
+        initial = self.decomposition
+
+        def describe(decomp, sv=None, fv=None):
+            return dict(
+                sv=sv, fv=fv,
+                rgs=[float(rg) for rg in decomp.get_rgs()],
+                peak_positions=[float(c.get_peak_position()) for c in decomp.xr_ccurves],
+                sec_ordered=bool(decomp.check_sec_order(rgcurve=self.rgcurve)),
+            )
+
+        init_fv = init_sv = None
+        if self.optimizer is not None and self.init_params is not None:
+            from molass.Rigorous.CurrentStateUtils import fv_to_sv
+            init_fv = float(self.optimizer.objective_func(self.init_params, return_full=True)[0])
+            init_sv = float(fv_to_sv(init_fv))
+
+        best_info = describe(best, sv=best.sv, fv=best.fv)
+        best_info['job'] = self.loaded_job
+        return dict(initial=describe(initial, sv=init_sv, fv=init_fv), best=best_info)
+
     def get_current_curves(self):
         """Return the data and model curves currently shown on the monitor.
 

@@ -1187,93 +1187,10 @@ class SecSaxsData:
             Specifies the number of components which also implies the SVD rank
             used to denoise the matrix data.
 
-        proportions : list of float, optional
-            Specifies the approximate area ratios of the elution peaks.
-            The values do not need to be normalized; for example,
-            ``[1, 1]``, ``[0.5, 0.5]``, and ``[3, 3]`` all produce the same result
-            because they are normalized internally.
-
-            When this option is given, a **proportional decomposition** algorithm
-            is used instead of the default peak-recognition algorithm.
-            The proportional algorithm divides the total elution curve by cumulative area
-            according to the given ratios, and fits an EGH model to each slice independently.
-            This provides better initialization for cases with highly overlapping peaks,
-            where the default algorithm may produce unstable results.
-
-            The exact ratios do not need to be known precisely;
-            even a rough estimate (e.g., ``[2, 1]`` when the true ratio is ``[1, 1]``)
-            is usually sufficient.
-
-        xslices : list of slice, optional
-            Precomputed slices over the XR icurve's frame axis, used instead of deriving
-            them from the XR icurve itself. Applies only to the ``proportions`` path.
-            Use this for cross-channel slicing when XR baseline noise causes area-based
-            slicing to miss small features (e.g. shoulders) that are much clearer in the
-            UV icurve -- build boundaries on UV with
-            ``molass.Decompose.Proportional.compute_proportional_boundaries()``, remap them
-            to XR frames with ``ssd.get_mapping().uv_to_xr()``, then build slices with
-            ``molass.Decompose.Proportional.slices_from_boundaries()``. Default None
-            (slice the XR icurve itself, original behavior).
-
-        proportions_source : {'xr', 'uv'}, optional
-            Which channel's icurve the ``proportions`` fit is performed on. Default
-            ``'xr'`` (fit on XR, derive UV as XR's partner -- original behavior). ``'uv'``
-            instead fits fully on the UV icurve -- usually much better signal-to-noise for
-            small features such as shoulders next to a dominant peak -- and derives XR as
-            UV's partner (mapping shape, refitting only heights). XR remains the shape
-            used by the rest of the pipeline (LRF, Rg/Guinier analysis, rigorous
-            optimization) either way.
-
-        rg_order_weight : float, optional
-            Applies only to the ``proportions`` path with ``proportions_source='xr'``.
-            Weight of a soft SEC-order penalty added to the proportional fit: component
-            Rgs (a cheap low-q-decay proxy from the LRF of the trial curves) should
-            decrease with elution order, as in the rigorous objective. This makes the
-            result far less sensitive to tiny input perturbations (trimming slice,
-            platform numerics). Default 0.1; ``0`` restores the elution-curve-only fit.
-            Ignored for a single component and when ``allow_negative_peaks`` is True.
-            See molass-library#295.
-
-        xr_peakpositions : list of float, optional
-            Specifies the frame positions where peaks should be pinned.
-            Uses a penalty-based optimizer (Nelder-Mead) that fits EGH peaks
-            with a strong position constraint. ``num_components`` is inferred
-            from the length if not provided.
-
-            Mutually exclusive with ``proportions``.
-
         ranks : list of int, optional
             Specifies the ranks to be used for XR data.
 
-        num_plates : int, optional
-            Fallback plate count used to seed the Martin-Synge plate-theory
-            estimation (shared injection time and plate count, from which each
-            component's Gaussian width is derived -- see
-            ``molass.SEC.Models.MartinSynge``) when self-estimation from the
-            component-wise (tR, sigma) pairs is degenerate. Applies only to the
-            ``proportions`` path. Default 14400.
-
-        tau_limit : float, optional
-            Maximum allowed ratio ``|tau| / sigma`` for positioned decomposition.
-            Default 0.6.
-
-        max_sigma : float, optional
-            Maximum allowed Gaussian width (sigma) for positioned decomposition.
-            Default 80.
-
-        min_sigma : float, optional
-            Minimum allowed Gaussian width (sigma) for positioned decomposition.
-            Default 5.
-
-        allow_negative_peaks : bool, optional
-            If True, allow negative peak heights (H < 0) in the EGH model.
-            This enables decomposition of components with negative scattering,
-            such as those arising from buffer composition mismatch.
-            Default False.
-
-        debug : bool, optional
-            If True, reload internal modules and show diagnostic plots.
-            Default False.
+        @@QUICK_OPTIONS@@
 
         Returns
         -------
@@ -1282,25 +1199,9 @@ class SecSaxsData:
         """
         
         debug = kwargs.get('debug', False)
-        # Validate kwargs to catch typos early (issue #64)
-        _KNOWN_KWARGS = {
-            'proportions', 'xr_peakpositions', 'debug',
-            'tau_limit', 'max_sigma', 'min_sigma', 'num_plates',
-            'allow_negative_peaks',
-            'ranks', 'randomize', 'seed', 'global_opt',
-            'area_weight', 'sec_constraints', 'data_matrix', 'qv',
-            'curve_model', 'smoothing', 'decompargs', 'peakpositions',
-            'smooth_uv', 'consistent_uv', 'ip_effect_info',
-            'rgcurve', 'xslices', 'proportions_source', 'rg_order_weight',
-        }
-        unknown = set(kwargs) - _KNOWN_KWARGS
-        if unknown:
-            import warnings
-            warnings.warn(
-                f"quick_decomposition() received unrecognized keyword arguments: {unknown}. "
-                f"Check for typos. Known kwargs: {sorted(_KNOWN_KWARGS)}",
-                stacklevel=2,
-            )
+        # Validate kwargs to catch typos early (issue #64); the accepted names live in LowRank/QuickOptions.py (#301)
+        from molass.LowRank.QuickOptions import check_known_kwargs
+        check_known_kwargs(kwargs, stacklevel=3)
         if debug:
             import molass.LowRank.QuickImplement
             reload(molass.LowRank.QuickImplement)
@@ -1330,6 +1231,10 @@ class SecSaxsData:
             if rgcurve is not None:
                 result._rgcurve = rgcurve
             return result
+
+    from molass.LowRank.QuickOptions import fill_doc as _fill_quick_doc
+    quick_decomposition.__doc__ = _fill_quick_doc(quick_decomposition.__doc__)
+    del _fill_quick_doc
 
     def rigorous_decomposition(self, num_components=None, ranks=None, **kwargs):
         """ssd.rigorous_decomposition(num_components=None, proportions=None, ranks=None, num_plates=None, **kwargs)
