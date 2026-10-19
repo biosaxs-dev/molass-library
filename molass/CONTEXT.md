@@ -156,6 +156,13 @@ comparing the model against frames where UV was never really measured. Use
 decision, and the chosen slices for both channels; pass an explicit
 `mapping=` to `trimmed_copy()` if the auto-estimated one looks wrong.
 
+**Irregular UV end.** If the UV elution curve ends with a dip below the baseline (falling
+baseline tilt >= 0.2 of the peak height and a dip below the noise band in the last 10 % of
+the frames, as in `20200123_3`), `trimmed_copy()` emits a `UserWarning` and excludes those
+frames from the trimming and from the XR/UV mapping (`molass/Trimming/AnomalyHandler.py`;
+data without it is not affected). Switch off with
+`molass.Global.Options.set_molass_options(anomaly_handling=False)`.
+
 **Identical trimming across machines.** For single-peak data the mapping comes
 from an EGH fit that can land on slightly different points on different
 CPU/BLAS builds (a 1-frame or larger change in the automatic slices; see

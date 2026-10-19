@@ -156,6 +156,11 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
             uv_jslice = slice(start, stop)
 
             if get_molass_options('mapped_trimming'):
+                if mapping is None and get_molass_options('anomaly_handling'):
+                    # kept out of the default course: returns its arguments unchanged
+                    # (mapping None) unless the UV curve has an irregular end
+                    from molass.Trimming.AnomalyHandler import handle_uv_end_anomaly
+                    uv_jslice, mapping = handle_uv_end_anomaly(ssd, uv_jslice, debug=debug)
                 xr_jslice, uv_jslice, mapping = make_mapped_trimming_info(
                     ssd, xr_jslice, uv_jslice, mapping=mapping, debug=debug)
                 ssd.mapping = mapping

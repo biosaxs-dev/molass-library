@@ -4,6 +4,7 @@
 
 GLOBAL_OPTIONS = dict(
     mapped_trimming = True,
+    anomaly_handling = True,
     flowchange = False,
     developer_mode = False,
     elution_recognition = 'icurve',
@@ -18,6 +19,10 @@ def set_molass_options(**kwargs):
     mapped_trimming : bool, optional
         Whether to perform mapped trimming. Default is True.
         See :func:`molass.Trimming.TrimmingUtils.make_mapped_trimming_info` for details.
+    anomaly_handling : bool, optional
+        Whether trimming excludes an irregular end of the UV elution curve (a dip below the
+        baseline in the last frames) from the trimming and from the XR/UV mapping. Default is True;
+        data without such an anomaly is not affected. See :mod:`molass.Trimming.AnomalyHandler`.
     flowchange : bool or str, optional
         Whether to consider flow change. Default is False.
         If a string is given and equal to 'auto', flow change will be considered
@@ -58,6 +63,7 @@ def get_molass_options(*args):
         The options are:
 
         - 'mapped_trimming': Whether to perform mapped trimming.
+        - 'anomaly_handling': Whether to exclude an irregular UV end from trimming.
         - 'flowchange': Whether to consider flow change.
         - 'developer_mode': Whether to enable developer mode.
         - 'elution_recognition': Which elution curve to use for recognition
