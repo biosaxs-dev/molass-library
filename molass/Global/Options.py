@@ -22,7 +22,9 @@ def set_molass_options(**kwargs):
     anomaly_handling : bool, optional
         Whether trimming excludes an irregular end of the UV elution curve (a dip below the
         baseline in the last frames) from the trimming and from the XR/UV mapping. Default is True;
-        data without such an anomaly is not affected. See :mod:`molass.Trimming.AnomalyHandler`.
+        data without such an anomaly is not affected. Set it to False to observe the anomaly itself
+        (e.g. the tilted baseline in ``plot_compact(baseline=True)``, or the unstable mapping it
+        causes). See :mod:`molass.Trimming.AnomalyHandler`.
     flowchange : bool or str, optional
         Whether to consider flow change. Default is False.
         If a string is given and equal to 'auto', flow change will be considered

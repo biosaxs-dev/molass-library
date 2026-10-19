@@ -160,7 +160,8 @@ decision, and the chosen slices for both channels; pass an explicit
 baseline tilt >= 0.2 of the peak height and a dip below the noise band in the last 10 % of
 the frames, as in `20200123_3`), `trimmed_copy()` emits a `UserWarning` and excludes those
 frames from the trimming and from the XR/UV mapping (`molass/Trimming/AnomalyHandler.py`;
-data without it is not affected). Switch off with
+data without it is not affected). To observe the anomaly itself (tilted baseline in
+`plot_compact(baseline=True)`, unstable mapping), switch the handling off with
 `molass.Global.Options.set_molass_options(anomaly_handling=False)`.
 
 **Identical trimming across machines.** For single-peak data the mapping comes
