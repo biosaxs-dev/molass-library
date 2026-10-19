@@ -337,6 +337,11 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
         recipe["uv_pickat"] = uv_pickat
     if xr_pickat is not None:
         recipe["xr_pickat"] = xr_pickat
+    # Recorded only when switched off (the default is on, so existing recipes stay as they are): the rebuild
+    # trims again, possibly in another process, and must trim the same frames the caller worked with.
+    from molass.Global.Options import get_molass_options
+    if get_molass_options('anomaly_handling') is False:
+        recipe["anomaly_handling"] = False
     recipe.update(extra)
     return recipe
 

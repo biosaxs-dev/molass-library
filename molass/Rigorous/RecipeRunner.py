@@ -76,7 +76,15 @@ def rebuild_decomposition_from_recipe(analysis_folder):
         ssd_kwargs['xr_pickat'] = recipe['xr_pickat']
 
     ssd = SSD(in_folder, **ssd_kwargs)
-    trimmed = ssd.trimmed_copy(**trim_params)
+    # The trimming must see the anomaly_handling option the recipe was made with (it is recorded only when
+    # switched off); the caller's setting is restored afterwards, this may run inside a notebook (#310).
+    from molass.Global.Options import get_molass_options, set_molass_options
+    saved_handling = get_molass_options('anomaly_handling')
+    set_molass_options(anomaly_handling=recipe.get('anomaly_handling', saved_handling))
+    try:
+        trimmed = ssd.trimmed_copy(**trim_params)
+    finally:
+        set_molass_options(anomaly_handling=saved_handling)
     corrected = trimmed.corrected_copy(**baseline_params)
     decomp = corrected.quick_decomposition(**decomp_params)
     if model != 'egh':

@@ -52,6 +52,23 @@ def test_build_pipeline_recipe_minimal_defaults():
     json.dumps(recipe)
 
 
+def test_build_pipeline_recipe_records_anomaly_handling_only_when_off():
+    """#310: absent by default (existing recipes unchanged), False when switched off."""
+    from molass.Global.Options import get_molass_options, set_molass_options
+    from molass.Rigorous.RigorousImplement import build_pipeline_recipe
+
+    before = get_molass_options('anomaly_handling')
+    try:
+        set_molass_options(anomaly_handling=True)
+        assert "anomaly_handling" not in build_pipeline_recipe(_DummyDecomp())
+        set_molass_options(anomaly_handling=False)
+        recipe = build_pipeline_recipe(_DummyDecomp())
+        assert recipe["anomaly_handling"] is False
+        json.dumps(recipe)
+    finally:
+        set_molass_options(anomaly_handling=before)
+
+
 def test_build_pipeline_recipe_records_resolved_rg_order_weight():
     """The default of rg_order_weight is recorded for proportional recipes (#299),
     an explicit value wins, and recipes without proportions stay untouched."""
