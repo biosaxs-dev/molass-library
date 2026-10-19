@@ -5,8 +5,6 @@ The proteins5 case: XR has 5 peaks and UV has 6 (one UV-only peak at 547); the f
 line with UV (603, 696, 812, 890, 937). The EGH-reconstruction correlation used before picked a different
 pairing depending on tau_limit.
 """
-import os
-
 import numpy as np
 import pytest
 
@@ -62,12 +60,12 @@ def test_estimate_peak_sigma():
 
 
 def test_proteins5_data_default_mapping():
-    from molass.Local import get_local_settings
+    """proteins5 is bundled as molass_data.SAMPLE6."""
+    molass_data = pytest.importorskip("molass_data")
+    if not hasattr(molass_data, "SAMPLE6"):
+        pytest.skip("installed molass_data has no SAMPLE6 (20191006_proteins5)")
     from molass.DataObjects import SecSaxsData as SSD
-    path = os.path.join(get_local_settings()['DATA_ROOT_FOLDER'], "20191006_proteins5")
-    if not os.path.exists(path):
-        pytest.skip("20191006_proteins5 is not available")
-    mapping = SSD(path).estimate_mapping()
+    mapping = SSD(molass_data.SAMPLE6).estimate_mapping()
     assert list(mapping.xr_peaks) == [561, 648, 760, 825, 878]
     assert list(mapping.uv_peaks) == [603, 696, 812, 890, 937]
     assert mapping.slope == pytest.approx(1.0636, abs=0.005)
