@@ -4,6 +4,18 @@
 import numpy as np
 from itertools import combinations
 
+# allowed RMS position residual of the peak-pairing line fit, in units of the median XR peak sigma;
+# the correct pairing of proteins5 fits within 0.33, the wrong 3-peak pairing of EcoCas3 is off by 1.0
+POSITION_TOLERANCE_SIGMA = 0.5
+FWHM_PER_SIGMA = 2.355
+
+def combination_pairs_of_size(m, n, k):
+    """Yield all candidate (xr_index_subset, uv_index_subset) pairs of exactly k peaks each,
+    preserving each side's relative (elution) order."""
+    for xr_idx in combinations(range(m), k):
+        for uv_idx in combinations(range(n), k):
+            yield list(xr_idx), list(uv_idx)
+
 def combination_pairs(m, n, min_k=2):
     """Yield all candidate (xr_index_subset, uv_index_subset) pairs of equal size k,
     for k = min(m, n) down to min_k, preserving each side's relative (elution) order.
@@ -14,11 +26,8 @@ def combination_pairs(m, n, min_k=2):
     peaks may need discarding, not just the extras on the larger side
     (see EcoCas3, molass-library#270).
     """
-    top_k = min(m, n)
-    for k in range(top_k, min_k - 1, -1):
-        for xr_idx in combinations(range(m), k):
-            for uv_idx in combinations(range(n), k):
-                yield list(xr_idx), list(uv_idx)
+    for k in range(min(m, n), min_k - 1, -1):
+        yield from combination_pairs_of_size(m, n, k)
 
 def get_smoothed_curve_y(curve):
     """Fit a smooth (EGH, negative-clipped) reconstruction of a curve's y-values, for
@@ -61,18 +70,37 @@ def compute_shape_correlation(xr_curve, uv_curve, xr_peaks, uv_peaks, xr_y_smoot
     uv_n = uv_on_grid / uv_on_grid.max()
     return np.corrcoef(xr_n, uv_n)[0, 1]
 
-def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False, prefer_margin=0.02):
+def estimate_peak_sigma(curve, peaks):
+    """Median peak width of *peaks* (indices) as a Gaussian sigma in frames, from the full width at
+    half maximum of the negative-clipped curve; ``None`` if no width can be determined."""
+    from scipy.signal import peak_widths
+    y = np.clip(np.asarray(curve.y, dtype=float), 0, None)
+    widths = peak_widths(y, np.asarray(peaks, dtype=int), rel_height=0.5)[0] / FWHM_PER_SIGMA
+    widths = widths[np.isfinite(widths) & (widths > 0)]
+    return float(np.median(widths)) if len(widths) else None
+
+def position_fit_rms(xr_x, uv_x):
+    """RMS residual, in XR frames, of the straight line through paired peak positions (UV = a*XR + b).
+    Returns ``(rms, slope, intercept)``."""
+    slope, intercept = np.polyfit(xr_x, uv_x, 1)
+    if slope <= 0:
+        return np.inf, slope, intercept
+    return float(np.sqrt(np.mean(((slope * xr_x + intercept - uv_x) / slope) ** 2))), slope, intercept
+
+def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False, tolerance_sigma=POSITION_TOLERANCE_SIGMA):
     """
     Select matching peaks between XR and UV curves.
 
-    Scores each candidate peak-subset correspondence by whole-shape correlation after
-    mapping (see `compute_shape_correlation`), not by peak-height agreement -- see
-    molass-library#270 for why the latter is unreliable. Candidates may drop peaks
-    from either side (or both), not just from whichever side has more raw peaks.
+    The peak *positions* decide first: a correct correspondence maps the XR peaks onto the UV
+    peaks along one straight line. Starting from the largest possible subset (k = min(m, n)) and
+    going down to k = 2, the first k for which some pairing fits a line to within
+    ``tolerance_sigma`` times the typical XR peak width is taken; peaks may be dropped from either
+    side, not just from whichever side has more raw peaks (see EcoCas3, molass-library#270).
 
-    Among candidates within `prefer_margin` correlation of the best one found, the
-    largest subset (fewest discarded peaks) is preferred, so a smaller subset only
-    wins by discarding real peaks when it fits meaningfully better.
+    The whole-shape correlation of the two curves after mapping (see `compute_shape_correlation`)
+    is used only to break ties, i.e. when positions cannot decide: k = 2 (any two pairs fit a line
+    exactly) or several pairings of the same size within tolerance. Peak heights are never used --
+    prominence is not preserved across UV/XR channels (#270).
 
     Parameters
     ----------
@@ -86,9 +114,9 @@ def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False, p
         The indices of the peaks in the UV curve.
     debug : bool, optional
         If True, print debug information.
-    prefer_margin : float, optional
-        Correlation tolerance for preferring a larger subset over the single best-
-        scoring one (default 0.02).
+    tolerance_sigma : float, optional
+        Allowed RMS position residual of the line fit, in units of the median XR peak sigma
+        (default 0.5). If no peak width can be determined, the largest subset is taken.
 
     Returns
     -------
@@ -101,25 +129,39 @@ def select_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=False, p
     xr_peaks = np.asarray(xr_peaks)
     uv_peaks = np.asarray(uv_peaks)
     if len(xr_peaks) < 2 or len(uv_peaks) < 2:
-        # not enough peaks on one side to fit a slope/intercept for shape scoring
+        # not enough peaks on one side to fit a slope/intercept
         num = min(len(xr_peaks), len(uv_peaks))
         return xr_peaks[:num], uv_peaks[:num]
 
-    xr_y_smooth = get_smoothed_curve_y(xr_curve)
-    uv_y_smooth = get_smoothed_curve_y(uv_curve)
+    sigma = estimate_peak_sigma(xr_curve, xr_peaks)
+    tolerance = np.inf if sigma is None else tolerance_sigma * sigma
+    if debug:
+        print(f"position tolerance = {tolerance} frames (sigma={sigma})")
+    xr_x = xr_curve.x[xr_peaks]
+    uv_x = uv_curve.x[uv_peaks]
 
-    # evaluate all candidate subset correspondences, grouped by subset size k
-    by_k = {}
-    for index1, index2 in combination_pairs(len(xr_peaks), len(uv_peaks)):
-        corr = compute_shape_correlation(xr_curve, uv_curve, xr_peaks[index1], uv_peaks[index2], xr_y_smooth, uv_y_smooth)
-        if debug:
-            print(index1, index2, corr)
-        by_k.setdefault(len(index1), []).append((index1, index2, corr))
-
-    best_overall = max(corr for recs in by_k.values() for _, _, corr in recs)
-    for k in sorted(by_k, reverse=True):
-        index1, index2, corr = max(by_k[k], key=lambda r: r[2])
-        if corr >= best_overall - prefer_margin:
+    for k in range(min(len(xr_peaks), len(uv_peaks)), 1, -1):
+        fitting = []
+        for index1, index2 in combination_pairs_of_size(len(xr_peaks), len(uv_peaks), k):
+            rms, slope, _ = position_fit_rms(xr_x[index1], uv_x[index2])
             if debug:
-                print(f"selected k={k}: xr_index={index1}, uv_index={index2}, corr={corr}")
-            return xr_peaks[index1], uv_peaks[index2]
+                print(index1, index2, f"rms={rms:.2f} slope={slope:.4f}")
+            if rms <= tolerance:
+                fitting.append((index1, index2, rms))
+        if not fitting:
+            continue
+        if k > 2 and len(fitting) == 1:
+            index1, index2, rms = fitting[0]
+        else:
+            # positions cannot decide: let the curve shapes break the tie
+            xr_y_smooth = get_smoothed_curve_y(xr_curve)
+            uv_y_smooth = get_smoothed_curve_y(uv_curve)
+            scored = [(compute_shape_correlation(xr_curve, uv_curve, xr_peaks[i1], uv_peaks[i2], xr_y_smooth, uv_y_smooth), i1, i2)
+                      for i1, i2, _ in fitting]
+            if debug:
+                for corr, i1, i2 in scored:
+                    print("tie-break", i1, i2, corr)
+            _, index1, index2 = max(scored, key=lambda r: r[0])
+        if debug:
+            print(f"selected k={k}: xr_index={index1}, uv_index={index2}")
+        return xr_peaks[index1], uv_peaks[index2]
