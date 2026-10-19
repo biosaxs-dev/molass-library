@@ -521,6 +521,22 @@ class SecSaxsData:
             :data:`TRIMMED_COVERAGE_WARN_RATIO`). See :meth:`make_trimming`
             with ``debug=True`` to inspect why a given range was chosen
             (raw peaks, the peak-matching decision, and the final slices).
+
+        Notes
+        -----
+        **Reproducibility across machines.** For data with a single elution peak
+        per channel, the XR/UV mapping is estimated from a fit whose result can
+        depend on the CPU/BLAS build (see molass-library#293). A one-frame
+        difference in the automatic slices is then possible between machines.
+        The quick decomposition is designed to be insensitive to this
+        (``rg_order_weight``), but if you need identical trimmed data on
+        several machines, record the slices once and pass them explicitly:
+
+        >>> auto = ssd.make_trimming()
+        >>> print(auto.xr_slices, auto.uv_slices)       # note the temporal slices
+        >>> trim = auto.copy(xr_slices=(auto.xr_slices[0], slice(95, 1327)),
+        ...                  uv_slices=(auto.uv_slices[0], slice(0, 1486)))
+        >>> trimmed = ssd.trimmed_copy(trimming=trim)   # same frames on every machine
         """
         start_time = time()
         from molass.Global.Quiet import suppress_if_quiet

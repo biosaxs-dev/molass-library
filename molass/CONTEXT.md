@@ -132,6 +132,21 @@ comparing the model against frames where UV was never really measured. Use
 decision, and the chosen slices for both channels; pass an explicit
 `mapping=` to `trimmed_copy()` if the auto-estimated one looks wrong.
 
+**Identical trimming across machines.** For single-peak data the mapping comes
+from an EGH fit that can land on slightly different points on different
+CPU/BLAS builds (a 1-frame or larger change in the automatic slices; see
+molass-library#293 — the cause is a flat fit objective, not a convergence
+setting, so there is no tolerance to tighten). `quick_decomposition()` is
+robust to it (`rg_order_weight`, default 0.1), but to get bit-identical
+trimmed data on several machines, pin the slices:
+
+```python
+auto = ssd.make_trimming()                       # inspect auto.xr_slices / auto.uv_slices
+trim = auto.copy(xr_slices=(auto.xr_slices[0], slice(95, 1327)),
+                 uv_slices=(auto.uv_slices[0], slice(0, 1486)))
+trimmed = ssd.trimmed_copy(trimming=trim)
+```
+
 ### `Decomposition.score()` / `RunInfo.score()`: check `.source`
 
 Both return a `Score` object with `.sv`, `.fv`, `.breakdown`, `.plot()`,
