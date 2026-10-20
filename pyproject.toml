@@ -21,6 +21,7 @@ dependencies = [
   "numba",
   "learnsaxs",
   "mrcfile",
+  "scikit-image",
   "ipywidgets",
   "ipykernel",
   "cma",
