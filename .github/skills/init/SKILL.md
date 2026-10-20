@@ -1,7 +1,7 @@
-﻿---
-agent: copilot
-description: セッション初期化（PROJECT_STATUS.md の読み込みと確認）
-alwaysApply: true
+---
+name: init
+description: "セッション初期化（PROJECT_STATUS.md の読み込みと確認）"
+disable-model-invocation: true
 ---
 
 Respond in English regardless of this file's language.
