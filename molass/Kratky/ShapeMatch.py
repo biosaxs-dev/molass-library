@@ -38,7 +38,8 @@ from molass.Kratky.ShapeLibrary import get_model_shapes
 QRG_PEAK_SEARCH_WINDOW = (0.5, 5.0)
 QRG_MATCH_WINDOW = (0.5, 5.0)
 GLOBULAR_PEAK_QRG = np.sqrt(3)
-
+CHAIN_GATE_FACTOR = 0.05  # score multiplier for the Gaussian chain when the component has a clear peak
+OVERLAY_QRG_MAX = 10.0  # upper end of the qRg range shown by plot_kratky_overlay
 
 
 def _savgol_smooth(y, window=11, polyorder=3):
@@ -87,6 +88,55 @@ def kratky_peak_qrg(qv, pv, rg, iz, qrg_search_window=QRG_PEAK_SEARCH_WINDOW):
     if local_peak_idx == idx[-1]:
         return None  # no decay observed -- treat as "no clear peak"
     return float(qrg[local_peak_idx])
+
+
+def has_clear_kratky_peak(qrg, ky, search=(0.5, 11.0), min_decay=0.08, nsigma=3.0):
+    """Whether a Kratky curve has a clear interior peak.
+
+    "Clear" means the smoothed maximum is not at the search-window edge and the
+    curve falls after it by at least ``min_decay`` (relative) AND by more than
+    ``nsigma`` times the local noise, so neither a monotonic/plateauing curve
+    nor a noisy plateau counts as peaked. Used to exclude the Gaussian chain
+    (which has no peak) from the candidates of a peaked component (see
+    molass-researcher experiment 49b).
+
+    Parameters
+    ----------
+    qrg : ndarray
+        Dimensionless q*Rg values.
+    ky : ndarray
+        Dimensionless Kratky values (qRg)^2 P(q)/I(0).
+    search : tuple of float, optional
+        (min, max) qRg range in which the peak is searched.
+    min_decay : float, optional
+    nsigma : float, optional
+
+    Returns
+    -------
+    bool
+    """
+    n = len(ky)
+    w = min(21, n - (1 - n % 2))
+    if w < 5:
+        return False
+    smoothed = savgol_filter(ky, w, 3)
+    resid = ky - smoothed
+    idx = np.where((qrg >= search[0]) & (qrg <= search[1]))[0]
+    if len(idx) < 5:
+        return False
+    k = idx[np.argmax(smoothed[idx])]
+    if k == idx[-1]:
+        return False
+    after = np.where((np.arange(n) > k) & (qrg <= search[1] + 3))[0]
+    if len(after) == 0:
+        return False
+    j = after[np.argmin(smoothed[after])]
+
+    def local_noise(c):
+        return np.std(resid[max(c - 10, 0):c + 11])
+
+    decay = smoothed[k] - smoothed[j]
+    return bool(decay >= max(min_decay * smoothed[k], nsigma * max(local_noise(k), local_noise(j))))
 
 
 def classify_shape_category(peak_qrg):
@@ -164,23 +214,44 @@ class ShapeMatchResult:
         component's category (molass-researcher experiment 41b/41c found
         this catches decomposition problems that a bulk LRF residual can
         miss, and vice versa).
+    best_raw_scores : list of float
+        Per component, the best un-normalized match score (0-1, NaN if
+        unavailable). Row normalization hides absolute quality; this tells
+        whether even the best library shape is a good match (well-covered
+        shapes score ~0.6-0.9, poorly covered ones ~0.2-0.4 in experiment 49b;
+        no hard threshold).
+    raw_score_matrix : ndarray, shape (n_components, n_shapes) or None
+        The un-normalized scores (after chain gating) behind ``score_matrix``.
+    kratky_curves : list of (ndarray, ndarray) or None
+        Per component, the dimensionless Kratky curve (qRg, (qRg)^2 P/I(0))
+        the scores were computed from (None if Rg was unavailable). Used by
+        :func:`plot_kratky_overlay`.
     """
 
     def __init__(self, shape_names, component_labels, score_matrix, categories,
-                 peak_qrgs, peak_spread):
+                 peak_qrgs, peak_spread, best_raw_scores=None, raw_score_matrix=None,
+                 kratky_curves=None):
         self.shape_names = shape_names
         self.component_labels = component_labels
         self.score_matrix = score_matrix
         self.categories = categories
         self.peak_qrgs = peak_qrgs
         self.peak_spread = peak_spread
+        if best_raw_scores is None:
+            best_raw_scores = [np.nan]*len(component_labels)
+        self.best_raw_scores = best_raw_scores
+        self.raw_score_matrix = raw_score_matrix
+        if kratky_curves is None:
+            kratky_curves = [None]*len(component_labels)
+        self.kratky_curves = kratky_curves
 
     def __repr__(self):
         lines = [f"ShapeMatchResult({len(self.component_labels)} components, "
                  f"{len(self.shape_names)} reference shapes, peak_spread={self.peak_spread})"]
-        for label, cat, peak in zip(self.component_labels, self.categories, self.peak_qrgs):
+        for label, cat, peak, best in zip(self.component_labels, self.categories,
+                                          self.peak_qrgs, self.best_raw_scores):
             peak_str = f"{peak:.3f}" if peak is not None else "none"
-            lines.append(f"  {label}: peak_qRg={peak_str}  category={cat}")
+            lines.append(f"  {label}: peak_qRg={peak_str}  category={cat}  best_raw_score={best:.2f}")
         return "\n".join(lines)
 
 
@@ -219,14 +290,20 @@ def compute_shape_match_scores(qv, P, sg_list):
     score_rows = []
     categories = []
     peak_qrgs = []
+    best_raw_scores = []
+    raw_rows = []
+    kratky_curves = []
 
     for k, sg in enumerate(sg_list):
         rg, iz = sg.Rg, sg.Iz
         if rg is None or (isinstance(rg, float) and np.isnan(rg)):
             component_labels.append(f"component-{k+1} (Rg=unavailable)")
             score_rows.append(np.full(len(model_shapes), np.nan))
+            raw_rows.append(np.full(len(model_shapes), np.nan))
             categories.append("Rg unavailable")
             peak_qrgs.append(None)
+            best_raw_scores.append(np.nan)
+            kratky_curves.append(None)
             continue
 
         qrg = qv * rg
@@ -235,13 +312,21 @@ def compute_shape_match_scores(qv, P, sg_list):
 
         scores = np.array([_match_score(qrg, ky, spec.Rg, spec.P_fn)
                             for spec in model_shapes])
+        # A clear interior peak rules out the (peak-less) Gaussian chain.
+        if has_clear_kratky_peak(qrg, ky):
+            for j, spec in enumerate(model_shapes):
+                if spec.is_chain:
+                    scores[j] *= CHAIN_GATE_FACTOR
         row_sum = np.nansum(scores)
         scores_norm = scores / row_sum if row_sum > 0 else scores
 
         component_labels.append(f"component-{k+1} (Rg={rg:.1f})")
         score_rows.append(scores_norm)
+        raw_rows.append(scores)
+        kratky_curves.append((qrg, ky))
         categories.append(classify_shape_category(peak))
         peak_qrgs.append(peak)
+        best_raw_scores.append(float(np.nanmax(scores)) if np.isfinite(scores).any() else np.nan)
 
     valid_peaks = np.array([p for p in peak_qrgs if p is not None])
     peak_spread = float(np.std(valid_peaks)) if len(valid_peaks) > 1 else None
@@ -253,11 +338,180 @@ def compute_shape_match_scores(qv, P, sg_list):
         categories=categories,
         peak_qrgs=peak_qrgs,
         peak_spread=peak_spread,
+        best_raw_scores=best_raw_scores,
+        raw_score_matrix=np.array(raw_rows),
+        kratky_curves=kratky_curves,
     )
 
 
+def plot_kratky_overlay(result, component, shapes=None, fig=None, qrg_max=OVERLAY_QRG_MAX,
+                        residual=True):
+    """Overlay a component's Kratky curve with one or more reference shapes' curves.
+
+    This is what the match score is computed from, made visible: the shaded
+    band is the match window, and the optional lower panel shows
+    ``data - model`` inside it.
+
+    Parameters
+    ----------
+    result : ShapeMatchResult
+    component : int
+        Zero-based component (row) index.
+    shapes : int, list of int, or None, optional
+        Shape (column) index, several indices, or None for all shapes.
+    fig : matplotlib.figure.Figure, optional
+        Figure to (re)draw into -- it is cleared first. If None, a new pyplot
+        figure is created.
+    qrg_max : float, optional
+        Upper end of the displayed qRg range. Default 10.
+    residual : bool, optional
+        Add a residual panel under the overlay. Default True.
+
+    Returns
+    -------
+    PlotResult
+        ``.fig`` and ``.axes`` (the overlay Axes).
+
+    Examples
+    --------
+    ::
+
+        result = decomp.get_kratky_shape_match()
+        plot_kratky_overlay(result, component=0, shapes=3)
+    """
+    import matplotlib.pyplot as plt
+    from molass.PlotUtils.PlotResult import PlotResult
+
+    curve = result.kratky_curves[component]
+    if curve is None:
+        raise ValueError(f"{result.component_labels[component]}: no Kratky curve available")
+    qrg, ky = curve
+
+    specs = get_model_shapes()
+    if shapes is None:
+        indices = list(range(len(specs)))
+    elif isinstance(shapes, (int, np.integer)):
+        indices = [int(shapes)]
+    else:
+        indices = [int(j) for j in shapes]
+
+    if fig is None:
+        fig = plt.figure(figsize=(7, 6 if residual else 4.5))
+    else:
+        fig.clear()
+    if residual:
+        ax, rax = fig.subplots(2, 1, sharex=True, gridspec_kw=dict(height_ratios=[3, 1]))
+    else:
+        ax, rax = fig.subplots(), None
+
+    lo, hi = QRG_MATCH_WINDOW
+    shown = qrg <= qrg_max
+    in_win = (qrg >= lo) & (qrg <= hi)
+    grid = np.linspace(0.05, qrg_max, 400)
+
+    ax.plot(qrg[shown], ky[shown], "o", ms=3, color="0.25", label=result.component_labels[component])
+    top = np.max(ky[in_win]) if in_win.any() else np.max(ky[shown])
+    for j in indices:
+        spec = specs[j]
+        label = spec.name
+        if result.raw_score_matrix is not None:
+            label += (f"  (score {result.score_matrix[component, j]:.2f}, "
+                      f"raw {result.raw_score_matrix[component, j]:.2f})")
+        model = grid**2 * spec.P_fn(grid/spec.Rg)
+        ax.plot(grid, model, color=f"C{j}", lw=1.6, label=label)
+        top = max(top, np.max(model[(grid >= lo) & (grid <= hi)]))
+        if rax is not None and in_win.any():
+            ref = qrg[in_win]**2 * spec.P_fn(qrg[in_win]/spec.Rg)
+            rax.plot(qrg[in_win], ky[in_win] - ref, color=f"C{j}", lw=1.2)
+
+    peak = result.peak_qrgs[component]
+    if peak is not None:
+        ax.axvline(peak, color="0.25", ls="--", lw=0.8)
+    ax.plot([GLOBULAR_PEAK_QRG], [1.104], "k+", ms=10, label="globular peak (√3, 1.104)")
+    for a in (ax, rax):
+        if a is not None:
+            a.axvspan(lo, hi, color="0.93", zorder=0)
+    ax.set_ylim(0, 1.25*top)
+    ax.set_xlim(0, qrg_max)
+    ax.set_ylabel("(qRg)² P(q) / I(0)")
+    ax.legend(fontsize=7, loc="upper right")
+    if len(indices) == 1:
+        ax.set_title(f"{result.component_labels[component]} vs {specs[indices[0]].name}")
+    else:
+        ax.set_title(f"{result.component_labels[component]} vs reference shapes")
+    last = rax if rax is not None else ax
+    last.set_xlabel("qRg")
+    if rax is not None:
+        rax.axhline(0, color="0.4", lw=0.6)
+        rax.set_ylabel("data − model", fontsize=8)
+    fig.tight_layout()
+    return PlotResult(fig, ax, result=result)
+
+
+def connect_shape_match_overlay(fig, ax, result, on_dblclick=None):
+    """Make a match-score heatmap respond to double-clicks.
+
+    A double-click on a cell calls ``on_dblclick(result, component, shape)``
+    with the cell's row and column indices; a double-click on a row label
+    calls it with ``shape=None`` (all shapes). Needs an interactive backend
+    (a plain inline notebook figure cannot receive clicks -- call
+    :func:`plot_kratky_overlay` directly there).
+
+    Parameters
+    ----------
+    fig, ax : matplotlib Figure and the heatmap Axes
+    result : ShapeMatchResult
+    on_dblclick : callable, optional
+        ``f(result, component, shape)``. Default: draw :func:`plot_kratky_overlay`
+        into one separate pyplot figure that is reused by later double-clicks.
+
+    Returns
+    -------
+    int
+        The matplotlib connection id (``fig.canvas.mpl_disconnect`` to remove).
+    """
+    if on_dblclick is None:
+        state = {"fig": None}
+
+        def on_dblclick(res, component, shape):
+            import matplotlib.pyplot as plt
+            ofig = state["fig"]
+            if ofig is not None and not plt.fignum_exists(ofig.number):
+                ofig = None
+            state["fig"] = plot_kratky_overlay(res, component, shape, fig=ofig).fig
+            state["fig"].canvas.draw_idle()
+            state["fig"].show()
+
+    n_comp, n_shapes = result.score_matrix.shape
+
+    def hit(event):
+        if event.inaxes is ax:
+            if event.xdata is None or event.ydata is None:
+                return None
+            i, j = int(round(event.ydata)), int(round(event.xdata))
+            return (i, j) if 0 <= i < n_comp and 0 <= j < n_shapes else None
+        try:
+            renderer = fig.canvas.get_renderer()
+        except AttributeError:
+            return None
+        for i, label in enumerate(ax.get_yticklabels()):
+            if label.get_window_extent(renderer).contains(event.x, event.y):
+                return i, None
+        return None
+
+    def on_press(event):
+        if not event.dblclick or event.button != 1:
+            return
+        cell = hit(event)
+        if cell is None or result.kratky_curves[cell[0]] is None:
+            return
+        on_dblclick(result, *cell)
+
+    return fig.canvas.mpl_connect("button_press_event", on_press)
+
+
 def plot_shape_match(result, ax=None, title="Component x model-shape match score",
-                         show_shape_key=True):
+                         show_shape_key=True, on_dblclick=None, interactive=True):
     """Render a :class:`ShapeMatchResult` as a components x shapes heatmap.
 
     Parameters
@@ -278,6 +532,13 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
         text labels. Default True. The key never changes per analysis --
         rendered once per process and reused (see
         :func:`molass.Kratky.ShapeKey.get_shape_key_image`).
+    on_dblclick : callable, optional
+        ``f(result, component, shape)`` called on a double-click on a heatmap
+        cell (``shape`` = column index) or row label (``shape=None``). Default:
+        open :func:`plot_kratky_overlay` in a reused pyplot figure. Only
+        effective on interactive backends.
+    interactive : bool, optional
+        Set False to not connect any double-click handler. Default True.
 
     Returns
     -------
@@ -303,7 +564,7 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
 
     own_fig = ax is None
     if own_fig:
-        height = 0.45*len(result.component_labels) + 1.5
+        height = 0.6*len(result.component_labels) + 1.5
         if show_shape_key:
             from molass.Kratky.ShapeKey import get_shape_key_image
             key_image = get_shape_key_image()
@@ -311,7 +572,7 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
             cbar_width = 0.35  # dedicated colorbar column -- kept OUT of the n_shapes
                                # equal-width columns so the icon row and heatmap span
                                # exactly the same width and align 1:1, column by column
-            fig = plt.figure(figsize=(8 + cbar_width, height + key_height))
+            fig = plt.figure(figsize=(9 + cbar_width, height + key_height))
             gs = fig.add_gridspec(2, n_shapes + 1,
                                    height_ratios=[key_height, height],
                                    width_ratios=[1]*n_shapes + [cbar_width])
@@ -326,7 +587,7 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
             cax = fig.add_subplot(gs[1, n_shapes])
             fig.colorbar(im, cax=cax, label="relative match score (row-normalized)")
         else:
-            fig, ax = plt.subplots(figsize=(8, height))
+            fig, ax = plt.subplots(figsize=(9, height))
             im = ax.imshow(matrix, cmap="viridis", aspect="auto", vmin=0, vmax=vmax)
             fig.colorbar(im, ax=ax, label="relative match score (row-normalized)")
     else:
@@ -337,7 +598,10 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
     ax.set_xticks(range(n_shapes))
     ax.set_xticklabels(result.shape_names, rotation=30, ha="right")
     ax.set_yticks(range(len(result.component_labels)))
-    ax.set_yticklabels(result.component_labels, fontsize=8)
+    # Row normalization hides absolute quality, so show the best raw score next to each label.
+    ylabels = [f"{label}\nbest raw {best:.2f}" if np.isfinite(best) else label
+               for label, best in zip(result.component_labels, result.best_raw_scores)]
+    ax.set_yticklabels(ylabels, fontsize=8)
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
             val = matrix[i, j]
@@ -350,6 +614,12 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
         fig.tight_layout()
     elif own_fig and show_shape_key:
         fig.subplots_adjust(left=0.22, right=0.85, bottom=0.28, top=0.95, hspace=0.35)
+
+    if interactive:
+        connect_shape_match_overlay(fig, ax, result, on_dblclick=on_dblclick)
+        if own_fig:
+            fig.text(0.5, 0.005, "double-click a cell to overlay the Kratky plots "
+                     "(row label: all shapes)", ha="center", va="bottom", fontsize=7, color="0.4")
 
     return PlotResult(fig, ax, result=result)
 

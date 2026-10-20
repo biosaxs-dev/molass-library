@@ -17,7 +17,8 @@ from molass.Kratky.FormFactors import (
     gaussian_chain_P,
 )
 
-ShapeSpec = namedtuple("ShapeSpec", ["name", "Rg", "P_fn", "plot3d_fn"])
+ShapeSpec = namedtuple("ShapeSpec", ["name", "Rg", "P_fn", "plot3d_fn", "is_chain"],
+                       defaults=(False,))
 
 _R_REF = 40.0  # arbitrary reference length scale; only Rg (derived) matters for the Kratky curve
 
@@ -82,27 +83,29 @@ def get_model_shapes():
         Each has ``.name``, ``.Rg`` (exact, from the form factor's own
         Rg relation), ``.P_fn(qs)`` (form factor as a function of q), and
         ``.plot3d_fn(ax)`` (draws the 3D representative shape into ``ax``,
-        returns its bounding extent).
+        returns its bounding extent), and ``.is_chain`` (True for the
+        flexible-chain reference, which has no Kratky peak).
     """
-    cyl1_R, cyl1_L = 20.0, 60.0
-    cyl2_R, cyl2_L = 20.0, 200.0
-    return [
+    cyl_R = 20.0
+    ellipsoid_epss = (2.0, 3.0, 4.0, 6.0)
+    cylinder_ratios = (3.0, 6.0, 10.0)
+
+    specs = [
         ShapeSpec("sphere", sphere_Rg(_R_REF),
                   lambda qs: sphere_F(np.asarray(qs)*_R_REF)**2,
                   lambda ax: _plot_sphere_3d(ax, _R_REF, "C0")),
-        ShapeSpec("ellipsoid (eps=2)", ellipsoid_Rg(_R_REF, 2.0),
-                  lambda qs: ellipsoid_P(qs, _R_REF, 2.0),
-                  lambda ax: _plot_ellipsoid_3d(ax, _R_REF, 2.0, "C1")),
-        ShapeSpec("ellipsoid (eps=6)", ellipsoid_Rg(_R_REF, 6.0),
-                  lambda qs: ellipsoid_P(qs, _R_REF, 6.0),
-                  lambda ax: _plot_ellipsoid_3d(ax, _R_REF, 6.0, "C2")),
-        ShapeSpec("cylinder (L/R=3)", cylinder_Rg(cyl1_R, cyl1_L),
-                  lambda qs: cylinder_P(qs, cyl1_R, cyl1_L),
-                  lambda ax: _plot_cylinder_3d(ax, cyl1_R, cyl1_L, "C3")),
-        ShapeSpec("cylinder (L/R=10)", cylinder_Rg(cyl2_R, cyl2_L),
-                  lambda qs: cylinder_P(qs, cyl2_R, cyl2_L),
-                  lambda ax: _plot_cylinder_3d(ax, cyl2_R, cyl2_L, "C4")),
-        ShapeSpec("Gaussian chain", _R_REF,
-                  lambda qs: gaussian_chain_P(qs, _R_REF),
-                  lambda ax: _plot_chain_3d(ax, _R_REF, "C5")),
     ]
+    for i, eps in enumerate(ellipsoid_epss):
+        specs.append(ShapeSpec(f"ellipsoid (eps={eps:g})", ellipsoid_Rg(_R_REF, eps),
+                               lambda qs, eps=eps: ellipsoid_P(qs, _R_REF, eps),
+                               lambda ax, eps=eps, i=i: _plot_ellipsoid_3d(ax, _R_REF, eps, f"C{i+1}")))
+    for i, ratio in enumerate(cylinder_ratios):
+        L = cyl_R*ratio
+        specs.append(ShapeSpec(f"cylinder (L/R={ratio:g})", cylinder_Rg(cyl_R, L),
+                               lambda qs, L=L: cylinder_P(qs, cyl_R, L),
+                               lambda ax, L=L, i=i: _plot_cylinder_3d(ax, cyl_R, L, f"C{i+5}")))
+    specs.append(ShapeSpec("Gaussian chain", _R_REF,
+                           lambda qs: gaussian_chain_P(qs, _R_REF),
+                           lambda ax: _plot_chain_3d(ax, _R_REF, "C8"),
+                           is_chain=True))
+    return specs

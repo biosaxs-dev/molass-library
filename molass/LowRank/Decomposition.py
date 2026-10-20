@@ -347,8 +347,8 @@ class Decomposition:
         """Compute a components x reference-shapes Kratky shape-match score matrix.
 
         Classifies each XR component's dimensionless Kratky curve against a
-        small, fixed library of reference shapes (sphere, two ellipsoid
-        eccentricities, two cylinder aspect ratios, a flexible Gaussian
+        small, fixed library of reference shapes (sphere, four ellipsoid
+        eccentricities, three cylinder aspect ratios, a flexible Gaussian
         chain), returning a heuristic *relative* match score per shape plus a
         coarse category label -- see :mod:`molass.Kratky.ShapeMatch` for
         the full design rationale and important caveats (these are similarity
@@ -390,7 +390,9 @@ class Decomposition:
         ax : matplotlib.axes.Axes, optional
         debug : bool, optional
         **kwargs
-            Passed to :func:`molass.Kratky.ShapeMatch.plot_shape_match`.
+            Passed to :func:`molass.Kratky.ShapeMatch.plot_shape_match`
+            (e.g. ``on_dblclick``, ``show_shape_key``). On an interactive backend,
+            double-clicking a heatmap cell overlays the two Kratky plots.
 
         Returns
         -------

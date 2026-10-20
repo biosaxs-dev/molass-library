@@ -51,6 +51,8 @@ def test_030_get_kratky_shape_match_baseline():
     # Row-normalized scores should sum to ~1 for every valid row.
     row_sums = np.nansum(result.score_matrix, axis=1)
     np.testing.assert_allclose(row_sums, 1.0, atol=1e-6)
+    assert np.all(np.isfinite(result.best_raw_scores))
+    assert np.all((np.asarray(result.best_raw_scores) > 0) & (np.asarray(result.best_raw_scores) <= 1))
     # Cached -- second call returns the same object without recomputing.
     assert decomp_baseline.get_kratky_shape_match() is result
 
@@ -89,3 +91,112 @@ def test_070_shape_key_image_is_cached():
     image_2 = get_shape_key_image()
     assert image_1.ndim == 3 and image_1.shape[2] == 4  # RGBA
     assert image_1 is image_2  # cached -- same object, not recomputed
+
+
+class _FakeGuinier:
+    def __init__(self, Rg, Iz):
+        self.Rg, self.Iz = Rg, Iz
+
+
+def _synthetic_match(P_fn, rg, noise, seed=0):
+    from molass.Kratky.ShapeMatch import compute_shape_match_scores
+    qv = np.linspace(0.004, 15/rg, 220)
+    P = P_fn(qv*rg)
+    P = P*(1 + noise*(1 + (qv*rg/3)**2)*np.random.default_rng(seed).standard_normal(len(qv)))
+    return compute_shape_match_scores(qv, P[:, None], [_FakeGuinier(rg, 1.0)])
+
+
+@pytest.mark.order(8)
+def test_080_library_names_and_chain_flag():
+    from molass.Kratky.ShapeLibrary import get_model_shapes
+
+    specs = get_model_shapes()
+    names = [spec.name for spec in specs]
+    assert names == ["sphere",
+                     "ellipsoid (eps=2)", "ellipsoid (eps=3)", "ellipsoid (eps=4)", "ellipsoid (eps=6)",
+                     "cylinder (L/R=3)", "cylinder (L/R=6)", "cylinder (L/R=10)",
+                     "Gaussian chain"]
+    assert [spec.name for spec in specs if spec.is_chain] == ["Gaussian chain"]
+
+
+@pytest.mark.order(9)
+def test_090_chain_gating_for_peaked_curve():
+    from molass.Kratky.FormFactors import ellipsoid_P, ellipsoid_Rg
+
+    # a prolate ellipsoid has a clear Kratky peak far above sqrt(3); the chain must not win
+    R, eps = 40.0, 5.0
+    rg = ellipsoid_Rg(R, eps)
+    result = _synthetic_match(lambda qrg: ellipsoid_P(qrg/rg, R, eps), rg, noise=0.003)
+    top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+    assert top != "Gaussian chain"
+    assert 0.0 < result.best_raw_scores[0] <= 1.0
+
+
+@pytest.mark.order(10)
+def test_100_chain_still_matches_true_chain():
+    from molass.Kratky.FormFactors import gaussian_chain_P
+
+    rg = 60.0
+    result = _synthetic_match(lambda qrg: gaussian_chain_P(qrg/rg, rg), rg, noise=0.003)
+    top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+    assert top == "Gaussian chain"
+
+
+def _dblclick(fig, x, y):
+    from matplotlib.backend_bases import MouseEvent
+    event = MouseEvent("button_press_event", fig.canvas, x, y, button=1, dblclick=True)
+    fig.canvas.callbacks.process("button_press_event", event)
+
+
+@pytest.mark.order(11)
+@control_matplotlib_plot
+def test_110_plot_kratky_overlay():
+    from molass.Kratky.ShapeMatch import plot_kratky_overlay
+    from molass.Kratky.FormFactors import ellipsoid_P, ellipsoid_Rg
+
+    R, eps = 40.0, 4.0
+    rg = ellipsoid_Rg(R, eps)
+    result = _synthetic_match(lambda qrg: ellipsoid_P(qrg/rg, R, eps), rg, noise=0.003)
+    one = plot_kratky_overlay(result, 0, shapes=3)
+    assert len(one.fig.axes) == 2  # overlay + residual
+    assert len(one.axes.get_lines()) >= 3
+    every = plot_kratky_overlay(result, 0, shapes=None, residual=False)
+    assert len(every.fig.axes) == 1
+    # redrawing into an existing figure reuses it
+    again = plot_kratky_overlay(result, 0, shapes=[1, 2], fig=one.fig)
+    assert again.fig is one.fig
+
+
+@pytest.mark.order(12)
+@control_matplotlib_plot
+def test_120_double_click_opens_overlay():
+    from molass.Kratky.ShapeMatch import plot_shape_match
+    from molass.Kratky.FormFactors import ellipsoid_P, ellipsoid_Rg
+
+    R, eps = 40.0, 4.0
+    rg = ellipsoid_Rg(R, eps)
+    result = _synthetic_match(lambda qrg: ellipsoid_P(qrg/rg, R, eps), rg, noise=0.003)
+
+    calls = []
+    plot_result = plot_shape_match(result, on_dblclick=lambda *args: calls.append(args))
+    fig, ax = plot_result.fig, plot_result.axes
+    fig.canvas.draw()
+
+    x, y = ax.transData.transform((3, 0))
+    _dblclick(fig, x, y)  # cell (component 0, shape 3)
+    assert len(calls) == 1 and calls[0][1:] == (0, 3)
+
+    label = ax.get_yticklabels()[0]
+    bbox = label.get_window_extent(fig.canvas.get_renderer())
+    _dblclick(fig, (bbox.x0 + bbox.x1)/2, (bbox.y0 + bbox.y1)/2)  # row label -> all shapes
+    assert calls[-1][1:] == (0, None)
+
+    _dblclick(fig, 1, 1)  # empty corner of the figure
+    assert len(calls) == 2
+
+    # interactive=False connects nothing
+    quiet = plot_shape_match(result, interactive=False, on_dblclick=lambda *args: calls.append(args))
+    quiet.fig.canvas.draw()
+    x, y = quiet.axes.transData.transform((3, 0))
+    _dblclick(quiet.fig, x, y)
+    assert len(calls) == 2
