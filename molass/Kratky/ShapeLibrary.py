@@ -2,7 +2,7 @@
 Kratky.ShapeLibrary
 
 Single source of truth for the fixed reference-shape library used by both
-``ShapeAnalysis`` (match-score computation) and ``ShapeKey`` (icon rendering).
+``ShapeMatch`` (match-score computation) and ``ShapeKey`` (icon rendering).
 
 Keeping both consumers pointed at this one list -- same order, same names --
 guarantees the shape-key icons and the match-score heatmap's columns always

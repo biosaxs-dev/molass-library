@@ -7,7 +7,7 @@ and polymer solutions: modeling and least-squares fitting", Adv. Colloid
 Interface Sci. 70:171-210. Equation numbers below refer to that paper.
 
 Physics only -- no application logic (peak-finding, classification, plotting)
-lives here. See ``molass.Kratky.ShapeAnalysis`` for that.
+lives here. See ``molass.Kratky.ShapeMatch`` for that.
 """
 import numpy as np
 from scipy.special import j1

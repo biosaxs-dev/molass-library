@@ -325,7 +325,7 @@ class Decomposition:
         to reliably worsen for objectively bad decompositions (under-fitting/
         merging real components, or a bad local optimum) even in cases where
         other per-component diagnostics look unremarkable -- use alongside
-        :meth:`get_shape_analysis`'s ``peak_spread``, not instead of it; the
+        :meth:`get_kratky_shape_match`'s ``peak_spread``, not instead of it; the
         two were found to catch *different* kinds of problems.
 
         Returns
@@ -343,14 +343,14 @@ class Decomposition:
         M, C, P = self.get_xr_matrices(debug=debug)[0:3]
         return float(np.linalg.norm(M - P @ C) / np.linalg.norm(M))
 
-    def get_shape_analysis(self, debug=False):
-        """Compute a components x reference-shapes Kratky match-score analysis.
+    def get_kratky_shape_match(self, debug=False):
+        """Compute a components x reference-shapes Kratky shape-match score matrix.
 
         Classifies each XR component's dimensionless Kratky curve against a
         small, fixed library of reference shapes (sphere, two ellipsoid
         eccentricities, two cylinder aspect ratios, a flexible Gaussian
         chain), returning a heuristic *relative* match score per shape plus a
-        coarse category label -- see :mod:`molass.Kratky.ShapeAnalysis` for
+        coarse category label -- see :mod:`molass.Kratky.ShapeMatch` for
         the full design rationale and important caveats (these are similarity
         scores, not validated structural fits, and should be read alongside
         :meth:`get_lrf_residual`).
@@ -359,38 +359,38 @@ class Decomposition:
 
         Returns
         -------
-        molass.Kratky.ShapeAnalysis.ShapeAnalysisResult
+        molass.Kratky.ShapeMatch.ShapeMatchResult
 
         Examples
         --------
         ::
 
-            result = decomp.get_shape_analysis()
+            result = decomp.get_kratky_shape_match()
             print(result)
-            plot_result = decomp.plot_shape_analysis()
+            plot_result = decomp.plot_kratky_shape_match()
         """
-        if getattr(self, '_shape_analysis', None) is None:
+        if getattr(self, '_kratky_shape_match', None) is None:
             if debug:
                 from importlib import reload
-                import molass.Kratky.ShapeAnalysis
-                reload(molass.Kratky.ShapeAnalysis)
-            from molass.Kratky.ShapeAnalysis import compute_shape_match_scores
+                import molass.Kratky.ShapeMatch
+                reload(molass.Kratky.ShapeMatch)
+            from molass.Kratky.ShapeMatch import compute_shape_match_scores
 
             qv = self.xr.qv
             _, _, P = self.get_xr_matrices(debug=debug)[0:3]
             sg_list = [c.get_guinier_object() for c in self.get_xr_components()]
-            self._shape_analysis = compute_shape_match_scores(qv, P, sg_list)
-        return self._shape_analysis
+            self._kratky_shape_match = compute_shape_match_scores(qv, P, sg_list)
+        return self._kratky_shape_match
 
-    def plot_shape_analysis(self, ax=None, debug=False, **kwargs):
-        """Plot the :meth:`get_shape_analysis` result as a components x shapes heatmap.
+    def plot_kratky_shape_match(self, ax=None, debug=False, **kwargs):
+        """Plot the :meth:`get_kratky_shape_match` result as a components x shapes heatmap.
 
         Parameters
         ----------
         ax : matplotlib.axes.Axes, optional
         debug : bool, optional
         **kwargs
-            Passed to :func:`molass.Kratky.ShapeAnalysis.plot_shape_analysis`.
+            Passed to :func:`molass.Kratky.ShapeMatch.plot_shape_match`.
 
         Returns
         -------
@@ -400,17 +400,17 @@ class Decomposition:
         --------
         ::
 
-            plot_result = decomp.plot_shape_analysis()
+            plot_result = decomp.plot_kratky_shape_match()
             plot_result.fig.show()
         """
         if debug:
             from importlib import reload
-            import molass.Kratky.ShapeAnalysis
-            reload(molass.Kratky.ShapeAnalysis)
-        from molass.Kratky.ShapeAnalysis import plot_shape_analysis as _plot_shape_analysis
+            import molass.Kratky.ShapeMatch
+            reload(molass.Kratky.ShapeMatch)
+        from molass.Kratky.ShapeMatch import plot_shape_match
 
-        result = self.get_shape_analysis(debug=debug)
-        return _plot_shape_analysis(result, ax=ax, **kwargs)
+        result = self.get_kratky_shape_match(debug=debug)
+        return plot_shape_match(result, ax=ax, **kwargs)
 
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.
@@ -739,7 +739,7 @@ class Decomposition:
         This method allows the user to set different ranks for each component.
 
         Also invalidates ``guinier_objects``, ``bounded_lrf_info``, and any
-        cached shape-analysis result (see :meth:`get_shape_analysis`), since
+        cached Kratky shape-match result (see :meth:`get_kratky_shape_match`), since
         all three are derived from ``get_xr_matrices()``'s output under the
         *previous* ranks. Without this, a prior call to e.g.
         ``get_guinier_objects()`` (made under the old ranks) would leave
@@ -751,7 +751,7 @@ class Decomposition:
         .. note::
             This only affects :meth:`get_xr_matrices`/:meth:`get_xr_components`
             and anything built on them (:meth:`plot_components`,
-            :meth:`plot_shape_analysis`, :meth:`get_shape_analysis`). It has
+            :meth:`plot_kratky_shape_match`, :meth:`get_kratky_shape_match`). It has
             **no effect** on ``optimize_rigorously()``'s live BH/DE search --
             the rigorous optimizer's own internal engine reconstructs P
             independently and has no awareness of ranks/Bounded LRF at all.
@@ -783,7 +783,7 @@ class Decomposition:
         self.xr_ranks = ranks
         self.guinier_objects = None
         self.bounded_lrf_info = None
-        self._shape_analysis = None
+        self._kratky_shape_match = None
 
     def get_xr_matrices(self, debug=False):
         """

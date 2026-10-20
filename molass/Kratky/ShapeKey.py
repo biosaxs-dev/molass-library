@@ -5,9 +5,9 @@ A persistent, fixed "shape key" -- one representative icon per reference
 shape in ``molass.Kratky.ShapeLibrary.get_model_shapes()``. The icons never
 change per analysis (same design principle as a map/UI pictogram: generic
 and unfittable by construction, so they can't be mistaken for a per-component
-fitted result -- see ShapeAnalysis.py's module docstring), and their order
+fitted result -- see ShapeMatch.py's module docstring), and their order
 matches the match-score heatmap's columns exactly (both read from the same
-shared library), so ``plot_shape_analysis()`` can align them 1:1.
+shared library), so ``plot_shape_match()`` can align them 1:1.
 
 Rendering several 3D surfaces is cheap (well under a second) but not free,
 and a matplotlib Axes3D cannot be moved into another figure's layout. So the

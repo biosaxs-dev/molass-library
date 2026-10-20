@@ -41,7 +41,7 @@ def test_get_xr_matrices_with_ranks():
 
 
 def test_update_xr_ranks_invalidates_cached_guinier_state():
-    """update_xr_ranks must reset guinier_objects/bounded_lrf_info/_shape_analysis
+    """update_xr_ranks must reset guinier_objects/bounded_lrf_info/_kratky_shape_match
     (molass-library#276) -- otherwise a prior get_guinier_objects() call (under
     the old ranks) leaves stale Rg values that get_xr_matrices()'s Bounded LRF
     path would silently reuse as its fit seed instead of recomputing."""
@@ -55,7 +55,7 @@ def test_update_xr_ranks_invalidates_cached_guinier_state():
     d.update_xr_ranks([2, 1, 1])
     assert d.guinier_objects is None
     assert d.bounded_lrf_info is None
-    assert d._shape_analysis is None
+    assert d._kratky_shape_match is None
 
     # get_xr_matrices() must recompute guinier_objects fresh, not find a stale
     # non-None cache and skip past the Bounded LRF seeding step.

@@ -1,8 +1,9 @@
 """
-Kratky.ShapeAnalysis
+Kratky.ShapeMatch
 
-Qualitative + quantitative shape-match diagnostics for decomposed XR
-components, using dimensionless Kratky-plot analysis.
+Qualitative + quantitative Kratky shape-match diagnostics for decomposed XR
+components, using dimensionless Kratky-plot analysis (shown in the GUI as
+"Kratky Shape Match").
 
 Design rationale (see molass-researcher/experiments/41_smoothing_kratky_plot/
 41a-41e for the full investigation this is based on):
@@ -21,7 +22,7 @@ Design rationale (see molass-researcher/experiments/41_smoothing_kratky_plot/
   decomposition can silently violate.
 - The approach implemented here instead computes a **relative match score**
   against a small, fixed library of reference shapes, displayed as a
-  components x shapes score matrix (see ``plot_shape_analysis``). Scores are
+  components x shapes score matrix (see ``plot_shape_match``). Scores are
   a heuristic similarity measure, NOT a rigorous statistical likelihood, and
   should always be read together with an independent decomposition-quality
   signal (``Decomposition.get_lrf_residual()``, and the ``peak_spread``
@@ -140,7 +141,7 @@ def _match_score(component_qrg, component_ky, model_Rg, model_P_fn,
     return float(np.exp(-(rmse/scale)))
 
 
-class ShapeAnalysisResult:
+class ShapeMatchResult:
     """Result of :func:`compute_shape_match_scores`.
 
     Attributes
@@ -175,7 +176,7 @@ class ShapeAnalysisResult:
         self.peak_spread = peak_spread
 
     def __repr__(self):
-        lines = [f"ShapeAnalysisResult({len(self.component_labels)} components, "
+        lines = [f"ShapeMatchResult({len(self.component_labels)} components, "
                  f"{len(self.shape_names)} reference shapes, peak_spread={self.peak_spread})"]
         for label, cat, peak in zip(self.component_labels, self.categories, self.peak_qrgs):
             peak_str = f"{peak:.3f}" if peak is not None else "none"
@@ -198,13 +199,13 @@ def compute_shape_match_scores(qv, P, sg_list):
 
     Returns
     -------
-    ShapeAnalysisResult
+    ShapeMatchResult
 
     Examples
     --------
     ::
 
-        from molass.Kratky.ShapeAnalysis import compute_shape_match_scores
+        from molass.Kratky.ShapeMatch import compute_shape_match_scores
         qv = decomp.xr.qv
         _, _, P = decomp.get_xr_matrices()[0:3]
         sg_list = [c.get_guinier_object() for c in decomp.get_xr_components()]
@@ -245,7 +246,7 @@ def compute_shape_match_scores(qv, P, sg_list):
     valid_peaks = np.array([p for p in peak_qrgs if p is not None])
     peak_spread = float(np.std(valid_peaks)) if len(valid_peaks) > 1 else None
 
-    return ShapeAnalysisResult(
+    return ShapeMatchResult(
         shape_names=shape_names,
         component_labels=component_labels,
         score_matrix=np.array(score_rows),
@@ -255,13 +256,13 @@ def compute_shape_match_scores(qv, P, sg_list):
     )
 
 
-def plot_shape_analysis(result, ax=None, title="Component x model-shape match score",
+def plot_shape_match(result, ax=None, title="Component x model-shape match score",
                          show_shape_key=True):
-    """Render a :class:`ShapeAnalysisResult` as a components x shapes heatmap.
+    """Render a :class:`ShapeMatchResult` as a components x shapes heatmap.
 
     Parameters
     ----------
-    result : ShapeAnalysisResult
+    result : ShapeMatchResult
         Output of :func:`compute_shape_match_scores`.
     ax : matplotlib.axes.Axes, optional
         Axes to draw the heatmap into. If None, a new figure is created (in
@@ -289,8 +290,8 @@ def plot_shape_analysis(result, ax=None, title="Component x model-shape match sc
     --------
     ::
 
-        result = decomp.get_shape_analysis()
-        plot_result = plot_shape_analysis(result)
+        result = decomp.get_kratky_shape_match()
+        plot_result = plot_shape_match(result)
         plot_result.fig.show()
     """
     import matplotlib.pyplot as plt

@@ -1,6 +1,6 @@
 """
-Test Kratky.ShapeAnalysis and Decomposition.get_shape_analysis()/get_lrf_residual()/
-plot_shape_analysis(). See molass-researcher/experiments/41_smoothing_kratky_plot/
+Test Kratky.ShapeMatch and Decomposition.get_kratky_shape_match()/get_lrf_residual()/
+plot_kratky_shape_match(). See molass-researcher/experiments/41_smoothing_kratky_plot/
 41a-41e for the investigation this feature is based on.
 """
 import numpy as np
@@ -38,8 +38,8 @@ def test_020_get_lrf_residual():
 
 
 @pytest.mark.order(3)
-def test_030_get_shape_analysis_baseline():
-    result = decomp_baseline.get_shape_analysis()
+def test_030_get_kratky_shape_match_baseline():
+    result = decomp_baseline.get_kratky_shape_match()
 
     assert result.score_matrix.shape == (3, len(result.shape_names))
     assert len(result.categories) == 3
@@ -52,23 +52,23 @@ def test_030_get_shape_analysis_baseline():
     row_sums = np.nansum(result.score_matrix, axis=1)
     np.testing.assert_allclose(row_sums, 1.0, atol=1e-6)
     # Cached -- second call returns the same object without recomputing.
-    assert decomp_baseline.get_shape_analysis() is result
+    assert decomp_baseline.get_kratky_shape_match() is result
 
 
 @pytest.mark.order(4)
-def test_040_get_shape_analysis_underfit_runs_without_error():
+def test_040_get_kratky_shape_match_underfit_runs_without_error():
     # Under-fit (n=2) should not crash even though a real species got merged;
     # this is exactly the case where shape category alone is known (41c) to
     # look unremarkable despite the decomposition being wrong -- the point of
     # pairing this with get_lrf_residual(), not a claim this test catches it.
-    result = decomp_underfit.get_shape_analysis()
+    result = decomp_underfit.get_kratky_shape_match()
     assert result.score_matrix.shape == (2, len(result.shape_names))
 
 
 @pytest.mark.order(5)
 @control_matplotlib_plot
-def test_050_plot_shape_analysis():
-    plot_result = decomp_baseline.plot_shape_analysis()
+def test_050_plot_kratky_shape_match():
+    plot_result = decomp_baseline.plot_kratky_shape_match()
     assert plot_result.fig is not None
     # heatmap Axes is returned even though the figure also has the shape-key row
     assert plot_result.axes.get_title() == "Component x model-shape match score"
@@ -76,8 +76,8 @@ def test_050_plot_shape_analysis():
 
 @pytest.mark.order(6)
 @control_matplotlib_plot
-def test_060_plot_shape_analysis_without_shape_key():
-    plot_result = decomp_baseline.plot_shape_analysis(show_shape_key=False)
+def test_060_plot_kratky_shape_match_without_shape_key():
+    plot_result = decomp_baseline.plot_kratky_shape_match(show_shape_key=False)
     assert plot_result.fig is not None
 
 
