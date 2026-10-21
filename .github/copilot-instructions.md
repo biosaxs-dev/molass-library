@@ -324,6 +324,16 @@ GitHub/
 
 ---
 
+## Git and shell quirks on Windows PowerShell
+
+Shared rules from [ai-context-standard](https://github.com/freesemt/ai-context-standard) v0.10.2 ("PowerShell Terminal — Native-command Output and Commit Messages"):
+
+- A red `NativeCommandError` after `git push` / `fetch` or `gh` is stderr progress, not failure. Judge by the result line (`a1b2c3d..e4f5a6b  main -> main`, `✓ Closed issue`) or `git status -sb`; do not retry.
+- Commit messages (and `gh ... --body-file` text): write to a fresh file with the editor's create tool, then `git commit -F <file>`. `git commit -F -` from a here-string fails. Keep trailers such as `Co-authored-by:`.
+- `| Select-Object -Last N` buffers output until the command ends; silence is expected.
+- Tool calls in one batch run in parallel: read an artifact in a later batch than the call that creates it.
+- A module-level constant used as a default argument is bound at import: patching `module.CONST` in a benchmark changes nothing (see #314); pass the value as an argument.
+
 ## Notebook workflow
 
 Read [NOTEBOOK_CONVENTIONS.md v0.2.6](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.  
