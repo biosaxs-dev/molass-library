@@ -214,7 +214,11 @@ def kratky_descriptors(qrg, ky, nsigma=6.0):
 
     Returns
     -------
-    dict or None
+    dict
+        ``has_peak``: False if there is no interior main peak (monotone /
+        elongated curves); then ``peak_qrg``, ``peak_height`` and
+        ``tail_ratio`` are NaN, ``hump_prominence`` is 0.0 and ``maxima`` is
+        empty -- the dict always has the same keys.
         ``peak_qrg``, ``peak_height``: main peak (smoothed) in qRg 0.5-5.
         ``tail_ratio``: curve height at 2.5 x peak_qrg relative to peak_height
         (NaN if beyond the data) -- how slowly the curve decays after the peak.
@@ -224,13 +228,14 @@ def kratky_descriptors(qrg, ky, nsigma=6.0):
         are form-factor oscillations of a compact body, a different feature).
         ``maxima``: list of (qrg, height, persistence) of all significant
         interior maxima, most persistent first.
-        None if there is no interior main peak.
     """
     qrg = np.asarray(qrg, float); ky = np.asarray(ky, float)
     n = len(ky)
+    no_peak = {"has_peak": False, "peak_qrg": np.nan, "peak_height": np.nan, "tail_ratio": np.nan,
+               "hump_prominence": 0.0, "maxima": []}
     w = min(15, n - (1 - n % 2))
     if w < 5:
-        return None
+        return no_peak
     smooth = savgol_filter(ky, w, 3)
     resid = ky - smooth
     h = savgol_coeffs(w, 3)
@@ -239,11 +244,11 @@ def kratky_descriptors(qrg, ky, nsigma=6.0):
     raw_to_smooth = np.sqrt(sh2)                                    # raw noise sigma -> smoothed-curve noise sigma
     window = (qrg >= 0.5) & (qrg <= 5.0)
     if window.sum() < 5:
-        return None
+        return no_peak
     idx = np.where(window)[0]
     k = idx[np.argmax(smooth[idx])]
     if k == idx[-1]:
-        return None
+        return no_peak
     xp, yp = float(qrg[k]), float(smooth[k])
 
     qmax = float(qrg.max())
@@ -260,7 +265,7 @@ def kratky_descriptors(qrg, ky, nsigma=6.0):
     maxima.sort(key=lambda m: -m[2])
     humps = [m for m in maxima if 1.2*xp <= m[0] <= 3.2*xp]
     prominence = humps[0][2]/yp if humps else 0.0
-    return {"peak_qrg": xp, "peak_height": yp, "tail_ratio": tail_ratio,
+    return {"has_peak": True, "peak_qrg": xp, "peak_height": yp, "tail_ratio": tail_ratio,
             "hump_prominence": float(prominence), "maxima": maxima}
 
 
@@ -299,11 +304,13 @@ def classify_shape_category(peak_qrg):
     return "highly elongated or flexible/disordered"
 
 
-def _match_score(component_qrg, component_ky, model_Rg, model_P_fn,
-                  qrg_window=QRG_MATCH_WINDOW):
+def _match_score(component_qrg, component_ky, model_Rg, model_P_fn, qrg_window=None):
     """Heuristic similarity (NOT a statistical likelihood): exp(-normalized RMSE)
     between the component's own Kratky curve and a reference shape's curve,
-    both evaluated on the component's own qRg grid within qrg_window."""
+    both evaluated on the component's own qRg grid within qrg_window
+    (None: the module default ``QRG_MATCH_WINDOW``, looked up at call time)."""
+    if qrg_window is None:
+        qrg_window = QRG_MATCH_WINDOW
     mask = (component_qrg >= qrg_window[0]) & (component_qrg <= qrg_window[1])
     if mask.sum() < 5:
         return np.nan
@@ -346,19 +353,27 @@ class ShapeMatchResult:
         shapes score ~0.6-0.9, poorly covered ones ~0.2-0.4 in experiment 49b;
         no hard threshold).
     raw_score_matrix : ndarray, shape (n_components, n_shapes) or None
-        The un-normalized scores (after chain gating) behind ``score_matrix``.
+        The un-normalized scores (after chain / two-lobe gating) behind
+        ``score_matrix``. Use ``score_matrix`` to *rank* the shapes of one
+        component (it only says which shape is relatively best) and the raw
+        scores / ``best_raw_scores`` to judge whether the best shape is a
+        good match at all.
+    qrg_window : tuple of float
+        The (low, high) qRg window the scores were computed in.
     kratky_curves : list of (ndarray, ndarray) or None
         Per component, the dimensionless Kratky curve (qRg, (qRg)^2 P/I(0))
         the scores were computed from (None if Rg was unavailable). Used by
         :func:`plot_kratky_overlay`.
     descriptors : list of dict or None
         Per component, the model-free curve descriptors of
-        :func:`kratky_descriptors` (None if Rg was unavailable).
+        :func:`kratky_descriptors` (None if Rg was unavailable; a curve
+        without an interior peak has ``has_peak=False``).
     """
 
     def __init__(self, shape_names, component_labels, score_matrix, categories,
                  peak_qrgs, peak_spread, best_raw_scores=None, raw_score_matrix=None,
-                 kratky_curves=None, descriptors=None):
+                 kratky_curves=None, descriptors=None, qrg_window=None):
+        self.qrg_window = tuple(QRG_MATCH_WINDOW if qrg_window is None else qrg_window)
         self.shape_names = shape_names
         self.component_labels = component_labels
         self.score_matrix = score_matrix
@@ -376,6 +391,29 @@ class ShapeMatchResult:
             descriptors = [None]*len(component_labels)
         self.descriptors = descriptors
 
+    def best_shape(self, component=0):
+        """Best-matching reference shape of one component.
+
+        Parameters
+        ----------
+        component : int, optional
+            Row index (0-based).
+
+        Returns
+        -------
+        tuple
+            ``(name, relative_score, raw_score)``; ``(None, nan, nan)`` if the
+            component had no usable Rg. ``relative_score`` is the row-normalized
+            score (ranking only), ``raw_score`` the absolute 0-1 score that
+            tells whether the match is good at all.
+        """
+        row = self.score_matrix[component]
+        if not np.isfinite(row).any():
+            return None, np.nan, np.nan
+        j = int(np.nanargmax(row))
+        raw = np.nan if self.raw_score_matrix is None else float(self.raw_score_matrix[component, j])
+        return self.shape_names[j], float(row[j]), raw
+
     def __repr__(self):
         lines = [f"ShapeMatchResult({len(self.component_labels)} components, "
                  f"{len(self.shape_names)} reference shapes, peak_spread={self.peak_spread})"]
@@ -386,7 +424,7 @@ class ShapeMatchResult:
         return "\n".join(lines)
 
 
-def compute_shape_match_scores(qv, P, sg_list):
+def compute_shape_match_scores(qv, P, sg_list, qrg_window=None):
     """Compute the components x reference-shapes match-score matrix.
 
     Parameters
@@ -398,6 +436,10 @@ def compute_shape_match_scores(qv, P, sg_list):
     sg_list : list
         Per-component Guinier objects (with ``.Rg``/``.Iz``) -- typically
         ``[c.get_guinier_object() for c in decomp.get_xr_components()]``.
+    qrg_window : tuple of float, optional
+        (low, high) qRg window the curves are compared in; default
+        ``QRG_MATCH_WINDOW``. A window ending before a curve's second hump
+        cannot see it.
 
     Returns
     -------
@@ -414,6 +456,43 @@ def compute_shape_match_scores(qv, P, sg_list):
         result = compute_shape_match_scores(qv, P, sg_list)
         print(result)
     """
+    return _match_columns(qv, [P[:, k] for k in range(len(sg_list))],
+                          [sg.Rg for sg in sg_list], [sg.Iz for sg in sg_list],
+                          [f"component-{k+1}" for k in range(len(sg_list))], qrg_window)
+
+
+def match_kratky_curve(q, I, Rg, I0=1.0, qrg_window=None, label="curve"):
+    """Match one scattering profile against the reference-shape library.
+
+    For data that do not come from a :class:`~molass.LowRank.Decomposition.Decomposition`
+    (simulated bodies, DENSS profiles, a benchmark): no Guinier objects needed.
+
+    Parameters
+    ----------
+    q : ndarray
+        q-values (Å⁻¹ or any unit consistent with ``Rg``).
+    I : ndarray
+        Scattering profile at ``q``.
+    Rg : float
+        Radius of gyration (in the inverse unit of ``q``).
+    I0 : float, optional
+        Forward scattering I(0) used to normalize the Kratky curve (default 1,
+        i.e. ``I`` is already normalized).
+    qrg_window : tuple of float, optional
+        As in :func:`compute_shape_match_scores`.
+    label : str, optional
+        Row label prefix.
+
+    Returns
+    -------
+    ShapeMatchResult
+        With a single row; ``result.best_shape()`` gives the best match.
+    """
+    return _match_columns(np.asarray(q, float), [np.asarray(I, float)], [Rg], [I0], [label], qrg_window)
+
+
+def _match_columns(qv, columns, rgs, izs, labels, qrg_window):
+    window = tuple(QRG_MATCH_WINDOW if qrg_window is None else qrg_window)
     model_shapes = get_model_shapes()
     shape_names = [spec.name for spec in model_shapes]
 
@@ -426,10 +505,9 @@ def compute_shape_match_scores(qv, P, sg_list):
     kratky_curves = []
     descriptors = []
 
-    for k, sg in enumerate(sg_list):
-        rg, iz = sg.Rg, sg.Iz
+    for k, (profile, rg, iz) in enumerate(zip(columns, rgs, izs)):
         if rg is None or (isinstance(rg, float) and np.isnan(rg)):
-            component_labels.append(f"component-{k+1} (Rg=unavailable)")
+            component_labels.append(f"{labels[k]} (Rg=unavailable)")
             score_rows.append(np.full(len(model_shapes), np.nan))
             raw_rows.append(np.full(len(model_shapes), np.nan))
             categories.append("Rg unavailable")
@@ -440,10 +518,10 @@ def compute_shape_match_scores(qv, P, sg_list):
             continue
 
         qrg = qv * rg
-        ky = qrg**2 * P[:, k] / iz
-        peak = kratky_peak_qrg(qv, P[:, k], rg, iz)
+        ky = qrg**2 * profile / iz
+        peak = kratky_peak_qrg(qv, profile, rg, iz)
 
-        scores = np.array([_match_score(qrg, ky, spec.Rg, spec.P_fn)
+        scores = np.array([_match_score(qrg, ky, spec.Rg, spec.P_fn, window)
                             for spec in model_shapes])
         # A clear interior peak rules out the (peak-less) Gaussian chain.
         if has_clear_kratky_peak(qrg, ky):
@@ -453,14 +531,14 @@ def compute_shape_match_scores(qv, P, sg_list):
         # The two-lobe entries are meant for curves with a second hump; without one they would only win
         # by the sharp minima of a monodisperse smooth body inside the wide match window (exp. 49o).
         desc = kratky_descriptors(qrg, ky)
-        if desc is None or desc["hump_prominence"] <= 0:
+        if desc["hump_prominence"] <= 0:
             for j, spec in enumerate(model_shapes):
                 if spec.is_two_lobe:
                     scores[j] *= TWO_LOBE_GATE_FACTOR
         row_sum = np.nansum(scores)
         scores_norm = scores / row_sum if row_sum > 0 else scores
 
-        component_labels.append(f"component-{k+1} (Rg={rg:.1f})")
+        component_labels.append(f"{labels[k]} (Rg={rg:.1f})")
         score_rows.append(scores_norm)
         raw_rows.append(scores)
         kratky_curves.append((qrg, ky))
@@ -483,6 +561,7 @@ def compute_shape_match_scores(qv, P, sg_list):
         raw_score_matrix=np.array(raw_rows),
         kratky_curves=kratky_curves,
         descriptors=descriptors,
+        qrg_window=window,
     )
 
 
@@ -546,7 +625,7 @@ def plot_kratky_overlay(result, component, shapes=None, fig=None, qrg_max=OVERLA
     else:
         ax, rax = fig.subplots(), None
 
-    lo, hi = QRG_MATCH_WINDOW
+    lo, hi = result.qrg_window
     shown = qrg <= qrg_max
     in_win = (qrg >= lo) & (qrg <= hi)
     grid = np.linspace(0.05, qrg_max, 400)
@@ -637,7 +716,7 @@ def plot_kratky_series(result, fig=None, qrg_max=OVERLAY_QRG_MAX):
         desc = result.descriptors[k]
         color = f"C{k}"
         label = result.component_labels[k]
-        if desc is None:
+        if desc is None or not desc["has_peak"]:
             ax.plot(qrg[shown], ky[shown], color=color, lw=1.2, label=f"{label}: no clear peak")
             continue
         tail = "n/a" if not np.isfinite(desc["tail_ratio"]) else f"{desc['tail_ratio']:.2f}"

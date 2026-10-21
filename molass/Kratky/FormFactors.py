@@ -6,6 +6,24 @@ J.S. Pedersen (1997), "Analysis of small-angle scattering data from colloids
 and polymer solutions: modeling and least-squares fitting", Adv. Colloid
 Interface Sci. 70:171-210. Equation numbers below refer to that paper.
 
+Signatures (``qs`` in inverse length; each ``*_Rg`` returns a length in the
+unit of the shape parameters, so ``qs * Rg`` is dimensionless):
+
+=====================  ===========================  ===========================
+form factor            parameters                   Rg
+=====================  ===========================  ===========================
+``sphere_P``           ``(qs, R)``                  ``sphere_Rg(R)``
+``ellipsoid_P``        ``(qs, R, eps)``             ``ellipsoid_Rg(R, eps)``
+``triaxial_P``         ``(qs, a, b, c)``            ``triaxial_Rg(a, b, c)``
+``cylinder_P``         ``(qs, R, L)``               ``cylinder_Rg(R, L)``
+``gaussian_chain_P``   ``(qs, Rg)``                 (is its argument)
+``bead_assembly_P``    ``(qs, centres, radii=None,  ``bead_assembly_Rg(centres,
+                       polydispersity=0.0)``        radii=None, polydispersity=0.0)``
+=====================  ===========================  ===========================
+
+``bead_assembly_*`` take centres and radii in one common length unit (the
+default radius is 1, so centres are then in bead radii).
+
 Physics only -- no application logic (peak-finding, classification, plotting)
 lives here. See ``molass.Kratky.ShapeMatch`` for that.
 """

@@ -250,6 +250,11 @@ pre-optimization decomposition instead of the restored best result):
 | GitHub Issue | Description | Status |
 |-------------|-------------|--------|
 | [#290](https://github.com/biosaxs-dev/molass-library/issues/290) | `RunInfo.reconnect()` leaves no documented path to a plottable, optimized `Decomposition`; `get_current_decomposition()` depends on a possibly-stale global legacy setting and disagrees with `score()` on which job is "current"; `reconnect()` docstring has a duplicate `load_best` entry | ✅ Done (closed) |
+| [#314](https://github.com/biosaxs-dev/molass-library/issues/314) | Shape-match window is a module constant bound at definition time; no per-call `qrg_window` | ✅ Done (closed) |
+| [#315](https://github.com/biosaxs-dev/molass-library/issues/315) | No public way to match a bare Kratky curve (`match_kratky_curve`) | ✅ Done (closed) |
+| [#316](https://github.com/biosaxs-dev/molass-library/issues/316) | `kratky_descriptors` returned `None` without an interior peak; now same keys + `has_peak` | ✅ Done (closed) |
+| [#317](https://github.com/biosaxs-dev/molass-library/issues/317) | Shape-match ergonomics: `ShapeMatchResult.best_shape`, relative vs raw score docs, form-factor signature table | ✅ Done (closed) |
+| [#318](https://github.com/biosaxs-dev/molass-library/issues/318) | No reader for DENSS component result files (`molass.SAXS.DenssResult`) | ✅ Done (closed) |
 
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable

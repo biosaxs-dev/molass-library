@@ -93,17 +93,12 @@ def test_070_shape_key_image_is_cached():
     assert image_1 is image_2  # cached -- same object, not recomputed
 
 
-class _FakeGuinier:
-    def __init__(self, Rg, Iz):
-        self.Rg, self.Iz = Rg, Iz
-
-
 def _synthetic_match(P_fn, rg, noise, seed=0):
-    from molass.Kratky.ShapeMatch import compute_shape_match_scores
+    from molass.Kratky.ShapeMatch import match_kratky_curve
     qv = np.linspace(0.004, 15/rg, 220)
     P = P_fn(qv*rg)
     P = P*(1 + noise*(1 + (qv*rg/3)**2)*np.random.default_rng(seed).standard_normal(len(qv)))
-    return compute_shape_match_scores(qv, P[:, None], [_FakeGuinier(rg, 1.0)])
+    return match_kratky_curve(qv, P, rg)
 
 
 @pytest.mark.order(8)
@@ -232,7 +227,12 @@ def test_130_kratky_descriptors():
     assert d1["hump_prominence"] == 0.0      # a single peak has none
     assert len(d1["maxima"]) == 1
     assert d1["tail_ratio"] < d2["tail_ratio"] or np.isnan(d2["tail_ratio"])
-    assert kratky_descriptors(x, monotone) is None   # no interior peak
+    assert d2["has_peak"] and d1["has_peak"]
+    d0 = kratky_descriptors(x, monotone)             # no interior peak: same keys, empty values, no None
+    assert set(d0) == set(d2)
+    assert d0["has_peak"] is False
+    assert np.isnan(d0["peak_qrg"]) and np.isnan(d0["peak_height"]) and np.isnan(d0["tail_ratio"])
+    assert d0["hump_prominence"] == 0.0 and d0["maxima"] == []
 
 
 @pytest.mark.order(15)
@@ -339,3 +339,59 @@ def test_120_double_click_opens_overlay():
     x, y = quiet.axes.transData.transform((3, 0))
     _dblclick(quiet.fig, x, y)
     assert len(calls) == 2
+
+
+@pytest.mark.order(17)
+def test_160_match_window_is_a_call_argument():
+    from molass.Kratky.FormFactors import bead_assembly_P, bead_assembly_Rg
+    from molass.Kratky.ShapeLibrary import _tetra_dumbbell_centres
+    from molass.Kratky.ShapeMatch import QRG_MATCH_WINDOW, match_kratky_curve
+
+    centres = _tetra_dumbbell_centres(2.6, 1.15, 0.8)
+    ru = bead_assembly_Rg(centres, polydispersity=0.15)
+    rg = 130.0
+    q = np.linspace(0.004, 15/rg, 220)
+    P = bead_assembly_P(q*rg/ru, centres, polydispersity=0.15)
+
+    default = match_kratky_curve(q, P, rg)
+    narrow = match_kratky_curve(q, P, rg, qrg_window=(0.5, 3.0))
+    assert default.qrg_window == QRG_MATCH_WINDOW
+    assert narrow.qrg_window == (0.5, 3.0)
+    assert not np.allclose(default.raw_score_matrix, narrow.raw_score_matrix)
+    # nothing is bound at import time: changing the module default changes the next call
+    import molass.Kratky.ShapeMatch as SM
+    saved = SM.QRG_MATCH_WINDOW
+    try:
+        SM.QRG_MATCH_WINDOW = (0.5, 3.0)
+        changed = match_kratky_curve(q, P, rg)
+    finally:
+        SM.QRG_MATCH_WINDOW = saved
+    np.testing.assert_allclose(changed.raw_score_matrix, narrow.raw_score_matrix)
+    # the Decomposition accessor caches per window
+    first = decomp_baseline.get_kratky_shape_match()
+    other = decomp_baseline.get_kratky_shape_match(qrg_window=(0.5, 4.0))
+    assert other is not first and other.qrg_window == (0.5, 4.0)
+    assert decomp_baseline.get_kratky_shape_match(qrg_window=(0.5, 4.0)) is other
+
+
+@pytest.mark.order(18)
+def test_170_match_kratky_curve_and_best_shape():
+    from molass.Kratky.FormFactors import ellipsoid_P, ellipsoid_Rg
+    from molass.Kratky.ShapeMatch import match_kratky_curve
+
+    R, eps = 40.0, 3.2
+    rg = ellipsoid_Rg(R, eps)
+    q = np.linspace(0.004, 15/rg, 220)
+    # a profile in arbitrary intensity units: I0 normalizes it
+    result = match_kratky_curve(q, 7.5*ellipsoid_P(q, R, eps), rg, I0=7.5, label="body")
+    assert result.score_matrix.shape == (1, len(result.shape_names))
+    assert result.component_labels[0].startswith("body (Rg=")
+    name, relative, raw = result.best_shape()
+    assert name == "ellipsoid (eps=3)"
+    j = result.shape_names.index(name)
+    assert relative == pytest.approx(result.score_matrix[0, j])
+    assert raw == pytest.approx(result.raw_score_matrix[0, j])
+    assert relative == np.nanmax(result.score_matrix[0]) and raw == result.best_raw_scores[0]
+    # unusable Rg: a row of NaN and no best shape
+    missing = match_kratky_curve(q, ellipsoid_P(q, R, eps), float("nan"))
+    assert missing.best_shape(0)[0] is None and np.isnan(missing.best_shape(0)[1])

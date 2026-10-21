@@ -343,7 +343,7 @@ class Decomposition:
         M, C, P = self.get_xr_matrices(debug=debug)[0:3]
         return float(np.linalg.norm(M - P @ C) / np.linalg.norm(M))
 
-    def get_kratky_shape_match(self, debug=False):
+    def get_kratky_shape_match(self, debug=False, qrg_window=None):
         """Compute a components x reference-shapes Kratky shape-match score matrix.
 
         Classifies each XR component's dimensionless Kratky curve against a
@@ -356,7 +356,18 @@ class Decomposition:
         scores, not validated structural fits, and should be read alongside
         :meth:`get_lrf_residual`).
 
-        Cached on first call.
+        The row-normalized ``score_matrix`` only ranks the shapes of one
+        component; ``raw_score_matrix`` / ``best_raw_scores`` say whether the
+        best shape is a good match at all (``result.best_shape(k)`` gives both).
+
+        Cached on first call (per ``qrg_window``).
+
+        Parameters
+        ----------
+        debug : bool, optional
+        qrg_window : tuple of float, optional
+            (low, high) qRg window the curves are compared in; default
+            ``molass.Kratky.ShapeMatch.QRG_MATCH_WINDOW``.
 
         Returns
         -------
@@ -368,9 +379,11 @@ class Decomposition:
 
             result = decomp.get_kratky_shape_match()
             print(result)
+            name, relative, raw = result.best_shape(0)
             plot_result = decomp.plot_kratky_shape_match()
         """
-        if getattr(self, '_kratky_shape_match', None) is None:
+        cached = getattr(self, '_kratky_shape_match', None)
+        if cached is None or (qrg_window is not None and tuple(qrg_window) != cached.qrg_window):
             if debug:
                 from importlib import reload
                 import molass.Kratky.ShapeMatch
@@ -380,7 +393,7 @@ class Decomposition:
             qv = self.xr.qv
             _, _, P = self.get_xr_matrices(debug=debug)[0:3]
             sg_list = [c.get_guinier_object() for c in self.get_xr_components()]
-            self._kratky_shape_match = compute_shape_match_scores(qv, P, sg_list)
+            self._kratky_shape_match = compute_shape_match_scores(qv, P, sg_list, qrg_window=qrg_window)
         return self._kratky_shape_match
 
     def plot_kratky_shape_match(self, ax=None, debug=False, **kwargs):
