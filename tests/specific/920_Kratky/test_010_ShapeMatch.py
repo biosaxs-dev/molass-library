@@ -114,9 +114,30 @@ def test_080_library_names_and_chain_flag():
     names = [spec.name for spec in specs]
     assert names == ["sphere",
                      "ellipsoid (eps=2)", "ellipsoid (eps=3)", "ellipsoid (eps=4)", "ellipsoid (eps=6)",
+                     "triaxial (1:3:6)", "triaxial (1:4:5)", "triaxial (1:4:12)",
                      "cylinder (L/R=3)", "cylinder (L/R=6)", "cylinder (L/R=10)",
                      "Gaussian chain"]
     assert [spec.name for spec in specs if spec.is_chain] == ["Gaussian chain"]
+
+
+@pytest.mark.order(8)
+def test_085_triaxial_form_factor_limits():
+    from molass.Kratky.FormFactors import (
+        triaxial_P, triaxial_Rg, ellipsoid_P, ellipsoid_Rg, sphere_P, sphere_Rg,
+    )
+
+    qs = np.array([1e-4, 0.01, 0.03, 0.06, 0.1])
+    # P(0) = 1 and the Guinier slope reproduces the exact Rg
+    rg_exact = triaxial_Rg(20.0, 60.0, 120.0)
+    P0 = triaxial_P(np.array([1e-4, 2e-4]), 20.0, 60.0, 120.0)
+    assert abs(P0[0] - (1 - (1e-4*rg_exact)**2/3)) < 1e-8
+    rg = np.sqrt(-3*np.log(P0[1]/P0[0])/((2e-4)**2 - (1e-4)**2))
+    assert abs(rg - rg_exact) / rg < 5e-3
+    # equal axes -> sphere; two equal axes -> ellipsoid of revolution
+    np.testing.assert_allclose(triaxial_P(qs, 30.0, 30.0, 30.0), sphere_P(qs, 30.0), atol=2e-4)
+    np.testing.assert_allclose(triaxial_P(qs, 25.0, 25.0, 100.0), ellipsoid_P(qs, 25.0, 4.0), atol=2e-4)
+    assert abs(triaxial_Rg(25.0, 25.0, 100.0) - ellipsoid_Rg(25.0, 4.0)) < 1e-9
+    assert abs(triaxial_Rg(30.0, 30.0, 30.0) - sphere_Rg(30.0)) < 1e-9
 
 
 @pytest.mark.order(9)

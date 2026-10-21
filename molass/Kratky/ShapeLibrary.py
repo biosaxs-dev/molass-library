@@ -13,7 +13,7 @@ from collections import namedtuple
 import numpy as np
 
 from molass.Kratky.FormFactors import (
-    sphere_F, sphere_Rg, ellipsoid_P, ellipsoid_Rg, cylinder_P, cylinder_Rg,
+    sphere_F, sphere_Rg, ellipsoid_P, ellipsoid_Rg, triaxial_P, triaxial_Rg, cylinder_P, cylinder_Rg,
     gaussian_chain_P,
 )
 
@@ -21,6 +21,16 @@ ShapeSpec = namedtuple("ShapeSpec", ["name", "Rg", "P_fn", "plot3d_fn", "is_chai
                        defaults=(False,))
 
 _R_REF = 40.0  # arbitrary reference length scale; only Rg (derived) matters for the Kratky curve
+
+# One colour per library position, shared by the shape-key icons and the overlay plots
+# (the default matplotlib cycle has only 10 colours, fewer than the library's shapes).
+SHAPE_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
+                "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#d4a017", "#00a884"]
+
+
+def get_shape_color(index):
+    """Colour of the library shape at ``index`` (position in :func:`get_model_shapes`)."""
+    return SHAPE_COLORS[index % len(SHAPE_COLORS)]
 
 
 def _plot_sphere_3d(ax, R, color):
@@ -41,6 +51,16 @@ def _plot_ellipsoid_3d(ax, R, eps, color):
     z = (eps*R)*np.outer(np.ones_like(u), np.cos(v))
     ax.plot_surface(x, y, z, color=color, alpha=0.9, linewidth=0)
     return max(R, eps*R)
+
+
+def _plot_triaxial_3d(ax, a, b, c, color):
+    u = np.linspace(0, 2*np.pi, 36)
+    v = np.linspace(0, np.pi, 18)
+    x = a*np.outer(np.cos(u), np.sin(v))
+    y = b*np.outer(np.sin(u), np.sin(v))
+    z = c*np.outer(np.ones_like(u), np.cos(v))
+    ax.plot_surface(x, y, z, color=color, alpha=0.9, linewidth=0)
+    return max(a, b, c)
 
 
 def _plot_cylinder_3d(ax, R, L, color):
@@ -88,24 +108,31 @@ def get_model_shapes():
     """
     cyl_R = 20.0
     ellipsoid_epss = (2.0, 3.0, 4.0, 6.0)
+    # tri-axial semi-axis ratios 1 : b : c (Pedersen Eq. 62): plate-like, disc-like and ribbon-like bodies;
+    # chosen as representatives of what the Y17AH20N components matched best (molass-researcher exp. 49h)
+    triaxial_ratios = ((3.0, 6.0), (4.0, 5.0), (4.0, 12.0))
     cylinder_ratios = (3.0, 6.0, 10.0)
 
-    specs = [
-        ShapeSpec("sphere", sphere_Rg(_R_REF),
-                  lambda qs: sphere_F(np.asarray(qs)*_R_REF)**2,
-                  lambda ax: _plot_sphere_3d(ax, _R_REF, "C0")),
-    ]
-    for i, eps in enumerate(ellipsoid_epss):
+    specs = []
+    specs.append(ShapeSpec("sphere", sphere_Rg(_R_REF),
+                           lambda qs: sphere_F(np.asarray(qs)*_R_REF)**2,
+                           lambda ax, col=SHAPE_COLORS[len(specs)]: _plot_sphere_3d(ax, _R_REF, col)))
+    for eps in ellipsoid_epss:
         specs.append(ShapeSpec(f"ellipsoid (eps={eps:g})", ellipsoid_Rg(_R_REF, eps),
                                lambda qs, eps=eps: ellipsoid_P(qs, _R_REF, eps),
-                               lambda ax, eps=eps, i=i: _plot_ellipsoid_3d(ax, _R_REF, eps, f"C{i+1}")))
-    for i, ratio in enumerate(cylinder_ratios):
+                               lambda ax, eps=eps, col=SHAPE_COLORS[len(specs)]: _plot_ellipsoid_3d(ax, _R_REF, eps, col)))
+    for b, c in triaxial_ratios:
+        a = _R_REF/2    # thinnest semi-axis; only the ratios matter
+        specs.append(ShapeSpec(f"triaxial (1:{b:g}:{c:g})", triaxial_Rg(a, a*b, a*c),
+                               lambda qs, a=a, b=b, c=c: triaxial_P(qs, a, a*b, a*c),
+                               lambda ax, a=a, b=b, c=c, col=SHAPE_COLORS[len(specs)]: _plot_triaxial_3d(ax, a, a*b, a*c, col)))
+    for ratio in cylinder_ratios:
         L = cyl_R*ratio
         specs.append(ShapeSpec(f"cylinder (L/R={ratio:g})", cylinder_Rg(cyl_R, L),
                                lambda qs, L=L: cylinder_P(qs, cyl_R, L),
-                               lambda ax, L=L, i=i: _plot_cylinder_3d(ax, cyl_R, L, f"C{i+5}")))
+                               lambda ax, L=L, col=SHAPE_COLORS[len(specs)]: _plot_cylinder_3d(ax, cyl_R, L, col)))
     specs.append(ShapeSpec("Gaussian chain", _R_REF,
                            lambda qs: gaussian_chain_P(qs, _R_REF),
-                           lambda ax: _plot_chain_3d(ax, _R_REF, "C8"),
+                           lambda ax, col=SHAPE_COLORS[len(specs)]: _plot_chain_3d(ax, _R_REF, col),
                            is_chain=True))
     return specs

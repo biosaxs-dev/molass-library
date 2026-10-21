@@ -54,6 +54,29 @@ def ellipsoid_Rg(R, eps):
     return R*np.sqrt((2 + eps**2)/5)
 
 
+_TRI_U, _TRI_W = np.polynomial.legendre.leggauss(48)
+_TRI_U = 0.5*(_TRI_U + 1)           # u = cos(alpha) in [0, 1]
+_TRI_W = 0.5*_TRI_W
+_TRI_PHI = 0.5*np.pi*_TRI_U         # phi in [0, pi/2]; the mean over phi is sum(W * f)
+
+
+def triaxial_P(qs, a, b, c):
+    """Pedersen Eq. 62: tri-axial ellipsoid with semi-axes a, b, c, orientation-averaged
+    (Gauss-Legendre in cos(alpha) and in phi; vectorized over qs)."""
+    qs = np.atleast_1d(np.asarray(qs, float))
+    r = np.sqrt((a**2*np.sin(_TRI_PHI)**2 + b**2*np.cos(_TRI_PHI)**2)[:, None]*(1 - _TRI_U**2)[None, :]
+                + c**2*(_TRI_U**2)[None, :])                       # (n_phi, n_u)
+    out = np.empty_like(qs)
+    for k, q in enumerate(qs):
+        out[k] = np.einsum("i,j,ij->", _TRI_W, _TRI_W, sphere_F(q*r)**2)
+    return out
+
+
+def triaxial_Rg(a, b, c):
+    """Exact tri-axial ellipsoid Rg: Rg^2 = (a^2 + b^2 + c^2) / 5."""
+    return np.sqrt((a**2 + b**2 + c**2)/5)
+
+
 def cylinder_P_single(q, R, L):
     """Pedersen Eq. 64: cylinder, radius R, length L. B1 = first-order Bessel J1."""
     def integrand(alpha):

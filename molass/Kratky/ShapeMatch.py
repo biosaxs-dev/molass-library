@@ -33,7 +33,7 @@ Design rationale (see molass-researcher/experiments/41_smoothing_kratky_plot/
 import numpy as np
 from scipy.signal import savgol_filter
 
-from molass.Kratky.ShapeLibrary import get_model_shapes
+from molass.Kratky.ShapeLibrary import get_model_shapes, get_shape_color
 
 QRG_PEAK_SEARCH_WINDOW = (0.5, 5.0)
 QRG_MATCH_WINDOW = (0.5, 5.0)
@@ -490,11 +490,11 @@ def plot_kratky_overlay(result, component, shapes=None, fig=None, qrg_max=OVERLA
             label += (f"  (score {result.score_matrix[component, j]:.2f}, "
                       f"raw {result.raw_score_matrix[component, j]:.2f})")
         model = grid**2 * spec.P_fn(grid/spec.Rg)
-        ax.plot(grid, model, color=f"C{j}", lw=1.6, label=label)
+        ax.plot(grid, model, color=get_shape_color(j), lw=1.6, label=label)
         top = max(top, np.max(model[(grid >= lo) & (grid <= hi)]))
         if rax is not None and in_win.any():
             ref = qrg[in_win]**2 * spec.P_fn(qrg[in_win]/spec.Rg)
-            rax.plot(qrg[in_win], ky[in_win] - ref, color=f"C{j}", lw=1.2)
+            rax.plot(qrg[in_win], ky[in_win] - ref, color=get_shape_color(j), lw=1.2)
 
     peak = result.peak_qrgs[component]
     if peak is not None:
@@ -713,7 +713,7 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
             cbar_width = 0.35  # dedicated colorbar column -- kept OUT of the n_shapes
                                # equal-width columns so the icon row and heatmap span
                                # exactly the same width and align 1:1, column by column
-            fig = plt.figure(figsize=(9 + cbar_width, height + key_height))
+            fig = plt.figure(figsize=(11 + cbar_width, height + key_height))
             gs = fig.add_gridspec(2, n_shapes + 1,
                                    height_ratios=[key_height, height],
                                    width_ratios=[1]*n_shapes + [cbar_width])
@@ -728,7 +728,7 @@ def plot_shape_match(result, ax=None, title="Component x model-shape match score
             cax = fig.add_subplot(gs[1, n_shapes])
             fig.colorbar(im, cax=cax, label="relative match score (row-normalized)")
         else:
-            fig, ax = plt.subplots(figsize=(9, height))
+            fig, ax = plt.subplots(figsize=(11, height))
             im = ax.imshow(matrix, cmap="viridis", aspect="auto", vmin=0, vmax=vmax)
             fig.colorbar(im, ax=ax, label="relative match score (row-normalized)")
     else:
