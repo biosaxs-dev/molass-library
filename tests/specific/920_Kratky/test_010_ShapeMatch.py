@@ -201,9 +201,32 @@ def test_130_kratky_descriptors():
     d1 = kratky_descriptors(x, one_peak)
     assert abs(d2["peak_qrg"] - 3.2) < 0.3
     assert d2["hump_prominence"] > 0.1       # the second lobe is a clear hump
+    assert len(d2["maxima"]) == 2
     assert d1["hump_prominence"] == 0.0      # a single peak has none
+    assert len(d1["maxima"]) == 1
     assert d1["tail_ratio"] < d2["tail_ratio"] or np.isnan(d2["tail_ratio"])
     assert kratky_descriptors(x, monotone) is None   # no interior peak
+
+
+@pytest.mark.order(15)
+def test_135_maxima_persistence_and_local_noise():
+    from molass.Kratky.ShapeMatch import _maxima_persistence, kratky_descriptors
+
+    # a maximum of height 2 separated by a dip to 1 from the global maximum 3 has persistence 1
+    pairs = dict(_maxima_persistence(np.array([0.0, 2.0, 1.0, 3.0, 0.0])))
+    assert pairs[1] == pytest.approx(1.0)
+    assert pairs[3] == pytest.approx(3.0)         # the global maximum persists down to the minimum
+
+    # the same small hump is significant where the noise is low and rejected where it is high
+    x = np.linspace(0.4, 10, 400)
+    main = 1.8*np.exp(-((x - 3.0)/1.2)**2) + 0.3
+    hump = 0.12*np.exp(-((x - 7.5)/0.7)**2)
+    rng = np.random.default_rng(1)
+    quiet = main + hump + 0.003*rng.standard_normal(len(x))
+    sigma_q = 0.003 + 0.2*(x/10)**3                   # noise growing smoothly with q, as in real data
+    noisy = main + hump + sigma_q*rng.standard_normal(len(x))
+    assert kratky_descriptors(x, quiet)["hump_prominence"] > 0.0
+    assert kratky_descriptors(x, noisy)["hump_prominence"] == 0.0
 
 
 @pytest.mark.order(14)

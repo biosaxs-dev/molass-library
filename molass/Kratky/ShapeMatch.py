@@ -31,7 +31,7 @@ Design rationale (see molass-researcher/experiments/41_smoothing_kratky_plot/
   problems, not the same one.
 """
 import numpy as np
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, savgol_coeffs
 
 from molass.Kratky.ShapeLibrary import get_model_shapes, get_shape_color
 
@@ -139,22 +139,74 @@ def has_clear_kratky_peak(qrg, ky, search=(0.5, 11.0), min_decay=0.08, nsigma=3.
     return bool(decay >= max(min_decay * smoothed[k], nsigma * max(local_noise(k), local_noise(j))))
 
 
-def kratky_descriptors(qrg, ky, nsigma=4.0):
+def _maxima_persistence(y):
+    """(index, persistence) of the maxima of a 1D curve (0-dimensional persistence of its superlevel sets).
+
+    The persistence of a maximum is how far one has to descend before it merges into a higher one; the
+    global maximum persists down to the curve's minimum. Small persistence = noise-sized wiggle."""
+    n = len(y)
+    order = np.argsort(-y, kind="stable")
+    parent = -np.ones(n, dtype=int)
+    peak = {}                                   # root -> index of that component's maximum
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    pairs = []
+    for i in order:
+        parent[i] = i
+        left = i > 0 and parent[i - 1] >= 0
+        right = i < n - 1 and parent[i + 1] >= 0
+        if not left and not right:
+            peak[i] = i                         # a new maximum is born
+        elif left and right:
+            rl, rr = find(i - 1), find(i + 1)
+            lo, hi = (rl, rr) if y[peak[rl]] < y[peak[rr]] else (rr, rl)
+            pairs.append((peak[lo], float(y[peak[lo]] - y[i])))     # the lower maximum dies here
+            parent[lo] = hi
+            parent[i] = hi
+        else:
+            parent[i] = find(i - 1 if left else i + 1)
+    g = int(np.argmax(y))
+    pairs.append((g, float(y[g] - y.min())))
+    return pairs
+
+
+def _local_noise(resid, k, half):
+    """Robust local sigma of a residual curve around index k (no correction for the smoother)."""
+    seg = resid[max(0, k - half):k + half + 1]
+    return 1.4826*float(np.median(np.abs(seg - np.median(seg))))
+
+
+def kratky_descriptors(qrg, ky, nsigma=6.0):
     """Model-free descriptors of a dimensionless Kratky curve.
 
     Meant as cheap hints for ordering components along a continuum
     (compact -> elongated/lobed) without choosing a model; see
-    molass-researcher experiment 49d/49f (the four Y17AH20N components
+    molass-researcher experiment 49d/49f/49j (the four Y17AH20N components
     collapse onto one master curve once normalized by their main peak, the
     second feature fading continuously from component 1 to 4).
+
+    Secondary maxima are judged by their *persistence* (how far the curve
+    must descend before the maximum merges into a higher one), which is the
+    stable notion: noise of sup-norm size eps moves persistences by at most
+    eps (Cohen-Steiner, Edelsbrunner, Harer), so a maximum with persistence
+    above 2*eps cannot be a noise artifact. Persistence is measured on the
+    Savitzky-Golay-smoothed curve, so eps is 3 x the *local* noise sigma of
+    that smoothed curve (noise grows with q; the smoother's variance
+    reduction is computed from its weights), i.e. the default ``nsigma`` = 6.
 
     Parameters
     ----------
     qrg, ky : ndarray
         Dimensionless q*Rg and (qRg)^2 P(q)/I(0).
     nsigma : float, optional
-        A secondary hump counts only if its prominence exceeds ``nsigma``
-        times the local noise (and 0.05).
+        A secondary maximum counts only if its persistence exceeds ``nsigma``
+        times the local noise sigma of the smoothed curve at its position.
+        Default 6 (= 2 x 3 sigma).
 
     Returns
     -------
@@ -162,9 +214,12 @@ def kratky_descriptors(qrg, ky, nsigma=4.0):
         ``peak_qrg``, ``peak_height``: main peak (smoothed) in qRg 0.5-5.
         ``tail_ratio``: curve height at 2.5 x peak_qrg relative to peak_height
         (NaN if beyond the data) -- how slowly the curve decays after the peak.
-        ``hump_prominence``: height of a secondary hump above the dip before it,
-        relative to peak_height (0 if none is clearly resolved; searched at
-        1.2-3.2 x peak_qrg).
+        ``hump_prominence``: persistence of the most persistent significant
+        secondary maximum at 1.2-3.2 x peak_qrg, relative to peak_height (0 if
+        none -- a shoulder without a maximum is not seen; ripples further out
+        are form-factor oscillations of a compact body, a different feature).
+        ``maxima``: list of (qrg, height, persistence) of all significant
+        interior maxima, most persistent first.
         None if there is no interior main peak.
     """
     qrg = np.asarray(qrg, float); ky = np.asarray(ky, float)
@@ -174,6 +229,10 @@ def kratky_descriptors(qrg, ky, nsigma=4.0):
         return None
     smooth = savgol_filter(ky, w, 3)
     resid = ky - smooth
+    h = savgol_coeffs(w, 3)
+    sh2 = float(np.sum(h**2))
+    resid_to_raw = 1.0/np.sqrt(max(1 - 2*h[w//2] + sh2, 1e-6))      # residual sigma -> raw point noise sigma
+    raw_to_smooth = np.sqrt(sh2)                                    # raw noise sigma -> smoothed-curve noise sigma
     window = (qrg >= 0.5) & (qrg <= 5.0)
     if window.sum() < 5:
         return None
@@ -186,19 +245,19 @@ def kratky_descriptors(qrg, ky, nsigma=4.0):
     qmax = float(qrg.max())
     tail_ratio = float(np.interp(2.5*xp, qrg, smooth)/yp) if 2.5*xp <= qmax else np.nan
 
-    prominence = 0.0
-    dip_zone = np.where((qrg >= 1.2*xp) & (qrg <= min(2.6*xp, qmax)))[0]
-    if len(dip_zone) >= 3:
-        iv = dip_zone[np.argmin(smooth[dip_zone])]
-        hump_zone = np.where((qrg > qrg[iv]) & (qrg <= min(3.2*xp, qmax)))[0]
-        if len(hump_zone) >= 3:
-            ih = hump_zone[np.argmax(smooth[hump_zone])]
-            if ih != hump_zone[-1]:   # an interior maximum, not just a rise at the edge
-                height = float(smooth[ih] - smooth[iv])
-                noise = float(np.std(resid[min(iv, ih):max(iv, ih) + 1]))
-                if height > max(0.05, nsigma*noise):
-                    prominence = height/yp
-    return {"peak_qrg": xp, "peak_height": yp, "tail_ratio": tail_ratio, "hump_prominence": float(prominence)}
+    half = max(10, n//12)
+    maxima = []
+    for i, persistence in _maxima_persistence(smooth):
+        if i in (0, n - 1):
+            continue                                # a rise at the edge is not an interior maximum
+        sigma_smooth = _local_noise(resid, i, half)*resid_to_raw*raw_to_smooth
+        if persistence > nsigma*sigma_smooth:
+            maxima.append((float(qrg[i]), float(smooth[i]), persistence))
+    maxima.sort(key=lambda m: -m[2])
+    humps = [m for m in maxima if 1.2*xp <= m[0] <= 3.2*xp]
+    prominence = humps[0][2]/yp if humps else 0.0
+    return {"peak_qrg": xp, "peak_height": yp, "tail_ratio": tail_ratio,
+            "hump_prominence": float(prominence), "maxima": maxima}
 
 
 def classify_shape_category(peak_qrg):
