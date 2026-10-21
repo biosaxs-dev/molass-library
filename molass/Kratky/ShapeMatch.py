@@ -36,9 +36,13 @@ from scipy.signal import savgol_filter, savgol_coeffs
 from molass.Kratky.ShapeLibrary import get_model_shapes, get_shape_color
 
 QRG_PEAK_SEARCH_WINDOW = (0.5, 5.0)
-QRG_MATCH_WINDOW = (0.5, 5.0)
+# The match window reaches beyond the main peak so that a second hump (e.g. a dumbbell of lobes, component 1 of
+# Y17AH20N at qRg ~8.5) is scored; it was (0.5, 5.0) before molass-researcher experiment 49o. Noise grows ~5x
+# towards high qRg, so going much beyond 7.5 would need a noise-weighted score.
+QRG_MATCH_WINDOW = (0.5, 7.5)
 GLOBULAR_PEAK_QRG = np.sqrt(3)
 CHAIN_GATE_FACTOR = 0.05  # score multiplier for the Gaussian chain when the component has a clear peak
+TWO_LOBE_GATE_FACTOR = 0.05  # score multiplier for the two-lobe entries when the component shows no second hump
 OVERLAY_QRG_MAX = 10.0  # upper end of the qRg range shown by plot_kratky_overlay
 
 
@@ -446,6 +450,13 @@ def compute_shape_match_scores(qv, P, sg_list):
             for j, spec in enumerate(model_shapes):
                 if spec.is_chain:
                     scores[j] *= CHAIN_GATE_FACTOR
+        # The two-lobe entries are meant for curves with a second hump; without one they would only win
+        # by the sharp minima of a monodisperse smooth body inside the wide match window (exp. 49o).
+        desc = kratky_descriptors(qrg, ky)
+        if desc is None or desc["hump_prominence"] <= 0:
+            for j, spec in enumerate(model_shapes):
+                if spec.is_two_lobe:
+                    scores[j] *= TWO_LOBE_GATE_FACTOR
         row_sum = np.nansum(scores)
         scores_norm = scores / row_sum if row_sum > 0 else scores
 
@@ -453,7 +464,7 @@ def compute_shape_match_scores(qv, P, sg_list):
         score_rows.append(scores_norm)
         raw_rows.append(scores)
         kratky_curves.append((qrg, ky))
-        descriptors.append(kratky_descriptors(qrg, ky))
+        descriptors.append(desc)
         categories.append(classify_shape_category(peak))
         peak_qrgs.append(peak)
         best_raw_scores.append(float(np.nanmax(scores)) if np.isfinite(scores).any() else np.nan)

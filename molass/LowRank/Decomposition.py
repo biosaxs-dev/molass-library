@@ -348,9 +348,9 @@ class Decomposition:
 
         Classifies each XR component's dimensionless Kratky curve against a
         small, fixed library of reference shapes (sphere, four ellipsoid
-        eccentricities, three tri-axial ellipsoids, three cylinder aspect
-        ratios, a flexible Gaussian chain), returning a heuristic *relative*
-        match score per shape plus a
+        eccentricities, three tri-axial ellipsoids, one long rod, a dumbbell
+        of two beads, a dumbbell of two bead tetrahedra, a flexible Gaussian
+        chain), returning a heuristic *relative* match score per shape plus a
         coarse category label -- see :mod:`molass.Kratky.ShapeMatch` for
         the full design rationale and important caveats (these are similarity
         scores, not validated structural fits, and should be read alongside

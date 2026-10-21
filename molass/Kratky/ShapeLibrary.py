@@ -14,13 +14,34 @@ import numpy as np
 
 from molass.Kratky.FormFactors import (
     sphere_F, sphere_Rg, ellipsoid_P, ellipsoid_Rg, triaxial_P, triaxial_Rg, cylinder_P, cylinder_Rg,
-    gaussian_chain_P,
+    gaussian_chain_P, bead_assembly_P, bead_assembly_Rg,
 )
 
-ShapeSpec = namedtuple("ShapeSpec", ["name", "Rg", "P_fn", "plot3d_fn", "is_chain"],
-                       defaults=(False,))
+ShapeSpec = namedtuple("ShapeSpec", ["name", "Rg", "P_fn", "plot3d_fn", "is_chain", "is_two_lobe"],
+                       defaults=(False, False))
 
 _R_REF = 40.0  # arbitrary reference length scale; only Rg (derived) matters for the Kratky curve
+_R_BEAD = 20.0  # bead radius of the bead-assembly entries (same remark)
+
+# Two-lobe bead models (Pedersen Eq. 59), lengths in bead radii.
+# Plain dumbbell: two nearly touching spheres (centre distance 2.4 R) with a modest size spread; parameters set
+# by principle, not fitted to a component.
+_DUMBBELL_CENTRES = np.array([[-1.2, 0.0, 0.0], [1.2, 0.0, 0.0]])
+_DUMBBELL_SPREAD = 0.12
+
+
+def _tetra_dumbbell_centres(D, dd_in, twist):
+    """Two bead tetrahedra (edge 2*dd_in) at x = -D and +D; the second is twisted by `twist` about the x axis."""
+    t = np.array([[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]], float)*(dd_in*2/(2*np.sqrt(2)))
+    c, s = np.cos(twist), np.sin(twist)
+    rot = np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
+    return np.vstack([t + [-D, 0, 0], t @ rot.T + [D, 0, 0]])
+
+
+# Dumbbell of two bead tetrahedra: parameters fitted to the two-peak Kratky curve of component 1 of Y17AH20N
+# (RMSE 0.072; molass-researcher experiments 49n/49p) -- tuned to one dataset, to be validated on others.
+_TETRA_DUMBBELL_CENTRES = _tetra_dumbbell_centres(2.416, 1.084, 1.07)
+_TETRA_DUMBBELL_SPREAD = 0.198
 
 # One colour per library position, shared by the shape-key icons and the overlay plots
 # (the default matplotlib cycle has only 10 colours, fewer than the library's shapes).
@@ -63,6 +84,17 @@ def _plot_triaxial_3d(ax, a, b, c, color):
     return max(a, b, c)
 
 
+def _plot_beads_3d(ax, centres, R, color):
+    u = np.linspace(0, 2*np.pi, 14)
+    v = np.linspace(0, np.pi, 8)
+    c0 = np.asarray(centres, float)
+    c0 = c0 - c0.mean(axis=0)
+    for c in c0:
+        ax.plot_surface(c[0] + R*np.outer(np.cos(u), np.sin(v)), c[1] + R*np.outer(np.sin(u), np.sin(v)),
+                        c[2] + R*np.outer(np.ones_like(u), np.cos(v)), color=color, alpha=0.9, linewidth=0)
+    return float(np.abs(c0).max() + R)
+
+
 def _plot_cylinder_3d(ax, R, L, color):
     theta = np.linspace(0, 2*np.pi, 30)
     z_line = np.linspace(-L/2, L/2, 2)
@@ -103,15 +135,17 @@ def get_model_shapes():
         Each has ``.name``, ``.Rg`` (exact, from the form factor's own
         Rg relation), ``.P_fn(qs)`` (form factor as a function of q), and
         ``.plot3d_fn(ax)`` (draws the 3D representative shape into ``ax``,
-        returns its bounding extent), and ``.is_chain`` (True for the
-        flexible-chain reference, which has no Kratky peak).
+        returns its bounding extent), ``.is_chain`` (True for the
+        flexible-chain reference, which has no Kratky peak), and ``.is_two_lobe``
+        (True for the dumbbells, whose Kratky curve has a second hump; they are
+        only considered when the data show one).
     """
     cyl_R = 20.0
     ellipsoid_epss = (2.0, 3.0, 4.0, 6.0)
     # tri-axial semi-axis ratios 1 : b : c (Pedersen Eq. 62): plate-like, disc-like and ribbon-like bodies;
     # chosen as representatives of what the Y17AH20N components matched best (molass-researcher exp. 49h)
     triaxial_ratios = ((3.0, 6.0), (4.0, 5.0), (4.0, 12.0))
-    cylinder_ratios = (3.0, 6.0, 10.0)
+    rod_ratios = (10.0,)     # one long rod; shorter cylinders are matched by ellipsoids (exp. 49l/49o)
 
     specs = []
     specs.append(ShapeSpec("sphere", sphere_Rg(_R_REF),
@@ -126,11 +160,17 @@ def get_model_shapes():
         specs.append(ShapeSpec(f"triaxial (1:{b:g}:{c:g})", triaxial_Rg(a, a*b, a*c),
                                lambda qs, a=a, b=b, c=c: triaxial_P(qs, a, a*b, a*c),
                                lambda ax, a=a, b=b, c=c, col=SHAPE_COLORS[len(specs)]: _plot_triaxial_3d(ax, a, a*b, a*c, col)))
-    for ratio in cylinder_ratios:
+    for ratio in rod_ratios:
         L = cyl_R*ratio
         specs.append(ShapeSpec(f"cylinder (L/R={ratio:g})", cylinder_Rg(cyl_R, L),
                                lambda qs, L=L: cylinder_P(qs, cyl_R, L),
                                lambda ax, L=L, col=SHAPE_COLORS[len(specs)]: _plot_cylinder_3d(ax, cyl_R, L, col)))
+    for name, centres, spread in (("dumbbell (2 beads)", _DUMBBELL_CENTRES, _DUMBBELL_SPREAD),
+                                  ("dumbbell of tetrahedra (2x4)", _TETRA_DUMBBELL_CENTRES, _TETRA_DUMBBELL_SPREAD)):
+        specs.append(ShapeSpec(name, bead_assembly_Rg(centres, polydispersity=spread)*_R_BEAD,
+                               lambda qs, centres=centres, spread=spread: bead_assembly_P(np.asarray(qs)*_R_BEAD, centres, polydispersity=spread),
+                               lambda ax, centres=centres, col=SHAPE_COLORS[len(specs)]: _plot_beads_3d(ax, centres*_R_BEAD, _R_BEAD, col),
+                               is_two_lobe=True))
     specs.append(ShapeSpec("Gaussian chain", _R_REF,
                            lambda qs: gaussian_chain_P(qs, _R_REF),
                            lambda ax, col=SHAPE_COLORS[len(specs)]: _plot_chain_3d(ax, _R_REF, col),

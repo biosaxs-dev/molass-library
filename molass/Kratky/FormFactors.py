@@ -77,6 +77,68 @@ def triaxial_Rg(a, b, c):
     return np.sqrt((a**2 + b**2 + c**2)/5)
 
 
+_GH_NODES, _GH_WEIGHTS = np.polynomial.hermite_e.hermegauss(13)
+_GH_WEIGHTS = _GH_WEIGHTS/_GH_WEIGHTS.sum()
+
+
+def _sphere_amplitude(x):
+    """Sphere amplitude F(x) with a series for small x (avoids cancellation)."""
+    x = np.asarray(x, float)
+    out = np.empty_like(x)
+    small = np.abs(x) < 1e-2
+    xs = x[small]
+    out[small] = 1 - xs**2/10 + xs**4/280
+    xb = x[~small]
+    out[~small] = 3*(np.sin(xb) - xb*np.cos(xb))/xb**3
+    return out
+
+
+def bead_assembly_P(qs, centres, radii=None, polydispersity=0.0):
+    """Pedersen Eq. 59 (Debye 1915): particle made of homogeneous spherical subunits, orientation-averaged.
+
+    P(q) = sum_ij V_i V_j F(q r_i) F(q r_j) sin(q d_ij)/(q d_ij) / (sum V)^2, P(0) = 1.
+
+    Parameters
+    ----------
+    qs : array_like
+    centres : array_like, shape (n, 3)
+        Centres of the beads (same length unit as ``radii`` and ``1/qs``).
+    radii : array_like, optional
+        Bead radii (default: all 1).
+    polydispersity : float, optional
+        Relative size spread (log-normal sigma) of the *whole* object. The curve is averaged over scaled copies,
+        which smears the deep minima of the sphere form factor -- a stand-in for irregular, non-spherical subunits
+        (see molass-researcher experiments 49d/49n). The exact Rg of the smeared form factor is given by
+        :func:`bead_assembly_Rg` with the same polydispersity.
+    """
+    qs = np.atleast_1d(np.asarray(qs, float))
+    c = np.asarray(centres, float)
+    r = np.ones(len(c)) if radii is None else np.asarray(radii, float)
+    V = r**3
+    d = np.linalg.norm(c[:, None] - c[None, :], axis=-1)
+
+    def once(q):
+        A = _sphere_amplitude(q[:, None]*r[None, :])*V[None, :]
+        z = q[:, None, None]*d[None]
+        S = np.where(z > 1e-8, np.sin(z)/np.where(z > 1e-8, z, 1.0), 1.0)
+        return np.einsum("qi,qj,qij->q", A, A, S)/V.sum()**2
+
+    if polydispersity < 1e-3:
+        return once(qs)
+    return sum(w*once(qs*np.exp(polydispersity*g - 0.5*polydispersity**2)) for g, w in zip(_GH_NODES, _GH_WEIGHTS))
+
+
+def bead_assembly_Rg(centres, radii=None, polydispersity=0.0):
+    """Exact Rg of :func:`bead_assembly_P`: Rg^2 = sum V_i (3/5 r_i^2 + |c_i - c_cm|^2) / sum V,
+    times exp(sigma^2/2) for a log-normal size spread sigma (the smeared form factor's Guinier radius)."""
+    c = np.asarray(centres, float)
+    r = np.ones(len(c)) if radii is None else np.asarray(radii, float)
+    V = r**3
+    cm = (V[:, None]*c).sum(0)/V.sum()
+    rg0 = np.sqrt((V*(0.6*r**2 + ((c - cm)**2).sum(1))).sum()/V.sum())
+    return float(rg0*np.exp(0.5*polydispersity**2))
+
+
 def cylinder_P_single(q, R, L):
     """Pedersen Eq. 64: cylinder, radius R, length L. B1 = first-order Bessel J1."""
     def integrand(alpha):

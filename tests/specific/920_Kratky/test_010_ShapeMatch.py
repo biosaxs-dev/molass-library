@@ -115,9 +115,36 @@ def test_080_library_names_and_chain_flag():
     assert names == ["sphere",
                      "ellipsoid (eps=2)", "ellipsoid (eps=3)", "ellipsoid (eps=4)", "ellipsoid (eps=6)",
                      "triaxial (1:3:6)", "triaxial (1:4:5)", "triaxial (1:4:12)",
-                     "cylinder (L/R=3)", "cylinder (L/R=6)", "cylinder (L/R=10)",
+                     "cylinder (L/R=10)",
+                     "dumbbell (2 beads)", "dumbbell of tetrahedra (2x4)",
                      "Gaussian chain"]
     assert [spec.name for spec in specs if spec.is_chain] == ["Gaussian chain"]
+
+
+@pytest.mark.order(8)
+def test_082_bead_assembly_form_factor():
+    from molass.Kratky.FormFactors import bead_assembly_P, bead_assembly_Rg, sphere_P, sphere_Rg
+
+    qs = np.array([0.01, 0.1, 0.5, 1.0, 2.0])
+    # one bead is a sphere
+    np.testing.assert_allclose(bead_assembly_P(qs, [[0, 0, 0]]), sphere_P(qs, 1.0), atol=1e-12)
+    assert bead_assembly_Rg([[0, 0, 0]]) == pytest.approx(sphere_Rg(1.0))
+    # two touching beads: Debye's formula  F(q)^2 (1 + sin(2q)/(2q)) / 2 for centre distance 2
+    two = np.array([[-1.0, 0, 0], [1.0, 0, 0]])
+    expected = sphere_P(qs, 1.0)*(1 + np.sin(2*qs)/(2*qs))/2
+    np.testing.assert_allclose(bead_assembly_P(qs, two), expected, atol=1e-12)
+    # P(0) = 1 and the Guinier slope reproduces the exact Rg, with and without size spread
+    for spread in (0.0, 0.15):
+        rg = bead_assembly_Rg(two, polydispersity=spread)
+        q = np.array([0.002, 0.004])/rg
+        P = bead_assembly_P(q, two, polydispersity=spread)
+        assert abs(P[0] - 1) < 1e-4
+        rg_fit = np.sqrt(-3*np.log(P[1]/P[0])/(q[1]**2 - q[0]**2))
+        assert rg_fit == pytest.approx(rg, rel=1e-3)
+    # the size spread smooths the deep minimum of the sphere form factor
+    deep = bead_assembly_P(np.array([2.2]), two)[0]
+    smooth = bead_assembly_P(np.array([2.2]), two, polydispersity=0.2)[0]
+    assert smooth > deep
 
 
 @pytest.mark.order(8)
@@ -240,6 +267,43 @@ def test_140_plot_kratky_series():
     # redraw into an existing figure reuses it
     again = decomp_baseline.plot_kratky_series(fig=plot_result.fig)
     assert again.fig is plot_result.fig
+
+
+@pytest.mark.order(16)
+def test_150_two_lobe_entries_are_recognised():
+    from molass.Kratky.FormFactors import bead_assembly_P, bead_assembly_Rg
+    from molass.Kratky.ShapeLibrary import _tetra_dumbbell_centres
+
+    def truth(centres, spread):
+        rg_unit = bead_assembly_Rg(centres, polydispersity=spread)
+        return lambda qrg: bead_assembly_P(qrg/rg_unit, centres, polydispersity=spread)
+
+    # a dumbbell of two bead tetrahedra with parameters different from the library entry's: the two-peak curve
+    result = _synthetic_match(truth(_tetra_dumbbell_centres(2.6, 1.15, 0.8), 0.15), 130.0, noise=0.003)
+    top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+    assert top == "dumbbell of tetrahedra (2x4)"
+    assert result.peak_qrgs[0] is not None
+    # two nearly touching spheres, again different from the library entry
+    two = np.array([[-1.3, 0.0, 0.0], [1.3, 0.0, 0.0]])
+    result = _synthetic_match(truth(two, 0.08), 80.0, noise=0.003)
+    top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+    assert top == "dumbbell (2 beads)"
+    # smooth bodies close to a library entry are not taken over by the two-lobe entries
+    # (mid-way between two entries, e.g. eps=5, the scores are nearly flat and no entry wins clearly)
+    from molass.Kratky.FormFactors import ellipsoid_P, ellipsoid_Rg
+    for eps, expected in [(2.8, "ellipsoid (eps=3)"), (3.2, "ellipsoid (eps=3)"), (4.2, "ellipsoid (eps=4)")]:
+        R = 40.0
+        rg = ellipsoid_Rg(R, eps)
+        result = _synthetic_match(lambda qrg: ellipsoid_P(qrg/rg, R, eps), rg, noise=0.003)
+        top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+        assert top == expected
+    # ribbon-like tri-axial bodies have a single maximum: the two-lobe entries are gated off for them
+    from molass.Kratky.FormFactors import triaxial_P, triaxial_Rg
+    a, b, c = 20.0, 3.3, 9.8
+    rg = triaxial_Rg(a, a*b, a*c)
+    result = _synthetic_match(lambda qrg: triaxial_P(qrg/rg, a, a*b, a*c), rg, noise=0.003)
+    top = result.shape_names[int(np.argmax(result.score_matrix[0]))]
+    assert "dumbbell" not in top
 
 
 @pytest.mark.order(12)
