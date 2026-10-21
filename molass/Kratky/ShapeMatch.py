@@ -139,6 +139,68 @@ def has_clear_kratky_peak(qrg, ky, search=(0.5, 11.0), min_decay=0.08, nsigma=3.
     return bool(decay >= max(min_decay * smoothed[k], nsigma * max(local_noise(k), local_noise(j))))
 
 
+def kratky_descriptors(qrg, ky, nsigma=4.0):
+    """Model-free descriptors of a dimensionless Kratky curve.
+
+    Meant as cheap hints for ordering components along a continuum
+    (compact -> elongated/lobed) without choosing a model; see
+    molass-researcher experiment 49d/49f (the four Y17AH20N components
+    collapse onto one master curve once normalized by their main peak, the
+    second feature fading continuously from component 1 to 4).
+
+    Parameters
+    ----------
+    qrg, ky : ndarray
+        Dimensionless q*Rg and (qRg)^2 P(q)/I(0).
+    nsigma : float, optional
+        A secondary hump counts only if its prominence exceeds ``nsigma``
+        times the local noise (and 0.05).
+
+    Returns
+    -------
+    dict or None
+        ``peak_qrg``, ``peak_height``: main peak (smoothed) in qRg 0.5-5.
+        ``tail_ratio``: curve height at 2.5 x peak_qrg relative to peak_height
+        (NaN if beyond the data) -- how slowly the curve decays after the peak.
+        ``hump_prominence``: height of a secondary hump above the dip before it,
+        relative to peak_height (0 if none is clearly resolved; searched at
+        1.2-3.2 x peak_qrg).
+        None if there is no interior main peak.
+    """
+    qrg = np.asarray(qrg, float); ky = np.asarray(ky, float)
+    n = len(ky)
+    w = min(15, n - (1 - n % 2))
+    if w < 5:
+        return None
+    smooth = savgol_filter(ky, w, 3)
+    resid = ky - smooth
+    window = (qrg >= 0.5) & (qrg <= 5.0)
+    if window.sum() < 5:
+        return None
+    idx = np.where(window)[0]
+    k = idx[np.argmax(smooth[idx])]
+    if k == idx[-1]:
+        return None
+    xp, yp = float(qrg[k]), float(smooth[k])
+
+    qmax = float(qrg.max())
+    tail_ratio = float(np.interp(2.5*xp, qrg, smooth)/yp) if 2.5*xp <= qmax else np.nan
+
+    prominence = 0.0
+    dip_zone = np.where((qrg >= 1.2*xp) & (qrg <= min(2.6*xp, qmax)))[0]
+    if len(dip_zone) >= 3:
+        iv = dip_zone[np.argmin(smooth[dip_zone])]
+        hump_zone = np.where((qrg > qrg[iv]) & (qrg <= min(3.2*xp, qmax)))[0]
+        if len(hump_zone) >= 3:
+            ih = hump_zone[np.argmax(smooth[hump_zone])]
+            if ih != hump_zone[-1]:   # an interior maximum, not just a rise at the edge
+                height = float(smooth[ih] - smooth[iv])
+                noise = float(np.std(resid[min(iv, ih):max(iv, ih) + 1]))
+                if height > max(0.05, nsigma*noise):
+                    prominence = height/yp
+    return {"peak_qrg": xp, "peak_height": yp, "tail_ratio": tail_ratio, "hump_prominence": float(prominence)}
+
+
 def classify_shape_category(peak_qrg):
     """Bucket a peak qRg into a coarse, honestly-labeled shape category.
 
@@ -226,11 +288,14 @@ class ShapeMatchResult:
         Per component, the dimensionless Kratky curve (qRg, (qRg)^2 P/I(0))
         the scores were computed from (None if Rg was unavailable). Used by
         :func:`plot_kratky_overlay`.
+    descriptors : list of dict or None
+        Per component, the model-free curve descriptors of
+        :func:`kratky_descriptors` (None if Rg was unavailable).
     """
 
     def __init__(self, shape_names, component_labels, score_matrix, categories,
                  peak_qrgs, peak_spread, best_raw_scores=None, raw_score_matrix=None,
-                 kratky_curves=None):
+                 kratky_curves=None, descriptors=None):
         self.shape_names = shape_names
         self.component_labels = component_labels
         self.score_matrix = score_matrix
@@ -244,6 +309,9 @@ class ShapeMatchResult:
         if kratky_curves is None:
             kratky_curves = [None]*len(component_labels)
         self.kratky_curves = kratky_curves
+        if descriptors is None:
+            descriptors = [None]*len(component_labels)
+        self.descriptors = descriptors
 
     def __repr__(self):
         lines = [f"ShapeMatchResult({len(self.component_labels)} components, "
@@ -293,6 +361,7 @@ def compute_shape_match_scores(qv, P, sg_list):
     best_raw_scores = []
     raw_rows = []
     kratky_curves = []
+    descriptors = []
 
     for k, sg in enumerate(sg_list):
         rg, iz = sg.Rg, sg.Iz
@@ -304,6 +373,7 @@ def compute_shape_match_scores(qv, P, sg_list):
             peak_qrgs.append(None)
             best_raw_scores.append(np.nan)
             kratky_curves.append(None)
+            descriptors.append(None)
             continue
 
         qrg = qv * rg
@@ -324,6 +394,7 @@ def compute_shape_match_scores(qv, P, sg_list):
         score_rows.append(scores_norm)
         raw_rows.append(scores)
         kratky_curves.append((qrg, ky))
+        descriptors.append(kratky_descriptors(qrg, ky))
         categories.append(classify_shape_category(peak))
         peak_qrgs.append(peak)
         best_raw_scores.append(float(np.nanmax(scores)) if np.isfinite(scores).any() else np.nan)
@@ -341,6 +412,7 @@ def compute_shape_match_scores(qv, P, sg_list):
         best_raw_scores=best_raw_scores,
         raw_score_matrix=np.array(raw_rows),
         kratky_curves=kratky_curves,
+        descriptors=descriptors,
     )
 
 
@@ -444,6 +516,75 @@ def plot_kratky_overlay(result, component, shapes=None, fig=None, qrg_max=OVERLA
     if rax is not None:
         rax.axhline(0, color="0.4", lw=0.6)
         rax.set_ylabel("data − model", fontsize=8)
+    fig.tight_layout()
+    return PlotResult(fig, ax, result=result)
+
+
+def plot_kratky_series(result, fig=None, qrg_max=OVERLAY_QRG_MAX):
+    """Compare the Kratky curves of all components, without choosing any model.
+
+    Left: the curves as measured (qRg vs (qRg)^2 P/I(0)). Right: each curve
+    normalized by its own main peak (x/x_peak vs y/y_peak) -- components of
+    similar architecture fall onto one master curve, and a continuous
+    variation (e.g. a secondary hump fading from one component to the next)
+    shows up as a gradual change. The legend lists the model-free
+    :func:`kratky_descriptors`.
+
+    Parameters
+    ----------
+    result : ShapeMatchResult
+    fig : matplotlib.figure.Figure, optional
+        Figure to (re)draw into (cleared first). If None, a new pyplot figure.
+    qrg_max : float, optional
+        Upper end of the displayed qRg range. Default 10.
+
+    Returns
+    -------
+    PlotResult
+        ``.fig`` and ``.axes`` (the left, measured-curve Axes).
+
+    Examples
+    --------
+    ::
+
+        result = decomp.get_kratky_shape_match()
+        plot_kratky_series(result)
+    """
+    import matplotlib.pyplot as plt
+    from molass.PlotUtils.PlotResult import PlotResult
+
+    if fig is None:
+        fig = plt.figure(figsize=(12, 4.8))
+    else:
+        fig.clear()
+    ax, axn = fig.subplots(1, 2)
+
+    for k, curve in enumerate(result.kratky_curves):
+        if curve is None:
+            continue
+        qrg, ky = curve
+        shown = qrg <= qrg_max
+        desc = result.descriptors[k]
+        color = f"C{k}"
+        label = result.component_labels[k]
+        if desc is None:
+            ax.plot(qrg[shown], ky[shown], color=color, lw=1.2, label=f"{label}: no clear peak")
+            continue
+        tail = "n/a" if not np.isfinite(desc["tail_ratio"]) else f"{desc['tail_ratio']:.2f}"
+        label += (f": peak {desc['peak_height']:.2f} @ {desc['peak_qrg']:.2f}, tail {tail}, "
+                  f"hump +{desc['hump_prominence']:.2f}")
+        ax.plot(qrg[shown], ky[shown], color=color, lw=1.2, label=label)
+        ax.plot([desc["peak_qrg"]], [desc["peak_height"]], "v", color=color)
+        xn = qrg/desc["peak_qrg"]
+        norm_shown = shown & (xn <= 5)
+        axn.plot(xn[norm_shown], ky[norm_shown]/desc["peak_height"], color=color, lw=1.2)
+
+    ax.plot([GLOBULAR_PEAK_QRG], [1.104], "k+", ms=10)
+    ax.set_xlabel("qRg"); ax.set_ylabel("(qRg)² P(q) / I(0)")
+    ax.set_title("Kratky curves as measured"); ax.set_xlim(0, qrg_max); ax.set_ylim(bottom=0)
+    ax.legend(fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.14))
+    axn.set_xlabel("qRg / qRg of the main peak"); axn.set_ylabel("Kratky / main peak height")
+    axn.set_title("normalized by each component's own peak"); axn.set_xlim(0, 5); axn.set_ylim(0, 1.2)
     fig.tight_layout()
     return PlotResult(fig, ax, result=result)
 

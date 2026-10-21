@@ -414,6 +414,39 @@ class Decomposition:
         result = self.get_kratky_shape_match(debug=debug)
         return plot_shape_match(result, ax=ax, **kwargs)
 
+    def plot_kratky_series(self, fig=None, debug=False, **kwargs):
+        """Compare the Kratky curves of all XR components without choosing a model.
+
+        Plots the curves as measured and normalized by each component's own
+        main peak, with model-free descriptors in the legend -- see
+        :func:`molass.Kratky.ShapeMatch.plot_kratky_series`.
+
+        Parameters
+        ----------
+        fig : matplotlib.figure.Figure, optional
+        debug : bool, optional
+        **kwargs
+            Passed to :func:`molass.Kratky.ShapeMatch.plot_kratky_series`.
+
+        Returns
+        -------
+        PlotResult
+
+        Examples
+        --------
+        ::
+
+            plot_result = decomp.plot_kratky_series()
+        """
+        if debug:
+            from importlib import reload
+            import molass.Kratky.ShapeMatch
+            reload(molass.Kratky.ShapeMatch)
+        from molass.Kratky.ShapeMatch import plot_kratky_series
+
+        result = self.get_kratky_shape_match(debug=debug)
+        return plot_kratky_series(result, fig=fig, **kwargs)
+
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.
 

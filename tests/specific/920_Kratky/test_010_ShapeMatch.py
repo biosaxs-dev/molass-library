@@ -167,6 +167,37 @@ def test_110_plot_kratky_overlay():
     assert again.fig is one.fig
 
 
+@pytest.mark.order(13)
+def test_130_kratky_descriptors():
+    from molass.Kratky.ShapeMatch import kratky_descriptors
+
+    x = np.linspace(0.4, 10, 220)
+    noise = 0.01*np.random.default_rng(0).standard_normal(len(x))
+    two_lobe = 1.8*np.exp(-((x - 3.2)/1.3)**2) + 0.55*np.exp(-((x - 8.0)/1.1)**2) + 0.35*np.exp(-x/6) + noise
+    one_peak = 1.5*np.exp(-((x - 2.5)/1.3)**2) + 0.2 + noise
+    monotone = 1.0 - np.exp(-x/2)
+    d2 = kratky_descriptors(x, two_lobe)
+    d1 = kratky_descriptors(x, one_peak)
+    assert abs(d2["peak_qrg"] - 3.2) < 0.3
+    assert d2["hump_prominence"] > 0.1       # the second lobe is a clear hump
+    assert d1["hump_prominence"] == 0.0      # a single peak has none
+    assert d1["tail_ratio"] < d2["tail_ratio"] or np.isnan(d2["tail_ratio"])
+    assert kratky_descriptors(x, monotone) is None   # no interior peak
+
+
+@pytest.mark.order(14)
+@control_matplotlib_plot
+def test_140_plot_kratky_series():
+    result = decomp_baseline.get_kratky_shape_match()
+    assert len(result.descriptors) == 3
+    assert all(d is not None for d in result.descriptors)
+    plot_result = decomp_baseline.plot_kratky_series()
+    assert len(plot_result.fig.axes) == 2
+    # redraw into an existing figure reuses it
+    again = decomp_baseline.plot_kratky_series(fig=plot_result.fig)
+    assert again.fig is plot_result.fig
+
+
 @pytest.mark.order(12)
 @control_matplotlib_plot
 def test_120_double_click_opens_overlay():
