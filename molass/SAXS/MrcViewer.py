@@ -83,7 +83,6 @@ def _geometry(data, voxel, level):
 
 def _draw_slice(ax, s, level, voxel, vmax):
     """One central slice: density map with Angstrom axes and the threshold contour."""
-    from matplotlib.lines import Line2D
     arr, name, row_name, col_name, row_c, col_c = s
     n_rows, n_cols = arr.shape
     extent = [(-col_c - 0.5) * voxel, (n_cols - col_c - 0.5) * voxel,
@@ -92,11 +91,10 @@ def _draw_slice(ax, s, level, voxel, vmax):
     if arr.min() < level < arr.max():
         ax.contour((np.arange(n_cols) - col_c) * voxel, (np.arange(n_rows) - row_c) * voxel,
                    arr, levels=[level], colors="white", linewidths=1.2)
-    ax.set_title(name, fontsize=10)
+    ax.set_title(name, fontsize=9)
     ax.set_xlabel(col_name + " (\u00c5)", fontsize=8)
     ax.set_ylabel(row_name + " (\u00c5)", fontsize=8)
     ax.tick_params(labelsize=7)
-    return Line2D([], [], color="white", linewidth=1.2, label="density = %.3g (threshold)" % level)
 
 def make_mrc_figure(mrc_file, level=None, fig=None):
     """make_mrc_figure(mrc_file, level=None, fig=None)
@@ -156,7 +154,7 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
 
     if fig is None:
         fig = Figure(figsize=(16, 7))
-    gs = fig.add_gridspec(6, 2, height_ratios=[1, 1, 1, 0.45, 1, 1])    # row 3: gap between slices and histogram
+    gs = fig.add_gridspec(6, 2, height_ratios=[1, 1, 1, 0.9, 1, 1])    # row 3: room for the histogram heading
     ax = fig.add_subplot(gs[:, 0], projection="3d")
     slice_gs = gs[0:3, 1].subgridspec(1, 3, wspace=0.45)
     slice_axes = [fig.add_subplot(slice_gs[0, k]) for k in range(3)]
@@ -164,19 +162,29 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
 
     state = {"mode": "fine", "dragging": False, "auto": False, "view": "Isosurface", "timer": None,
              "level": level, "poly": None, "sc": None, "meshes": None,
-             "slider_drag": False, "legend": []}
+             "slider_drag": False}
 
     # one density scale for the slices, the voxel scatter, the histogram and the colorbar
     density_norm = Normalize(vmin=0, vmax=dmax)
+
+    # every panel has the same kind of heading: a bold title and a gray one-line note below it
+    heads = {key: (fig.text(0, 0, "", ha="center", va="top", fontsize=11, fontweight="bold"),
+                   fig.text(0, 0, "", ha="center", va="top", fontsize=8, color="dimgray"))
+             for key in ("3d", "slices", "hist")}
+
+    def set_head(key, title, note):
+        heads[key][0].set_text(title)
+        heads[key][1].set_text(note)
 
     def apply_view():
         iso = state["view"] == "Isosurface"
         state["poly"].set_visible(iso)
         state["sc"].set_visible(not iso)
         if iso:
-            ax.set_title(f"Isosurface (level={state['level']:.3g}, {voxel:.2f} \u00c5/voxel) -- drag to rotate")
+            set_head("3d", "3D view: isosurface",
+                     f"level {state['level']:.3g}, {voxel:.2f} \u00c5/voxel; drag to rotate")
         else:
-            ax.set_title("Density Distribution in Voxels -- drag to rotate")
+            set_head("3d", "3D view: voxel scatter", "colour = density; drag to rotate")
 
     def use(mode):
         if state["mode"] != mode:
@@ -206,15 +214,11 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
         ax.set_box_aspect((1, 1, 1))
         ax.set_axis_off()
 
-        handles = []
         for sax, s in zip(slice_axes, geo["slices"]):
             sax.clear()
-            handles.append(_draw_slice(sax, s, level, voxel, dmax))
-        for artist in state["legend"]:
-            artist.remove()
-        handles[0].set_label("Central slices, white line: threshold = %.3g" % level)
-        state["legend"] = [fig.legend(handles=handles[:1], loc="upper center", bbox_to_anchor=(0.75, 0.995),
-                                      fontsize=9, frameon=False)]
+            _draw_slice(sax, s, level, voxel, dmax)
+        set_head("slices", "Central slices", "colour = density; white line = threshold %.3g" % level)
+
         ax3.clear()
         counts, edges = np.histogram(vals, bins=10)
         centers = (edges[:-1] + edges[1:]) / 2
@@ -225,16 +229,29 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
         ax3.legend(fontsize=8, loc="upper right")
         ax3.set_xlabel("Density")
         ax3.set_ylabel("Voxels (%)")
-        ax3.set_title("Density of the %d marked voxels (%.2g%% of the %dx%dx%d cube)"
-                      % (len(vals), len(vals) / data.size * 100, *data.shape))
+        set_head("hist", "Density of the %d marked voxels" % len(vals),
+                 "%.2g%% of the %dx%dx%d cube" % (len(vals) / data.size * 100, *data.shape))
 
         apply_view()
 
     draw_geometry(geo, level)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.9, right=0.88)    # room for the 3D title and, at the right, the colorbar with its labels
+    fig.subplots_adjust(top=0.86, right=0.88)    # room for the headings above, and the colorbar at the right
 
-    cbax = fig.add_axes([0.905, 0.15, 0.012, 0.7])
+    def place_panel_elements():
+        """Centre each heading over its own panel; make the colorbar span the slices and the histogram."""
+        p3 = ax.get_position()
+        pl, pr = slice_gs[0, 0].get_position(fig), slice_gs[0, 2].get_position(fig)
+        ph = ax3.get_position()
+        top_row, note_row = 0.985, 0.945
+        for key, x, y in (("3d", (p3.x0 + p3.x1) / 2, top_row), ("slices", (pl.x0 + pr.x1) / 2, top_row),
+                          ("hist", (ph.x0 + ph.x1) / 2, ph.y1 + 0.085)):
+            heads[key][0].set_position((x, y))
+            heads[key][1].set_position((x, y - (top_row - note_row)))
+        return ph.y0, pl.y1
+
+    cb_bottom, cb_top = place_panel_elements()
+    cbax = fig.add_axes([0.905, cb_bottom, 0.012, cb_top - cb_bottom])
     cbar = fig.colorbar(ScalarMappable(norm=density_norm, cmap="plasma"), cax=cbax, label="Density")
     cbar.ax.yaxis.set_major_formatter(FormatStrFormatter("%.3g"))
     cbar.ax.tick_params(labelsize=8)

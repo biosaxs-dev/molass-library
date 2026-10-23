@@ -134,6 +134,43 @@ def test_08_slider_level_without_surface_is_rejected(spiky_mrc_path):
 def _slice_axes(fig):
     return [a for a in fig.axes if a.get_title() in ("yz plane", "xz plane", "xy plane")]
 
+def _heading_texts(fig):
+    return [t.get_text() for t in fig.texts if t.get_text()]
+
+def test_13_three_panel_headings_are_consistent_and_centred(mrc_path):
+    fig = make_mrc_figure(mrc_path, level=0.2)
+    FigureCanvasAgg(fig)
+    fig.canvas.draw()
+    bold = [t for t in fig.texts if t.get_fontweight() in ("bold", 700)]
+    assert [t.get_text() for t in bold][:2] == ["3D view: isosurface", "Central slices"]
+    assert bold[2].get_text().startswith("Density of the")
+    assert len({t.get_fontsize() for t in bold}) == 1            # one heading style
+    notes = [t for t in fig.texts if t.get_color() == "dimgray"]
+    assert len(notes) == 3 and len({t.get_fontsize() for t in notes}) == 1
+    # each heading is centred over its own panel
+    ax3d = [a for a in fig.axes if a.name == "3d"][0]
+    hist = [a for a in fig.axes if a.get_legend() is not None][0]
+    slices = _slice_axes(fig)
+    span = (min(a.get_position().x0 for a in slices), max(a.get_position().x1 for a in slices))
+    centres = [t.get_position()[0] for t in bold]
+    for c, (x0, x1) in zip(centres, ((ax3d.get_position().x0, ax3d.get_position().x1), (0.0, 1.0), (hist.get_position().x0, hist.get_position().x1))):
+        if x1 - x0 < 1.0:
+            assert abs(c - (x0 + x1) / 2) < 0.02
+    assert span[0] < centres[1] < span[1]
+    # the first two headings share one row; the histogram heading sits above its own panel
+    assert bold[0].get_position()[1] == bold[1].get_position()[1]
+    assert bold[2].get_position()[1] > hist.get_position().y1
+
+def test_14_colorbar_spans_the_right_column(mrc_path):
+    fig = make_mrc_figure(mrc_path, level=0.2)
+    FigureCanvasAgg(fig)
+    fig.canvas.draw()
+    cbar = [a for a in fig.axes if a.get_ylabel() == "Density"][0].get_position()
+    hist = [a for a in fig.axes if a.get_legend() is not None][0].get_position()
+    top = max(a.get_position().y1 for a in _slice_axes(fig))
+    assert cbar.y0 == pytest.approx(hist.y0, abs=1e-6)
+    assert cbar.y1 >= top - 1e-6
+
 def test_09_central_slices_are_three_labelled_panels(mrc_path):
     fig = make_mrc_figure(mrc_path, level=0.2)
     FigureCanvasAgg(fig)
@@ -143,7 +180,10 @@ def test_09_central_slices_are_three_labelled_panels(mrc_path):
         assert a.get_xlabel().endswith("(\u00c5)") and a.get_ylabel().endswith("(\u00c5)")
         assert len(a.images) == 1
         assert len(a.collections) >= 1      # the threshold contour
-    assert len(fig.legends) == 1 and "0.2" in fig.legends[0].get_texts()[0].get_text()
+    assert len(fig.legends) == 0
+    texts = _heading_texts(fig)
+    assert any(t.startswith("Central slices") for t in texts)
+    assert any("threshold 0.2" in t for t in texts)
     hist = [a for a in fig.axes if a.get_legend() is not None]
     assert len(hist) == 1 and "threshold" in hist[0].get_legend().get_texts()[0].get_text()
     fig.canvas.draw()
@@ -155,8 +195,8 @@ def test_10_slice_legend_follows_level_slider(mrc_path):
     _slider_event(fig, slider, "button_press_event")
     slider.set_val(-0.3)
     _slider_event(fig, slider, "button_release_event")
-    assert len(fig.legends) == 1
-    assert "%.3g" % state["level"] in fig.legends[0].get_texts()[0].get_text()
+    assert len(fig.legends) == 0
+    assert any("threshold %.3g" % state["level"] in t for t in _heading_texts(fig))
     assert len(_slice_axes(fig)) == 3
     fig.canvas.draw()
 
