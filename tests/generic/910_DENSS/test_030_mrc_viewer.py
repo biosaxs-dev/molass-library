@@ -160,5 +160,23 @@ def test_10_slice_legend_follows_level_slider(mrc_path):
     assert len(_slice_axes(fig)) == 3
     fig.canvas.draw()
 
+def test_11_density_colorbar_is_shared_in_both_views(mrc_path):
+    fig = make_mrc_figure(mrc_path, level=0.2)
+    FigureCanvasAgg(fig)
+    state, radio, check, slider, ax = fig._mrc_viewer_state
+    cbars = [a for a in fig.axes if a.get_ylabel() == "Density"]
+    assert len(cbars) == 1
+    for label in ("Isosurface", "Voxel scatter"):
+        radio.set_active(0 if label == "Isosurface" else 1)
+        assert cbars[0].get_visible()
+    # the scatter and the slices use the same scale: 0 .. maximum density (1.0 for this blob)
+    assert state["sc"].norm.vmin == 0 and state["sc"].norm.vmax == pytest.approx(1.0)
+    for a in _slice_axes(fig):
+        assert a.images[0].norm.vmin == 0 and a.images[0].norm.vmax == pytest.approx(1.0)
+    # the isosurface is neutral lighting of one hue (blue > green > red), not the density colormap
+    colors = np.asarray(state["poly"].get_facecolor())
+    assert (colors[:, 2] > colors[:, 1]).all() and (colors[:, 1] > colors[:, 0]).all()
+    fig.canvas.draw()
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

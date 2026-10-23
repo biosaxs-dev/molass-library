@@ -40,12 +40,15 @@ def _surface(crop, level, voxel, up, step):
     return verts, faces
 
 def _shaded_triangles(verts, faces, center):
-    from matplotlib import colormaps
     tri = (verts - center)[faces]
     fn = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
     fn /= np.linalg.norm(fn, axis=1, keepdims=True) + 1e-12
     shade = np.abs(fn @ np.array([0.3, 0.3, 0.9]))
-    return tri, colormaps["plasma"](0.25 + 0.65 * shade)
+    # a neutral colour with lighting: the isosurface does not encode density,
+    # so it must not share the density colormap used elsewhere in the figure
+    colors = np.ones((len(tri), 4))
+    colors[:, :3] = np.array([0.50, 0.64, 0.85]) * (0.45 + 0.55 * shade)[:, None]
+    return tri, colors
 
 def _scatter_points(crop, level, voxel, center):
     w = np.argwhere(crop > level)
@@ -101,7 +104,10 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
     Builds an interactive viewer figure for an MRC (electron density) file.
 
     The left panel is a 3D view that can be switched between an isosurface and
-    a voxel scatter (drag to rotate, optional auto-rotation). The "Level" slider
+    a voxel scatter (drag to rotate, optional auto-rotation). The isosurface has
+    a neutral colour (lighting only); the slices, the voxel scatter and the
+    histogram share one density colour scale, shown by the colorbar at the right.
+    The "Level" slider
     (logarithmic, relative to the maximum density) changes the density threshold;
     the display is rebuilt when the slider is released. The right panels
     show the three central slices (yz, xz and xy planes, in Angstrom, with the
@@ -129,6 +135,8 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
     """
     import mrcfile
     from matplotlib import colormaps
+    from matplotlib.cm import ScalarMappable
+    from matplotlib.colors import Normalize
     from matplotlib.figure import Figure
     from matplotlib.widgets import CheckButtons, RadioButtons, Slider
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -154,15 +162,16 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
     ax3 = fig.add_subplot(gs[4:6, 1])
 
     state = {"mode": "fine", "dragging": False, "auto": False, "view": "Isosurface", "timer": None,
-             "level": level, "poly": None, "sc": None, "cbax": None, "meshes": None,
+             "level": level, "poly": None, "sc": None, "meshes": None,
              "slider_drag": False, "legend": []}
+
+    # one density scale for the slices, the voxel scatter, the histogram and the colorbar
+    density_norm = Normalize(vmin=0, vmax=dmax)
 
     def apply_view():
         iso = state["view"] == "Isosurface"
         state["poly"].set_visible(iso)
         state["sc"].set_visible(not iso)
-        if state["cbax"] is not None:
-            state["cbax"].set_visible(not iso)
         if iso:
             ax.set_title(f"Isosurface (level={state['level']:.3g}, {voxel:.2f} \u00c5/voxel) -- drag to rotate")
         else:
@@ -186,7 +195,8 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
         poly.set_facecolor(geo["meshes"]["fine"][1])
         ax.add_collection3d(poly)
         pts, vals = geo["pts"], geo["vals"]
-        sc = ax.scatter3D(pts[:, 0], pts[:, 1], pts[:, 2], c=vals, cmap="plasma", s=30, alpha=1)
+        sc = ax.scatter3D(pts[:, 0], pts[:, 1], pts[:, 2], c=vals, cmap="plasma", norm=density_norm,
+                          s=30, alpha=1)
         state["poly"], state["sc"], state["mode"] = poly, sc, "fine"
         if state["auto"]:
             use("coarse")
@@ -201,14 +211,14 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
             handles.append(_draw_slice(sax, s, level, voxel, dmax))
         for artist in state["legend"]:
             artist.remove()
-        handles[0].set_label("Central slices (colour = density), white line: threshold = %.3g" % level)
-        state["legend"] = [fig.legend(handles=handles[:1], loc="upper center", bbox_to_anchor=(0.76, 0.995),
+        handles[0].set_label("Central slices, white line: threshold = %.3g" % level)
+        state["legend"] = [fig.legend(handles=handles[:1], loc="upper center", bbox_to_anchor=(0.75, 0.995),
                                       fontsize=9, frameon=False)]
         ax3.clear()
         counts, edges = np.histogram(vals, bins=10)
         centers = (edges[:-1] + edges[1:]) / 2
         ax3.bar(centers, counts / counts.sum() * 100, width=np.diff(edges) * 0.9,
-                color=colormaps["plasma"](sc.norm(centers)))
+                color=colormaps["plasma"](density_norm(centers)))
         ax3.axvline(level, color="gray", linestyle="--", linewidth=1,
                     label="threshold = %.3g (Level slider)" % level)
         ax3.legend(fontsize=8, loc="upper right")
@@ -217,18 +227,14 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
         ax3.set_title("Density of the %d marked voxels (%.2g%% of the %dx%dx%d cube)"
                       % (len(vals), len(vals) / data.size * 100, *data.shape))
 
-        if state["cbax"] is not None:
-            state["cbax"].clear()
-            fig.colorbar(sc, cax=state["cbax"])
         apply_view()
 
     draw_geometry(geo, level)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.9)    # room for the 3D title set by apply_view()
+    fig.subplots_adjust(top=0.9, right=0.92)    # room for the 3D title and the colorbar
 
-    cbax = fig.add_axes([0.455, 0.2, 0.01, 0.55])   # density colorbar, scatter view only
-    fig.colorbar(state["sc"], cax=cbax)
-    state["cbax"] = cbax
+    cbax = fig.add_axes([0.945, 0.15, 0.012, 0.7])
+    fig.colorbar(ScalarMappable(norm=density_norm, cmap="plasma"), cax=cbax, label="Density")
     apply_view()
 
     def set_view(label):
