@@ -137,6 +137,7 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
     from matplotlib import colormaps
     from matplotlib.cm import ScalarMappable
     from matplotlib.colors import Normalize
+    from matplotlib.ticker import FormatStrFormatter
     from matplotlib.figure import Figure
     from matplotlib.widgets import CheckButtons, RadioButtons, Slider
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -231,10 +232,12 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
 
     draw_geometry(geo, level)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.9, right=0.92)    # room for the 3D title and the colorbar
+    fig.subplots_adjust(top=0.9, right=0.88)    # room for the 3D title and, at the right, the colorbar with its labels
 
-    cbax = fig.add_axes([0.945, 0.15, 0.012, 0.7])
-    fig.colorbar(ScalarMappable(norm=density_norm, cmap="plasma"), cax=cbax, label="Density")
+    cbax = fig.add_axes([0.905, 0.15, 0.012, 0.7])
+    cbar = fig.colorbar(ScalarMappable(norm=density_norm, cmap="plasma"), cax=cbax, label="Density")
+    cbar.ax.yaxis.set_major_formatter(FormatStrFormatter("%.3g"))
+    cbar.ax.tick_params(labelsize=8)
     apply_view()
 
     def set_view(label):

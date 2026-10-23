@@ -178,5 +178,22 @@ def test_11_density_colorbar_is_shared_in_both_views(mrc_path):
     assert (colors[:, 2] > colors[:, 1]).all() and (colors[:, 1] > colors[:, 0]).all()
     fig.canvas.draw()
 
+def test_12_colorbar_labels_stay_inside_the_figure(tmp_path):
+    # a small maximum density gives wide tick labels like 0.0175 (the DENSS case)
+    n = 24
+    g = np.indices((n, n, n)).astype(float) - n / 2
+    rho = 0.022 * np.exp(-((g[0] / 5) ** 2 + (g[1] / 3) ** 2 + (g[2] / 3) ** 2))
+    path = tmp_path / "faint.mrc"
+    with mrcfile.new(str(path)) as mrc:
+        mrc.set_data(rho.astype(np.float32))
+        mrc.voxel_size = 4.0
+    from matplotlib.figure import Figure
+    fig = make_mrc_figure(str(path), level=3e-5, fig=Figure(figsize=(12, 5.5)))
+    FigureCanvasAgg(fig)
+    fig.canvas.draw()
+    cbax = [a for a in fig.axes if a.get_ylabel() == "Density"][0]
+    right = cbax.get_tightbbox(fig.canvas.get_renderer()).x1
+    assert right <= fig.bbox.x1, "colorbar labels are clipped at the right edge"
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
