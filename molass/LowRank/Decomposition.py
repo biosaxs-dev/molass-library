@@ -1007,6 +1007,62 @@ class Decomposition:
             paths.append(path)
         return paths
 
+    def export(self, folder, fmt='dat', rgcurve=None, compute_rg_curve=False, debug=False):
+        """
+        Export the decomposition so that its figures can be reproduced, or the
+        analysis continued, in other tools (Excel, Origin, IGOR, pandas, ...).
+
+        Writes the following files to ``folder`` (``<ext>`` is ``fmt``):
+
+        - ``component_N.<ext>`` -- XR scattering profile ``(q, intensity, error)``
+          of component N (for ``fmt='dat'`` identical to
+          :meth:`export_xr_components`, without a header).
+        - ``xr_elution.<ext>`` -- ``frame, xr_total, comp1..compN, xr_sum, xr_residual``.
+        - ``uv_elution.<ext>`` -- same layout for UV (``uv_total``, ``uv_sum``,
+          ``uv_residual``); skipped if there is no UV data.
+        - ``uv_spectra.<ext>`` -- ``wavelength, comp1..compN``; skipped if no UV.
+        - ``guinier.<ext>`` -- ``component, rg, i0, q_min, q_max, score``
+          (NaN where the Guinier fit failed).
+        - ``rg_curve.<ext>`` -- per-frame ``frame, rg, score``; see below.
+        - ``summary.json`` -- molass version, model, ranks, ``sv``/``fv`` when
+          attached (e.g. by ``RunInfo.load_best()``), per-component Rg,
+          proportion and UV/XR scale, the file list and anything skipped.
+
+        Column names are ASCII/IGOR-safe (letters, digits and ``_``). ``dat``
+        files are whitespace-delimited with a ``# name1 name2 ...`` header line
+        (``np.loadtxt`` compatible); ``csv`` files are comma-delimited with a
+        plain header row (``pandas.read_csv`` compatible).
+
+        Parameters
+        ----------
+        folder : str
+            Destination folder. Created if it doesn't already exist.
+        fmt : {'dat', 'csv'}, optional
+            Output format. Default ``'dat'``.
+        rgcurve : RgCurve, optional
+            The per-frame Rg curve to write. If None, the curve is written only
+            if it is already available (see :attr:`has_rg_curve`), because
+            computing it is slow.
+        compute_rg_curve : bool, optional
+            If True and no curve is available, compute it via :meth:`get_rg_curve`.
+        debug : bool, optional
+            Passed through to the underlying accessors.
+
+        Returns
+        -------
+        paths : list of str
+            The written file paths; ``summary.json`` is last.
+
+        Examples
+        --------
+        ::
+
+            decomp.export(r"C:\\path\\to\\export_folder", fmt='csv')
+        """
+        from molass.LowRank.ExportDecomposition import export_decomposition_impl
+        return export_decomposition_impl(self, folder, fmt=fmt, rgcurve=rgcurve,
+                                         compute_rg_curve=compute_rg_curve, debug=debug)
+
     def get_scattering_profiles(self, debug=False):
         """
         Get the per-component scattering profiles ``P`` and their errors ``Pe``.
