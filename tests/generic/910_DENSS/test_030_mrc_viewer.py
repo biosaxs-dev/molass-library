@@ -131,5 +131,34 @@ def test_08_slider_level_without_surface_is_rejected(spiky_mrc_path):
     assert slider.val == pytest.approx(old_value)
     fig.canvas.draw()
 
+def _slice_axes(fig):
+    return [a for a in fig.axes if a.get_title() in ("yz plane", "xz plane", "xy plane")]
+
+def test_09_central_slices_are_three_labelled_panels(mrc_path):
+    fig = make_mrc_figure(mrc_path, level=0.2)
+    FigureCanvasAgg(fig)
+    axes = _slice_axes(fig)
+    assert [a.get_title() for a in axes] == ["yz plane", "xz plane", "xy plane"]
+    for a in axes:
+        assert a.get_xlabel().endswith("(\u00c5)") and a.get_ylabel().endswith("(\u00c5)")
+        assert len(a.images) == 1
+        assert len(a.collections) >= 1      # the threshold contour
+    assert len(fig.legends) == 1 and "0.2" in fig.legends[0].get_texts()[0].get_text()
+    hist = [a for a in fig.axes if a.get_legend() is not None]
+    assert len(hist) == 1 and "threshold" in hist[0].get_legend().get_texts()[0].get_text()
+    fig.canvas.draw()
+
+def test_10_slice_legend_follows_level_slider(mrc_path):
+    fig = make_mrc_figure(mrc_path, level=0.2)
+    FigureCanvasAgg(fig)
+    state, radio, check, slider, ax = fig._mrc_viewer_state
+    _slider_event(fig, slider, "button_press_event")
+    slider.set_val(-0.3)
+    _slider_event(fig, slider, "button_release_event")
+    assert len(fig.legends) == 1
+    assert "%.3g" % state["level"] in fig.legends[0].get_texts()[0].get_text()
+    assert len(_slice_axes(fig)) == 3
+    fig.canvas.draw()
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

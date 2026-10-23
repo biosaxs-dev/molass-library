@@ -71,11 +71,29 @@ def _geometry(data, voxel, level):
     pts, vals = _scatter_points(crop, level, voxel, center)
 
     c = [int(round(v)) - l for v, l in zip(idx.mean(axis=0), lo)]
-    slices = [crop[c[0], :, :], crop[:, c[1], :], crop[:, :, c[2]]]
-    h = max(s.shape[0] for s in slices)
-    slices = [np.pad(s, ((0, h - s.shape[0]), (0, 0))) for s in slices]   # crop is not cubic in general
-    return dict(meshes=meshes, pts=pts, vals=vals, r=np.abs(fv - center).max(),
-                panel=np.concatenate(slices, axis=1))
+    # (array, plane name, row axis, column axis, row centre, column centre); the centre
+    # (centroid of the marked voxels) is the origin of the Angstrom ticks
+    slices = [(crop[c[0], :, :], "yz plane", "y", "z", c[1], c[2]),
+              (crop[:, c[1], :], "xz plane", "x", "z", c[0], c[2]),
+              (crop[:, :, c[2]], "xy plane", "x", "y", c[0], c[1])]
+    return dict(meshes=meshes, pts=pts, vals=vals, r=np.abs(fv - center).max(), slices=slices)
+
+def _draw_slice(ax, s, level, voxel, vmax):
+    """One central slice: density map with Angstrom axes and the threshold contour."""
+    from matplotlib.lines import Line2D
+    arr, name, row_name, col_name, row_c, col_c = s
+    n_rows, n_cols = arr.shape
+    extent = [(-col_c - 0.5) * voxel, (n_cols - col_c - 0.5) * voxel,
+              (n_rows - row_c - 0.5) * voxel, (-row_c - 0.5) * voxel]
+    ax.imshow(arr, cmap="plasma", vmin=0, vmax=vmax, extent=extent)
+    if arr.min() < level < arr.max():
+        ax.contour((np.arange(n_cols) - col_c) * voxel, (np.arange(n_rows) - row_c) * voxel,
+                   arr, levels=[level], colors="white", linewidths=1.2)
+    ax.set_title(name, fontsize=10)
+    ax.set_xlabel(col_name + " (\u00c5)", fontsize=8)
+    ax.set_ylabel(row_name + " (\u00c5)", fontsize=8)
+    ax.tick_params(labelsize=7)
+    return Line2D([], [], color="white", linewidth=1.2, label="density = %.3g (threshold)" % level)
 
 def make_mrc_figure(mrc_file, level=None, fig=None):
     """make_mrc_figure(mrc_file, level=None, fig=None)
@@ -86,7 +104,9 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
     a voxel scatter (drag to rotate, optional auto-rotation). The "Level" slider
     (logarithmic, relative to the maximum density) changes the density threshold;
     the display is rebuilt when the slider is released. The right panels
-    show the central slices and a histogram of the marked voxel densities.
+    show the three central slices (yz, xz and xy planes, in Angstrom, with the
+    isosurface threshold drawn as a white contour line) and a histogram of the
+    marked voxel densities (the threshold is the dashed line).
     While the mouse button is down or auto-rotation is running, a coarse
     isosurface mesh is used to keep the rotation smooth.
 
@@ -127,14 +147,15 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
 
     if fig is None:
         fig = Figure(figsize=(16, 7))
-    gs = fig.add_gridspec(5, 2)
+    gs = fig.add_gridspec(6, 2, height_ratios=[1, 1, 1, 0.45, 1, 1])    # row 3: gap between slices and histogram
     ax = fig.add_subplot(gs[:, 0], projection="3d")
-    ax2 = fig.add_subplot(gs[0:3, 1])
-    ax3 = fig.add_subplot(gs[3:5, 1])
+    slice_gs = gs[0:3, 1].subgridspec(1, 3, wspace=0.45)
+    slice_axes = [fig.add_subplot(slice_gs[0, k]) for k in range(3)]
+    ax3 = fig.add_subplot(gs[4:6, 1])
 
     state = {"mode": "fine", "dragging": False, "auto": False, "view": "Isosurface", "timer": None,
              "level": level, "poly": None, "sc": None, "cbax": None, "meshes": None,
-             "slider_drag": False}
+             "slider_drag": False, "legend": []}
 
     def apply_view():
         iso = state["view"] == "Isosurface"
@@ -174,17 +195,23 @@ def make_mrc_figure(mrc_file, level=None, fig=None):
         ax.set_box_aspect((1, 1, 1))
         ax.set_axis_off()
 
-        ax2.clear()
-        ax2.imshow(geo["panel"], cmap="plasma", vmin=0, vmax=dmax)
-        ax2.set_axis_off()
-        ax2.set_title("Central slices (yz | xz | xy)")
-
+        handles = []
+        for sax, s in zip(slice_axes, geo["slices"]):
+            sax.clear()
+            handles.append(_draw_slice(sax, s, level, voxel, dmax))
+        for artist in state["legend"]:
+            artist.remove()
+        handles[0].set_label("Central slices (colour = density), white line: threshold = %.3g" % level)
+        state["legend"] = [fig.legend(handles=handles[:1], loc="upper center", bbox_to_anchor=(0.76, 0.995),
+                                      fontsize=9, frameon=False)]
         ax3.clear()
         counts, edges = np.histogram(vals, bins=10)
         centers = (edges[:-1] + edges[1:]) / 2
         ax3.bar(centers, counts / counts.sum() * 100, width=np.diff(edges) * 0.9,
                 color=colormaps["plasma"](sc.norm(centers)))
-        ax3.axvline(level, color="gray", linestyle="--", linewidth=1)
+        ax3.axvline(level, color="gray", linestyle="--", linewidth=1,
+                    label="threshold = %.3g (Level slider)" % level)
+        ax3.legend(fontsize=8, loc="upper right")
         ax3.set_xlabel("Density")
         ax3.set_ylabel("Voxels (%)")
         ax3.set_title("Density of the %d marked voxels (%.2g%% of the %dx%dx%d cube)"
