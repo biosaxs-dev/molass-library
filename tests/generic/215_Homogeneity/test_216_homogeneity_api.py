@@ -131,3 +131,19 @@ def test_100_decomposition_homogeneity_uses_its_own_mapping(corrected, result):
     np.testing.assert_allclose(mapping_shift((a, b), decomp.get_uv_mapping(), [100, 150]), -0.75)
     assert moved.stats[(1, "I(0)/A280")].sd < 0.5 * result.stats[(1, "I(0)/A280")].sd
     assert decomp.ssd.get_mapping() is not None and tuple(decomp.ssd.get_mapping()) == pytest.approx((a, b))
+
+
+def test_110_rgcurve_covering_only_some_frames(corrected, result):
+    # an Rg curve restored from disk can cover only part of the frames (molass-library#329)
+    from types import SimpleNamespace
+    from molass.Homogeneity import xr_i0_proxy
+    rg = corrected.get_rg_curve()
+    keep = (np.asarray(rg.frames) >= 100) & (np.asarray(rg.frames) <= 180)
+    partial = SimpleNamespace(frames=np.asarray(rg.frames)[keep], i0s=rg.i0s[keep], rgs=rg.rgs[keep],
+                              scores=np.asarray(rg.scores)[keep])
+    p = xr_i0_proxy(partial, frames=corrected.xr.jv)
+    assert len(p.values) == len(corrected.xr.jv) and np.isnan(p.values[:100]).all() and np.isfinite(p.values[120:160]).any()
+    r = corrected.homogeneity(rgcurve=partial, cores=result.cores)
+    assert r.stats[(0, "I(0)/A280")].n <= 14 < result.stats[(0, "I(0)/A280")].n     # core 1 (77-113): only frames 100-113 have I(0)
+    assert r.stats[(1, "I(0)/A280")].median == pytest.approx(result.stats[(1, "I(0)/A280")].median, rel=1e-6)
+    assert (0, "A260/A280") in r.stats                                           # UV-only ratios are unaffected

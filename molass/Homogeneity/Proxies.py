@@ -56,7 +56,7 @@ def band_average(M, axis_values, center, half_width):
     return np.asarray(M)[rows].mean(axis=0)
 
 
-def xr_i0_proxy(rgcurve, min_score=None):
+def xr_i0_proxy(rgcurve, min_score=None, frames=None):
     """I(0) of the per-frame Guinier fits (see ``RgCurve.i0s``) as a proxy named ``"I(0)"``.
 
     Concentration times molar mass of the species in the frame, with the usual
@@ -67,11 +67,24 @@ def xr_i0_proxy(rgcurve, min_score=None):
     rgcurve : RgCurve
     min_score : float or None
         If given, frames whose Guinier fit score is below it are set to NaN.
+    frames : array-like or None
+        XR frames to define the proxy on (e.g. ``xr.jv``); NaN where ``rgcurve`` has no fit.
+        None uses the frames of ``rgcurve`` (an Rg curve restored from disk may cover only some frames).
     """
     values = np.array(rgcurve.i0s, dtype=float)
     if min_score is not None:
         values[np.asarray(rgcurve.scores, dtype=float) < min_score] = np.nan
-    return ConcentrationProxy("I(0)", rgcurve.frames, values, "xr")
+    rg_frames = np.asarray(rgcurve.frames)
+    if frames is not None:
+        frames = np.asarray(frames)
+        full = np.full(len(frames), np.nan)
+        pos = {int(f): k for k, f in enumerate(rg_frames)}
+        for j, f in enumerate(frames):
+            k = pos.get(int(f))
+            if k is not None:
+                full[j] = values[k]
+        return ConcentrationProxy("I(0)", frames, full, "xr")
+    return ConcentrationProxy("I(0)", rg_frames, values, "xr")
 
 
 def xr_q_proxy(xr, q, half_width=None):

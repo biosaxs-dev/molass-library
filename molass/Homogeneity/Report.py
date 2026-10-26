@@ -115,7 +115,7 @@ class HomogeneityResult:
         if name == "I(0)":
             if self._rgcurve is None:
                 raise ValueError("no Rg curve")
-            p = xr_i0_proxy(self._rgcurve, min_score=self._min_score)
+            p = xr_i0_proxy(self._rgcurve, min_score=self._min_score, frames=self.frames)
         elif _Q_NAME.match(name):
             p = xr_q_proxy(ssd.xr, float(_Q_NAME.match(name).group(1)))
         elif _A_NAME.match(name):
