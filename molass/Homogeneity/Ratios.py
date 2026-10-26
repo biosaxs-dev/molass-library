@@ -49,6 +49,14 @@ class Flatness:
         Linear trend across the core (end minus start), relative to ``scale``.
     tilt_z : float
         Slope divided by its standard error for white noise ``noise``.
+    tilt_quad : float
+        Tilt from a quadratic fit ``y = a + b*t + c*t**2`` on ``t`` in [-1, 1] across the core:
+        ``2*b / scale`` (end minus start); NaN with fewer than 5 points.
+    curvature : float
+        ``c / scale`` of the same fit: the value at the core ends minus the value at the centre
+        (positive = a dip at the centre, negative = a hump).
+        A mapping error gives a tilt with curvature near 0, a concentration-dependent
+        effect a curvature with tilt near 0 (symmetric peaks).
     """
     n: int
     median: float
@@ -57,6 +65,8 @@ class Flatness:
     sd_over_noise: float
     tilt: float
     tilt_z: float
+    tilt_quad: float = np.nan
+    curvature: float = np.nan
 
     def asdict(self):
         return asdict(self)
@@ -147,9 +157,14 @@ class ProxyRatio(Curve):
         with np.errstate(divide="ignore", invalid="ignore"):
             sd_over_noise = y.std() / noise_abs
             tilt_z = slope * np.sqrt(sxx) / noise_abs
+        tilt_quad = curvature = np.nan
+        if len(x) >= 5:
+            t = (x - x.mean()) / ((x[-1] - x[0]) / 2)
+            c2, b, _ = np.polyfit(t, y, 2)
+            tilt_quad, curvature = 2 * b / s, c2 / s
         return Flatness(n=int(fin.sum()), median=med, sd=float(y.std() / s), noise=float(noise_abs / s),
                         sd_over_noise=float(sd_over_noise), tilt=float(slope * (x[-1] - x[0]) / s),
-                        tilt_z=float(tilt_z))
+                        tilt_z=float(tilt_z), tilt_quad=float(tilt_quad), curvature=float(curvature))
 
 
 def independent_axes(ratios):

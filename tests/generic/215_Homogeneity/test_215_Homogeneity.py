@@ -39,6 +39,19 @@ def test_020_tilted_ratio_is_detected():
     assert f.sd_over_noise > 10
 
 
+def test_025_curvature_and_quadratic_tilt():
+    conc = _conc()
+    t = (FRAMES - 30) / 20.0                        # core 10..50 -> t in [-1, 1]
+    dip = ProxyRatio(_proxy("a", conc * (1 + 0.2 * t ** 2)), _proxy("b", conc, "uv")).flatness((10, 50))
+    assert dip.curvature == pytest.approx(0.2 / 1.07, rel=0.1)       # median of 1 + 0.2 t^2 is about 1.07
+    assert abs(dip.tilt_quad) < 0.01
+    ramp = ProxyRatio(_proxy("a", conc * (1 + 0.1 * t)), _proxy("b", conc, "uv")).flatness((10, 50))
+    assert ramp.tilt_quad == pytest.approx(0.2, rel=0.05)
+    assert abs(ramp.curvature) < 0.01
+    short = ProxyRatio(_proxy("a", conc), _proxy("b", conc, "uv")).flatness((28, 31))
+    assert np.isnan(short.curvature) and np.isnan(short.tilt_quad)
+
+
 def test_030_deviation_and_scale():
     conc = _conc()
     r = ProxyRatio(_proxy("A320", 0.01 * conc), _proxy("A280", conc))
