@@ -1111,6 +1111,56 @@ class SecSaxsData:
             self._rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
         return self._rgcurve
 
+    def homogeneity(self, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5):
+        """Homogeneity analysis of the elution peaks from ratios of concentration proxies.
+
+        A ratio of two proxies of the concentration (``I(0)``, ``I(q)``, ``A<wavelength>``) is
+        flat across the peak of a single species and changes where the composition changes.
+        The ratios differ in what they are sensitive to: size and shape (XR only, e.g. ``I(0)/I(q1)``),
+        spectrum (UV only, e.g. ``A260/A280``), mass per absorbance (``I(0)/A280``, the classical
+        I(0)/c). Only XR/UV ratios depend on the UV->XR mapping.
+
+        The result gives curves and descriptive statistics (SD, noise, tilt, curvature), not a
+        pure/impure verdict. A mapping error shows as a *tilt* of the XR/UV ratios, a
+        concentration-dependent effect as a *curvature*; see ``HomogeneityResult``.
+
+        Parameters
+        ----------
+        pairs : list of (str, str) or None
+            ``(numerator, denominator)`` proxy names, e.g. ``[("I(0)", "A280"), ("A260", "A280")]``.
+            None selects the default set: the classical ``I(0)/I(q1)`` and ``I(0)/A280`` plus
+            ``I(q1)/I(q2)``, ``A260/A280``, ``A280/A290``, ``A320/A280`` (XR-only pairs without UV).
+        delta : float
+            Shift of the UV->XR mapping in XR frames (+ = later); 0 is the estimated mapping.
+        q1, q2 : float or None
+            q values (1/A) of the default ``I(q1)``, ``I(q2)``; None means ``q1 = 0.7 / median Rg``
+            and ``q2 = 3 * q1``.
+        cores : list of (int, int) or None
+            Frame ranges of the peak cores; None finds them from the A280 curve (or the XR curve)
+            as the frames above 30 % of each peak height.
+        rgcurve : RgCurve or None
+            The per-frame Guinier results for ``I(0)``; None uses ``get_rg_curve()`` (cached).
+        min_score : float
+            Guinier fits scoring below this are ignored in ``I(0)``.
+
+        Returns
+        -------
+        molass.Homogeneity.Report.HomogeneityResult
+
+        Examples
+        --------
+        ::
+
+            result = corrected.homogeneity()
+            print(result.summary())
+            result.plot()
+            result.shifted(-0.75).plot()          # does a sub-frame mapping shift flatten the XR/UV ratios?
+            result.reselect([("I(0)", "A280"), ("I(0)", "A260")])
+        """
+        from molass.Homogeneity.Report import compute_homogeneity
+        return compute_homogeneity(self, pairs=pairs, delta=delta, q1=q1, q2=q2, cores=cores,
+                                   rgcurve=rgcurve, min_score=min_score)
+
     def recommend_decomposition_options(self, egh_overlap_threshold=1.3):
         """Recommend keyword arguments for ``quick_decomposition()`` by detecting peaks.
 
