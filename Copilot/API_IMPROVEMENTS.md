@@ -255,6 +255,8 @@ pre-optimization decomposition instead of the restored best result):
 | [#316](https://github.com/biosaxs-dev/molass-library/issues/316) | `kratky_descriptors` returned `None` without an interior peak; now same keys + `has_peak` | ✅ Done (closed) |
 | [#317](https://github.com/biosaxs-dev/molass-library/issues/317) | Shape-match ergonomics: `ShapeMatchResult.best_shape`, relative vs raw score docs, form-factor signature table | ✅ Done (closed) |
 | [#318](https://github.com/biosaxs-dev/molass-library/issues/318) | No reader for DENSS component result files (`molass.SAXS.DenssResult`) | ✅ Done (closed) |
+| [#322](https://github.com/biosaxs-dev/molass-library/issues/322) | `RgCurve.i0s` / `i0_errors` next to `.rgs` (per-frame Guinier I(0)) | ✅ Implemented and tested (not pushed yet) |
+| [#323](https://github.com/biosaxs-dev/molass-library/issues/323) | Homogeneity composing API `molass.Homogeneity`: concentration proxies, `ProxyRatio`, flatness statistics, `independent_axes` (composed `SecSaxsData` API and GUI dialog follow after molass-researcher 50f) | ✅ Composing layer implemented and tested (not pushed yet) |
 
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable
