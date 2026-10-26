@@ -7,4 +7,4 @@
 from molass.Homogeneity.Proxies import (ConcentrationProxy, band_average, LinearMapping, as_mapping, mapping_shift,
                                         xr_i0_proxy, xr_q_proxy, uv_proxy)
 from molass.Homogeneity.Ratios import ProxyRatio, independent_axes
-from molass.Homogeneity.Report import HomogeneityResult, compute_homogeneity, find_cores
+from molass.Homogeneity.Report import HomogeneityResult, compute_homogeneity, find_cores, ensure_i0_rgcurve

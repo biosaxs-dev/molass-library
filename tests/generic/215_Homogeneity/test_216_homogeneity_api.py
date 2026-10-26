@@ -147,3 +147,17 @@ def test_110_rgcurve_covering_only_some_frames(corrected, result):
     assert r.stats[(0, "I(0)/A280")].n <= 14 < result.stats[(0, "I(0)/A280")].n     # core 1 (77-113): only frames 100-113 have I(0)
     assert r.stats[(1, "I(0)/A280")].median == pytest.approx(result.stats[(1, "I(0)/A280")].median, rel=1e-6)
     assert (0, "A260/A280") in r.stats                                           # UV-only ratios are unaffected
+
+
+def test_120_rgcurve_without_i0_is_completed(corrected, result):
+    # an Rg curve restored from disk has Rg and scores but no I(0) (molass-library#330)
+    from molass.Guinier.RgCurve import RgCurve
+    from molass.Homogeneity import ensure_i0_rgcurve
+    rg = corrected.get_rg_curve()
+    bare = RgCurve(rg.frames, rg.rgs, rg.scores)             # results=None
+    assert not bare.has_i0 and rg.has_i0
+    assert ensure_i0_rgcurve(corrected, rg) is rg
+    r = corrected.homogeneity(rgcurve=bare, cores=result.cores)
+    assert (1, "I(0)/A280") in r.stats and getattr(corrected, "_i0_rgcurve", None) is not None
+    assert r.stats[(1, "I(0)/A280")].median == pytest.approx(result.stats[(1, "I(0)/A280")].median, rel=1e-6)
+    assert ensure_i0_rgcurve(corrected, bare) is corrected._i0_rgcurve              # cached

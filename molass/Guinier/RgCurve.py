@@ -70,6 +70,12 @@ class RgCurve(Curve):
         return self._result_values('I0')
 
     @property
+    def has_i0(self):
+        """Whether any I(0) is available. An Rg curve restored from disk (``try_fast_rg_curve``)
+        carries Rg and scores but no I(0)."""
+        return bool(np.isfinite(self.i0s).any())
+
+    @property
     def i0_errors(self):
         """Standard deviation of ``i0s``; NaN where not available
         (failed fit, or results that carry no I(0) error, e.g. ATSAS)."""

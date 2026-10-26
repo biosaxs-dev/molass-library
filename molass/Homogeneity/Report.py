@@ -227,11 +227,32 @@ def default_pairs(q1, q2, has_uv):
     return [p for p in names if has_uv or not any(n.startswith("A") for n in p)]
 
 
+def ensure_i0_rgcurve(ssd, rgcurve=None):
+    """An Rg curve of ``ssd`` that carries I(0).
+
+    Returns ``rgcurve`` if it has I(0); otherwise (``None``, or restored from disk with Rg and scores
+    only) a Guinier Rg curve computed by ``ssd.xr.compute_rgcurve()`` (about 30 s), cached on ``ssd``
+    as ``_i0_rgcurve``. Safe to call from a background thread (no GUI or plotting).
+    """
+    if rgcurve is None:
+        rgcurve = ssd.get_rg_curve()
+    i0s = getattr(rgcurve, "i0s", None)
+    if i0s is not None and np.isfinite(np.asarray(i0s, dtype=float)).any():
+        return rgcurve
+    cached = getattr(ssd, "_i0_rgcurve", None)
+    if cached is None:
+        logger = getattr(ssd, "logger", None)
+        if logger is not None:
+            logger.info("the Rg curve has no I(0); computing Guinier fits for the homogeneity analysis")
+        cached = ssd.xr.compute_rgcurve()
+        ssd._i0_rgcurve = cached
+    return cached
+
+
 def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,
                         mapping=None):
     """Implementation of :meth:`SecSaxsData.homogeneity`."""
-    if rgcurve is None:
-        rgcurve = ssd.get_rg_curve()
+    rgcurve = ensure_i0_rgcurve(ssd, rgcurve)
     has_uv = ssd.uv is not None
     frames = np.asarray(ssd.xr.jv)
     if has_uv:
