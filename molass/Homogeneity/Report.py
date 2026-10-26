@@ -5,6 +5,7 @@
     automatic peak cores and descriptive flatness statistics, with no pure/impure verdict.
 """
 import re
+import itertools
 import numpy as np
 from molass.Homogeneity.Proxies import xr_i0_proxy, xr_q_proxy, uv_proxy
 from molass.Homogeneity.Ratios import ProxyRatio, independent_axes
@@ -185,7 +186,7 @@ class HomogeneityResult:
         xr_curve = self._ssd.xr.get_icurve()
         ax1.plot(xr_curve.x, xr_curve.y / xr_curve.y.max(), color="0.7", lw=1, label="XR curve")
         ax1.set_ylabel("normalised"); ax1.legend(fontsize=8)
-        classical_colors = iter(["k", "0.45"])
+        classical_colors = itertools.cycle(["k", "0.45", "0.65"])
         for name, r in self.ratios.items():
             y = np.full(len(self.frames), np.nan)
             for k, (f0, f1) in enumerate(self.cores):

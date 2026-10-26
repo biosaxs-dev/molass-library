@@ -88,6 +88,14 @@ def test_070_summary_table_plot(result):
     assert len(fig.axes) >= 2
 
 
+def test_075_plot_with_many_classical_ratios(result):
+    # more than two I(0)-numerator ratios used to exhaust the colour list
+    names = ["I(0)", "I(0.021)", "I(0.063)", "A260", "A280", "A290"]
+    pairs = [("I(0)", n) for n in names[1:]]
+    fig = result.reselect(pairs).plot()
+    assert len(fig.axes) >= 2
+
+
 def test_080_xr_only_default_set(corrected):
     from molass.DataObjects import SecSaxsData as SSD
     xr = corrected.xr
