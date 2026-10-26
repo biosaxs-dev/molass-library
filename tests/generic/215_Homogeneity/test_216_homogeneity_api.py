@@ -103,3 +103,31 @@ def test_080_xr_only_default_set(corrected):
     r = xr_only.homogeneity(rgcurve=corrected.get_rg_curve())
     assert len(r.ratios) == 2 and not r.skipped and r.independent_axes == 2
     assert all(not x.depends_on_mapping for x in r.ratios.values())
+
+
+def test_090_mapping_argument_equals_shift(corrected, result):
+    slope, intercept = tuple(corrected.get_mapping())
+    delta = 0.5
+    by_mapping = corrected.homogeneity(mapping=(slope, intercept - slope * delta), cores=result.cores)
+    by_shift = result.shifted(delta)
+    for key, f in by_shift.stats.items():
+        assert by_mapping.stats[key].median == pytest.approx(f.median, rel=1e-6)
+        assert by_mapping.stats[key].tilt == pytest.approx(f.tilt, rel=1e-6, abs=1e-9)
+    assert result.mapping is not None and by_mapping.reselect([("I(0)", "A280")]).mapping is by_mapping.mapping
+
+
+def test_100_decomposition_homogeneity_uses_its_own_mapping(corrected, result):
+    from molass.Mapping.Mapping import Mapping
+    from molass.Homogeneity import mapping_shift
+    decomp = corrected.quick_decomposition()
+    a, b = tuple(corrected.get_mapping())
+    assert tuple(decomp.get_uv_mapping()) == pytest.approx((a, b))
+    same = decomp.homogeneity(cores=result.cores)
+    assert same.stats[(1, "I(0)/A280")].tilt == pytest.approx(result.stats[(1, "I(0)/A280")].tilt, rel=1e-6)
+    # an "optimized" mapping, 0.75 frame earlier at every frame as in experiment 50b
+    for uv_ccurve in decomp.uv_ccurves:
+        uv_ccurve.mapping = Mapping(a, b - a * (-0.75))
+    moved = decomp.homogeneity(cores=result.cores)
+    np.testing.assert_allclose(mapping_shift((a, b), decomp.get_uv_mapping(), [100, 150]), -0.75)
+    assert moved.stats[(1, "I(0)/A280")].sd < 0.5 * result.stats[(1, "I(0)/A280")].sd
+    assert decomp.ssd.get_mapping() is not None and tuple(decomp.ssd.get_mapping()) == pytest.approx((a, b))

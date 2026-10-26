@@ -259,6 +259,7 @@ pre-optimization decomposition instead of the restored best result):
 | [#323](https://github.com/biosaxs-dev/molass-library/issues/323) | Homogeneity composing API `molass.Homogeneity`: concentration proxies, `ProxyRatio`, flatness statistics, `independent_axes` | ✅ Done (closed) |
 | [#324](https://github.com/biosaxs-dev/molass-library/issues/324) | `Flatness.curvature` / `tilt_quad` (separates a mapping error, a tilt, from a concentration effect, a curvature) | ✅ Done (closed) |
 | [#325](https://github.com/biosaxs-dev/molass-library/issues/325) | Composed API `SecSaxsData.homogeneity()` with `HomogeneityResult` (summary, plot, shifted, reselect); GUI dialog follows in molass-gui | ✅ Done (closed) |
+| [#327](https://github.com/biosaxs-dev/molass-library/issues/327) | Homogeneity with a given or optimized mapping: `homogeneity(mapping=...)`, `Decomposition.get_uv_mapping()` / `.homogeneity()`, `mapping_shift()` | ✅ Done (closed) |
 
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable

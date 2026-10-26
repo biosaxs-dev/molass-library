@@ -94,6 +94,45 @@ def xr_q_proxy(xr, q, half_width=None):
                               params=dict(q=q, half_width=half_width))
 
 
+class LinearMapping:
+    """``uv_frame = slope * xr_frame + intercept`` (a plain stand-in for ``MappingInfo``)."""
+
+    def __init__(self, slope, intercept):
+        self.slope, self.intercept = float(slope), float(intercept)
+
+    def xr_to_uv(self, x):
+        return self.slope * np.asarray(x) + self.intercept
+
+    def __iter__(self):
+        return iter((self.slope, self.intercept))
+
+    def __repr__(self):
+        return f"LinearMapping(slope={self.slope:.4g}, intercept={self.intercept:.4g})"
+
+
+def as_mapping(mapping):
+    """A mapping object with ``xr_to_uv`` from a ``MappingInfo``/``Mapping`` (anything unpackable
+    to ``(slope, intercept)``) or a ``(slope, intercept)`` pair."""
+    if hasattr(mapping, "xr_to_uv"):
+        return mapping
+    slope, intercept = tuple(mapping)
+    return LinearMapping(slope, intercept)
+
+
+def mapping_shift(nominal, other, frames):
+    """Equivalent shift of ``other`` relative to ``nominal``, in XR frames, at ``frames``.
+
+    The ``delta`` of :func:`uv_proxy` (+ = later) that gives the same UV frames as ``other``:
+    ``delta(f) = f - (other(f) - nominal_intercept) / nominal_slope`` -- constant for a pure offset,
+    varying with ``f`` if the slopes differ.
+    """
+    nominal, other = as_mapping(nominal), as_mapping(other)
+    frames = np.asarray(frames, dtype=float)
+    b0 = float(nominal.xr_to_uv(0.0))
+    s0 = float(nominal.xr_to_uv(1.0)) - b0
+    return frames - (other.xr_to_uv(frames) - b0) / s0
+
+
 def uv_proxy(uv, wavelength, mapping, frames, delta=0.0, half_width=2.5):
     """Absorbance at ``wavelength`` (nm) mapped onto the XR ``frames``, as ``"A<wavelength>"``.
 
@@ -118,6 +157,8 @@ def uv_proxy(uv, wavelength, mapping, frames, delta=0.0, half_width=2.5):
     Values are NaN where the mapped UV frame lies outside the UV frame range.
     """
     frames = np.asarray(frames)
+    mapping = as_mapping(mapping)
+    band = band_average(uv.M, uv.wv, wavelength, half_width)
     band = band_average(uv.M, uv.wv, wavelength, half_width)
     uv_frames = mapping.xr_to_uv(frames - delta)
     values = np.interp(uv_frames, uv.jv, band, left=np.nan, right=np.nan)

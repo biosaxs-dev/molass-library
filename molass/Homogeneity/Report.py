@@ -7,7 +7,7 @@
 import re
 import itertools
 import numpy as np
-from molass.Homogeneity.Proxies import xr_i0_proxy, xr_q_proxy, uv_proxy
+from molass.Homogeneity.Proxies import xr_i0_proxy, xr_q_proxy, uv_proxy, as_mapping
 from molass.Homogeneity.Ratios import ProxyRatio, independent_axes
 
 DEFAULT_WAVELENGTHS = (260, 280, 290, 320)
@@ -68,6 +68,8 @@ class HomogeneityResult:
         The q values (1/A) behind the default ``I(q1)``, ``I(q2)``.
     delta : float
         Shift of the UV->XR mapping in XR frames (+ = later) used for the UV proxies.
+    mapping : mapping object or None
+        The UV->XR mapping the UV proxies are made with (``None`` without UV data).
     skipped : list of str
         Requested ratios that could not be made (missing UV, wavelength out of range ...).
     independent_axes : int
@@ -81,8 +83,12 @@ class HomogeneityResult:
     a concentration-dependent effect as a curvature (symmetric peaks).
     """
 
-    def __init__(self, ssd, pairs, delta, q1, q2, cores, rgcurve, min_score):
+    def __init__(self, ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=None):
         self._ssd, self._rgcurve, self._min_score = ssd, rgcurve, min_score
+        if mapping is not None:
+            self.mapping = as_mapping(mapping)
+        else:
+            self.mapping = ssd.get_mapping() if ssd.uv is not None else None
         self.pairs, self.delta, self.q1, self.q2 = list(pairs), delta, q1, q2
         self.frames = np.asarray(ssd.xr.jv)
         self.cores = list(cores)
@@ -118,7 +124,7 @@ class HomogeneityResult:
             w = float(_A_NAME.match(name).group(1))
             if not ssd.uv.wv[0] <= w <= ssd.uv.wv[-1]:
                 raise ValueError(f"{w:g} nm is outside the UV range")
-            p = uv_proxy(ssd.uv, w, ssd.get_mapping(), self.frames, delta=self.delta)
+            p = uv_proxy(ssd.uv, w, self.mapping, self.frames, delta=self.delta)
         else:
             raise KeyError(f"unknown proxy name {name!r}; use I(0), I(<q>) or A<wavelength>")
         self.proxies[name] = p
@@ -134,12 +140,12 @@ class HomogeneityResult:
     def shifted(self, delta):
         """The same analysis with the UV->XR mapping shifted by ``delta`` XR frames (+ = later)."""
         return HomogeneityResult(self._ssd, self.pairs, delta, self.q1, self.q2, self.cores,
-                                 self._rgcurve, self._min_score)
+                                 self._rgcurve, self._min_score, mapping=self.mapping)
 
     def reselect(self, pairs):
         """The same analysis (cores, q values, shift) with a different set of ``(numerator, denominator)`` names."""
         return HomogeneityResult(self._ssd, pairs, self.delta, self.q1, self.q2, self.cores,
-                                 self._rgcurve, self._min_score)
+                                 self._rgcurve, self._min_score, mapping=self.mapping)
 
     def table(self):
         """Rows (dicts) of the statistics: core, first, last, ratio, mapping dependence and the Flatness fields."""
@@ -221,14 +227,17 @@ def default_pairs(q1, q2, has_uv):
     return [p for p in names if has_uv or not any(n.startswith("A") for n in p)]
 
 
-def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5):
+def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,
+                        mapping=None):
     """Implementation of :meth:`SecSaxsData.homogeneity`."""
     if rgcurve is None:
         rgcurve = ssd.get_rg_curve()
     has_uv = ssd.uv is not None
     frames = np.asarray(ssd.xr.jv)
+    if has_uv:
+        mapping = as_mapping(mapping) if mapping is not None else ssd.get_mapping()
     if has_uv and ssd.uv.wv[0] <= 280 <= ssd.uv.wv[-1]:
-        conc = uv_proxy(ssd.uv, 280, ssd.get_mapping(), frames, delta=delta).values
+        conc = uv_proxy(ssd.uv, 280, mapping, frames, delta=delta).values
     else:
         conc = np.asarray(ssd.xr.get_icurve().y, dtype=float)
     if cores is None:
@@ -242,4 +251,4 @@ def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None
         q2 = round(3 * q1, 3)
     if pairs is None:
         pairs = default_pairs(q1, q2, has_uv)
-    return HomogeneityResult(ssd, pairs, delta, q1, q2, cores, rgcurve, min_score)
+    return HomogeneityResult(ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=mapping)

@@ -138,3 +138,18 @@ def test_100_sample1_proxies_and_ratios(sample1):
     f = ratio.flatness((145, 170))          # peak 2 core of SAMPLE1: UV spectrum constant to < 1 %
     assert f.sd < 0.02
     assert ProxyRatio(i1, a280).depends_on_mapping
+
+
+def test_110_as_mapping_and_mapping_shift():
+    from molass.Homogeneity import as_mapping, mapping_shift, LinearMapping
+    from molass.Mapping.Mapping import Mapping
+    nominal = (1.5, 4.0)
+    for m in (nominal, Mapping(*nominal), LinearMapping(*nominal)):
+        np.testing.assert_allclose(as_mapping(m).xr_to_uv([0, 10]), [4.0, 19.0])
+    frames = np.array([10.0, 100.0, 200.0])
+    # a pure offset: the mapping (s, b - s*delta) is the same as delta
+    np.testing.assert_allclose(mapping_shift(nominal, (1.5, 4.0 - 1.5 * 0.75), frames), 0.75)
+    np.testing.assert_allclose(mapping_shift(nominal, nominal, frames), 0.0, atol=1e-12)
+    # a slope difference: the equivalent shift grows linearly with the frame
+    shifts = mapping_shift(nominal, (1.5 * 1.02, 4.0), frames)
+    np.testing.assert_allclose(shifts, -0.02 * frames, atol=1e-9)

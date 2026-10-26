@@ -567,6 +567,30 @@ class Decomposition:
             return parent.has_rg_curve
         return getattr(self.ssd, '_rgcurve', None) is not None
 
+    def get_uv_mapping(self):
+        """The XR->UV mapping that this decomposition's UV component curves use.
+
+        For a rigorous result this is the *optimized* mapping (``Mapping(a, b)``); for a quick
+        decomposition it is the estimated one (the same as ``self.mapping``). ``None`` without UV.
+        """
+        for uv_ccurve in (self.uv_ccurves or []):
+            mapping = getattr(uv_ccurve, 'mapping', None)
+            if mapping is not None:
+                return mapping
+        return self.mapping if self.uv_icurve is not None else None
+
+    def homogeneity(self, **kwargs):
+        """Homogeneity analysis of the data with this decomposition's UV->XR mapping.
+
+        Same as :meth:`SecSaxsData.homogeneity` on ``self.ssd`` with ``mapping=self.get_uv_mapping()``
+        and this decomposition's Rg curve, so that a rigorous result is analysed with its optimized
+        mapping. Use ``molass.Homogeneity.mapping_shift(decomp.ssd.get_mapping(), decomp.get_uv_mapping(), frames)``
+        to see how far the optimizer moved the mapping, in XR frames.
+        """
+        kwargs.setdefault('mapping', self.get_uv_mapping())
+        kwargs.setdefault('rgcurve', self.get_rg_curve())
+        return self.ssd.homogeneity(**kwargs)
+
     def compute_reconstructed_rgcurve(self, debug=False):
         """Compute the reconstructed Rg curve as a concentration-weighted average.
 
