@@ -261,6 +261,23 @@ pre-optimization decomposition instead of the restored best result):
 | [#325](https://github.com/biosaxs-dev/molass-library/issues/325) | Composed API `SecSaxsData.homogeneity()` with `HomogeneityResult` (summary, plot, shifted, reselect); GUI dialog follows in molass-gui | ✅ Done (closed) |
 | [#327](https://github.com/biosaxs-dev/molass-library/issues/327) | Homogeneity with a given or optimized mapping: `homogeneity(mapping=...)`, `Decomposition.get_uv_mapping()` / `.homogeneity()`, `mapping_shift()` | ✅ Done (closed) |
 
+### Newly filed (October 26, 2026)
+
+AI-friendliness assessment after the homogeneity work (molass-researcher experiments 50e-50g); none implemented yet:
+
+| GitHub Issue | Class | Description | Status |
+|-------------|-------|-------------|--------|
+| [#331](https://github.com/biosaxs-dev/molass-library/issues/331) | Naming / Interpretability | Three mapping types; `Decomposition.mapping` ignores the optimized mapping; add `optimized_mapping`, aliases on `Mapping` | ⏳ Open |
+| [#332](https://github.com/biosaxs-dev/molass-library/issues/332) | Observability | `RgCurve` repr: frame coverage, I(0) availability | ⏳ Open |
+| [#333](https://github.com/biosaxs-dev/molass-library/issues/333) | Naming | `xr_peaks`/`uv_peaks` are indices not frames; `indeces` typo; frame conventions | ⏳ Open |
+| [#334](https://github.com/biosaxs-dev/molass-library/issues/334) | Workflow | Second `optimize_rigorously(in_process=True)` in one process: cryptic AttributeError | ⏳ Open |
+| [#335](https://github.com/biosaxs-dev/molass-library/issues/335) | Naming / Workflow | One documented `RunInfo.wait_until_done()` / `is_done` | ⏳ Open |
+| [#336](https://github.com/biosaxs-dev/molass-library/issues/336) | Navigation | One call to load the best on-disk rigorous result (logic copied in three GUI dialogs) | ⏳ Open |
+| [#337](https://github.com/biosaxs-dev/molass-library/issues/337) | Interpretability | `estimate_mapping()` resolution/uncertainty (see #328) | ⏳ Open |
+| [#338](https://github.com/biosaxs-dev/molass-library/issues/338) | Naming | Did-you-mean hints for `AttributeError` on data objects | ⏳ Open |
+| [#339](https://github.com/biosaxs-dev/molass-library/issues/339) | Workflow | Route informational output through `logging` (PowerShell `NativeCommandError`; cf. #256) | ⏳ Open |
+| [#340](https://github.com/biosaxs-dev/molass-library/issues/340) | Navigation | Promote a known-truth simulator (`molass.Testing.simulate_ssd`) | ⏳ Open |
+
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable
 Decomposition for the best completed result," but `restore()` was not exported
