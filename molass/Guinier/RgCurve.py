@@ -52,6 +52,29 @@ class RgCurve(Curve):
         ``get_xy()`` returns the same data as ``(frames, rgs)``."""
         return self.rgvalues
 
+    def _result_values(self, name):
+        n = len(self.indeces)
+        if self.results is None:
+            return np.full(n, np.nan)
+        values = np.full(n, np.nan)
+        for k, r in enumerate(self.results):
+            v = None if r is None else getattr(r, name, None)
+            if v is not None:
+                values[k] = v
+        return values
+
+    @property
+    def i0s(self):
+        """I(0) of the per-frame Guinier fits, in the units of the intensities
+        (same length and order as ``frames``); NaN where the fit failed."""
+        return self._result_values('I0')
+
+    @property
+    def i0_errors(self):
+        """Standard deviation of ``i0s``; NaN where not available
+        (failed fit, or results that carry no I(0) error, e.g. ATSAS)."""
+        return self._result_values('I0_stdev')
+
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
     """
