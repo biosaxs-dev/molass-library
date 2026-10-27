@@ -6,6 +6,7 @@ from .CurrentStateUtils import (
     construct_decomposition_from_results,
     load_rigorous_result,
     load_best_rigorous_result,
+    NoCompletedJobError,
     list_rigorous_jobs,
     has_rigorous_results,
     wait_for_rigorous_results,

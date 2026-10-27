@@ -45,5 +45,7 @@ def test_explicit_jobid_is_untouched(monkeypatch, stop_at_params, tmp_path):
 
 def test_no_completed_job_raises_a_clear_error(monkeypatch, tmp_path):
     monkeypatch.setattr(csu, "list_rigorous_jobs", lambda folder: [])
-    with pytest.raises(FileNotFoundError, match="No completed job"):
+    with pytest.raises(csu.NoCompletedJobError, match="No completed job"):
         load_best_rigorous_result(object(), str(tmp_path))
+    with pytest.raises(FileNotFoundError):              # still a FileNotFoundError for existing handlers
+        csu.load_rigorous_result(object(), str(tmp_path))

@@ -21,6 +21,14 @@ JobInfo.__doc__ = """Metadata for a single rigorous optimization job.
 Attributes: id, iterations, best_fv, timestamp.
 """
 
+
+class NoCompletedJobError(FileNotFoundError):
+    """No job with at least one real result exists (yet) in the analysis folder, e.g. right after launch.
+
+    A ``FileNotFoundError``, so existing handlers keep working; catch this class to tell the
+    "no result yet" case from other missing files.
+    """
+
 JobConvergence.__doc__ = """Per-job convergence detail with full fv trajectory.
 
 Attributes: id, evals (list of eval counts), fvs (list of fv values),
@@ -254,7 +262,7 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
         # the job with the lowest objective value (a later job can be worse than an earlier one)
         valid_jobs = list_rigorous_jobs(analysis_folder)
         if not valid_jobs:
-            raise FileNotFoundError(
+            raise NoCompletedJobError(
                 f"No completed job (with at least one real result) found in {jobs_folder}"
             )
         best_job = min(valid_jobs, key=lambda j: j.best_fv)
@@ -267,7 +275,7 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
         # get_params() with a cryptic IndexError instead of a clear message.
         valid_jobs = list_rigorous_jobs(analysis_folder)
         if not valid_jobs:
-            raise FileNotFoundError(
+            raise NoCompletedJobError(
                 f"No completed job (with at least one real result) found in {jobs_folder}"
             )
         jobid = valid_jobs[-1].id
