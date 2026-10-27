@@ -132,6 +132,48 @@ def compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, deb
         print("compute_mapping_by_full_coverage: slope=", slope, "intercept=", intercept)
     return MappingInfo(slope, intercept, xr_peaks, uv_peaks, None, None, xr_curve, uv_curve)
 
+PEAK_CORE_FRACTION = 0.5    # the core of a peak: the contiguous region above this fraction of its height
+MIN_CORE_POINTS = 3
+
+def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
+    """
+    Estimate the position of the peak at index i with sub-frame resolution (molass-library#328).
+
+    The apex index of a noisy curve is only good to about one frame, which limits a mapping
+    fitted through apexes accordingly. The centroid of the peak core (the contiguous region
+    above ``fraction`` of the peak height, weighted by the excess over that level) is
+    several times less noise-sensitive.
+
+    Parameters
+    ----------
+    x, y : array-like
+        The curve.
+    i : int
+        The index of the (integer) peak position.
+    fraction : float, optional
+        The core is the region above this fraction of the peak height.
+
+    Returns
+    -------
+    position : float
+        The refined peak position in the units of x. Falls back to ``x[i]`` when the core
+        is cut by the edge of the curve or too narrow.
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    level = fraction * y[i]
+    if not y[i] > 0:
+        return float(x[i])
+    lo = hi = i
+    while lo > 0 and y[lo - 1] >= level:
+        lo -= 1
+    while hi < len(y) - 1 and y[hi + 1] >= level:
+        hi += 1
+    if lo == 0 or hi == len(y) - 1 or hi - lo + 1 < MIN_CORE_POINTS:
+        return float(x[i])
+    w = y[lo:hi + 1] - level
+    return float(np.sum(x[lo:hi + 1] * w) / np.sum(w))
+
 def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, retry=True, debug=False):
     """
     Estimate the mapping between xr_curve and uv_curve using the given peak positions.
@@ -159,8 +201,9 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, 
         The estimated mapping information.
     """
     if len(xr_peaks) > 1:
-        x = xr_curve.x[xr_peaks]
-        y = uv_curve.x[uv_peaks]
+        # sub-frame positions: the integer apex limits the mapping to about one frame (#328)
+        x = np.array([refine_peak_position(xr_curve.x, xr_curve.y, i) for i in xr_peaks])
+        y = np.array([refine_peak_position(uv_curve.x, uv_curve.y, i) for i in uv_peaks])
         xr_moment = None
         uv_moment = None
 

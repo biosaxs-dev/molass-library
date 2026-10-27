@@ -902,6 +902,16 @@ class SecSaxsData:
     def estimate_mapping(self, debug=False):
         """ssd.estimate_mapping()
         Estimates the mapping information between UV and XR data.
+
+        With two or more matched peaks the mapping is fitted through sub-frame peak
+        positions (centroids of the peak cores, see
+        :func:`molass.Mapping.SimpleMapper.refine_peak_position`), which on clean
+        simulated data with noise resolves the mapping to a few hundredths of an XR frame
+        (integer apex positions limited it to about one frame). With a single peak the
+        mapping rests on the peak moment and the curve extent, and is much less certain.
+        The resolution still degrades with noise, peak asymmetry and unresolved overlaps;
+        ``MappingInfo.xr_peaks`` / ``uv_peaks`` remain the integer apex indices.
+
         Parameters
         ----------
         debug : bool, optional

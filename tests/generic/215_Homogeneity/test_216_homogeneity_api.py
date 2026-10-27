@@ -51,7 +51,17 @@ def test_030_default_set_and_cores(result):
     assert not result.is_classical("A260/A280")
 
 
-def test_040_statistics_reproduce_experiment_50e(result):
+OLD_SAMPLE1_MAPPING = (1.4492753623188406, 3.463768115942031)   # estimate_mapping() before the sub-frame positions of #328
+
+
+@pytest.fixture(scope="module")
+def old_result(corrected, result):
+    """The analysis under the integer-apex mapping on which experiment 50e's numbers were obtained."""
+    return corrected.homogeneity(mapping=OLD_SAMPLE1_MAPPING, cores=result.cores)
+
+
+def test_040_statistics_reproduce_experiment_50e(old_result):
+    result = old_result
     f2 = result.stats[(1, "I(0)/A280")]               # peak 2: mapping artefact, tilt about -31 %
     assert f2.tilt == pytest.approx(-0.31, abs=0.03)
     assert abs(f2.curvature) < 0.1
@@ -62,7 +72,13 @@ def test_040_statistics_reproduce_experiment_50e(result):
     assert result.ratios["A320/A280"].depends_on_mapping is False
 
 
-def test_050_shifted_flattens_peak2_cross_ratio(result):
+def test_045_subframe_mapping_removes_most_of_the_50e_artefact(result, old_result):
+    # molass-library#328: the default mapping is fitted through sub-frame peak positions
+    assert abs(result.stats[(1, "I(0)/A280")].tilt) < 0.1 < abs(old_result.stats[(1, "I(0)/A280")].tilt)
+
+
+def test_050_shifted_flattens_peak2_cross_ratio(old_result):
+    result = old_result
     base = result.stats[(1, "I(0)/A280")].sd
     shifted = result.shifted(-0.75)
     assert shifted.delta == -0.75
@@ -124,12 +140,13 @@ def test_100_decomposition_homogeneity_uses_its_own_mapping(corrected, result):
     assert tuple(decomp.get_uv_mapping()) == pytest.approx((a, b))
     same = decomp.homogeneity(cores=result.cores)
     assert same.stats[(1, "I(0)/A280")].tilt == pytest.approx(result.stats[(1, "I(0)/A280")].tilt, rel=1e-6)
-    # an "optimized" mapping, 0.75 frame earlier at every frame as in experiment 50b
+    # an "optimized" mapping, 0.75 frame earlier at every frame as in experiment 50b; the default mapping
+    # (sub-frame, #328) is already nearly flat there, so moving it makes the ratio clearly less flat
     for uv_ccurve in decomp.uv_ccurves:
         uv_ccurve.mapping = Mapping(a, b - a * (-0.75))
     moved = decomp.homogeneity(cores=result.cores)
     np.testing.assert_allclose(mapping_shift((a, b), decomp.get_uv_mapping(), [100, 150]), -0.75)
-    assert moved.stats[(1, "I(0)/A280")].sd < 0.5 * result.stats[(1, "I(0)/A280")].sd
+    assert moved.stats[(1, "I(0)/A280")].sd > 2 * result.stats[(1, "I(0)/A280")].sd
     assert decomp.ssd.get_mapping() is not None and tuple(decomp.ssd.get_mapping()) == pytest.approx((a, b))
 
 
@@ -142,9 +159,9 @@ def test_110_rgcurve_covering_only_some_frames(corrected, result):
     partial = SimpleNamespace(frames=np.asarray(rg.frames)[keep], i0s=rg.i0s[keep], rgs=rg.rgs[keep],
                               scores=np.asarray(rg.scores)[keep])
     p = xr_i0_proxy(partial, frames=corrected.xr.jv)
-    assert len(p.values) == len(corrected.xr.jv) and np.isnan(p.values[:100]).all() and np.isfinite(p.values[120:160]).any()
+    assert len(p.values) == len(corrected.xr.jv) and np.isnan(p.values[:95]).all() and np.isfinite(p.values[120:160]).any()
     r = corrected.homogeneity(rgcurve=partial, cores=result.cores)
-    assert r.stats[(0, "I(0)/A280")].n <= 14 < result.stats[(0, "I(0)/A280")].n     # core 1 (77-113): only frames 100-113 have I(0)
+    assert r.stats[(0, "I(0)/A280")].n <= 16 < result.stats[(0, "I(0)/A280")].n     # core 1 (77-114): only frames 100-114 have I(0)
     assert r.stats[(1, "I(0)/A280")].median == pytest.approx(result.stats[(1, "I(0)/A280")].median, rel=1e-6)
     assert (0, "A260/A280") in r.stats                                           # UV-only ratios are unaffected
 
