@@ -152,3 +152,7 @@ def print_context():
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
 from molass.Dev.ReloadAll import reload_all  # noqa: E402
 from molass.PackageUtils.EnvironmentReport import environment_report  # noqa: E402
+
+# informational log messages go to stdout, not stderr (molass-library#339)
+from molass.Global.LogSetup import install_stdout_logging  # noqa: E402
+install_stdout_logging()

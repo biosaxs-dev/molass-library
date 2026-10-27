@@ -3,8 +3,9 @@
 """
 import numpy as np
 from bisect import bisect_right
+from molass.Global.DidYouMean import DidYouMeanMixin
 
-class Curve:
+class Curve(DidYouMeanMixin):
     """A class representing a 1D curve with x and y data.
     
     Attributes

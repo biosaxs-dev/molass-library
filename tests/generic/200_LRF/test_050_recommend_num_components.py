@@ -14,7 +14,15 @@ from molass_data import SAMPLE1
 from molass.DataObjects import SecSaxsData as SSD
 from molass.LowRank.NumComponentsRecommender import Recommendation
 
-set_molass_options(quiet=True)
+
+@pytest.fixture(scope="module", autouse=True)
+def _quiet_for_this_module():
+    # not at import time: that would silence every other test of a whole-suite run (collection imports all modules)
+    from molass.Global.Options import get_molass_options
+    saved = get_molass_options('quiet')
+    set_molass_options(quiet=True)
+    yield
+    set_molass_options(quiet=bool(saved))
 
 
 @pytest.fixture(scope="module")

@@ -125,6 +125,16 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
     
     return optimizer
 
+def update_legacy_trimming_settings(ssd):
+    """Push the trimming of ``ssd`` to the legacy settings; clear error for data without trimming info."""
+    if ssd.trimming is None:
+        raise RuntimeError(
+            "This SecSaxsData has no trimming information (it was built from arrays), and its data was "
+            "not exported for the optimizer, so the legacy settings cannot be set up. Pass the data's "
+            "analysis_folder explicitly, or run each case in a fresh Python process "
+            "(see molass-library#334).")
+    ssd.trimming.update_legacy_settings()
+
 def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_ssd=None, debug=False, pipeline_recipe=None, progress_cb=None):
     """
     progress_cb : callable, optional
@@ -151,6 +161,12 @@ def prepare_rigorous_folders(decomposition, rgcurve, analysis_folder=None, data_
 
     temp_in_folder = os.path.abspath(os.path.join(analysis_folder, "temp_in_folder"))
     in_folder = get_setting('in_folder')
+    # A leftover 'temp_in_folder' of a previous analysis (global legacy state of an earlier run in
+    # this process) is not this run's input: without this, the second run of a process finds its own
+    # temp_in_folder missing, exports nothing and then fails (molass-library#334).
+    if in_folder is not None and os.path.basename(os.path.normpath(in_folder)) == 'temp_in_folder' \
+            and os.path.abspath(in_folder) != temp_in_folder:
+        in_folder = None
     # When negative-peak zeroing has been applied, the subprocess must see
     # the corrected (zeroed) matrices.  Force-export so it loads from
     # temp_in_folder instead of the original raw folder.

@@ -135,6 +135,36 @@ def compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, deb
 PEAK_CORE_FRACTION = 0.5    # the core of a peak: the contiguous region above this fraction of its height
 MIN_CORE_POINTS = 3
 
+def peak_position_with_sd(x, y, i, fraction=PEAK_CORE_FRACTION):
+    """
+    The refined position of the peak at index i and its noise-propagated standard deviation.
+
+    See :func:`refine_peak_position`. The standard deviation propagates the noise of ``y``
+    (estimated from the second differences, robustly) through the centroid; it ignores the
+    dependence of the core limits on the noise. When the position falls back to ``x[i]``
+    the standard deviation is half a sample spacing.
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    fallback = (float(x[i]), 0.5 * float(np.median(np.diff(x))) if len(x) > 1 else 0.5)
+    level = fraction * y[i]
+    if not y[i] > 0:
+        return fallback
+    lo = hi = i
+    while lo > 0 and y[lo - 1] >= level:
+        lo -= 1
+    while hi < len(y) - 1 and y[hi + 1] >= level:
+        hi += 1
+    if lo == 0 or hi == len(y) - 1 or hi - lo + 1 < MIN_CORE_POINTS:
+        return fallback
+    w = y[lo:hi + 1] - level
+    xs = x[lo:hi + 1]
+    position = float(np.sum(xs * w) / np.sum(w))
+    d2 = y[:-2] - 2 * y[1:-1] + y[2:]
+    sigma = 1.4826 * float(np.median(np.abs(d2 - np.median(d2)))) / np.sqrt(6)
+    sd = sigma * float(np.sqrt(np.sum((xs - position)**2))) / float(np.sum(w))
+    return position, sd
+
 def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
     """
     Estimate the position of the peak at index i with sub-frame resolution (molass-library#328).
@@ -159,20 +189,25 @@ def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
         The refined peak position in the units of x. Falls back to ``x[i]`` when the core
         is cut by the edge of the curve or too narrow.
     """
-    x = np.asarray(x, dtype=float)
-    y = np.asarray(y, dtype=float)
-    level = fraction * y[i]
-    if not y[i] > 0:
-        return float(x[i])
-    lo = hi = i
-    while lo > 0 and y[lo - 1] >= level:
-        lo -= 1
-    while hi < len(y) - 1 and y[hi + 1] >= level:
-        hi += 1
-    if lo == 0 or hi == len(y) - 1 or hi - lo + 1 < MIN_CORE_POINTS:
-        return float(x[i])
-    w = y[lo:hi + 1] - level
-    return float(np.sum(x[lo:hi + 1] * w) / np.sum(w))
+    return peak_position_with_sd(x, y, i, fraction)[0]
+
+def estimate_resolution_frames(x, sdx, y, sdy, xr_range, num_samples=200, seed=0):
+    """
+    Rough uncertainty of a mapping fitted through the peak positions, in XR frames (molass-library#337).
+
+    The positions are perturbed by their standard deviations and the mapping is refitted;
+    the result is the rms, over the perturbations, of the equivalent XR-frame shift of the
+    mapping at the middle of ``xr_range``.
+    """
+    x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    rng = np.random.default_rng(seed)
+    slope, intercept = linregress(x, y)[0:2]
+    mid = 0.5 * (xr_range[0] + xr_range[1])
+    shifts = []
+    for _ in range(num_samples):
+        s, b = linregress(x + rng.normal(0, sdx), y + rng.normal(0, sdy))[0:2]
+        shifts.append(((s - slope) * mid + (b - intercept)) / slope)
+    return float(np.sqrt(np.mean(np.square(shifts))))
 
 def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, retry=True, debug=False):
     """
@@ -200,12 +235,17 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, 
     mapping : MappingInfo
         The estimated mapping information.
     """
+    resolution_frames = None
     if len(xr_peaks) > 1:
         # sub-frame positions: the integer apex limits the mapping to about one frame (#328)
-        x = np.array([refine_peak_position(xr_curve.x, xr_curve.y, i) for i in xr_peaks])
-        y = np.array([refine_peak_position(uv_curve.x, uv_curve.y, i) for i in uv_peaks])
+        xr_fits = [peak_position_with_sd(xr_curve.x, xr_curve.y, i) for i in xr_peaks]
+        uv_fits = [peak_position_with_sd(uv_curve.x, uv_curve.y, i) for i in uv_peaks]
+        x = np.array([p for p, _ in xr_fits])
+        y = np.array([p for p, _ in uv_fits])
         xr_moment = None
         uv_moment = None
+        resolution_frames = estimate_resolution_frames(x, [s for _, s in xr_fits], y, [s for _, s in uv_fits],
+                                                       (xr_curve.x[0], xr_curve.x[-1]))
 
     elif len(xr_peaks) == 1:
         from molass.Stats.EghMoment import EghMoment
@@ -230,7 +270,8 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, 
             if not reliable:
                 return compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, debug=debug)
 
-        return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve)
+        return MappingInfo(slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve,
+                           resolution_frames=resolution_frames)
     else:
         assert retry, "Mapping coverage is not acceptable after retry."
         xr_curve_ = xr_curve.corrected_copy()

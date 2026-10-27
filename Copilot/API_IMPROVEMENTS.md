@@ -267,20 +267,18 @@ pre-optimization decomposition instead of the restored best result):
 
 ### Newly filed (October 26, 2026)
 
-AI-friendliness assessment after the homogeneity work (molass-researcher experiments 50e-50g); none implemented yet:
+AI-friendliness assessment after the homogeneity work (molass-researcher experiments 50e-50g); #331 and #332 are listed above, the rest were implemented together (October 27, 2026):
 
 | GitHub Issue | Class | Description | Status |
 |-------------|-------|-------------|--------|
-| [#331](https://github.com/biosaxs-dev/molass-library/issues/331) | Naming / Interpretability | Three mapping types; `Decomposition.mapping` ignores the optimized mapping; add `optimized_mapping`, aliases on `Mapping` | ⏳ Open |
-| [#332](https://github.com/biosaxs-dev/molass-library/issues/332) | Observability | `RgCurve` repr: frame coverage, I(0) availability | ⏳ Open |
-| [#333](https://github.com/biosaxs-dev/molass-library/issues/333) | Naming | `xr_peaks`/`uv_peaks` are indices not frames; `indeces` typo; frame conventions | ⏳ Open |
-| [#334](https://github.com/biosaxs-dev/molass-library/issues/334) | Workflow | Second `optimize_rigorously(in_process=True)` in one process: cryptic AttributeError | ⏳ Open |
-| [#335](https://github.com/biosaxs-dev/molass-library/issues/335) | Naming / Workflow | One documented `RunInfo.wait_until_done()` / `is_done` | ⏳ Open |
-| [#336](https://github.com/biosaxs-dev/molass-library/issues/336) | Navigation | One call to load the best on-disk rigorous result (logic copied in three GUI dialogs) | ⏳ Open |
-| [#337](https://github.com/biosaxs-dev/molass-library/issues/337) | Interpretability | `estimate_mapping()` resolution/uncertainty (see #328) | ⏳ Open |
-| [#338](https://github.com/biosaxs-dev/molass-library/issues/338) | Naming | Did-you-mean hints for `AttributeError` on data objects | ⏳ Open |
-| [#339](https://github.com/biosaxs-dev/molass-library/issues/339) | Workflow | Route informational output through `logging` (PowerShell `NativeCommandError`; cf. #256) | ⏳ Open |
-| [#340](https://github.com/biosaxs-dev/molass-library/issues/340) | Navigation | Promote a known-truth simulator (`molass.Testing.simulate_ssd`) | ⏳ Open |
+| [#333](https://github.com/biosaxs-dev/molass-library/issues/333) | Naming | `MappingInfo.xr_peak_frames` / `uv_peak_frames` next to the index arrays `xr_peaks` / `uv_peaks`; index-versus-frame conventions documented in the `SsMatrixData` docstring | ✅ Done |
+| [#334](https://github.com/biosaxs-dev/molass-library/issues/334) | Workflow | Second `optimize_rigorously(in_process=True)` in one process: a leftover `temp_in_folder` in the legacy settings no longer breaks it; clear `RuntimeError` when trimming info is missing and nothing was exported | ✅ Done |
+| [#335](https://github.com/biosaxs-dev/molass-library/issues/335) | Naming / Workflow | `RunInfo.wait_until_done(timeout=None)` / `RunInfo.is_done`: one meaning for all run kinds | ✅ Done |
+| [#336](https://github.com/biosaxs-dev/molass-library/issues/336) | Navigation | `load_best_rigorous_result(decomp, analysis_folder, ...)` and `load_rigorous_result(..., jobid='best')`, with `fv`/`sv` attached (the three molass-gui dialogs can switch to it) | ✅ Done |
+| [#337](https://github.com/biosaxs-dev/molass-library/issues/337) | Interpretability | `MappingInfo.resolution_frames`: noise-propagated uncertainty of the mapping in XR frames (see #328) | ✅ Done |
+| [#338](https://github.com/biosaxs-dev/molass-library/issues/338) | Naming | `DidYouMeanMixin`: close names and aliases in the `AttributeError` of `XrData`, `UvData`, `SecSaxsData`, `Decomposition`, `Curve`/`RgCurve` | ✅ Done |
+| [#339](https://github.com/biosaxs-dev/molass-library/issues/339) | Workflow | Library log messages and progress bars go to stdout (`Global/LogSetup.py`, `Global/Tqdm.py`); stderr kept for errors; no more PowerShell `NativeCommandError` for a successful run (cf. #256) | ✅ Done |
+| [#340](https://github.com/biosaxs-dev/molass-library/issues/340) | Navigation | `molass.Testing.simulate_ssd(species, uv_late, noise, seed, ...)` and `Species`, with `ssd.simulation_truth` | ✅ Done |
 
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable

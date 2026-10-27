@@ -8,7 +8,7 @@ from time import time
 from importlib import reload
 import logging
 from molass_legacy._MOLASS.SerialSettings import set_setting
-
+from molass.Global.DidYouMean import DidYouMeanMixin
 # Below this mapped-coverage ratio, trimmed_copy() warns that XR/UV frame
 # ranges diverged too much (see the warning in trimmed_copy() for details).
 TRIMMED_COVERAGE_WARN_RATIO = 0.7
@@ -66,7 +66,7 @@ def _baseline_selftest(M, recognition_curve):
     _, p_value = wilcoxon(nonzero, alternative='greater')
     return float(p_value)
 
-class SecSaxsData:
+class SecSaxsData(DidYouMeanMixin):
     """
     A class to represent a SEC-SAXS data object.
     It contains a pair of :class:`~molass.DataObjects.XrData` and :class:`~molass.DataObjects.UvData` objects.
@@ -910,7 +910,10 @@ class SecSaxsData:
         (integer apex positions limited it to about one frame). With a single peak the
         mapping rests on the peak moment and the curve extent, and is much less certain.
         The resolution still degrades with noise, peak asymmetry and unresolved overlaps;
-        ``MappingInfo.xr_peaks`` / ``uv_peaks`` remain the integer apex indices.
+        ``MappingInfo.xr_peaks`` / ``uv_peaks`` remain the integer apex *indices* (not frame
+        numbers; see ``xr_peak_frames`` / ``uv_peak_frames``). ``MappingInfo.resolution_frames``
+        estimates the noise-limited uncertainty of the mapping in XR frames (``None`` for a
+        single-peak mapping); asymmetry and overlap come on top of it.
 
         Parameters
         ----------

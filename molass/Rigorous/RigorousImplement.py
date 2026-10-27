@@ -750,7 +750,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             # instead of slices referencing the original raw dimensions.
             _set_identity_restrict_lists(data_ssd)
         else:
-            decomposition.ssd.trimming.update_legacy_settings()
+            from molass.Rigorous.LegacyBridgeUtils import update_legacy_trimming_settings
+            update_legacy_trimming_settings(decomposition.ssd)
 
         # construct legacy optimizer
         spectral_vectors = data_ssd.get_spectral_vectors()

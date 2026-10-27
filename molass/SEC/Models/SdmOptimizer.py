@@ -376,7 +376,7 @@ def optimize_sdm_xr_decomposition(decomposition, env_params, model_params=None, 
             _pbar.set_postfix(evals=_eval_count[0], refresh=False)
 
     if progress:
-        from tqdm.auto import tqdm as _tqdm
+        from molass.Global.Tqdm import tqdm as _tqdm
         _pbar = _tqdm(desc='SDM(mono) opt', unit='iter', dynamic_ncols=True)
     else:
         _pbar = None
@@ -838,7 +838,7 @@ def optimize_sdm_lognormal_xr_decomposition(decomposition, env_params, model_par
     nm_options = {'maxiter': nm_maxiter if nm_maxiter is not None else max(200 * n_params, 12000)}
 
     if progress:
-        from tqdm.auto import tqdm as _tqdm
+        from molass.Global.Tqdm import tqdm as _tqdm
         _pbar = _tqdm(total=nm_options['maxiter'], desc='SDM(lognormal) NM', unit='iter',
                       dynamic_ncols=True)
     else:

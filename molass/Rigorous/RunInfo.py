@@ -322,6 +322,10 @@ class RunInfo:
     def wait(self, timeout=600, poll_interval=5):
         """Wait for rigorous optimization results to become available.
 
+        .. seealso:: :meth:`wait_until_done` / :attr:`is_done`: one meaning for every kind of
+           run (``wait`` behaves differently for subprocess, async and synchronous runs, as
+           described below).
+
         Parameters
         ----------
         timeout : float, optional
@@ -410,6 +414,71 @@ class RunInfo:
         return wait_for_rigorous_results(
             self.analysis_folder, timeout=timeout, poll_interval=poll_interval
         )
+
+    @property
+    def is_done(self):
+        """``True`` once the run has finished, whatever its kind (molass-library#335).
+
+        One meaning for all run kinds: a subprocess run, an async in-process run
+        (``async_=True``), a synchronous run, or a run restored with :meth:`reconnect`.
+        ``True`` also for a run that ended in failure (check ``live_status()['phase']``
+        for ``'completed'`` versus ``'failed'``). Unlike :meth:`load_best`, which returns as
+        soon as the *first* result exists, ``is_done`` is ``True`` only when the optimizer has stopped.
+        """
+        if self.is_alive:
+            return False
+        if self._async_thread is not None:
+            return True         # the background thread has ended (successfully or with _async_error)
+        phase = self.live_status().get('phase')
+        if phase in ('completed', 'failed'):
+            return True
+        if phase in ('running', 'pending'):
+            return False
+        # no manifest information: a synchronous in-process run has finished when it has returned
+        return (self._async_thread is None and self._subprocess_process is None
+                and self.in_process_result is not None)
+
+    def wait_until_done(self, timeout=None, poll_interval=2):
+        """Block until the run has finished (:attr:`is_done`), for every kind of run (molass-library#335).
+
+        Parameters
+        ----------
+        timeout : float or None, optional
+            Maximum seconds to wait; ``None`` (default) waits without a limit.
+        poll_interval : float, optional
+            Seconds between checks (default 2).
+
+        Returns
+        -------
+        bool
+            ``True`` if the run is done, ``False`` if the timeout expired first.
+
+        Raises
+        ------
+        RuntimeError
+            If an async in-process run ended with an error.
+
+        Notes
+        -----
+        This blocks the calling thread (in a notebook, the kernel) like :meth:`wait` does;
+        poll :attr:`is_done` / :meth:`live_status` instead to keep a notebook responsive.
+        After it returns ``True``, :meth:`load_best` gives the *final* best result.
+        """
+        import time
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while True:
+            if self._async_error is not None:
+                raise RuntimeError("Async optimizer failed") from self._async_error
+            if self.is_done:
+                return True
+            remaining = None if deadline is None else deadline - time.monotonic()
+            if remaining is not None and remaining <= 0:
+                return False
+            pause = poll_interval if remaining is None else min(poll_interval, remaining)
+            if self._async_thread is not None:
+                self._async_thread.join(timeout=pause)
+            else:
+                time.sleep(pause)
 
     def load_best(self, timeout=0, poll_interval=5, debug=False):
         """Load the best rigorous optimization result, waiting until one is available.

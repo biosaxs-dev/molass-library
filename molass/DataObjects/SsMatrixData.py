@@ -4,7 +4,9 @@
 import numpy as np
 from molass.DataObjects.Curve import create_icurve, create_jcurve
 
-class SsMatrixData:
+from molass.Global.DidYouMean import DidYouMeanMixin
+
+class SsMatrixData(DidYouMeanMixin):
     """A class to represent a SAXS/UV matrix data object.
     It contains a 2D matrix M where M[i,j] is the intensity value
     at the i-th value of the first variable (iv) and the j-th value
@@ -16,6 +18,8 @@ class SsMatrixData:
         The values of the first variable (e.g., scattering angle or q).
     jv : array-like
         The values of the second variable (e.g., time or wavelength).
+        For XR and UV data these are *frame numbers*; they need not start at 0 and differ
+        between the two (e.g. XR frames 1-239, UV frames 3-351).
     M : 2D array-like
         The 2D matrix of intensity values.
     data : 2D array-like (property)
@@ -39,6 +43,14 @@ class SsMatrixData:
         Explicit mask of frames to exclude from LPM fitting when
         ``has_anomaly_mask=True``.  If None (default), the mask is
         derived automatically from the recognition curve (frames where y < 0).
+
+    Notes
+    -----
+    Frame numbers and indices: ``jv`` (and ``Curve.x`` of an i-curve) hold frame numbers; an
+    *index* is a 0-based position in ``jv``, so ``frame == jv[index]``. Peak positions come in
+    both forms: ``MappingInfo.xr_peaks`` / ``uv_peaks`` are indices, ``xr_peak_frames`` /
+    ``uv_peak_frames`` the corresponding frame numbers; ``RgCurve.frames`` (the alias of the
+    misspelled ``indeces``) holds frame numbers, not positions.
     """
     def __init__(self, M, iv, jv, E=None,
                  moment=None,

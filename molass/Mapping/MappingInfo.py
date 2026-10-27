@@ -12,10 +12,12 @@ class MappingInfo:
         The slope of the linear mapping from XR to UV in the form y = slope * x + intercept.
     intercept : float
         The intercept of the linear mapping from XR to UV in the form y = slope * x + intercept.
-    xr_peaks : list of tuples
-        List of (position, intensity) tuples for XR peaks.
-    uv_peaks : list of tuples
-        List of (position, intensity) tuples for UV peaks.
+    xr_peaks : array-like of int
+        *Indices* (0-based positions in ``xr_curve.x``) of the matched XR peaks, not frame
+        numbers: for data whose frames start at 3, a peak at frame 134 has index 131.
+        Use :attr:`xr_peak_frames` for the frame numbers.
+    uv_peaks : array-like of int
+        *Indices* of the matched UV peaks (see ``xr_peaks``); :attr:`uv_peak_frames` gives frames.
     xr_moment : float
         The moment of the XR data.
     uv_moment : float
@@ -24,8 +26,17 @@ class MappingInfo:
         The XR curve object.
     uv_curve : Curve
         The UV curve object.
+    resolution_frames : float or None
+        Rough statistical uncertainty of the mapping, in XR frames (rms of the equivalent frame
+        shift at the middle of the XR curve), propagated from the noise-limited peak positions
+        (see ``SimpleMapper.refine_peak_position``). ``None`` when it was not estimated, e.g.
+        for a single-peak mapping, which rests on the peak moment and curve extent and is
+        much less certain. It covers noise only: asymmetry or overlapping peaks add to it.
     """
-    def __init__(self, slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve):
+    resolution_frames = None    # class-level default for objects created before this attribute existed
+
+    def __init__(self, slope, intercept, xr_peaks, uv_peaks, xr_moment, uv_moment, xr_curve, uv_curve,
+                 resolution_frames=None):
         """
         Initializes the MappingInfo object with the given parameters.
         """
@@ -37,6 +48,17 @@ class MappingInfo:
         self.uv_moment = uv_moment
         self.xr_curve = xr_curve
         self.uv_curve = uv_curve
+        self.resolution_frames = resolution_frames
+
+    @property
+    def xr_peak_frames(self):
+        """Frame numbers of the matched XR peaks (``xr_curve.x[xr_peaks]``); ``xr_peaks`` are indices."""
+        return np.asarray(self.xr_curve.x)[np.asarray(self.xr_peaks, dtype=int)]
+
+    @property
+    def uv_peak_frames(self):
+        """Frame numbers of the matched UV peaks (``uv_curve.x[uv_peaks]``); ``uv_peaks`` are indices."""
+        return np.asarray(self.uv_curve.x)[np.asarray(self.uv_peaks, dtype=int)]
 
     def xr_to_uv(self, x):
         """Convert XR frame number(s) to the corresponding UV frame number(s).
@@ -75,7 +97,9 @@ class MappingInfo:
         return (np.asarray(x) - self.intercept) / self.slope
 
     def __repr__(self):
-        return f"MappingInfo(slope=%.3g, intercept=%.3g, xr_peaks=..., uv_peaks=..., xr_moment=..., uv_moment=...)" % (self.slope, self.intercept)
+        res = "" if self.resolution_frames is None else ", resolution_frames=%.2g" % self.resolution_frames
+        return (f"MappingInfo(slope=%.3g, intercept=%.3g{res}, xr_peaks=..., uv_peaks=..., xr_moment=..., uv_moment=...)"
+                % (self.slope, self.intercept))
     
     def __str__(self):
         return self.__repr__()

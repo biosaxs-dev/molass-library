@@ -7,8 +7,9 @@
 """
 from importlib import reload
 import numpy as np
+from molass.Global.DidYouMean import DidYouMeanMixin
 
-class Decomposition:
+class Decomposition(DidYouMeanMixin):
     """
     A class to store the result of decomposition which is a low rank approximation.
 
@@ -1715,9 +1716,10 @@ class Decomposition:
         RunInfo
             A ``RunInfo`` object that tracks the optimization run.
             For blocking runs (``async_=False``), the run is complete when
-            this returns.  For non-blocking runs (``async_=True``), call
-            ``run_info.load_best()`` to wait for the first result and load it,
-            or ``run_info.wait()`` then ``run_info.load_best()``.
+            this returns.  For non-blocking runs (``async_=True``), wait for the
+            *end* of the run with ``run_info.wait_until_done()`` (``run_info.is_done``
+            to poll; same meaning for every kind of run), then ``run_info.load_best()``;
+            ``run_info.load_best()`` alone returns as soon as the *first* result exists.
 
         Notes
         -----
@@ -1754,9 +1756,12 @@ class Decomposition:
         RunInfo.get_score_breakdown : Inspect the individual score and
             penalty components that make up the objective value (fv).
         RunInfo.is_alive : Check whether an async run is still in progress.
-        RunInfo.wait : Block until the run completes.
+        RunInfo.is_done : ``True`` once the run has finished (all run kinds).
+        RunInfo.wait_until_done : Block until the run has finished (all run kinds).
+        RunInfo.wait : Block until results are available (behaves differently per run kind).
         RunInfo.load_best : Wait for the first result then load it (recommended
-            for ``async_=True`` runs instead of ``wait()`` + ``load_best()``).        """
+            for ``async_=True`` runs instead of ``wait()`` + ``load_best()``).
+        """
         # Backward compatibility: accept old name uncorrected_ssd
         if 'uncorrected_ssd' in kwargs:
             import warnings

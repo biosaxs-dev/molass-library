@@ -208,7 +208,9 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
         passed to ``optimize_rigorously(analysis_folder=...)``).  
     jobid : str, optional
         Specific job id to load (subfolder name under ``optimized/jobs/``).  
-        If ``None``, loads the latest (last sorted) job.
+        If ``None``, loads the latest (last sorted) job; ``'best'`` loads the job with the lowest
+        objective value and attaches ``fv`` / ``sv`` to the result (see
+        :func:`load_best_rigorous_result`).
     rgcurve : RgCurve, optional
         Pre-computed Rg curve.  When provided, skips the expensive per-frame
         Guinier fitting that ``ssd.xr.compute_rgcurve()`` would perform.
@@ -247,7 +249,17 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
     set_setting('optimizer_folder', optimizer_folder)
 
     # Resolve job id
-    if jobid is None:
+    best_job = None
+    if isinstance(jobid, str) and jobid == 'best':
+        # the job with the lowest objective value (a later job can be worse than an earlier one)
+        valid_jobs = list_rigorous_jobs(analysis_folder)
+        if not valid_jobs:
+            raise FileNotFoundError(
+                f"No completed job (with at least one real result) found in {jobs_folder}"
+            )
+        best_job = min(valid_jobs, key=lambda j: j.best_fv)
+        jobid = best_job.id
+    elif jobid is None:
         # Skip jobs that only have the single init-params entry (e.g. a round
         # still starting up, or one interrupted before its first real result) --
         # same guard as list_rigorous_jobs() (issue #188). Without this, "latest
@@ -351,7 +363,38 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
     ranks = xr_ranks if xr_ranks is not None else getattr(decomp, 'xr_ranks', None)
     if ranks is not None:
         result.update_xr_ranks(list(ranks))
+    if best_job is not None:
+        # same convention as RunInfo.load_best(): `result.fv` / `result.sv` without re-parsing callback.txt
+        result.fv = best_job.best_fv
+        result.sv = float(fv_to_sv(best_job.best_fv))
     return result
+
+
+def load_best_rigorous_result(decomp, analysis_folder, rgcurve=None, xr_ranks=None, debug=False):
+    """Load the best (lowest objective value) rigorous result from an analysis folder in one call.
+
+    ``load_rigorous_result(..., jobid=None)`` loads the *latest* job, which can be worse than an
+    earlier one (e.g. a reseeded round that has not improved yet); this picks the best job of
+    ``list_rigorous_jobs()`` instead, and attaches ``fv`` and ``sv`` to the result as
+    ``RunInfo.load_best()`` does (molass-library#336).
+
+    Parameters
+    ----------
+    decomp, analysis_folder, rgcurve, xr_ranks, debug
+        As in :func:`load_rigorous_result`.
+
+    Returns
+    -------
+    Decomposition
+        The result, with ``fv`` (best objective value) and ``sv`` (score value, 0-100) attributes.
+
+    Raises
+    ------
+    FileNotFoundError
+        If no completed job (with at least one real result) exists yet.
+    """
+    return load_rigorous_result(decomp, analysis_folder, jobid='best', rgcurve=rgcurve,
+                                xr_ranks=xr_ranks, debug=debug)
 
 
 def load_analysis_session(analysis_folder, jobid=None, debug=False):

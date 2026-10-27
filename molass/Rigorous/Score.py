@@ -375,7 +375,8 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
             from molass.Rigorous.RigorousImplement import _set_identity_restrict_lists
             _set_identity_restrict_lists(data_ssd)
         else:
-            decomposition.ssd.trimming.update_legacy_settings()
+            from molass.Rigorous.LegacyBridgeUtils import update_legacy_trimming_settings
+            update_legacy_trimming_settings(decomposition.ssd)
 
         spectral_vectors = data_ssd.get_spectral_vectors()
         model = decomposition.xr_ccurves[0].model
