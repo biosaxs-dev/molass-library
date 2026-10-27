@@ -12,6 +12,7 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
         reload(molass.LowRank.CoupledAdjuster)
     from molass.LowRank.CoupledAdjuster import make_component_curves
 
+    requested_num_components = num_components
     proportions = kwargs.pop('proportions', None)
     xr_peakpositions = kwargs.pop('xr_peakpositions', None)
     if proportions is not None and xr_peakpositions is not None:
@@ -43,12 +44,53 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
             "Try specifying num_components explicitly."
         )
 
+    warn_on_suspicious_components(requested_num_components, xr_ccurves,
+                                  allow_negative=kwargs.get('allow_negative_peaks', False))
+
     if uv_ccurves is None:
         uv_ccurves = make_dummy_uv_ccurves(ssd, xr_ccurves)
 
     decomposition = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
     decomposition.method_label = "quick decomposition"
     return decomposition
+
+NEGLIGIBLE_SHARE = 1e-3
+
+def warn_on_suspicious_components(requested, xr_ccurves, allow_negative=False):
+    """Warn (molass-library#321) when the result silently differs from what was asked for.
+
+    1. Fewer components than requested: peak recognition found fewer peaks.
+    2. A component with a non-positive or negligible area share: its per-component
+       results (Guinier I0, I0/UV ratios, ...) are meaningless.
+
+    The warnings point at the caller of ``quick_decomposition``.
+    """
+    import warnings
+
+    n = len(xr_ccurves)
+    if requested is not None and n < requested:
+        warnings.warn(
+            f"quick_decomposition(num_components={requested}) returned {n} components: "
+            f"peak recognition found only {n} peaks. To get {requested} components, "
+            f"pass proportions=[1]*{requested} (proportional slicing) or "
+            f"xr_peakpositions=[...] with {requested} frame positions.",
+            UserWarning, stacklevel=4)
+
+    if allow_negative or n == 0:
+        return
+    areas = np.array([np.sum(c.get_y()) for c in xr_ccurves], dtype=float)
+    total = np.sum(areas)
+    if total <= 0:
+        return
+    shares = areas/total
+    bad = [i + 1 for i, (a, s) in enumerate(zip(areas, shares)) if a <= 0 or s < NEGLIGIBLE_SHARE]
+    if bad:
+        details = ", ".join(f"{i}: {shares[i-1]:.2g}" for i in bad)
+        warnings.warn(
+            f"component(s) {bad} have a non-positive or negligible area share ({details}); "
+            f"their per-component results (e.g. Guinier I0, I0/UV ratios) are not meaningful. "
+            f"Try a different num_components or different xr_peakpositions/proportions.",
+            UserWarning, stacklevel=4)
 
 def make_component_curves_with_proportions(ssd, num_components, proportions, **kwargs):
     """

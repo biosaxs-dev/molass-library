@@ -260,6 +260,7 @@ pre-optimization decomposition instead of the restored best result):
 | [#324](https://github.com/biosaxs-dev/molass-library/issues/324) | `Flatness.curvature` / `tilt_quad` (separates a mapping error, a tilt, from a concentration effect, a curvature) | ✅ Done (closed) |
 | [#325](https://github.com/biosaxs-dev/molass-library/issues/325) | Composed API `SecSaxsData.homogeneity()` with `HomogeneityResult` (summary, plot, shifted, reselect); GUI dialog follows in molass-gui | ✅ Done (closed) |
 | [#327](https://github.com/biosaxs-dev/molass-library/issues/327) | Homogeneity with a given or optimized mapping: `homogeneity(mapping=...)`, `Decomposition.get_uv_mapping()` / `.homogeneity()`, `mapping_shift()` | ✅ Done (closed) |
+| [#321](https://github.com/biosaxs-dev/molass-library/issues/321) | `quick_decomposition` warns when it returns fewer components than `num_components` and when a component has a non-positive/negligible area share (`warn_on_suspicious_components`) | ✅ Done |
 
 ### Newly filed (October 26, 2026)
 
