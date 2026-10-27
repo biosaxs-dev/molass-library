@@ -81,6 +81,26 @@ class RgCurve(Curve):
         (failed fit, or results that carry no I(0) error, e.g. ATSAS)."""
         return self._result_values('I0_stdev')
 
+    def __repr__(self):
+        """Summarize what this curve covers: frame count and range, finite Rg count, I(0) availability.
+
+        An Rg curve restored from disk (``try_fast_rg_curve``) can cover only part of the frames
+        and carry no I(0); the representation makes that visible (molass-library#332).
+        """
+        n = len(self.indeces)
+        if n == 0:
+            return "RgCurve(empty)"
+        first, last = int(np.min(self.indeces)), int(np.max(self.indeces))
+        n_rg = int(np.isfinite(np.asarray(self.rgvalues, dtype=float)).sum())
+        n_i0 = int(np.isfinite(self.i0s).sum())
+        parts = [f"{n} frames {first}-{last}"]
+        n_missing = (last - first + 1) - n
+        if n_missing > 0:
+            parts.append(f"{n_missing} frames missing in between")
+        parts.append(f"finite Rg: {n_rg}")
+        parts.append(f"I(0): {n_i0} finite" if n_i0 > 0 else "I(0): not available")
+        return "RgCurve(" + ", ".join(parts) + ")"
+
 
 def construct_rgcurve_from_list(rginfo_list, result_type=None):
     """

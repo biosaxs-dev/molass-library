@@ -263,6 +263,7 @@ pre-optimization decomposition instead of the restored best result):
 | [#321](https://github.com/biosaxs-dev/molass-library/issues/321) | `quick_decomposition` warns when it returns fewer components than `num_components` and when a component has a non-positive/negligible area share (`warn_on_suspicious_components`) | ✅ Done (closed) |
 | [#328](https://github.com/biosaxs-dev/molass-library/issues/328) | `estimate_mapping()` fits through sub-frame peak positions (`SimpleMapper.refine_peak_position`, core centroid) instead of integer apexes: simulated mapping error 0.63 → 0.05 XR frames rms; resolution documented | ✅ Done (closed) |
 | [#331](https://github.com/biosaxs-dev/molass-library/issues/331) | `Mapping` gets `slope`/`intercept`/`xr_to_uv`/`uv_to_xr`; `Decomposition.estimated_mapping` / `optimized_mapping` added; `Decomposition.mapping` (the estimate) warns when the UV curves use a different, optimized mapping | ✅ Done (closed) |
+| [#332](https://github.com/biosaxs-dev/molass-library/issues/332) | `RgCurve.__repr__` summarizes frame count/range, gaps, finite Rg count and I(0) availability (restored curves cover part of the frames and carry no I(0)) | ✅ Done (closed) |
 
 ### Newly filed (October 26, 2026)
 
