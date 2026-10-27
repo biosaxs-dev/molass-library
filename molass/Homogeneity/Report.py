@@ -68,6 +68,8 @@ class HomogeneityResult:
         The q values (1/A) behind the default ``I(q1)``, ``I(q2)``.
     delta : float
         Shift of the UV->XR mapping in XR frames (+ = later) used for the UV proxies.
+    title : str or None
+        Suptitle of :meth:`plot` saying where the result comes from (see ``Decomposition.homogeneity``).
     mapping : mapping object or None
         The UV->XR mapping the UV proxies are made with (``None`` without UV data).
     skipped : list of str
@@ -83,8 +85,9 @@ class HomogeneityResult:
     a concentration-dependent effect as a curvature (symmetric peaks).
     """
 
-    def __init__(self, ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=None):
+    def __init__(self, ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=None, title=None):
         self._ssd, self._rgcurve, self._min_score = ssd, rgcurve, min_score
+        self.title = title
         if mapping is not None:
             self.mapping = as_mapping(mapping)
         else:
@@ -140,12 +143,12 @@ class HomogeneityResult:
     def shifted(self, delta):
         """The same analysis with the UV->XR mapping shifted by ``delta`` XR frames (+ = later)."""
         return HomogeneityResult(self._ssd, self.pairs, delta, self.q1, self.q2, self.cores,
-                                 self._rgcurve, self._min_score, mapping=self.mapping)
+                                 self._rgcurve, self._min_score, mapping=self.mapping, title=self.title)
 
     def reselect(self, pairs):
         """The same analysis (cores, q values, shift) with a different set of ``(numerator, denominator)`` names."""
         return HomogeneityResult(self._ssd, pairs, self.delta, self.q1, self.q2, self.cores,
-                                 self._rgcurve, self._min_score, mapping=self.mapping)
+                                 self._rgcurve, self._min_score, mapping=self.mapping, title=self.title)
 
     def table(self):
         """Rows (dicts) of the statistics: core, first, last, ratio, mapping dependence and the Flatness fields."""
@@ -177,11 +180,13 @@ class HomogeneityResult:
     def __repr__(self):
         return f"HomogeneityResult({len(self.ratios)} ratios, {len(self.cores)} cores, delta={self.delta:g})"
 
-    def plot(self, ylim=(-40, 40), pad=8, figsize=(12, 7)):
+    def plot(self, ylim=(-40, 40), pad=8, figsize=(12, 7), title=None):
         """Elution curves (top) and the deviation of each ratio from its core median (bottom).
 
         Classical ratios (I(0) numerator) are drawn black/gray and thick; ratios that depend on
-        the mapping are dashed. Returns the figure.
+        the mapping are dashed. ``title`` (default: the ``title`` of this result, e.g. the
+        ``dataset | model | method | mapping`` line made by ``Decomposition.homogeneity()``) is
+        the suptitle that tells where the figure comes from. Returns the figure.
         """
         import matplotlib.pyplot as plt
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, sharex=True, gridspec_kw=dict(height_ratios=[1, 2]))
@@ -217,7 +222,12 @@ class HomogeneityResult:
         ax2.set_title(f"* depends on the UV->XR mapping (shift {self.delta:+g} frame); {self.independent_axes} independent axes",
                       fontsize=9)
         ax2.legend(fontsize=8, ncol=3)
-        fig.tight_layout()
+        title = title if title is not None else self.title
+        if title:
+            fig.suptitle(title, fontsize=10)
+            fig.tight_layout(rect=(0, 0, 1, 0.96))
+        else:
+            fig.tight_layout()
         return fig
 
 
@@ -250,7 +260,7 @@ def ensure_i0_rgcurve(ssd, rgcurve=None):
 
 
 def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,
-                        mapping=None):
+                        mapping=None, title=None):
     """Implementation of :meth:`SecSaxsData.homogeneity`."""
     rgcurve = ensure_i0_rgcurve(ssd, rgcurve)
     has_uv = ssd.uv is not None
@@ -272,4 +282,4 @@ def compute_homogeneity(ssd, pairs=None, delta=0.0, q1=None, q2=None, cores=None
         q2 = round(3 * q1, 3)
     if pairs is None:
         pairs = default_pairs(q1, q2, has_uv)
-    return HomogeneityResult(ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=mapping)
+    return HomogeneityResult(ssd, pairs, delta, q1, q2, cores, rgcurve, min_score, mapping=mapping, title=title)

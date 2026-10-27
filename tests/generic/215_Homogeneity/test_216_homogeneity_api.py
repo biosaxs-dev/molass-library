@@ -178,3 +178,21 @@ def test_120_rgcurve_without_i0_is_completed(corrected, result):
     assert (1, "I(0)/A280") in r.stats and getattr(corrected, "_i0_rgcurve", None) is not None
     assert r.stats[(1, "I(0)/A280")].median == pytest.approx(result.stats[(1, "I(0)/A280")].median, rel=1e-6)
     assert ensure_i0_rgcurve(corrected, bare) is corrected._i0_rgcurve              # cached
+
+
+def test_130_figure_title_tells_the_stage_and_the_mapping(corrected, result):
+    # a plain SecSaxsData analysis has no stage: no suptitle
+    assert result.title is None and result.plot().texts == [] and result.plot()._suptitle is None
+    decomp = corrected.quick_decomposition()
+    r = decomp.homogeneity(cores=result.cores)
+    assert "method: quick decomposition" in r.title and "mapping: estimated" in r.title
+    assert r.plot()._suptitle.get_text() == r.title
+    assert r.shifted(0.5).title == r.title and r.reselect([("I(0)", "A280")]).title == r.title
+    assert r.plot(title="mine")._suptitle.get_text() == "mine"
+    assert decomp.homogeneity(cores=result.cores, title="").plot()._suptitle is None
+    # the UV curves of the decomposition carry an optimized mapping: the title says so
+    from molass.Mapping.Mapping import Mapping
+    a, b = tuple(corrected.get_mapping())
+    for uv_ccurve in decomp.uv_ccurves:
+        uv_ccurve.mapping = Mapping(a, b + 1.0)
+    assert "mapping: optimized" in decomp.homogeneity(cores=result.cores).title

@@ -637,9 +637,18 @@ class Decomposition(DidYouMeanMixin):
         and this decomposition's Rg curve, so that a rigorous result is analysed with its optimized
         mapping. Use ``molass.Homogeneity.mapping_shift(decomp.ssd.get_mapping(), decomp.get_uv_mapping(), frames)``
         to see how far the optimizer moved the mapping, in XR frames.
+
+        The figure gets the same kind of suptitle as ``plot_components(title='auto')`` --
+        ``dataset | model: ... | method: <how this decomposition was made> | mapping: estimated or
+        optimized`` -- so that figures of the quick, upgraded and rigorous stages can be told apart;
+        pass ``title=`` to replace it (``title=''`` for none).
         """
         kwargs.setdefault('mapping', self.get_uv_mapping())
         kwargs.setdefault('rgcurve', self.get_rg_curve())
+        if 'title' not in kwargs:
+            from molass.PlotUtils.DecompositionPlot import make_auto_title
+            kind = "optimized" if self.optimized_mapping is not None else "estimated"
+            kwargs['title'] = f"{make_auto_title(self)} | mapping: {kind}"
         return self.ssd.homogeneity(**kwargs)
 
     def compute_reconstructed_rgcurve(self, debug=False):

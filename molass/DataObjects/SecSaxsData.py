@@ -1125,7 +1125,7 @@ class SecSaxsData(DidYouMeanMixin):
         return self._rgcurve
 
     def homogeneity(self, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,
-                    mapping=None):
+                    mapping=None, title=None):
         """Homogeneity analysis of the elution peaks from ratios of concentration proxies.
 
         A ratio of two proxies of the concentration (``I(0)``, ``I(q)``, ``A<wavelength>``) is
@@ -1159,6 +1159,10 @@ class SecSaxsData(DidYouMeanMixin):
         mapping : MappingInfo, Mapping, (slope, intercept) or None
             The UV->XR mapping for the UV proxies; None uses ``get_mapping()`` (the estimated one).
             A rigorous result's optimized mapping is used by ``Decomposition.homogeneity()``.
+        title : str or None
+            Suptitle of ``result.plot()`` saying where the figure comes from (kept by ``shifted()``
+            and ``reselect()``); None for none. ``Decomposition.homogeneity()`` sets
+            ``dataset | model | method | mapping`` like ``plot_components(title='auto')``.
 
         Returns
         -------
@@ -1176,7 +1180,7 @@ class SecSaxsData(DidYouMeanMixin):
         """
         from molass.Homogeneity.Report import compute_homogeneity
         return compute_homogeneity(self, pairs=pairs, delta=delta, q1=q1, q2=q2, cores=cores,
-                                   rgcurve=rgcurve, min_score=min_score, mapping=mapping)
+                                   rgcurve=rgcurve, min_score=min_score, mapping=mapping, title=title)
 
     def recommend_decomposition_options(self, egh_overlap_threshold=1.3):
         """Recommend keyword arguments for ``quick_decomposition()`` by detecting peaks.
