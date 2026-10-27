@@ -270,7 +270,7 @@ def plot_components_impl(decomposition, **kwargs):
     pairedranges = kwargs.get('pairedranges', None)
     if pairedranges is not None:
         x = decomposition.xr_icurve.x
-        mapping = decomposition.mapping
+        mapping = decomposition.estimated_mapping
         uv_ylim = ax1.get_ylim()
         xr_ylim = ax2.get_ylim()
         for prange in pairedranges:

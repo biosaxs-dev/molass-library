@@ -566,7 +566,7 @@ def optimize_sdm_uv_decomposition(decomposition, xr_ccurves, **kwargs):
         error = np.sum((y - ty)**2)
         return error
 
-    mapping = decomposition.mapping
+    mapping = decomposition.estimated_mapping
     a, b = mapping.slope, mapping.intercept
 
     initial_guess = [a, b] + [1.0]*num_components

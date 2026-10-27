@@ -88,7 +88,7 @@ class Decomposition:
         self.uv_ccurves = uv_ccurves
         self.uv_ranks = None
  
-        self.mapping = ssd.get_mapping()
+        self._estimated_mapping = ssd.get_mapping()
         self.mapped_curve = mapped_curve
         self.paired_ranges = paired_ranges
 
@@ -567,17 +567,67 @@ class Decomposition:
             return parent.has_rg_curve
         return getattr(self.ssd, '_rgcurve', None) is not None
 
-    def get_uv_mapping(self):
-        """The XR->UV mapping that this decomposition's UV component curves use.
+    @property
+    def estimated_mapping(self):
+        """The estimated XR->UV mapping of the data (``ssd.get_mapping()``, a ``MappingInfo``).
 
-        For a rigorous result this is the *optimized* mapping (``Mapping(a, b)``); for a quick
-        decomposition it is the estimated one (the same as ``self.mapping``). ``None`` without UV.
+        Unlike :attr:`optimized_mapping`, this never reflects an optimization of the UV curves.
         """
+        mapping = getattr(self, '_estimated_mapping', None)
+        return mapping if mapping is not None else self.ssd.get_mapping()
+
+    @property
+    def optimized_mapping(self):
+        """The mapping optimized together with the UV component curves, or ``None``.
+
+        A rigorous result (and a decomposition after ``optimize_uv_...``) carries its own
+        ``Mapping(a, b)`` in the UV component curves; ``None`` is returned when the UV curves
+        use the estimated mapping (e.g. a quick decomposition) or there is no UV.
+        """
+        estimated = self.estimated_mapping
         for uv_ccurve in (self.uv_ccurves or []):
             mapping = getattr(uv_ccurve, 'mapping', None)
             if mapping is not None:
+                if estimated is not None and np.allclose(tuple(mapping), (estimated.slope, estimated.intercept),
+                                                         rtol=1e-9, atol=1e-9):
+                    return None
                 return mapping
-        return self.mapping if self.uv_icurve is not None else None
+        return None
+
+    @property
+    def mapping(self):
+        """The *estimated* mapping (a ``MappingInfo``), as before.
+
+        For a result whose UV curves use an optimized mapping this is not the mapping the
+        result is built on, so a warning is issued: use :attr:`optimized_mapping`,
+        :meth:`get_uv_mapping` (whichever applies) or :attr:`estimated_mapping` (explicit).
+        """
+        optimized = self.optimized_mapping
+        if optimized is not None:
+            import warnings
+            warnings.warn(
+                f"Decomposition.mapping is the estimated mapping {tuple(self.estimated_mapping)}, "
+                f"but the UV curves of this result use the optimized mapping {tuple(optimized)}. "
+                "Use decomp.get_uv_mapping() / decomp.optimized_mapping for the latter, "
+                "or decomp.estimated_mapping to silence this warning.",
+                UserWarning, stacklevel=2)
+        return self.estimated_mapping
+
+    @mapping.setter
+    def mapping(self, value):
+        self._estimated_mapping = value
+
+    def get_uv_mapping(self):
+        """The XR->UV mapping that this decomposition's UV component curves use.
+
+        For a rigorous result this is the *optimized* mapping (``Mapping(a, b)``, also
+        :attr:`optimized_mapping`); for a quick decomposition it is the estimated one
+        (:attr:`estimated_mapping`). ``None`` without UV.
+        """
+        optimized = self.optimized_mapping
+        if optimized is not None:
+            return optimized
+        return self.estimated_mapping if self.uv_icurve is not None else None
 
     def homogeneity(self, **kwargs):
         """Homogeneity analysis of the data with this decomposition's UV->XR mapping.

@@ -67,7 +67,7 @@ def optimize_uv_decomposition(decomposition, xr_ccurves, preserve_ratios=False, 
         error = np.sum((y - ty)**2)
         return error
 
-    mapping = decomposition.mapping
+    mapping = decomposition.estimated_mapping
     a, b = mapping.slope, mapping.intercept
 
     if preserve_ratios:

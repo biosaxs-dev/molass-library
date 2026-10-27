@@ -58,7 +58,7 @@ class _FakeDecomp:
     """Minimal decomposition consumed by optimize_uv_decomposition."""
     def __init__(self, uv_x, uv_y, mapping, xr_ccurves):
         self.uv_icurve = _FakeIcurve(uv_x, uv_y)
-        self.mapping = mapping
+        self.estimated_mapping = mapping
         self.xr_ccurves = xr_ccurves
         self.num_components = len(xr_ccurves)
 

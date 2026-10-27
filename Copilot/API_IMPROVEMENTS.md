@@ -261,7 +261,8 @@ pre-optimization decomposition instead of the restored best result):
 | [#325](https://github.com/biosaxs-dev/molass-library/issues/325) | Composed API `SecSaxsData.homogeneity()` with `HomogeneityResult` (summary, plot, shifted, reselect); GUI dialog follows in molass-gui | ✅ Done (closed) |
 | [#327](https://github.com/biosaxs-dev/molass-library/issues/327) | Homogeneity with a given or optimized mapping: `homogeneity(mapping=...)`, `Decomposition.get_uv_mapping()` / `.homogeneity()`, `mapping_shift()` | ✅ Done (closed) |
 | [#321](https://github.com/biosaxs-dev/molass-library/issues/321) | `quick_decomposition` warns when it returns fewer components than `num_components` and when a component has a non-positive/negligible area share (`warn_on_suspicious_components`) | ✅ Done (closed) |
-| [#328](https://github.com/biosaxs-dev/molass-library/issues/328) | `estimate_mapping()` fits through sub-frame peak positions (`SimpleMapper.refine_peak_position`, core centroid) instead of integer apexes: simulated mapping error 0.63 → 0.05 XR frames rms; resolution documented | ✅ Done |
+| [#328](https://github.com/biosaxs-dev/molass-library/issues/328) | `estimate_mapping()` fits through sub-frame peak positions (`SimpleMapper.refine_peak_position`, core centroid) instead of integer apexes: simulated mapping error 0.63 → 0.05 XR frames rms; resolution documented | ✅ Done (closed) |
+| [#331](https://github.com/biosaxs-dev/molass-library/issues/331) | `Mapping` gets `slope`/`intercept`/`xr_to_uv`/`uv_to_xr`; `Decomposition.estimated_mapping` / `optimized_mapping` added; `Decomposition.mapping` (the estimate) warns when the UV curves use a different, optimized mapping | ✅ Done (closed) |
 
 ### Newly filed (October 26, 2026)
 
