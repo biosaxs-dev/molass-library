@@ -44,10 +44,12 @@ def create_axes(fig, row_titles=["UV", "XR"], row_labels=True):
         axes.append(axis_row)
     return np.array(axes)
 
-def make_title_text(ssd, model=None, method_label=None, dataset=None):
+def make_title_text(ssd, model=None, method_label=None, dataset=None, xr_ranks=None):
     """Compose a suptitle identifying the dataset, the model and how the result was made.
 
     ``dataset`` overrides the name derived from ``ssd.datafiles`` (the folder name).
+    ``xr_ranks`` (per-component XR ranks) is shown as ``ranks: 1,2,1`` only when some
+    component has a rank other than 1, so the default (all rank 1) title is unchanged.
     """
     parts = []
     if dataset is None:
@@ -61,13 +63,16 @@ def make_title_text(ssd, model=None, method_label=None, dataset=None):
         parts.append(f"model: {str(model).upper()}")
     if method_label:
         parts.append(f"method: {method_label}")
+    if xr_ranks is not None and any(int(r) != 1 for r in xr_ranks):
+        parts.append("ranks: " + ",".join(str(int(r)) for r in xr_ranks))
     return " | ".join(parts)
 
 def make_auto_title(decomposition):
     """Build the default suptitle of ``plot_components`` for a Decomposition."""
     return make_title_text(decomposition.ssd,
                            getattr(decomposition, 'model', None),
-                           getattr(decomposition, 'method_label', None))
+                           getattr(decomposition, 'method_label', None),
+                           xr_ranks=getattr(decomposition, 'xr_ranks', None))
 
 def plot_elution_curve(ax, icurve, ccurves, title=None, ylabel=None, rgcurve=None, **kwargs):
     if title is not None:
