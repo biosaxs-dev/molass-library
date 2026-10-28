@@ -9,6 +9,7 @@ GLOBAL_OPTIONS = dict(
     developer_mode = False,
     elution_recognition = 'icurve',
     quiet = False,
+    small_angle_limit = 'extended',
 )
 
 def set_molass_options(**kwargs):
@@ -25,6 +26,14 @@ def set_molass_options(**kwargs):
         data without such an anomaly is not affected. Set it to False to observe the anomaly itself
         (e.g. the tilted baseline in ``plot_compact(baseline=True)``, or the unstable mapping it
         causes). See :mod:`molass.Trimming.AnomalyHandler`.
+    small_angle_limit : {'extended', 'guinier', 'none'}, optional
+        How the trimming sets the start of the angular range (the lowest q kept), as in the legacy
+        GUI's "Guinier Limit in Small Angle Data Trimming". Default is ``'extended'``: the extended
+        limit beyond the Guinier range plus the B(q) limit, which keeps the low-q points where
+        interparticle effects act. ``'guinier'`` is the minimum of the Guinier range (the default
+        before molass-library#342; it can drop the lowest-q points of concentrated samples, e.g. 24
+        of SAMPLE3's) and ``'none'`` keeps the whole measured range. It can also be given per call as
+        ``trimmed_copy(small_angle_limit=...)`` or fixed by ``trimmed_copy(xr_qr=(start, stop))``.
     flowchange : bool or str, optional
         Whether to consider flow change. Default is False.
         If a string is given and equal to 'auto', flow change will be considered
@@ -53,6 +62,8 @@ def set_molass_options(**kwargs):
             v = GLOBAL_OPTIONS[key]
         except:
             raise ValueError("No such global option: %s" % key)
+        if key == 'small_angle_limit' and value not in ('extended', 'guinier', 'none'):
+            raise ValueError("small_angle_limit must be 'extended', 'guinier' or 'none', not %r" % (value,))
         GLOBAL_OPTIONS[key] = value
 
 def get_molass_options(*args):
@@ -71,6 +82,8 @@ def get_molass_options(*args):
         - 'elution_recognition': Which elution curve to use for recognition
           (``'icurve'`` or ``'sum'``).
         - 'quiet': Whether to suppress verbose diagnostic output.
+        - 'small_angle_limit': How trimming sets the lowest q kept
+          (``'extended'``, ``'guinier'`` or ``'none'``).
     Returns
     -------
     dict

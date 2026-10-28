@@ -6,6 +6,22 @@ this function directly, bypassing the subprocess machinery entirely.
 """
 
 
+def _trim_kwargs_from_recipe(recipe):
+    """Keyword arguments of ``trimmed_copy`` to rebuild the trimming a recipe was made with.
+
+    New recipes record the angular range (``xr_qr``, point indices). Recipes written before it was
+    recorded (molass-library#342) were made with the then default, the minimum of the Guinier
+    range, so they are rebuilt with ``small_angle_limit='guinier'`` instead of today's default.
+    """
+    kwargs = dict(recipe.get('trim_params', {}))
+    if 'xr_qr' not in kwargs and 'small_angle_limit' not in kwargs:
+        if recipe.get('xr_qr') is not None:
+            kwargs['xr_qr'] = tuple(recipe['xr_qr'])
+        else:
+            kwargs['small_angle_limit'] = 'guinier'
+    return kwargs
+
+
 def rebuild_decomposition_from_recipe(analysis_folder):
     """Rebuild (ssd, trimmed, decomp, recipe) from an analysis_folder's recipe.json.
 
@@ -56,7 +72,6 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     model = recipe.get('model', 'egh').lower()
     pore_dist = recipe.get('pore_dist', None)
     ln_pore_sigma = recipe.get('ln_pore_sigma', None)
-    trim_params = recipe.get('trim_params', {})
     baseline_params = recipe.get('baseline_params', {})
     decomp_params = dict(recipe.get('decomp_params', {}))
     decomp_params['num_components'] = n_components
@@ -82,7 +97,7 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     saved_handling = get_molass_options('anomaly_handling')
     set_molass_options(anomaly_handling=recipe.get('anomaly_handling', saved_handling))
     try:
-        trimmed = ssd.trimmed_copy(**trim_params)
+        trimmed = ssd.trimmed_copy(**_trim_kwargs_from_recipe(recipe))
     finally:
         set_molass_options(anomaly_handling=saved_handling)
     corrected = trimmed.corrected_copy(**baseline_params)

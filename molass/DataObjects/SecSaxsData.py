@@ -487,8 +487,9 @@ class SecSaxsData(DidYouMeanMixin):
                            beamline_info=self.beamline_info, mapping=mapping, 
                            time_initialized=self.time_initialized, datafiles=datafiles)
 
-    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None):
-        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None)
+    def trimmed_copy(self, trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None,
+                     xr_qr=None, small_angle_limit=None):
+        """ssd.trimmed_copy(trimming=None, jranges=None, mapping=None, nsigmas=None, uv_wavelength=None, xr_qr=None, small_angle_limit=None)
 
         Parameters
         ----------
@@ -507,6 +508,18 @@ class SecSaxsData(DidYouMeanMixin):
             (``None`` on the min side uses the instrument's usable wavelength start,
             typically ~250 nm; ``None`` on the max side uses the full upper end).
             Example: ``uv_wavelength=(None, 550)`` trims UV to ≤ 550 nm.
+        xr_qr : tuple of (int, int), optional
+            The angular range to keep, as q-point indices ``(start, stop)`` into the raw data.
+            It is JSON-serializable, so it can be stored in ``trim_params`` of a recipe.
+            Use it to keep the lowest-q points, which carry the interparticle effect
+            (``xr_qr=(0, stop)``), or to pin the range on every machine.
+        small_angle_limit : {'extended', 'guinier', 'none'}, optional
+            How the start of the angular range is determined when ``xr_qr`` is not given:
+            ``'extended'`` (legacy GUI default: extended Guinier limit and B(q) limit, keeps
+            more low-q points), ``'guinier'`` (minimum of the Guinier range; the default
+            before molass-library#342) or ``'none'`` (the whole measured range). If omitted,
+            the global option ``small_angle_limit`` is used
+            (``molass.Global.Options.set_molass_options``).
 
         Returns
         -------
@@ -552,12 +565,16 @@ class SecSaxsData(DidYouMeanMixin):
                     stop  = bisect_right(wl, wl_max_nm) if wl_max_nm is not None else default_stop
                     uv_wr = (start, stop)
                 if nsigmas is not None:
-                    trimming = self.make_trimming(nsigmas=nsigmas, uv_wr=uv_wr, debug=False)
+                    trimming = self.make_trimming(nsigmas=nsigmas, uv_wr=uv_wr, xr_qr=xr_qr,
+                                                  small_angle_limit=small_angle_limit, debug=False)
                 else:
-                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, uv_wr=uv_wr, debug=False)
+                    trimming = self.make_trimming(jranges=jranges, mapping=mapping, uv_wr=uv_wr, xr_qr=xr_qr,
+                                                  small_angle_limit=small_angle_limit, debug=False)
             else:
                 assert jranges is None, "jranges must be None if trimming is specified."
                 assert nsigmas is None, "nsigmas must be None if trimming is specified."
+                assert xr_qr is None and small_angle_limit is None, \
+                    "xr_qr and small_angle_limit must be None if trimming is specified."
         result = self.copy(xr_slices=trimming.xr_slices, uv_slices=trimming.uv_slices,
                            trimmed=True, trimming=trimming,
                            mapping=mapping,

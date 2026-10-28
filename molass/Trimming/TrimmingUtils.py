@@ -49,7 +49,7 @@ def make_and_slicepair(pair1, pair2, judge_info, debug=False):
 
 def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_fc=None, flowchange=None,
                             ip_effect_info=None, nsigmas=None, nguiniers=None,
-                            jranges=None, mapping=None,
+                            jranges=None, mapping=None, small_angle_limit=None,
                             debug=False):
     """ 
     Create trimming slices for the given data.
@@ -59,7 +59,11 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
     ssd : SampledScatteringData
         The data to be trimmed.
     xr_qr : tuple (start, stop) or None
-        The q-range for XR data. If None, use the usable q-range.
+        The q-range for XR data as point indices. If None, use the usable q-range.
+    small_angle_limit : {'extended', 'guinier', 'none'} or None
+        How the start of the usable q-range is determined when ``xr_qr`` is None
+        (see :func:`molass.Trimming.UsableQrange.get_usable_qrange_impl`). If None,
+        the global option ``small_angle_limit`` is used.
     xr_mt : Moment or None
         The moment for XR data. If None, compute from the data.
     uv_wr : tuple (start, stop) or None
@@ -107,10 +111,14 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
             xr_jslice = None
         else:
             if xr_qr is None:
-                start, stop = ssd.xr.get_usable_qrange(ip_effect_info=ip_effect_info, nguiniers=nguiniers)
+                start, stop = ssd.xr.get_usable_qrange(ip_effect_info=ip_effect_info, nguiniers=nguiniers,
+                                                       small_angle_limit=small_angle_limit)
+                if small_angle_limit is None:
+                    small_angle_limit = get_molass_options('small_angle_limit')
             else:
                 start, stop = xr_qr
-            xr_islice = slice(start, stop)
+                small_angle_limit = 'explicit'
+            xr_islice = slice(int(start), int(stop))
 
             if xr_mt is None:
                 from molass.Stats import EghMoment
@@ -204,7 +212,8 @@ def make_trimming_impl(ssd, xr_qr=None, xr_mt=None, uv_wr=None, uv_mt=None, uv_f
         "uv_restrict_list": to_legacy_slice_list(ssd.uv, uv_islice, uv_jslice),
     }
 
-    return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping, legacy_info=legacy_info)
+    return TrimmingInfo(xr_slices=(xr_islice, xr_jslice), uv_slices=(uv_islice, uv_jslice), mapping=mapping,
+                        legacy_info=legacy_info, small_angle_limit=small_angle_limit if jranges is None else None)
 
 def slice_to_values(vec, slice_):
     """ Convert a slice to its start and stop values in the given vector. 

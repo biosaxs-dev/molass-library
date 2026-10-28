@@ -917,6 +917,28 @@ class Decomposition(DidYouMeanMixin):
         self.guinier_objects = None
         self.bounded_lrf_info = None
         self._kratky_shape_match = None
+        self._warn_if_low_q_was_cut(ranks)
+
+    def _warn_if_low_q_was_cut(self, ranks):
+        """Warn when a rank-2 (interparticle) component is requested on data whose lowest-q points were
+        cut at the Guinier start: the interparticle effect acts at the lowest q, so the correction then
+        has little to act on (molass-library#342)."""
+        if not any(int(r) == 2 for r in ranks):
+            return
+        trimming = getattr(getattr(self, 'ssd', None), 'trimming', None)
+        if getattr(trimming, 'small_angle_limit', None) != 'guinier':
+            return
+        xr_slices = getattr(trimming, 'xr_slices', None)
+        n_cut = 0 if xr_slices is None or xr_slices[0] is None else (xr_slices[0].start or 0)
+        if n_cut <= 0:
+            return
+        import warnings
+        warnings.warn(
+            f"xr_ranks contains a rank-2 component, but the trimming cut the {n_cut} lowest-q points at the "
+            f"Guinier start (small_angle_limit='guinier'). The interparticle effect acts at the lowest q, so "
+            f"the correction may be hardly visible. Use trimmed_copy(small_angle_limit='extended') (the "
+            f"default) or trimmed_copy(xr_qr=(0, stop)) to keep them.",
+            UserWarning, stacklevel=3)
 
     def get_xr_matrices(self, debug=False):
         """

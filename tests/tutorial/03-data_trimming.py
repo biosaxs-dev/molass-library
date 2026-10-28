@@ -43,9 +43,12 @@ def test_005_make_trimming():
     print("Trimming:", trimming)
     xr = trimming.xr_slices
     uv = trimming.uv_slices
-    # q-range is deterministic
-    assert int(xr[0].start) == 12
+    # q-range is deterministic; since molass-library#342 the default keeps more low-q points
+    # (small_angle_limit='extended', the legacy GUI default), the former default is 'guinier'
+    assert int(xr[0].start) == 8
     assert int(xr[0].stop) == 765
+    assert trimming.small_angle_limit == 'extended'
+    assert int(ssd.make_trimming(small_angle_limit='guinier').xr_slices[0].start) == 12
     # frame ranges may vary by Python/NumPy version (±80 tolerance)
     assert abs(int(xr[1].start) - 235) < 80, f"xr frame start unexpected: {xr[1].start}"
     assert abs(int(xr[1].stop) - 643) < 80, f"xr frame stop unexpected: {xr[1].stop}"

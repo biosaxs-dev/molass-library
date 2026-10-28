@@ -342,6 +342,14 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
     from molass.Global.Options import get_molass_options
     if get_molass_options('anomaly_handling') is False:
         recipe["anomaly_handling"] = False
+    # The angular range (the lowest q kept) the trimming chose, as point indices: the rebuild must use the
+    # same range, and the default policy for it may differ from the one the caller worked with (#342).
+    # Recipes without this key were written before it existed and are rebuilt with the former default
+    # ('guinier', see RecipeRunner).
+    trimming = getattr(effective_ssd, 'trimming', None)
+    xr_slices = getattr(trimming, 'xr_slices', None)
+    if xr_slices is not None and xr_slices[0] is not None and 'xr_qr' not in recipe["trim_params"]:
+        recipe["xr_qr"] = [int(xr_slices[0].start), int(xr_slices[0].stop)]
     recipe.update(extra)
     return recipe
 
