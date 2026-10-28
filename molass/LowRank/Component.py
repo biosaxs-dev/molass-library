@@ -53,10 +53,20 @@ class Component:
         self.jcurve_array = jcurve_array
         x, y = self.icurve_array
         self.peak_index = int(np.argmax(y))     # to avoid np.int64()
-        self.icurve = None
-        self.jcurve = None
+        self._icurve = None
+        self._jcurve = None
         self.area = None
         self.ccurve = ccurve
+
+    @property
+    def icurve(self):
+        """The i-curve object (same as :meth:`get_icurve`; built on first access)."""
+        return self.get_icurve()
+
+    @property
+    def jcurve(self):
+        """The j-curve object (same as :meth:`get_jcurve`; built on first access)."""
+        return self.get_jcurve()
 
     def get_icurve(self):
         """
@@ -66,10 +76,10 @@ class Component:
         -------
         The i-curve object which is of type Curve.
         """
-        if self.icurve is None:
+        if self._icurve is None:
             from molass.DataObjects.Curve import Curve
-            self.icurve = Curve(*self.icurve_array[0:2], type='i')
-        return self.icurve
+            self._icurve = Curve(*self.icurve_array[0:2], type='i')
+        return self._icurve
 
     def get_jcurve(self):
         """
@@ -79,10 +89,10 @@ class Component:
         -------
         The j-curve object which is of type Curve.
         """
-        if self.jcurve is None:
+        if self._jcurve is None:
             from molass.DataObjects.Curve import Curve
-            self.jcurve = Curve(*self.jcurve_array[:,0:2], type='j')
-        return self.jcurve
+            self._jcurve = Curve(*self.jcurve_array[:,0:2].T, type='j')
+        return self._jcurve
 
     def get_jcurve_array(self):
         """

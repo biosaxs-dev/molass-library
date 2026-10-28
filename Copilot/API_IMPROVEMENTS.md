@@ -281,11 +281,11 @@ AI-friendliness assessment after the homogeneity work (molass-researcher experim
 | [#340](https://github.com/biosaxs-dev/molass-library/issues/340) | Navigation | `molass.Testing.simulate_ssd(species, uv_late, noise, seed, ...)` and `Species`, with `ssd.simulation_truth` | ✅ Done |
 | [#341](https://github.com/biosaxs-dev/molass-library/issues/341) | Robustness | EDM non-finite objective: `conformance_score` returns NaN for non-finite moments (no more `DLASCL` console messages), `Edm.edm_func` skips frames before `t0`; the EDM search stall is open | 🔶 Partly done |
 | [#342](https://github.com/biosaxs-dev/molass-library/issues/342) | Data trimming | Default trimming hid the interparticle correction (cut the lowest-q points): `small_angle_limit` ('extended' legacy default / 'guinier' / 'none', global option and `trimmed_copy` argument), `trimmed_copy(xr_qr=...)`, recipe records `xr_qr` (old recipes rebuild with 'guinier'), `TrimmingInfo.small_angle_limit`, warning for rank 2 on a Guinier-cut range; GUI control open | 🔶 Library done |
-| [#343](https://github.com/biosaxs-dev/molass-library/issues/343) | Correctness | `load_analysis_session`: docstring says best result, code loads the latest job | ⏳ Open |
+| [#343](https://github.com/biosaxs-dev/molass-library/issues/343) | Correctness | `load_analysis_session`: docstring says best result, code loads the latest job | ✅ Done |
 | [#344](https://github.com/biosaxs-dev/molass-library/issues/344) | Navigation | One discoverable call to open an analysis folder (best result, SV, jobs, recipe) | ⏳ Open |
 | [#345](https://github.com/biosaxs-dev/molass-library/issues/345) | Workflow | `RUN_MANIFEST.json` status/phase go stale | ⏳ Open |
 | [#346](https://github.com/biosaxs-dev/molass-library/issues/346) | Workflow | `live_status()`: rejected (non-finite) iterations and stalled jobs | ⏳ Open |
-| [#347](https://github.com/biosaxs-dev/molass-library/issues/347) | Naming / defaults | `get_usable_qrange_impl(debug=True)` default; `XrComponent.icurve`/`jcurve` always `None` | ⏳ Open |
+| [#347](https://github.com/biosaxs-dev/molass-library/issues/347) | Naming / defaults | `get_usable_qrange_impl(debug=True)` default; `XrComponent.icurve`/`jcurve` always `None` (and `get_jcurve()` was broken) | ✅ Done |
 | [#348](https://github.com/biosaxs-dev/molass-library/issues/348) | Portability | recipe/analysis folder stores the absolute data path | ⏳ Open |
 
 **#290 details**: root cause was discoverability, not missing functionality --

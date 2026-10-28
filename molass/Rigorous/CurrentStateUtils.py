@@ -405,7 +405,7 @@ def load_best_rigorous_result(decomp, analysis_folder, rgcurve=None, xr_ranks=No
                                 xr_ranks=xr_ranks, debug=debug)
 
 
-def load_analysis_session(analysis_folder, jobid=None, debug=False):
+def load_analysis_session(analysis_folder, jobid='best', debug=False):
     """Reconstruct a full session from just an ``analysis_folder``.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -418,8 +418,10 @@ def load_analysis_session(analysis_folder, jobid=None, debug=False):
     ----------
     analysis_folder : str
         Same value passed to ``optimize_rigorously(analysis_folder=...)``.
-    jobid : str, optional
-        Specific job id to load. If ``None``, loads the latest job.
+    jobid : str or None, optional
+        Specific job id to load. The default ``'best'`` loads the job with the lowest
+        objective value (a later job can be worse than an earlier one, #343); ``None``
+        loads the latest valid job.
     debug : bool, optional
         If True, reload modules from disk.
 

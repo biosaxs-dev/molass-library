@@ -2168,7 +2168,7 @@ class Decomposition(DidYouMeanMixin):
         return _has(analysis_folder)
 
     @staticmethod
-    def load_analysis_session(analysis_folder, jobid=None, debug=False):
+    def load_analysis_session(analysis_folder, jobid='best', debug=False):
         """Reconstruct a full session (ssd, trimmed, decomp, result) from just
         an ``analysis_folder`` -- e.g. to resume a GUI/notebook session after
         a restart, without needing to remember or re-supply the original
@@ -2178,8 +2178,9 @@ class Decomposition(DidYouMeanMixin):
         ----------
         analysis_folder : str
             Same value passed to ``optimize_rigorously(analysis_folder=...)``.
-        jobid : str, optional
-            Specific job id to load. If ``None``, loads the latest job.
+        jobid : str or None, optional
+            Specific job id to load. The default ``'best'`` loads the job with the
+            lowest objective value; ``None`` loads the latest valid job.
         debug : bool, optional
             If True, reload modules from disk.
 

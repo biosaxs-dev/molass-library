@@ -83,7 +83,7 @@ def _extended_small_angle_start(xr_data):
         return None
 
 
-def get_usable_qrange_impl(xr_data, ip_effect_info=False, nguiniers=None, return_object=False, debug=True,
+def get_usable_qrange_impl(xr_data, ip_effect_info=False, nguiniers=None, return_object=False, debug=False,
                            small_angle_limit=None):
     """
     Get the usable Q range for the given XR data.
