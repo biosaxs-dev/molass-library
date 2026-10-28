@@ -196,7 +196,8 @@ def conformance_score(tR, sigma):
     -------
     float
         ``NEUTRAL_RAW_CONFORMANCE`` when fewer than 2 components (no regression
-        is possible with a single point -- neither rewarded nor penalized).
+        is possible with a single point -- neither rewarded nor penalized), and
+        ``nan`` when any moment is not finite (the caller rejects such a state).
         Otherwise a log-scaled residual, floored at ``SECCONF_LOWER_BOUND``
         (best) and reduced (via ``BAD_CONFORMANCE_REDUCE``) when it would
         otherwise be positive (worst), mirroring the historical EGH formula's
@@ -207,6 +208,12 @@ def conformance_score(tR, sigma):
     if len(tR) < 2:
         return NEUTRAL_RAW_CONFORMANCE
 
+    if not (np.all(np.isfinite(tR)) and np.all(np.isfinite(sigma))):
+        # Moments of an all-zero (collapsed or overflowed) component are NaN. np.polyfit would
+        # fail on them, and LAPACK prints "On entry to DLASCL parameter number 4 had an illegal
+        # value" directly to the console on every such evaluation; the caller turns NaN into
+        # a rejected (infinite) objective value.
+        return np.nan
     slope, intercept = np.polyfit(sigma, tR, 1)   # slope = sqrt(N), intercept = tI
     model_tR = intercept + slope * sigma
     residual = float(np.average((model_tR - tR) ** 2))

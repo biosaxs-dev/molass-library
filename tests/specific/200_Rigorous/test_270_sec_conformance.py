@@ -26,6 +26,15 @@ def test_single_component_is_neutral_regardless_of_values():
     assert conformance_score([5.0], [1.0]) == conformance_score([5000.0], [900.0])
 
 
+@pytest.mark.parametrize("bad", [np.nan, np.inf])
+def test_non_finite_moments_return_nan_without_lapack(bad):
+    """A collapsed (all-zero) component has NaN moments; the score must be NaN so the
+    caller rejects the state, and np.polyfit (whose LAPACK call prints 'On entry to
+    DLASCL parameter number 4 had an illegal value' to the console) must not run."""
+    assert np.isnan(conformance_score([80.0, bad, 120.0], [8.0, 10.0, 12.0]))
+    assert np.isnan(conformance_score([80.0, 100.0, 120.0], [8.0, bad, 12.0]))
+
+
 @pytest.mark.parametrize("nc", [2, 3, 5])
 def test_perfectly_consistent_moments_hit_the_floor(nc):
     """Component moments that exactly satisfy tR_i = tI + sqrt(N)*sigma_i (for a
