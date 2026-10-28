@@ -10,7 +10,8 @@ from molass.LowRank.Decomposition import Decomposition
 from molass.SEC.Models.UvComponentCurve import UvComponentCurve
 from molass.Mapping.Mapping import Mapping
 
-JobInfo = namedtuple('JobInfo', ['id', 'iterations', 'best_fv', 'timestamp'])
+JobInfo = namedtuple('JobInfo', ['id', 'iterations', 'best_fv', 'timestamp', 'n_entries', 'n_nonfinite'],
+                     defaults=(None, 0))
 JobConvergence = namedtuple('JobConvergence', ['id', 'evals', 'fvs', 'best_fv', 'best_sv', 'timestamps'])
 ConvergenceInfo = namedtuple('ConvergenceInfo', [
     'jobs', 'best_fv', 'best_sv', 'best_job_id', 'spread', 'trend', 'n_jobs',
@@ -18,8 +19,16 @@ ConvergenceInfo = namedtuple('ConvergenceInfo', [
 
 JobInfo.__doc__ = """Metadata for a single rigorous optimization job.
 
-Attributes: id, iterations, best_fv, timestamp.
+Attributes: id, iterations, best_fv, timestamp, n_entries, n_nonfinite.
+
+``n_entries`` is the number of callback entries of the job (equal to ``iterations``);
+``n_nonfinite`` counts the entries rejected as non-finite (``fv`` is ``inf``/NaN or at least
+``NONFINITE_FV``), a search that wastes many iterations that way or stalls looks otherwise
+like a healthy one (#346).
 """
+
+# the objective returns this order of magnitude (or inf) for a rejected evaluation
+NONFINITE_FV = 1e7
 
 
 class NoCompletedJobError(FileNotFoundError):
@@ -405,7 +414,7 @@ def load_best_rigorous_result(decomp, analysis_folder, rgcurve=None, xr_ranks=No
                                 xr_ranks=xr_ranks, debug=debug)
 
 
-def load_analysis_session(analysis_folder, jobid='best', debug=False):
+def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=None):
     """Reconstruct a full session from just an ``analysis_folder``.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -424,11 +433,15 @@ def load_analysis_session(analysis_folder, jobid='best', debug=False):
         loads the latest valid job.
     debug : bool, optional
         If True, reload modules from disk.
+    in_folder : str, optional
+        Folder holding the input data, for an analysis folder whose recorded data path does not
+        exist here (another machine, moved data); see ``rebuild_decomposition_from_recipe`` (#348).
 
     Returns
     -------
     ssd : SecSaxsData
         The raw loaded data.
+
     trimmed : SecSaxsData
         Trimmed (uncorrected) SSD -- pass as ``trimmed_ssd`` to a further
         ``optimize_rigorously()`` call to resume.
@@ -452,7 +465,7 @@ def load_analysis_session(analysis_folder, jobid='best', debug=False):
         import molass.Rigorous.RecipeRunner
         reload(molass.Rigorous.RecipeRunner)
     from molass.Rigorous.RecipeRunner import rebuild_decomposition_from_recipe
-    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder)
+    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder, in_folder=in_folder)
     result = load_rigorous_result(decomp, analysis_folder, jobid=jobid, debug=debug)
     return ssd, trimmed, decomp, result, recipe
 
@@ -471,8 +484,8 @@ def list_rigorous_jobs(analysis_folder):
     Returns
     -------
     list of JobInfo
-        Each entry is a ``JobInfo(id, iterations, best_fv, timestamp)``
-        namedtuple.  The list is sorted by job id.
+        Each entry is a ``JobInfo(id, iterations, best_fv, timestamp, n_entries, n_nonfinite)``
+        namedtuple (``n_nonfinite``: entries rejected as non-finite, #346).  The list is sorted by job id.
 
     Examples
     --------
@@ -524,12 +537,38 @@ def list_rigorous_jobs(analysis_folder):
         fv_arr = np.array(fv_list, dtype=object)
         iterations = len(fv_arr)
         best_fv = float(min(row[1] for row in fv_list))
+        n_nonfinite = sum(1 for row in fv_list if not _is_finite_fv(row[1]))
         # Last iteration's timestamp (column 3)
         timestamp = fv_list[-1][3]
 
         result.append(JobInfo(id=d, iterations=iterations,
-                              best_fv=best_fv, timestamp=timestamp))
+                              best_fv=best_fv, timestamp=timestamp,
+                              n_entries=iterations, n_nonfinite=n_nonfinite))
     return result
+
+
+def _is_finite_fv(fv):
+    return bool(np.isfinite(fv)) and abs(fv) < NONFINITE_FV
+
+
+def count_stalled_jobs(jobs, tol=1e-3):
+    """Number of trailing jobs that did not improve the best objective value so far (#346).
+
+    ``jobs`` is a list of :class:`JobInfo` in job order (as ``list_rigorous_jobs`` returns it).
+    For best values -1.511, -1.574, -1.574, -1.574 the answer is 2: the last two jobs did not
+    improve on the first one that reached -1.574. Improvements smaller than ``tol`` (an
+    objective value of about -1.5 changing in the fourth digit) do not count.
+    """
+    best = None
+    stalled = 0
+    for job in jobs:
+        fv = job.best_fv
+        if best is None or fv < best - tol:
+            best = fv
+            stalled = 0
+        else:
+            stalled += 1
+    return stalled
 
 
 def has_rigorous_results(analysis_folder):

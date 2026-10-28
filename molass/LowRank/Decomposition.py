@@ -1594,7 +1594,10 @@ class Decomposition(DidYouMeanMixin):
             Each ``callback.txt`` records per-iteration objective values
             and parameter vectors.  Use ``list_rigorous_jobs()`` to
             inspect existing jobs, or ``load_rigorous_result()`` to
-            reconstruct a ``Decomposition`` from a completed job.
+            reconstruct a ``Decomposition`` from a completed job.  To open
+            a finished (or running) analysis folder in one call -- best
+            result, its SV, jobs, rejected iterations, recipe -- use
+            ``molass.load_analysis(analysis_folder)``.
         method : str, optional
             The optimization algorithm to use. Default is ``'BH'``.
 
@@ -2122,7 +2125,7 @@ class Decomposition(DidYouMeanMixin):
         Returns
         -------
         list of JobInfo
-            Each entry is a ``JobInfo(id, iterations, best_fv, timestamp)``
+            Each entry is a ``JobInfo(id, iterations, best_fv, timestamp, n_entries, n_nonfinite)``
             namedtuple.  Sorted by job id.
 
         Examples
@@ -2168,7 +2171,7 @@ class Decomposition(DidYouMeanMixin):
         return _has(analysis_folder)
 
     @staticmethod
-    def load_analysis_session(analysis_folder, jobid='best', debug=False):
+    def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=None):
         """Reconstruct a full session (ssd, trimmed, decomp, result) from just
         an ``analysis_folder`` -- e.g. to resume a GUI/notebook session after
         a restart, without needing to remember or re-supply the original
@@ -2183,6 +2186,9 @@ class Decomposition(DidYouMeanMixin):
             lowest objective value; ``None`` loads the latest valid job.
         debug : bool, optional
             If True, reload modules from disk.
+        in_folder : str, optional
+            Folder holding the input data, for an analysis folder whose recorded data path
+            does not exist here (another machine, moved data).
 
         Returns
         -------
@@ -2199,7 +2205,7 @@ class Decomposition(DidYouMeanMixin):
             result.plot_components()
         """
         from molass.Rigorous.CurrentStateUtils import load_analysis_session as _load
-        return _load(analysis_folder, jobid=jobid, debug=debug)
+        return _load(analysis_folder, jobid=jobid, debug=debug, in_folder=in_folder)
 
     @staticmethod
     def wait_for_rigorous_results(analysis_folder, timeout=600, poll_interval=5):

@@ -22,7 +22,96 @@ def _trim_kwargs_from_recipe(recipe):
     return kwargs
 
 
-def rebuild_decomposition_from_recipe(analysis_folder):
+def bundled_dataset_name(path):
+    """Name of the ``molass_data`` sample (e.g. ``'SAMPLE1'``) that ``path`` is, or ``None``."""
+    import os
+    if not path:
+        return None
+    try:
+        import molass_data
+    except ImportError:
+        return None
+    target = os.path.normcase(os.path.abspath(path))
+    for name in dir(molass_data):
+        if name.startswith('SAMPLE'):
+            folder = getattr(molass_data, name)
+            if isinstance(folder, str) and os.path.normcase(os.path.abspath(folder)) == target:
+                return name
+    return None
+
+
+def _bundled_dataset_folder(name):
+    import os
+    try:
+        import molass_data
+    except ImportError:
+        return None
+    folder = getattr(molass_data, name, None) if name else None
+    return folder if isinstance(folder, str) and os.path.isdir(folder) else None
+
+
+def resolve_input_folder(analysis_folder, recipe, in_folder=None):
+    """Find the folder holding the input data of an analysis, in order of portability (#348).
+
+    1. ``in_folder``, the caller's override;
+    2. ``recipe['dataset']`` (a bundled ``molass_data`` sample name, recorded by new recipes);
+    3. the absolute path stored in the ``in_folder.txt`` of the first job, if it still exists;
+    4. fallbacks for folders made before ``dataset`` was recorded: the bundled sample named like the
+       last component of the stored path (the stored path points into the ``molass_data`` of the machine
+       that made the analysis), or the ``temp_in_folder`` export inside the (possibly moved)
+       analysis folder.
+
+    Raises
+    ------
+    FileNotFoundError
+        Naming the missing path and the ``in_folder`` override.
+    """
+    import os
+
+    if in_folder is not None:
+        if not os.path.isdir(in_folder):
+            raise FileNotFoundError(f"in_folder={in_folder!r} does not exist")
+        return in_folder
+
+    dataset_folder = _bundled_dataset_folder(recipe.get('dataset'))
+    if dataset_folder is not None:
+        return dataset_folder
+
+    jobs_folder = os.path.join(analysis_folder, "optimized", "jobs")
+    stored = None
+    if os.path.isdir(jobs_folder):
+        for jobid in sorted(os.listdir(jobs_folder)):
+            candidate = os.path.join(jobs_folder, jobid, 'in_folder.txt')
+            if os.path.exists(candidate):
+                with open(candidate) as f:
+                    stored = f.read().strip()
+                break
+
+    if stored:
+        if os.path.isdir(stored):
+            return stored
+        leaf = os.path.basename(os.path.normpath(stored.replace('\\', '/')))
+        folder = _bundled_dataset_folder(leaf)
+        if folder is not None:
+            return folder
+        if leaf == 'temp_in_folder':
+            relocated = os.path.join(analysis_folder, 'temp_in_folder')
+            if os.path.isdir(relocated):
+                return relocated
+        raise FileNotFoundError(
+            f"The input data folder recorded for {analysis_folder} does not exist here: {stored}\n"
+            f"Pass in_folder=<the folder holding the data> to rebuild_decomposition_from_recipe() "
+            f"(or load_analysis_session()) to use a copy at another location.")
+    if recipe.get('dataset'):
+        raise FileNotFoundError(
+            f"The bundled dataset {recipe['dataset']!r} recorded in the recipe is not available "
+            f"(is molass_data installed?). Pass in_folder=<the folder holding the data> to override.")
+    raise FileNotFoundError(
+        f"No in_folder.txt found under any job in {jobs_folder}. "
+        f"Pass in_folder=<the folder holding the data> to override.")
+
+
+def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     """Rebuild (ssd, trimmed, decomp, recipe) from an analysis_folder's recipe.json.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -36,6 +125,11 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     ----------
     analysis_folder : str
         Same value passed to optimize_rigorously(analysis_folder=...).
+    in_folder : str, optional
+        Folder holding the input data, overriding what the analysis folder records. Use it to
+        reopen an analysis on another machine or after the data moved (#348). By default the
+        bundled ``molass_data`` sample named in ``recipe.json`` (``dataset``) is used, then the
+        absolute path stored in the first job's ``in_folder.txt``; see :func:`resolve_input_folder`.
 
     Returns
     -------
@@ -54,17 +148,7 @@ def rebuild_decomposition_from_recipe(analysis_folder):
     with open(recipe_file) as f:
         recipe = json.load(f)
 
-    jobs_folder = os.path.join(optimizer_folder, "jobs")
-    in_folder = None
-    if os.path.isdir(jobs_folder):
-        for jobid in sorted(os.listdir(jobs_folder)):
-            candidate = os.path.join(jobs_folder, jobid, 'in_folder.txt')
-            if os.path.exists(candidate):
-                with open(candidate) as f:
-                    in_folder = f.read().strip()
-                break
-    if in_folder is None:
-        raise FileNotFoundError(f"No in_folder.txt found under any job in {jobs_folder}")
+    in_folder = resolve_input_folder(analysis_folder, recipe, in_folder=in_folder)
 
     from molass.DataObjects import SecSaxsData as SSD
 

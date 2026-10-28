@@ -121,8 +121,18 @@ def update_run_manifest(folder, **fields):
         return None
 
 
-def read_manifest(folder):
-    """Return the manifest dict in ``folder``, or ``None`` if absent / unreadable."""
+def read_manifest(folder, refresh=False):
+    """Return the manifest dict in ``folder``, or ``None`` if absent / unreadable.
+
+    The stored ``status`` / ``phase`` are written by whoever launched the run, and nothing
+    updates them while a run in another process (e.g. the GUI's optimizer subprocess) progresses.
+    With ``refresh=True`` they are first re-derived from the process table and the job files
+    (see :func:`refresh_run_manifest`).
+    """
+    if refresh:
+        refreshed = refresh_run_manifest(folder)
+        if refreshed is not None:
+            return refreshed
     path = os.path.join(folder, MANIFEST_NAME)
     if not os.path.exists(path):
         return None
@@ -133,7 +143,146 @@ def read_manifest(folder):
         return None
 
 
-def locate_recent_runs(since_minutes=60, registry_path=None):
+# A run with no live subprocess is taken as finished when no job file was written for this long
+# (the callback of one iteration can take many minutes on large data).
+STALE_AFTER_S = 1800
+
+
+def _pid_alive(pid):
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    try:
+        import psutil
+        return psutil.pid_exists(pid)
+    except ImportError:
+        pass
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def _latest_job_activity(folder):
+    """Latest modification time (epoch seconds) of the ``callback.txt`` / ``optimizer.log`` files of the jobs."""
+    jobs_folder = os.path.join(folder, "optimized", "jobs")
+    latest = None
+    try:
+        for job in os.listdir(jobs_folder):
+            for name in ("callback.txt", "optimizer.log"):
+                try:
+                    mtime = os.path.getmtime(os.path.join(jobs_folder, job, name))
+                except OSError:
+                    continue
+                if latest is None or mtime > latest:
+                    latest = mtime
+    except OSError:
+        pass
+    return latest
+
+
+def _manifest_stamp(manifest):
+    """Epoch seconds of the last write of the manifest (``last_updated``, else ``start_time``)."""
+    for key in ("last_updated", "start_time"):
+        try:
+            return datetime.fromisoformat(manifest[key]).timestamp()
+        except (KeyError, TypeError, ValueError):
+            continue
+    return 0.0
+
+
+def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
+    """Bring ``status`` / ``phase`` of the manifest in an analysis folder up to date, and return it.
+
+    ``RUN_MANIFEST.json`` is written when a run starts; the optimizer subprocess does not touch it
+    afterwards, so ``status`` stayed ``'running'`` for ever, or said ``'completed'`` while chained jobs
+    were still being added to the folder (#345). This derives the state from what is on disk:
+
+    1. the recorded ``subprocess_pid`` is alive, or a job file (``callback.txt``, ``optimizer.log``)
+       was written within ``stale_after_s`` seconds: ``status='running'``, ``phase='optimizing'``
+       (a recorded ``'completed'`` / ``'failed'`` is contradicted only by job files written *after*
+       it was recorded, i.e. by further jobs chained in the same folder);
+    2. otherwise a manifest still saying ``'running'`` / ``'starting'`` becomes ``'completed'``,
+       ``phase='finished'`` (the return code of a process that is gone is not known; a recorded
+       ``'failed'`` is kept);
+    3. with no process and no job file at all (a run that has just been launched) nothing changes.
+
+    ``status`` describes the analysis folder as a whole, so it is ``'running'`` while any of its (chained)
+    jobs is active; ``jobs/NNN/RUN_MANIFEST.json`` keeps the state of the single job.
+
+    Also stores the progress numbers ``n_jobs``, ``n_callbacks``, ``n_nonfinite`` (entries rejected as
+    non-finite, #346), ``stalled_jobs``, ``best_fv`` and ``last_callback_time`` (UTC ISO), and
+    ``status_source`` (``'pid'``, ``'job_files'`` or ``'stored'``). The file is rewritten only when
+    one of them changed. Errors are swallowed; returns ``None`` if the folder has no manifest.
+    """
+    path = os.path.join(folder, MANIFEST_NAME)
+    if not os.path.exists(path) or not os.path.isdir(os.path.join(folder, "optimized", "jobs")):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    try:
+        changes = {}
+        status = manifest.get("status")
+        sub_pid = manifest.get("subprocess_pid")
+        last_activity = _latest_job_activity(folder)
+        recent = last_activity is not None and time.time() - last_activity < stale_after_s
+        if status in ("completed", "failed"):
+            # a final status is the launching process's word; only job files written after it
+            # (chained jobs of the same folder) contradict it
+            recent = recent and last_activity > _manifest_stamp(manifest) + 2
+        if sub_pid is not None and _pid_alive(sub_pid):
+            new_status, source = "running", "pid"
+        elif recent:
+            new_status, source = "running", "job_files"
+        elif status in ("running", "starting") and (sub_pid is not None or last_activity is not None):
+            new_status, source = "completed", "job_files"
+        else:
+            new_status, source = status, "stored"
+        if new_status != status:
+            changes["status"] = new_status
+            changes["phase"] = "optimizing" if new_status == "running" else "finished"
+        elif status == "completed" and manifest.get("phase") in ("folders_prepared", "constructing_optimizer", "optimizer_ready"):
+            changes["phase"] = "finished"
+        if manifest.get("status_source") != source:
+            changes["status_source"] = source
+        if last_activity is not None:
+            stamp = datetime.fromtimestamp(last_activity, timezone.utc).isoformat(timespec="seconds")
+            if manifest.get("last_callback_time") != stamp:
+                changes["last_callback_time"] = stamp
+
+        try:
+            from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, count_stalled_jobs
+            jobs = list_rigorous_jobs(folder)
+            stats = {
+                "n_jobs": len(jobs),
+                "n_callbacks": sum(j.n_entries for j in jobs),
+                "n_nonfinite": sum(j.n_nonfinite for j in jobs),
+                "stalled_jobs": count_stalled_jobs(jobs),
+                "best_fv": min((j.best_fv for j in jobs), default=None),
+            }
+            for key, value in stats.items():
+                if manifest.get(key) != value:
+                    changes[key] = value
+        except Exception:
+            pass
+
+        if changes:
+            updated = update_run_manifest(folder, **changes)
+            if updated is not None:
+                return updated
+            manifest.update(changes)
+        return manifest
+    except Exception:
+        return manifest
+
+
+def locate_recent_runs(since_minutes=60, registry_path=None, refresh=True):
     """Return a list of recently-started runs (newest first).
 
     Reads the global registry at ``~/.molass/runs.jsonl`` and filters by
@@ -147,6 +296,9 @@ def locate_recent_runs(since_minutes=60, registry_path=None):
         Window for "recent".  Default 60.
     registry_path : str, optional
         Override registry location (mainly for tests).
+    refresh : bool, optional
+        Re-derive each manifest's ``status`` / ``phase`` from the disk first
+        (:func:`refresh_run_manifest`).  Default True.
 
     Returns
     -------
@@ -179,7 +331,7 @@ def locate_recent_runs(since_minutes=60, registry_path=None):
                     if when < cutoff:
                         continue
                 rec["exists"] = os.path.isdir(rec.get("folder", ""))
-                rec["manifest"] = read_manifest(rec["folder"]) if rec["exists"] else None
+                rec["manifest"] = read_manifest(rec["folder"], refresh=refresh) if rec["exists"] else None
                 entries.append(rec)
     except OSError:
         return []

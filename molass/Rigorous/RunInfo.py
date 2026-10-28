@@ -14,6 +14,10 @@ class RunInfo:
     """Handle returned by :func:`molass.Rigorous.make_rigorous_decomposition`
     (and ``Decomposition.optimize_rigorously()``).
 
+    To open the analysis folder of a finished run later (best result, SV, jobs,
+    recipe) in one call, use ``molass.load_analysis(analysis_folder)``; this
+    handle's ``live_status()`` reports a running one.
+
     Attributes
     ----------
     ssd : SecSaxsData
@@ -1589,6 +1593,11 @@ class RunInfo:
               hops; for DE it equals the number of new-best improvements found.
               This is NOT the total number of objective function calls — see
               ``n_fevals`` (issue #231) for that.
+            - ``n_jobs`` (int), ``n_entries`` (int), ``n_nonfinite`` (int),
+              ``stalled_jobs`` (int): over the jobs in the analysis folder, the
+              number of jobs, of callback entries, of entries rejected as
+              non-finite (``fv`` of ``inf``), and of trailing jobs that did
+              not improve ``best_fv`` (a stalled search), see #346.
             - ``best_fv`` (float): inverted from ``best_sv`` (matches
               ``check_progress`` arithmetic).
             - ``best_sv`` (float): best score-value-so-far on the 0-100
@@ -1620,12 +1629,14 @@ class RunInfo:
         analysis_folder = self.analysis_folder
         work_folder = self.work_folder
 
-        # Try to load the per-run manifest (RunRegistry breadcrumb).
+        # Try to load the per-run manifest (RunRegistry breadcrumb). Its stored status is stale unless
+        # the launching process updated it, so re-derive it from the disk (#345) -- except while this
+        # RunInfo knows better, from its own live thread/process.
         manifest = None
         if analysis_folder:
             try:
                 from molass.Rigorous.RunRegistry import read_manifest
-                manifest = read_manifest(analysis_folder)
+                manifest = read_manifest(analysis_folder, refresh=not self.is_alive)
             except Exception:
                 manifest = None
 
@@ -1656,6 +1667,19 @@ class RunInfo:
                         best_fv = -math.log(200.0 / (100.0 - best_sv) - 1.0) / 1.5
                     except (ValueError, ZeroDivisionError):
                         best_fv = None
+            except Exception:
+                pass
+
+        # Rejected (non-finite) iterations and stalled search: invisible in best_fv alone (#346).
+        n_jobs = n_entries = n_nonfinite = stalled_jobs = None
+        if analysis_folder:
+            try:
+                from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, count_stalled_jobs
+                jobs = list_rigorous_jobs(analysis_folder)
+                n_jobs = len(jobs)
+                n_entries = sum(j.n_entries for j in jobs)
+                n_nonfinite = sum(j.n_nonfinite for j in jobs)
+                stalled_jobs = count_stalled_jobs(jobs)
             except Exception:
                 pass
 
@@ -1736,6 +1760,10 @@ class RunInfo:
             "phase": phase,
             "n_callbacks": n_callbacks,
             "n_evals": n_callbacks,  # deprecated alias, remove in future release (#231)
+            "n_jobs": n_jobs,
+            "n_entries": n_entries,
+            "n_nonfinite": n_nonfinite,
+            "stalled_jobs": stalled_jobs,
             "best_fv": best_fv,
             "best_sv": best_sv,
             "elapsed_s": elapsed_s,

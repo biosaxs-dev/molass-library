@@ -350,6 +350,15 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
     xr_slices = getattr(trimming, 'xr_slices', None)
     if xr_slices is not None and xr_slices[0] is not None and 'xr_qr' not in recipe["trim_params"]:
         recipe["xr_qr"] = [int(xr_slices[0].start), int(xr_slices[0].stop)]
+    # The name of a bundled molass_data sample, when that is the input: unlike the absolute path stored in
+    # jobs/NNN/in_folder.txt it is valid on every machine (#348). Taken from the data files the SSD
+    # was loaded from, which its trimmed/corrected copies keep.
+    datafiles = getattr(effective_ssd, 'datafiles', None)
+    if datafiles:
+        from molass.Rigorous.RecipeRunner import bundled_dataset_name
+        dataset = bundled_dataset_name(os.path.dirname(datafiles[0]))
+        if dataset is not None:
+            recipe["dataset"] = dataset
     recipe.update(extra)
     return recipe
 

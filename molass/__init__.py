@@ -149,6 +149,21 @@ def print_context():
         import sys
         print(text.encode(sys.stdout.encoding or "ascii", errors="replace").decode(sys.stdout.encoding or "ascii"))
 
+def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None):
+    """Open an analysis folder in one call: best result, score value, jobs, rejected iterations, recipe.
+
+    Lazy wrapper of :func:`molass.Rigorous.AnalysisFolder.load_analysis`; see there for the details.
+
+    Examples
+    --------
+    >>> import molass
+    >>> info = molass.load_analysis("analysis-001")
+    >>> print(info)
+    >>> info.result.plot_components()
+    """
+    from molass.Rigorous.AnalysisFolder import load_analysis as _load_analysis
+    return _load_analysis(analysis_folder, jobid=jobid, rgcurve=rgcurve, in_folder=in_folder)
+
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
 from molass.Dev.ReloadAll import reload_all  # noqa: E402
 from molass.PackageUtils.EnvironmentReport import environment_report  # noqa: E402

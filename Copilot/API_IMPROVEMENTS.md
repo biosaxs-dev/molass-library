@@ -282,11 +282,11 @@ AI-friendliness assessment after the homogeneity work (molass-researcher experim
 | [#341](https://github.com/biosaxs-dev/molass-library/issues/341) | Robustness | EDM non-finite objective: `conformance_score` returns NaN for non-finite moments (no more `DLASCL` console messages), `Edm.edm_func` skips frames before `t0`; the EDM search stall is open | 🔶 Partly done |
 | [#342](https://github.com/biosaxs-dev/molass-library/issues/342) | Data trimming | Default trimming hid the interparticle correction (cut the lowest-q points): `small_angle_limit` ('extended' legacy default / 'guinier' / 'none', global option and `trimmed_copy` argument), `trimmed_copy(xr_qr=...)`, recipe records `xr_qr` (old recipes rebuild with 'guinier'), `TrimmingInfo.small_angle_limit`, warning for rank 2 on a Guinier-cut range; GUI control open | 🔶 Library done |
 | [#343](https://github.com/biosaxs-dev/molass-library/issues/343) | Correctness | `load_analysis_session`: docstring says best result, code loads the latest job | ✅ Done |
-| [#344](https://github.com/biosaxs-dev/molass-library/issues/344) | Navigation | One discoverable call to open an analysis folder (best result, SV, jobs, recipe) | ⏳ Open |
-| [#345](https://github.com/biosaxs-dev/molass-library/issues/345) | Workflow | `RUN_MANIFEST.json` status/phase go stale | ⏳ Open |
-| [#346](https://github.com/biosaxs-dev/molass-library/issues/346) | Workflow | `live_status()`: rejected (non-finite) iterations and stalled jobs | ⏳ Open |
+| [#344](https://github.com/biosaxs-dev/molass-library/issues/344) | Navigation | One discoverable call to open an analysis folder (best result, SV, jobs, recipe): `molass.load_analysis(folder)` returns an `AnalysisInfo` | ✅ Done |
+| [#345](https://github.com/biosaxs-dev/molass-library/issues/345) | Workflow | `RUN_MANIFEST.json` status/phase go stale: `refresh_run_manifest()` derives them from the subprocess pid and the job files (`read_manifest(refresh=True)`, `locate_recent_runs`, `live_status()`) | ✅ Done |
+| [#346](https://github.com/biosaxs-dev/molass-library/issues/346) | Workflow | `live_status()`: rejected (non-finite) iterations and stalled jobs (`n_jobs`, `n_entries`, `n_nonfinite`, `stalled_jobs`; `JobInfo.n_nonfinite`); GUI status line open | 🔶 Library done |
 | [#347](https://github.com/biosaxs-dev/molass-library/issues/347) | Naming / defaults | `get_usable_qrange_impl(debug=True)` default; `XrComponent.icurve`/`jcurve` always `None` (and `get_jcurve()` was broken) | ✅ Done |
-| [#348](https://github.com/biosaxs-dev/molass-library/issues/348) | Portability | recipe/analysis folder stores the absolute data path | ⏳ Open |
+| [#348](https://github.com/biosaxs-dev/molass-library/issues/348) | Portability | recipe/analysis folder stores the absolute data path: `recipe.json` records `dataset`, `rebuild_decomposition_from_recipe` / `load_analysis_session` / `load_analysis` take `in_folder=`, stale bundled-sample paths resolve through `molass_data` | ✅ Done |
 
 **#290 details**: root cause was discoverability, not missing functionality --
 `RunInfo.restore()` + `load_best()` already correctly solve "get a plottable
