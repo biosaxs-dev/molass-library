@@ -30,7 +30,11 @@ _EGH_OVERLAP_THRESHOLD = 1.3  # spacing / sigma_sum below this → EGH peaks mer
 # Interparticle detection helpers (Guinier low-q suppression test)
 # ---------------------------------------------------------------------------
 
-_LOWQ_SUPPRESSION_THRESHOLD = 0.995   # ratio < this → repulsive interparticle
+_LOWQ_SUPPRESSION_THRESHOLD = 0.95    # ratio < this → repulsive interparticle
+# The ratio is taken at the first q point of the data, so it depends on the trimming. With the default
+# trimming (small_angle_limit='extended', molass-library#342) SAMPLE3, measured under interparticle-inducing
+# conditions, gives 0.81, SAMPLE1 0.988, SAMPLE5 0.994 and SAMPLE2/4/6 >= 0.997; the former threshold 0.995 had
+# been set for the stricter 'guinier' cut and flagged SAMPLE1 and SAMPLE5 (molass-researcher experiment 53b).
 _PEAK_FRAMES_THRESHOLD      = 0.1     # fraction of max integrated intensity
 _GUINIER_Q_MAX_RATIO        = 1.3     # q·Rg upper bound for Guinier fit
 
@@ -212,7 +216,8 @@ def recommend_decomposition_options(xr_data,
         uses a rank-2 component model.
     lowq_suppression_threshold : float, optional
         The Guinier suppression ratio below which interparticle effects are
-        flagged.  Default 0.995 (requires ≥0.5 % suppression at q_min).
+        flagged.  Default 0.95 (requires ≥5 % suppression at q_min; the
+        ratio depends on the trimming, see ``_LOWQ_SUPPRESSION_THRESHOLD``).
     egh_overlap_threshold : float, optional
         EGH peak pairs with spacing/sigma_sum below this value are merged
         into one component.  Default 1.3.
