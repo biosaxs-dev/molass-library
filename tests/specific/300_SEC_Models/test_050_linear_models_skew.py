@@ -94,6 +94,45 @@ def test_grm_pdf_has_the_moments_of_qamar_table_1(Pe, k_ext, D_eff):
     assert m3 > 0
 
 
+def test_general_sojourn_time_law_gives_a_positive_skew_and_felinger_eq_44():
+    """Felinger Eq. (32) with any positive sojourn-time law: kappa2 = Y2 + Y1^2/Nd,
+    kappa3 = Y3 + 3 Y1 Y2/Nd + 3 Y1^3/Nd^2, Y1 = n E[tau] + t0, Y_k = n E[tau^k]."""
+    rng = np.random.default_rng(0)
+    for _ in range(1000):
+        n, t0, Nd = 10 ** rng.uniform(-1, 2), 10 ** rng.uniform(-1, 2), 10 ** rng.uniform(0, 4)
+        m1, m2, m3 = 10 ** rng.uniform(-2, 1, 3)               # any positive moments (not necessarily consistent)
+        Y1, Y2, Y3 = n * m1 + t0, n * m2, n * m3
+        assert Y3 + 3 * Y1 * Y2 / Nd + 3 * Y1 ** 3 / Nd ** 2 > 0
+    n, t0, Nd, ts = 7.3, 2.1, 40.0, 0.9                          # exponential sojourn times: m_k = k! ts^k
+    Y1, Y2, Y3 = n * ts + t0, 2 * n * ts ** 2, 6 * n * ts ** 3
+    S = (Y3 + 3 * Y1 * Y2 / Nd + 3 * Y1 ** 3 / Nd ** 2) / (Y2 + Y1 ** 2 / Nd) ** 1.5
+    assert S == pytest.approx(felinger_skew(Nd, n, n * ts / t0), rel=1e-12)     # k' = n ts / t0, N_m = n
+
+
+@pytest.mark.parametrize("n, ts, t0, Nd", [(20, 0.5, 10.0, 150.0), (20, 0.5, 10.0, 14400.0), (4, 2.0, 10.0, 150.0), (60, 0.2, 10.0, 40.0)])
+def test_molass_sdm_has_the_second_order_skew_not_the_lkm_one(n, ts, t0, Nd):
+    """sdm_monopore_pdf uses exp(Z + Z^2/(2 N0)): kappa3 = Y3 + 3 Y1 Y2/N0 (positive), equal to the LKM's skew
+    only when N0 is large."""
+    from molass.SEC.Models.SdmMonoPore import sdm_monopore_pdf
+    t = np.linspace(0.001, 150, 150001)
+    tR = t0 + n * ts
+    _, m, v, skew = _moments(sdm_monopore_pdf(t, n, ts, Nd, t0, timescale=80 / tR), t)
+    Y1, Y2, Y3 = n * ts + t0, 2 * n * ts ** 2, 6 * n * ts ** 3
+    assert m == pytest.approx(tR, rel=1e-3)
+    assert v == pytest.approx(Y2 + Y1 ** 2 / Nd, rel=2e-3)
+    assert skew == pytest.approx((Y3 + 3 * Y1 * Y2 / Nd) / (Y2 + Y1 ** 2 / Nd) ** 1.5, rel=5e-3)
+    assert skew > 0
+    exact = felinger_skew(Nd, n, n * ts / t0)
+    assert skew <= exact * (1 + 5e-3)                            # never above the LKM's skew
+
+
+def test_molass_sdm_without_adsorption_is_a_gaussian():
+    from molass.SEC.Models.SdmMonoPore import sdm_monopore_pdf
+    t = np.linspace(0.001, 150, 150001)
+    _, m, v, skew = _moments(sdm_monopore_pdf(t, 1e-9, 0.5, 150.0, 10.0, timescale=8.0), t)
+    assert abs(skew) < 1e-3                                       # the LKM / linear EDM would give 3/sqrt(150) = 0.245
+
+
 def test_qamar_table_1_third_moment_is_positive_and_gives_the_edm_limit():
     rng = np.random.default_rng(0)
     N = 100000

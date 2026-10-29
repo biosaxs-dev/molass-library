@@ -153,9 +153,14 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
 
         - one component (a sum of tailing components can look fronted where peaks
           overlap);
-        - the **linear** isotherm, exponential sojourn times and Poisson
-          adsorption events, which the paper names as the details that make the
-          stochastic–dispersive model identical to this one;
+        - the **linear** isotherm. The equivalence of the stochastic–dispersive model
+          (SDM) with this one needs, in Felinger's words, "exponential distribution for
+          the sojourn times and Poisson distribution for the number of adsorption
+          events" (homogeneous kinetics): without these details the two are not
+          equivalent. Heterogeneous kinetics (e.g. a pore-size distribution) is the
+          SDM's extension beyond the LKM (replace φ_S by the CF of the heterogeneous
+          kinetics, his conclusions), so "SDM = LKM in general" is **not** what the
+          paper establishes; the positivity below does not need it;
         - the third standardized moment, not the asymmetry factor (it indicates
           tailing for a unimodal profile of this family; the mean against the
           peak position was not checked).
@@ -163,8 +168,24 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
         Which models, for a single component (checked in
         ``tests/specific/300_SEC_Models/test_050_linear_models_skew.py``):
 
-        - LKM, and the stochastic–dispersive model it is identical to: S > 0 from
-          the formula above;
+        - LKM: S > 0 from the formula above;
+        - the SDM with **any** positive sojourn-time law (exponential, gamma, a
+          pore-size mixture): in Felinger's Eq. (32) the cumulants are, with
+          ``Y₁ = n E[τ] + t0`` and ``Y_k = n E[τ^k]`` (k ≥ 2),
+          ``κ₂ = Y₂ + Y₁²/N_d`` and ``κ₃ = Y₃ + 3 Y₁ Y₂/N_d + 3 Y₁³/N_d²``, all terms
+          positive, so S > 0 (it gives Eq. (44) for exponential sojourn times; the
+          chain rule is the whole proof);
+        - molass's SDM (``SdmMonoPore``, its gamma form, ``LognormalPore``) uses the
+          second-order form ``exp(Z + Z²/(2 N0))`` instead of Felinger's exact
+          first-passage form ``exp[N_d (1 − sqrt(1 − 2Z/N_d))]``: the same mean and
+          variance (``N0`` plays the role of ``N_d``) but ``κ₃ = Y₃ + 3 Y₁ Y₂/N0``,
+          positive for any adsorption (``n > 0``) and zero without it, since the
+          mobile-phase dispersion is then Gaussian. Its skew equals this expression
+          exactly (checked on ``sdm_monopore_pdf``) and is below the LKM's when ``N0``
+          is small (0.156 against 0.443 at ``N0 = 40``, n = 60, τ = 0.2, t0 = 10), the
+          same at ``N0 = 14400``. So molass's SDM is not the LKM exactly either. For the
+          lognormal-pore form ``Y_k = ∫ f(r) N K_e(r) k! (T K_p(r))^k dr > 0`` is read from
+          its CF; only the mono-pore form was tested numerically;
         - linear EDM (``EdmLinear.edm_pdf``, the ``k_MT → ∞`` limit): an inverse
           Gaussian, ``S = 3 sqrt(2/Pe) > 0`` exactly;
         - linear GRM (``GrmLinear.grm_pdf``): S > 0 from Qamar *et al.* (2014,
@@ -177,7 +198,7 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
           the GRM (differences of about 4 % and 14 % at best), so Felinger's remark
           that the general rate model is equivalent to the LKM in linear
           chromatography (his ref. [38], not read here) cannot be read as identity;
-        - not covered: the lognormal-pore SDM, and any non-linear isotherm
+        - not covered: any non-linear isotherm
           (the EDM with ``b < 0`` and the empirical EGH with ``tau < 0`` can front).
 
         (Qamar's "front asymmetry" is the third moment, not fronting: his positive
