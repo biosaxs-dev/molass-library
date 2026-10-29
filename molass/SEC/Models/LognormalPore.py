@@ -1,5 +1,17 @@
 """
 SEC.Models.LognormalPore.py
+
+``gec_lognormal_pore_*``: size exclusion with a lognormal pore-size distribution, the molecular (stochastic)
+theory of Sepsey, Bacskay and Felinger (2014, J. Chromatogr. A 1331:52): ingress count
+``n_p = N (1 - rho)^me`` and residence time ``tau_p = T (1 - rho)^mp`` for ``rho = Rg / r`` (their Eq. 5-6), the
+characteristic function of their Eq. (18)-(21), whose first three cumulants are their Eq. (22)-(25) (reproduced
+by this integrand, ``tests/specific/300_SEC_Models/test_050_linear_models_skew.py``). The paper neglects axial
+dispersion and has no dead time.
+
+``sdm_lognormal_pore_*``: the same with a mobile-phase dispersion term ``Z + Z^2/(2 N0)`` and a drift ``t0`` added
+here, not in that paper (see the notes in ``LkmLinear.lkm_pdf`` on the skew); the gamma residence-time forms are
+a further extension. The upper integration limit ``min(PORESIZE_INTEG_LIMIT, mode + 5 stdev)`` drops 0.3-2.6 %
+of the pore mass for sigma = 0.3-1.5.
 """
 import numpy as np
 from scipy.stats import lognorm

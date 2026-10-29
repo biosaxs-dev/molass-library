@@ -133,6 +133,48 @@ def test_molass_sdm_without_adsorption_is_a_gaussian():
     assert abs(skew) < 1e-3                                       # the LKM / linear EDM would give 3/sqrt(150) = 0.245
 
 
+def _sepsey_a(eta, rho, sigma):
+    """Sepsey, Bacskay and Felinger 2014 (J. Chromatogr. A 1331:52), Eq. (25), integer eta >= 0;
+    rho = r_G / r_{p,0}."""
+    from math import comb
+    from scipy import special
+    return 0.5 * sum((-rho) ** k * np.exp(k ** 2 * sigma ** 2 / 2) * comb(eta, k)
+                     * special.erfc((k * sigma ** 2 + np.log(rho)) / (np.sqrt(2) * sigma)) for k in range(eta + 1))
+
+
+def _lognormal_pore_cumulant(k, N, T, me, mp, mu, sigma, Rg):
+    """k-th cumulant of the CF of gec_lognormal_pore_cf (no dispersion): the integrand of
+    gec_lognormal_pore_integrand_impl differentiated k times at w = 0, over (Rg, infinity)."""
+    from math import factorial
+    from scipy import integrate
+    from molass.SEC.Models.LognormalPore import distribution_func, Ksec
+    f = lambda r: distribution_func(r, mu, sigma) * N * Ksec(Rg, r, me) * factorial(k) * (T * Ksec(Rg, r, mp)) ** k
+    return integrate.quad(f, Rg, np.inf, limit=400)[0]
+
+
+@pytest.mark.parametrize("me, mp", [(2, 1), (4, -1), (3, 0)])
+@pytest.mark.parametrize("sigma", [0.3, 0.5, 1.0])
+def test_lognormal_pore_cumulants_are_sepsey_eq_22_to_25(me, mp, sigma):
+    """mu1 = n T a, mu2' = 2 n T^2 a, mu3' = 6 n T^3 a with a = K_SEC(eta), eta = m_e + k m_p (Eq. 22-25)."""
+    from math import factorial
+    N, T, r0 = 2000.0, 1.0, 12.434                             # n_perm, tau_perm, r_{p,0} of the paper's Sec. 3
+    Rg = 0.4 * r0
+    for k in (1, 2, 3):
+        got = _lognormal_pore_cumulant(k, N, T, me, mp, np.log(r0), sigma, Rg)
+        want = N * T ** k * factorial(k) * _sepsey_a(me + k * mp, Rg / r0, sigma)
+        assert got == pytest.approx(want, rel=1e-6)
+        assert got > 0
+
+
+def test_lognormal_pore_cumulants_are_positive_also_for_non_integer_exponents():
+    """Positive integrand: every cumulant is positive wherever the integral converges (eta > -1)."""
+    r0 = 12.434
+    for me, mp in ((1.7, 0.3), (2.5, -0.4), (1.1, -0.1)):
+        for sigma in (0.3, 1.0):
+            for k in (1, 2, 3):
+                assert _lognormal_pore_cumulant(k, 2000.0, 1.0, me, mp, np.log(r0), sigma, 0.4 * r0) > 0
+
+
 def test_qamar_table_1_third_moment_is_positive_and_gives_the_edm_limit():
     rng = np.random.default_rng(0)
     N = 100000

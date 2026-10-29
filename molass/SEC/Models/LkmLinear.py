@@ -183,9 +183,18 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
           mobile-phase dispersion is then Gaussian. Its skew equals this expression
           exactly (checked on ``sdm_monopore_pdf``) and is below the LKM's when ``N0``
           is small (0.156 against 0.443 at ``N0 = 40``, n = 60, τ = 0.2, t0 = 10), the
-          same at ``N0 = 14400``. So molass's SDM is not the LKM exactly either. For the
-          lognormal-pore form ``Y_k = ∫ f(r) N K_e(r) k! (T K_p(r))^k dr > 0`` is read from
-          its CF; only the mono-pore form was tested numerically;
+          same at ``N0 = 14400``. So molass's SDM is not the LKM exactly either. The
+          lognormal-pore form is the pore-size mixture of Sepsey, Bacskay and Felinger
+          (2014, J. Chromatogr. A 1331:52), Eq. (18)-(21), plus molass's own mobile-phase
+          dispersion term (the paper neglects axial dispersion): its cumulants
+          ``Y_k = ∫ f(r) N K_e(r) k! (T K_p(r))^k dr`` are the paper's Eq. (22)-(25)
+          (third central moment ``6 n_perm τ_perm³ a``, ``a`` an integral of a positive
+          function), reproduced to 8 digits for integer exponents ``η = m_e + k m_p`` of
+          both signs of ``m_p``, so they are positive; in the paper every plotted skew is
+          positive (Fig. 3-5). molass integrates up to ``min(600, mode + 5 stdev)``
+          instead of infinity, which drops 0.3-2.6 % of the pore mass for σ = 0.3-1.5.
+          The mixture was tested through its moments, the dispersion form only on the
+          mono-pore ``sdm_monopore_pdf``;
         - linear EDM (``EdmLinear.edm_pdf``, the ``k_MT → ∞`` limit): an inverse
           Gaussian, ``S = 3 sqrt(2/Pe) > 0`` exactly;
         - linear GRM (``GrmLinear.grm_pdf``): S > 0 from Qamar *et al.* (2014,
