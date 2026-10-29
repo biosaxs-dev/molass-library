@@ -153,6 +153,18 @@ def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, c_inj=1.0, t_inj=1.0,
         GRM  (this function)       — intermediate width
         LKM  (LkmLinear.lkm_pdf)  — broadest, lumped mass transfer
 
+    Skewness
+        For a single component the skew of the linear GRM peak is positive (a tailed,
+        never a fronted peak): ``S > 0`` on 400 000 random positive parameter sets
+        (Pe 10-1e4, k_ext 1e-5-10, R_p 1e-4-0.1, D_eff 1e-8-1e3, a_star 1e-3-100,
+        F 0.1-10; smallest value 0.037), computed from the cumulants of the transfer
+        function above and equal to the skew of ``grm_pdf``. This is numerical, not a
+        proof; the analytic statement for the LKM and its limits are in
+        ``LkmLinear.lkm_pdf`` (Felinger et al. 2004, Eq. (39)/(44)), and Felinger's
+        conclusion that the general rate model is equivalent to the LKM in linear
+        chromatography (citing its ref. [38]) was not checked here. It does not hold for
+        a non-linear isotherm.
+
     LKM initialisation
         Given a GRM result (k_ext, R_p, R), the equivalent LKM k_MT is:
           k_MT_LKM = R / (R−1) × k_MT_eff

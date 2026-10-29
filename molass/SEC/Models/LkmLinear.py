@@ -129,6 +129,55 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
         For nonlinear chromatography (fronting or tailing peaks), the LKM and
         SDM diverge.
 
+    Skewness: a single LKM peak never fronts
+        For **one component** the standardized third central moment of the LKM
+        peak is, with ``N_d = Pe/2``, ``N_m = k_MT (R-1) t0`` and ``k' = R - 1``
+        (Felinger *et al.* 2004, Eq. (39), equivalently Eq. (44)), ::
+
+            S = 3 / sqrt(N_m N_d)
+                * [N_m² (k'+1)³ + 2 N_m N_d k'² (k'+1) + 2 N_d² k'³]
+                / [N_m (k'+1)² + 2 N_d k'²]^(3/2)
+
+        Every quantity in it is positive, so **S > 0 for all physical
+        parameters**: the peak is skewed to the tail and cannot front. The paper
+        does not state this; it is deduced from the formula. (The formula is the
+        standardized skew κ₃/κ₂^(3/2) of the characteristic function of its
+        Eq. (52), which is the transfer function used here; ``lkm_pdf`` reproduces
+        it numerically.) Limits: ``k' → 0`` (dispersion only): ``S = 3/sqrt(N_d)``;
+        ``N_d → ∞`` (no axial dispersion, the Thomas model): ``S = 3/sqrt(2 N_m)``,
+        which tends to 0 (a Gaussian) only as ``N_m → ∞``. ``k_MT → ∞`` gives the
+        linear EDM, ``S = 3/sqrt(N_d)``; in between S is not monotonic in k_MT
+        but stays positive.
+
+        Scope of the statement:
+
+        - one component (a sum of tailing components can look fronted where peaks
+          overlap);
+        - the **linear** isotherm, exponential sojourn times and Poisson
+          adsorption events, which the paper names as the details that make the
+          stochastic–dispersive model identical to this one;
+        - the third standardized moment, not the asymmetry factor (it indicates
+          tailing for a unimodal profile of this family; the mean against the
+          peak position was not checked).
+
+        Which models, for a single component (checked in
+        ``tests/specific/300_SEC_Models/test_050_linear_models_skew.py``):
+
+        - LKM, and the stochastic–dispersive model it is identical to: S > 0 from
+          the formula above;
+        - linear EDM (``EdmLinear.edm_pdf``, the ``k_MT → ∞`` limit): an inverse
+          Gaussian, ``S = 3 sqrt(2/Pe) > 0`` exactly;
+        - linear GRM (``GrmLinear.grm_pdf``): S > 0 on 400 000 random positive
+          parameter sets (numerically, from the cumulants of its transfer function;
+          not a proof). The paper's conclusion says the general rate and lumped
+          pore models are equivalent to the LKM in linear chromatography, citing
+          its ref. [38], which was not read here;
+        - not covered: the lognormal-pore SDM, and any non-linear isotherm
+          (the EDM with ``b < 0`` and the empirical EGH with ``tau < 0`` can front).
+
+        So in linear chromatography fronting needs a non-linear isotherm
+        (molass-library#350).
+
     Examples
     --------
     >>> import numpy as np

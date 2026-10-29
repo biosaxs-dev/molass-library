@@ -28,12 +28,13 @@ This is the k_MT → ∞ limit of the LKM transfer function:
   LKM:  Phi = (4*s*t0/Pe) * (s + k_MT*R) / (s + k_MT)
   EDM:  Phi = (4*s*t0*R / Pe)          [k_MT → ∞]
 
-The elution profile is a perfect Gaussian with:
+The elution profile is an inverse Gaussian (it is a Gaussian only as Pe -> infinity):
   μ₁ = t0 * R
   σ² = 2 * t0² * R² / Pe
+  skew = 3 * sqrt(2 / Pe)      (+0.245 at Pe = 300: slightly tailed, never fronted)
 
-This agrees with the classical moment formula (Qamar 2014, Table 1,
-Dirichlet BCs, linear isotherm) and is validated in:
+The mean and variance agree with the classical moment formula (Qamar 2014, Table 1,
+Dirichlet BCs, linear isotherm) and are validated in:
   molass-researcher/experiments/27_qamar_2014_paper/27b_edm_lkm_grm_consistency.ipynb
 
 Note on edm_func (molass-legacy)
@@ -112,9 +113,10 @@ def edm_pdf(x, Pe, t0, R, timescale=None):
 
     Notes
     -----
-    The profile is analytically a Gaussian with:
+    The profile is analytically an inverse Gaussian (a Gaussian only as Pe -> infinity) with:
       μ₁ = t0 * R
       σ² = 2 * t0² * R² / Pe
+      skew = 3 * sqrt(2 / Pe) > 0   (never fronting; see ``LkmLinear.lkm_pdf`` Notes)
 
     This is the narrowest of the three linear-isotherm SEC models:
       EDM  (this function) — axial dispersion only
