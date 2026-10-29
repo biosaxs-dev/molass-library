@@ -513,38 +513,56 @@ def list_rigorous_jobs(analysis_folder):
         if not os.path.exists(cb_file):
             continue
 
-        fv_list, _ = read_callback_txt_impl(cb_file)
-        if not fv_list:
+        stats = _read_job_stats(cb_file, read_callback_txt_impl)
+        if stats is None:
             continue
+        iterations, best_fv, timestamp, n_nonfinite = stats
+        result.append(JobInfo(id=d, iterations=iterations,
+                              best_fv=best_fv, timestamp=timestamp,
+                              n_entries=iterations, n_nonfinite=n_nonfinite))
+    return result
 
-        # Guard against premature reads.  The very first callback.txt entry is
-        # always the init-params evaluation written before any search begins:
-        #   BH:  c=0, a=False  (init); subsequent entries have a=True when BH
-        #        accepts a jump.
-        #   NS:  a is ALWAYS False (hardcoded in SamplerCallback.__call__);
-        #        the counter rises with each NS iteration callback.
-        # Skip the job if only the single init entry exists (i.e. the search
-        # has not yet made its first move in either method). (issue #188)
-        if len(fv_list) <= 1:
-            continue  # only init entry — BH/NS has not started yet
 
+# callback.txt of a running job is polled (the GUI calls live_status() twice a second), parse it only when it changed
+_job_stats_cache = {}
+
+
+def _read_job_stats(cb_file, read_callback_txt_impl):
+    """``(iterations, best_fv, timestamp, n_nonfinite)`` of a callback.txt, ``None`` if the job has no real result yet."""
+    try:
+        st = os.stat(cb_file)
+        key = (st.st_mtime_ns, st.st_size)
+    except OSError:
+        key = None
+    cached = _job_stats_cache.get(cb_file)
+    if key is not None and cached is not None and cached[0] == key:
+        return cached[1]
+
+    fv_list, _ = read_callback_txt_impl(cb_file)
+    # Guard against premature reads.  The very first callback.txt entry is
+    # always the init-params evaluation written before any search begins:
+    #   BH:  c=0, a=False  (init); subsequent entries have a=True when BH
+    #        accepts a jump.
+    #   NS:  a is ALWAYS False (hardcoded in SamplerCallback.__call__);
+    #        the counter rises with each NS iteration callback.
+    # Skip the job if only the single init entry exists (i.e. the search
+    # has not yet made its first move in either method). (issue #188)
+    if not fv_list or len(fv_list) <= 1:
+        stats = None
+    else:
         # Use all entries for best_fv regardless of a=True/False.
         # For BH: the true best may be in a rejected basin (a=False).
         # For CMA: a=True marks a generation improvement but NOT whether it
         #   beats the init params — init gets a=False and is often the best.
         # For NS: all entries are a=False by design.
         # get_params() (Scripting.py) also uses argmin over all entries.
-        fv_arr = np.array(fv_list, dtype=object)
-        iterations = len(fv_arr)
-        best_fv = float(min(row[1] for row in fv_list))
-        n_nonfinite = sum(1 for row in fv_list if not _is_finite_fv(row[1]))
-        # Last iteration's timestamp (column 3)
-        timestamp = fv_list[-1][3]
-
-        result.append(JobInfo(id=d, iterations=iterations,
-                              best_fv=best_fv, timestamp=timestamp,
-                              n_entries=iterations, n_nonfinite=n_nonfinite))
-    return result
+        stats = (len(fv_list),
+                 float(min(row[1] for row in fv_list)),
+                 fv_list[-1][3],      # timestamp of the last iteration
+                 sum(1 for row in fv_list if not _is_finite_fv(row[1])))
+    if key is not None:
+        _job_stats_cache[cb_file] = (key, stats)
+    return stats
 
 
 def _is_finite_fv(fv):

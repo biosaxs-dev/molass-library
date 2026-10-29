@@ -52,6 +52,15 @@ def test_job_info_counts_nonfinite(tmp_path):
     assert job.best_fv == pytest.approx(-1.6)
 
 
+def test_job_info_follows_a_growing_callback_file(tmp_path):
+    folder = str(tmp_path)
+    _write_job(folder, "000", [-1.4, -1.5])
+    assert list_rigorous_jobs(folder)[0].n_entries == 2
+    _write_job(folder, "000", [-1.4, -1.5, "inf", -1.6])   # the running job appended entries
+    (job,) = list_rigorous_jobs(folder)
+    assert job.n_entries == 4 and job.n_nonfinite == 1 and job.best_fv == pytest.approx(-1.6)
+
+
 def test_job_info_keeps_four_field_construction():
     job = JobInfo("000", 5, -1.0, None)
     assert job.n_nonfinite == 0
