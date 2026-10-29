@@ -100,6 +100,9 @@ class Decomposition(DidYouMeanMixin):
         # 'quick decomposition'); shown by plot_components(title='auto').
         self.method_label = None
         self._optimizer_rgs = kwargs.get('optimizer_rgs', None)
+        # Which components may front in the rigorous stage (one bool each; None until decided, see
+        # molass.Rigorous.FrontingPolicy, molass-library#350).
+        self.fronting_flags = None
 
     def copy_with_new_components(self, xr_ccurves, uv_ccurves, **kwargs):
         """
@@ -141,6 +144,8 @@ class Decomposition(DidYouMeanMixin):
         # is unchanged by upgrade(), so the length always still matches).
         if self.xr_ranks is not None:
             new_decomp.xr_ranks = self.xr_ranks
+        if self.fronting_flags is not None:
+            new_decomp.fronting_flags = list(self.fronting_flags)
 
         return new_decomp
 
@@ -1567,6 +1572,7 @@ class Decomposition(DidYouMeanMixin):
                             seed_params=None,
                             constraints=None,
                             pipeline_recipe=None,
+                            fronting=None,
                             num_jobs=1,
                             on_round_start=None,
                             stop_check=None,
@@ -1744,6 +1750,16 @@ class Decomposition(DidYouMeanMixin):
             triggers a ``UserWarning`` and falls back to the estimator-derived
             init.  When ``seed_params`` is provided it takes precedence over
             the ``clear_jobs=False`` resume path.
+        fronting : str, sequence of bool or None, optional
+            Which components may have a fronting peak in the rigorous stage (EGH ``tau < 0``, EDM
+            ``b < 0``). Fronting is rare in SEC and visible in the elution plot, so by default a
+            component may front only when its quick EGH fit shows it (``tau / sigma`` below
+            ``molass.Rigorous.FrontingPolicy.FRONTING_THRESHOLD``). ``None`` (default): the policy the
+            decomposition carries (``decomp.fronting_flags``, set by ``upgrade()``), else ``'auto'``.
+            ``'auto'``: detect from the EGH fit; ``'allow'``: every component may front; ``'forbid'``:
+            none; or one bool per component. The resolved policy is recorded in ``recipe.json``
+            (``fronting``) and shown by ``molass.load_analysis(...).summary()``
+            (molass-library#350).
 
         Returns
         -------
@@ -1885,7 +1901,7 @@ class Decomposition(DidYouMeanMixin):
                 # async_=True internally so run_info exists (for on_round_start) before
                 # this round's wait() blocks -- the overall call still blocks the caller
                 # per the async_=False contract enforced above.
-                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
+                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting)
                 if run_info is None:
                     return None  # _dry_run=True: pre-flight checks done, nothing to run/wait on
                 if on_round_start is not None:
@@ -1893,7 +1909,7 @@ class Decomposition(DidYouMeanMixin):
                 run_info.wait(timeout=0)
             return run_info
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
               function_code=None, debug=False, progress_cb=None):

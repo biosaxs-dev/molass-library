@@ -37,13 +37,12 @@ def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
             Lower and upper bounds for partition coefficient ``a`` (K_SEC).
             Derived from EGH peak positions with 2× safety margin.
         
-        - ``'b_bounds'``: tuple (b_min, b_max)
-            Lower and upper bounds for adsorption exponent ``b``.
-            Derived from EGH asymmetry (tau):
-            
-            - ``|tau| < 0.3`` (nearly symmetric) → ``(-2.0, 0.5)`` (mostly kinetic)
-            - ``tau < -0.3`` (right-tail) → ``(-5.0, 1.0)``
-            - ``tau > 0.3`` (left-tail, unusual) → ``(-1.0, 3.0)``
+        - ``'b_bounds'``: list of (b_min, b_max), one per component
+            Bounds of the adsorption isotherm parameter ``b`` from the fronting policy
+            (molass-library#350). In the EDM, ``b > 0`` gives a tailing peak, ``b = 0`` a nearly symmetric
+            one and ``b < 0`` a fronting one. A component whose EGH fit shows fronting
+            (``tau / sigma`` below ``FrontingPolicy.FRONTING_THRESHOLD``) gets ``(None, None)``, every
+            other component ``(0.0, None)``.
         
         - ``'cinj_min'``: float
             Minimum injection concentration (prevents component collapse).
@@ -70,9 +69,10 @@ def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
           For SEC, K_SEC = accessible_pore_volume / mobile_phase_volume.
           Typical range: 0.0 (total exclusion) to 1.5 (full access).
         
-        - **b**: Adsorption isotherm exponent. In SEC, tailing is normally
-          kinetic (b ≈ 0), not adsorptive (b > 0). Positive b suggests
-          secondary adsorption or overloading.
+        - **b**: Isotherm parameter (stationary phase ``q = a c / (1 + b c)``). ``b > 0`` (Langmuir)
+          gives a tailing peak, ``b < 0`` (anti-Langmuir) a fronting one. In SEC, tailing is normally
+          kinetic (b ≈ 0), not adsorptive (b > 0), and fronting is rare: only a component whose EGH
+          fit shows it may have b < 0 (see ``b_bounds`` and molass-library#350).
         
         - **cinj**: Injection concentration. Prevents optimizer from collapsing
           components to zero amplitude (degenerate solution).
@@ -121,20 +121,13 @@ def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     a_max = 2.0 * max(a_analytical)  # 2× safety margin
     a_bounds = (0.0, a_max)
     
-    # --- 2. Derive b_bounds from tau asymmetry ---
-    # tau > 0: right-tail (kinetic tailing, b < 0 typical for SEC)
-    # tau < 0: left-tail (Langmuir adsorption, b > 0, unusual in SEC)
-    # tau ≈ 0: Gaussian (b ≈ 0)
-    
-    if abs(tau_mean) < 0.3:
-        # Nearly symmetric peaks → mostly kinetic tailing
-        b_bounds = (-2.0, 0.5)
-    elif tau_mean > 0:
-        # Right-tail dominant (typical SEC kinetic limitation)
-        b_bounds = (-5.0, 1.0)
-    else:
-        # Left-tail (unusual; secondary adsorption or overloading)
-        b_bounds = (-1.0, 3.0)
+    # --- 2. b_bounds from the fronting policy (molass-library#350) ---
+    # In edm_func b > 0 gives a TAILING peak (Langmuir), b = 0 a nearly symmetric one and b < 0 a FRONTING one
+    # (anti-Langmuir). Fronting is rare in SEC, so only a component whose EGH fit shows it (tau / sigma below
+    # FRONTING_THRESHOLD) may have b < 0; the others get b >= 0. One bound per component.
+    from molass.Rigorous.FrontingPolicy import detect_fronting
+    fronting = detect_fronting(decomp_egh)
+    b_bounds = [(None, None) if f else (0.0, None) for f in fronting]
     
     # Recommend sharing b if tau values are similar (column property)
     shared_b = (tau_std < 0.2)

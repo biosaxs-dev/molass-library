@@ -186,13 +186,22 @@ def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
         set_molass_options(anomaly_handling=saved_handling)
     corrected = trimmed.corrected_copy(**baseline_params)
     decomp = corrected.quick_decomposition(**decomp_params)
+    # Which components may front (molass-library#350). Recipes written before the policy was recorded have no
+    # 'fronting' and are rebuilt with the bounds they ran with ('legacy': EGH tau >= 0, EDM b free).
+    from molass.Rigorous.FrontingPolicy import resolve_fronting
+    fronting = recipe.get('fronting')
+    fronting_mode = list(fronting) if fronting is not None else 'legacy'
     if model != 'egh':
         upgrade_kwargs = {}
         if pore_dist is not None:
             upgrade_kwargs['pore_dist'] = pore_dist
             if ln_pore_sigma is not None:
                 upgrade_kwargs['model_params'] = {'ln_pore_sigma': ln_pore_sigma}
+        if model == 'edm':
+            upgrade_kwargs['fronting'] = fronting_mode
         decomp = decomp.upgrade(model=model, **upgrade_kwargs)
+    elif getattr(decomp, 'xr_ccurves', None) is not None:
+        decomp.fronting_flags = resolve_fronting(decomp, fronting_mode)
 
     xr_ranks = recipe.get('xr_ranks')
     if xr_ranks is not None:

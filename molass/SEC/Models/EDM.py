@@ -51,6 +51,14 @@ class EDM:
         from molass.SEC.Models.EdmOptimizer import optimize_edm_xr_decomposition, refine_edm_per_component
         from molass.SEC.Models.UvOptimizer import optimize_uv_decomposition
 
+        # Which components may front, i.e. have b < 0 (molass-library#350). The others get b >= 0 in both
+        # passes below and in the rigorous stage (recipe 'fronting'). 'fronting' is accepted as an option of
+        # upgrade('EDM'): 'auto' (default, from the quick EGH fit), 'allow', 'forbid', 'legacy' or one bool
+        # per component.
+        from molass.Rigorous.FrontingPolicy import resolve_fronting
+        fronting_flags = resolve_fronting(decomposition, kwargs.pop('fronting', None), target_model='edm')
+        kwargs['fronting_flags'] = fronting_flags
+
         init_params = estimate_edm_init_params(decomposition, **kwargs)
         # Pass 1 (heavy): full shared-column optimisation — finds (t0, u, e, Dz, a, b, cinj).
         new_xr_ccurves = optimize_edm_xr_decomposition(decomposition, init_params, **kwargs)
@@ -67,6 +75,7 @@ class EDM:
         else:
             new_uv_ccurves = optimize_uv_decomposition(decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
         edm_decomposition = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
+        edm_decomposition.fronting_flags = fronting_flags
 
         if debug:
             import matplotlib.pyplot as plt

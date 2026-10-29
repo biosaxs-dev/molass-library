@@ -105,6 +105,19 @@ def test_refresh_keeps_completed_manifest_of_run_that_just_ended(tmp_path):
     assert refresh_run_manifest(folder)["status"] == "completed"
 
 
+def test_final_status_is_not_flipped_by_the_log_or_a_live_pid(tmp_path):
+    """A log touched after the run ended (in-process runs keep logging) and a recorded pid that is alive
+    (pids are reused) do not make a 'completed' run 'running'."""
+    folder = str(tmp_path)
+    job_dir = _write_job(folder, "000", [-1.4, -1.5])
+    _age(job_dir, 3600)
+    write_run_manifest(folder, status="completed", subprocess_pid=os.getpid())   # this process is alive
+    _set_manifest_time(folder, 1800)
+    with open(os.path.join(job_dir, "optimizer.log"), "w") as f:                  # written just now
+        f.write("late log line\n")
+    assert refresh_run_manifest(folder)["status"] == "completed"
+
+
 def test_refresh_keeps_failed_and_new_runs(tmp_path):
     failed = str(tmp_path / "failed")
     os.makedirs(failed)

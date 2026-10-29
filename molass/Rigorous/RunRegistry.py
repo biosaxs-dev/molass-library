@@ -147,6 +147,9 @@ def read_manifest(folder, refresh=False):
 # (the callback of one iteration can take many minutes on large data).
 STALE_AFTER_S = 1800
 
+# A recorded 'completed' / 'failed' is contradicted only by a callback.txt written more than this many seconds after it.
+FINAL_STATUS_MARGIN_S = 10
+
 
 def _pid_alive(pid):
     try:
@@ -165,13 +168,13 @@ def _pid_alive(pid):
         return False
 
 
-def _latest_job_activity(folder):
-    """Latest modification time (epoch seconds) of the ``callback.txt`` / ``optimizer.log`` files of the jobs."""
+def _latest_job_activity(folder, names=("callback.txt", "optimizer.log")):
+    """Latest modification time (epoch seconds) of the given files (default ``callback.txt`` / ``optimizer.log``) of the jobs."""
     jobs_folder = os.path.join(folder, "optimized", "jobs")
     latest = None
     try:
         for job in os.listdir(jobs_folder):
-            for name in ("callback.txt", "optimizer.log"):
+            for name in names:
                 try:
                     mtime = os.path.getmtime(os.path.join(jobs_folder, job, name))
                 except OSError:
@@ -202,8 +205,10 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
 
     1. the recorded ``subprocess_pid`` is alive, or a job file (``callback.txt``, ``optimizer.log``)
        was written within ``stale_after_s`` seconds: ``status='running'``, ``phase='optimizing'``
-       (a recorded ``'completed'`` / ``'failed'`` is contradicted only by job files written *after*
-       it was recorded, i.e. by further jobs chained in the same folder);
+       (a recorded ``'completed'`` / ``'failed'`` is the launching process's word: only a ``callback.txt``
+       written more than ``FINAL_STATUS_MARGIN_S`` seconds after it was recorded, i.e. a further job
+       chained in the same folder, contradicts it; neither ``optimizer.log`` nor a live pid does, since
+       logging can touch the log after the run ended and a pid can be reused);
     2. otherwise a manifest still saying ``'running'`` / ``'starting'`` becomes ``'completed'``,
        ``phase='finished'`` (the return code of a process that is gone is not known; a recorded
        ``'failed'`` is kept);
@@ -231,19 +236,25 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
         status = manifest.get("status")
         sub_pid = manifest.get("subprocess_pid")
         last_activity = _latest_job_activity(folder)
-        recent = last_activity is not None and time.time() - last_activity < stale_after_s
+        last_callback = _latest_job_activity(folder, names=("callback.txt",))
         if status in ("completed", "failed"):
-            # a final status is the launching process's word; only job files written after it
-            # (chained jobs of the same folder) contradict it
-            recent = recent and last_activity > _manifest_stamp(manifest) + 2
-        if sub_pid is not None and _pid_alive(sub_pid):
-            new_status, source = "running", "pid"
-        elif recent:
-            new_status, source = "running", "job_files"
-        elif status in ("running", "starting") and (sub_pid is not None or last_activity is not None):
-            new_status, source = "completed", "job_files"
+            # A final status is the launching process's word. Only a callback.txt written clearly after it
+            # (a further job chained in the same folder) contradicts it: optimizer.log can be touched by
+            # logging after the run ended, and a recorded pid may have been reused by another process.
+            chained = (last_callback is not None
+                       and last_callback > _manifest_stamp(manifest) + FINAL_STATUS_MARGIN_S
+                       and time.time() - last_callback < stale_after_s)
+            new_status, source = ("running", "job_files") if chained else (status, "stored")
         else:
-            new_status, source = status, "stored"
+            recent = last_activity is not None and time.time() - last_activity < stale_after_s
+            if sub_pid is not None and _pid_alive(sub_pid):
+                new_status, source = "running", "pid"
+            elif recent:
+                new_status, source = "running", "job_files"
+            elif status in ("running", "starting") and (sub_pid is not None or last_activity is not None):
+                new_status, source = "completed", "job_files"
+            else:
+                new_status, source = status, "stored"
         if new_status != status:
             changes["status"] = new_status
             changes["phase"] = "optimizing" if new_status == "running" else "finished"
@@ -251,8 +262,8 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
             changes["phase"] = "finished"
         if manifest.get("status_source") != source:
             changes["status_source"] = source
-        if last_activity is not None:
-            stamp = datetime.fromtimestamp(last_activity, timezone.utc).isoformat(timespec="seconds")
+        if last_callback is not None:
+            stamp = datetime.fromtimestamp(last_callback, timezone.utc).isoformat(timespec="seconds")
             if manifest.get("last_callback_time") != stamp:
                 changes["last_callback_time"] = stamp
 

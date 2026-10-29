@@ -359,12 +359,18 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
         dataset = bundled_dataset_name(os.path.dirname(datafiles[0]))
         if dataset is not None:
             recipe["dataset"] = dataset
+    # Which components may front in the rigorous stage (molass-library#350). Absent in recipes written before
+    # the policy existed: RecipeRunner rebuilds those with the former bounds ('legacy').
+    from molass.Rigorous.FrontingPolicy import recipe_flags
+    fronting = recipe_flags(decomposition)
+    if fronting is not None:
+        recipe["fronting"] = fronting
     recipe.update(extra)
     return recipe
 
 
 def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
-                        frozen_param_groups=None, function_code=None, seed_params=None):
+                        frozen_param_groups=None, function_code=None, seed_params=None, fronting=None):
     """Build a recipe dict from a decomposition for backward-compat auto-construction.
 
     Captures every parameter that affects optimizer construction so that
@@ -373,6 +379,8 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     silently diverge from what the caller actually asked for (issue #260).
     """
     recipe = build_pipeline_recipe(decomposition, method=method, niter=niter)
+    if fronting is not None:
+        recipe["fronting"] = list(fronting)
     if frozen_components is not None:
         recipe["frozen_components"] = list(frozen_components)
     if frozen_param_groups is not None:
@@ -385,7 +393,7 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     return recipe
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None, fronting=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -685,6 +693,16 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # Step 3: auto-construct recipe when subprocess path is used without one.
     # This is the normal default flow (in_process=False is now the default),
     # not a deprecated fallback -- see Copilot/refactor/DESIGN_default_in_process_reversal.md.
+    # Which components may front (molass-library#350): an explicit `fronting` wins, then a given recipe,
+    # then the decomposition's own policy / the quick EGH fit.
+    from molass.Rigorous.FrontingPolicy import resolve_fronting
+    if fronting is None and pipeline_recipe is not None and pipeline_recipe.get('fronting') is not None:
+        fronting_flags = [bool(v) for v in pipeline_recipe['fronting']]
+    else:
+        fronting_flags = resolve_fronting(decomposition, fronting)
+    if pipeline_recipe is not None and fronting_flags is not None and pipeline_recipe.get('fronting') != fronting_flags:
+        pipeline_recipe = dict(pipeline_recipe, fronting=fronting_flags)
+
     if not in_process and pipeline_recipe is None:
         # Resolve function_code before recipe construction so it round-trips
         # through recipe.json (issue #260) -- the later detection below becomes
@@ -698,6 +716,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             frozen_param_groups=frozen_param_groups,
             function_code=function_code,
             seed_params=seed_params,
+            fronting=fronting_flags,
         )
 
     # Suppress verbose legacy output unless debug=True.
@@ -787,7 +806,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         except Exception:
             pass
 
-        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, function_code=function_code, debug=debug)
+        optimizer = construct_legacy_optimizer(dsets, basecurves, spectral_vectors, num_components=num_components, model=model, method=method, function_code=function_code, fronting=fronting_flags, debug=debug)
         optimizer.set_xr_only(not data_ssd.has_uv())
         if frozen_components is not None:
             optimizer.freeze_components(frozen_components)

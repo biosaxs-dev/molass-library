@@ -388,11 +388,13 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
             function_code = detect_function_code(decomposition)
 
         _report("Constructing optimizer")
+        from molass.Rigorous.FrontingPolicy import resolve_fronting
         optimizer = construct_legacy_optimizer(
             dsets, basecurves, spectral_vectors,
             num_components=num_components, model=model,
             method='BH',  # method only affects optimizer setup, not objective_func
             function_code=function_code, debug=debug,
+            fronting=resolve_fronting(decomposition, None),
         )
         optimizer.set_xr_only(not data_ssd.has_uv())
 

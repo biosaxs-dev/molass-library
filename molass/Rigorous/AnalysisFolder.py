@@ -85,6 +85,11 @@ class AnalysisInfo:
         lines.append(f"recipe: model={r.get('model')}, num_components={r.get('num_components')}, "
                      f"method={r.get('method')}, xr_ranks={r.get('xr_ranks')}, "
                      f"dataset={r.get('dataset')}, molass_version={r.get('molass_version')}")
+        if str(r.get('model', '')).lower() in ('egh', 'edm'):
+            from molass.Rigorous.FrontingPolicy import describe
+            fronting = r.get('fronting')
+            lines.append("fronting allowed for: " + (describe(fronting) if fronting is not None
+                                                     else "(recipe written before the policy: the former bounds)"))
         if self.result is None:
             lines.append("result: none yet (no job has a real result)")
         else:

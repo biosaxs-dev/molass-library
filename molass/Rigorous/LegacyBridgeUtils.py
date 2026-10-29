@@ -62,8 +62,12 @@ def make_basecurves_from_decomposition(decomposition, data_ssd=None, debug=False
     baseline_type = get_setting('unified_baseline_type') or 1
     return make_basecurves_from_sd(sd, baseline_type, xr_only=xr_only, debug=debug)
 
-def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, function_code=None, debug=False):
+def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_components=3, model="EGH", method="BH", for_split_only=False, function_code=None, fronting=None, debug=False):
     """Build a legacy rigorous optimizer instance for the given model.
+
+    ``fronting`` is the per-component policy of molass.Rigorous.FrontingPolicy (one bool per elution
+    component, ``True``: may front), handed to the parameter type, which turns it into the bounds of
+    ``tau`` (EGH) or ``b`` (EDM) when ``prepare_for_optimization()`` computes them (molass-library#350).
 
     Notes
     -----
@@ -95,6 +99,8 @@ def construct_legacy_optimizer(dsets, baseline_objects, spectral_vectors, num_co
         wvector=spectral_vectors[1],
         for_split_only=for_split_only,
         )
+    if fronting is not None:
+        optimizer.params_type.fronting_flags = [bool(v) for v in fronting]
 
     # backward compatibility for estimator setting
     model = model.upper()

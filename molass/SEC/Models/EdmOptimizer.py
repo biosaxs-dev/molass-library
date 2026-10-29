@@ -246,11 +246,18 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         sc_e_bounds,              # e_sh
         (1e-6, None),             # Dz_sh — must be positive
     ]
+    # fronting_flags (molass-library#350): one bool per component; only a flagged one may have b < 0.
+    fronting_flags = kwargs.get('fronting_flags', None)
     pc_bounds = []
-    for _ in range(n_comp):
+    for k in range(n_comp):
         # Per-component bounds: apply kwargs overrides if present
         a_bound = a_bounds_kw if a_bounds_kw is not None else (0.0, None)
         b_bound = b_bounds_kw if b_bounds_kw is not None else (None, None)
+        if b_bounds_kw is not None and isinstance(b_bounds_kw[0], (tuple, list)):
+            b_bound = b_bounds_kw[k]       # one (lo, hi) per component, e.g. from suggest_edm_bounds_from_egh
+        if fronting_flags is not None and not fronting_flags[k]:
+            b_lo = 0.0 if b_bound[0] is None else max(0.0, b_bound[0])
+            b_bound = (b_lo, b_bound[1])
         pc_bounds += [
             a_bound,              # a_i   (K_SEC, user or auto-derived bounds)
             b_bound,              # b_i   (user or auto-derived bounds)
@@ -444,8 +451,9 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
                 position_penalty += (x[-1] - egh_peak) ** 2
         return data_error + position_penalty * position_anchor_scale
 
+    fronting_flags = kwargs.get('fronting_flags', None)
     abc_bounds = []
-    for cc in edm_ccurves:
+    for k, cc in enumerate(edm_ccurves):
         b_pass1 = float(cc.params[3])
         if _b_max_global is not None:
             b_upper = _b_max_global
@@ -453,9 +461,13 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
             b_upper = 0.0                 # hard b ≤ 0 for 4+ comp: prevents EDM overflow
         else:
             b_upper = b_pass1             # b ≤ b_pass1 for 2/3 comp: preserves physical b
+        # b >= 0 for a component that may not front (molass-library#350); pass 1 already respects it
+        b_lower = 0.0 if (fronting_flags is not None and not fronting_flags[k]) else None
+        if b_lower is not None and b_upper is not None and b_upper < b_lower:
+            b_lower = b_upper
         abc_bounds += [
-            (0.0, None),          # a (K_SEC ≥ 0)
-            (None, b_upper),      # b (adaptive upper bound — see strategy comment above)
+            (0.0, None),          # a (K_SEC >= 0)
+            (b_lower, b_upper),   # b (adaptive upper bound, see strategy comment above)
             (cinj_min, None),     # cinj
         ]
 
