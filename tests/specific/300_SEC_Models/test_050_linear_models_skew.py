@@ -65,6 +65,46 @@ def test_linear_grm_skew_is_positive(Pe, k_ext, D_eff):
     assert skew > 0
 
 
+def qamar_table1_dirichlet(Pe, t0, k_ext, R_p, D_eff, a_star, F, L=1.7):
+    """Mean, variance (without the t_inj^2/12 of a rectangular pulse) and third central moment of the GRM,
+    Qamar et al. 2014 (Chem. Eng. Sci. 107:192), Table 1, Dirichlet BCs. L only fixes the units (u = L/t0)."""
+    u = L / t0
+    D_L = u * L / Pe
+    A = 2 * R_p * a_star ** 2 / (3 * k_ext) + 2 * R_p ** 2 * a_star ** 2 / (15 * D_eff)
+    m1 = (L / u) * (1 + a_star * F)
+    m2 = L * F / u * A + 2 * L * D_L / u ** 3 * (1 + a_star * F) ** 2
+    m3 = (6 * L * D_L * (1 + a_star * F) * F / u ** 3 * A
+          + L * F * a_star ** 3 / u * (4 * R_p ** 4 / (105 * D_eff ** 2) + 4 * R_p ** 3 / (15 * k_ext * D_eff) + 2 * R_p ** 2 / (3 * k_ext ** 2))
+          + 12 * L * D_L ** 2 * (1 + a_star * F) ** 3 / u ** 5)
+    return m1, m2, m3
+
+
+@pytest.mark.parametrize("Pe, k_ext, D_eff", [(400, 0.00533, 1e3), (150, 0.003, 1e3), (400, 0.02, 2e-4)])
+def test_grm_pdf_has_the_moments_of_qamar_table_1(Pe, k_ext, D_eff):
+    F = 1.5
+    a_star = 2.0 / F
+    t = np.linspace(0.01, 120, 240001)
+    _, m, v, skew = _moments(grm_pdf(t, Pe, 5.0, k_ext, 0.004, D_eff, a_star, F), t)
+    m1, m2, m3 = qamar_table1_dirichlet(Pe, 5.0, k_ext, 0.004, D_eff, a_star, F)
+    assert m == pytest.approx(m1, rel=2e-3)
+    assert v == pytest.approx(m2, rel=3e-3)
+    # the third moment weights the far tail, where the FFT inversion has a little noise: 1 % (the exact
+    # agreement of the transfer function with Table 1 is to rounding error, see the cumulant check in experiment 54)
+    assert skew == pytest.approx(m3 / m2 ** 1.5, rel=1e-2)
+    assert m3 > 0
+
+
+def test_qamar_table_1_third_moment_is_positive_and_gives_the_edm_limit():
+    rng = np.random.default_rng(0)
+    N = 100000
+    p = (10 ** rng.uniform(1, 4, N), 10 ** rng.uniform(-1, 2, N), 10 ** rng.uniform(-5, 1, N), 10 ** rng.uniform(-4, -1, N),
+         10 ** rng.uniform(-8, 3, N), 10 ** rng.uniform(-3, 2, N), 10 ** rng.uniform(-1, 1, N))
+    _, m2, m3 = qamar_table1_dirichlet(*p)
+    assert (m3 > 0).all() and (m2 > 0).all()
+    _, m2, m3 = qamar_table1_dirichlet(300.0, 5.0, 1e12, 0.004, 1e12, 2.0 / 1.5, 1.5)           # k_ext, D_eff -> infinity
+    assert m3 / m2 ** 1.5 == pytest.approx(3 * np.sqrt(2 / 300.0), rel=1e-6)
+
+
 def test_grm_series_value_of_the_docstring():
     """The value quoted while deriving the cumulants: skew 0.3872 for the example of the grm_pdf docstring."""
     t = np.linspace(0.01, 80, 160001)

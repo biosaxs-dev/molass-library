@@ -167,13 +167,21 @@ def lkm_pdf(x, Pe, t0, k_MT, R, c_inj=1.0, t_inj=1.0, timescale=None):
           the formula above;
         - linear EDM (``EdmLinear.edm_pdf``, the ``k_MT → ∞`` limit): an inverse
           Gaussian, ``S = 3 sqrt(2/Pe) > 0`` exactly;
-        - linear GRM (``GrmLinear.grm_pdf``): S > 0 on 400 000 random positive
-          parameter sets (numerically, from the cumulants of its transfer function;
-          not a proof). The paper's conclusion says the general rate and lumped
-          pore models are equivalent to the LKM in linear chromatography, citing
-          its ref. [38], which was not read here;
+        - linear GRM (``GrmLinear.grm_pdf``): S > 0 from Qamar *et al.* (2014,
+          Chem. Eng. Sci. 107:192), Table 1 (Dirichlet boundary conditions): the third
+          central moment is a sum of three positive terms. The transfer function used
+          here reproduces the table's mean, variance and third moment to rounding
+          error, and S > 0 also holds on 400 000 random positive parameter sets. The
+          GRM is **not identical** to the LKM, though: in the paper's Table 3 / Fig. 12
+          no single LKM rate constant matches both the second and the third moment of
+          the GRM (differences of about 4 % and 14 % at best), so Felinger's remark
+          that the general rate model is equivalent to the LKM in linear
+          chromatography (his ref. [38], not read here) cannot be read as identity;
         - not covered: the lognormal-pore SDM, and any non-linear isotherm
           (the EDM with ``b < 0`` and the empirical EGH with ``tau < 0`` can front).
+
+        (Qamar's "front asymmetry" is the third moment, not fronting: his positive
+        skewness ``β = μ₃'/(μ₂')^(3/2)`` means a right-skewed, i.e. tailed, peak.)
 
         So in linear chromatography fronting needs a non-linear isotherm
         (molass-library#350).

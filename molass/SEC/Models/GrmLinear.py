@@ -155,15 +155,23 @@ def grm_pdf(x, Pe, t0, k_ext, R_p, D_eff, a_star, F_ratio, c_inj=1.0, t_inj=1.0,
 
     Skewness
         For a single component the skew of the linear GRM peak is positive (a tailed,
-        never a fronted peak): ``S > 0`` on 400 000 random positive parameter sets
-        (Pe 10-1e4, k_ext 1e-5-10, R_p 1e-4-0.1, D_eff 1e-8-1e3, a_star 1e-3-100,
-        F 0.1-10; smallest value 0.037), computed from the cumulants of the transfer
-        function above and equal to the skew of ``grm_pdf``. This is numerical, not a
-        proof; the analytic statement for the LKM and its limits are in
-        ``LkmLinear.lkm_pdf`` (Felinger et al. 2004, Eq. (39)/(44)), and Felinger's
-        conclusion that the general rate model is equivalent to the LKM in linear
-        chromatography (citing its ref. [38]) was not checked here. It does not hold for
-        a non-linear isotherm.
+        never a fronted peak). Qamar et al. (2014), Table 1 (Dirichlet BCs, the
+        boundary conditions of this model) gives the third central moment as a sum of
+        three positive terms::
+
+            μ₃' = 6 L D_L (1+a*F) F / u³ · (2 R_p a*²/(3 k_ext) + 2 R_p² a*²/(15 D_eff))
+                + L F a*³ / u · (4 R_p⁴/(105 D_eff²) + 4 R_p³/(15 k_ext D_eff) + 2 R_p²/(3 k_ext²))
+                + 12 L D_L² (1+a*F)³ / u⁵
+
+        with ``D_L = u L / Pe`` and ``u = L / t0``; the transfer function above reproduces
+        this, the mean and the variance to rounding error. Also ``S > 0`` on 400 000 random
+        positive parameter sets (Pe 10-1e4, k_ext 1e-5-10, R_p 1e-4-0.1, D_eff 1e-8-1e3,
+        a_star 1e-3-100, F 0.1-10; smallest value 0.037). Letting k_ext and D_eff tend to
+        infinity gives the linear EDM, ``S = 3 sqrt(2/Pe)``. The analytic statement for
+        the LKM is in ``LkmLinear.lkm_pdf`` (Felinger et al. 2004, Eq. (39)/(44)); the GRM
+        and the LKM are not identical (Qamar's Table 3: no single LKM rate constant matches
+        both the second and the third GRM moment). None of this holds for a non-linear
+        isotherm.
 
     LKM initialisation
         Given a GRM result (k_ext, R_p, R), the equivalent LKM k_MT is:
