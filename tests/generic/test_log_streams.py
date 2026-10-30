@@ -45,3 +45,37 @@ def test_progress_bars_are_written_to_stdout():
              "for _ in tqdm(range(3), desc='progress-check'):\n"
              "    pass\n")
     assert "progress-check" in r.stdout and r.stderr == ""
+
+
+# molass-library#358: pythonw.exe has no console, sys.stdout and sys.stderr are None
+_NO_CONSOLE = "import sys\nsys.stdout = sys.stderr = None\n"
+
+
+def test_progress_bars_do_not_fail_without_a_console():
+    r = _run("import molass\n" + _NO_CONSOLE +
+             "from molass.Global.Tqdm import tqdm\n"
+             "assert list(tqdm(range(3))) == [0, 1, 2]\n")
+    assert r.returncode == 0, r.stderr
+
+
+def test_rg_curve_progress_bar_is_the_safe_one():
+    r = _run("import molass.Guinier.RgCurveUtils as m\n" + _NO_CONSOLE +
+             "from molass.Global.Tqdm import tqdm\n"
+             "assert m.tqdm is tqdm\n"
+             "assert list(m.tqdm(range(2))) == [0, 1]\n")
+    assert r.returncode == 0, r.stderr
+
+
+def test_library_warnings_do_not_fail_without_a_console():
+    r = _run("import molass, logging\n" + _NO_CONSOLE +
+             "logging.getLogger('molass.Anything').warning('nowhere to go')\n"
+             "from molass.Logging.Utils import setup_notebook_logging\n"
+             "setup_notebook_logging().warning('still nowhere')\n"
+             "import molass.Global.Streams as s\n"
+             "assert s.stdout_or_null() is s.null_stream()\n")
+    assert r.returncode == 0, r.stderr
+
+
+def test_context_can_be_printed_without_a_console():
+    r = _run("import molass\n" + _NO_CONSOLE + "molass.print_context()\n")
+    assert r.returncode == 0, r.stderr

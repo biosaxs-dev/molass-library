@@ -5,7 +5,6 @@ Logging utilities for the Molass library.
 """
 
 import logging
-import sys
 
 def setup_notebook_logging():
     """
@@ -23,7 +22,8 @@ def setup_notebook_logging():
     logger.handlers = []
 
     # Add a StreamHandler for notebook output
-    handler = logging.StreamHandler(sys.stdout)
+    from molass.Global.Streams import stdout_or_null
+    handler = logging.StreamHandler(stdout_or_null())
     handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
     logger.addHandler(handler)
     return logger

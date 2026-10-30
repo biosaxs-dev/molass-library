@@ -27,6 +27,8 @@ class _StdoutHandler(logging.StreamHandler):
         pass
 
     def emit(self, record):
+        if sys.stdout is None:                 # no console (pythonw.exe): nowhere to write (molass-library#358)
+            return
         if logging.getLogger().handlers:       # the application configured logging: let it decide
             return
         super().emit(record)
