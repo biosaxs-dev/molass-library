@@ -17,6 +17,7 @@ from .CurrentStateUtils import (
 )
 from .RunInfo import restore
 from .AnalysisFolder import load_analysis, AnalysisInfo
+from .AnalysisStatus import analysis_status, AnalysisStatus
 from .RigorousImplement import build_pipeline_recipe
 from .ComparePaths import (
     compare_optimization_paths,

@@ -216,6 +216,16 @@ subprocess_pid, subprocess_returncode, manifest}` in one disk read.
 the live monitor dashboard as a plain dict, for numeric comparison against
 what's visually displayed.
 
+For an analysis **folder** without a `RunInfo` in memory (a run started from the GUI, or by
+another session), use `molass.analysis_status(folder)`: it reads only `RUN_MANIFEST.json`,
+`recipe.json` and `callback.txt` (seconds, also while the run is going) and gives `fv`, `sv`,
+`jobs`, `is_active`, `best_params` and `diagnose()` (warnings for a run that never left its
+starting point, stalled jobs, many non-finite iterations, a recipe written before the fronting
+policy, parameters on a bound). `molass.load_analysis(folder)` additionally rebuilds the
+decomposition (minutes) and loads the result; `load_analysis(folder, light=True)` is the same as
+`analysis_status(folder)`. `optimize_rigorously(..., note="why this run")` stores a note in the
+recipe, shown by both.
+
 `optimize_rigorously()` defaults to `in_process=True` (runs in the calling
 process; used by notebook/library workflows). `in_process=False` spawns a
 subprocess with its own independent data-derivation pipeline (used by the

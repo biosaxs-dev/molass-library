@@ -149,10 +149,11 @@ def print_context():
         import sys
         print(text.encode(sys.stdout.encoding or "ascii", errors="replace").decode(sys.stdout.encoding or "ascii"))
 
-def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None):
+def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, light=False):
     """Open an analysis folder in one call: best result, score value, jobs, rejected iterations, recipe.
 
     Lazy wrapper of :func:`molass.Rigorous.AnalysisFolder.load_analysis`; see there for the details.
+    ``light=True`` skips the rebuild of the decomposition (see :func:`analysis_status`).
 
     Examples
     --------
@@ -162,7 +163,24 @@ def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None):
     >>> info.result.plot_components()
     """
     from molass.Rigorous.AnalysisFolder import load_analysis as _load_analysis
-    return _load_analysis(analysis_folder, jobid=jobid, rgcurve=rgcurve, in_folder=in_folder)
+    return _load_analysis(analysis_folder, jobid=jobid, rgcurve=rgcurve, in_folder=in_folder, light=light)
+
+def analysis_status(analysis_folder):
+    """The light status of an analysis folder, read from its files in seconds (no decomposition rebuild).
+
+    Lazy wrapper of :func:`molass.Rigorous.AnalysisStatus.analysis_status`; see there for the details.
+    Meant for polling a running analysis and for surveying many folders; ``status.diagnose()`` lists
+    the warnings (stalled, at the starting point, many non-finite iterations, former bounds, on a bound).
+
+    Examples
+    --------
+    >>> import molass
+    >>> status = molass.analysis_status("analysis-001")
+    >>> print(status)
+    >>> status.is_active, status.fv, status.diagnose()
+    """
+    from molass.Rigorous.AnalysisStatus import analysis_status as _analysis_status
+    return _analysis_status(analysis_folder)
 
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
 from molass.Dev.ReloadAll import reload_all  # noqa: E402

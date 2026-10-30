@@ -1303,6 +1303,20 @@ class Decomposition(DidYouMeanMixin):
             props[i] = c.compute_area()
         return props/np.sum(props)
 
+    def get_skewnesses(self):
+        """
+        Get the skewness of the elution curve of each XR component.
+
+        Defined for every elution model. Negative means a fronting peak, positive a tailing one
+        (see :meth:`molass.LowRank.ComponentCurve.ComponentCurve.skewness`).
+
+        Returns
+        -------
+        skewnesses : list of float
+            One value per component, in component order.
+        """
+        return [c.skewness() for c in self.xr_ccurves]
+
     def compute_scds(self, debug=False):
         """
         Get the list of SCDs (Score of Concentration Dependence) for the decomposition.
@@ -1573,6 +1587,7 @@ class Decomposition(DidYouMeanMixin):
                             constraints=None,
                             pipeline_recipe=None,
                             fronting=None,
+                            note=None,
                             num_jobs=1,
                             on_round_start=None,
                             stop_check=None,
@@ -1760,6 +1775,12 @@ class Decomposition(DidYouMeanMixin):
             none; or one bool per component. The resolved policy is recorded in ``recipe.json``
             (``fronting``) and shown by ``molass.load_analysis(...).summary()``
             (molass-library#350).
+        note : str or None, optional
+            Why this analysis exists, e.g. ``"Q2 rank-1 EGH, SAMPLE3"``. Stored in ``recipe.json``
+            (``note``) and shown by ``molass.load_analysis(...).summary()`` (molass-library#357). A folder
+            that is continued keeps the note recorded earlier unless a new one is given. The name of the
+            analysis folder at creation is recorded too (``analysis_folder_name``), so that a later move
+            or renaming can be seen.
 
         Returns
         -------
@@ -1901,7 +1922,7 @@ class Decomposition(DidYouMeanMixin):
                 # async_=True internally so run_info exists (for on_round_start) before
                 # this round's wait() blocks -- the overall call still blocks the caller
                 # per the async_=False contract enforced above.
-                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting)
+                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting, note=note)
                 if run_info is None:
                     return None  # _dry_run=True: pre-flight checks done, nothing to run/wait on
                 if on_round_start is not None:
@@ -1909,7 +1930,7 @@ class Decomposition(DidYouMeanMixin):
                 run_info.wait(timeout=0)
             return run_info
 
-        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting)
+        return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting, note=note)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
               function_code=None, debug=False, progress_cb=None):

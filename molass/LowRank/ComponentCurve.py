@@ -77,6 +77,22 @@ class ComponentCurve:
         x = self.x
         return x, self.get_y()
 
+    def skewness(self):
+        """
+        Returns the skewness (third standardized moment) of the sampled elution curve.
+
+        Defined for every elution model, because it is computed from the curve and not from the
+        parameters. Negative means a fronting peak (a longer leading side), positive a tailing one,
+        about zero a symmetric one. The value does not depend on the height of the curve.
+
+        Returns
+        -------
+        float
+            The skewness, ``nan`` if the curve has no positive area or no spread.
+        """
+        from molass.Stats.Moment import compute_skewness
+        return compute_skewness(*self.get_xy())
+
     def get_moment(self):
         """
         Returns the moment of the component curve.

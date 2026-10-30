@@ -369,6 +369,34 @@ def build_pipeline_recipe(decomposition, method='BH', model=None, num_components
     return recipe
 
 
+def with_provenance(recipe, analysis_folder, note=None):
+    """``recipe`` plus the note and the analysis folder name (molass-library#357).
+
+    ``note``: why the analysis exists. ``analysis_folder_name``: the folder's name when it was first
+    created, so that a later renaming or move can be detected. A folder that is continued (resume,
+    next job) keeps what an earlier ``recipe.json`` recorded unless the caller gives a new note.
+    """
+    previous = {}
+    if analysis_folder:
+        import json
+        path = os.path.join(analysis_folder, 'optimized', 'recipe.json')
+        try:
+            with open(path) as f:
+                previous = json.load(f)
+        except (OSError, ValueError):
+            previous = {}
+    extra = {}
+    kept_note = note if note is not None else recipe.get('note', previous.get('note'))
+    if kept_note is not None:
+        extra['note'] = str(kept_note)
+    name = recipe.get('analysis_folder_name', previous.get('analysis_folder_name'))
+    if name is None and analysis_folder:
+        name = os.path.basename(os.path.normpath(analysis_folder))
+    if name:
+        extra['analysis_folder_name'] = name
+    return dict(recipe, **extra)
+
+
 def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=None,
                         frozen_param_groups=None, function_code=None, seed_params=None, fronting=None):
     """Build a recipe dict from a decomposition for backward-compat auto-construction.
@@ -393,7 +421,7 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     return recipe
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None, fronting=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None, fronting=None, note=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -465,6 +493,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         Kept in the signature only for backward compatibility.
     debug : bool, optional
         If True, enable debug mode with additional output.
+    note : str, optional
+        Why this analysis exists; stored in ``recipe.json`` (``note``, molass-library#357), together with the
+        name of the analysis folder at creation (``analysis_folder_name``).
 
     Returns
     -------
@@ -719,6 +750,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             fronting=fronting_flags,
         )
 
+    if pipeline_recipe is not None:
+        pipeline_recipe = with_provenance(pipeline_recipe, analysis_folder, note)
     # Suppress verbose legacy output unless debug=True.
     # The pre-optimization pipeline (folder setup, dataset construction,
     # baseline fitting, optimizer construction, parameter preparation)

@@ -27,6 +27,36 @@ def compute_meanstd(x, y):
     M2 = np.sum(y*(x-M1)**2)/W      # central moment
     return M1, np.sqrt(M2)
 
+def compute_skewness(x, y):
+    """Compute the skewness (third standardized moment) of a distribution defined by x and y.
+
+    The curve ``y`` is used as a weight, so the value does not depend on its scale.
+    Negative means fronting (a longer leading side), positive tailing, about zero symmetric.
+
+    Parameters
+    ----------
+    x : array-like
+        The x-values of the distribution.
+    y : array-like
+        The y-values of the distribution.
+
+    Returns
+    -------
+    float
+        The skewness, ``nan`` if the distribution has no positive area or no spread.
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    W = np.sum(y)
+    if not np.isfinite(W) or W <= 0:
+        return float('nan')
+    w = y/W
+    M1 = np.sum(w*x)
+    std = np.sqrt(np.sum(w*(x - M1)**2))
+    if not np.isfinite(std) or std == 0:
+        return float('nan')
+    return float(np.sum(w*(x - M1)**3)/std**3)
+
 class Moment:
     """A class to represent the moment of a distribution defined by x and y.
     Attributes

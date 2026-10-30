@@ -108,6 +108,26 @@ class Component:
         """
         return self.jcurve_array
 
+    def skewness(self):
+        """
+        Returns the skewness (third standardized moment) of the component's elution curve.
+
+        Negative means a fronting peak, positive a tailing one, about zero a symmetric one
+        (see :meth:`molass.LowRank.ComponentCurve.ComponentCurve.skewness`). The sampled i-curve is
+        used when the component has no model curve.
+
+        Returns
+        -------
+        float
+            The skewness, ``nan`` if the curve has no positive area or no spread.
+        """
+        curve = getattr(self.ccurve, 'skewness', None)
+        if callable(curve):
+            return curve()
+        from molass.Stats.Moment import compute_skewness
+        x, y = self.icurve_array[0:2]
+        return compute_skewness(x, y)
+
     def compute_area(self):
         """
         Compute the area under the i-curve.
