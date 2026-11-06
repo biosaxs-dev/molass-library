@@ -503,13 +503,21 @@ class Decomposition(DidYouMeanMixin):
         """
         return [uv_cc.scale for uv_cc in self.uv_ccurves]
 
-    def get_rg_curve(self, progress_cb=None):
+    def get_rg_curve(self, progress_cb=None, refresh=False):
         """Compute the per-frame Rg curve from the raw XR data.
 
         Runs a Guinier fit on every elution frame independently and returns
         the results as an ``RgCurve`` object.  This is useful for assessing
         whether a peak is a pure single-component species (flat Rg vs. frame)
         or a heterogeneous mixture (varying Rg).
+
+        Parameters
+        ----------
+        progress_cb : callable, optional
+            Called with intermediate fit progress by the underlying Rg estimator.
+        refresh : bool, optional
+            Ignore in-memory and disk caches, recompute the curve, and replace the
+            disk cache when this decomposition has a cache path.
 
         .. note::
             This can be slow for large datasets because it fits one Guinier
@@ -536,13 +544,24 @@ class Decomposition(DidYouMeanMixin):
             plt.title("Rg vs. elution frame")
             plt.show()
         """
+        if refresh:
+            self._rgcurve = None
+        if getattr(self, '_rgcurve', None) is None and not refresh:
+            cache_path = getattr(self, '_rg_curve_cache_path', None)
+            if cache_path is not None:
+                from molass.Guinier.RgCurveCache import load_rg_curve_cache
+                self._rgcurve = load_rg_curve_cache(cache_path, self.ssd)
         if getattr(self, '_rgcurve', None) is None:
             parent = getattr(self, '_parent', None)
             if parent is not None:
                 # Inherit from parent decomposition — same XR data, no recomputation.
-                self._rgcurve = parent.get_rg_curve(progress_cb=progress_cb)
+                self._rgcurve = parent.get_rg_curve(progress_cb=progress_cb, refresh=refresh)
             else:
                 self._rgcurve = self.ssd.get_rg_curve(progress_cb=progress_cb)
+            cache_path = getattr(self, '_rg_curve_cache_path', None)
+            if cache_path is not None:
+                from molass.Guinier.RgCurveCache import save_rg_curve_cache
+                save_rg_curve_cache(cache_path, self.ssd, self._rgcurve)
         return self._rgcurve
 
     @property

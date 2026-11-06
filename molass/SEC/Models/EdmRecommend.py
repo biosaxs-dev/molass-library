@@ -60,9 +60,10 @@ def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     Notes
     -----
     **Integration with upgrade()**:
-        These bounds are automatically applied when calling
-        ``decomposition.upgrade(model='EDM')`` unless explicitly overridden
-        via kwargs (e.g., ``a_bounds=(0, 3.0)`` in the call).
+        These bounds are advisory and are not automatically applied by
+        ``decomposition.upgrade(model='EDM')``. Pass bounds explicitly when
+        calling ``upgrade()`` if this experimental recommendation is desired.
+        The default tailing-component ``b`` policy remains open (issue #349).
     
     **Physical Interpretation**:
         - **a (K_SEC)**: Partition coefficient between mobile and stationary phases.
@@ -81,8 +82,10 @@ def suggest_edm_bounds_from_egh(decomp_egh, e_assumed=0.5, verbose=False):
     --------
     >>> decomp_egh = corrected.quick_decomposition(proportions=[1, 1])
     >>> bounds = suggest_edm_bounds_from_egh(decomp_egh, verbose=True)
-    >>> # Bounds are auto-applied:
-    >>> decomp_edm = decomp_egh.upgrade(model='EDM')
+    >>> # Apply selected suggestions explicitly:
+    >>> decomp_edm = decomp_egh.upgrade(
+    ...     model='EDM', a_bounds=bounds['a_bounds'], b_bounds=bounds['b_bounds'],
+    ...     cinj_min=bounds['cinj_min'])
     >>> # Or explicitly override:
     >>> decomp_edm = decomp_egh.upgrade(model='EDM', a_bounds=(0, 2.5))
     """

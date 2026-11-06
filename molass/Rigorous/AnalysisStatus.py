@@ -8,6 +8,34 @@
     (``molass.load_analysis`` needs minutes for that rebuild).
 """
 import os
+import re
+
+
+_KNOWN_DEFAULT_CHANGES = (
+    (
+        (1, 2, 1),
+        "XR trimming default changed in molass 1.2.1 from small_angle_limit='guinier' "
+        "to 'extended'. This recipe does not record xr_qr or small_angle_limit; "
+        "the recipe rebuild uses the legacy 'guinier' setting.",
+        lambda recipe: (
+            recipe.get("xr_qr") is None
+            and "xr_qr" not in (recipe.get("trim_params") or {})
+            and "small_angle_limit" not in (recipe.get("trim_params") or {})
+        ),
+    ),
+)
+
+
+def _version_tuple(value):
+    match = re.match(r"\s*(\d+(?:\.\d+)*)", str(value or ""))
+    if match is None:
+        return None
+    return tuple(int(part) for part in match.group(1).split("."))
+
+
+def _version_at_least(version, minimum):
+    length = max(len(version), len(minimum))
+    return version + (0,) * (length - len(version)) >= minimum + (0,) * (length - len(minimum))
 
 
 class AnalysisStatus:
@@ -90,6 +118,23 @@ class AnalysisStatus:
         current = os.path.basename(os.path.normpath(self.analysis_folder))
         return created if created is not None and created != current else None
 
+    def changed_defaults(self):
+        """Known default changes newer than this recipe that it does not explicitly record."""
+        recipe_version = _version_tuple(self.recipe.get("molass_version"))
+        if recipe_version is None:
+            return []
+        import molass
+        current_version = _version_tuple(molass.__version__)
+        if current_version is None:
+            return []
+        return [
+            message
+            for introduced, message, applies in _KNOWN_DEFAULT_CHANGES
+            if _version_at_least(current_version, introduced)
+            and recipe_version < introduced
+            and applies(self.recipe)
+        ]
+
     def _callback(self, job_id):
         """``(fvs, xs)`` of the callback.txt of a job, read once."""
         if job_id not in self._entries:
@@ -170,7 +215,7 @@ class AnalysisStatus:
         ``bounds.txt``).
         """
         import numpy as np
-        findings = []
+        findings = self.changed_defaults()
         if not self.jobs:
             return findings
         fv, start = self.fv, self.start_fv

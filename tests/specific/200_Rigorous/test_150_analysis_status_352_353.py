@@ -78,6 +78,22 @@ def test_status_without_jobs_or_recipe(tmp_path):
     assert st.diagnose() == [] and "none yet" in st.summary()
 
 
+def test_status_notices_known_defaults_not_recorded_in_an_old_recipe():
+    old = AnalysisStatus("analysis-old", {"molass_version": "1.1.4", "trim_params": {}}, [], None)
+    assert len(old.changed_defaults()) == 1
+    assert "small_angle_limit='guinier'" in old.changed_defaults()[0]
+    assert old.diagnose() == old.changed_defaults()
+    assert "warning: XR trimming default changed" in old.summary()
+
+    recorded = AnalysisStatus(
+        "analysis-recorded",
+        {"molass_version": "1.1.4", "xr_qr": [11, 1003], "trim_params": {}},
+        [],
+        None,
+    )
+    assert recorded.changed_defaults() == []
+
+
 def test_is_active_follows_the_manifest():
     assert AnalysisStatus("f", {}, [], {"status": "running"}).is_active
     assert not AnalysisStatus("f", {}, [], {"status": "completed"}).is_active

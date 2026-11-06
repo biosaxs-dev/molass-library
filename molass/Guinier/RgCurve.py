@@ -10,6 +10,9 @@ class RgCurve(Curve):
     """
     A class to represent an Rg curve.
 
+    See :doc:`the after-analysis cookbook </after_analysis>` for
+    examples comparing data and model-reconstructed Rg curves.
+
     Attributes
     ----------
     indeces : np.ndarray
@@ -17,7 +20,11 @@ class RgCurve(Curve):
     rgvalues : np.ndarray
         The Rg values corresponding to the indeces.
     scores : np.ndarray
-        The scores corresponding to the indeces and rgvalues.
+        The estimator's raw quality scores for each frame. SimpleGuinier
+        scores are weighted interval-fit scores in [0, 1]; ATSAS Autorg
+        ``Quality`` values are a different weighted composite in [0, 1].
+        A score of 0.6 is a heuristic threshold, not a confidence probability,
+        and the two estimators' scores are not interchangeable.
     results : list or None
         The results of the Rg computation. It can be None if not specified.
     intensities : list or None
@@ -25,7 +32,7 @@ class RgCurve(Curve):
 
     """
 
-    def __init__(self, indeces, rgvalues, scores, results=None, intensities=None):
+    def __init__(self, indeces, rgvalues, scores, results=None, intensities=None, score_source=None):
         """
         """
         indeces = np.asarray(indeces, dtype=int)
@@ -39,6 +46,7 @@ class RgCurve(Curve):
         self.scores = scores
         self.results = results  # either, molass results or atsas results
         self.intensities = intensities  # only for molass results, None for atsas results
+        self.score_source = score_source
 
     @property
     def frames(self):
@@ -81,11 +89,46 @@ class RgCurve(Curve):
         (failed fit, or results that carry no I(0) error, e.g. ATSAS)."""
         return self._result_values('I0_stdev')
 
+    def reliable(self, score_min=0.6, intensity=None, intensity_frac=0.05):
+        """Return frames and Rg values passing the standard reliability filters.
+
+        A result is usable when its score is at least ``score_min``, its Rg is
+        finite and in ``(0, 99)`` (excluding failed fits and the 100 Å
+        sentinel), and, when provided, its aligned intensity is finite and at
+        least ``intensity_frac`` of the maximum. ``intensity`` must have one
+        value per entry in :attr:`frames`.
+
+        ``score_min=0.6`` retains frames whose SimpleGuinier interval-fit
+        score is at least 0.6, or whose ATSAS Autorg weighted-composite
+        ``Quality`` is at least 0.6. Both are normalized to [0, 1], but use
+        different factors; 0.6 is not a probability and does not imply
+        identical fit quality between the estimators.
+        """
+        if not np.isfinite(score_min) or not 0 <= score_min <= 1:
+            raise ValueError("score_min must be finite and between 0 and 1")
+        if not np.isfinite(intensity_frac) or not 0 <= intensity_frac <= 1:
+            raise ValueError("intensity_frac must be finite and between 0 and 1")
+        rgs = np.asarray(self.rgvalues, dtype=float)
+        scores = np.asarray(self.scores, dtype=float)
+        mask = np.isfinite(rgs) & (rgs > 0) & (rgs < 99) & np.isfinite(scores) & (scores >= score_min)
+        if intensity is not None:
+            intensities = np.asarray(intensity, dtype=float)
+            if intensities.ndim != 1 or len(intensities) != len(self.frames):
+                raise ValueError("intensity must be a 1D array aligned with frames")
+            finite = np.isfinite(intensities)
+            if finite.any():
+                threshold = intensity_frac * np.max(intensities[finite])
+                mask &= finite & (intensities >= threshold)
+            else:
+                mask[:] = False
+        return self.frames[mask], rgs[mask]
+
     def __repr__(self):
-        """Summarize what this curve covers: frame count and range, finite Rg count, I(0) availability.
+        """Summarize frame coverage, Rg/I(0) availability and known score source.
 
         An Rg curve restored from disk (``try_fast_rg_curve``) can cover only part of the frames
-        and carry no I(0); the representation makes that visible (molass-library#332).
+        and carry no I(0); the representation makes that visible (molass-library#332). When known,
+        the score source is also shown because SimpleGuinier and ATSAS quality scores differ (#361).
         """
         n = len(self.indeces)
         if n == 0:
@@ -99,6 +142,8 @@ class RgCurve(Curve):
             parts.append(f"{n_missing} frames missing in between")
         parts.append(f"finite Rg: {n_rg}")
         parts.append(f"I(0): {n_i0} finite" if n_i0 > 0 else "I(0): not available")
+        if self.score_source is not None:
+            parts.append(f"scores: {self.score_source}")
         return "RgCurve(" + ", ".join(parts) + ")"
 
 
@@ -127,6 +172,8 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
     scores = []
     results = []
     intensities = [] if result_type is None else None
+    score_source = ("SimpleGuinier interval-fit score (0-1)" if result_type is None
+                    else "ATSAS Autorg Quality (0-1)")
     for k, (i, result) in enumerate(rginfo_list):
         indeces.append(i)
         rg = result.Rg
@@ -143,4 +190,5 @@ def construct_rgcurve_from_list(rginfo_list, result_type=None):
             result_ = result
         results.append(result_)
     
-    return RgCurve(np.array(indeces), np.array(values, dtype=float), np.array(scores), results=results, intensities=intensities)
+    return RgCurve(np.array(indeces), np.array(values, dtype=float), np.array(scores), results=results,
+                    intensities=intensities, score_source=score_source)
