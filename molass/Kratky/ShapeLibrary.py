@@ -10,6 +10,7 @@ correspond 1:1 by construction, rather than by two lists that happen to agree
 today but could silently drift apart later.
 """
 from collections import namedtuple
+from functools import lru_cache
 import numpy as np
 
 from molass.Kratky.FormFactors import (
@@ -122,6 +123,12 @@ def _plot_chain_3d(ax, Rg, color, n_segments=250, seed=1):
 
 
 def get_model_shapes():
+    """Return a fresh list of the canonical, cached reference-shape specs."""
+    return list(_get_model_shapes_cached())
+
+
+@lru_cache(maxsize=1)
+def _get_model_shapes_cached():
     """The canonical, fixed reference-shape library.
 
     Order here IS the column order in the match-score heatmap and the icon

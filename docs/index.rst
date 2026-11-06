@@ -21,6 +21,14 @@ To join the community, see also:
 
 - **Handbook:** https://biosaxs-dev.github.io/molass-develop on maintenance, for developers.
 
+After-analysis workflow
+-----------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   after_analysis
+
 Module Functions
 ----------------
 

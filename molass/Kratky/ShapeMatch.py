@@ -30,6 +30,7 @@ Design rationale (see molass-researcher/experiments/41_smoothing_kratky_plot/
   bulk fit quality were found to catch *different* kinds of decomposition
   problems, not the same one.
 """
+from functools import lru_cache
 import numpy as np
 from scipy.signal import savgol_filter, savgol_coeffs
 
@@ -44,6 +45,7 @@ GLOBULAR_PEAK_QRG = np.sqrt(3)
 CHAIN_GATE_FACTOR = 0.05  # score multiplier for the Gaussian chain when the component has a clear peak
 TWO_LOBE_GATE_FACTOR = 0.05  # score multiplier for the two-lobe entries when the component shows no second hump
 OVERLAY_QRG_MAX = 10.0  # upper end of the qRg range shown by plot_kratky_overlay
+_REFERENCE_QRG_STEP = 0.0005
 
 
 def _savgol_smooth(y, window=11, polyorder=3):
@@ -316,11 +318,20 @@ def _match_score(component_qrg, component_ky, model_Rg, model_P_fn, qrg_window=N
         return np.nan
     qrg_m = component_qrg[mask]
     ky_m = component_ky[mask]
-    qs = qrg_m / model_Rg
-    ref_y = qrg_m**2 * model_P_fn(qs)
+    grid, ref_curve = _reference_curve(float(model_Rg), model_P_fn, float(qrg_window[1]))
+    ref_y = np.interp(qrg_m, grid, ref_curve)
     rmse = np.sqrt(np.mean((ky_m - ref_y)**2))
     scale = np.std(ky_m) if np.std(ky_m) > 1e-6 else 1.0
     return float(np.exp(-(rmse/scale)))
+
+
+@lru_cache(maxsize=64)
+def _reference_curve(model_rg, model_p_fn, qrg_max):
+    qrg_max = max(qrg_max, 0.0)
+    n = max(2, int(np.ceil(qrg_max / _REFERENCE_QRG_STEP)) + 1)
+    qrg = np.linspace(0.0, qrg_max, n)
+    curve = qrg**2 * model_p_fn(qrg / model_rg)
+    return qrg, np.asarray(curve, dtype=float)
 
 
 class ShapeMatchResult:
@@ -414,6 +425,63 @@ class ShapeMatchResult:
         raw = np.nan if self.raw_score_matrix is None else float(self.raw_score_matrix[component, j])
         return self.shape_names[j], float(row[j]), raw
 
+    def to_dict(self):
+        """Return a JSON-serializable representation of this result.
+
+        Non-finite numeric values are represented as ``None`` so the output
+        also works with strict JSON encoders such as ``json.dumps(...,
+        allow_nan=False)``.
+        """
+        return {
+            "type": "ShapeMatchResult",
+            "version": 1,
+            "shape_names": _json_safe(self.shape_names),
+            "component_labels": _json_safe(self.component_labels),
+            "score_matrix": _json_safe(self.score_matrix),
+            "categories": _json_safe(self.categories),
+            "peak_qrgs": _json_safe(self.peak_qrgs),
+            "peak_spread": _json_safe(self.peak_spread),
+            "best_raw_scores": _json_safe(self.best_raw_scores),
+            "raw_score_matrix": _json_safe(self.raw_score_matrix),
+            "kratky_curves": _json_safe(self.kratky_curves),
+            "descriptors": _json_safe(self.descriptors),
+            "qrg_window": _json_safe(self.qrg_window),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Restore a result produced by :meth:`to_dict`."""
+        if not isinstance(data, dict) or data.get("type") != "ShapeMatchResult":
+            raise ValueError("expected a ShapeMatchResult dictionary")
+        if data.get("version") != 1:
+            raise ValueError(f"unsupported ShapeMatchResult version: {data.get('version')!r}")
+
+        score_matrix = _numeric_array(data["score_matrix"])
+        raw_data = data["raw_score_matrix"]
+        raw_score_matrix = None if raw_data is None else _numeric_array(raw_data)
+        curves = data["kratky_curves"]
+        kratky_curves = [
+            None if curve is None else tuple(_numeric_array(axis) for axis in curve)
+            for curve in curves
+        ]
+        descriptors = [
+            None if desc is None else _restore_nonfinite(desc)
+            for desc in data["descriptors"]
+        ]
+        return cls(
+            shape_names=list(data["shape_names"]),
+            component_labels=list(data["component_labels"]),
+            score_matrix=score_matrix,
+            categories=list(data["categories"]),
+            peak_qrgs=list(data["peak_qrgs"]),
+            peak_spread=data["peak_spread"],
+            best_raw_scores=[np.nan if v is None else float(v) for v in data["best_raw_scores"]],
+            raw_score_matrix=raw_score_matrix,
+            kratky_curves=kratky_curves,
+            descriptors=descriptors,
+            qrg_window=tuple(data["qrg_window"]),
+        )
+
     def __repr__(self):
         lines = [f"ShapeMatchResult({len(self.component_labels)} components, "
                  f"{len(self.shape_names)} reference shapes, peak_spread={self.peak_spread})"]
@@ -424,7 +492,36 @@ class ShapeMatchResult:
         return "\n".join(lines)
 
 
-def compute_shape_match_scores(qv, P, sg_list, qrg_window=None):
+def _json_safe(value):
+    if isinstance(value, np.ndarray):
+        return _json_safe(value.tolist())
+    if isinstance(value, np.generic):
+        return _json_safe(value.item())
+    if isinstance(value, float) and not np.isfinite(value):
+        return None
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
+
+
+def _restore_nonfinite(value):
+    if value is None:
+        return np.nan
+    if isinstance(value, dict):
+        return {key: _restore_nonfinite(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_restore_nonfinite(item) for item in value]
+    return value
+
+
+def _numeric_array(values):
+    return np.asarray(_restore_nonfinite(values), dtype=float)
+
+
+def compute_shape_match_scores(qv, P, sg_list=None, qrg_window=None, *,
+                               rgs=None, i0s=None, labels=None, shapes=None):
     """Compute the components x reference-shapes match-score matrix.
 
     Parameters
@@ -433,9 +530,16 @@ def compute_shape_match_scores(qv, P, sg_list, qrg_window=None):
         q-values (Å⁻¹) -- typically ``decomp.xr.qv``.
     P : ndarray, shape (n_q, n_components)
         Scattering profiles -- typically ``decomp.get_xr_matrices()[2]``.
-    sg_list : list
-        Per-component Guinier objects (with ``.Rg``/``.Iz``) -- typically
-        ``[c.get_guinier_object() for c in decomp.get_xr_components()]``.
+    sg_list : list, optional
+        Per-component Guinier objects (with ``.Rg``/``.Iz``). For array inputs,
+        pass ``rgs`` and ``i0s`` instead.
+    rgs, i0s : array-like, optional
+        Per-component radii and forward intensities. Both are required when
+        ``sg_list`` is omitted.
+    labels : list of str, optional
+        Component labels. Defaults to ``component-1``, ``component-2``, etc.
+    shapes : iterable of ShapeSpec, optional
+        Reference shapes to use; defaults to the cached canonical library.
     qrg_window : tuple of float, optional
         (low, high) qRg window the curves are compared in; default
         ``QRG_MATCH_WINDOW``. A window ending before a curve's second hump
@@ -456,12 +560,34 @@ def compute_shape_match_scores(qv, P, sg_list, qrg_window=None):
         result = compute_shape_match_scores(qv, P, sg_list)
         print(result)
     """
-    return _match_columns(qv, [P[:, k] for k in range(len(sg_list))],
-                          [sg.Rg for sg in sg_list], [sg.Iz for sg in sg_list],
-                          [f"component-{k+1}" for k in range(len(sg_list))], qrg_window)
+    qv = np.asarray(qv, dtype=float)
+    P = np.asarray(P, dtype=float)
+    if qv.ndim != 1 or P.ndim != 2 or P.shape[0] != len(qv):
+        raise ValueError("qv must be 1D and P must have shape (len(qv), n_components)")
+    n_components = P.shape[1]
+    if sg_list is not None:
+        if rgs is not None or i0s is not None:
+            raise ValueError("provide either sg_list or both rgs and i0s, not both")
+        sg_list = list(sg_list)
+        if len(sg_list) != n_components:
+            raise ValueError("sg_list length must match the number of P columns")
+        rgs = [sg.Rg for sg in sg_list]
+        i0s = [sg.Iz for sg in sg_list]
+    elif rgs is None or i0s is None:
+        raise ValueError("provide sg_list or both rgs and i0s")
+    else:
+        rgs = np.asarray(rgs, dtype=float)
+        i0s = np.asarray(i0s, dtype=float)
+        if rgs.ndim != 1 or i0s.ndim != 1 or len(rgs) != n_components or len(i0s) != n_components:
+            raise ValueError("rgs and i0s must be 1D arrays matching the number of P columns")
+    labels = [f"component-{k+1}" for k in range(n_components)] if labels is None else list(labels)
+    if len(labels) != n_components:
+        raise ValueError("labels length must match the number of P columns")
+    return _match_columns(qv, [P[:, k] for k in range(n_components)], rgs, i0s,
+                          labels, qrg_window, shapes=shapes)
 
 
-def match_kratky_curve(q, I, Rg, I0=1.0, qrg_window=None, label="curve"):
+def match_kratky_curve(q, I, Rg, I0=1.0, qrg_window=None, label="curve", shapes=None):
     """Match one scattering profile against the reference-shape library.
 
     For data that do not come from a :class:`~molass.LowRank.Decomposition.Decomposition`
@@ -482,18 +608,33 @@ def match_kratky_curve(q, I, Rg, I0=1.0, qrg_window=None, label="curve"):
         As in :func:`compute_shape_match_scores`.
     label : str, optional
         Row label prefix.
+    shapes : iterable of ShapeSpec, optional
+        Reference shapes to use; defaults to the cached canonical library.
 
     Returns
     -------
     ShapeMatchResult
         With a single row; ``result.best_shape()`` gives the best match.
     """
-    return _match_columns(np.asarray(q, float), [np.asarray(I, float)], [Rg], [I0], [label], qrg_window)
+    return _match_columns(np.asarray(q, float), [np.asarray(I, float)], [Rg], [I0], [label], qrg_window,
+                          shapes=shapes)
 
 
-def _match_columns(qv, columns, rgs, izs, labels, qrg_window):
+def match_kratky_curves(q, P, rgs, i0s, labels=None, qrg_window=None, shapes=None):
+    """Match several profiles from arrays, without requiring Guinier objects.
+
+    ``P`` must have shape ``(len(q), n_components)``; ``rgs`` and ``i0s``
+    must each contain one value per component.
+    """
+    return compute_shape_match_scores(q, P, qrg_window=qrg_window, rgs=rgs, i0s=i0s,
+                                      labels=labels, shapes=shapes)
+
+
+def _match_columns(qv, columns, rgs, izs, labels, qrg_window, shapes=None):
     window = tuple(QRG_MATCH_WINDOW if qrg_window is None else qrg_window)
-    model_shapes = get_model_shapes()
+    model_shapes = list(get_model_shapes() if shapes is None else shapes)
+    if not model_shapes:
+        raise ValueError("at least one reference shape is required")
     shape_names = [spec.name for spec in model_shapes]
 
     component_labels = []

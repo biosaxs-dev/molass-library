@@ -136,6 +136,10 @@ class Curve(DidYouMeanMixin):
 
     def get_moment(self):
         """Get the moment of the curve.
+
+        See :doc:`the after-analysis cookbook </after_analysis>` for
+        examples of retrieving total and component elution moments.
+
         Returns
         -------
         moment: Moment
