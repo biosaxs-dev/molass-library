@@ -81,9 +81,25 @@ def test_edm_quick_stage_b_follows_the_policy():
     assert auto.fronting_flags == [False, False, False]
     b = [float(cc.get_params()[3]) for cc in auto.xr_ccurves]
     assert min(b) >= -1e-9, b
-
+    assert max(abs(v) for v in b) < 1e-9, b                 # tailing_b='zero' (default): kinetic tailing only (#349)
     # the policy is carried to the rigorous stage through the decomposition
     score = auto.score(trimmed_ssd=trimmed)
     xr_b_bounds = np.asarray(score.optimizer.real_bounds)[:9].reshape(3, 3, 2)[:, 1, :]
     assert (xr_b_bounds[:, 0] == 0).all()
     assert (np.asarray(score.init_params)[:9].reshape(3, 3)[:, 1] >= xr_b_bounds[:, 0]).all()
+
+
+def test_edm_tailing_b_option_restores_the_free_b_range():
+    """tailing_b='free' keeps the former b >= 0 range (#349): SAMPLE1 then fits b > 0 for a component."""
+    trimmed, decomp = _quick("SAMPLE1")
+    free = decomp.upgrade(model='EDM', tailing_b='free', suppress_positive_b_warning=True)
+    b = [float(cc.get_params()[3]) for cc in free.xr_ccurves]
+    assert min(b) >= -1e-9 and max(b) > 1e-3, b
+
+
+def test_edm_tailing_b_rejects_unknown_mode():
+    from molass.SEC.Models.EdmOptimizer import _pins_tailing_b
+    assert _pins_tailing_b({}) is True
+    assert _pins_tailing_b({'tailing_b': 'free'}) is False
+    with pytest.raises(ValueError, match="tailing_b"):
+        _pins_tailing_b({'tailing_b': 'cap'})

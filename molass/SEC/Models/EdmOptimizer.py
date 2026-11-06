@@ -32,6 +32,14 @@ def _check_positive_b(b_values, suppress, stacklevel=4):
             stacklevel=stacklevel,
         )
 
+def _pins_tailing_b(kwargs):
+    """Whether components that may not front have ``b`` fixed at 0 (molass-library#349)."""
+    mode = kwargs.get('tailing_b', 'zero')
+    if mode not in ('zero', 'free'):
+        raise ValueError(f"tailing_b must be 'zero' or 'free', not {mode!r}")
+    return mode == 'zero'
+
+
 def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
     """ Optimize the EDM decomposition.
 
@@ -85,6 +93,14 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
             - ``cinj_min`` kwarg
 
             Passing ``shared_column=False`` raises ``ValueError``.
+
+        tailing_b : {'zero', 'free'}, optional
+            ``b`` of components that may not front (``fronting_flags``, see
+            ``molass.Rigorous.FrontingPolicy``). ``'zero'`` (default) fixes it at 0, i.e. kinetic
+            tailing only: on the bundled samples this fits as well as a free ``b`` (SAMPLE2 much
+            better) and avoids the ``b``/``a``/``c_inj`` degeneracy (molass-library#349). ``'free'``
+            keeps the former ``b >= 0`` range. Components that may front, an explicit ``b_bounds``
+            and the rigorous stage are not affected.
 
         suppress_positive_b_warning : bool, optional
             If True, suppress the UserWarning that is issued when any fitted
@@ -258,6 +274,8 @@ def optimize_edm_xr_decomposition(decomposition, init_params, **kwargs):
         if fronting_flags is not None and not fronting_flags[k]:
             b_lo = 0.0 if b_bound[0] is None else max(0.0, b_bound[0])
             b_bound = (b_lo, b_bound[1])
+            if b_bounds_kw is None and _pins_tailing_b(kwargs):
+                b_bound = (0.0, 0.0)
         pc_bounds += [
             a_bound,              # a_i   (K_SEC, user or auto-derived bounds)
             b_bound,              # b_i   (user or auto-derived bounds)
@@ -383,6 +401,9 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
 
             Pass an explicit float to override for all components (e.g. 0.0
             to force the physical regime regardless of component count).
+        tailing_b : {'zero', 'free'}, optional
+            As in :func:`optimize_edm_xr_decomposition`: ``'zero'`` (default) keeps ``b = 0`` for
+            components that may not front, unless ``b_max`` is given.
         position_anchor_scale : float, optional
             Scale for soft centroid-to-EGH-peak penalty.  Default 1e-5.
         suppress_positive_b_warning : bool, optional
@@ -465,6 +486,8 @@ def refine_edm_per_component(edm_ccurves, x, y, **kwargs):
         b_lower = 0.0 if (fronting_flags is not None and not fronting_flags[k]) else None
         if b_lower is not None and b_upper is not None and b_upper < b_lower:
             b_lower = b_upper
+        if b_lower is not None and _b_max_global is None and _pins_tailing_b(kwargs):
+            b_lower, b_upper = 0.0, 0.0
         abc_bounds += [
             (0.0, None),          # a (K_SEC >= 0)
             (b_lower, b_upper),   # b (adaptive upper bound, see strategy comment above)
