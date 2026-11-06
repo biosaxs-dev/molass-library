@@ -134,8 +134,28 @@ def compute_mapping_by_full_coverage(xr_curve, xr_peaks, uv_curve, uv_peaks, deb
 
 PEAK_CORE_FRACTION = 0.5    # the core of a peak: the contiguous region above this fraction of its height
 MIN_CORE_POINTS = 3
+VALLEY_SMOOTHING_POINTS = 9     # moving-average width of the curve used to find the valley between neighbouring peaks (#368)
+VALLEY_RISE_SIGMAS = 4.0        # a rise of the smoothed curve by this many (smoothed) noise sigmas after its minimum ...
+VALLEY_RISE_FLOOR = 0.005       # ... and by at least this fraction of the peak height (clean curves) starts the next peak
+MAX_SHIFT_SIGMAS = 1.5          # a core centroid farther than this many peak sigmas from the apex is suspect (#368)
 
-def peak_position_with_sd(x, y, i, fraction=PEAK_CORE_FRACTION):
+def _core_limit(y, ys, i, direction, level, tol):
+    """The index where the core of the peak at i ends on one side: the region above ``level`` (on ``y``),
+    cut at the valley towards a neighbouring peak when ``ys`` (the smoothed curve) is not None, i.e. at the
+    lowest point of ``ys`` before it rises by more than ``tol`` (#368)."""
+    j = i
+    jmin, ymin = i, None if ys is None else ys[i]
+    while 0 <= j + direction < len(y) and y[j + direction] >= level:
+        j += direction
+        if ys is None:
+            continue
+        if ys[j] < ymin:
+            jmin, ymin = j, ys[j]
+        elif ys[j] > ymin + tol:
+            return jmin
+    return j
+
+def peak_position_with_sd(x, y, i, fraction=PEAK_CORE_FRACTION, max_shift=None):
     """
     The refined position of the peak at index i and its noise-propagated standard deviation.
 
@@ -143,29 +163,45 @@ def peak_position_with_sd(x, y, i, fraction=PEAK_CORE_FRACTION):
     (estimated from the second differences, robustly) through the centroid; it ignores the
     dependence of the core limits on the noise. When the position falls back to ``x[i]``
     the standard deviation is half a sample spacing.
+
+    ``max_shift`` (in the units of x) guards against a core that runs into a neighbouring peak,
+    which drags the centroid toward it (#368): when the centroid is farther than ``max_shift`` from
+    the apex, the core is cut at the valley towards the neighbour (the lowest point of the smoothed
+    curve before it rises again), and when that centroid is still farther than ``max_shift`` the
+    apex ``x[i]`` is returned. ``None`` (default) does not check.
     """
+    from scipy.ndimage import uniform_filter1d
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
     fallback = (float(x[i]), 0.5 * float(np.median(np.diff(x))) if len(x) > 1 else 0.5)
     level = fraction * y[i]
     if not y[i] > 0:
         return fallback
-    lo = hi = i
-    while lo > 0 and y[lo - 1] >= level:
-        lo -= 1
-    while hi < len(y) - 1 and y[hi + 1] >= level:
-        hi += 1
-    if lo == 0 or hi == len(y) - 1 or hi - lo + 1 < MIN_CORE_POINTS:
-        return fallback
-    w = y[lo:hi + 1] - level
-    xs = x[lo:hi + 1]
-    position = float(np.sum(xs * w) / np.sum(w))
     d2 = y[:-2] - 2 * y[1:-1] + y[2:]
     sigma = 1.4826 * float(np.median(np.abs(d2 - np.median(d2)))) / np.sqrt(6)
-    sd = sigma * float(np.sqrt(np.sum((xs - position)**2))) / float(np.sum(w))
-    return position, sd
 
-def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
+    def centroid(ys, tol):
+        lo = _core_limit(y, ys, i, -1, level, tol)
+        hi = _core_limit(y, ys, i, +1, level, tol)
+        if lo == 0 or hi == len(y) - 1 or hi - lo + 1 < MIN_CORE_POINTS:
+            return None
+        w = y[lo:hi + 1] - level
+        xs = x[lo:hi + 1]
+        position = float(np.sum(xs * w) / np.sum(w))
+        return position, sigma * float(np.sqrt(np.sum((xs - position)**2))) / float(np.sum(w))
+
+    result = centroid(None, None)
+    if result is None:
+        return fallback
+    if max_shift is not None and abs(result[0] - x[i]) > max_shift:
+        ys = uniform_filter1d(y, VALLEY_SMOOTHING_POINTS, mode="nearest")
+        tol = max(VALLEY_RISE_SIGMAS * sigma / np.sqrt(VALLEY_SMOOTHING_POINTS), VALLEY_RISE_FLOOR * y[i])
+        result = centroid(ys, tol)
+        if result is None or abs(result[0] - x[i]) > max_shift:
+            return fallback
+    return result
+
+def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION, max_shift=None):
     """
     Estimate the position of the peak at index i with sub-frame resolution (molass-library#328).
 
@@ -182,6 +218,9 @@ def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
         The index of the (integer) peak position.
     fraction : float, optional
         The core is the region above this fraction of the peak height.
+    max_shift : float, optional
+        Guard against a core that runs into a larger neighbouring peak (#368), see
+        :func:`peak_position_with_sd`. Default ``None`` (no check).
 
     Returns
     -------
@@ -189,7 +228,7 @@ def refine_peak_position(x, y, i, fraction=PEAK_CORE_FRACTION):
         The refined peak position in the units of x. Falls back to ``x[i]`` when the core
         is cut by the edge of the curve or too narrow.
     """
-    return peak_position_with_sd(x, y, i, fraction)[0]
+    return peak_position_with_sd(x, y, i, fraction, max_shift)[0]
 
 def estimate_resolution_frames(x, sdx, y, sdy, xr_range, num_samples=200, seed=0):
     """
@@ -208,6 +247,18 @@ def estimate_resolution_frames(x, sdx, y, sdy, xr_range, num_samples=200, seed=0
         s, b = linregress(x + rng.normal(0, sdx), y + rng.normal(0, sdy))[0:2]
         shifts.append(((s - slope) * mid + (b - intercept)) / slope)
     return float(np.sqrt(np.mean(np.square(shifts))))
+
+def _max_shift(curve, peaks, estimate_peak_sigma):
+    """The largest plausible distance, in the units of curve.x, between a peak's core centroid and its apex:
+    ``MAX_SHIFT_SIGMAS`` times the median peak width (``None``, i.e. no check, when no width can be determined)."""
+    try:
+        sigma = estimate_peak_sigma(curve, np.asarray(peaks, dtype=int))
+    except Exception:
+        return None
+    if sigma is None:
+        return None
+    x = np.asarray(curve.x, dtype=float)
+    return MAX_SHIFT_SIGMAS * sigma * float(np.median(np.diff(x)))
 
 def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, retry=True, debug=False):
     """
@@ -237,9 +288,13 @@ def estimate_mapping_for_matching_peaks(xr_curve, xr_peaks, uv_curve, uv_peaks, 
     """
     resolution_frames = None
     if len(xr_peaks) > 1:
-        # sub-frame positions: the integer apex limits the mapping to about one frame (#328)
-        xr_fits = [peak_position_with_sd(xr_curve.x, xr_curve.y, i) for i in xr_peaks]
-        uv_fits = [peak_position_with_sd(uv_curve.x, uv_curve.y, i) for i in uv_peaks]
+        # sub-frame positions: the integer apex limits the mapping to about one frame (#328);
+        # a centroid far from its apex (core run into a neighbouring peak) is re-cut at the valley (#368)
+        from molass.Mapping.PeakMatcher import estimate_peak_sigma
+        xr_shift = _max_shift(xr_curve, xr_peaks, estimate_peak_sigma)
+        uv_shift = _max_shift(uv_curve, uv_peaks, estimate_peak_sigma)
+        xr_fits = [peak_position_with_sd(xr_curve.x, xr_curve.y, i, max_shift=xr_shift) for i in xr_peaks]
+        uv_fits = [peak_position_with_sd(uv_curve.x, uv_curve.y, i, max_shift=uv_shift) for i in uv_peaks]
         x = np.array([p for p, _ in xr_fits])
         y = np.array([p for p, _ in uv_fits])
         xr_moment = None
