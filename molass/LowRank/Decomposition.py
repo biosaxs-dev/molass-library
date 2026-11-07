@@ -467,6 +467,41 @@ class Decomposition(DidYouMeanMixin):
         result = self.get_kratky_shape_match(debug=debug)
         return plot_kratky_series(result, fig=fig, **kwargs)
 
+    def get_continuity_report(self, **thresholds):
+        """Report whether the decomposition describes distinct species or slices of a continuum.
+
+        Combines the plateau structure of the data Rg curve (a single species has a constant Rg,
+        a continuum a ramp), the shape heterogeneity of the component Kratky curves and the
+        ordering of the components along the elution -- see :mod:`molass.Continuity.Report` and
+        :class:`~molass.Continuity.Report.ContinuityReport`. The verdict is one of ``"discrete"``,
+        ``"no evidence for distinct species"`` and ``"undetermined"``; it is **never**
+        ``"continuum"``, and a missing plateau is weak evidence when the Rg drop is small
+        against the noise (see ``power``). The numbers are always reported with the verdict.
+
+        Uses :meth:`get_rg_curve` (slow the first time, then cached) and
+        :meth:`get_kratky_shape_match`.
+
+        Parameters
+        ----------
+        **thresholds
+            Overrides of :data:`molass.Continuity.Report.DEFAULT_THRESHOLDS`, e.g.
+            ``excess_min=2.5`` or ``score_min=0.7``.
+
+        Returns
+        -------
+        molass.Continuity.Report.ContinuityReport
+
+        Examples
+        --------
+        ::
+
+            report = decomp.get_continuity_report()
+            print(report)
+            report.verdict, report.power, report.excess
+        """
+        from molass.Continuity.Report import compute_continuity_report_of
+        return compute_continuity_report_of(self, **thresholds)
+
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.
 

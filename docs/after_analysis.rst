@@ -72,6 +72,42 @@ shapes. Its result exposes the score matrices and can be serialized directly.
    first_component_best_shape = shape_match.best_shape(0)
    saved_shape_match = shape_match.to_dict()
 
+Distinct species or slices of a continuum?
+------------------------------------------
+
+The continuity report asks whether the data support a few *distinct species*.
+A single species has the same Rg at every concentration, so a mixture of
+distinct species shows plateaus in the per-frame Rg curve of the data, whereas
+a continuum shows a ramp. The report combines this plateau test with the shape
+heterogeneity of the component Kratky curves and the ordering of the
+components along the elution (from four components).
+
+.. code-block:: python
+
+   report = result.get_continuity_report()
+   print(report)
+   report.verdict, report.power, report.excess, report.plateaus
+   report.to_dict()                      # JSON-serializable
+
+The verdict is ``"discrete"``, ``"no evidence for distinct species"`` or
+``"undetermined"``; it is never "continuum", because a continuum can only be
+*not excluded*. Read it together with its regime:
+
+* ``"discrete"`` is the reliable finding: it needs clear plateaus
+  (``excess`` of at least 2) in an Rg curve that drops by at least 5 noise units.
+* ``"no evidence ..."`` is weak evidence at best. With a small Rg drop against
+  the noise (``power`` below about 20) a staircase still looks like a ramp, and
+  the report says so in ``notes``.
+* The Kratky ``max_separation`` measures how different the component *shapes*
+  are, not discreteness: a wide continuum differs as much as discrete species
+  of different shapes, and two compact proteins look alike. It is reported, not
+  used for the verdict.
+* The thresholds are heuristics calibrated on a few real analyses and on
+  simulations with known truth (molass-researcher, experiments 51i-51r); they
+  can be overridden, e.g. ``result.get_continuity_report(excess_min=2.5)``.
+  The array-level indicators (``molass.Continuity.plateau_excess``,
+  ``find_plateaus``, ``kratky_separation``) can be used on their own.
+
 Decomposition residual
 ----------------------
 
