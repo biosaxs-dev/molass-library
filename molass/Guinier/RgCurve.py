@@ -123,6 +123,30 @@ class RgCurve(Curve):
                 mask[:] = False
         return self.frames[mask], rgs[mask]
 
+    def noise(self, score_min=0.6, intensity=None, intensity_frac=0.05):
+        """Standard deviation of a single-frame Rg value (Å) of the reliable frames.
+
+        A robust estimate from the differences of neighbouring frames (see
+        :func:`molass.Continuity.Indicators.rg_point_noise`); the frames are those of
+        :meth:`reliable` with the same arguments. It is what the total Rg drop is compared with
+        in the continuity report. NaN with fewer than two usable pairs of consecutive frames.
+        """
+        from molass.Continuity.Indicators import rg_point_noise
+        frames, rgs = self._reliable_sorted(score_min, intensity, intensity_frac)
+        return rg_point_noise(frames, rgs) if len(rgs) >= 2 else float('nan')
+
+    def drop(self, score_min=0.6, intensity=None, intensity_frac=0.05):
+        """Total drop of the Rg of the reliable frames (Å): ``|median of the first five - median of
+        the last five|`` (see :func:`molass.Continuity.Indicators.rg_drop`). NaN without reliable frames."""
+        from molass.Continuity.Indicators import rg_drop
+        _, rgs = self._reliable_sorted(score_min, intensity, intensity_frac)
+        return rg_drop(rgs) if len(rgs) else float('nan')
+
+    def _reliable_sorted(self, score_min, intensity, intensity_frac):
+        frames, rgs = self.reliable(score_min=score_min, intensity=intensity, intensity_frac=intensity_frac)
+        order = np.argsort(frames)
+        return frames[order], rgs[order]
+
     def __repr__(self):
         """Summarize frame coverage, Rg/I(0) availability and known score source.
 

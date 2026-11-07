@@ -318,7 +318,7 @@ def _match_score(component_qrg, component_ky, model_Rg, model_P_fn, qrg_window=N
         return np.nan
     qrg_m = component_qrg[mask]
     ky_m = component_ky[mask]
-    grid, ref_curve = _reference_curve(float(model_Rg), model_P_fn, float(qrg_window[1]))
+    grid, ref_curve = _reference_curve_for(float(model_Rg), model_P_fn, float(qrg_window[1]))
     ref_y = np.interp(qrg_m, grid, ref_curve)
     rmse = np.sqrt(np.mean((ky_m - ref_y)**2))
     scale = np.std(ky_m) if np.std(ky_m) > 1e-6 else 1.0
@@ -332,6 +332,108 @@ def _reference_curve(model_rg, model_p_fn, qrg_max):
     qrg = np.linspace(0.0, qrg_max, n)
     curve = qrg**2 * model_p_fn(qrg / model_rg)
     return qrg, np.asarray(curve, dtype=float)
+
+
+# Reference curves of the canonical shape library restored from (or saved to) the disk cache, keyed like
+# the lru_cache above; looked up first (molass-library#374).
+_PRIMED_REFERENCE_CURVES = {}
+
+
+def _reference_curve_for(model_rg, model_p_fn, qrg_max):
+    primed = _PRIMED_REFERENCE_CURVES.get((model_rg, model_p_fn, qrg_max))
+    if primed is not None:
+        return primed
+    return _reference_curve(model_rg, model_p_fn, qrg_max)
+
+
+def _reference_cache_key(model_shapes, qrg_max):
+    """Hash of everything the reference curves of the canonical library are made from: the shapes
+    (name, Rg), the grid, and the source of the form factors, so an edited form factor is never
+    served from a stale file."""
+    import hashlib
+    import os
+    h = hashlib.sha1()
+    h.update(repr([(spec.name, round(float(spec.Rg), 9)) for spec in model_shapes]).encode())
+    h.update(repr((float(qrg_max), _REFERENCE_QRG_STEP)).encode())
+    here = os.path.dirname(os.path.abspath(__file__))
+    for name in ("ShapeLibrary.py", "FormFactors.py"):
+        with open(os.path.join(here, name), "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()[:20]
+
+
+def _prime_reference_curves(model_shapes, qrg_max, notify=print):
+    """Make the reference curves of the canonical library available without recomputing them.
+
+    They take about 30 s to compute (ellipsoid and triaxial form factors). They are read from the disk
+    cache (:mod:`molass.Global.Cache`) when there; otherwise computed once -- with a one-line notice --
+    and saved there. Only the canonical library is cached; user-supplied ``shapes`` are not.
+    """
+    import os
+    from molass.Global.Cache import resolve_cache_dir, atomic_save_npz
+
+    qrg_max = float(qrg_max)
+    keys = [(float(spec.Rg), spec.P_fn, qrg_max) for spec in model_shapes]
+    if all(key in _PRIMED_REFERENCE_CURVES for key in keys):
+        return
+    folder = resolve_cache_dir(create=False)
+    path = None if folder is None else os.path.join(folder, f"kratky-reference-{_reference_cache_key(model_shapes, qrg_max)}.npz")
+    if path is not None and os.path.exists(path):
+        try:
+            with np.load(path) as data:
+                for i, key in enumerate(keys):
+                    _PRIMED_REFERENCE_CURVES[key] = (data[f"grid_{i}"], data[f"curve_{i}"])
+            return
+        except (OSError, KeyError, ValueError):
+            pass                                    # unreadable file: recompute (and overwrite below)
+    notify(f"molass: building the reference curves of the Kratky shape library (first use, about 30 s"
+           + (f"; cached in {folder}" if folder else "") + ")")
+    arrays = {}
+    for i, key in enumerate(keys):
+        grid, curve = _reference_curve(*key)
+        _PRIMED_REFERENCE_CURVES[key] = (grid, curve)
+        arrays[f"grid_{i}"], arrays[f"curve_{i}"] = grid, curve
+    folder = resolve_cache_dir(create=True)
+    if folder is not None:
+        try:
+            atomic_save_npz(os.path.join(folder, f"kratky-reference-{_reference_cache_key(model_shapes, qrg_max)}.npz"), **arrays)
+        except OSError:
+            pass                                    # a read-only cache is not an error
+
+
+def kratky_curves_of(qv, P, rgs, i0s):
+    """The dimensionless Kratky curve of each profile, **without** building or scoring the shape library.
+
+    This is the cheap part of the shape match (the library takes about 30 s on first use, see
+    :func:`_prime_reference_curves`): it is all the continuity report needs.
+
+    Parameters
+    ----------
+    qv : ndarray
+        q-values (Å⁻¹).
+    P : ndarray, shape (len(qv), n_components)
+        Scattering profiles.
+    rgs, i0s : array-like
+        Radius of gyration and forward intensity of each component.
+
+    Returns
+    -------
+    list of (qrg, ky) or None
+        ``qrg = q*Rg`` and ``ky = (qRg)^2 P/I(0)`` per component; ``None`` where the Rg is unavailable
+        (the same convention as ``ShapeMatchResult.kratky_curves``).
+    """
+    qv = np.asarray(qv, dtype=float)
+    P = np.asarray(P, dtype=float)
+    if qv.ndim != 1 or P.ndim != 2 or P.shape[0] != len(qv):
+        raise ValueError("qv must be 1D and P must have shape (len(qv), n_components)")
+    curves = []
+    for k, (rg, iz) in enumerate(zip(rgs, i0s)):
+        if rg is None or not np.isfinite(rg):
+            curves.append(None)
+            continue
+        qrg = qv * rg
+        curves.append((qrg, qrg**2 * P[:, k] / iz))
+    return curves
 
 
 class ShapeMatchResult:
@@ -636,6 +738,8 @@ def _match_columns(qv, columns, rgs, izs, labels, qrg_window, shapes=None):
     if not model_shapes:
         raise ValueError("at least one reference shape is required")
     shape_names = [spec.name for spec in model_shapes]
+    if shapes is None:
+        _prime_reference_curves(model_shapes, window[1])
 
     component_labels = []
     score_rows = []

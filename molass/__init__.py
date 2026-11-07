@@ -86,6 +86,110 @@ def get_version(toml_only=False):
 
 __version__ = str(get_version())
 
+
+class VersionInfo:
+    """Where ``molass.__version__`` comes from and whether it agrees with the installed metadata.
+
+    Attributes
+    ----------
+    version : str
+        The value of ``molass.__version__``.
+    source : str
+        ``'pyproject'`` when read from the ``pyproject.toml`` next to the package (a source
+        checkout / editable install), ``'metadata'`` when read from the installed distribution.
+    path : str
+        Directory of the imported ``molass`` package.
+    metadata_version : str or None
+        The version recorded by ``pip`` (``importlib.metadata``); ``None`` if molass is not installed
+        as a distribution.
+    consistent : bool
+        ``True`` unless ``metadata_version`` exists and differs from ``version`` -- with an editable
+        install this means the installed metadata is stale (``pip install -e . --no-deps`` refreshes it).
+    """
+
+    def __init__(self, version, source, path, metadata_version):
+        self.version = version
+        self.source = source
+        self.path = path
+        self.metadata_version = metadata_version
+        self.consistent = metadata_version is None or metadata_version == version
+
+    def to_dict(self):
+        return dict(version=self.version, source=self.source, path=self.path,
+                    metadata_version=self.metadata_version, consistent=self.consistent)
+
+    def __repr__(self):
+        lines = [f"molass {self.version} (from {self.source})", f"  path: {self.path}",
+                 f"  installed metadata (pip): {self.metadata_version}"]
+        if not self.consistent:
+            lines.append("  NOTE: the installed metadata differs from the code version; with an editable install "
+                         "run `pip install -e <repo> --no-deps` to refresh it (results record the code version).")
+        return "\n".join(lines)
+
+
+def _version_info_impl(file, package, version):
+    import importlib.metadata
+    pkg_dir = os.path.dirname(file)
+    source = 'pyproject' if os.path.exists(os.path.join(os.path.dirname(pkg_dir), 'pyproject.toml')) else 'metadata'
+    try:
+        metadata_version = importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        metadata_version = None
+    return VersionInfo(version, source, pkg_dir, metadata_version)
+
+
+def version_info():
+    """Where the molass version comes from, and whether it is consistent (molass-library#378).
+
+    ``molass.__version__`` reads ``pyproject.toml`` in a source checkout, while ``pip list`` shows the
+    metadata recorded at install time; with an editable install the two can differ, and result files
+    record ``__version__``. This function shows both.
+
+    Returns
+    -------
+    VersionInfo
+        Prints as a short readable block; see :class:`VersionInfo` for the attributes.
+
+    Examples
+    --------
+    >>> import molass
+    >>> molass.version_info()
+    """
+    return _version_info_impl(__file__, __package__, __version__)
+
+
+def set_progress(enabled):
+    """Switch the progress bars of molass on or off for this process (molass-library#375).
+
+    The environment variable ``MOLASS_PROGRESS=0`` does the same from the start. Default: on.
+    """
+    from molass.Global.Tqdm import set_progress as _set_progress
+    _set_progress(enabled)
+
+
+def get_progress():
+    """Whether molass progress bars are on (see :func:`set_progress`)."""
+    from molass.Global.Tqdm import get_progress as _get_progress
+    return _get_progress()
+
+
+def set_cache_dir(path):
+    """Set the directory where molass caches derived data (molass-library#376); ``None`` switches it off.
+
+    Opt-in: with a directory set, ``SecSaxsData.get_rg_curve()`` stores and reloads the per-frame Rg
+    curve instead of refitting every frame in every process (15-50 s). The environment variable
+    ``MOLASS_CACHE_DIR`` does the same from the start. Files are keyed by a hash of the data and the
+    trimming, so a changed input is never served from a stale file.
+    """
+    from molass.Global.Cache import set_cache_dir as _set_cache_dir
+    _set_cache_dir(path)
+
+
+def get_cache_dir():
+    """The configured cache directory, or ``None`` (see :func:`set_cache_dir`)."""
+    from molass.Global.Cache import get_cache_dir as _get_cache_dir
+    return _get_cache_dir()
+
 def requires(version):
     """
     Assert that the installed molass version meets a minimum requirement.

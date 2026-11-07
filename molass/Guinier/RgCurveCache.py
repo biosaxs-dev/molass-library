@@ -44,6 +44,15 @@ def _metadata(ssd):
     }
 
 
+def ssd_cache_path(cache_dir, ssd):
+    """File in ``cache_dir`` for the Rg curve of ``ssd`` (molass-library#376): named by a hash of the XR
+    data and the trimming (the molass version is checked inside the file, like for analysis folders)."""
+    metadata = _metadata(ssd)
+    key = {k: v for k, v in metadata.items() if k != "molass_version"}
+    digest = hashlib.sha256(json.dumps(key, sort_keys=True).encode("utf-8")).hexdigest()[:24]
+    return os.path.join(cache_dir, f"rgcurve-{digest}.npz")
+
+
 def load_rg_curve_cache(path, ssd):
     """Return a matching cached RgCurve, or None when no usable cache exists."""
     if not os.path.isfile(path):

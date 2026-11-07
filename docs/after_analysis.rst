@@ -90,6 +90,12 @@ components along the elution (from four components).
    report.plot()                         # (a) data Rg, plateaus, component Rg; (b) Kratky plots
    report.to_dict()                      # JSON-serializable
 
+The report takes seconds: it needs the Rg curve and the component Kratky curves, not the
+reference-shape library. ``get_continuity_report(shapes=True)`` also lists the best library shape of
+each component (the library is built once, about 30 s, and cached on disk). The building blocks are
+public: ``result.get_reliable_rg()`` (frames and Rg of the reliable points), ``result.get_kratky_curves()``,
+``result.get_component_extents()`` and ``result.get_rg_curve().noise()`` / ``.drop()``.
+
 The verdict is ``"discrete"``, ``"no evidence for distinct species"`` or
 ``"undetermined"``; it is never "continuum", because a continuum can only be
 *not excluded*. Read it together with its regime:
@@ -118,6 +124,18 @@ The LRF residual is the relative Frobenius-norm reconstruction error
 .. code-block:: python
 
    residual = result.get_lrf_residual()
+
+Quiet and repeatable runs (scripts, agents, headless)
+-----------------------------------------------------
+
+.. code-block:: python
+
+   import molass
+   molass.set_progress(False)            # no progress bars (or the environment variable MOLASS_PROGRESS=0)
+   molass.set_cache_dir("C:/cache")      # opt-in: reuse per-frame Rg curves of the same data in later
+                                         # processes (or MOLASS_CACHE_DIR); keyed by data and trimming
+   molass.version_info()                 # the version in use, where it comes from, and whether the
+                                         # installed metadata (pip) agrees with the code
 
 Freeze a compact JSON summary
 -----------------------------

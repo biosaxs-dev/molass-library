@@ -1132,13 +1132,38 @@ class SecSaxsData(DidYouMeanMixin):
             - ``.y`` — Rg values in Å; ``NaN`` where Guinier fit failed
             - ``.scores`` — Guinier fit quality scores (0–1)
 
+        Notes
+        -----
+        Opt-in disk cache (molass-library#376): after ``molass.set_cache_dir(path)`` (or with the
+        environment variable ``MOLASS_CACHE_DIR``) the curve is also stored there, keyed by the XR data
+        and the trimming, and loaded instead of refitting every frame in a later process. A curve
+        loaded from disk carries Rg, scores and I(0), not the per-frame Guinier results.
+
         See also
         --------
         XrData.compute_rgcurve : underlying computation (no caching)
         Decomposition.get_rg_curve : same pattern on a Decomposition object
         """
         if getattr(self, '_rgcurve', None) is None:
-            self._rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
+            from molass.Global.Cache import get_cache_dir
+            cache_dir = get_cache_dir()
+            path = rgcurve = None
+            if cache_dir is not None:
+                from molass.Guinier.RgCurveCache import ssd_cache_path, load_rg_curve_cache
+                try:
+                    path = ssd_cache_path(cache_dir, self)
+                    rgcurve = load_rg_curve_cache(path, self)
+                except TypeError:
+                    path = None                    # object-valued data cannot be fingerprinted: no caching
+            if rgcurve is None:
+                rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
+                if path is not None:
+                    from molass.Guinier.RgCurveCache import save_rg_curve_cache
+                    try:
+                        save_rg_curve_cache(path, self, rgcurve)
+                    except OSError:
+                        pass                       # an unwritable cache is not an error
+            self._rgcurve = rgcurve
         return self._rgcurve
 
     def homogeneity(self, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,

@@ -467,7 +467,69 @@ class Decomposition(DidYouMeanMixin):
         result = self.get_kratky_shape_match(debug=debug)
         return plot_kratky_series(result, fig=fig, **kwargs)
 
-    def get_continuity_report(self, rgcurve=None, **thresholds):
+    def get_kratky_curves(self):
+        """The dimensionless Kratky curve of each XR component, without the shape library.
+
+        ``(qRg, (qRg)^2 P(q)/I(0))`` per component (``None`` where the Rg is unavailable), the same
+        curves as ``get_kratky_shape_match().kratky_curves`` but available at once: the shape match
+        first builds a reference library that takes about 30 s (molass-library#374).
+
+        Returns
+        -------
+        list of (ndarray, ndarray) or None
+        """
+        from molass.Kratky.ShapeMatch import kratky_curves_of
+        P = self.get_xr_matrices()[2]
+        sg_list = [c.get_guinier_object() for c in self.get_xr_components()]
+        return kratky_curves_of(self.xr.qv, P, [sg.Rg for sg in sg_list], [sg.Iz for sg in sg_list])
+
+    def get_reliable_rg(self, score_min=0.6, intensity_frac=0.05, rgcurve=None):
+        """The reliable points of the data Rg curve: ``(frames, rgs)``, sorted by frame.
+
+        The standard filters of :meth:`molass.Guinier.RgCurve.RgCurve.reliable` (Guinier score at least
+        ``score_min``, finite Rg in ``(0, 99)``) plus an intensity floor: frames whose XR elution
+        intensity is below ``intensity_frac`` of the maximum are dropped. The intensity is taken from
+        this decomposition, so callers need not interpolate it themselves.
+
+        Parameters
+        ----------
+        score_min : float, optional
+        intensity_frac : float, optional
+        rgcurve : RgCurve, optional
+            The data Rg curve if already at hand; default :meth:`get_rg_curve`.
+
+        Returns
+        -------
+        frames, rgs : np.ndarray
+
+        Examples
+        --------
+        ::
+
+            frames, rgs = decomp.get_reliable_rg()
+        """
+        if rgcurve is None:
+            rgcurve = self.get_rg_curve()
+        icurve = self.xr_icurve
+        intensity = np.interp(rgcurve.frames, icurve.x, icurve.y)
+        frames, rgs = rgcurve.reliable(score_min=score_min, intensity=intensity, intensity_frac=intensity_frac)
+        order = np.argsort(frames)
+        return frames[order], rgs[order]
+
+    def get_component_extents(self):
+        """The elution extent of each XR component: ``(mean_frame, sd_frames)``, in component order.
+
+        The mean and standard deviation of the component's elution curve (the moment of
+        ``component.get_icurve()``), the extent a component is drawn over in the continuity plot.
+
+        Returns
+        -------
+        list of (float, float)
+        """
+        return [tuple(float(v) for v in c.get_icurve().get_moment().get_meanstd())
+                for c in self.get_xr_components()]
+
+    def get_continuity_report(self, rgcurve=None, shapes=None, **thresholds):
         """Report whether the decomposition describes distinct species or slices of a continuum.
 
         Combines the plateau structure of the data Rg curve (a single species has a constant Rg,
@@ -478,14 +540,19 @@ class Decomposition(DidYouMeanMixin):
         ``"continuum"``, and a missing plateau is weak evidence when the Rg drop is small
         against the noise (see ``power``). The numbers are always reported with the verdict.
 
-        Uses :meth:`get_rg_curve` (slow the first time, then cached) and
-        :meth:`get_kratky_shape_match`.
+        Uses :meth:`get_reliable_rg` (the Rg curve: slow the first time, then cached) and
+        :meth:`get_kratky_curves`; the shape library of :meth:`get_kratky_shape_match` is **not** needed.
 
         Parameters
         ----------
         rgcurve : RgCurve, optional
             The data Rg curve if already at hand (as for ``plot_components(rgcurve=...)``);
             default :meth:`get_rg_curve`.
+        shapes : bool or None, optional
+            Whether to add the best-matching library shape of each component. ``None`` (default):
+            only if :meth:`get_kratky_shape_match` has already been computed, so the report stays
+            fast; ``True``: compute it (about 30 s the first time in a session, see
+            :func:`molass.Kratky.ShapeMatch.kratky_curves_of`); ``False``: never.
         **thresholds
             Overrides of :data:`molass.Continuity.Report.DEFAULT_THRESHOLDS`, e.g.
             ``excess_min=2.5`` or ``score_min=0.7``.
@@ -503,7 +570,7 @@ class Decomposition(DidYouMeanMixin):
             report.verdict, report.power, report.excess
         """
         from molass.Continuity.Report import compute_continuity_report_of
-        return compute_continuity_report_of(self, rgcurve=rgcurve, **thresholds)
+        return compute_continuity_report_of(self, rgcurve=rgcurve, shapes=shapes, **thresholds)
 
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.

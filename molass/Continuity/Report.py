@@ -354,7 +354,7 @@ def _plot_inputs_of(decomposition):
     must not cost the verdict, so each is optional (None)."""
     extents = heading = None
     try:
-        extents = [c.get_icurve().get_moment().get_meanstd() for c in decomposition.get_xr_components()]
+        extents = decomposition.get_component_extents()
     except Exception:
         pass
     try:
@@ -366,21 +366,22 @@ def _plot_inputs_of(decomposition):
     return extents, (icurve.x, icurve.y), heading
 
 
-def compute_continuity_report_of(decomposition, rgcurve=None, **thresholds):
+def compute_continuity_report_of(decomposition, rgcurve=None, shapes=None, **thresholds):
     """Continuity report of a :class:`~molass.LowRank.Decomposition.Decomposition`.
 
     ``rgcurve`` is the data Rg curve; ``decomposition.get_rg_curve()`` (cached) if not given.
+    ``shapes``: add the best-matching library shape of each component -- ``None``: only if the shape
+    match is already computed (the library takes about 30 s on first use), ``True``: compute it,
+    ``False``: never.
     """
     t = {**DEFAULT_THRESHOLDS, **thresholds}
-    if rgcurve is None:
-        rgcurve = decomposition.get_rg_curve()
-    icurve = decomposition.xr_icurve
-    intensity = np.interp(rgcurve.frames, icurve.x, icurve.y)
-    frames, rgs = rgcurve.reliable(score_min=t["score_min"], intensity=intensity, intensity_frac=t["intensity_frac"])
-    order = np.argsort(frames)
-    match = decomposition.get_kratky_shape_match()
-    best = [match.best_shape(k)[0] for k in range(len(match.component_labels))]
+    frames, rgs = decomposition.get_reliable_rg(score_min=t["score_min"], intensity_frac=t["intensity_frac"],
+                                                rgcurve=rgcurve)
+    best = None
+    if shapes is True or (shapes is None and getattr(decomposition, '_kratky_shape_match', None) is not None):
+        match = decomposition.get_kratky_shape_match()
+        best = [match.best_shape(k)[0] for k in range(len(match.component_labels))]
     extents, elution, heading = _plot_inputs_of(decomposition)
-    return compute_continuity_report(frames[order], rgs[order], component_rgs=decomposition.get_rgs(),
-                                     kratky_curves=match.kratky_curves, best_shapes=best,
+    return compute_continuity_report(frames, rgs, component_rgs=decomposition.get_rgs(),
+                                     kratky_curves=decomposition.get_kratky_curves(), best_shapes=best,
                                      component_extents=extents, elution=elution, heading=heading, **thresholds)
