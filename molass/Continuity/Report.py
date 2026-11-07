@@ -302,6 +302,10 @@ def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=Non
     elif plateaus and excess >= t["excess_min"]:
         verdict = VERDICT_DISCRETE
         reason = f"The data Rg curve has {len(plateaus)} plateau(s), plateau excess {excess:.2f} >= {t['excess_min']:g}."
+        if len(plateaus) == 1:
+            notes.append("Only one plateau: a region of constant Rg shows one homogeneous species, but not "
+                         "by itself that the rest of the elution consists of other distinct species. "
+                         "Compare the plateau with the Rg of the components and the elution profile.")
     else:
         verdict = VERDICT_NO_EVIDENCE
         reason = f"No clear plateau in the data Rg curve (plateau excess {excess:.2f} < {t['excess_min']:g})."

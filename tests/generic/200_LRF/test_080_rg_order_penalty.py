@@ -58,6 +58,7 @@ def test_quick_decomposition_accepts_rg_order_weight():
     ssd = SSD(SAMPLE3)
     with warnings.catch_warnings():
         warnings.simplefilter("error", UserWarning)   # unknown kwargs would warn
+        warnings.filterwarnings("ignore", message=".*physically implausible")   # SAMPLE3 is one peak; its tail component is flagged (#372)
         d_default = ssd.quick_decomposition(proportions=[3, 2, 1])
         d_off = ssd.quick_decomposition(proportions=[3, 2, 1], rg_order_weight=0)
     assert d_default.num_components == d_off.num_components == 3

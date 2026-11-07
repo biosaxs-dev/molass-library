@@ -2,6 +2,24 @@
     Mapping.MappingInfo.py
 """
 import numpy as np
+from collections import namedtuple
+
+# Warning thresholds of the mapping quality (molass-library#371). A correct mapping of the
+# SAMPLE1-6 datasets gives a shape correlation of 0.82-1.0 and full coverage; a mapping shifted by
+# 30 % of the XR range gives a correlation below 0.3 and a coverage of 0.7.
+MIN_SHAPE_CORRELATION = 0.5
+MIN_COVERAGE = 0.3
+
+MappingQuality = namedtuple("MappingQuality", "correlation coverage")
+MappingQuality.__doc__ = """Plausibility numbers of a mapping (see :attr:`MappingInfo.quality`).
+
+correlation : Pearson correlation of the normalized XR curve and the UV curve mapped onto the XR
+    frame axis, over their overlap (1 = same shape, around 0 or negative = unrelated).
+coverage : fraction of the UV frame range that falls inside the XR frame range after mapping
+    (1 = the whole UV curve is covered).
+"""
+
+
 class MappingInfo:
     """
     Contains information about the mapping between XR and UV data.
@@ -96,9 +114,58 @@ class MappingInfo:
         """
         return (np.asarray(x) - self.intercept) / self.slope
 
+    @property
+    def quality(self):
+        """Plausibility check of the mapping: a :class:`MappingQuality` (``correlation``, ``coverage``).
+
+        ``correlation`` is the Pearson correlation of the normalized XR curve and the UV curve
+        mapped onto the XR frame axis over their overlap; ``coverage`` is the fraction of the UV
+        frame range inside the XR range. Correct mappings of the local datasets give a
+        correlation of 0.8-1.0 and a coverage close to 1; a low value (below
+        ``MIN_SHAPE_CORRELATION`` / ``MIN_COVERAGE``) means the mapping is probably wrong --
+        inspect it with :meth:`plot_diagnostics`. Both are ``nan`` when they cannot be computed.
+        Different extinction ratios of the species lower the correlation somewhat, so this is a
+        plausibility check, not a measure of accuracy (see ``resolution_frames`` for that).
+        """
+        return self._compute_quality()
+
+    def _compute_quality(self):
+        nan = float('nan')
+        try:
+            xr_x = np.asarray(self.xr_curve.x, dtype=float)
+            uv_x = np.asarray(self.uv_curve.x, dtype=float)
+            if not (np.isfinite(self.slope) and self.slope > 0):
+                return MappingQuality(nan, 0.0)
+            mapped_uv_x = (uv_x - self.intercept) / self.slope
+            lo = max(xr_x[0], mapped_uv_x[0])
+            hi = min(xr_x[-1], mapped_uv_x[-1])
+            coverage = max(hi - lo, 0.0) / (mapped_uv_x[-1] - mapped_uv_x[0])
+            if hi <= lo:
+                return MappingQuality(nan, 0.0)
+            grid = np.linspace(lo, hi, 500)
+            xr_y = np.interp(grid, xr_x, np.clip(np.asarray(self.xr_curve.y, dtype=float), 0, None))
+            uv_y = np.interp(grid, mapped_uv_x, np.clip(np.asarray(self.uv_curve.y, dtype=float), 0, None))
+            if xr_y.max() <= 0 or uv_y.max() <= 0:
+                return MappingQuality(nan, float(coverage))
+            correlation = np.corrcoef(xr_y/xr_y.max(), uv_y/uv_y.max())[0, 1]
+            return MappingQuality(float(correlation), float(coverage))
+        except Exception:
+            return MappingQuality(nan, nan)
+
+    def is_plausible(self):
+        """False when the :attr:`quality` is below the warning thresholds (see there)."""
+        q = self.quality
+        if not np.isnan(q.coverage) and q.coverage < MIN_COVERAGE:
+            return False
+        if np.isnan(q.correlation):
+            return True     # not computable: no evidence against the mapping
+        return q.correlation >= MIN_SHAPE_CORRELATION
+
     def __repr__(self):
         res = "" if self.resolution_frames is None else ", resolution_frames=%.2g" % self.resolution_frames
-        return (f"MappingInfo(slope=%.3g, intercept=%.3g{res}, xr_peaks=..., uv_peaks=..., xr_moment=..., uv_moment=...)"
+        q = self.quality
+        qual = "" if np.isnan(q.coverage) else ", shape_correlation=%.2f, coverage=%.2f" % q
+        return (f"MappingInfo(slope=%.3g, intercept=%.3g{res}{qual}, xr_peaks=..., uv_peaks=..., xr_moment=..., uv_moment=...)"
                 % (self.slope, self.intercept))
     
     def __str__(self):

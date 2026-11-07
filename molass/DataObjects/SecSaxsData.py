@@ -932,6 +932,10 @@ class SecSaxsData(DidYouMeanMixin):
         estimates the noise-limited uncertainty of the mapping in XR frames (``None`` for a
         single-peak mapping); asymmetry and overlap come on top of it.
 
+        ``MappingInfo.quality`` (shape correlation of the XR curve and the mapped UV curve, and the
+        coverage of the UV range) is checked here: a mapping below the thresholds raises a
+        ``UserWarning`` that points to ``plot_diagnostics()``.
+
         Parameters
         ----------
         debug : bool, optional
@@ -946,6 +950,7 @@ class SecSaxsData(DidYouMeanMixin):
             import molass.Mapping.SimpleMapper
             reload(molass.Mapping.SimpleMapper)
         from molass.Mapping.SimpleMapper import estimate_mapping_impl
+        from molass.Mapping.MappingInfo import MIN_SHAPE_CORRELATION, MIN_COVERAGE
 
         if self.uv is None:
             from molass.Except.ExceptionTypes import InconsistentUseError
@@ -960,6 +965,15 @@ class SecSaxsData(DidYouMeanMixin):
             self.mapping = estimate_mapping_handling_anomaly(xr_curve, uv_curve, debug=debug)
         else:
             self.mapping = estimate_mapping_impl(xr_curve, uv_curve, debug=debug)
+        if not self.mapping.is_plausible():
+            q = self.mapping.quality
+            import warnings
+            warnings.warn(
+                f"The estimated XR/UV mapping (slope={self.mapping.slope:.3g}, intercept={self.mapping.intercept:.3g}) "
+                f"looks implausible: the mapped UV curve correlates with the XR curve at {q.correlation:.2f} "
+                f"(warning below {MIN_SHAPE_CORRELATION}) and {q.coverage:.0%} of the UV range lies inside the XR range "
+                f"(warning below {MIN_COVERAGE:.0%}). Inspect it with ssd.get_mapping().plot_diagnostics().",
+                UserWarning, stacklevel=2)
         return self.mapping
 
     def get_mapping(self):

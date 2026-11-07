@@ -52,9 +52,83 @@ def make_decomposition_impl(ssd, num_components=None, **kwargs):
 
     decomposition = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves, **kwargs)
     decomposition.method_label = "quick decomposition"
+    warn_on_implausible_component_rg(ssd, decomposition)
     return decomposition
 
 NEGLIGIBLE_SHARE = 1e-3
+# a component Rg outside [RG_LOWER_FACTOR * min, RG_UPPER_FACTOR * max] of the reliable data Rg is flagged (#372)
+RG_LOWER_FACTOR = 0.5
+RG_UPPER_FACTOR = 2.0
+RG_SAMPLE_FRAMES = 9
+RG_SAMPLE_INTENSITY_FRAC = 0.3
+RG_SAMPLE_MIN_SCORE = 0.6
+
+
+def data_rg_range(ssd, xr_icurve):
+    """(min, max) of the reliable data Rg, or None if it cannot be told.
+
+    Uses the Rg curve if ``ssd`` already holds one; otherwise Guinier fits at a few
+    (``RG_SAMPLE_FRAMES``) frames spread over the elution where the intensity is at least
+    ``RG_SAMPLE_INTENSITY_FRAC`` of the maximum, which costs about a second instead of the
+    seconds-to-minutes of the whole curve.
+    """
+    rgcurve = getattr(ssd, '_rgcurve', None)
+    if rgcurve is not None:
+        intensity = np.interp(rgcurve.frames, xr_icurve.x, xr_icurve.y)
+        _, rgs = rgcurve.reliable(score_min=RG_SAMPLE_MIN_SCORE, intensity=intensity,
+                                  intensity_frac=RG_SAMPLE_INTENSITY_FRAC)
+        return (float(np.min(rgs)), float(np.max(rgs))) if len(rgs) >= 3 else None
+
+    from molass.Guinier.RgEstimator import RgEstimator
+    y = np.asarray(xr_icurve.y, dtype=float)
+    ok = np.flatnonzero(y >= RG_SAMPLE_INTENSITY_FRAC*np.max(y))
+    if len(ok) < 3:
+        return None
+    picks = ok[np.unique(np.linspace(0, len(ok) - 1, RG_SAMPLE_FRAMES).round().astype(int))]
+    xr = ssd.xr
+    jv = np.asarray(xr.jv)
+    rgs = []
+    for i in picks:
+        j = int(np.searchsorted(jv, xr_icurve.x[i]))
+        if j >= len(jv) or jv[j] != xr_icurve.x[i]:
+            continue
+        sg = RgEstimator(np.array([xr.qv, xr.M[:, j], xr.E[:, j]]).T)
+        if sg.Rg is not None and np.isfinite(sg.Rg) and sg.Rg > 0 and sg.score >= RG_SAMPLE_MIN_SCORE:
+            rgs.append(float(sg.Rg))
+    return (min(rgs), max(rgs)) if len(rgs) >= 3 else None
+
+
+def warn_on_implausible_component_rg(ssd, decomposition):
+    """Warn (molass-library#372) when a component's Guinier Rg is missing or far outside the data Rg.
+
+    A component whose Rg is below ``RG_LOWER_FACTOR`` times the smallest or above ``RG_UPPER_FACTOR``
+    times the largest reliable data Rg (``data_rg_range``) does not describe the sample: typically a
+    degenerate decomposition of a continuum with the default proportions. The check never raises.
+    """
+    import warnings
+    try:
+        components = decomposition.get_xr_components()
+        rgs = []
+        for c in components:
+            rg = c.get_guinier_object().Rg
+            rgs.append(None if rg is None or not np.isfinite(rg) or rg <= 0 else float(rg))
+        span = data_rg_range(ssd, decomposition.xr_icurve)
+    except Exception:
+        return
+    bad = []
+    for i, rg in enumerate(rgs, start=1):
+        if rg is None:
+            bad.append((i, "no Guinier Rg"))
+        elif span is not None and not (RG_LOWER_FACTOR*span[0] <= rg <= RG_UPPER_FACTOR*span[1]):
+            bad.append((i, f"Rg={rg:.1f}"))
+    if not bad:
+        return
+    where = "" if span is None else f"; the data Rg is {span[0]:.0f}-{span[1]:.0f} (reliable frames)"
+    warnings.warn(
+        f"component(s) {', '.join(f'{i} ({what})' for i, what in bad)} look physically implausible{where}. "
+        f"The decomposition may be degenerate (e.g. a continuum or overlapping peaks with the default "
+        f"proportions): try proportions=[1]*k or a different num_components.",
+        UserWarning, stacklevel=4)
 
 def warn_on_suspicious_components(requested, xr_ccurves, allow_negative=False):
     """Warn (molass-library#321) when the result silently differs from what was asked for.
