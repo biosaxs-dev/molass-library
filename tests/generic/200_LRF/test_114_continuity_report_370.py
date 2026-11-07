@@ -78,15 +78,40 @@ def test_plot_draws_into_axes_or_figure_and_survives_json():
     fig, ax = plt.subplots()
     result = report.plot(ax=ax)
     assert result.fig is fig
-    assert len(ax.collections) == len(report.plateaus) == 3 and len(ax.lines) == 1 + 3
+    assert len(ax.collections) == len(report.plateaus) == 3          # one bar per plateau
     plt.close(fig)
 
     figure = Figure()
     result = report.plot(fig=figure)
-    assert result.fig is figure and len(figure.axes) == 1
+    assert result.fig is figure and len(figure.axes) == 1             # no Kratky curves: panel (a) only
 
     flat = compute_continuity_report(np.arange(100.0), np.linspace(30, 25, 100))     # no plateaus, no components
     flat.plot(fig=Figure())
+    json.dumps(report.to_dict(), allow_nan=False)
+
+
+def test_plot_shows_components_kratky_curves_and_a_heading():
+    from matplotlib.figure import Figure
+
+    frames, rgs = _curve([60.0, 40.0, 25.0])
+    qrg = np.linspace(0.3, 6, 100)
+    curves = [(qrg, 2*(qrg/p)**2*np.exp(-(qrg/p)**2)) for p in (1.7, 1.8, 1.9)]
+    elution = (np.arange(120.0), np.exp(-0.5*((np.arange(120.0) - 60)/25)**2))
+    report = compute_continuity_report(frames, rgs, component_rgs=[60, 40, 25], kratky_curves=curves,
+                                       component_extents=[(20, 8), (60, 8), (100, 8)], elution=elution,
+                                       heading="SAMPLE9 | model: EGH | method: quick decomposition")
+    figure = Figure()
+    result = report.plot(fig=figure)
+    rg_ax, kratky_ax = figure.axes[0], figure.axes[1]
+    assert len(figure.axes) == 3                                       # (a), (b), and the elution curve behind (a)
+    assert [t.get_text() for t in rg_ax.get_legend().get_texts()].count("component 2") == 1
+    assert len(kratky_ax.lines) >= 3
+    title = figure._suptitle.get_text()
+    assert title.startswith("SAMPLE9 | model: EGH | method: quick decomposition")
+    assert "Guinier score" in title                                    # how the Rg frames were selected
+    other = Figure()
+    report.plot(fig=other, title="SAMPLE0 | model: GRM")
+    assert other._suptitle.get_text().startswith("SAMPLE0 | model: GRM")
     json.dumps(report.to_dict(), allow_nan=False)
 
 

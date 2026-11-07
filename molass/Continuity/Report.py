@@ -77,6 +77,16 @@ class ContinuityReport:
         Best-matching library shape of each component.
     frames, rgs : np.ndarray
         The reliable points of the data Rg curve the indicators were computed from.
+    component_extents : list of (float, float) or None
+        Per component the mean frame and standard deviation of its elution curve (drawn as the
+        extent of the component in :meth:`plot`).
+    elution : (np.ndarray, np.ndarray) or None
+        The XR elution curve (frames, intensity), the background of :meth:`plot`.
+    kratky_curves : list of (qrg, ky) or None
+        The dimensionless Kratky curve of each component (panel b of :meth:`plot`).
+    heading : str or None
+        The ``dataset | model | method`` line of the decomposition, the same as the title of
+        ``plot_components``.
     thresholds : dict
         The thresholds used (:data:`DEFAULT_THRESHOLDS` with the overrides).
     notes : list of str
@@ -86,19 +96,27 @@ class ContinuityReport:
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-    def plot(self, ax=None, fig=None):
-        """Plot the data Rg curve with the plateaus found and the component Rg values.
+    def plot(self, ax=None, fig=None, title=None):
+        """Plot the evidence behind the verdict.
 
-        Points are the reliable frames of the data Rg curve, thick bars the plateaus, dotted
-        lines the Rg of the components (a bar at the level of a dotted line is a component
-        backed by a plateau).
+        (a) The Rg of the data, frame by frame (reliable frames only), on the elution curve (grey),
+        with the plateaus found (red bars) and the Rg of each component drawn over its elution
+        extent (mean +- one standard deviation of its elution curve). A mixture of distinct species
+        shows flat stretches in the data Rg where one species dominates; a continuum a ramp.
+        (b) The dimensionless Kratky plots of the components (drawn when ``fig`` is used and the
+        report has them): curves that coincide mean the same particle shape.
 
         Parameters
         ----------
         ax : matplotlib.axes.Axes, optional
-            Draw into this axes.
+            Draw panel (a) only, into this axes.
         fig : matplotlib.figure.Figure, optional
-            Draw into this figure (cleared first); ignored if ``ax`` is given.
+            Draw both panels into this figure (cleared first); ignored if ``ax`` is given.
+            If neither is given a new figure is made.
+        title : str, optional
+            The heading of the figure (suptitle); default :attr:`heading`, i.e. the
+            ``dataset | model | method`` line of ``plot_components``. A second line says how the
+            Rg frames were selected.
 
         Returns
         -------
@@ -107,29 +125,90 @@ class ContinuityReport:
         import matplotlib.pyplot as plt
         from molass.PlotUtils.PlotResult import PlotResult
 
+        has_kratky = ax is None and any(c is not None for c in (self.kratky_curves or []))
         if ax is None:
             if fig is None:
-                fig = plt.figure(figsize=(7, 4.5))
+                fig = plt.figure(figsize=(11.5, 4.8))
             else:
                 fig.clear()
-            ax = fig.subplots()
+            axes = list(fig.subplots(1, 2)) if has_kratky else [fig.subplots()]
         else:
             fig = ax.figure
-        ax.plot(self.frames, self.rgs, ".", color="C0", ms=4, label="data Rg (reliable frames)")
+            axes = [ax]
+        self._plot_rg(axes[0], panel_label="(a) " if has_kratky else "")
+        if has_kratky:
+            self._plot_kratky(axes[1])
+
+        if ax is None:
+            t = self.thresholds
+            lines = [title if title is not None else self.heading,
+                     f"continuity report | Rg frames: Guinier score \u2265 {t['score_min']:g}, "
+                     f"intensity \u2265 {t['intensity_frac']:.0%} of the maximum"]
+            fig.suptitle("\n".join(s for s in lines if s), fontsize=10)
+            fig.tight_layout(rect=(0, 0, 1, 0.93))
+        else:
+            if title is not None:
+                ax.set_title(title, fontsize=10)
+            fig.tight_layout()
+        return PlotResult(fig, axes if len(axes) > 1 else axes[0])
+
+    def _plot_rg(self, ax, panel_label=""):
+        t_lo, t_hi = float(np.min(self.frames)), float(np.max(self.frames))
+        extents = self.component_extents
+        if extents:
+            t_lo = min(t_lo, min(m - s for m, s in extents))
+            t_hi = max(t_hi, max(m + s for m, s in extents))
+        if self.elution is not None:
+            x, y = (np.asarray(v, dtype=float) for v in self.elution)
+            back = ax.twinx()
+            back.fill_between(x, 0, y/np.max(y), color="0.9", zorder=0)
+            back.set_ylim(0, 4)                  # the elution curve fills the lower quarter
+            back.set_yticks([])
+            ax.set_zorder(back.get_zorder() + 1)
+            ax.patch.set_visible(False)
+        ax.plot(self.frames, self.rgs, "o", ms=3.5, color="0.35", label="data, per frame")
         for k, p in enumerate(self.plateaus):
-            ax.hlines(p["level"], p["start"], p["stop"], colors="C3", lw=5, alpha=0.7,
+            ax.hlines(p["level"], p["start"], p["stop"], colors="k", lw=7, alpha=0.35, zorder=2,
                       label="plateau" if k == 0 else None)
         for k, rg in enumerate(self.component_rgs or []):
-            ax.axhline(rg, color="gray", ls=":", lw=1, label="component Rg" if k == 0 else None)
+            label = f"component {k + 1}"
+            if extents:
+                mean, sd = extents[k]
+                ax.plot([mean - sd, mean + sd], [rg, rg], lw=4, color=f"C{k}", solid_capstyle="butt",
+                        label=label, zorder=3)
+            else:
+                ax.axhline(rg, color=f"C{k}", ls=":", lw=1.5, label=label)
+        pad = 0.03*(t_hi - t_lo)
+        ax.set_xlim(t_lo - pad, t_hi + pad)
         ax.set_xlabel("frame")
         ax.set_ylabel("Rg (\u00c5)")
-        power = "n/a" if not np.isfinite(self.power) else f"{self.power:.1f}"
-        excess = "n/a" if not np.isfinite(self.excess) else f"{self.excess:.2f}"
-        ax.set_title(f"{self.verdict}\nplateau excess {excess}, power {power} noise units", fontsize=10)
-        if ax.get_legend_handles_labels()[0]:
-            ax.legend(fontsize=8)
-        fig.tight_layout()
-        return PlotResult(fig, ax)
+        ax.set_title(f"{panel_label}Rg of the data and of the components: {self.verdict}", loc="left", fontsize=10)
+        f = lambda v, fmt: "n/a" if not np.isfinite(v) else format(v, fmt)
+        ax.text(0.02, 0.03, f"total drop {f(self.drop, '.1f')} \u00c5, noise of one frame {f(self.noise, '.2f')} \u00c5\n"
+                            f"plateau excess {f(self.excess, '.2f')}, power {f(self.power, '.1f')} noise units",
+                transform=ax.transAxes, fontsize=8, va="bottom", zorder=5)
+        ax.legend(loc="upper right", fontsize=8)
+
+    def _plot_kratky(self, ax):
+        top = 1.4
+        for k, curve in enumerate(self.kratky_curves):
+            if curve is None:
+                continue
+            qrg, ky = (np.asarray(v, dtype=float) for v in curve)
+            rg = self.component_rgs[k] if self.component_rgs is not None and k < len(self.component_rgs) else None
+            label = f"component {k + 1}" + (f", Rg = {rg:.1f} \u00c5" if rg is not None and np.isfinite(rg) else "")
+            ax.plot(qrg, ky, color=f"C{k}", lw=1.5, label=label)
+            shown = ky[qrg <= 6]
+            if len(shown):
+                top = max(top, 1.1*float(np.nanmax(shown)))
+        ax.axvline(np.sqrt(3), color="0.7", ls=":", lw=1)      # maximum of a compact globular particle
+        ax.axhline(3/np.e, color="0.7", ls=":", lw=1)
+        ax.set_xlim(0, 6)
+        ax.set_ylim(0, top)
+        ax.set_xlabel("qRg")
+        ax.set_ylabel("(qRg)$^2$ I(q) / I(0)")
+        ax.set_title("(b) Kratky plots of the components", loc="left", fontsize=10)
+        ax.legend(loc="upper right", fontsize=8)
 
     def to_dict(self):
         """JSON-serializable form (NaN as ``None``)."""
@@ -170,7 +249,8 @@ def _json_safe(value):
     return value
 
 
-def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=None, best_shapes=None, **thresholds):
+def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=None, best_shapes=None,
+                              component_extents=None, elution=None, heading=None, **thresholds):
     """Continuity report from arrays (the engine behind :meth:`Decomposition.get_continuity_report`).
 
     Parameters
@@ -182,6 +262,12 @@ def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=Non
     kratky_curves : list of (qrg, ky), optional
         Dimensionless Kratky curve of each component (``ShapeMatchResult.kratky_curves``).
     best_shapes : list of str, optional
+    component_extents : list of (mean, sd), optional
+        Mean frame and standard deviation of the elution curve of each component (for the plot only).
+    elution : (frames, intensity), optional
+        The XR elution curve (for the plot only).
+    heading : str, optional
+        The ``dataset | model | method`` line of the decomposition (for the plot only).
     **thresholds
         Overrides of :data:`DEFAULT_THRESHOLDS`.
 
@@ -257,7 +343,27 @@ def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=Non
         excess=excess, plateaus=plateaus, component_rgs=component_rgs, plateau_backed=backed,
         n_components=n_components, max_separation=max_sep, end_fraction=end_fraction,
         best_shapes=None if best_shapes is None else list(best_shapes), thresholds=t, notes=notes,
-        frames=frames, rgs=rgs)
+        frames=frames, rgs=rgs,
+        component_extents=None if component_extents is None else [(float(m), float(s)) for m, s in component_extents],
+        elution=None if elution is None else (np.asarray(elution[0], dtype=float), np.asarray(elution[1], dtype=float)),
+        kratky_curves=kratky_curves, heading=heading)
+
+
+def _plot_inputs_of(decomposition):
+    """Component extents, elution curve and heading, which only the plot needs. A failure here
+    must not cost the verdict, so each is optional (None)."""
+    extents = heading = None
+    try:
+        extents = [c.get_icurve().get_moment().get_meanstd() for c in decomposition.get_xr_components()]
+    except Exception:
+        pass
+    try:
+        from molass.PlotUtils.DecompositionPlot import make_auto_title
+        heading = make_auto_title(decomposition)
+    except Exception:
+        pass
+    icurve = decomposition.xr_icurve
+    return extents, (icurve.x, icurve.y), heading
 
 
 def compute_continuity_report_of(decomposition, rgcurve=None, **thresholds):
@@ -274,5 +380,7 @@ def compute_continuity_report_of(decomposition, rgcurve=None, **thresholds):
     order = np.argsort(frames)
     match = decomposition.get_kratky_shape_match()
     best = [match.best_shape(k)[0] for k in range(len(match.component_labels))]
+    extents, elution, heading = _plot_inputs_of(decomposition)
     return compute_continuity_report(frames[order], rgs[order], component_rgs=decomposition.get_rgs(),
-                                     kratky_curves=match.kratky_curves, best_shapes=best, **thresholds)
+                                     kratky_curves=match.kratky_curves, best_shapes=best,
+                                     component_extents=extents, elution=elution, heading=heading, **thresholds)
