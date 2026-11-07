@@ -65,6 +65,31 @@ def test_report_is_strict_json_and_printable():
     assert "DISCRETE" in text and "plateau excess" in text
 
 
+def test_plot_draws_into_axes_or_figure_and_survives_json():
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.figure import Figure
+
+    frames, rgs = _curve([60.0, 40.0, 25.0])
+    report = compute_continuity_report(frames, rgs, component_rgs=[60, 40, 25])
+    assert len(report.frames) == len(report.rgs) == len(frames)
+
+    fig, ax = plt.subplots()
+    result = report.plot(ax=ax)
+    assert result.fig is fig
+    assert len(ax.collections) == len(report.plateaus) == 3 and len(ax.lines) == 1 + 3
+    plt.close(fig)
+
+    figure = Figure()
+    result = report.plot(fig=figure)
+    assert result.fig is figure and len(figure.axes) == 1
+
+    flat = compute_continuity_report(np.arange(100.0), np.linspace(30, 25, 100))     # no plateaus, no components
+    flat.plot(fig=Figure())
+    json.dumps(report.to_dict(), allow_nan=False)
+
+
 def test_indicators_on_arrays():
     frames, rgs = _curve([60.0, 25.0])
     assert plateau_excess(frames, rgs) > 2

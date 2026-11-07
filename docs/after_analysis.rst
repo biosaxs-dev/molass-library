@@ -87,6 +87,7 @@ components along the elution (from four components).
    report = result.get_continuity_report()
    print(report)
    report.verdict, report.power, report.excess, report.plateaus
+   report.plot()                         # data Rg curve, plateaus, component Rg
    report.to_dict()                      # JSON-serializable
 
 The verdict is ``"discrete"``, ``"no evidence for distinct species"`` or

@@ -467,7 +467,7 @@ class Decomposition(DidYouMeanMixin):
         result = self.get_kratky_shape_match(debug=debug)
         return plot_kratky_series(result, fig=fig, **kwargs)
 
-    def get_continuity_report(self, **thresholds):
+    def get_continuity_report(self, rgcurve=None, **thresholds):
         """Report whether the decomposition describes distinct species or slices of a continuum.
 
         Combines the plateau structure of the data Rg curve (a single species has a constant Rg,
@@ -483,6 +483,9 @@ class Decomposition(DidYouMeanMixin):
 
         Parameters
         ----------
+        rgcurve : RgCurve, optional
+            The data Rg curve if already at hand (as for ``plot_components(rgcurve=...)``);
+            default :meth:`get_rg_curve`.
         **thresholds
             Overrides of :data:`molass.Continuity.Report.DEFAULT_THRESHOLDS`, e.g.
             ``excess_min=2.5`` or ``score_min=0.7``.
@@ -500,7 +503,7 @@ class Decomposition(DidYouMeanMixin):
             report.verdict, report.power, report.excess
         """
         from molass.Continuity.Report import compute_continuity_report_of
-        return compute_continuity_report_of(self, **thresholds)
+        return compute_continuity_report_of(self, rgcurve=rgcurve, **thresholds)
 
     def get_uv_params(self):
         """Get UV/XR scale ratios (species properties) for all components.

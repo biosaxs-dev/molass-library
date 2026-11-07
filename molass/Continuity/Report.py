@@ -75,6 +75,8 @@ class ContinuityReport:
         ``ordering_min_components`` components).
     best_shapes : list of str or None
         Best-matching library shape of each component.
+    frames, rgs : np.ndarray
+        The reliable points of the data Rg curve the indicators were computed from.
     thresholds : dict
         The thresholds used (:data:`DEFAULT_THRESHOLDS` with the overrides).
     notes : list of str
@@ -83,6 +85,51 @@ class ContinuityReport:
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
+    def plot(self, ax=None, fig=None):
+        """Plot the data Rg curve with the plateaus found and the component Rg values.
+
+        Points are the reliable frames of the data Rg curve, thick bars the plateaus, dotted
+        lines the Rg of the components (a bar at the level of a dotted line is a component
+        backed by a plateau).
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Draw into this axes.
+        fig : matplotlib.figure.Figure, optional
+            Draw into this figure (cleared first); ignored if ``ax`` is given.
+
+        Returns
+        -------
+        molass.PlotUtils.PlotResult.PlotResult
+        """
+        import matplotlib.pyplot as plt
+        from molass.PlotUtils.PlotResult import PlotResult
+
+        if ax is None:
+            if fig is None:
+                fig = plt.figure(figsize=(7, 4.5))
+            else:
+                fig.clear()
+            ax = fig.subplots()
+        else:
+            fig = ax.figure
+        ax.plot(self.frames, self.rgs, ".", color="C0", ms=4, label="data Rg (reliable frames)")
+        for k, p in enumerate(self.plateaus):
+            ax.hlines(p["level"], p["start"], p["stop"], colors="C3", lw=5, alpha=0.7,
+                      label="plateau" if k == 0 else None)
+        for k, rg in enumerate(self.component_rgs or []):
+            ax.axhline(rg, color="gray", ls=":", lw=1, label="component Rg" if k == 0 else None)
+        ax.set_xlabel("frame")
+        ax.set_ylabel("Rg (\u00c5)")
+        power = "n/a" if not np.isfinite(self.power) else f"{self.power:.1f}"
+        excess = "n/a" if not np.isfinite(self.excess) else f"{self.excess:.2f}"
+        ax.set_title(f"{self.verdict}\nplateau excess {excess}, power {power} noise units", fontsize=10)
+        if ax.get_legend_handles_labels()[0]:
+            ax.legend(fontsize=8)
+        fig.tight_layout()
+        return PlotResult(fig, ax)
 
     def to_dict(self):
         """JSON-serializable form (NaN as ``None``)."""
@@ -209,13 +256,18 @@ def compute_continuity_report(frames, rgs, component_rgs=None, kratky_curves=Non
         verdict=verdict, reason=reason, n_frames=int(n), drop=drop, noise=noise, power=power,
         excess=excess, plateaus=plateaus, component_rgs=component_rgs, plateau_backed=backed,
         n_components=n_components, max_separation=max_sep, end_fraction=end_fraction,
-        best_shapes=None if best_shapes is None else list(best_shapes), thresholds=t, notes=notes)
+        best_shapes=None if best_shapes is None else list(best_shapes), thresholds=t, notes=notes,
+        frames=frames, rgs=rgs)
 
 
-def compute_continuity_report_of(decomposition, **thresholds):
-    """Continuity report of a :class:`~molass.LowRank.Decomposition.Decomposition`."""
+def compute_continuity_report_of(decomposition, rgcurve=None, **thresholds):
+    """Continuity report of a :class:`~molass.LowRank.Decomposition.Decomposition`.
+
+    ``rgcurve`` is the data Rg curve; ``decomposition.get_rg_curve()`` (cached) if not given.
+    """
     t = {**DEFAULT_THRESHOLDS, **thresholds}
-    rgcurve = decomposition.get_rg_curve()
+    if rgcurve is None:
+        rgcurve = decomposition.get_rg_curve()
     icurve = decomposition.xr_icurve
     intensity = np.interp(rgcurve.frames, icurve.x, icurve.y)
     frames, rgs = rgcurve.reliable(score_min=t["score_min"], intensity=intensity, intensity_frac=t["intensity_frac"])

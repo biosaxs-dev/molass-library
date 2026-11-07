@@ -27,7 +27,9 @@ def _narrow_continuum():
 
 def _report(species, k):
     ssd = simulate_ssd(species, noise=1.0, seed=1)
-    return ssd.quick_decomposition(num_components=k, proportions=[1]*k).get_continuity_report()
+    rgcurve = ssd.get_rg_curve()
+    decomp = ssd.quick_decomposition(num_components=k, rgcurve=rgcurve, proportions=[1]*k)
+    return decomp.get_continuity_report(rgcurve=rgcurve)
 
 
 def test_resolved_discrete_species_are_reported_discrete():
