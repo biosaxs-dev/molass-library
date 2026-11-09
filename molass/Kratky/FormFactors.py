@@ -17,6 +17,11 @@ form factor            parameters                   Rg
 ``triaxial_P``         ``(qs, a, b, c)``            ``triaxial_Rg(a, b, c)``
 ``cylinder_P``         ``(qs, R, L)``               ``cylinder_Rg(R, L)``
 ``gaussian_chain_P``   ``(qs, Rg)``                 (is its argument)
+``sphere_chains_P``    ``(qs, R, rg_c, phi,         ``sphere_chains_Rg(R, rg_c, phi,
+                       n_chains=1,                  n_chains=1, nonpenetrating=True)``
+                       nonpenetrating=True)``
+``fold_unfold_P``      ``(qs, rg_fold, rg_unfold,   ``fold_unfold_Rg(rg_fold, rg_unfold,
+                       f_unfold)``                  f_unfold)``
 ``bead_assembly_P``    ``(qs, centres, radii=None,  ``bead_assembly_Rg(centres,
                        polydispersity=0.0)``        radii=None, polydispersity=0.0)``
 =====================  ===========================  ===========================
@@ -189,3 +194,49 @@ def gaussian_chain_P(qs, Rg):
     un = u[nz]
     out[nz] = 2*(np.exp(-un) + un - 1)/un**2
     return out
+
+
+def sphere_chains_P(qs, R, rg_c, phi, n_chains=1, nonpenetrating=True):
+    """Pedersen item 25 (Pedersen and Gerstenberg 1996): a sphere of radius ``R`` with ``n_chains`` Gaussian
+    chains attached, each of radius of gyration ``rg_c``; a folded core with disordered tails.
+
+    ``phi`` is the share of the total scattering mass carried by the chains (all chains together), so the
+    sphere carries ``1 - phi``; ``P(0) = 1``. ``nonpenetrating`` replaces ``R`` by ``R + rg_c`` in the
+    sin(x)/x terms of the sphere-chain and chain-chain cross terms, as Pedersen recommends for ``R >> rg_c``.
+    """
+    qs = np.asarray(qs, dtype=float)
+    rs, rc = 1.0 - phi, phi/n_chains
+    Fs = sphere_F(qs*R)
+    u = (qs*rg_c)**2
+    psi = np.where(u > 1e-8, (1.0 - np.exp(-u))/np.where(u > 1e-8, u, 1.0), 1.0)
+    x = qs*(R + rg_c if nonpenetrating else R)
+    sinc = np.where(x > 1e-8, np.sin(x)/np.where(x > 1e-8, x, 1.0), 1.0)
+    cross = psi*sinc
+    return (rs**2*Fs**2 + n_chains*rc**2*gaussian_chain_P(qs, rg_c) + n_chains*(n_chains - 1)*rc**2*cross**2
+            + 2*n_chains*rs*rc*Fs*cross)
+
+
+def sphere_chains_Rg(R, rg_c, phi, n_chains=1, nonpenetrating=True):
+    """Radius of gyration of :func:`sphere_chains_P`, from the small-q expansion ``P = 1 - q^2 G / 3``:
+    ``G = rs^2 Rs^2 + Nc rc^2 Rc^2 + Nc (Nc - 1) rc^2 (3 Rc^2 + d^2) + Nc rs rc (Rs^2 + 3 Rc^2 + d^2)`` with the
+    mass shares ``rs``, ``rc`` of the sphere and of one chain, ``Rs^2 = 3 R^2 / 5`` and ``d`` the distance of the
+    chain start from the centre (``R``, or ``R + rg_c`` when non-penetrating)."""
+    rs, rc = 1.0 - phi, phi/n_chains
+    Rs2, Rc2 = 0.6*R**2, rg_c**2
+    d2 = (R + rg_c)**2 if nonpenetrating else R**2
+    G = (rs**2*Rs2 + n_chains*rc**2*Rc2 + n_chains*(n_chains - 1)*rc**2*(3*Rc2 + d2)
+         + n_chains*rs*rc*(Rs2 + 3*Rc2 + d2))
+    return np.sqrt(G)
+
+
+def fold_unfold_P(qs, rg_fold, rg_unfold, f_unfold):
+    """Fast-exchange population mix of a folded state (homogeneous sphere of radius of gyration ``rg_fold``) and
+    an unfolded state (Gaussian chain of radius of gyration ``rg_unfold``) of equal mass; ``f_unfold`` is the
+    unfolded fraction. ``P(0) = 1``."""
+    qs = np.asarray(qs, dtype=float)
+    return (1 - f_unfold)*sphere_P(qs, rg_fold/np.sqrt(0.6)) + f_unfold*gaussian_chain_P(qs, rg_unfold)
+
+
+def fold_unfold_Rg(rg_fold, rg_unfold, f_unfold):
+    """Radius of gyration of :func:`fold_unfold_P`: ``Rg^2 = (1 - f) Rg_fold^2 + f Rg_unfold^2``."""
+    return np.sqrt((1 - f_unfold)*rg_fold**2 + f_unfold*rg_unfold**2)

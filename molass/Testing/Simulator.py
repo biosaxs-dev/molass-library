@@ -84,6 +84,44 @@ def shape_profile(shape, rg, qv, shape_arg=None):
     return CubicSpline(coarse, fn(coarse))(qv)
 
 
+def _solved_shape(rg_of_parameter, parameter_bounds, profile_of_parameter):
+    """A ``Species.shape`` callable ``f(q, rg)`` whose single shape parameter is solved for the requested Rg."""
+    from scipy.optimize import brentq
+    lo, hi = parameter_bounds
+    rg_lo, rg_hi = rg_of_parameter(lo), rg_of_parameter(hi)
+
+    def shape(q, rg):
+        if not min(rg_lo, rg_hi) - 1e-9 <= rg <= max(rg_lo, rg_hi) + 1e-9:
+            raise ValueError(f"rg={rg:.4g} is outside the range {min(rg_lo, rg_hi):.4g}..{max(rg_lo, rg_hi):.4g} "
+                             "reachable with this shape")
+        p = brentq(lambda x: rg_of_parameter(x) - rg, lo, hi)
+        return profile_of_parameter(np.asarray(q, dtype=float), p)
+    return shape
+
+
+def tail_shape(R=27.0, rg_c=18.0, n_chains=1, nonpenetrating=True):
+    """``Species.shape`` for a folded sphere (radius ``R``) with ``n_chains`` disordered Gaussian-chain tails
+    (radius of gyration ``rg_c`` each; Pedersen 1997, item 25: :func:`molass.Kratky.FormFactors.sphere_chains_P`).
+
+    The share of the scattering mass carried by the tails is solved (between 0 and 0.4, where the Rg still
+    rises with the share) so that the species has the requested ``Species.rg``; a ``ValueError`` is raised
+    for an Rg outside that range (for the defaults about 20.9 to 32 A).
+    """
+    from molass.Kratky import FormFactors as ff
+    return _solved_shape(lambda phi: float(ff.sphere_chains_Rg(R, rg_c, phi, n_chains, nonpenetrating)), (0.0, 0.4),
+                         lambda q, phi: ff.sphere_chains_P(q, R, rg_c, phi, n_chains, nonpenetrating))
+
+
+def fold_unfold_shape(rg_fold=20.0, rg_unfold=55.0):
+    """``Species.shape`` for a fast-exchange mix of a folded sphere (radius of gyration ``rg_fold``) and an
+    unfolded Gaussian chain (``rg_unfold``) of equal mass (:func:`molass.Kratky.FormFactors.fold_unfold_P`).
+    The unfolded fraction is solved so that the species has the requested ``Species.rg``
+    (between ``rg_fold`` and ``rg_unfold``)."""
+    from molass.Kratky import FormFactors as ff
+    return _solved_shape(lambda f: float(ff.fold_unfold_Rg(rg_fold, rg_unfold, f)), (0.0, 1.0),
+                         lambda q, f: ff.fold_unfold_P(q, rg_fold, rg_unfold, f))
+
+
 @dataclass
 class Species:
     """One species: Gaussian elution (``amp``, ``center`` and ``sigma`` in XR frames), scattering mass
@@ -124,7 +162,8 @@ def clean_signals(species, uv_late=0.0, slope=SLOPE, intercept=INTERCEPT,
 
 
 def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept=INTERCEPT,
-                 qv=QV, wv=WV, xr_frames=XR_FRAMES, uv_frames=UV_FRAMES):
+                 qv=QV, wv=WV, xr_frames=XR_FRAMES, uv_frames=UV_FRAMES,
+                 xr_sigma=None, xr_noise_ratio=None, uv_sigma=None, trimmed=True):
     """A SecSaxsData of simulated data with known truth, built with ``SecSaxsData.from_arrays``.
 
     Parameters
@@ -143,11 +182,22 @@ def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept
     qv, wv, xr_frames, uv_frames : array-like, optional
         The axes; default is the SAMPLE1 geometry (984 q-values, 254 wavelengths,
         XR frames 0-240, UV frames 3-351).
+    xr_sigma : float or array-like, optional
+        Stated error of the XR intensities, a scalar or one value per q-point (default ``SIGMA_XR``). The
+        error written to the data is ``max(noise, 1e-3) * xr_sigma``. A q-dependent error (rising at both
+        ends of the q range, as in measured data) is needed by the automatic trimming.
+    xr_noise_ratio : float or array-like, optional
+        Scatter of the XR noise relative to its stated error, a scalar or one value per q-point
+        (default 1). Real data may scatter much less than their stated error at the first q-points.
+    uv_sigma : float, optional
+        Noise of the UV intensities (default ``SIGMA_UV``), multiplied by ``noise``.
+    trimmed : bool, optional
+        Mark the data as trimmed (default). Use ``False`` to let ``trimmed_copy()`` trim them.
 
     Returns
     -------
     ssd : SecSaxsData
-        Marked as trimmed and corrected (the simulation has no baseline). The truth is attached
+        Marked as trimmed (unless ``trimmed=False``) and corrected (the simulation has no baseline). The truth is attached
         as ``ssd.simulation_truth`` with ``species``, ``uv_late``, ``mapping`` (the nominal
         ``(slope, intercept)``) and ``true_mapping`` (``(slope, intercept)`` of the mapping that
         matches the data, i.e. the nominal one shifted by ``uv_late`` XR frames).
@@ -155,11 +205,17 @@ def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept
     from molass.DataObjects import SecSaxsData as SSD
     I, A = clean_signals(species, uv_late, slope, intercept, qv, wv, xr_frames, uv_frames)
     rng = np.random.default_rng(seed)
-    I = I + noise * SIGMA_XR * rng.standard_normal(I.shape)
-    A = A + noise * SIGMA_UV * rng.standard_normal(A.shape)
-    E = np.full_like(I, max(noise, 1e-3) * SIGMA_XR)
+    sigma = SIGMA_XR if xr_sigma is None else np.asarray(xr_sigma, dtype=float)
+    ratio = 1.0 if xr_noise_ratio is None else np.asarray(xr_noise_ratio, dtype=float)
+    if np.ndim(sigma) == 1:
+        sigma = sigma[:, None]
+    if np.ndim(ratio) == 1:
+        ratio = ratio[:, None]
+    I = I + noise * sigma * ratio * rng.standard_normal(I.shape)
+    A = A + noise * (SIGMA_UV if uv_sigma is None else uv_sigma) * rng.standard_normal(A.shape)
+    E = np.broadcast_to(max(noise, 1e-3) * sigma, I.shape).copy()
     ssd = SSD.from_arrays(I, np.asarray(qv), E, xr_jv=np.asarray(xr_frames),
-                          uv_M=A, uv_wv=np.asarray(wv), uv_jv=np.asarray(uv_frames), trimmed=True)
+                          uv_M=A, uv_wv=np.asarray(wv), uv_jv=np.asarray(uv_frames), trimmed=trimmed)
     ssd.simulation_truth = SimpleNamespace(
         species=list(species), uv_late=uv_late, mapping=(slope, intercept),
         true_mapping=(slope, intercept + slope * uv_late))
