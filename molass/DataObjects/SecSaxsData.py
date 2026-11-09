@@ -1321,7 +1321,11 @@ class SecSaxsData(DidYouMeanMixin):
             used to denoise the matrix data.
 
         ranks : list of int, optional
-            Specifies the ranks to be used for XR data.
+            Specifies the ranks to be used for XR data, one per component (``[2]`` for a
+            single component with an interparticle effect). Applied with
+            :meth:`~molass.LowRank.Decomposition.Decomposition.update_xr_ranks` (molass-library#380);
+            a list whose length differs from the number of components raises ``ValueError``.
+            Default: rank 1 for every component.
 
         @@QUICK_OPTIONS@@
 
@@ -1363,6 +1367,8 @@ class SecSaxsData(DidYouMeanMixin):
             result = make_decomposition_impl(self, num_components, **kwargs)
             if rgcurve is not None:
                 result._rgcurve = rgcurve
+            if ranks is not None:
+                result.update_xr_ranks(list(ranks))     # raises ValueError if its length differs from the number of components (#380)
             return result
 
     from molass.LowRank.QuickOptions import fill_doc as _fill_quick_doc
