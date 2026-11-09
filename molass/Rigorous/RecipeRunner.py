@@ -22,32 +22,43 @@ def _trim_kwargs_from_recipe(recipe):
     return kwargs
 
 
+def _bundled_dataset_items():
+    """(name, folder) of the bundled data sets: ``SAMPLE*`` of ``molass_data`` and the upper-case attributes of
+    ``molass_benchmarks`` (e.g. ``PROTEINS5``); packages that are not installed are skipped."""
+    import importlib
+    for package, selects in (("molass_data", lambda n: n.startswith('SAMPLE')),
+                             ("molass_benchmarks", lambda n: n.isupper())):
+        try:
+            module = importlib.import_module(package)
+        except ImportError:
+            continue
+        for name in dir(module):
+            folder = getattr(module, name)
+            if selects(name) and isinstance(folder, str):
+                yield name, folder
+
+
 def bundled_dataset_name(path):
-    """Name of the ``molass_data`` sample (e.g. ``'SAMPLE1'``) that ``path`` is, or ``None``."""
+    """Name of the bundled sample (e.g. ``'SAMPLE1'`` of ``molass_data``, ``'PROTEINS5'`` of
+    ``molass_benchmarks``) that ``path`` is, or ``None``."""
     import os
     if not path:
         return None
-    try:
-        import molass_data
-    except ImportError:
-        return None
     target = os.path.normcase(os.path.abspath(path))
-    for name in dir(molass_data):
-        if name.startswith('SAMPLE'):
-            folder = getattr(molass_data, name)
-            if isinstance(folder, str) and os.path.normcase(os.path.abspath(folder)) == target:
-                return name
+    for name, folder in _bundled_dataset_items():
+        if os.path.normcase(os.path.abspath(folder)) == target:
+            return name
     return None
 
 
 def _bundled_dataset_folder(name):
     import os
-    try:
-        import molass_data
-    except ImportError:
+    if not name:
         return None
-    folder = getattr(molass_data, name, None) if name else None
-    return folder if isinstance(folder, str) and os.path.isdir(folder) else None
+    for item_name, folder in _bundled_dataset_items():
+        if item_name == name:
+            return folder if os.path.isdir(folder) else None
+    return None
 
 
 def resolve_input_folder(analysis_folder, recipe, in_folder=None):

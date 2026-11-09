@@ -219,6 +219,15 @@ def test_resolve_input_folder_bundled_sample_on_another_machine(tmp_path):
     assert resolve_input_folder(bare, {"dataset": "SAMPLE1"}) == molass_data.SAMPLE1
 
 
+def test_resolve_input_folder_benchmark_dataset(tmp_path):
+    molass_benchmarks = pytest.importorskip("molass_benchmarks")
+    from molass.Rigorous.RecipeRunner import resolve_input_folder, bundled_dataset_name
+    assert bundled_dataset_name(molass_benchmarks.PROTEINS5) == "PROTEINS5"
+    bare = str(tmp_path / "bare")
+    os.makedirs(bare)
+    assert resolve_input_folder(bare, {"dataset": "PROTEINS5"}) == molass_benchmarks.PROTEINS5
+
+
 def test_resolve_input_folder_relocated_temp_in_folder(tmp_path):
     from molass.Rigorous.RecipeRunner import resolve_input_folder
     folder = _recipe_folder(tmp_path, stored=r"E:\old_place\analysis\temp_in_folder")

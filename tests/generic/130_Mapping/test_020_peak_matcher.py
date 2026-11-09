@@ -60,12 +60,10 @@ def test_estimate_peak_sigma():
 
 
 def test_proteins5_data_default_mapping():
-    """proteins5 is bundled as molass_data.SAMPLE6."""
-    molass_data = pytest.importorskip("molass_data")
-    if not hasattr(molass_data, "SAMPLE6"):
-        pytest.skip("installed molass_data has no SAMPLE6 (20191006_proteins5)")
+    """proteins5 is bundled as molass_benchmarks.PROTEINS5 (it was molass_data.SAMPLE6 up to molass_data 0.5.0)."""
+    molass_benchmarks = pytest.importorskip("molass_benchmarks")
     from molass.DataObjects import SecSaxsData as SSD
-    mapping = SSD(molass_data.SAMPLE6).estimate_mapping()
+    mapping = SSD(molass_benchmarks.PROTEINS5).estimate_mapping()
     assert list(mapping.xr_peaks) == [561, 648, 760, 825, 878]
     assert list(mapping.uv_peaks) == [603, 696, 812, 890, 937]
     assert mapping.slope == pytest.approx(1.0636, abs=0.005)
