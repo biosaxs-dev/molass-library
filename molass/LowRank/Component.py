@@ -317,6 +317,31 @@ class XrComponent(Component):
             return sg
         else:
             return sg.Rg
+
+    def get_volume_mass(self, qmax_rg=None):
+        """
+        The concentration-free mass of the component from its volume of correlation (molass-library#381).
+
+        Uses the Guinier Rg and I(0) of the component profile and integrates q*I(q) up to ``qmax_rg / Rg``
+        (default 8); no concentration and no Dmax are needed. A protein calibration (Rambo and Tainer 2013):
+        within about 10-17 % of the known mass for compact proteins, not for other particles.
+        See :mod:`molass.SAXS.VolumeMass`.
+
+        Parameters
+        ----------
+        qmax_rg : float, optional
+            The integral runs up to ``qmax_rg / Rg``. Default 8.
+
+        Returns
+        -------
+        molass.SAXS.VolumeMass.VolumeMass
+            With ``mass`` (kDa), ``vc`` (A^2), ``qr``, the q cut used and ``reason`` if it is NaN.
+        """
+        from molass.SAXS.VolumeMass import volume_of_correlation, DEFAULT_QMAX_RG
+        sg = self.get_guinier_object()
+        a = self.get_jcurve_array()
+        return volume_of_correlation(a[:, 0], a[:, 1], sg.Rg, sg.Iz,
+                                     qmax_rg=DEFAULT_QMAX_RG if qmax_rg is None else qmax_rg)
         
     def plot_guinier(self, axes=None, debug=False):
         """

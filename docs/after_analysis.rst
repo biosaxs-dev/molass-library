@@ -137,6 +137,28 @@ Quiet and repeatable runs (scripts, agents, headless)
    molass.version_info()                 # the version in use, where it comes from, and whether the
                                          # installed metadata (pip) agrees with the code
 
+Concentration-free mass of components and frames
+------------------------------------------------
+
+The volume of correlation :math:`V_c = I(0) / \int q\,I(q)\,dq` of a profile gives a mass without a
+concentration and without :math:`D_{max}` (Rambo and Tainer 2013, with the :math:`q` cut at :math:`8/R_g` of
+Grant 2022). It is a calibration on proteins: within about 10-17 % of the known mass for compact proteins
+(aldolase, ovalbumin, glucose isomerase, BSA in the public data; it agrees with the ATSAS program DATVC within about
+10 %), not for other particles. Like the Porod volume it follows :math:`R_g` along the elution for species of equal
+mass whose conformation changes, so a mass curve cannot tell a conformational continuum from species of different
+size.
+
+.. code-block:: python
+
+   corrected = ssd.trimmed_copy().corrected_copy()
+   decomp = corrected.quick_decomposition(num_components=3, rgcurve=corrected.get_rg_curve(), proportions=[1]*3)
+   for comp in decomp.get_xr_components():
+       m = comp.get_volume_mass()          # VolumeMass: .mass (kDa), .vc (A^2), .qr, .q_cut, .reason if NaN
+       print(f"{m.mass:.1f} kDa (Vc {m.vc:.0f} A^2, q cut {m.q_cut:.3f})")
+
+   curve = corrected.get_volume_mass_curve()   # per frame, next to get_rg_curve(); curve.plot() draws mass and Rg
+
+See :mod:`molass.SAXS.VolumeMass` for the formula and its limits.
 Freeze a compact JSON summary
 -----------------------------
 
