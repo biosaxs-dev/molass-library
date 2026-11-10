@@ -1,7 +1,7 @@
 # Sample Datasets of molass_data and molass_benchmarks
 
 Reference for the test datasets included in the `molass_data` package (`SAMPLE1`-`SAMPLE5`) and in the
-`molass_benchmarks` package (data of known composition).
+`molass_benchmarks` package (simulated data with a known truth and a measured protein mixture).
 
 ## Overview
 
@@ -12,7 +12,7 @@ Reference for the test datasets included in the `molass_data` package (`SAMPLE1`
 | SAMPLE3 | GI | 360 | 775 | 0.0075 – 0.4192 | 2 | Interparticle effects (SCD ≈ 5.14) |
 | SAMPLE4 | **simulated** | 220 | 773 | 0.0073 – 0.4075 | 3 | Three overlapping species with a small Rg drop (molass_data 0.6.0 and later) |
 | SAMPLE5 | BSA | — | — | — | — | Measured; minor components |
-| PROTEINS5 (`molass_benchmarks`) | five proteins | 1400 | 1074 | — | 5 | Measured mixture of known composition (was SAMPLE6 of molass_data 0.5.0) |
+| PROTEINS5 (`molass_benchmarks`) | five proteins | 1400 | 1074 | — | 5 | Measured mixture of five proteins, composition not documented (was SAMPLE6 of molass_data 0.5.0) |
 | FOLDUNFOLD_CONTINUUM (`molass_benchmarks`) | **simulated** | 220 | 773 | 0.0073 – 0.4075 | — | Continuum of fold/unfold species, Rg 52 to 26 Å |
 | FOLDUNFOLD_DISCRETE (`molass_benchmarks`) | **simulated** | 220 | 773 | 0.0073 – 0.4075 | 3 | Three discrete fold/unfold species, Rg 48 / 33 / 22 Å |
 
@@ -57,7 +57,7 @@ Reference for the test datasets included in the `molass_data` package (`SAMPLE1`
 
 ## `molass_benchmarks`
 
-Data of known composition, kept out of `molass_data` to keep that package small.
+Benchmark data (simulated data with a known truth, and a measured protein mixture), kept out of `molass_data` to keep that package small.
 
 - **`PROTEINS5`**: measured mixture of five proteins (`20191006_proteins5`); formerly `SAMPLE6` of `molass_data` 0.5.0. Used by the library's peak-matching test (mapping of five peaks).
 - **`FOLDUNFOLD_CONTINUUM`**: simulated; fast-exchange mix of a folded sphere and an unfolded Gaussian chain whose unfolded fraction falls along the elution; one peak with a trailing shoulder (`simulate_sample4_like("fold_unfold_continuum")`).
