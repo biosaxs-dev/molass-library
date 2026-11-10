@@ -16,9 +16,19 @@ def test_sphere_vc_is_exact_and_the_mass_follows_the_formula():
     assert r.vc == pytest.approx(277.78, rel=0.02)           # exact Vc of a sphere of R = 25 A
     assert r.qr == pytest.approx(r.vc**2/ff.sphere_Rg(R))
     assert r.mass == pytest.approx(r.qr/RT_CONSTANT/1000.0)
-    assert r.mass == pytest.approx(32.5, abs=1.0)            # DATVC (ATSAS 3.1.3) gives 32.9 kDa for the same sphere with noise
-    assert r.q_cut == pytest.approx(8/ff.sphere_Rg(R))
+    assert r.mass == pytest.approx(32.9, abs=1.0)            # DATVC (ATSAS 3.1.3) gives 32.9 kDa for the same sphere with noise
+    assert r.q_cut == pytest.approx(0.3)
     assert r and r.reason is None
+
+
+def test_q_cut_options():
+    R = 25.0
+    I = 100*ff.sphere_P(Q, R)
+    rg = ff.sphere_Rg(R)
+    by_rg = volume_of_correlation(Q, I, rg, 100.0, qmax_rg=5.0)
+    assert by_rg.q_cut == pytest.approx(5.0/rg)                                   # 0.258 < 0.3: the smaller limit wins
+    assert volume_of_correlation(Q, I, rg, 100.0, qmax_rg=6.0).q_cut == pytest.approx(0.3)        # 6/Rg = 0.31 > 0.3
+    assert volume_of_correlation(Q, I, rg, 100.0, q_max=0.2).q_cut == pytest.approx(0.2)
 
 
 def test_vc_does_not_depend_on_the_intensity_scale():

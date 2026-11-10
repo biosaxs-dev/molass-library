@@ -141,12 +141,11 @@ Concentration-free mass of components and frames
 ------------------------------------------------
 
 The volume of correlation :math:`V_c = I(0) / \int q\,I(q)\,dq` of a profile gives a mass without a
-concentration and without :math:`D_{max}` (Rambo and Tainer 2013, with the :math:`q` cut at :math:`8/R_g` of
-Grant 2022). It is a calibration on proteins: within about 10-17 % of the known mass for compact proteins
-(aldolase, ovalbumin, glucose isomerase, BSA in the public data; it agrees with the ATSAS program DATVC within about
-10 %), not for other particles. Like the Porod volume it follows :math:`R_g` along the elution for species of equal
-mass whose conformation changes, so a mass curve cannot tell a conformational continuum from species of different
-size.
+concentration and without :math:`D_{max}` (Rambo and Tainer 2013; the integral runs to :math:`q = 0.3`, as in the ATSAS
+program DATVC). It is a calibration on proteins and comes out low: on 11 SASBDB protein entries of 13.7-479 kDa it is
+0.77-0.95 of the sequence mass (median 0.83), the same as DATVC. It is not meant for other particles. Like the Porod
+volume it follows :math:`R_g` along the elution for species of equal mass whose conformation changes, so a mass curve
+cannot tell a conformational continuum from species of different size.
 
 .. code-block:: python
 

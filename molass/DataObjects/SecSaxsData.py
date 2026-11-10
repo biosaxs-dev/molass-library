@@ -1112,15 +1112,16 @@ class SecSaxsData(DidYouMeanMixin):
 
         return cls(object_list=[xr_data, uv_data], trimmed=trimmed)
 
-    def get_volume_mass_curve(self, score_min=0.6, intensity_frac=0.2, qmax_rg=None):
+    def get_volume_mass_curve(self, score_min=0.6, intensity_frac=0.2, q_max=None, qmax_rg=None):
         """Per-frame volume-of-correlation mass along the elution, next to :meth:`get_rg_curve` (molass-library#381).
 
         For every frame with a reliable Guinier fit (score at least ``score_min``) and an I(0) of at least
         ``intensity_frac`` of the maximum, the concentration-free mass of
         :func:`molass.SAXS.VolumeMass.volume_of_correlation` is computed from the frame's own profile.
-        Uses the cached :meth:`get_rg_curve`, so call it on the trimmed and corrected data.
+        Uses the cached :meth:`get_rg_curve`, so call it on the trimmed and corrected data. The integral runs to
+        ``q_max`` (default 0.3 1/A, as in ATSAS DATVC) or, if ``qmax_rg`` is given, to ``min(q_max, qmax_rg / Rg)``.
 
-        The mass is a protein calibration (about 10-17 % on compact proteins) and, like the Porod volume,
+        The mass is a protein calibration (0.77-0.95 of the sequence mass on 11 SASBDB proteins) and, like the Porod volume,
         follows Rg along the elution for non-compact particles: it cannot tell a conformational continuum
         from species of different size.
 
@@ -1129,13 +1130,13 @@ class SecSaxsData(DidYouMeanMixin):
         molass.SAXS.VolumeMass.VolumeMassCurve
             With ``frames``, ``rg``, ``i0``, ``vc``, ``mass`` (kDa) and a ``plot()`` method.
         """
-        from molass.SAXS.VolumeMass import volume_mass_curve, DEFAULT_QMAX_RG
+        from molass.SAXS.VolumeMass import volume_mass_curve, DEFAULT_Q_MAX
         rgcurve = self.get_rg_curve()
         if not rgcurve.has_i0:
             # a curve restored from the disk cache carries no I(0): fit the frames again
             rgcurve = self.xr.compute_rgcurve()
         return volume_mass_curve(self.xr, rgcurve, score_min=score_min, intensity_frac=intensity_frac,
-                                 qmax_rg=DEFAULT_QMAX_RG if qmax_rg is None else qmax_rg)
+                                 q_max=DEFAULT_Q_MAX if q_max is None else q_max, qmax_rg=qmax_rg)
 
     def get_rg_curve(self, progress_cb=None):
         """Compute the per-frame Rg curve from the corrected XR data, with caching.
