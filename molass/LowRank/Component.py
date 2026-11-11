@@ -8,11 +8,12 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import minimize
 import scipy.integrate as integrate
+from molass.Global.DidYouMean import DidYouMeanMixin
 
 SAFE_AVOID_WIDTH = 5
 LOW_VALUE_RATIO = 0.01
 
-class Component:
+class Component(DidYouMeanMixin):
     """
     A class to represent a component.
     It contains the i-curve, j-curve, concentration curve, and related information.

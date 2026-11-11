@@ -8,6 +8,7 @@ import pytest
 from molass.DataObjects.XrData import XrData
 from molass.DataObjects.UvData import UvData
 from molass.Guinier.RgCurve import RgCurve
+from molass.LowRank.Component import XrComponent, UvComponent
 from molass.Global.DidYouMean import suggest_names, DidYouMeanMixin
 
 
@@ -63,3 +64,37 @@ def test_error_inside_a_property_is_not_masked():
 
 def test_suggest_names_prefers_the_hint(xr):
     assert suggest_names(xr, "q_vector")[0] == "qv"
+
+
+# components (molass-library#385)
+@pytest.fixture
+def component():
+    x = np.arange(20.0)
+    icurve = np.array([x, np.exp(-0.5*((x - 9)/3.0)**2)])
+    q = np.linspace(0.01, 0.2, 10)
+    jcurve = np.array([q, np.exp(-q**2*900/3), np.full(10, 0.01)]).T
+    return XrComponent(icurve, jcurve, np.ones(20))
+
+
+@pytest.mark.parametrize("guess, target", [("get_rg", "compute_rg"), ("rg", "compute_rg"),
+                                           ("radius_of_gyration", "compute_rg"),
+                                           ("get_peak_top_x", "peak_index"), ("peak_position", "peak_index"),
+                                           ("get_mass", "get_volume_mass"), ("get_guinier", "get_guinier_object")])
+def test_component_guesses_name_the_working_attribute(component, guess, target):
+    with pytest.raises(AttributeError, match=rf"no attribute '{guess}'\. Did you mean: .*'{target}'"):
+        getattr(component, guess)
+
+
+def test_uv_component_has_the_hints_too():
+    x = np.arange(10.0)
+    comp = UvComponent(np.array([x, x]), np.array([x, x, x]).T, np.ones(10))
+    with pytest.raises(AttributeError, match="Did you mean: .*'peak_index'"):
+        comp.peak_position
+
+
+def test_component_still_behaves_as_before(component):
+    assert not hasattr(component, "get_rg") and getattr(component, "get_rg", 1) == 1
+    assert component.peak_index == 9 and component.get_xy()[0][0] == 0
+    assert copy.deepcopy(component).peak_index == 9
+    assert pickle.loads(pickle.dumps(component)).peak_index == 9
+    assert component.sg is None                      # attributes set in __init__ are plain attributes
