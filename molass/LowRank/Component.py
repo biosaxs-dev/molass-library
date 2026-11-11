@@ -81,6 +81,16 @@ class Component:
             self._icurve = Curve(*self.icurve_array[0:2], type='i')
         return self._icurve
 
+    def get_xy(self):
+        """
+        Returns ``(x, y)`` of the i-curve (elution), the same as ``get_icurve().get_xy()``.
+
+        Returns
+        -------
+        x, y : tuple of ndarray
+        """
+        return self.get_icurve().get_xy()
+
     def get_jcurve(self):
         """
         Returns the j-curve object instead of the array.

@@ -336,7 +336,12 @@ class SecSaxsData(DidYouMeanMixin):
                 A PlotResult object which contains the following attributes.
 
                 fig: Figure
-                axes: Axes
+                axes: tuple of three Axes: ``(xr, uv_spectrum, xr_spectrum)``. ``axes[0]`` is the elution
+                    panel (XR curve), ``axes[1]`` the UV absorbance vs wavelength, ``axes[2]`` the XR
+                    scattering vs Q. The UV elution curve is drawn on a twin of ``axes[0]`` laid over
+                    it: it is not in ``axes`` but is ``uv_ax`` below (also ``fig.axes[1]``), and mouse
+                    events over the elution panel are reported for that twin, not for ``axes[0]``.
+                uv_ax: Axes, the twin y-axis of ``axes[0]`` that carries the mapped UV elution curve
                 mapping: MappingInfo (if available)
                 xr_curve: Curve (if available)
                 uv_curve: Curve (if available)

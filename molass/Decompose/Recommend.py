@@ -248,7 +248,7 @@ def recommend_decomposition_options(xr_data,
     if is_overlapping:
         opts = {'num_components': n, 'proportions': [1] * n}
     else:
-        opts = {'num_components': n, 'xr_peakpositions': peak_positions}
+        opts = {'num_components': n, 'xr_peakpositions': [int(p) for p in peak_positions]}   # a list, like quick_decomposition takes it
 
     if detect_interparticle and _has_interparticle_effects(
             xr_data, suppression_threshold=lowq_suppression_threshold):
@@ -312,7 +312,7 @@ def restrict_to_confirmed(opts, confirmation, min_mapping_peaks=MIN_MAPPING_PEAK
         return opts
     opts = dict(opts)
     opts['num_components'] = n_confirmed
-    opts['xr_peakpositions'] = confirmation.confirmed_positions
+    opts['xr_peakpositions'] = [int(p) for p in confirmation.confirmed_positions]
     if 'ranks' in opts:
         opts['ranks'] = [2] * n_confirmed
     return opts

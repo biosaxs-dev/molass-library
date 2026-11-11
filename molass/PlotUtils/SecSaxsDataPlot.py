@@ -153,6 +153,7 @@ def plot_compact_impl(ssd, **kwargs):
     ax1 = fig.add_subplot(gs[:, 0])
     ax1.plot(x, xr_curve.y, color="orange", alpha=0.5, label=xr_label)
     axt = ax1.twinx()
+    uv_ax = axt     # the twin that carries the UV elution; mouse events over the elution panel go to it
     axt.grid(False)
     uv_wl = ssd.uv.pickat
     axt.plot(mp_curve.x, mp_curve.y, linestyle=":", color="C0", label=f"mapped UV Elution at wavelength={uv_wl}")
@@ -260,6 +261,7 @@ def plot_compact_impl(ssd, **kwargs):
 
     from molass.PlotUtils.PlotResult import PlotResult
     return PlotResult(fig, (ax1, ax2, ax3),
+                      uv_ax=uv_ax,
                       mapping=mapping, xr_curve=xr_curve, uv_curve=uv_curve, mp_curve=mp_curve,
                       moment=moment,
                       uv_pickat=uv_wl,
