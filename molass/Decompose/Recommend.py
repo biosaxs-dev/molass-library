@@ -5,6 +5,7 @@ This module is the backend for :meth:`SecSaxsData.recommend_decomposition_option
 Keeping the logic here allows it to grow (multi-channel heuristics, per-sample
 tuning, custom strategies) without cluttering the top-level data object.
 """
+from typing import NamedTuple
 import numpy as np
 
 # ---------------------------------------------------------------------------
@@ -253,4 +254,65 @@ def recommend_decomposition_options(xr_data,
             xr_data, suppression_threshold=lowq_suppression_threshold):
         opts['ranks'] = [2] * n
 
+    return opts
+
+
+# ---------------------------------------------------------------------------
+# Peaks confirmed by the XR/UV mapping (molass-library#382)
+# ---------------------------------------------------------------------------
+
+CONFIRM_TOLERANCE_FRAMES = 10   # a detected peak is confirmed when a mapping peak lies this close (PROTEINS5 needs 7)
+MIN_MAPPING_PEAKS = 3           # the confirmed peaks replace the detected ones only if the mapping rests on this many:
+                                # with fewer (SAMPLE1: 2, SAMPLE5: 2) an unconfirmed peak is often a real component
+                                # overlapping a confirmed one (SAMPLE1 at frame 110), with more (PROTEINS5: 5) it is spurious
+
+
+class PeakConfirmation(NamedTuple):
+    """The detected XR peaks and which of them the XR/UV mapping also sees.
+
+    Attributes
+    ----------
+    positions : np.ndarray of int
+        Detected peak positions (frame numbers), as ``recommend_decomposition_options()`` gives them
+        (one per cluster of overlapping EGH peaks).
+    confirmed : np.ndarray of bool
+        ``confirmed[i]`` is True when a peak of the XR/UV mapping lies within ``tolerance`` frames of ``positions[i]``.
+    num_mapping_peaks : int
+        The number of peaks the mapping rests on (0 without UV data or with an implausible mapping).
+    tolerance : int
+        The tolerance in frames.
+    """
+    positions: np.ndarray
+    confirmed: np.ndarray
+    num_mapping_peaks: int
+    tolerance: int
+
+    @property
+    def confirmed_positions(self):
+        return self.positions[self.confirmed]
+
+
+def confirm_peaks(positions, mapping_peak_frames, tolerance=CONFIRM_TOLERANCE_FRAMES):
+    """Flag the detected ``positions`` (frames) that a peak in ``mapping_peak_frames`` lies close to."""
+    positions = np.asarray([] if positions is None else positions, dtype=int)
+    frames = np.asarray(mapping_peak_frames, dtype=float)
+    if len(frames) == 0:
+        confirmed = np.zeros(len(positions), dtype=bool)
+    else:
+        confirmed = np.array([bool(np.any(np.abs(frames - p) <= tolerance)) for p in positions], dtype=bool)
+    return PeakConfirmation(positions, confirmed, len(frames), int(tolerance))
+
+
+def restrict_to_confirmed(opts, confirmation, min_mapping_peaks=MIN_MAPPING_PEAKS):
+    """``opts`` of ``recommend_decomposition_options()`` with the unconfirmed peaks left out, when the mapping
+    rests on at least ``min_mapping_peaks`` peaks and at least two peaks are confirmed; otherwise ``opts`` as it is."""
+    n_confirmed = int(confirmation.confirmed.sum())
+    if ('xr_peakpositions' not in opts or confirmation.num_mapping_peaks < min_mapping_peaks
+            or n_confirmed < 2 or n_confirmed == len(confirmation.positions)):
+        return opts
+    opts = dict(opts)
+    opts['num_components'] = n_confirmed
+    opts['xr_peakpositions'] = confirmation.confirmed_positions
+    if 'ranks' in opts:
+        opts['ranks'] = [2] * n_confirmed
     return opts

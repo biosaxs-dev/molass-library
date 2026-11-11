@@ -1264,7 +1264,7 @@ class SecSaxsData(DidYouMeanMixin):
         return compute_homogeneity(self, pairs=pairs, delta=delta, q1=q1, q2=q2, cores=cores,
                                    rgcurve=rgcurve, min_score=min_score, mapping=mapping, title=title)
 
-    def recommend_decomposition_options(self, egh_overlap_threshold=1.3):
+    def recommend_decomposition_options(self, egh_overlap_threshold=1.3, confirm_with_uv=False, uv_tolerance=10):
         """Recommend keyword arguments for ``quick_decomposition()`` by detecting peaks.
 
         Uses EGH peeling to identify elution components robustly.  Consecutive
@@ -1284,6 +1284,16 @@ class SecSaxsData(DidYouMeanMixin):
         egh_overlap_threshold : float, optional
             EGH peak pairs with spacing/sigma_sum below this value are merged
             into one component.  Default 1.3.
+        confirm_with_uv : bool, optional
+            If True, leave out the detected peaks that the XR/UV mapping does not
+            also see (see :meth:`get_confirmed_peaks`), but only when the mapping rests
+            on at least 3 matched peaks and at least two peaks are confirmed. Well
+            separated proteins such as ``molass_benchmarks.PROTEINS5`` then give their
+            five peaks instead of seven (two spurious ones). With fewer mapping peaks an
+            unconfirmed peak is often a real component overlapping a confirmed one
+            (SAMPLE1), so the detected peaks stay. Default False.
+        uv_tolerance : int, optional
+            Tolerance in frames of ``confirm_with_uv``. Default 10.
 
         Returns
         -------
@@ -1294,9 +1304,56 @@ class SecSaxsData(DidYouMeanMixin):
         --------
         recommend_decomposition : convenience wrapper that calls this method
             and then ``quick_decomposition(**opts)``.
+        get_confirmed_peaks : the detected peaks with their confirmation by the mapping.
         """
         from molass.Decompose.Recommend import recommend_decomposition_options as _impl
-        return _impl(self.xr, egh_overlap_threshold=egh_overlap_threshold)
+        opts = _impl(self.xr, egh_overlap_threshold=egh_overlap_threshold)
+        if confirm_with_uv and 'xr_peakpositions' in opts:
+            from molass.Decompose.Recommend import confirm_peaks, restrict_to_confirmed
+            confirmation = confirm_peaks(opts['xr_peakpositions'], self._get_mapping_peak_frames(), uv_tolerance)
+            opts = restrict_to_confirmed(opts, confirmation)
+        return opts
+
+    def _get_mapping_peak_frames(self):
+        """XR frames of the peaks the XR/UV mapping rests on; empty without UV data or with an implausible mapping."""
+        if self.uv is None:
+            return np.array([])
+        mapping = self.get_mapping()
+        if not mapping.is_plausible():
+            return np.array([])
+        return np.asarray(mapping.xr_peak_frames)
+
+    def get_confirmed_peaks(self, tol=10, egh_overlap_threshold=1.3):
+        """ssd.get_confirmed_peaks(tol=10)
+
+        The detected XR peaks, each with the information whether the XR/UV mapping also sees a peak
+        within *tol* frames of it.
+
+        The detected peaks are those of :meth:`recommend_decomposition_options` (for the corrected data
+        of PROTEINS5: 500, 562, 648, 758, 827, 871, 1103); the mapping peaks are
+        ``estimate_mapping().xr_peak_frames`` (561, 648, 760, 825, 878). A peak seen in both is a
+        well supported component (the five proteins), the others (500, 1103) are weak candidates.
+        Either set can be passed to ``quick_decomposition(xr_peakpositions=...)`` (with
+        ``num_components`` equal to their number); the confirmed ones are the safer start for well
+        separated peaks. For overlapping species an unconfirmed peak can still be a real component.
+
+        Parameters
+        ----------
+        tol : int, optional
+            Tolerance in frames. Default 10.
+        egh_overlap_threshold : float, optional
+            See :meth:`recommend_decomposition_options`.
+
+        Returns
+        -------
+        PeakConfirmation
+            Named tuple ``(positions, confirmed, num_mapping_peaks, tolerance)``;
+            ``confirmed_positions`` gives the confirmed positions. Without UV data (or with an
+            implausible mapping) no peak is confirmed and ``num_mapping_peaks`` is 0.
+        """
+        from molass.Decompose.Recommend import _count_components_by_egh_peeling, confirm_peaks
+        _, positions, _ = _count_components_by_egh_peeling(self.xr, egh_overlap_threshold=egh_overlap_threshold)
+        return confirm_peaks(positions, self._get_mapping_peak_frames(), tol)
 
     def recommend_decomposition(self, **kwargs):
         """Automatically detect peaks and return a decomposition.
@@ -1337,7 +1394,10 @@ class SecSaxsData(DidYouMeanMixin):
         1. **Default** (no extra keywords) — greedy peak-recognition.
         2. **Proportional** (``proportions``) — area-ratio slicing.
         3. **Positioned** (``xr_peakpositions``) — peaks pinned to specified frame positions.
-
+           ``num_components`` must equal their number. Either the detected peaks
+           (``recommend_decomposition_options()['xr_peakpositions']``) or the ones the XR/UV mapping
+           also sees (``get_confirmed_peaks().confirmed_positions``) can be passed; for well separated
+           peaks the confirmed ones are the safer start.
         ``proportions`` and ``xr_peakpositions`` are mutually exclusive.
 
         Parameters
