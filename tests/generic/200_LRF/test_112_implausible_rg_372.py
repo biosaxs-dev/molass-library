@@ -16,14 +16,48 @@ def _implausible_messages(records):
     return [str(r.message) for r in records if "physically implausible" in str(r.message)]
 
 
-def test_a_degenerate_continuum_decomposition_warns_with_default_proportions():
-    ssd = _continuum_ssd()
+class _Component:
+    def __init__(self, rg):
+        self.rg = rg
+
+    def get_guinier_object(self):
+        return type("Guinier", (), {"Rg": self.rg})()
+
+
+class _Decomposition:
+    xr_icurve = None
+
+    def __init__(self, rgs):
+        self.rgs = rgs
+
+    def get_xr_components(self):
+        return [_Component(rg) for rg in self.rgs]
+
+
+def _warnings_for(monkeypatch, rgs, span=(27.0, 30.0)):
+    from molass.LowRank import QuickImplement
+    monkeypatch.setattr(QuickImplement, "data_rg_range", lambda ssd, icurve: span)
     with warnings.catch_warnings(record=True) as rec:
         warnings.simplefilter("always")
-        ssd.quick_decomposition(num_components=3)
-    messages = _implausible_messages(rec)
+        QuickImplement.warn_on_implausible_component_rg(None, _Decomposition(rgs))
+    return _implausible_messages(rec)
+
+
+# The greedy peak recognition of the simulated continuum differs between machines (Rg 35.8 / 7.0 / 17.6 where the
+# issue was found, 32.3 / 30.3 / 16.8 on another), so the warning is tested on the Rg values themselves.
+def test_a_component_far_outside_the_data_rg_warns(monkeypatch):
+    messages = _warnings_for(monkeypatch, [35.8, 7.0, 17.6])
     assert len(messages) == 1 and "proportions=[1]*k" in messages[0]
-    assert "the data Rg is" in messages[0]
+    assert "component(s) 2 (Rg=7.0)" in messages[0] and "the data Rg is 27-30" in messages[0]
+
+
+def test_a_component_without_guinier_rg_warns(monkeypatch):
+    messages = _warnings_for(monkeypatch, [30.0, float("nan"), 28.0])
+    assert len(messages) == 1 and "2 (no Guinier Rg)" in messages[0]
+
+
+def test_components_within_half_to_double_the_data_rg_do_not_warn(monkeypatch):
+    assert _warnings_for(monkeypatch, [32.3, 30.3, 16.8]) == []
 
 
 def test_equal_proportions_do_not_warn_on_the_same_data():

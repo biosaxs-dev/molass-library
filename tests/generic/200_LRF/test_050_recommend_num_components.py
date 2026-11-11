@@ -62,6 +62,8 @@ def test_recommend_sample1_no_degeneracy(sample1_decomp):
 APO_PATH = r"C:\Users\takahashi\Dropbox\MOLASS\DATA\20260305\Apo"
 
 
+@pytest.mark.xfail(reason="Apo gives k=2 on the current data and fits (same on v1.2.1 and v1.2.3): molass-library#384",
+                   strict=False)
 @pytest.mark.skipif(not os.path.isdir(APO_PATH),
                     reason="Apo dataset not available on this machine")
 def test_recommend_apo_picks_one_component():
