@@ -163,7 +163,7 @@ def clean_signals(species, uv_late=0.0, slope=SLOPE, intercept=INTERCEPT,
 
 def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept=INTERCEPT,
                  qv=QV, wv=WV, xr_frames=XR_FRAMES, uv_frames=UV_FRAMES,
-                 xr_sigma=None, xr_noise_ratio=None, uv_sigma=None, trimmed=True):
+                 xr_sigma=None, xr_noise_ratio=None, uv_sigma=None, trimmed=True, xr_error_model=None):
     """A SecSaxsData of simulated data with known truth, built with ``SecSaxsData.from_arrays``.
 
     Parameters
@@ -193,6 +193,13 @@ def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept
         Noise of the UV intensities (default ``SIGMA_UV``), multiplied by ``noise``.
     trimmed : bool, optional
         Mark the data as trimmed (default). Use ``False`` to let ``trimmed_copy()`` trim them.
+    xr_error_model : callable or "sedlak", optional
+        Photon-counting error model of the XR data (molass-library#390): a function ``f(I, qv)`` that returns the
+        standard error with the shape of the noise-free intensity matrix ``I`` (for example
+        ``functools.partial(molass.SAXS.ErrorModel.sedlak_sigma, scale=30)``), or ``"sedlak"`` for
+        :func:`molass.SAXS.ErrorModel.sedlak_sigma` with its default synchrotron values. The sigma is both the noise
+        (times ``noise``) and the stated error; it replaces ``xr_sigma`` and ``xr_noise_ratio`` (giving them as well
+        is an error). The error then follows the intensity of each frame instead of being the same for all frames.
 
     Returns
     -------
@@ -205,12 +212,22 @@ def simulate_ssd(species, uv_late=0.0, noise=1.0, seed=0, slope=SLOPE, intercept
     from molass.DataObjects import SecSaxsData as SSD
     I, A = clean_signals(species, uv_late, slope, intercept, qv, wv, xr_frames, uv_frames)
     rng = np.random.default_rng(seed)
-    sigma = SIGMA_XR if xr_sigma is None else np.asarray(xr_sigma, dtype=float)
-    ratio = 1.0 if xr_noise_ratio is None else np.asarray(xr_noise_ratio, dtype=float)
-    if np.ndim(sigma) == 1:
-        sigma = sigma[:, None]
-    if np.ndim(ratio) == 1:
-        ratio = ratio[:, None]
+    if xr_error_model is not None:
+        if xr_sigma is not None or xr_noise_ratio is not None:
+            raise ValueError("xr_error_model replaces xr_sigma and xr_noise_ratio; give one or the other")
+        if xr_error_model == "sedlak":
+            from molass.SAXS.ErrorModel import sedlak_sigma as xr_error_model
+        sigma = np.asarray(xr_error_model(I, np.asarray(qv)), dtype=float)
+        if sigma.shape != I.shape:
+            raise ValueError(f"xr_error_model must return an array of the shape of the intensity matrix {I.shape}")
+        ratio = 1.0
+    else:
+        sigma = SIGMA_XR if xr_sigma is None else np.asarray(xr_sigma, dtype=float)
+        ratio = 1.0 if xr_noise_ratio is None else np.asarray(xr_noise_ratio, dtype=float)
+        if np.ndim(sigma) == 1:
+            sigma = sigma[:, None]
+        if np.ndim(ratio) == 1:
+            ratio = ratio[:, None]
     I = I + noise * sigma * ratio * rng.standard_normal(I.shape)
     A = A + noise * (SIGMA_UV if uv_sigma is None else uv_sigma) * rng.standard_normal(A.shape)
     E = np.broadcast_to(max(noise, 1e-3) * sigma, I.shape).copy()
