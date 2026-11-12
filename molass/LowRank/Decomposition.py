@@ -1743,6 +1743,12 @@ class Decomposition(DidYouMeanMixin):
             a finished (or running) analysis folder in one call -- best
             result, its SV, jobs, rejected iterations, recipe -- use
             ``molass.load_analysis(analysis_folder)``.
+
+            Settings and logs are kept in ``~/.KekTools/<script name>``, so two
+            concurrent runs of one script share them.  Set the environment variable
+            ``MOLASS_SETTINGS_NAME`` to a distinct folder name per run (for example
+            ``MOLASS_SETTINGS_NAME=job2 python run.py``) to keep them apart; needs
+            ``molass-legacy`` with the variable support (molass-library#393).
         method : str, optional
             The optimization algorithm to use. Default is ``'BH'``.
 

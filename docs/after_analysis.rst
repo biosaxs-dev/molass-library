@@ -138,6 +138,13 @@ Quiet and repeatable runs (scripts, agents, headless)
    molass.version_info()                 # the version in use, where it comes from, and whether the
                                          # installed metadata (pip) agrees with the code
 
+Parallel runs of one script keep their settings and logs in ``~/.KekTools/<script name>``, so they collide.
+Give each run its own folder name with the environment variable ``MOLASS_SETTINGS_NAME``:
+
+.. code-block:: powershell
+
+   $env:MOLASS_SETTINGS_NAME = "job2"; python run_optimization.py
+
 Concentration-free mass of components and frames
 ------------------------------------------------
 
