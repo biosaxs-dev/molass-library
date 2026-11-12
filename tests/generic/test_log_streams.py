@@ -41,7 +41,9 @@ def test_quiet_mode_silences_the_library_log_output():
 
 
 def test_progress_bars_are_written_to_stdout():
-    r = _run("from molass.Global.Tqdm import tqdm\n"
+    r = _run("import molass\n"
+             "molass.set_progress(True)     # piped output: bars are off by default (#388)\n"
+             "from molass.Global.Tqdm import tqdm\n"
              "for _ in tqdm(range(3), desc='progress-check'):\n"
              "    pass\n")
     assert "progress-check" in r.stdout and r.stderr == ""

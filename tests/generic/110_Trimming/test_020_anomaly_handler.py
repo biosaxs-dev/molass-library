@@ -132,7 +132,10 @@ def test_option_is_on_by_default():
 def test_20200123_3_mapping_and_trimming():
     from molass.Local import get_local_settings
     from molass.DataObjects import SecSaxsData as SSD
-    path = os.path.join(get_local_settings()['DATA_ROOT_FOLDER'], "20200123_3")
+    try:
+        path = os.path.join(get_local_settings()['DATA_ROOT_FOLDER'], "20200123_3")
+    except (FileNotFoundError, KeyError):
+        pytest.skip("no local settings with DATA_ROOT_FOLDER")
     if not os.path.exists(path):
         pytest.skip("20200123_3 is not available")
 

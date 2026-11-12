@@ -75,6 +75,11 @@ python run_tests.py
 # Specific category
 pytest tests/tutorial/ -v
 
+# Fast generic subset (no local data; what CI runs on every push, #389)
+pytest tests/generic -m fast
+
+# Before a release: the full suite (about 40 minutes, needs the local data sets)
+pytest tests/tutorial tests/generic
 # With coverage
 pytest --cov=molass tests/
 

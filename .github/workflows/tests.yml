@@ -5,12 +5,16 @@ on:
     branches: [main]
     paths:
       - 'molass/**'
-      - 'tests/tutorial/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/tests.yml'
   pull_request:
     branches: [main]
     paths:
       - 'molass/**'
-      - 'tests/tutorial/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/tests.yml'
   workflow_dispatch:
 
 jobs:
@@ -38,3 +42,7 @@ jobs:
       - name: Run tutorial tests
         run: |
           pytest tests/tutorial/ -v --tb=short
+
+      - name: Run fast generic tests
+        run: |
+          pytest tests/generic -m fast -v --tb=short

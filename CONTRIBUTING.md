@@ -25,7 +25,17 @@ pip install molass_data
 
 # 3. Run the tutorial tests
 pytest tests/tutorial/ -v
+
+# 4. Run the fast generic tests (seconds to minutes, no local data; CI runs this on every push)
+pytest tests/generic -m fast
+
+# 5. Before a release: the full suite (about 40 minutes; needs the local data sets, so run it on the
+#    maintainer's machine; tests without data are skipped)
+pytest tests/tutorial tests/generic
 ```
+
+A test module of `tests/generic` that runs in seconds without local data is added to the `fast` subset
+in `tests/generic/conftest.py`.
 
 ## Reporting issues
 

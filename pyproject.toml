@@ -81,6 +81,7 @@ pythonpath = [
   "../molass-legacy",
 ]
 markers = [
+    "fast: runs in seconds and needs no local data (tests/generic/conftest.py); CI runs it on every push: pytest tests/generic -m fast",
     "slow: builds a full legacy optimizer and/or runs real BH/DE (~30s-several min per test); skip with -m 'not slow'",
 ]
 env = [
