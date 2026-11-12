@@ -161,7 +161,9 @@ def version_info():
 def set_progress(enabled):
     """Switch the progress bars of molass on or off for this process (molass-library#375).
 
-    The environment variable ``MOLASS_PROGRESS=0`` does the same from the start. Default: on.
+    The environment variable ``MOLASS_PROGRESS=0`` does the same from the start. Default: on in a
+    terminal or a Jupyter kernel, off when the output is not a terminal (molass-library#388);
+    ``set_progress(True)`` / ``MOLASS_PROGRESS=1`` forces them on, ``set_progress(None)`` restores the default.
     """
     from molass.Global.Tqdm import set_progress as _set_progress
     _set_progress(enabled)

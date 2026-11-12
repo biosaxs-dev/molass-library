@@ -131,7 +131,8 @@ Quiet and repeatable runs (scripts, agents, headless)
 .. code-block:: python
 
    import molass
-   molass.set_progress(False)            # no progress bars (or the environment variable MOLASS_PROGRESS=0)
+   molass.set_progress(False)            # no progress bars (or the environment variable MOLASS_PROGRESS=0);
+                                         # by default they are shown only in a terminal or a notebook
    molass.set_cache_dir("C:/cache")      # opt-in: reuse per-frame Rg curves of the same data in later
                                          # processes (or MOLASS_CACHE_DIR); keyed by data and trimming
    molass.version_info()                 # the version in use, where it comes from, and whether the
