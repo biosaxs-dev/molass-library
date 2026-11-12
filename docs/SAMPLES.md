@@ -14,7 +14,7 @@ Reference for the test datasets included in the `molass_data` package (`SAMPLE1`
 | SAMPLE5 | BSA | — | — | — | — | Measured; minor components |
 | PROTEINS5 (`molass_benchmarks`) | five proteins | 1400 | 1074 | — | 5 | Measured mixture of known composition (was SAMPLE6 of molass_data 0.5.0) |
 | FOLDUNFOLD_CONTINUUM (`molass_benchmarks`) | **simulated** | 220 | 773 | 0.0073 – 0.4075 | — | Continuum of fold/unfold species, Rg 52 to 26 Å |
-| FOLDUNFOLD_DISCRETE (`molass_benchmarks`) | **simulated** | 220 | 773 | 0.0073 – 0.4075 | 3 | Three discrete fold/unfold species, Rg 48 / 33 / 22 Å |
+| FOLDUNFOLD_DISCRETE (`molass_benchmarks`) | **simulated** | 220 | 773 | 0.0073 – 0.4075 | 3 | Three discrete fold/unfold species, Rg 47 / 34 / 22 Å |
 
 ## Detailed Descriptions
 
