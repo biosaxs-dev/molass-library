@@ -77,6 +77,20 @@ def test_simulate_ssd_error_and_scatter_options():
     assert np.std(ssd.xr.M[5:] - I[5:]) > 0.5*np.median(sigma)
 
 
+def test_sample4_like_noise_is_the_sedlak_model_and_no_measured_table_remains():
+    import molass.Testing.Sample4Like as s4
+    assert not hasattr(s4, "error_profile") and not hasattr(s4, "noise_ratio")        # molass-library#391
+    ssd = simulate_sample4_like("tails3", noise=1.0, seed=0)
+    E = ssd.xr.E
+    assert E.shape == ssd.xr.M.shape
+    clean = simulate_sample4_like("tails3", noise=0.0).xr.M
+    assert (ssd.xr.M - clean).std()/E.mean() > 0.2                                    # real scatter, not a flat error
+    z = (ssd.xr.M - clean)/E
+    assert z.std() == pytest.approx(1.0, abs=0.02)                                    # the stated error is the noise
+    assert E[:, 83].mean() > E[:, 5].mean()                                           # it follows the intensity of each frame
+    assert simulate_sample4_like("tails3", scale=100.0).xr.E[:, 83].mean() < E[:, 83].mean()        # more counts, smaller error
+
+
 def test_sample4_like_tails3_truth_and_geometry():
     species = sample4_like_species("tails3")
     assert [s.center for s in species] == [81.0, 95.0, 115.0]
