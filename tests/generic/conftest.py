@@ -26,6 +26,7 @@ FAST_MODULES = {
     "130_Mapping/test_060_simulator",
     "130_Mapping/test_070_peak_core_valley",
     "130_Mapping/test_080_mapping_quality_371",
+    "130_Mapping/test_090_simulate_tiny_387",
     "200_LRF/test_020_BoundedLrf",
     "200_LRF/test_060_ai_friendliness_343_347",
     "200_LRF/test_060_proportional_degenerate",
