@@ -349,6 +349,77 @@ class Decomposition(DidYouMeanMixin):
         M, C, P = self.get_xr_matrices(debug=debug)[0:3]
         return float(np.linalg.norm(M - P @ C) / np.linalg.norm(M))
 
+    def get_residuals(self, error_weighted=True, min_fraction=0.05):
+        """Residual of the **measured** XR matrix against the decomposition (molass-library#392).
+
+        :meth:`get_xr_matrices` returns the rank-k denoised matrix, so its residual is white by construction and cannot
+        tell whether k is enough. Here the elution curves ``C`` of the decomposition are used with the scattering
+        profiles ``P`` solved by least squares against the measured matrix (``xr.M``, over the frames above
+        ``min_fraction`` of the strongest frame), and the residual is ``xr.M - P @ C``.
+
+        Parameters
+        ----------
+        error_weighted : bool, optional
+            Divide by the stated error (default), i.e. return the residual in units of the stated error;
+            ``False`` gives it in the units of the intensities. Needs ``xr.E`` when ``True``.
+        min_fraction : float, optional
+            Frames weaker than this fraction of the strongest frame are left out of the least-squares fit of ``P``
+            (the residual is still returned for every frame).
+
+        Returns
+        -------
+        numpy.ndarray, shape (n_q, n_frames)
+
+        See Also
+        --------
+        get_residual_report : chi2, Durbin-Watson and a Shannon-limited AIC built on it.
+        """
+        from molass.LowRank.ResidualReport import compute_residuals
+        return compute_residuals(self, error_weighted=error_weighted, min_fraction=min_fraction)[0]
+
+    def get_residual_report(self, dmax=None, min_fraction=0.05, params_per_curve=4):
+        """chi2, Durbin-Watson and a Shannon-limited AIC of the residual against the measured data (molass-library#392).
+
+        Built on :meth:`get_residuals` over the frames above ``min_fraction`` of the strongest frame. Compare the
+        reports of decompositions of the same data with different ``num_components`` (or models): the smallest k
+        whose residual is white (Durbin-Watson along the elution about 2, chi2 about 1) is enough, and
+        ``report_k.delta_aic(report_k_plus_1)`` is positive while the smaller model is preferred.
+
+        Notes
+        -----
+        * Durbin-Watson is scale-free: the stated error x 0.5 or x 2 leaves it unchanged (chi2 changes by 4).
+          Along q, measured reduced data have a plateau of about 1.8 at any rank (neighbouring points are
+          correlated); along the elution about 2 is the reference.
+        * The AIC counts the data as ``Ns = qmax * dmax / pi`` independent values per profile and not every q point:
+          counting every q point favours k + 1 by hundreds of AIC units whatever the data (oversampling paradox,
+          Rambo and Tainer 2025). ``aic_all_points`` shows that version for contrast.
+        * Validated on simulated data only (molass-researcher experiment 58); not yet on real analyses.
+
+        Parameters
+        ----------
+        dmax : float, optional
+            Maximum particle dimension in Angstrom for the Shannon number. Default: 3.5 times the largest
+            component Rg (``report.dmax_assumed`` is then ``True``); give the same ``dmax`` to the reports you compare.
+        min_fraction : float, optional
+        params_per_curve : int, optional
+            Parameters of the elution curve of one component (4 for EGH).
+
+        Returns
+        -------
+        molass.LowRank.ResidualReport.ResidualReport
+
+        Examples
+        --------
+        ::
+
+            r3 = decomp3.get_residual_report(dmax=110)
+            r4 = decomp4.get_residual_report(dmax=110)
+            print(r3, r4)
+            r3.delta_aic(r4)       # > 0: k = 3 is enough
+        """
+        from molass.LowRank.ResidualReport import compute_residual_report
+        return compute_residual_report(self, dmax=dmax, min_fraction=min_fraction, params_per_curve=params_per_curve)
+
     def get_kratky_shape_match(self, debug=False, qrg_window=None):
         """Compute a components x reference-shapes Kratky shape-match score matrix.
 

@@ -125,6 +125,28 @@ The LRF residual is the relative Frobenius-norm reconstruction error
 
    residual = result.get_lrf_residual()
 
+Residual against the measured data: is k enough?
+------------------------------------------------
+
+``get_xr_matrices()`` returns the rank-k denoised matrix, so its residual is white by construction.
+``get_residuals()`` solves the scattering profiles against the **measured** matrix and returns the residual in units of the
+stated error; ``get_residual_report()`` adds chi2, the Durbin-Watson statistic (DW, 2 for white residuals) along q and along
+the elution, and a Shannon-limited AIC (data counted as ``qmax * dmax / pi`` values per profile, not every q point).
+
+.. code-block:: python
+
+   Z = decomp.get_residuals()                        # (n_q, n_frames), in units of the stated error
+   r3 = decomp3.get_residual_report(dmax=110)        # give the same dmax to the reports you compare
+   r4 = decomp4.get_residual_report(dmax=110)
+   print(r3)                                         # chi2, DW along q / the elution, Shannon AIC
+   r3.delta_aic(r4)                                  # > 0: k = 3 is enough, k = 4 does not pay
+
+DW does not depend on the scale of the stated error (x 0.5 or x 2 leaves it unchanged, chi2 changes by 4), so it still works
+when the stated error is wrong. Measured reduced data show a DW plateau of about 1.8 along q at every rank (neighbouring
+points are correlated): compare with that plateau, and use the elution direction (about 2) as the reference. Counting every
+q point as independent favours k + 1 by hundreds of AIC units whatever the data (oversampling paradox); ``aic_all_points``
+shows that version for contrast. Validated on simulated data only so far (molass-researcher experiment 58).
+
 Quiet and repeatable runs (scripts, agents, headless)
 -----------------------------------------------------
 
