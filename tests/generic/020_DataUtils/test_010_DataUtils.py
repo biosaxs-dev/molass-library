@@ -5,7 +5,11 @@ import os
 from molass import get_version
 get_version(toml_only=True)     # to ensure that the current repository is used
 from molass.Local import get_local_settings
-local_settings = get_local_settings()
+try:
+    local_settings = get_local_settings()
+except FileNotFoundError:
+    import pytest
+    pytest.skip("no local_settings.py: needs the local data sets", allow_module_level=True)
 TUTORIAL_DATA = local_settings['TUTORIAL_DATA']
 DATA_ROOT_FOLDER = local_settings['DATA_ROOT_FOLDER']
 
