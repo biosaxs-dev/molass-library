@@ -1,6 +1,9 @@
 """
     Trimming.UsableQrange.py
 """
+import logging
+
+
 class UsableQrange:
     """
     Holds information about the usable Q range in XR data.
@@ -132,6 +135,10 @@ def get_usable_qrange_impl(xr_data, ip_effect_info=False, nguiniers=None, return
     ecurve = ElutioCurvProxy(xr_icurve)
     flimit = FlangeLimit(xr_data.M, xr_data.E, ecurve, xr_data.qv)
     stop = flimit.get_limit()
+    if stop is None:
+        # no flange or wide-angle limit found (a smooth stated error, e.g. simulated data): keep the whole q range
+        logging.getLogger(__name__).info("no wide-angle limit found; using all %d q-points", len(xr_data.qv))
+        stop = len(xr_data.qv)
     pre_rg = PreliminaryRg(xr_data.M, xr_data.E, ecurve, xr_data.qv, stop, ip_effect_info=ip_effect_info)
     start = pre_rg.get_guinier_start_index()
     if small_angle_limit == 'none':

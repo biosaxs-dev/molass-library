@@ -25,6 +25,18 @@ def test_truth_is_attached():
     assert ssd.xr.M.shape == (200, 80)
 
 
+def test_trimming_keeps_all_q_points_when_no_wide_angle_limit_is_found(monkeypatch):
+    # on some platforms the flange detection finds nothing on the smooth simulated error (it returned None and
+    # trimmed_copy() failed with a TypeError)
+    from molass_legacy.Trimming.FlangeLimit import FlangeLimit
+    monkeypatch.setattr(FlangeLimit, "get_limit", lambda self, debug=False: None)
+    corrected = simulate_tiny().trimmed_copy().corrected_copy()
+    assert corrected.xr.M.shape[0] >= 190
+    decomp = corrected.quick_decomposition(num_components=2)
+    rgs = [float(c.compute_rg()) for c in decomp.get_xr_components()]
+    assert rgs == pytest.approx([40.0, 25.0], rel=0.15)
+
+
 def test_the_five_calls_recover_the_documented_rg_values(chain):
     ssd, corrected, rg_curve, decomp = chain
     assert corrected.xr.M.shape[1] >= 70
