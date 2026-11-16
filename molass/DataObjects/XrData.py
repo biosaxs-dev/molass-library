@@ -56,6 +56,32 @@ class XrData(SsMatrixData):
         result.pickat = self.pickat
         return result
 
+    def to_bundle(self):
+        """The arrays of this object (``M``, ``qv``, ``jv``, and ``E`` if present) as an
+        :class:`~molass.Global.ArrayBundle.ArrayBundle`, to hand them to another process
+        (pickle, disk or shared memory)."""
+        from molass.Global.ArrayBundle import ArrayBundle
+        arrays = dict(M=self.M, qv=self.qv, jv=self.jv)
+        if self.E is not None:
+            arrays['E'] = self.E
+        return ArrayBundle(arrays, meta=dict(kind='XrData', baseline_method=self.baseline_method, pickat=self.pickat))
+
+    @classmethod
+    def from_bundle(cls, bundle, copy=False):
+        """Rebuild an XrData from :meth:`to_bundle`.
+
+        With ``copy=False`` the arrays are the bundle's own (for shared memory: read-only
+        views), so keep the bundle open while the object is used; ``copy=True`` detaches it.
+        """
+        def get(name):
+            if name not in bundle:
+                return None
+            return bundle[name].copy() if copy else bundle[name]
+        xr = cls(get('M'), get('qv'), get('jv'), get('E'),
+                 baseline_method=bundle.meta.get('baseline_method', 'linear'))
+        xr.pickat = bundle.meta.get('pickat', PICKAT)
+        return xr
+
     def get_ipickvalue(self):
         """Get the default pickvalue for i-curves.
         Returns

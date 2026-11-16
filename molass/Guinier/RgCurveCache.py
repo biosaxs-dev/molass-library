@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import tempfile
-from types import SimpleNamespace
 
 import numpy as np
 
@@ -72,18 +71,8 @@ def load_rg_curve_cache(path, ssd):
         logger.warning("Ignoring unreadable Rg-curve cache %s: %s", path, error)
         return None
 
-    has_guinier_results = np.isfinite(i0s).any() or np.isfinite(i0_errors).any()
-    results = None
-    if has_guinier_results:
-        results = [
-            SimpleNamespace(
-                I0=float(i0) if np.isfinite(i0) else None,
-                I0_stdev=float(error) if np.isfinite(error) else None,
-            )
-            for i0, error in zip(i0s, i0_errors)
-        ]
     from molass.Guinier.RgCurve import RgCurve
-    return RgCurve(frames, rgs, scores, results=results, score_source=score_source)
+    return RgCurve.from_arrays(frames, rgs, scores, i0s, i0_errors, score_source=score_source)
 
 
 def save_rg_curve_cache(path, ssd, curve):

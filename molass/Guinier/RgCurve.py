@@ -3,6 +3,7 @@
 
     This module contains the class RgCurve, which is used to store Rg curve information.
 """
+from types import SimpleNamespace
 import numpy as np
 from molass.DataObjects.Curve import Curve
 
@@ -88,6 +89,45 @@ class RgCurve(Curve):
         """Standard deviation of ``i0s``; NaN where not available
         (failed fit, or results that carry no I(0) error, e.g. ATSAS)."""
         return self._result_values('I0_stdev')
+
+    @classmethod
+    def from_arrays(cls, frames, rgs, scores, i0s, i0_errors, score_source=None):
+        """Rebuild a slim RgCurve from its derived values (the form of the disk cache and of
+        :meth:`to_bundle`): Rg, scores and I(0) with its error, but not the per-frame Guinier
+        results. ``i0s`` / ``i0_errors`` are NaN where not available."""
+        frames = np.asarray(frames, dtype=int)
+        rgs = np.asarray(rgs, dtype=float)
+        scores = np.asarray(scores, dtype=float)
+        i0s = np.asarray(i0s, dtype=float)
+        i0_errors = np.asarray(i0_errors, dtype=float)
+        results = None
+        if np.isfinite(i0s).any() or np.isfinite(i0_errors).any():
+            results = [
+                SimpleNamespace(
+                    I0=float(i0) if np.isfinite(i0) else None,
+                    I0_stdev=float(error) if np.isfinite(error) else None,
+                )
+                for i0, error in zip(i0s, i0_errors)
+            ]
+        return cls(frames, rgs, scores, results=results, score_source=score_source or None)
+
+    def to_bundle(self):
+        """The slim form of this curve as an :class:`~molass.Global.ArrayBundle.ArrayBundle`
+        (``frames``, ``rgs``, ``scores``, ``i0s``, ``i0_errors``), e.g. to hand a result
+        back from another process. The per-frame Guinier results are not included."""
+        from molass.Global.ArrayBundle import ArrayBundle
+        arrays = dict(frames=self.frames, rgs=np.asarray(self.rgs, dtype=float),
+                      scores=np.asarray(self.scores, dtype=float),
+                      i0s=self.i0s, i0_errors=self.i0_errors)
+        return ArrayBundle(arrays, meta=dict(kind="RgCurve", score_source=self.score_source))
+
+    @classmethod
+    def from_bundle(cls, bundle):
+        """Rebuild an RgCurve from :meth:`to_bundle`. The values are copied, so the bundle
+        (e.g. a shared-memory one) can be closed afterwards."""
+        return cls.from_arrays(bundle["frames"].copy(), bundle["rgs"].copy(), bundle["scores"].copy(),
+                               bundle["i0s"].copy(), bundle["i0_errors"].copy(),
+                               score_source=bundle.meta.get("score_source"))
 
     def reliable(self, score_min=0.6, intensity=None, intensity_frac=0.05):
         """Return frames and Rg values passing the standard reliability filters.
