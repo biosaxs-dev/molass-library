@@ -1190,26 +1190,76 @@ class SecSaxsData(DidYouMeanMixin):
         Decomposition.get_rg_curve : same pattern on a Decomposition object
         """
         if getattr(self, '_rgcurve', None) is None:
-            from molass.Global.Cache import get_cache_dir
-            cache_dir = get_cache_dir()
-            path = rgcurve = None
-            if cache_dir is not None:
-                from molass.Guinier.RgCurveCache import ssd_cache_path, load_rg_curve_cache
-                try:
-                    path = ssd_cache_path(cache_dir, self)
-                    rgcurve = load_rg_curve_cache(path, self)
-                except TypeError:
-                    path = None                    # object-valued data cannot be fingerprinted: no caching
+            path, rgcurve = self._rg_curve_from_cache()
             if rgcurve is None:
                 rgcurve = self.xr.compute_rgcurve(progress_cb=progress_cb)
-                if path is not None:
-                    from molass.Guinier.RgCurveCache import save_rg_curve_cache
-                    try:
-                        save_rg_curve_cache(path, self, rgcurve)
-                    except OSError:
-                        pass                       # an unwritable cache is not an error
+                self._rg_curve_to_cache(path, rgcurve)
             self._rgcurve = rgcurve
         return self._rgcurve
+
+    def _rg_curve_from_cache(self):
+        """``(cache path or None, cached RgCurve or None)`` of the opt-in disk cache."""
+        from molass.Global.Cache import get_cache_dir
+        cache_dir = get_cache_dir()
+        path = rgcurve = None
+        if cache_dir is not None:
+            from molass.Guinier.RgCurveCache import ssd_cache_path, load_rg_curve_cache
+            try:
+                path = ssd_cache_path(cache_dir, self)
+                rgcurve = load_rg_curve_cache(path, self)
+            except TypeError:
+                path = None                    # object-valued data cannot be fingerprinted: no caching
+        return path, rgcurve
+
+    def _rg_curve_to_cache(self, path, rgcurve):
+        if path is not None:
+            from molass.Guinier.RgCurveCache import save_rg_curve_cache
+            try:
+                save_rg_curve_cache(path, self, rgcurve)
+            except OSError:
+                pass                           # an unwritable cache is not an error
+
+    def start_rg_curve_process(self, low_priority=True):
+        """Compute the Rg curve in a separate process and return an :class:`~molass.Guinier.RgCurveProcess.RgCurveJob`.
+
+        Same result as :meth:`get_rg_curve`, but the pure-Python Guinier loop does not run in this
+        process, so a GUI is not slowed down by it (it would keep the GIL in a thread). The XR data
+        are shared with the child, not copied. Poll the job from a timer::
+
+            job = corrected.start_rg_curve_process()
+            ...
+            n_done, rg_so_far = job.progress()      # live values, 0 for frames not yet fitted
+            outcome = job.poll()                    # None while running, else ('done', curve) ...
+
+        or just ``rgcurve = job.result()`` to wait. When the job is done, the curve is stored on this
+        object (and in the disk cache, if one is set), so later :meth:`get_rg_curve` calls are free.
+        If the curve is already known, the job is finished immediately and starts no process.
+
+        Parameters
+        ----------
+        low_priority : bool, optional
+            Run the child at below-normal priority so that the GUI wins when both need the CPU.
+
+        Notes
+        -----
+        The curve comes back in the slim form of the disk cache: Rg, scores and I(0), without the
+        per-frame Guinier results. A script that starts a job must be importable without side
+        effects (``if __name__ == "__main__":``), as for any ``spawn`` child.
+        """
+        from molass.Guinier.RgCurveProcess import RgCurveJob
+        if getattr(self, '_rgcurve', None) is not None:
+            return RgCurveJob.finished(self._rgcurve)
+        path, rgcurve = self._rg_curve_from_cache()
+        if rgcurve is not None:
+            self._rgcurve = rgcurve
+            return RgCurveJob.finished(rgcurve)
+
+        def store(curve):
+            self._rg_curve_to_cache(path, curve)
+            if getattr(self, '_rgcurve', None) is None:
+                self._rgcurve = curve
+
+        return RgCurveJob(self.xr, on_done=store, low_priority=low_priority)
 
     def homogeneity(self, pairs=None, delta=0.0, q1=None, q2=None, cores=None, rgcurve=None, min_score=0.5,
                     mapping=None, title=None):
