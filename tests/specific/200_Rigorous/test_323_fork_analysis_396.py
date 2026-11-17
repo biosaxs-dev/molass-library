@@ -280,3 +280,16 @@ def test_fork_source_without_a_completed_job_raises(tiny, tmp_path):
     os.makedirs(os.path.join(folder, "optimized", "jobs"))
     with pytest.raises(NoCompletedJobError):
         fork_source(folder, decomp, trimmed, {})
+
+
+@pytest.mark.slow
+def test_the_plan_scores_its_own_starting_point(finished):
+    """ForkPlan.score() is the fv job 000 records first: the stored best for a same-model fork, the seed of a
+    converted one (what a GUI shows before it starts the run)."""
+    source, folder = finished
+    info = molass.load_analysis(source)
+    plan = molass.fork_analysis(source, os.path.join(folder, "analysis-H"), dry_run=True, info=info)
+    score = plan.score()
+    assert score.source == 'rigorous' and score.fv == pytest.approx(info.fv, abs=1e-3)
+    converted = molass.fork_analysis(source, os.path.join(folder, "analysis-I"), model="lkm", dry_run=True, info=info)
+    assert np.isfinite(converted.score().fv)

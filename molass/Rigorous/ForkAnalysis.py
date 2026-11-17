@@ -54,6 +54,13 @@ class ForkPlan:
         """Start the run; returns its :class:`~molass.Rigorous.RunInfo.RunInfo`."""
         return self.decomposition.optimize_rigorously(**self.kwargs)
 
+    def score(self, **kwargs):
+        """The :class:`~molass.Rigorous.Score.Score` of the starting point of job 000 (the seed, or the estimate
+        when there is none), on the optimizer the run will use: its ``fv`` / ``sv`` are what the first callback
+        entry of job 000 records. Call it from the main thread of a GUI (see ``Decomposition.score``)."""
+        from molass.Rigorous.Score import make_score_impl
+        return make_score_impl(self.decomposition, trimmed_ssd=self.info.trimmed, params=self.seed_params, **kwargs)
+
     def __repr__(self):
         n = None if self.seed_params is None else len(self.seed_params)
         return (f"ForkPlan({os.path.basename(self.source_folder)!r} -> {os.path.basename(self.new_folder)!r}, "
