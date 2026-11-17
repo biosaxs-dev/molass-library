@@ -2141,7 +2141,7 @@ class Decomposition(DidYouMeanMixin):
         return make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=clear_jobs, function_code=function_code, in_process=in_process, monitor=monitor, async_=async_, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting, note=note)
 
     def score(self, trimmed_ssd=None, analysis_folder=None,
-              function_code=None, debug=False, progress_cb=None):
+              function_code=None, debug=False, progress_cb=None, use_stored_params=True):
         """Evaluate the rigorous objective function once at initial parameters.
 
         A lightweight alternative to :meth:`optimize_rigorously` when you only
@@ -2182,6 +2182,10 @@ class Decomposition(DidYouMeanMixin):
             computed (if not already cached), it is instead called once per
             frame as ``progress_cb(rg_buffer, j)`` — the same convention as
             :meth:`get_rg_curve`. Callers distinguish the two by argument count.
+        use_stored_params : bool, optional
+            For a result loaded from a rigorous job: evaluate the job's optimized parameters (default).
+            ``False`` evaluates the parameters derived from the component curves instead (see Notes).
+            Ignored for other decompositions.
 
         Returns
         -------
@@ -2246,7 +2250,7 @@ class Decomposition(DidYouMeanMixin):
 
         # A result loaded from a rigorous job: evaluate the job's parameters on the optimizer of the decomposition
         # the run started from (molass-library#394).
-        stored_params = getattr(self, '_rigorous_params', None)
+        stored_params = getattr(self, '_rigorous_params', None) if use_stored_params else None
         basis = getattr(self, '_rigorous_basis', None)
         target = basis if (stored_params is not None and basis is not None) else self
 

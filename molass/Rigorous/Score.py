@@ -283,7 +283,7 @@ def make_score_impl(decomposition, trimmed_ssd=None,
     debug : bool, optional
     params : array-like, optional
         Parameter vector to evaluate instead of the one derived from ``decomposition``
-        (molass-library#394). A vector of the wrong length is ignored with a ``UserWarning``.
+        (molass-library#394). A vector of the wrong length raises ``ValueError``.
     """
     import numpy as np
     import tempfile, shutil
@@ -415,23 +415,17 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         # (e.g. the UV low-rank residual) is fixed by the first call, and fixing it at the optimized parameters
         # gives another objective value than the run had.
         stored_params = params
-        stored_mismatch = None
         optimizer.prepare_for_optimization(init_params)
         if stored_params is not None:
-            if len(stored_params) == len(init_params):
-                init_params = np.array(stored_params, dtype=float)
-                optimizer.prepare_for_optimization(init_params)
-            else:
-                stored_mismatch = (len(stored_params), len(init_params))
-                stored_params = None
-
-    if stored_mismatch is not None:
-        warnings.warn(
-            f"The stored optimized parameters ({stored_mismatch[0]}) do not fit the optimizer "
-            f"({stored_mismatch[1]} parameters): score() evaluates parameters re-derived from the component "
-            "curves instead, which need not give result.fv.",
-            UserWarning, stacklevel=4,
-        )
+            if len(stored_params) != len(init_params):
+                raise ValueError(
+                    f"The stored optimized parameters have {len(stored_params)} entries but the optimizer "
+                    f"expects {len(init_params)}: the result was optimized with another model, component "
+                    "count or function_code than this one (function_code=%r). Pass the function_code of the "
+                    "run, or score(use_stored_params=False) to evaluate the component curves instead."
+                    % (function_code,))
+            init_params = np.array(stored_params, dtype=float)
+            optimizer.prepare_for_optimization(init_params)
 
     _report("Evaluating objective function")
     # Evaluate objective once (outside suppression so exceptions are visible)

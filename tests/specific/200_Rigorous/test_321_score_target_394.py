@@ -38,6 +38,17 @@ def test_a_decomposition_that_is_not_a_loaded_result_is_scored_from_its_own_curv
     assert target is plain and kwargs["params"] is None
 
 
+def test_use_stored_params_false_scores_the_loaded_curves_themselves(monkeypatch):
+    basis = SimpleNamespace(has_rg_curve=True)
+    loaded = SimpleNamespace(has_rg_curve=True, _rigorous_params=np.zeros(3), _rigorous_basis=basis)
+    import molass.Rigorous.Score as score_module
+    calls = []
+    monkeypatch.setattr(score_module, "make_score_impl",
+                        lambda target, **kwargs: calls.append((target, kwargs)) or "score")
+    Decomposition.score(loaded, use_stored_params=False)
+    assert calls[0][0] is loaded and calls[0][1]["params"] is None
+
+
 def test_copies_of_a_loaded_result_do_not_carry_its_parameters():
     # upgrade() and copy_with_new_components() build a new Decomposition: another model or other curves
     import inspect

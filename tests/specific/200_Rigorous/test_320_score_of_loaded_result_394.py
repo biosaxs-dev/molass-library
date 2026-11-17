@@ -57,10 +57,10 @@ def test_a_result_without_stored_parameters_is_evaluated_from_its_curves(finishe
     assert result.score(trimmed_ssd=trimmed).source == 'decomp'
 
 
-def test_stored_parameters_of_the_wrong_length_warn(finished_run):
+def test_stored_parameters_of_the_wrong_length_raise_and_use_stored_params_false_opts_out(finished_run):
     decomp, trimmed, folder = finished_run
     result = load_best_rigorous_result(decomp, folder)
     result._rigorous_params = result._rigorous_params[:-1]
-    with pytest.warns(UserWarning, match="stored optimized parameters"):
-        score = result.score(trimmed_ssd=trimmed)
-    assert score.source == 'decomp'
+    with pytest.raises(ValueError, match="stored optimized parameters"):
+        result.score(trimmed_ssd=trimmed)
+    assert result.score(trimmed_ssd=trimmed, use_stored_params=False).source == 'decomp'
