@@ -377,6 +377,7 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
     result = Decomposition(ssd, xr_icurve, xr_ccurves, uv_icurve, uv_ccurves,
                            optimizer_rgs=optimizer_rgs)
     result.method_label = _rigorous_method_label(optimizer_folder)
+    result._rigorous_params = np.array(params, dtype=float)
     ranks = xr_ranks if xr_ranks is not None else getattr(decomp, 'xr_ranks', None)
     if ranks is not None:
         result.update_xr_ranks(list(ranks))

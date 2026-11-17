@@ -100,6 +100,10 @@ class Decomposition(DidYouMeanMixin):
         # 'quick decomposition'); shown by plot_components(title='auto').
         self.method_label = None
         self._optimizer_rgs = kwargs.get('optimizer_rgs', None)
+        # The full optimized parameter vector (baselines, mapping, scales, ...) of a result loaded from a rigorous
+        # job (set by load_rigorous_result). Not carried across upgrade() or other copies: they are other models
+        # or other curves. score() evaluates it instead of re-deriving the parameters (molass-library#394).
+        self._rigorous_params = None
         # Which components may front in the rigorous stage (one bool each; None until decided, see
         # molass.Rigorous.FrontingPolicy, molass-library#350).
         self.fronting_flags = None
@@ -2194,6 +2198,17 @@ class Decomposition(DidYouMeanMixin):
 
         Notes
         -----
+        **What is evaluated**: for a decomposition made by :meth:`quick_decomposition` or
+        :meth:`upgrade`, the parameters are derived from its component curves (peak
+        shapes, Rg values, the mapping of the data, estimated baselines). For a result
+        *loaded* from a rigorous job (``load_analysis``, ``load_rigorous_result``,
+        ``RunInfo.load_best``), ``score()`` evaluates the optimized parameters of that job
+        (baselines, mapping and scales included), so ``score().fv`` agrees with
+        ``result.fv`` when the same trimmed data are given (``Score.source`` is then
+        ``'rigorous'``). Re-deriving them gives another number: the component curves
+        carry only part of the parameters. A result that was changed after loading
+        (``upgrade()``) is a different decomposition and is evaluated from its curves.
+
         **rgcurve**: ``score()`` does not accept ``rgcurve`` as a keyword
         argument.  Pre-compute and cache it by calling
         ``decomp.get_rg_curve()`` *before* ``score()``; the cached value is

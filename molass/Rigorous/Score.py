@@ -404,7 +404,25 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         )
 
         init_params = decomposition.make_rigorous_initparams(baseparams)
+        # A result loaded from a rigorous job evaluates the parameters of that job (baselines, mapping, scales
+        # as optimized), not the ones re-derived from its component curves (molass-library#394).
+        stored_params = getattr(decomposition, '_rigorous_params', None)
+        stored_mismatch = None
+        if stored_params is not None:
+            if len(stored_params) == len(init_params):
+                init_params = np.array(stored_params, dtype=float)
+            else:
+                stored_mismatch = (len(stored_params), len(init_params))
+                stored_params = None
         optimizer.prepare_for_optimization(init_params)
+
+    if stored_mismatch is not None:
+        warnings.warn(
+            f"The stored optimized parameters ({stored_mismatch[0]}) do not fit the optimizer "
+            f"({stored_mismatch[1]} parameters): score() evaluates parameters re-derived from the component "
+            "curves instead, which need not give result.fv.",
+            UserWarning, stacklevel=4,
+        )
 
     _report("Evaluating objective function")
     # Evaluate objective once (outside suppression so exceptions are visible)
@@ -420,7 +438,8 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
 
     return Score(
         fv=fv, sv=sv, breakdown=breakdown,
-        optimizer=optimizer, params=init_params, source='decomp',
+        optimizer=optimizer, params=init_params,
+        source='rigorous' if stored_params is not None else 'decomp',
     )
 
 
