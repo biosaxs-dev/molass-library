@@ -27,7 +27,7 @@ def finished_run():
 def test_score_of_a_loaded_result_gives_its_stored_fv(finished_run):
     decomp, trimmed, folder = finished_run
     result = load_best_rigorous_result(decomp, folder)
-    assert result._rigorous_params is not None
+    assert result._rigorous_params is not None and result._rigorous_basis is decomp
     score = result.score(trimmed_ssd=trimmed)
     assert score.source == 'rigorous'
     assert score.fv == pytest.approx(result.fv, abs=1e-4)           # callback.txt keeps 6 significant digits

@@ -258,7 +258,7 @@ class ScoreSnapshot:
 
 def make_score_impl(decomposition, trimmed_ssd=None,
                     analysis_folder=None, function_code=None,
-                    debug=False, progress_cb=None):
+                    debug=False, progress_cb=None, params=None):
     """Set up the rigorous optimizer, evaluate the objective once, return Score.
 
     This mirrors the setup phase of
@@ -272,6 +272,8 @@ def make_score_impl(decomposition, trimmed_ssd=None,
     Parameters
     ----------
     decomposition : Decomposition
+        The decomposition the optimizer is built from. For the result of a rigorous run this is the one the
+        run started from (the data sets and baselines depend on it).
     trimmed_ssd : SecSaxsData, optional
         Trimmed (uncorrected) SSD.  Recommended (Pattern B).
     analysis_folder : str, optional
@@ -279,6 +281,9 @@ def make_score_impl(decomposition, trimmed_ssd=None,
     function_code : str, optional
         Override auto-detected function code.
     debug : bool, optional
+    params : array-like, optional
+        Parameter vector to evaluate instead of the one derived from ``decomposition``
+        (molass-library#394). A vector of the wrong length is ignored with a ``UserWarning``.
     """
     import numpy as np
     import tempfile, shutil
@@ -296,7 +301,7 @@ def make_score_impl(decomposition, trimmed_ssd=None,
             decomposition, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
-            progress_cb=progress_cb,
+            progress_cb=progress_cb, params=params,
         )
     finally:
         if _tmp_dir is not None:
@@ -307,7 +312,7 @@ def make_score_impl(decomposition, trimmed_ssd=None,
 
 
 def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
-                              function_code, debug, progress_cb=None):
+                              function_code, debug, progress_cb=None, params=None):
     """Inner implementation (analysis_folder is always provided)."""
     import numpy as np
     from molass.Rigorous.RigorousImplement import _apply_anomaly_interpolation
@@ -404,17 +409,21 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         )
 
         init_params = decomposition.make_rigorous_initparams(baseparams)
-        # A result loaded from a rigorous job evaluates the parameters of that job (baselines, mapping, scales
-        # as optimized), not the ones re-derived from its component curves (molass-library#394).
-        stored_params = getattr(decomposition, '_rigorous_params', None)
+        # Parameters given by the caller (the optimized ones of a rigorous job) are evaluated instead of the ones
+        # re-derived from the component curves, which carry only part of them (molass-library#394).
+        # The optimizer is first prepared at the derived start parameters, as a run does: part of its state
+        # (e.g. the UV low-rank residual) is fixed by the first call, and fixing it at the optimized parameters
+        # gives another objective value than the run had.
+        stored_params = params
         stored_mismatch = None
+        optimizer.prepare_for_optimization(init_params)
         if stored_params is not None:
             if len(stored_params) == len(init_params):
                 init_params = np.array(stored_params, dtype=float)
+                optimizer.prepare_for_optimization(init_params)
             else:
                 stored_mismatch = (len(stored_params), len(init_params))
                 stored_params = None
-        optimizer.prepare_for_optimization(init_params)
 
     if stored_mismatch is not None:
         warnings.warn(

@@ -104,6 +104,9 @@ class Decomposition(DidYouMeanMixin):
         # job (set by load_rigorous_result). Not carried across upgrade() or other copies: they are other models
         # or other curves. score() evaluates it instead of re-deriving the parameters (molass-library#394).
         self._rigorous_params = None
+        # The decomposition the rigorous run started from (set by load_rigorous_result): the optimizer of that run
+        # was built from it, so score() builds its optimizer from it too.
+        self._rigorous_basis = None
         # Which components may front in the rigorous stage (one bool each; None until decided, see
         # molass.Rigorous.FrontingPolicy, molass-library#350).
         self.fronting_flags = None
@@ -2203,10 +2206,13 @@ class Decomposition(DidYouMeanMixin):
         shapes, Rg values, the mapping of the data, estimated baselines). For a result
         *loaded* from a rigorous job (``load_analysis``, ``load_rigorous_result``,
         ``RunInfo.load_best``), ``score()`` evaluates the optimized parameters of that job
-        (baselines, mapping and scales included), so ``score().fv`` agrees with
+        (baselines, mapping and scales included) on the optimizer of the decomposition the
+        run started from, as the run itself did, so ``score().fv`` agrees with
         ``result.fv`` when the same trimmed data are given (``Score.source`` is then
-        ``'rigorous'``). Re-deriving them gives another number: the component curves
-        carry only part of the parameters. A result that was changed after loading
+        ``'rigorous'``). Re-deriving them from the optimized curves gives another number
+        (fv -1.45 against -1.54 on one analysis): the component curves carry only part of
+        the parameters, and the data sets of the optimizer depend on the starting
+        decomposition. A result that was changed after loading
         (``upgrade()``) is a different decomposition and is evaluated from its curves.
 
         **rgcurve**: ``score()`` does not accept ``rgcurve`` as a keyword
@@ -2238,7 +2244,13 @@ class Decomposition(DidYouMeanMixin):
         from molass.Rigorous.Score import _warn_if_background_thread
         _warn_if_background_thread("Decomposition.score()")
 
-        if not self.has_rg_curve:
+        # A result loaded from a rigorous job: evaluate the job's parameters on the optimizer of the decomposition
+        # the run started from (molass-library#394).
+        stored_params = getattr(self, '_rigorous_params', None)
+        basis = getattr(self, '_rigorous_basis', None)
+        target = basis if (stored_params is not None and basis is not None) else self
+
+        if not target.has_rg_curve:
             import warnings
             warnings.warn(
                 "Rg curve not pre-computed on this Decomposition. "
@@ -2248,10 +2260,10 @@ class Decomposition(DidYouMeanMixin):
             )
         from molass.Rigorous.Score import make_score_impl
         return make_score_impl(
-            self, trimmed_ssd=trimmed_ssd,
+            target, trimmed_ssd=trimmed_ssd,
             analysis_folder=analysis_folder,
             function_code=function_code, debug=debug,
-            progress_cb=progress_cb,
+            progress_cb=progress_cb, params=stored_params,
         )
 
     def score_initial(self, *args, **kwargs):
