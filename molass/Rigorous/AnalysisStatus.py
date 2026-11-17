@@ -106,6 +106,28 @@ class AnalysisStatus:
         return self.manifest is not None and self.manifest.get('status') == 'running'
 
     @property
+    def seconds_per_callback(self):
+        """Recent mean time between two callbacks in seconds (``None`` with fewer than two), molass-library#397.
+
+        A callback is an accepted step of the solver, not an objective evaluation. A rate far above that of an
+        earlier run of the same data (3 minutes against 11 seconds) is what a slow or stuck run looks like."""
+        from molass.Rigorous.CurrentStateUtils import seconds_per_callback
+        return seconds_per_callback(self.analysis_folder)
+
+    @property
+    def last_callback_time(self):
+        """Time of the newest callback entry (naive local ``datetime``), ``None`` while there is none."""
+        stamps = [j.timestamp for j in self.jobs if j.timestamp is not None]
+        return max(stamps) if stamps else None
+
+    @property
+    def seconds_since_callback(self):
+        """Seconds since the newest callback entry (``None`` while there is none)."""
+        from datetime import datetime
+        last = self.last_callback_time
+        return None if last is None else max(0.0, (datetime.now() - last).total_seconds())
+
+    @property
     def note(self):
         """The note given to ``optimize_rigorously(note=...)`` (``None`` if there is none), molass-library#357."""
         return self.recipe.get('note')
@@ -261,6 +283,16 @@ class AnalysisStatus:
             lines.append(f"note: {self.note}")
         if self.manifest is not None:
             lines.append(f"status: {self.manifest.get('status')} ({self.manifest.get('phase')})")
+        if self.is_active:
+            rate, since = self.seconds_per_callback, self.seconds_since_callback
+            parts = [f"{self.n_iterations} callbacks"]
+            if self.fv is not None:
+                parts.append(f"best fv={self.fv:.4f}")
+            if rate is not None:
+                parts.append(f"{rate:.0f} s per callback (recent mean)")
+            if since is not None:
+                parts.append(f"last callback {since:.0f} s ago")
+            lines.append("progress: " + ", ".join(parts))
         lines.append(f"recipe: model={r.get('model')}, num_components={r.get('num_components')}, "
                      f"method={r.get('method')}, xr_ranks={r.get('xr_ranks')}, "
                      f"dataset={r.get('dataset')}, molass_version={r.get('molass_version')}")

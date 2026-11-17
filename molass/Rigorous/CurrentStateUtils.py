@@ -564,7 +564,36 @@ def _read_job_stats(cb_file, read_callback_txt_impl):
                  sum(1 for row in fv_list if not _is_finite_fv(row[1])))
     if key is not None:
         _job_stats_cache[cb_file] = (key, stats)
+        _job_times_cache[cb_file] = [row[3] for row in fv_list[-_RATE_TIMES:] if row[3] is not None]
     return stats
+
+
+# the last timestamps of each callback.txt, from the same parse as the stats above (for seconds_per_callback)
+_RATE_TIMES = 51
+_job_times_cache = {}
+
+# number of recent callback intervals the mean of seconds_per_callback() is taken over
+RATE_WINDOW = 10
+
+
+def seconds_per_callback(analysis_folder, recent=RATE_WINDOW):
+    """Recent mean time between two callbacks of the running (or last) job, in seconds (#397).
+
+    The mean over the last ``recent`` intervals of the newest job that has at least two callback entries,
+    from the timestamps in its ``callback.txt`` (one second resolution). ``None`` when there are fewer
+    than two timestamps. It shows the rate of a search: an iteration that takes 3 minutes where an
+    earlier run of the same data needed 11 seconds looks like a healthy run otherwise.
+
+    Note that a callback is an accepted step of the solver, not an objective evaluation: for BH it is one
+    hop, for DE a new best, so the rates of different methods are not comparable.
+    """
+    recent = max(1, min(int(recent), _RATE_TIMES - 1))
+    for job in reversed(list_rigorous_jobs(analysis_folder)):
+        cb_file = os.path.join(os.path.abspath(analysis_folder), "optimized", "jobs", job.id, "callback.txt")
+        times = _job_times_cache.get(cb_file, [])[-(recent + 1):]
+        if len(times) >= 2:
+            return (times[-1] - times[0]).total_seconds() / (len(times) - 1)
+    return None
 
 
 def _is_finite_fv(fv):

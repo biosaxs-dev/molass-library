@@ -230,7 +230,7 @@ def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     return ssd, trimmed, decomp, recipe
 
 
-def create_optimizer_from_recipe(work_folder, class_code):
+def create_optimizer_from_recipe(work_folder, class_code, watch_manifest=False):
     """Rebuild the SSD pipeline from recipe.json and return a ready optimizer.
 
     Parameters
@@ -239,6 +239,10 @@ def create_optimizer_from_recipe(work_folder, class_code):
         Job folder (e.g. .../optimized/jobs/000).  Must contain in_folder.txt.
     class_code : str
         Model code (e.g. 'G0346' for EGH, 'G1200' for SDM).
+    watch_manifest : bool, optional
+        Start a :class:`~molass.Rigorous.RunRegistry.ManifestWatcher` in this process, so that
+        ``RUN_MANIFEST.json`` shows the progress of the run to an observer that only reads the file (#397).
+        The optimizer subprocess sets it; leave it off when calling this from a notebook.
 
     Returns
     -------
@@ -250,6 +254,11 @@ def create_optimizer_from_recipe(work_folder, class_code):
 
     optimizer_folder = os.path.dirname(os.path.dirname(work_folder))  # .../optimized
     analysis_folder = os.path.dirname(optimizer_folder)
+
+    if watch_manifest:
+        # before the (minutes long) rebuild below: the run is already going on
+        from molass.Rigorous.RunRegistry import start_manifest_watcher
+        start_manifest_watcher(analysis_folder)
 
     ssd_trimmed_and_decomp = rebuild_decomposition_from_recipe(analysis_folder)
     _ssd, ssd_trimmed, decomp, recipe = ssd_trimmed_and_decomp

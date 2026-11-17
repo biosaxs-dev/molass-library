@@ -31,9 +31,11 @@
     - :func:`update_run_manifest` — merge fields into an existing manifest
     - :func:`read_manifest`       — read a single manifest
     - :func:`locate_recent_runs`  — list recently-started runs
+    - :func:`start_manifest_watcher` — keep a running run's manifest current from inside its process
 """
 import json
 import os
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -98,6 +100,31 @@ def write_run_manifest(folder, **fields):
         return None
 
 
+def _write_json_atomically(path, data):
+    """Write ``data`` as JSON so that a concurrent reader sees the old or the new file, never half of it.
+
+    The manifest is read and rewritten by several processes (the launcher, the optimizer subprocess, observers):
+    a torn read used to count as an empty manifest, and the next write then dropped everything in it.
+    """
+    tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
+    try:
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, default=str)
+        for attempt in range(5):
+            try:
+                os.replace(tmp, path)
+                return
+            except PermissionError:          # Windows: a reader has the file open for a moment
+                time.sleep(0.02)
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+
+
 def update_run_manifest(folder, **fields):
     """Merge ``fields`` into an existing manifest in ``folder``.
 
@@ -114,8 +141,7 @@ def update_run_manifest(folder, **fields):
                 existing = {}
         existing.update(fields)
         existing["last_updated"] = _now_iso()
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(existing, f, indent=2, default=str)
+        _write_json_atomically(path, existing)
         return existing
     except OSError:
         return None
@@ -218,7 +244,8 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
     jobs is active; ``jobs/NNN/RUN_MANIFEST.json`` keeps the state of the single job.
 
     Also stores the progress numbers ``n_jobs``, ``n_callbacks``, ``n_nonfinite`` (entries rejected as
-    non-finite, #346), ``stalled_jobs``, ``best_fv`` and ``last_callback_time`` (UTC ISO), and
+    non-finite, #346), ``stalled_jobs``, ``best_fv``, ``seconds_per_callback`` (recent mean, #397) and
+    ``last_callback_time`` (UTC ISO), and
     ``status_source`` (``'pid'``, ``'job_files'`` or ``'stored'``). The file is rewritten only when
     one of them changed. Errors are swallowed; returns ``None`` if the folder has no manifest.
     """
@@ -260,6 +287,11 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
             changes["phase"] = "optimizing" if new_status == "running" else "finished"
         elif status == "completed" and manifest.get("phase") in ("folders_prepared", "constructing_optimizer", "optimizer_ready"):
             changes["phase"] = "finished"
+        elif (new_status == "running" and last_callback is not None
+              and manifest.get("phase") in ("folders_prepared", "constructing_optimizer", "optimizer_ready")):
+            # the launcher's last word was 'optimizer_ready': once the job has written its first callback entry
+            # the optimizer is searching, and 40 minutes later the manifest still said 'optimizer_ready' (#397)
+            changes["phase"] = "optimizing"
         if manifest.get("status_source") != source:
             changes["status_source"] = source
         if last_callback is not None:
@@ -268,14 +300,16 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
                 changes["last_callback_time"] = stamp
 
         try:
-            from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, count_stalled_jobs
+            from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, count_stalled_jobs, seconds_per_callback
             jobs = list_rigorous_jobs(folder)
+            rate = seconds_per_callback(folder)
             stats = {
                 "n_jobs": len(jobs),
                 "n_callbacks": sum(j.n_entries for j in jobs),
                 "n_nonfinite": sum(j.n_nonfinite for j in jobs),
                 "stalled_jobs": count_stalled_jobs(jobs),
                 "best_fv": min((j.best_fv for j in jobs), default=None),
+                "seconds_per_callback": None if rate is None else round(rate, 1),
             }
             for key, value in stats.items():
                 if manifest.get(key) != value:
@@ -291,6 +325,45 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
         return manifest
     except Exception:
         return manifest
+
+
+class ManifestWatcher:
+    """A daemon thread that keeps the manifest of an analysis folder current while a run goes on (#397).
+
+    Every ``interval_s`` seconds it calls :func:`refresh_run_manifest`, which rewrites the file only when
+    something changed. Start it in the process that runs the optimizer (the recipe subprocess does), so that
+    ``RUN_MANIFEST.json`` shows ``n_callbacks``, ``best_fv``, ``seconds_per_callback`` and
+    ``last_callback_time`` to an observer that only reads the file (another process, an AI agent, a shell),
+    without anybody having to call ``analysis_status()`` first. The thread only sleeps and reads a few small
+    files, so it costs the optimizer nothing noticeable. Use :meth:`stop` (or let the process end).
+    """
+
+    def __init__(self, analysis_folder, interval_s=10.0):
+        self.analysis_folder = os.path.abspath(analysis_folder)
+        self.interval_s = interval_s
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, name="molass-manifest-watcher", daemon=True)
+
+    def start(self):
+        self._thread.start()
+        return self
+
+    def _run(self):
+        while not self._stop.wait(self.interval_s):
+            try:
+                refresh_run_manifest(self.analysis_folder)
+            except Exception:
+                pass            # bookkeeping must never disturb the optimizer
+
+    def stop(self, timeout=5.0):
+        self._stop.set()
+        if self._thread.is_alive() and threading.current_thread() is not self._thread:
+            self._thread.join(timeout)
+
+
+def start_manifest_watcher(analysis_folder, interval_s=10.0):
+    """Start a :class:`ManifestWatcher` for ``analysis_folder`` and return it."""
+    return ManifestWatcher(analysis_folder, interval_s=interval_s).start()
 
 
 def locate_recent_runs(since_minutes=60, registry_path=None, refresh=True):

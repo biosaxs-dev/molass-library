@@ -1598,6 +1598,12 @@ class RunInfo:
               number of jobs, of callback entries, of entries rejected as
               non-finite (``fv`` of ``inf``), and of trailing jobs that did
               not improve ``best_fv`` (a stalled search), see #346.
+            - ``seconds_per_callback`` (float or None): recent mean time between
+              two callbacks of the newest job, from the timestamps in its
+              ``callback.txt`` (#397). A rate far above an earlier run of the same
+              data is what a slow or stuck run looks like.
+            - ``seconds_since_callback`` (float or None): seconds since the
+              newest callback entry.
             - ``best_fv`` (float): inverted from ``best_sv`` (matches
               ``check_progress`` arithmetic).
             - ``best_sv`` (float): best score-value-so-far on the 0-100
@@ -1672,16 +1678,25 @@ class RunInfo:
 
         # Rejected (non-finite) iterations and stalled search: invisible in best_fv alone (#346).
         n_jobs = n_entries = n_nonfinite = stalled_jobs = None
+        rate = last_callback_time = None
         if analysis_folder:
             try:
-                from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, count_stalled_jobs
+                from molass.Rigorous.CurrentStateUtils import (
+                    list_rigorous_jobs, count_stalled_jobs, seconds_per_callback)
                 jobs = list_rigorous_jobs(analysis_folder)
                 n_jobs = len(jobs)
                 n_entries = sum(j.n_entries for j in jobs)
                 n_nonfinite = sum(j.n_nonfinite for j in jobs)
                 stalled_jobs = count_stalled_jobs(jobs)
+                rate = seconds_per_callback(analysis_folder)
+                stamps = [j.timestamp for j in jobs if j.timestamp is not None]
+                last_callback_time = max(stamps) if stamps else None
             except Exception:
                 pass
+        seconds_since_callback = None
+        if last_callback_time is not None:
+            from datetime import datetime as _datetime
+            seconds_since_callback = max(0.0, (_datetime.now() - last_callback_time).total_seconds())
 
         # Subprocess returncode: prefer polling the live Popen object directly
         # (available for free the moment the process exits -- no need to wait()
@@ -1764,6 +1779,8 @@ class RunInfo:
             "n_entries": n_entries,
             "n_nonfinite": n_nonfinite,
             "stalled_jobs": stalled_jobs,
+            "seconds_per_callback": rate,
+            "seconds_since_callback": seconds_since_callback,
             "best_fv": best_fv,
             "best_sv": best_sv,
             "elapsed_s": elapsed_s,
