@@ -394,6 +394,10 @@ def with_provenance(recipe, analysis_folder, note=None):
         name = os.path.basename(os.path.normpath(analysis_folder))
     if name:
         extra['analysis_folder_name'] = name
+    # what job 000 started from (#396): a continued folder keeps it, a new seed replaces it
+    for key in ('seeded_from', 'seed_params', 'forked_from'):
+        if key not in recipe and previous.get(key) is not None:
+            extra[key] = previous[key]
     return dict(recipe, **extra)
 
 
@@ -421,7 +425,7 @@ def _build_auto_recipe(decomposition, method='BH', niter=20, frozen_components=N
     return recipe
 
 
-def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None, fronting=None, note=None):
+def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=None, niter=20, method="BH", frozen_components=None, frozen_param_groups=None, trimmed_ssd=None, clear_jobs=True, function_code=None, in_process=False, monitor=True, async_=True, progress='dashboard', max_trials=0, debug=False, _dry_run=False, ns_narrow_bounds=True, ns_adaptive_nsteps=False, ns_nsteps=None, solver_kwargs=None, seed_params=None, constraints=None, pipeline_recipe=None, fronting=None, note=None, seed_source=None):
     """
     Make a rigorous decomposition using a given RG curve.
 
@@ -750,6 +754,24 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
             fronting=fronting_flags,
         )
 
+    if seed_params is not None:
+        # A seed that does not fit used to be ignored: the warning for it was raised where all warnings are
+        # suppressed, so the run silently started from the estimator instead (#396). Check before any folder exists.
+        import numpy as _np
+        _seed = _np.asarray(seed_params, dtype=float).ravel()
+        _expected = decomposition.get_rigorous_param_count()
+        if len(_seed) != _expected:
+            raise ValueError(
+                f"seed_params has {len(_seed)} entries but this decomposition ({decomposition.xr_ccurves[0].model}, "
+                f"{decomposition.num_components} components) has {_expected} parameters: the seed was made for "
+                "another model, component count or function_code. Nothing was started.")
+        if not _np.all(_np.isfinite(_seed)):
+            raise ValueError("seed_params contains NaN or infinite values. Nothing was started.")
+        if pipeline_recipe is not None:
+            # what job 000 started from, so that the folder can tell it later (also for a recipe given by the caller)
+            pipeline_recipe = dict(pipeline_recipe, seed_params=_seed.tolist(),
+                                   seeded_from=seed_source if seed_source is not None else "seed_params")
+
     if pipeline_recipe is not None:
         pipeline_recipe = with_provenance(pipeline_recipe, analysis_folder, note)
     # Suppress verbose legacy output unless debug=True.
@@ -862,17 +884,12 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
         if seed_params is not None:
             import numpy as _np
             _seed = _np.asarray(seed_params)
-            if len(_seed) == len(init_params):
-                init_params = _seed
-                _seeded_from_known_point = True
-            else:
-                import warnings as _w
-                _w.warn(
-                    f"seed_params length {len(_seed)} does not match "
-                    f"estimator-derived length {len(init_params)}. "
-                    "Ignoring seed_params and using estimator-derived init.",
-                    UserWarning, stacklevel=4,
-                )
+            if len(_seed) != len(init_params):
+                # checked before any folder is made; this guards the paths that bypass that check
+                raise ValueError(
+                    f"seed_params length {len(_seed)} does not match the estimator-derived length {len(init_params)}")
+            init_params = _seed
+            _seeded_from_known_point = True
         # When resuming (clear_jobs=False), override with the best params found
         # across previous jobs — starting from the best known point is almost
         # always better than starting from the initial decomp params (#169).

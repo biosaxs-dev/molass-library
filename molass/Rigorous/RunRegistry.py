@@ -125,20 +125,39 @@ def _write_json_atomically(path, data):
                 pass
 
 
+def _read_manifest_for_update(path):
+    """The manifest dict for a read-modify-write, ``{}`` when there is none, ``None`` when it cannot be read now.
+
+    A read can fail for a moment while another process replaces the file (``PermissionError`` on Windows): that
+    is retried, and if the file still cannot be read it is left alone. Treating it as an empty manifest made
+    the update drop everything else in it (``start_time``, ``subprocess_pid``, ...). A file that is readable
+    but not valid JSON (written by a version without atomic writes) counts as empty.
+    """
+    for attempt in range(10):
+        if not os.path.exists(path):
+            return {}
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            if attempt >= 3:
+                return {}
+        except OSError:
+            pass
+        time.sleep(0.02)
+    return None
+
+
 def update_run_manifest(folder, **fields):
     """Merge ``fields`` into an existing manifest in ``folder``.
 
-    Creates the file if missing.  Errors swallowed.
+    Creates the file if missing.  Errors swallowed (``None`` is returned when nothing could be written).
     """
     try:
         path = os.path.join(folder, MANIFEST_NAME)
-        existing = {}
-        if os.path.exists(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    existing = json.load(f)
-            except (OSError, json.JSONDecodeError):
-                existing = {}
+        existing = _read_manifest_for_update(path)
+        if existing is None:
+            return None
         existing.update(fields)
         existing["last_updated"] = _now_iso()
         _write_json_atomically(path, existing)
@@ -244,7 +263,8 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
     jobs is active; ``jobs/NNN/RUN_MANIFEST.json`` keeps the state of the single job.
 
     Also stores the progress numbers ``n_jobs``, ``n_callbacks``, ``n_nonfinite`` (entries rejected as
-    non-finite, #346), ``stalled_jobs``, ``best_fv``, ``seconds_per_callback`` (recent mean, #397) and
+    non-finite, #346), ``stalled_jobs``, ``best_fv``, ``start_fv`` (the first entry of the first job: for a seeded
+    run the value of the seed, #396), ``seconds_per_callback`` (recent mean, #397) and
     ``last_callback_time`` (UTC ISO), and
     ``status_source`` (``'pid'``, ``'job_files'`` or ``'stored'``). The file is rewritten only when
     one of them changed. Errors are swallowed; returns ``None`` if the folder has no manifest.
@@ -309,6 +329,7 @@ def refresh_run_manifest(folder, stale_after_s=STALE_AFTER_S):
                 "n_nonfinite": sum(j.n_nonfinite for j in jobs),
                 "stalled_jobs": count_stalled_jobs(jobs),
                 "best_fv": min((j.best_fv for j in jobs), default=None),
+                "start_fv": jobs[0].first_fv if jobs else None,
                 "seconds_per_callback": None if rate is None else round(rate, 1),
             }
             for key, value in stats.items():

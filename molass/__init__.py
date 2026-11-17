@@ -288,6 +288,23 @@ def analysis_status(analysis_folder):
     from molass.Rigorous.AnalysisStatus import analysis_status as _analysis_status
     return _analysis_status(analysis_folder)
 
+def fork_analysis(source_folder, new_folder, model=None, seed='auto', **kwargs):
+    """Continue an existing analysis in a new folder, under another model or from its best result.
+
+    Lazy wrapper of :func:`molass.Rigorous.ForkAnalysis.fork_analysis`; see there for the details
+    (``match_curves``, ``method``, ``niter``, ``note``, ``dry_run``, and the arguments of
+    ``optimize_rigorously``). ``recipe.json`` of the new folder records ``forked_from``, ``seeded_from`` and
+    ``seed_params``; ``molass.analysis_status(new_folder).start_fv`` is the objective value of the seed.
+
+    Examples
+    --------
+    >>> import molass
+    >>> run = molass.fork_analysis("analysis-EGH", "analysis-GRM", model="grm", match_curves=True,
+    ...                            async_=True, monitor=False)
+    """
+    from molass.Rigorous.ForkAnalysis import fork_analysis as _fork_analysis
+    return _fork_analysis(source_folder, new_folder, model=model, seed=seed, **kwargs)
+
 from molass.LowRank.AlignDecompositions import align_decompositions  # noqa: E402
 from molass.Dev.ReloadAll import reload_all  # noqa: E402
 from molass.PackageUtils.EnvironmentReport import environment_report  # noqa: E402

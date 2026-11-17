@@ -10,8 +10,8 @@ from molass.LowRank.Decomposition import Decomposition
 from molass.SEC.Models.UvComponentCurve import UvComponentCurve
 from molass.Mapping.Mapping import Mapping
 
-JobInfo = namedtuple('JobInfo', ['id', 'iterations', 'best_fv', 'timestamp', 'n_entries', 'n_nonfinite'],
-                     defaults=(None, 0))
+JobInfo = namedtuple('JobInfo', ['id', 'iterations', 'best_fv', 'timestamp', 'n_entries', 'n_nonfinite', 'first_fv'],
+                     defaults=(None, 0, None))
 JobConvergence = namedtuple('JobConvergence', ['id', 'evals', 'fvs', 'best_fv', 'best_sv', 'timestamps'])
 ConvergenceInfo = namedtuple('ConvergenceInfo', [
     'jobs', 'best_fv', 'best_sv', 'best_job_id', 'spread', 'trend', 'n_jobs',
@@ -19,12 +19,16 @@ ConvergenceInfo = namedtuple('ConvergenceInfo', [
 
 JobInfo.__doc__ = """Metadata for a single rigorous optimization job.
 
-Attributes: id, iterations, best_fv, timestamp, n_entries, n_nonfinite.
+Attributes: id, iterations, best_fv, timestamp, n_entries, n_nonfinite, first_fv.
 
 ``n_entries`` is the number of callback entries of the job (equal to ``iterations``);
 ``n_nonfinite`` counts the entries rejected as non-finite (``fv`` is ``inf``/NaN or at least
 ``NONFINITE_FV``), a search that wastes many iterations that way or stalls looks otherwise
 like a healthy one (#346).
+
+``first_fv`` is the objective value at the start of the job (its first callback entry): ``best_fv < first_fv``
+means the job improved on its start, and for a seeded job it is the value of the seed, which tells whether the
+seed was used (#396). ``None`` when it cannot be read.
 """
 
 # the objective returns this order of magnitude (or inf) for a rejected evaluation
@@ -486,7 +490,7 @@ def list_rigorous_jobs(analysis_folder):
     Returns
     -------
     list of JobInfo
-        Each entry is a ``JobInfo(id, iterations, best_fv, timestamp, n_entries, n_nonfinite)``
+        Each entry is a ``JobInfo(id, iterations, best_fv, timestamp, n_entries, n_nonfinite, first_fv)``
         namedtuple (``n_nonfinite``: entries rejected as non-finite, #346).  The list is sorted by job id.
 
     Examples
@@ -518,10 +522,10 @@ def list_rigorous_jobs(analysis_folder):
         stats = _read_job_stats(cb_file, read_callback_txt_impl)
         if stats is None:
             continue
-        iterations, best_fv, timestamp, n_nonfinite = stats
+        iterations, best_fv, timestamp, n_nonfinite, first_fv = stats
         result.append(JobInfo(id=d, iterations=iterations,
                               best_fv=best_fv, timestamp=timestamp,
-                              n_entries=iterations, n_nonfinite=n_nonfinite))
+                              n_entries=iterations, n_nonfinite=n_nonfinite, first_fv=first_fv))
     return result
 
 
@@ -530,7 +534,7 @@ _job_stats_cache = {}
 
 
 def _read_job_stats(cb_file, read_callback_txt_impl):
-    """``(iterations, best_fv, timestamp, n_nonfinite)`` of a callback.txt, ``None`` if the job has no real result yet."""
+    """``(iterations, best_fv, timestamp, n_nonfinite, first_fv)`` of a callback.txt, ``None`` if the job has no real result yet."""
     try:
         st = os.stat(cb_file)
         key = (st.st_mtime_ns, st.st_size)
@@ -561,7 +565,8 @@ def _read_job_stats(cb_file, read_callback_txt_impl):
         stats = (len(fv_list),
                  float(min(row[1] for row in fv_list)),
                  fv_list[-1][3],      # timestamp of the last iteration
-                 sum(1 for row in fv_list if not _is_finite_fv(row[1])))
+                 sum(1 for row in fv_list if not _is_finite_fv(row[1])),
+                 float(fv_list[0][1]))   # the start of the job (#396)
     if key is not None:
         _job_stats_cache[cb_file] = (key, stats)
         _job_times_cache[cb_file] = [row[3] for row in fv_list[-_RATE_TIMES:] if row[3] is not None]

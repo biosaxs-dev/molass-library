@@ -171,12 +171,9 @@ class AnalysisStatus:
 
     @property
     def start_fv(self):
-        """Objective value of the starting point of the analysis (the first entry of the first job),
-        ``None`` if it cannot be read."""
-        if not self.jobs:
-            return None
-        fvs, _ = self._callback(self.jobs[0].id)
-        return float(fvs[0]) if fvs else None
+        """Objective value of the starting point of the analysis (the first entry of the first job): for a
+        seeded analysis the value of the seed. ``None`` if it cannot be read."""
+        return self.jobs[0].first_fv if self.jobs else None
 
     @property
     def best_params(self):
@@ -302,10 +299,16 @@ class AnalysisStatus:
             lines.append("fronting allowed for: " + (describe(fronting) if fronting is not None
                                                      else "(recipe written before the policy: the former bounds)"))
         lines.extend(self._result_lines())
+        if r.get('seeded_from') is not None:
+            lines.append(f"seeded from: {r['seeded_from']} (job 000 started from the seed"
+                         + ("" if self.start_fv is None else f", start fv={self.start_fv:.4f}") + ")")
+        if r.get('forked_from') is not None:
+            lines.append(f"forked from: {r['forked_from']}")
         lines.append(f"jobs: {self.n_jobs}, iterations: {self.n_iterations}, "
                      f"rejected (non-finite): {self.n_nonfinite}, stalled jobs: {self.stalled_jobs}")
         for j in self.jobs:
-            lines.append(f"  job {j.id}: {j.iterations} iterations, best fv={j.best_fv:.4f}, "
+            start = "" if j.first_fv is None else f"start fv={j.first_fv:.4f}, "
+            lines.append(f"  job {j.id}: {j.iterations} iterations, {start}best fv={j.best_fv:.4f}, "
                          f"non-finite {j.n_nonfinite}")
         for finding in self.diagnose():
             lines.append(f"warning: {finding}")
