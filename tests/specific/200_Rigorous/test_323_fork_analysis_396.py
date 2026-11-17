@@ -109,6 +109,34 @@ def test_a_seed_with_nan_raises(tiny, tmp_path):
                                        async_=False, monitor=False)
 
 
+def test_a_seed_starts_job_000_only_later_rounds_continue_from_the_best(tiny, tmp_path, monkeypatch):
+    """With num_jobs > 1 every round used to get the seed, which takes priority over the resume from the best
+    parameters: each round restarted from the seed."""
+    import molass.LowRank.Decomposition as decomposition_module
+    import molass.Rigorous.RigorousImplement as implement
+    trimmed, decomp = tiny
+    calls = []
+
+    class Run:
+        def wait(self, timeout=None):
+            pass
+
+    def fake(decomposition, rgcurve, **kwargs):
+        calls.append((kwargs["clear_jobs"], kwargs["seed_params"]))
+        return Run()
+
+    monkeypatch.setattr(implement, "make_rigorous_decomposition_impl", fake)
+    # optimize_rigorously reloads the module on every call, which would undo the patch
+    monkeypatch.setattr(decomposition_module, "reload", lambda module: module)
+    seed = decomp.get_rigorous_initparams()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        decomp.optimize_rigorously(analysis_folder=str(tmp_path / "run"), trimmed_ssd=trimmed, seed_params=seed,
+                                   num_jobs=3, async_=False, monitor=False)
+    assert [clear for clear, _ in calls] == [True, False, False]
+    assert calls[0][1] is seed and calls[1][1] is None and calls[2][1] is None
+
+
 # -- the arguments of fork_analysis ------------------------------------------------------------------------------
 
 def test_the_seed_argument_is_resolved():

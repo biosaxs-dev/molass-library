@@ -2186,7 +2186,9 @@ class Decomposition(DidYouMeanMixin):
                 # async_=True internally so run_info exists (for on_round_start) before
                 # this round's wait() blocks -- the overall call still blocks the caller
                 # per the async_=False contract enforced above.
-                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=seed_params, constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting, note=note, seed_source=seed_source)
+                # the seed starts job 000 only: later rounds continue from the best parameters of all rounds so
+                # far (an explicit seed would take priority over that and restart every round from the seed, #396)
+                run_info = make_rigorous_decomposition_impl(self, rgcurve, analysis_folder=analysis_folder, method=method, niter=niter, frozen_components=frozen_components, frozen_param_groups=frozen_param_groups, trimmed_ssd=trimmed_ssd, clear_jobs=(round_idx == 0), function_code=function_code, in_process=in_process, monitor=monitor, async_=True, progress=progress, max_trials=max_trials, debug=debug, _dry_run=_dry_run, ns_narrow_bounds=ns_narrow_bounds, ns_adaptive_nsteps=ns_adaptive_nsteps, ns_nsteps=ns_nsteps, solver_kwargs=solver_kwargs, seed_params=(seed_params if round_idx == 0 else None), constraints=constraints, pipeline_recipe=pipeline_recipe, fronting=fronting, note=note, seed_source=seed_source)
                 if run_info is None:
                     return None  # _dry_run=True: pre-flight checks done, nothing to run/wait on
                 if on_round_start is not None:
