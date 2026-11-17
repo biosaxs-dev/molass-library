@@ -104,6 +104,8 @@ class Decomposition(DidYouMeanMixin):
         # job (set by load_rigorous_result). Not carried across upgrade() or other copies: they are other models
         # or other curves. score() evaluates it instead of re-deriving the parameters (molass-library#394).
         self._rigorous_params = None
+        # Set by upgrade(..., match_curves=True): how well the new curves matched the source ones (None otherwise).
+        self.match_curves_info = None
         # The decomposition the rigorous run started from (set by load_rigorous_result): the optimizer of that run
         # was built from it, so score() builds its optimizer from it too.
         self._rigorous_basis = None
@@ -1556,7 +1558,7 @@ class Decomposition(DidYouMeanMixin):
         scd_colors = ['green' if rank == 1 else 'red' for rank in ranks]
         return peak_top_xes, scd_colors
     
-    def upgrade(self, model, *, rgcurve=None, model_params=None, debug=False, **kwargs):
+    def upgrade(self, model, *, rgcurve=None, model_params=None, match_curves=False, debug=False, **kwargs):
         """
         Upgrade the decomposition to a physics-aware column model (SDM, EDM, LKM or GRM).
 
@@ -1576,7 +1578,8 @@ class Decomposition(DidYouMeanMixin):
         the EGH ones (GRM: about twice as broad); SDM and EDM additionally fit their
         parameters to the observed elution curve, not to the EGH curves. Upgrading
         the *rigorous* EGH result therefore gives a start no better than upgrading
-        the quick one. ``upgrade()`` does not resume an optimization either: to
+        the quick one. Pass ``match_curves=True`` (GRM and LKM) to start near the EGH curves
+        instead. ``upgrade()`` does not resume an optimization either: to
         continue from known parameters pass them to
         ``optimize_rigorously(seed_params=...)``.
         ::
@@ -1603,6 +1606,15 @@ class Decomposition(DidYouMeanMixin):
         model_params : dict, optional
             The parameters for the model.
 
+        match_curves : bool, optional
+            ``True``: after the estimate, fit the parameters of the new components (shared column
+            parameters and per-component ones together) by least squares to the component curves of
+            *this* decomposition, so that the new model starts near this solution, e.g.
+            ``rigorous_egh_result.upgrade('GRM', match_curves=True)``. The result is a start, not a fit of
+            the model to the data; ``result.match_curves_info`` has the error (root mean square
+            difference to the source curves, relative to the maximum of their sum) before and after.
+            Available for ``GRM`` and ``LKM`` (``NotImplementedError`` for the others). Default False.
+
         pore_dist : str, optional
             For SDM only: pore-size distribution to use.
             ``'mono'`` (default) uses a single pore size (G1200, gamma residence time);
@@ -1627,6 +1639,10 @@ class Decomposition(DidYouMeanMixin):
             import molass.SEC.ModelFactory
             reload(molass.SEC.ModelFactory)
         from molass.SEC.ModelFactory import create_model
+        if match_curves:
+            from molass.SEC.Models.MatchCurves import check_model
+            check_model(model)
+            kwargs['match_curves'] = True
         sec_model = create_model(model, debug=debug)
         return sec_model.optimize_decomposition(self, rgcurve=rgcurve,
                                                 model_params=model_params,

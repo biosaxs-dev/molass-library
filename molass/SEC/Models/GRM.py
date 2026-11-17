@@ -52,6 +52,7 @@ class GRM:
             New decomposition with ``GrmComponentCurve`` objects.
         """
         debug = kwargs.get('debug', False)
+        match_curves = kwargs.pop('match_curves', False)
 
         if debug:
             from importlib import reload
@@ -68,6 +69,11 @@ class GRM:
         grm_init_params = estimate_grm_init_params(decomposition, **kwargs)
         new_xr_ccurves = optimize_grm_xr_decomposition(
             decomposition, grm_init_params, **kwargs)
+        match_info = None
+        if match_curves:
+            from molass.SEC.Models.MatchCurves import match_ccurves
+            new_xr_ccurves, match_info = match_ccurves(
+                'GRM', decomposition.xr_ccurves, new_xr_ccurves, decomposition.xr_icurve.x, debug=debug)
 
         if decomposition.uv is None:
             from molass.Decompose.XrOnlyUtils import make_dummy_uv_ccurves
@@ -77,4 +83,6 @@ class GRM:
             new_uv_ccurves = optimize_uv_decomposition(
                 decomposition, new_xr_ccurves, preserve_ratios=True, **kwargs)
 
-        return decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
+        result = decomposition.copy_with_new_components(new_xr_ccurves, new_uv_ccurves)
+        result.match_curves_info = match_info
+        return result
