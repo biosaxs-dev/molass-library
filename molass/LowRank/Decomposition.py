@@ -1558,11 +1558,31 @@ class Decomposition(DidYouMeanMixin):
     
     def upgrade(self, model, *, rgcurve=None, model_params=None, debug=False, **kwargs):
         """
-        Upgrade the decomposition to a physics-aware column model (SDM or EDM).
+        Upgrade the decomposition to a physics-aware column model (SDM, EDM, LKM or GRM).
 
         Replaces the EGH elution model with a more physically realistic
-        column model, using the EGH shape parameters as a starting point
-        for column-parameter estimation.
+        column model. This is a **fresh estimate** of the new model on the same
+        data, guided by the EGH decomposition; it does not convert the fit.
+
+        What is carried over: the number of components, the peak positions
+        (the means of the components), the Rg values, the ``xr_ranks`` and the
+        fronting flags.
+
+        What is not: the fitted widths and shapes of the EGH curves, and everything a
+        rigorous optimization has refined (optimized baselines, UV scales, mapping).
+        The column parameters of the new model are estimated again from positions,
+        widths and Rg. For LKM and GRM only the component scales are then fitted
+        (non-negative least squares) and the curves can start quite different from
+        the EGH ones (GRM: about twice as broad); SDM and EDM additionally fit their
+        parameters to the observed elution curve, not to the EGH curves. Upgrading
+        the *rigorous* EGH result therefore gives a start no better than upgrading
+        the quick one. ``upgrade()`` does not resume an optimization either: to
+        continue from known parameters pass them to
+        ``optimize_rigorously(seed_params=...)``.
+        ::
+
+            decomp_grm = decomp_egh.upgrade('GRM')
+            decomp_grm.score(trimmed_ssd=trimmed)      # the start of a GRM run
 
         Parameters
         ----------
