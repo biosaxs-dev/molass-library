@@ -1622,7 +1622,8 @@ class Decomposition(DidYouMeanMixin):
             Takes precedence over ``model_params['pore_dist']`` when both are given.
 
         debug : bool, optional
-            If True, enable debug mode.
+            If True, reload the modules of the model and show the output the legacy code prints
+            (peak-boundary traces, tracebacks of handled exceptions, ...), which is discarded by default.
 
         **kwargs
             Additional keyword arguments forwarded to the model's
@@ -1644,9 +1645,11 @@ class Decomposition(DidYouMeanMixin):
             check_model(model)
             kwargs['match_curves'] = True
         sec_model = create_model(model, debug=debug)
-        return sec_model.optimize_decomposition(self, rgcurve=rgcurve,
-                                                model_params=model_params,
-                                                debug=debug, **kwargs)
+        from molass.Global.Quiet import quiet_legacy
+        with quiet_legacy(debug):
+            return sec_model.optimize_decomposition(self, rgcurve=rgcurve,
+                                                    model_params=model_params,
+                                                    debug=debug, **kwargs)
 
     def optimize_with_model(self, model_name, rgcurve=None, model_params=None, debug=False, **kwargs):
         """Deprecated. Use :meth:`upgrade` instead."""
@@ -1763,7 +1766,7 @@ class Decomposition(DidYouMeanMixin):
         else:
             raise ValueError(f"Decomposition.make_rigorous_initparams: Unsupported model '{self.model}'")
 
-    def get_rigorous_param_count(self):
+    def get_rigorous_param_count(self, debug=False):
         """Return the number of parameters for rigorous optimization.
 
         Convenience wrapper around :meth:`make_rigorous_initparams` that
@@ -1775,6 +1778,11 @@ class Decomposition(DidYouMeanMixin):
 
         Works for all supported models (EGH, SDM, EDM, LKM).
 
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, show the output the legacy code prints (discarded by default).
+
         Returns
         -------
         int
@@ -1782,11 +1790,9 @@ class Decomposition(DidYouMeanMixin):
             passed to the legacy objective function (G1100 / G1200 / G1300 /
             G1400 / G2020).
         """
-        from molass.Rigorous.LegacyBridgeUtils import make_basecurves_from_decomposition
-        _, baseparams = make_basecurves_from_decomposition(self)
-        return len(self.make_rigorous_initparams(baseparams))
+        return len(self.get_rigorous_initparams(debug=debug))
 
-    def get_rigorous_initparams(self):
+    def get_rigorous_initparams(self, debug=False):
         """Return the estimator-derived initial parameter vector for rigorous optimization.
 
         Equivalent to what :meth:`optimize_rigorously` computes internally before
@@ -1800,15 +1806,23 @@ class Decomposition(DidYouMeanMixin):
 
         Works for all supported models (EGH, SDM, EDM, LKM, GRM).
 
+        Parameters
+        ----------
+        debug : bool, optional
+            If True, show the output the legacy code prints (peak-boundary traces, tracebacks of
+            handled exceptions, ...). It is discarded by default: one call printed ~90 lines.
+
         Returns
         -------
         np.ndarray
             Flat parameter vector (same shape as ``best_params`` on a completed
             :class:`~molass.Rigorous.RunInfo.RunInfo`).
         """
+        from molass.Global.Quiet import quiet_legacy
         from molass.Rigorous.LegacyBridgeUtils import make_basecurves_from_decomposition
-        _, baseparams = make_basecurves_from_decomposition(self)
-        return self.make_rigorous_initparams(baseparams)
+        with quiet_legacy(debug):
+            _, baseparams = make_basecurves_from_decomposition(self)
+            return self.make_rigorous_initparams(baseparams)
 
     def optimize_rigorously(self, rgcurve=None, analysis_folder=None, method='BH', niter=20,
                             frozen_components=None, free_components=None,

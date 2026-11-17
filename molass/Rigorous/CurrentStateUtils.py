@@ -833,7 +833,7 @@ def try_fast_rg_curve(decomp, analysis_folder, debug=False):
     analysis_folder : str
         Same value passed to ``optimize_rigorously(analysis_folder=...)``.
     debug : bool, optional
-        If True, reload modules from disk.
+        If True, show the output the legacy code prints (discarded by default).
 
     Returns
     -------
@@ -851,22 +851,24 @@ def try_fast_rg_curve(decomp, analysis_folder, debug=False):
             decomp.get_rg_curve()  # fall back to the full per-frame Guinier fit
         score = decomp.score(trimmed_ssd=trimmed)  # picks up the cached curve either way
     """
+    from molass.Global.Quiet import quiet_legacy
     try:
-        from molass_legacy.RgProcess.RgCurve import check_rg_folder
-        from molass_legacy.RgProcess.RgCurveProxy import RgCurveProxy
-        from molass.Rigorous.LegacyBridgeUtils import _make_elcurve
-        from molass.Guinier.RgCurveUtils import get_connected_curve_info
-        from molass.Guinier.RgCurve import RgCurve
+        with quiet_legacy(debug):
+            from molass_legacy.RgProcess.RgCurve import check_rg_folder
+            from molass_legacy.RgProcess.RgCurveProxy import RgCurveProxy
+            from molass.Rigorous.LegacyBridgeUtils import _make_elcurve
+            from molass.Guinier.RgCurveUtils import get_connected_curve_info
+            from molass.Guinier.RgCurve import RgCurve
 
-        rg_curve_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "rg-curve")
-        if not check_rg_folder(rg_curve_folder):
-            return False
+            rg_curve_folder = os.path.join(os.path.abspath(analysis_folder), "optimized", "rg-curve")
+            if not check_rg_folder(rg_curve_folder):
+                return False
 
-        xr_curve = _make_elcurve(*decomp.ssd.xr.get_icurve().get_xy())
-        proxy = RgCurveProxy(xr_curve, rg_curve_folder)
-        indeces, _, rgvalues, scores, _ = get_connected_curve_info(proxy)
-        decomp._rgcurve = RgCurve(indeces, rgvalues, scores)
-        return True
+            xr_curve = _make_elcurve(*decomp.ssd.xr.get_icurve().get_xy())
+            proxy = RgCurveProxy(xr_curve, rg_curve_folder)
+            indeces, _, rgvalues, scores, _ = get_connected_curve_info(proxy)
+            decomp._rgcurve = RgCurve(indeces, rgvalues, scores)
+            return True
     except Exception:
         return False
 

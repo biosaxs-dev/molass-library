@@ -122,7 +122,7 @@ def resolve_input_folder(analysis_folder, recipe, in_folder=None):
         f"Pass in_folder=<the folder holding the data> to override.")
 
 
-def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
+def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, debug=False):
     """Rebuild (ssd, trimmed, decomp, recipe) from an analysis_folder's recipe.json.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -141,6 +141,9 @@ def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
         reopen an analysis on another machine or after the data moved (#348). By default the
         bundled ``molass_data`` sample named in ``recipe.json`` (``dataset``) is used, then the
         absolute path stored in the first job's ``in_folder.txt``; see :func:`resolve_input_folder`.
+    debug : bool, optional
+        If True, show the output the legacy code prints while the pipeline is replayed
+        (peak-boundary traces, tracebacks of handled exceptions, ...). Discarded by default (#398).
 
     Returns
     -------
@@ -149,6 +152,12 @@ def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
         to any rigorous-optimization result. Use ``decomp.load_rigorous_result(
         analysis_folder)`` to attach the best on-disk result.
     """
+    from molass.Global.Quiet import quiet_legacy
+    with quiet_legacy(debug):
+        return _rebuild_decomposition_from_recipe(analysis_folder, in_folder)
+
+
+def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     import os, json
 
     analysis_folder = os.path.abspath(analysis_folder)
