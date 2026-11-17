@@ -248,3 +248,35 @@ def test_a_fork_starts_from_the_best_of_its_source_and_says_so(finished):
     assert status.start_fv == pytest.approx(src.result.fv, abs=1e-3)       # job 000 started from the seed
     assert "seeded from: best of analysis-A" in status.summary()
     assert status.jobs[0].first_fv == pytest.approx(src.result.fv, abs=1e-3)
+
+
+@pytest.mark.slow
+def test_a_source_the_caller_already_holds_is_not_rebuilt(finished, monkeypatch):
+    """The GUI's result view has the decomposition, the trimmed data and the recipe: fork_source loads only the
+    result of a job, and the plan is the same as from load_analysis."""
+    from molass.Rigorous.ForkAnalysis import fork_source
+    source, folder = finished
+    loaded = molass.load_analysis(source)
+    held = fork_source(source, loaded.decomp, loaded.trimmed, loaded.recipe)
+    assert held.jobid == loaded.jobid and held.fv == pytest.approx(loaded.fv, abs=1e-3)
+    assert held.result._rigorous_params is not None
+
+    import molass.Rigorous.AnalysisFolder as analysis_folder_module
+    monkeypatch.setattr(analysis_folder_module, "load_analysis",
+                        lambda *a, **k: pytest.fail("the source was rebuilt although it was given"))
+    plan = molass.fork_analysis(source, os.path.join(folder, "analysis-F"), dry_run=True, info=held)
+    np.testing.assert_allclose(plan.seed_params, loaded.result._rigorous_params)
+    assert plan.seed == 'best' and plan.info is held
+    plan = molass.fork_analysis(source, os.path.join(folder, "analysis-G"), model="lkm", match_curves=True,
+                                dry_run=True, info=held)
+    assert plan.seed == 'converted' and plan.model == 'lkm'
+
+
+def test_fork_source_without_a_completed_job_raises(tiny, tmp_path):
+    from molass.Rigorous.CurrentStateUtils import NoCompletedJobError
+    from molass.Rigorous.ForkAnalysis import fork_source
+    trimmed, decomp = tiny
+    folder = str(tmp_path / "empty")
+    os.makedirs(os.path.join(folder, "optimized", "jobs"))
+    with pytest.raises(NoCompletedJobError):
+        fork_source(folder, decomp, trimmed, {})

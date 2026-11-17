@@ -94,8 +94,51 @@ def _resolve_seed(seed, changed, source_model, target):
     return 'given', array
 
 
+def fork_source(analysis_folder, decomp, trimmed, recipe, rgcurve=None, jobid='best'):
+    """A fork source from what a caller already holds, without rebuilding the decomposition (#396).
+
+    ``load_analysis`` rebuilds the pipeline from ``recipe.json``, which takes minutes. A program that has the
+    initial decomposition ``decomp``, the trimmed data and the recipe (the GUI's result view) only needs to load
+    the result of a job, which is fast. Pass the returned object as ``info=`` of :func:`plan_fork` /
+    :func:`fork_analysis`.
+
+    Returns
+    -------
+    types.SimpleNamespace
+        ``analysis_folder``, ``result`` (the loaded result with its stored parameters), ``jobid``, ``decomp``,
+        ``trimmed``, ``recipe``, ``fv``, ``sv`` -- what :func:`plan_fork` reads of an
+        :class:`~molass.Rigorous.AnalysisFolder.AnalysisInfo`.
+
+    Raises
+    ------
+    NoCompletedJobError
+        The folder has no completed job yet.
+    """
+    from types import SimpleNamespace
+    from molass.Global.Quiet import quiet_legacy
+    from molass.Rigorous.CurrentStateUtils import list_rigorous_jobs, load_rigorous_result, fv_to_sv
+    analysis_folder = os.path.abspath(analysis_folder)
+    with quiet_legacy():
+        result = load_rigorous_result(decomp, analysis_folder, jobid=jobid, rgcurve=rgcurve)
+    jobs = list_rigorous_jobs(analysis_folder)
+    if isinstance(jobid, str) and jobid != 'best':
+        loaded = jobid
+    elif jobs:
+        loaded = (min(jobs, key=lambda j: j.best_fv) if jobid == 'best' else jobs[-1]).id
+    else:
+        loaded = None
+    job = next((j for j in jobs if j.id == loaded), None)
+    if job is not None and getattr(result, 'fv', None) is None:
+        result.fv = job.best_fv
+        result.sv = float(fv_to_sv(job.best_fv))
+    return SimpleNamespace(analysis_folder=analysis_folder, result=result, jobid=loaded, decomp=decomp,
+                           trimmed=trimmed, recipe=recipe, fv=getattr(result, 'fv', None),
+                           sv=getattr(result, 'sv', None))
+
+
 def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', match_curves=False,
-              method=None, niter=None, note=None, in_folder=None, upgrade_kwargs=None, optimize_kwargs=None):
+              method=None, niter=None, note=None, in_folder=None, upgrade_kwargs=None, optimize_kwargs=None,
+              info=None):
     """Prepare the fork (see :func:`fork_analysis`) without starting anything."""
     source_folder = os.path.abspath(source_folder)
     new_folder = os.path.abspath(new_folder)
@@ -117,9 +160,10 @@ def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', 
         raise ValueError("match_curves=True matches the curves of another model: it needs model=...")
     kind, given = _resolve_seed(seed, changed, source_model, target)
 
-    from molass.Rigorous.AnalysisFolder import load_analysis
     from molass.Rigorous.CurrentStateUtils import NoCompletedJobError
-    info = load_analysis(source_folder, jobid=jobid, in_folder=in_folder)
+    if info is None:
+        from molass.Rigorous.AnalysisFolder import load_analysis
+        info = load_analysis(source_folder, jobid=jobid, in_folder=in_folder)
     if info.result is None:
         raise NoCompletedJobError(f"{source_folder} has no completed job to fork from yet")
 
@@ -182,7 +226,7 @@ def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', 
 
 def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='best', match_curves=False,
                   method=None, niter=None, note=None, in_folder=None, dry_run=False, upgrade_kwargs=None,
-                  **optimize_kwargs):
+                  info=None, **optimize_kwargs):
     """Continue an analysis in a new folder, under another model or from its best result (molass-library#396).
 
     Opens ``source_folder`` (:func:`molass.load_analysis`), copies its recipe into a new analysis with the
@@ -223,6 +267,9 @@ def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='bes
         folder. Default False.
     upgrade_kwargs : dict, optional
         Arguments for ``upgrade()`` (e.g. ``{'pore_dist': 'lognormal'}`` for SDM).
+    info : AnalysisInfo or object from :func:`fork_source`, optional
+        The already loaded source: skips the rebuild of the decomposition from ``recipe.json`` (minutes).
+        ``jobid`` and ``in_folder`` are then not used.
     **optimize_kwargs
         Passed to ``optimize_rigorously`` (``async_``, ``monitor``, ``constraints``, ...), overriding what
         the fork sets.
@@ -249,7 +296,7 @@ def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='bes
     """
     plan = plan_fork(source_folder, new_folder, model=model, seed=seed, jobid=jobid, match_curves=match_curves,
                      method=method, niter=niter, note=note, in_folder=in_folder, upgrade_kwargs=upgrade_kwargs,
-                     optimize_kwargs=optimize_kwargs)
+                     optimize_kwargs=optimize_kwargs, info=info)
     if dry_run:
         return plan
     return plan.launch()
