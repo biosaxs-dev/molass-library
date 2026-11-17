@@ -8,7 +8,7 @@ GLOBAL_OPTIONS = dict(
     flowchange = False,
     developer_mode = False,
     elution_recognition = 'icurve',
-    quiet = False,
+    quiet = True,
     small_angle_limit = 'extended',
 )
 
@@ -50,10 +50,13 @@ def set_molass_options(**kwargs):
         (trimmed) q-rows, which is more robust when baseline drift is
         q-dependent (e.g. MY-type datasets).
     quiet : bool, optional
-        If True, suppress verbose diagnostic output from internal and
-        legacy code during core API calls (``SSD()``, ``trimmed_copy()``,
-        ``corrected_copy()``, ``quick_decomposition()``,
-        ``optimize_rigorously()``).  Default is False.
+        If True (the default), discard the verbose output of the legacy code (peak-boundary traces,
+        tracebacks of exceptions it handles itself, mapping results, numerical warnings) during the core
+        API calls (``SSD()``, ``trimmed_copy()``, ``corrected_copy()``, ``quick_decomposition()``,
+        ``optimize_rigorously()``). Warnings meant for the user (molass ``UserWarning`` s) are still shown.
+        ``set_molass_options(quiet=False)`` or ``debug=True`` in a call shows everything. Calls that run
+        legacy code on their own (``upgrade()``, ``get_rigorous_initparams()``, ``score()``, ...) are
+        quiet unless ``debug=True`` whatever this option says. Was False before molass-library#398.
     kwargs : dict
         Other options to set.
     """
