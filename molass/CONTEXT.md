@@ -8,6 +8,10 @@ checkout of the source repository.
 Find this file's absolute path at runtime: `python -c "import molass; print(molass.context_path())"`
 (or `molass.print_context()` to dump it directly).
 
+**`CHANGELOG.md` sits next to this file**: per version, what changed in behavior (read that first when results or output differ
+from what you expect), what was added, and what it requires. To test for a feature instead of a version:
+`hasattr(molass, "fork_analysis")` or `molass.requires("1.3.0")`.
+
 If you're developing `molass-library`/`molass-legacy` themselves (not just
 using the package), see `.github/copilot-instructions.md` and `PROJECT_STATUS.md`
 in the source repository instead — those cover testing conventions, the
