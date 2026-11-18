@@ -581,10 +581,11 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     if analysis_folder is not None:
         analysis_folder = os.path.abspath(analysis_folder)
 
-    import molass.Rigorous.LegacyBridgeUtils
-    reload(molass.Rigorous.LegacyBridgeUtils)
-    import molass.Rigorous.FunctionCodeUtils
-    reload(molass.Rigorous.FunctionCodeUtils)
+    if debug:
+        import molass.Rigorous.LegacyBridgeUtils
+        reload(molass.Rigorous.LegacyBridgeUtils)
+        import molass.Rigorous.FunctionCodeUtils
+        reload(molass.Rigorous.FunctionCodeUtils)
     from molass.Rigorous.LegacyBridgeUtils import (prepare_rigorous_folders,
                                                     make_dsets_from_decomposition,
                                                     make_basecurves_from_decomposition,
@@ -598,9 +599,8 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # the LPM baseline, which can be biased (e.g. negative on anomaly datasets).
     # See molass-library#163 (comment) and #164 for background.
     #
-    # PLACEMENT CONSTRAINT: this block must remain ABOVE the `with _stack:` context
-    # manager below.  The _stack enters warnings.simplefilter("ignore"), which would
-    # swallow this warning silently.  Do NOT move this block inside `with _stack:`.
+    # PLACEMENT: keep this block ABOVE the `with _stack:` context manager below, so the warning is
+    # raised at the caller's stack level (the block now re-emits user-facing warnings on exit, #404).
     if trimmed_ssd is None and getattr(decomposition.ssd, 'corrected', False):
         import warnings as _w
         _w.warn(
@@ -672,8 +672,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # choice the end user actually made) rather than real evidence. Absent
     # or True (the default) preserves existing behavior for plain script/
     # notebook callers, who wrote proportions=... (or nothing) themselves.
-    # PLACEMENT: must be ABOVE `with _stack:` — the stack enters
-    # warnings.simplefilter("ignore") and would swallow this warning silently.
+    # PLACEMENT: above `with _stack:` -- see the comment of the Pattern A warning above.
     _auto_constraint_ok = pipeline_recipe is None or pipeline_recipe.get('auto_constraint', True)
     if constraints is None and _auto_constraint_ok and len(decomposition.xr_ccurves) >= 3:
         import warnings as _w
@@ -711,7 +710,7 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
     # #249: warn when USER-supplied constraints cannot be transferred to recipe subprocess.
     # Only fires for constraints the caller passed explicitly — not auto-applied LumpingConstraint
     # (which is handled via method in recipe.json, so no warning needed for that case).
-    # PLACEMENT: must be ABOVE `with _stack:` — the stack suppresses all warnings.
+    # PLACEMENT: above `with _stack:` -- see the comment of the Pattern A warning above.
     _user_constraints = constraints  # at this point only user-supplied constraints remain
     # After the DE auto-apply block, constraints may include auto-added LumpingConstraint;
     # we track whether the user originally passed anything non-None and non-empty.
@@ -790,11 +789,9 @@ def make_rigorous_decomposition_impl(decomposition, rgcurve, analysis_folder=Non
 
     _stack = ExitStack()
     if not debug:
-        _stack.enter_context(redirect_stdout(io.StringIO()))
-        _stack.enter_context(redirect_stderr(io.StringIO()))
-        _wctx = _warnings.catch_warnings()
-        _stack.enter_context(_wctx)
-        _warnings.simplefilter("ignore")
+        from molass.Global.Quiet import quiet_legacy
+        # Discards the legacy output; warnings meant for the user are shown when the block is left (#404).
+        _stack.enter_context(quiet_legacy())
 
     # Capture the original input data folder before prepare_rigorous_folders may
     # overwrite the global 'in_folder' setting with the temp export directory.

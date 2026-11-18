@@ -176,9 +176,10 @@ def construct_decomposition_from_results(run_info, **kwargs):
     separated_params = optimizer.split_params_simple(params)
 
     # xr_ccurves
-    from importlib import reload
-    import molass.Rigorous.ComponentUtils
-    reload(molass.Rigorous.ComponentUtils)
+    if debug:
+        from importlib import reload
+        import molass.Rigorous.ComponentUtils
+        reload(molass.Rigorous.ComponentUtils)
     from .ComponentUtils import get_xr_ccurves
     xr_ccurves = get_xr_ccurves(optimizer, xr_icurve, separated_params)
 
@@ -314,11 +315,8 @@ def load_rigorous_result(decomp, analysis_folder, jobid=None, rgcurve=None, xr_r
 
     ssd = decomp.ssd
     rgcurve_for_dsets = rgcurve if rgcurve is not None else ssd.xr.compute_rgcurve()
-    import io, warnings
-    from contextlib import redirect_stdout, redirect_stderr
-    with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), \
-         warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    from molass.Global.Quiet import quiet_legacy
+    with quiet_legacy(debug):
         dsets = make_dsets_from_decomposition(decomp, rgcurve_for_dsets, debug=debug)
         basecurves, _ = make_basecurves_from_decomposition(decomp, debug=debug)
     spectral_vectors = ssd.get_spectral_vectors()
@@ -420,7 +418,7 @@ def load_best_rigorous_result(decomp, analysis_folder, rgcurve=None, xr_ranks=No
                                 xr_ranks=xr_ranks, debug=debug)
 
 
-def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=None):
+def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=None, progress_cb=None):
     """Reconstruct a full session from just an ``analysis_folder``.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -442,6 +440,8 @@ def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=
     in_folder : str, optional
         Folder holding the input data, for an analysis folder whose recorded data path does not
         exist here (another machine, moved data); see ``rebuild_decomposition_from_recipe`` (#348).
+    progress_cb : callable, optional
+        ``progress_cb(stage, fraction)`` while the decomposition is rebuilt (#401).
 
     Returns
     -------
@@ -471,7 +471,8 @@ def load_analysis_session(analysis_folder, jobid='best', debug=False, in_folder=
         import molass.Rigorous.RecipeRunner
         reload(molass.Rigorous.RecipeRunner)
     from molass.Rigorous.RecipeRunner import rebuild_decomposition_from_recipe
-    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder, in_folder=in_folder)
+    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder, in_folder=in_folder,
+                                                                     progress_cb=progress_cb)
     result = load_rigorous_result(decomp, analysis_folder, jobid=jobid, debug=debug)
     return ssd, trimmed, decomp, result, recipe
 

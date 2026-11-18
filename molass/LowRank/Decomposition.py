@@ -708,6 +708,12 @@ class Decomposition(DidYouMeanMixin):
             This can be slow for large datasets because it fits one Guinier
             region per frame.
 
+        .. note::
+            **Thread safety**: unlike :meth:`score`, this touches neither Tk nor matplotlib, so
+            it may run on a background thread (molass-gui does) or in a child process
+            (:meth:`SecSaxsData.start_rg_curve_process`, which also avoids competing for the GIL
+            with a GUI thread).
+
         Returns
         -------
         rgcurve : molass.Guinier.RgCurve.RgCurve
@@ -2156,7 +2162,8 @@ class Decomposition(DidYouMeanMixin):
             frozen_components = sorted(all_indices - free_set)
 
         import molass.Rigorous.RigorousImplement
-        reload(molass.Rigorous.RigorousImplement)
+        if debug:
+            reload(molass.Rigorous.RigorousImplement)
         from molass.Rigorous.RigorousImplement import make_rigorous_decomposition_impl
 
         if rgcurve is None:
@@ -2405,6 +2412,10 @@ class Decomposition(DidYouMeanMixin):
         This reads saved parameters without launching a new subprocess.
         Use it to view results from a previous session after a kernel or
         VS Code restart.
+
+        .. note::
+            Like :meth:`score`, this builds a legacy optimizer: in a GUI application call it from the
+            main thread (see the thread-safety warning of :meth:`score`).
 
         Parameters
         ----------

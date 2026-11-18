@@ -122,7 +122,7 @@ def resolve_input_folder(analysis_folder, recipe, in_folder=None):
         f"Pass in_folder=<the folder holding the data> to override.")
 
 
-def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, debug=False):
+def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, debug=False, progress_cb=None):
     """Rebuild (ssd, trimmed, decomp, recipe) from an analysis_folder's recipe.json.
 
     Replays the same SSD -> trim -> correct -> quick_decomposition -> upgrade
@@ -144,6 +144,13 @@ def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, debug=Fal
     debug : bool, optional
         If True, show the output the legacy code prints while the pipeline is replayed
         (peak-boundary traces, tracebacks of handled exceptions, ...). Discarded by default (#398).
+    progress_cb : callable, optional
+        ``progress_cb(stage, fraction)``, called when each stage starts ("Loading the data", "Trimming",
+        "Correcting the baseline", "Quick decomposition", "Upgrading to GRM", ...) and once more with
+        ``("Done", 1.0)``. ``fraction`` is the share of the stages that have finished. The replay takes
+        minutes on large data and runs on the calling thread, so this is the way for a GUI or a notebook
+        to say what is going on (#401). To look at a folder without the replay: ``molass.analysis_status()``
+        or ``molass.load_analysis(..., light=True)``.
 
     Returns
     -------
@@ -154,10 +161,10 @@ def rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, debug=Fal
     """
     from molass.Global.Quiet import quiet_legacy
     with quiet_legacy(debug):
-        return _rebuild_decomposition_from_recipe(analysis_folder, in_folder)
+        return _rebuild_decomposition_from_recipe(analysis_folder, in_folder, progress_cb=progress_cb)
 
 
-def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
+def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None, progress_cb=None):
     import os, json
 
     analysis_folder = os.path.abspath(analysis_folder)
@@ -194,17 +201,29 @@ def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     if recipe.get('xr_pickat') is not None:
         ssd_kwargs['xr_pickat'] = recipe['xr_pickat']
 
+    stages = ["Loading the data", "Trimming", "Correcting the baseline", "Quick decomposition"]
+    if model != 'egh':
+        stages.append(f"Upgrading to {model.upper()}")
+
+    def report(i):
+        if progress_cb is not None:
+            progress_cb(stages[i], i / len(stages))
+
+    report(0)
     ssd = SSD(in_folder, **ssd_kwargs)
     # The trimming must see the anomaly_handling option the recipe was made with (it is recorded only when
     # switched off); the caller's setting is restored afterwards, this may run inside a notebook (#310).
     from molass.Global.Options import get_molass_options, set_molass_options
     saved_handling = get_molass_options('anomaly_handling')
     set_molass_options(anomaly_handling=recipe.get('anomaly_handling', saved_handling))
+    report(1)
     try:
         trimmed = ssd.trimmed_copy(**_trim_kwargs_from_recipe(recipe))
     finally:
         set_molass_options(anomaly_handling=saved_handling)
+    report(2)
     corrected = trimmed.corrected_copy(**baseline_params)
+    report(3)
     decomp = corrected.quick_decomposition(**decomp_params)
     # Which components may front (molass-library#350). Recipes written before the policy was recorded have no
     # 'fronting' and are rebuilt with the bounds they ran with ('legacy': EGH tau >= 0, EDM b free).
@@ -212,6 +231,7 @@ def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     fronting = recipe.get('fronting')
     fronting_mode = list(fronting) if fronting is not None else 'legacy'
     if model != 'egh':
+        report(4)
         upgrade_kwargs = {}
         if pore_dist is not None:
             upgrade_kwargs['pore_dist'] = pore_dist
@@ -227,6 +247,8 @@ def _rebuild_decomposition_from_recipe(analysis_folder, in_folder=None):
     if xr_ranks is not None:
         decomp.update_xr_ranks(xr_ranks)
 
+    if progress_cb is not None:
+        progress_cb("Done", 1.0)
     return ssd, trimmed, decomp, recipe
 
 

@@ -281,13 +281,15 @@ class AnalysisInfo(AnalysisStatus):
         return f"AnalysisInfo({os.path.basename(os.path.normpath(self.analysis_folder))!r}, jobid={self.jobid!r}, fv={self.fv}, n_jobs={self.n_jobs})"
 
 
-def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, light=False):
+def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, light=False, progress_cb=None):
     """Open an analysis folder: best result, its score value, jobs, rejected iterations and recipe.
 
     The one call for "what happened in this analysis folder", whether the run is finished or still
     going. It rebuilds the decomposition from ``recipe.json``, loads the result of the job selected
     by ``jobid`` and lists the jobs; ``print(info)`` (or ``info.summary()``) answers the usual
-    questions at once.
+    questions at once. The rebuild replays the whole pipeline and takes minutes on large data: use
+    ``light=True`` (or :func:`molass.analysis_status`) when the files are enough, and ``progress_cb``
+    to report the stages.
 
     Parameters
     ----------
@@ -305,6 +307,9 @@ def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, l
         :func:`molass.analysis_status` (files only, seconds instead of minutes; no ``result``,
         ``decomp``, ``ssd``, ``trimmed``), and ``jobid``, ``rgcurve`` and ``in_folder`` are not used (#352).
         Default ``False``.
+    progress_cb : callable, optional
+        ``progress_cb(stage, fraction)`` while the decomposition is rebuilt, see
+        :func:`~molass.Rigorous.RecipeRunner.rebuild_decomposition_from_recipe` (#401).
 
     Returns
     -------
@@ -332,7 +337,8 @@ def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, l
     from molass.Rigorous.RunRegistry import read_manifest
 
     analysis_folder = os.path.abspath(analysis_folder)
-    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder, in_folder=in_folder)
+    ssd, trimmed, decomp, recipe = rebuild_decomposition_from_recipe(analysis_folder, in_folder=in_folder,
+                                                                     progress_cb=progress_cb)
     rg_cache_path = os.path.join(analysis_folder, "optimized", "cache", "rgcurve.npz")
     decomp._rg_curve_cache_path = rg_cache_path
     jobs = list_rigorous_jobs(analysis_folder)

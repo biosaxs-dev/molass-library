@@ -321,10 +321,11 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
         if progress_cb is not None:
             progress_cb(phase)
 
-    import molass.Rigorous.LegacyBridgeUtils
-    reload(molass.Rigorous.LegacyBridgeUtils)
-    import molass.Rigorous.FunctionCodeUtils
-    reload(molass.Rigorous.FunctionCodeUtils)
+    if debug:
+        import molass.Rigorous.LegacyBridgeUtils
+        reload(molass.Rigorous.LegacyBridgeUtils)
+        import molass.Rigorous.FunctionCodeUtils
+        reload(molass.Rigorous.FunctionCodeUtils)
     from molass.Rigorous.LegacyBridgeUtils import (
         prepare_rigorous_folders,
         make_dsets_from_decomposition,
@@ -349,11 +350,9 @@ def _make_initial_score_core(decomposition, trimmed_ssd, analysis_folder,
     # Suppress verbose legacy output
     _stack = ExitStack()
     if not debug:
-        _stack.enter_context(redirect_stdout(io.StringIO()))
-        _stack.enter_context(redirect_stderr(io.StringIO()))
-        _wctx = warnings.catch_warnings()
-        _stack.enter_context(_wctx)
-        warnings.simplefilter("ignore")
+        from molass.Global.Quiet import quiet_legacy
+        # Discards the legacy output; warnings meant for the user are shown when the block is left (#404).
+        _stack.enter_context(quiet_legacy())
 
     # Capture original in_folder before prepare_rigorous_folders overwrites it
     from molass_legacy.SerialAnalyzer.DataUtils import get_in_folder as _get_in_folder_raw

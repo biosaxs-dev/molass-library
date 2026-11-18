@@ -255,11 +255,12 @@ def print_context():
         import sys
         print(text.encode(sys.stdout.encoding or "ascii", errors="replace").decode(sys.stdout.encoding or "ascii"))
 
-def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, light=False):
+def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, light=False, progress_cb=None):
     """Open an analysis folder in one call: best result, score value, jobs, rejected iterations, recipe.
 
     Lazy wrapper of :func:`molass.Rigorous.AnalysisFolder.load_analysis`; see there for the details.
-    ``light=True`` skips the rebuild of the decomposition (see :func:`analysis_status`).
+    ``light=True`` skips the rebuild of the decomposition (see :func:`analysis_status`); without it the
+    rebuild takes minutes on large data, and ``progress_cb(stage, fraction)`` reports its stages.
 
     Examples
     --------
@@ -269,7 +270,8 @@ def load_analysis(analysis_folder, jobid='best', rgcurve=None, in_folder=None, l
     >>> info.result.plot_components()
     """
     from molass.Rigorous.AnalysisFolder import load_analysis as _load_analysis
-    return _load_analysis(analysis_folder, jobid=jobid, rgcurve=rgcurve, in_folder=in_folder, light=light)
+    return _load_analysis(analysis_folder, jobid=jobid, rgcurve=rgcurve, in_folder=in_folder, light=light,
+                          progress_cb=progress_cb)
 
 def analysis_status(analysis_folder):
     """The light status of an analysis folder, read from its files in seconds (no decomposition rebuild).

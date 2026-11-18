@@ -145,7 +145,7 @@ def fork_source(analysis_folder, decomp, trimmed, recipe, rgcurve=None, jobid='b
 
 def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', match_curves=False,
               method=None, niter=None, note=None, in_folder=None, upgrade_kwargs=None, optimize_kwargs=None,
-              info=None):
+              info=None, progress_cb=None):
     """Prepare the fork (see :func:`fork_analysis`) without starting anything."""
     source_folder = os.path.abspath(source_folder)
     new_folder = os.path.abspath(new_folder)
@@ -170,7 +170,7 @@ def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', 
     from molass.Rigorous.CurrentStateUtils import NoCompletedJobError
     if info is None:
         from molass.Rigorous.AnalysisFolder import load_analysis
-        info = load_analysis(source_folder, jobid=jobid, in_folder=in_folder)
+        info = load_analysis(source_folder, jobid=jobid, in_folder=in_folder, progress_cb=progress_cb)
     if info.result is None:
         raise NoCompletedJobError(f"{source_folder} has no completed job to fork from yet")
 
@@ -233,7 +233,7 @@ def plan_fork(source_folder, new_folder, model=None, seed='auto', jobid='best', 
 
 def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='best', match_curves=False,
                   method=None, niter=None, note=None, in_folder=None, dry_run=False, upgrade_kwargs=None,
-                  info=None, **optimize_kwargs):
+                  info=None, progress_cb=None, **optimize_kwargs):
     """Continue an analysis in a new folder, under another model or from its best result (molass-library#396).
 
     Opens ``source_folder`` (:func:`molass.load_analysis`), copies its recipe into a new analysis with the
@@ -277,6 +277,9 @@ def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='bes
     info : AnalysisInfo or object from :func:`fork_source`, optional
         The already loaded source: skips the rebuild of the decomposition from ``recipe.json`` (minutes).
         ``jobid`` and ``in_folder`` are then not used.
+    progress_cb : callable, optional
+        ``progress_cb(stage, fraction)`` while the source is loaded (without ``info``, this takes minutes on
+        large data; :func:`molass.analysis_status` reads the folder in seconds if its files are enough, #401).
     **optimize_kwargs
         Passed to ``optimize_rigorously`` (``async_``, ``monitor``, ``constraints``, ...), overriding what
         the fork sets.
@@ -303,7 +306,7 @@ def fork_analysis(source_folder, new_folder, model=None, seed='auto', jobid='bes
     """
     plan = plan_fork(source_folder, new_folder, model=model, seed=seed, jobid=jobid, match_curves=match_curves,
                      method=method, niter=niter, note=note, in_folder=in_folder, upgrade_kwargs=upgrade_kwargs,
-                     optimize_kwargs=optimize_kwargs, info=info)
+                     optimize_kwargs=optimize_kwargs, info=info, progress_cb=progress_cb)
     if dry_run:
         return plan
     return plan.launch()
