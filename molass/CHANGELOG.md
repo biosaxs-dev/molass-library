@@ -11,6 +11,18 @@ differ; read this first), **Added**, **Fixed**, **Requires**. Issue numbers are 
 Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis")`, or
 `molass.requires("1.3.0")` (raises `ImportError` when older). Versions before 1.2.2: see the GitHub Releases.
 
+## Unreleased
+
+### Changed (behavior)
+- **Bounded LRF no longer clips B(q) below `b1 = pi/R`** (#411). `coerce_bounds` (and so `apply_bounded_lrf` and
+  `Decomposition` with `xr_ranks=[2]`) applies the envelope `1/(q*L*R)^2` only for `q >= pi/R`; below that the plain
+  rank-2 A(q) and B(q) are kept. The envelope is the large-x asymptote of the hard-sphere function, not a bound at low q,
+  and the interparticle correction lives at low q: when B(q) had more structure at higher q than a hard sphere of radius
+  `sqrt(5/3)*Rg` (non-spherical particles, long- or short-range interactions) the old code could remove real B(q) at low q
+  and add it to A(q) (Guinier Rg 38-54 Å instead of 33 Å in simulations). For hard-sphere-like data and the real SAMPLE3
+  the result is unchanged (identical at low q); the high-q clipping that suppresses the noise of the rank-2 solution is
+  unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
+
 ## 1.3.0 (2026-11-18)
 
 Headline: continue an analysis in a new folder under another elution model (`molass.fork_analysis`),

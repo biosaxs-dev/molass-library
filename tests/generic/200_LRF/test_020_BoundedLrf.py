@@ -30,7 +30,7 @@ def make_synthetic_rank2(Rg=35, K_true=1.0, num_q=400, num_frames=50, c_max=5.0)
 
 
 def test_010_coerce_bounds_clips():
-    """coerce_bounds should clip B(q) within the bound envelope."""
+    """coerce_bounds should clip B(q) within the bound envelope for q >= b1 = pi/R."""
     from molass.LowRank.BoundedLrf import estimate_KL, coerce_bounds
 
     qv, aq, bq, c1_arr, c2_arr, *_ = make_synthetic_rank2()
@@ -39,10 +39,37 @@ def test_010_coerce_bounds_clips():
     K, L, R = estimate_KL(qv, aq, bq, Rg, c1)
     aq_corr, bq_coerced, bq_bounds = coerce_bounds(qv, aq, bq, c1, L, R)
 
-    # every coerced value must lie within bounds (allowing tiny float tolerance)
+    # every coerced value at q >= b1 must lie within bounds (allowing tiny float tolerance)
     eps = 1e-12
-    assert np.all(bq_coerced >= bq_bounds[0] - eps)
-    assert np.all(bq_coerced <= bq_bounds[1] + eps)
+    above = qv >= np.pi / R
+    assert np.all(bq_coerced[above] >= bq_bounds[0][above] - eps)
+    assert np.all(bq_coerced[above] <= bq_bounds[1][above] + eps)
+
+
+def test_015_no_clipping_below_b1():
+    """molass-library#411: points below b1 = pi/R keep B(q) and A(q) of the plain rank-2 solution,
+    even when the envelope would cut real B(q) there (short-range B(q), forced L = 2)."""
+    from molass.SAXS.Theory.SolidSphere import phi
+    from molass.LowRank.BoundedLrf import estimate_KL, coerce_bounds
+
+    Rg = 33.0
+    R = np.sqrt(5 / 3) * Rg
+    qv = np.linspace(0.0075, 0.4, 740)
+    aq = phi(qv, R) ** 2
+    bq = -0.51 * phi(qv, 2 * R * 0.6) * aq        # exactly rank 2, structure at higher q than a hard sphere
+    c1 = 1.0
+    K, L, R_ = estimate_KL(qv, aq, bq, Rg, c1)
+
+    # the envelope alone would clip real low-q B(q) here (this is the failure of #411)
+    low = qv < 0.03
+    assert np.mean(np.abs(bq[low]) > (1 / (qv * L * R_) ** 2 * aq / c1)[low]) > 0.3
+
+    aq_corr, bq_coerced, _ = coerce_bounds(qv, aq, bq, c1, L, R_)
+    below = qv < np.pi / R_
+    np.testing.assert_array_equal(bq_coerced[below], bq[below])
+    np.testing.assert_array_equal(aq_corr[below], aq[below])
+    # the low-q A(q) is exact, not corrupted by redistribution (it was off by 14 % before)
+    assert np.max(np.abs((aq_corr - aq) / aq)[low]) < 1e-12
 
 
 def test_020_conservation():
@@ -142,6 +169,7 @@ def test_050_bounded_lrf_info_repr_is_concise():
 
 if __name__ == "__main__":
     test_010_coerce_bounds_clips()
+    test_015_no_clipping_below_b1()
     test_020_conservation()
     test_030_apply_bounded_lrf()
     test_040_rank1_unchanged()

@@ -5,7 +5,8 @@
 
     Clips B(q) within a physics-motivated envelope derived from the hard-sphere
     structure factor and redistributes excess to A(q), preserving the row-wise
-    intensity sum  A(q)*c1 + B(q)*c2.
+    intensity sum  A(q)*c1 + B(q)*c2. The envelope is enforced only for
+    q >= b1 = pi/R; below b1 the plain rank-2 solution is kept (molass-library#411).
 
     Ported from molass_legacy BoundedLrfSolver.py (coerce_bounds + estimate_RgL).
 """
@@ -128,6 +129,12 @@ def coerce_bounds(qv, aq, bq, c1, L, R):
     Clip B(q) within the physics-motivated envelope and redistribute
     the excess to A(q) so that  A(q)*c1 + B(q)*c2  is preserved row-wise.
 
+    The envelope ``1/(q*L*R)^2`` is the large-x asymptote of the hard-sphere
+    function, not a bound below the first boundary ``b1 = pi/R``, and the
+    interparticle correction itself lives at low q. Points with ``q < b1`` are
+    therefore **not clipped** (B(q) and A(q) stay as the plain rank-2 solution);
+    the envelope applies only from ``b1`` up (molass-library#411).
+
     Parameters
     ----------
     qv : ndarray
@@ -148,15 +155,16 @@ def coerce_bounds(qv, aq, bq, c1, L, R):
     aq_corrected : ndarray
         A(q) after redistribution.
     bq_coerced : ndarray
-        B(q) after clipping.
+        B(q) after clipping (unchanged for q < pi/R).
     bq_bounds : tuple of ndarray
-        (-bq_bound, +bq_bound) envelope arrays.
+        (-bq_bound, +bq_bound) envelope arrays (defined at all q, enforced for q >= pi/R).
     """
     c2 = c1 ** 2
     bound = 1 / (qv * L * R) ** 2
     bq_bound = bound * aq / c1
     bq_bounds = (-bq_bound, bq_bound)
-    bq_coerced = np.clip(bq, -bq_bound, bq_bound)
+    clipped = np.clip(bq, -bq_bound, bq_bound)
+    bq_coerced = np.where(qv < np.pi / R, bq, clipped)
     aq_corrected = aq + (bq - bq_coerced) * c2 / c1
     return aq_corrected, bq_coerced, bq_bounds
 
