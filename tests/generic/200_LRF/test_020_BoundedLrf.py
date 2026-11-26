@@ -167,6 +167,63 @@ def test_050_bounded_lrf_info_repr_is_concise():
     assert str(entry['bq_coerced'][0]) not in r
 
 
+def _run(qv, aq, bq, c1, Rg=33.0, **kwargs):
+    from molass.LowRank.BoundedLrf import apply_bounded_lrf
+
+    class MockGuinier:
+        def __init__(self, Rg):
+            self.Rg = Rg
+
+    frames = np.arange(60)
+    c = c1 * np.exp(-0.5 * ((frames - 30) / 8.0) ** 2)
+    C_full = np.array([c, c ** 2])
+    P_full = np.column_stack([aq, bq])
+    return apply_bounded_lrf(qv, P_full, C_full, [2], [MockGuinier(Rg)], **kwargs)[1][0]
+
+
+def _noise_free(K=0.51, f=1.0, Rg=33.0):
+    from molass.SAXS.Theory.SolidSphere import phi
+    R = np.sqrt(5 / 3) * Rg
+    qv = np.linspace(0.0075, 0.4, 740)
+    aq = phi(qv, R) ** 2
+    return qv, aq, -K * phi(qv, 2 * R * f) * aq, R
+
+
+def test_060_diagnostics_report_what_was_clipped_413():
+    """molass-library#413: cut-off, clipped fraction per region, what moved into A(q), L at the penalty bound, lowest q used;
+    on the noise-free reproducer of #411 (exactly rank 2, structure at higher q than a hard sphere)."""
+    qv, aq, bq, R = _noise_free(0.51, 0.6)
+    info = _run(qv, aq, bq, 1.0, warn=False)
+    assert info['cutoff_q'] == pytest.approx(np.pi / info['R']) and info['band_upper_q'] == pytest.approx(1.5 * np.pi / info['R'])
+    assert info['clipped_fraction']['below_b1'] == 0 and info['moved_to_A']['below_b1'] == 0       # #411: nothing is clipped below b1
+    above = qv >= info['band_upper_q']
+    assert info['clipped_fraction']['above_b2'] == pytest.approx(np.mean(info['bq_original'][above] != info['bq_coerced'][above]))
+    assert set(info['clipped_fraction']) == set(info['moved_to_A']) == {'below_b1', 'band', 'above_b2'}
+    moved = (info['bq_original'] - info['bq_coerced']) * info['c1']
+    band = (qv >= info['cutoff_q']) & (qv < info['band_upper_q'])
+    assert info['max_move_in_band'] == pytest.approx(np.max(np.abs(moved[band]) / np.abs(aq[band])))
+    assert info['L_penalized'] and info['L_stage1'] == pytest.approx(2.0, abs=0.01)                # short-range B(q): L sits at the penalty bound
+    assert info['q_min_used'] == pytest.approx(qv[0])
+    r = repr(info)
+    assert "cutoff_q=" in r and "clipped(band)=" in r and "L_penalized=" in r and "<array" in r
+
+
+def test_070_warning_names_the_reason_and_can_be_silenced_413():
+    import warnings
+    qv, aq, bq, R = _noise_free(0.51, 0.6)
+    with pytest.warns(UserWarning, match="penalty bound"):
+        info = _run(qv, aq, bq, 1.0)
+    assert any("penalty bound" in w for w in info.warnings_list())
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        _run(qv, aq, bq, 1.0, warn=False)
+    # a hard sphere with the right shape and a high lowest q: the L penalty is not active, but the lowest q is reported
+    qv, aq, bq, R = _noise_free(0.255, 1.0)
+    keep = qv > 0.03
+    info = _run(qv[keep], aq[keep], bq[keep], 1.0, warn=False)
+    assert not info['L_penalized'] and any("lowest q" in w for w in info.warnings_list())
+
+
 if __name__ == "__main__":
     test_010_coerce_bounds_clips()
     test_015_no_clipping_below_b1()
@@ -174,4 +231,6 @@ if __name__ == "__main__":
     test_030_apply_bounded_lrf()
     test_040_rank1_unchanged()
     test_050_bounded_lrf_info_repr_is_concise()
+    test_060_diagnostics_report_what_was_clipped_413()
+    test_070_warning_names_the_reason_and_can_be_silenced_413()
     print("All tests passed.")

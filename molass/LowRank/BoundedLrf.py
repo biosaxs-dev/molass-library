@@ -10,28 +10,65 @@
 
     Ported from molass_legacy BoundedLrfSolver.py (coerce_bounds + estimate_RgL).
 """
+import warnings
 import numpy as np
 from scipy.optimize import minimize
 from bisect import bisect_right
 from molass.SAXS.Theory.SolidSphere import phi
 
 
+BAND_FACTOR = 1.5               # the band is b1 <= q < b2 = BAND_FACTOR * b1
+BAND_CLIP_WARN = 0.3            # warn when more than this fraction of the band points is clipped
+L_PENALTY_TOL = 0.01            # the stage-1 penalty L >= 2 is "active" when the stage-1 L is within this of 2
+Q_MIN_WARN = 0.02               # warn when the lowest q used is above this (1/Angstrom)
+
+
 class BoundedLrfInfo(dict):
-    """Per-component Bounded LRF diagnostic info.
+    """Per-component Bounded LRF diagnostic info (molass-library#413).
 
     A plain ``dict`` subclass -- every existing usage pattern (``info['K']``,
     ``.items()``, ``.get()``, iteration, ``k in info``, ...) keeps working
     exactly as before. The only difference is ``repr()``: printing this
     (e.g. inspecting ``decomp.bounded_lrf_info`` in a notebook) shows only
-    the scalar fields (K, L, R, Rg) and the *shape* of the array fields
+    the scalar fields and the *shape* of the array fields
     (``bq_bounds``, ``bq_original``, ``bq_coerced``), instead of dumping the
     full arrays -- which can otherwise be hundreds of lines for a single
     component. Index into the fields directly to get the raw arrays.
+
+    Fields
+    ------
+    K, L, R, Rg : float
+        The fitted structure-factor amplitude, the bound-tightness, the sphere-equivalent radius
+        ``sqrt(5/3) * Rg`` and the Rg it was derived from (the Rg estimated from the naive rank-2 A(q)).
+    bq_bounds, bq_original, bq_coerced : numpy.ndarray
+        The envelope (``(-bound, +bound)``, defined at all q, enforced for ``q >= cutoff_q``), B(q) before and after clipping.
+    cutoff_q : float
+        ``b1 = pi / R``: B(q) is clipped only from here up (#411). It depends on the Rg given to the method.
+    band_upper_q : float
+        ``b2 = 1.5 * b1``, the upper end of the band ``b1 <= q < b2``.
+    clipped_fraction : dict
+        Fraction of the points clipped, for ``below_b1`` (0 by construction), ``band`` and ``above_b2``.
+    moved_to_A : dict
+        RMS of what was moved from B(q) into A(q), ``(B - B_clipped) * c2 / c1``, relative to the RMS of A(q), per region.
+    max_move_in_band : float
+        Largest ``|(B - B_clipped) * c2 / c1| / |A|`` over the band: how much the clipping changes A(q) relative to A(q) just above the
+        cut-off, where A(q) below ``cutoff_q`` is untouched (the "step" of experiment 65 is of this size when the clipping starts at the cut-off).
+    L_stage1 : float
+        L of the stage-1 fit (``B ~ -K phi(2 L R q) A``); ``L_penalized`` is True when it sits at the penalty bound 2.
+    q_min_used : float
+        Lowest q of the data given to the method (the trimming decides it and it can be high for strong effects).
+    c1 : float
+        Peak concentration of the component curve that was used.
     """
     _ARRAY_KEYS = ('bq_bounds', 'bq_original', 'bq_coerced')
 
     def __repr__(self):
-        parts = [f"{k}={self[k]:.4g}" for k in ('K', 'L', 'R', 'Rg') if k in self]
+        parts = [f"{k}={self[k]:.4g}" for k in ('K', 'L', 'R', 'Rg', 'cutoff_q', 'max_move_in_band') if k in self]
+        if 'clipped_fraction' in self:
+            parts.append(f"clipped(band)={self['clipped_fraction']['band']:.0%}")
+            parts.append(f"clipped(>=b2)={self['clipped_fraction']['above_b2']:.0%}")
+        if 'L_penalized' in self:
+            parts.append(f"L_penalized={self['L_penalized']}")
         for k in self._ARRAY_KEYS:
             if k in self:
                 v = self[k]
@@ -39,8 +76,42 @@ class BoundedLrfInfo(dict):
                 parts.append(f"{k}=<array {shape}>")
         return f"BoundedLrfInfo({', '.join(parts)})"
 
+    def warnings_list(self):
+        """The reasons (strings) why this result deserves a second look; the same texts are emitted as a ``UserWarning``."""
+        out = []
+        if self['clipped_fraction']['below_b1'] > 0:
+            out.append("B(q) was clipped below the cut-off, which should not happen")
+        if self['clipped_fraction']['band'] > BAND_CLIP_WARN:
+            out.append(f"B(q) exceeds the hard-sphere envelope at {self['clipped_fraction']['band']:.0%} of the points in the band "
+                       f"{self['cutoff_q']:.3g} <= q < {self['band_upper_q']:.3g} (noise or real structure; A(q) changes by up to "
+                       f"{self['max_move_in_band']:.1%} there; the cut-off follows Rg = {self['Rg']:.1f} A)")
+        if self['L_penalized']:
+            out.append("the stage-1 L sits at the penalty bound 2: the envelope does not follow the shape of B(q)")
+        if self['K'] < 0 or self['L'] < 0:
+            out.append(f"K = {self['K']:.3g}, L = {self['L']:.3g}: a negative value means the stage-1 fit did not find the hard-sphere shape of B(q)")
+        if self['q_min_used'] > Q_MIN_WARN:
+            out.append(f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on")
+        return out
 
-def estimate_KL(qv, aq, bq, Rg, c1):
+
+def clipping_summary(qv, aq, bq, bq_coerced, c1, R):
+    """Where and how much ``coerce_bounds`` clipped: ``cutoff_q``, ``band_upper_q``, ``clipped_fraction``, ``moved_to_A``, ``max_move_in_band``
+    (see :class:`BoundedLrfInfo`)."""
+    b1 = np.pi / R
+    b2 = BAND_FACTOR * b1
+    regions = {'below_b1': qv < b1, 'band': (qv >= b1) & (qv < b2), 'above_b2': qv >= b2}
+    moved = (bq - bq_coerced) * c1                    # (B - B_clipped) * c2 / c1 with c2 = c1**2
+    clipped_fraction, moved_to_A = {}, {}
+    for name, m in regions.items():
+        n = int(m.sum())
+        clipped_fraction[name] = float(np.mean(bq[m] != bq_coerced[m])) if n else 0.0
+        moved_to_A[name] = float(np.sqrt(np.mean(moved[m] ** 2)) / np.sqrt(np.mean(aq[m] ** 2))) if n else 0.0
+    band = regions['band'] & (aq != 0)
+    max_move = float(np.max(np.abs(moved[band]) / np.abs(aq[band]))) if band.any() else 0.0
+    return dict(cutoff_q=float(b1), band_upper_q=float(b2), clipped_fraction=clipped_fraction, moved_to_A=moved_to_A, max_move_in_band=max_move)
+
+
+def estimate_KL(qv, aq, bq, Rg, c1, return_stage1_L=False):
     """
     Estimate the hard-sphere model parameters K and L.
 
@@ -60,6 +131,8 @@ def estimate_KL(qv, aq, bq, Rg, c1):
         Radius of gyration from Guinier analysis.
     c1 : float
         Peak monomer concentration.
+    return_stage1_L : bool, optional
+        Also return the L of Stage 1 (a fourth value), to see whether the penalty ``L >= 2`` is active (#413).
 
     Returns
     -------
@@ -69,6 +142,8 @@ def estimate_KL(qv, aq, bq, Rg, c1):
         Bound-tightness parameter (from Stage 2).
     R : float
         Sphere-equivalent radius  sqrt(5/3) * Rg.
+    L_stage1 : float
+        Only if ``return_stage1_L``.
     """
     R = np.sqrt(5 / 3) * Rg
 
@@ -100,7 +175,7 @@ def estimate_KL(qv, aq, bq, Rg, c1):
     bq2 = bq[sl2]
 
     if len(q2) < 3:
-        return hK, hL, R
+        return (hK, hL, R, hL) if return_stage1_L else (hK, hL, R)
 
     h_bq2 = -hK * phi(q2, 2 * hL * R) * aq2 / c1
     upper_bq = np.maximum(bq2, h_bq2)
@@ -121,7 +196,7 @@ def estimate_KL(qv, aq, bq, Rg, c1):
     ret2 = minimize(objective2, (hL,))
     L = ret2.x[0]
 
-    return hK, L, R
+    return (hK, L, R, hL) if return_stage1_L else (hK, L, R)
 
 
 def coerce_bounds(qv, aq, bq, c1, L, R):
@@ -169,7 +244,7 @@ def coerce_bounds(qv, aq, bq, c1, L, R):
     return aq_corrected, bq_coerced, bq_bounds
 
 
-def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
+def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects, warn=True):
     """
     Apply Bounded LRF to every rank-2 component in P_full.
 
@@ -185,6 +260,9 @@ def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
         Rank for each component (1 or 2).
     guinier_objects : list
         Pre-computed RgEstimator objects (one per component).
+    warn : bool, optional
+        Emit a ``UserWarning`` when a component's diagnostics deserve a second look
+        (:meth:`BoundedLrfInfo.warnings_list`, molass-library#413).
 
     Returns
     -------
@@ -220,7 +298,7 @@ def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
         j_peak = np.argmax(C_full[k, :])
         c1 = C_full[k, j_peak]
 
-        K, L, R = estimate_KL(qv, aq, bq, Rg, c1)
+        K, L, R, L_stage1 = estimate_KL(qv, aq, bq, Rg, c1, return_stage1_L=True)
         aq_corrected, bq_coerced, bq_bounds = coerce_bounds(qv, aq, bq, c1, L, R)
 
         P_out[:, k] = aq_corrected
@@ -231,7 +309,15 @@ def apply_bounded_lrf(qv, P_full, C_full, ranks, guinier_objects):
             bq_bounds=bq_bounds,
             bq_original=bq,
             bq_coerced=bq_coerced,
+            **clipping_summary(qv, aq, bq, bq_coerced, c1, R),
+            L_stage1=float(L_stage1),
+            L_penalized=bool(abs(L_stage1 - 2.0) < L_PENALTY_TOL),
+            q_min_used=float(np.min(qv)),
+            c1=float(c1),
         )
+        reasons = info[k].warnings_list()
+        if reasons and warn:
+            warnings.warn(f"Bounded LRF, component {k}: " + "; ".join(reasons) + " (see decomposition.bounded_lrf_info)", UserWarning, stacklevel=2)
 
     P_truncated = P_out[:, :num_components]
     return P_truncated, info

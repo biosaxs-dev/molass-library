@@ -24,6 +24,14 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 
 ### Added
+- **Bounded LRF diagnostics** (#413): `decomposition.bounded_lrf_info[k]` now also has `cutoff_q` (`b1 = pi/R`, which follows the Rg
+  given to the method), `band_upper_q` (`1.5 b1`), `clipped_fraction` and `moved_to_A` (what was moved from B(q) into A(q), relative to A,
+  for `below_b1` (always 0 since #411), `band` and `above_b2`), `max_move_in_band`, `L_stage1` / `L_penalized` (the stage-1 penalty
+  `L >= 2` is active), `q_min_used` and `c1`; the concise `repr` shows them. A `UserWarning` (once per location; `warn=False` in
+  `apply_bounded_lrf` silences it) names the reason when more than 30 % of the band points are clipped, `L` sits at the penalty bound, `K` or
+  `L` is negative (the stage-1 fit did not find the hard-sphere shape), or the lowest q used is above 0.02 1/A. The thresholds are provisional.
+  Note: clipping above `b2` (90-100 % of the points, also on data without an interparticle effect) is the noise suppression of the method and
+  is not a warning. `estimate_KL(..., return_stage1_L=True)` also returns the stage-1 L.
 - **`molass.Testing.interparticle_frames(A, B, c, qv, error, noise_scale=1.0, seed=0)`** (#415): frames
   `M = A c + B c^2 + noise` with the truth attached (`A`, `B`, `c`, `K`, `R_eff`, `truth_on(qv)` for any q grid, because the
   automatic trimming changes the grid with the noise and the interaction) and `to_ssd()` (a `SecSaxsData` with a UV matrix
