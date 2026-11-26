@@ -24,6 +24,18 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 
 ### Added
+- **Envelope-prior LRF** (`decomp.set_rank2_method('envelope_prior')`): a second way to correct rank-2 (interparticle) components, next to the Bounded LRF
+  (`'bounded'`, still the default). The envelope of the Bounded LRF, `|B/A| <= K min(1, L 3/(q sigma)^2)`, is used as a **prior** on B/A instead of a clip:
+  per q the plain c^2 fit gives B/A with its error, and the posterior mean is the plain quadratic correction at low q, zero at high q and a noise-weighted
+  blend between (no switch point, no shape model of B(q), no sign constraint). The envelope has a general ground: a hard core makes the Mayer function jump at
+  contact, which bounds the interparticle term at every q whatever the soft part of the potential does. By default the concentration curve is refined first
+  (`molass.LowRank.ConcentrationRefine.refine_concentration`; no UV curve needed) and the matrix is denoised with a whitened SVD
+  (`molass.LowRank.LowRankInfo.get_weighted_denoised_data`, each q row divided by its median error). The result is in `decomp.envelope_prior_info[k]`
+  (K, sigma, cut-off, the plain-fit ratio with its error, the prior width, the posterior ratio, the weight in the mid region, `violation_fraction`, the refined c)
+  with a `UserWarning` (small K, refinement at a bound, envelope violated, high lowest q). On 14 simulated cases (Pedersen 1997 shapes x hard-sphere, sticky, Yukawa
+  and RPA interactions, stated noise) it was the only candidate without a catastrophic case (worst mid-q error 31 against 91-498 for the others); with the true c it is
+  not more accurate than the plain simple LRF at mid q. Simulations only; an adhesive shell and particles without a hard core violate the bound; strong effects keep a
+  truncation floor. `Decomposition.get_xr_matrices()` returns the unchanged elution curves `C`; the refined curve is in the info.
 - **Bounded LRF diagnostics** (#413): `decomposition.bounded_lrf_info[k]` now also has `cutoff_q` (`b1 = pi/R`, which follows the Rg
   given to the method), `band_upper_q` (`1.5 b1`), `clipped_fraction` and `moved_to_A` (what was moved from B(q) into A(q), relative to A,
   for `below_b1` (always 0 since #411), `band` and `above_b2`), `max_move_in_band`, `L_stage1` / `L_penalized` (the stage-1 penalty

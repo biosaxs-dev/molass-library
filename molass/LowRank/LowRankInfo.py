@@ -41,6 +41,33 @@ def get_denoised_data( D, rank=3, svd=None ):
         D_  = np.array(D)
     return D_
 
+def get_weighted_denoised_data(D, E, rank):
+    """
+    Low rank approximation using SVD after whitening each q row by its stated error.
+
+    The plain SVD of :func:`get_denoised_data` is the best low rank fit only for equal noise, but the stated error varies strongly with q
+    (on SAMPLE3 the median error at the lowest kept q is 15 times that at q = 0.05), so the noisy lowest-q rows can dominate the singular
+    vectors (molass-library#418; molass-researcher experiment 65, decision D2). Each row is divided by its **median error over the frames**,
+    not element by element (the error varies along the frames, so ``D / E`` is not low rank even for a clean model).
+
+    Parameters
+    ----------
+    D : 2D array-like, shape (n_q, n_frames)
+    E : 2D array-like, shape (n_q, n_frames)
+        The stated error.
+    rank : int
+
+    Returns
+    -------
+    D_ : 2D array
+        The denoised matrix (in the units of ``D``).
+    """
+    D = np.asarray(D, dtype=float)
+    e = np.median(np.asarray(E, dtype=float), axis=1)
+    e = np.where(e > 0, e, 1.0)
+    U, s, VT = np.linalg.svd(D / e[:, None], full_matrices=False)
+    return ((U[:, :rank] * s[:rank]) @ VT[:rank]) * e[:, None]
+
 def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
     """
     Compute the matrices for the low rank approximation.

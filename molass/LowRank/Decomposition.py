@@ -95,6 +95,10 @@ class Decomposition(DidYouMeanMixin):
 
         self.guinier_objects = None
         self.bounded_lrf_info = None
+        # How the rank-2 (interparticle) components are corrected: 'bounded' (default) or 'envelope_prior' (see set_rank2_method)
+        self.rank2_method = 'bounded'
+        self.rank2_options = {}
+        self.envelope_prior_info = None
         self.model = xr_ccurves[0].model
         # Short description of how this decomposition was made (e.g.
         # 'quick decomposition'); shown by plot_components(title='auto').
@@ -153,6 +157,8 @@ class Decomposition(DidYouMeanMixin):
         # is unchanged by upgrade(), so the length always still matches).
         if self.xr_ranks is not None:
             new_decomp.xr_ranks = self.xr_ranks
+        new_decomp.rank2_method = self.rank2_method
+        new_decomp.rank2_options = dict(self.rank2_options)
         if self.fronting_flags is not None:
             new_decomp.fronting_flags = list(self.fronting_flags)
 
@@ -1155,8 +1161,53 @@ class Decomposition(DidYouMeanMixin):
         self.xr_ranks = ranks
         self.guinier_objects = None
         self.bounded_lrf_info = None
+        self.envelope_prior_info = None
         self._kratky_shape_match = None
         self._warn_if_low_q_was_cut(ranks)
+
+    RANK2_METHODS = ('bounded', 'envelope_prior')
+
+    def set_rank2_method(self, method, **options):
+        """
+        Choose how the rank-2 (interparticle) components of :meth:`get_xr_matrices` are corrected.
+
+        Parameters
+        ----------
+        method : str
+            ``'bounded'`` (default): the Bounded LRF (:mod:`molass.LowRank.BoundedLrf`): B(q) is clipped to the hard-sphere envelope above ``pi/R``; the
+            result is in ``bounded_lrf_info``.
+            ``'envelope_prior'``: the envelope-prior LRF (:mod:`molass.LowRank.EnvelopePrior`): the same envelope used as a prior on B/A, weighed against the
+            per-q noise (no switch point, no shape model of B(q)), with the concentration curve refined first and a whitened SVD denoising; the result is in
+            ``envelope_prior_info``. Needs the stated error ``xr.E``. Validated on simulations only; see the module docstring for its limits.
+        **options
+            For ``'envelope_prior'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.018, 0.035)``,
+            the q range where K is estimated), ``warn`` (default ``True``).
+
+        Only has an effect for components whose rank is 2 (see :meth:`update_xr_ranks`). Invalidates the cached Guinier objects and diagnostics.
+
+        Examples
+        --------
+        ::
+
+            decomp = ssd.quick_decomposition(1, ranks=[2])
+            decomp.set_rank2_method('envelope_prior')
+            M, C, P, Pe = decomp.get_xr_matrices()
+            decomp.envelope_prior_info[0]          # K, cut-off, weights, violation fraction, refined c ...
+        """
+        if method not in self.RANK2_METHODS:
+            raise ValueError(f"unknown rank-2 method {method!r}; use one of {self.RANK2_METHODS}")
+        if method == 'bounded' and options:
+            raise ValueError("the 'bounded' method has no options")
+        allowed = {'refine_c', 'L', 'k_window', 'warn'}
+        bad = set(options) - allowed
+        if bad:
+            raise ValueError(f"unknown option(s) {sorted(bad)} for 'envelope_prior'; use {sorted(allowed)}")
+        self.rank2_method = method
+        self.rank2_options = dict(options)
+        self.guinier_objects = None
+        self.bounded_lrf_info = None
+        self.envelope_prior_info = None
+        self._kratky_shape_match = None
 
     def _warn_if_low_q_was_cut(self, ranks):
         """Warn when a rank-2 (interparticle) component is requested on data whose lowest-q points were
@@ -1250,15 +1301,22 @@ class Decomposition(DidYouMeanMixin):
             C_full = np.array(cy_list)
             P_full = M_ @ np.linalg.pinv(C_full)
 
-            # Step 2c: apply bounded LRF
-            if debug:
-                from importlib import reload
-                import molass.LowRank.BoundedLrf
-                reload(molass.LowRank.BoundedLrf)
-            from molass.LowRank.BoundedLrf import apply_bounded_lrf
-            P_, bounded_info = apply_bounded_lrf(
-                xr.qv, P_full, C_full, ranks, seed_objects)
-            self.bounded_lrf_info = bounded_info
+            # Step 2c: apply the chosen rank-2 correction (the Bounded LRF by default)
+            if self.rank2_method == 'envelope_prior':
+                from molass.LowRank.EnvelopePrior import apply_envelope_prior_lrf
+                P_, ep_info = apply_envelope_prior_lrf(
+                    xr.qv, xr.M, xr.E, C_full, P_full, ranks, seed_objects, **self.rank2_options)
+                self.envelope_prior_info = ep_info
+                self.bounded_lrf_info = None
+            else:
+                if debug:
+                    from importlib import reload
+                    import molass.LowRank.BoundedLrf
+                    reload(molass.LowRank.BoundedLrf)
+                from molass.LowRank.BoundedLrf import apply_bounded_lrf
+                P_, bounded_info = apply_bounded_lrf(
+                    xr.qv, P_full, C_full, ranks, seed_objects)
+                self.bounded_lrf_info = bounded_info
 
             # Step 2d: re-propagate error for corrected P
             if xr.E is not None:
