@@ -9,6 +9,14 @@
     q >= b1 = pi/R; below b1 the plain rank-2 solution is kept (molass-library#411).
 
     Ported from molass_legacy BoundedLrfSolver.py (coerce_bounds + estimate_RgL).
+
+    Status (molass-researcher experiments 64-66, 2026-11, simulations with known truth): the hard clip is the hard-threshold form of a bound that
+    holds at every q for particles with a hard core (|B/A| <= K min(1, L 3/(q sigma)^2)). Applied as a clip it leaves envelope-sized noise in A(q) at
+    high q and had mid-q failures on non-spherical particles and non-hard-sphere interactions (worst mid-q error 146 against 32 for the soft version);
+    with the library's own elution curve and unweighted SVD denoising its low-q gain is small (0.057 against 0.125 without correction, 0.013 with the soft
+    version, refined curve and whitened denoising). The soft, noise-weighted form of the same bound is :mod:`molass.LowRank.SoftBoundedLrf`
+    (``decomposition.set_rank2_method('soft_bounded')``); this method stays the default until that is decided.
+    On the real SAMPLE3 the two give the same Guinier-region correction (nothing is clipped there).
 """
 import warnings
 import numpy as np

@@ -1,5 +1,13 @@
 # Bounded LRF Implementation Plan
 
+> **Status note (2026-11-26).** This is the original implementation plan (February 2026) and is kept as the architecture record of `get_xr_matrices()`.
+> Its premises have been revisited in molass-researcher experiments 64-66 (simulations with known truth, stated noise, 14 particle / interaction
+> combinations, real SAMPLE3): (1) "Synthesized LRF is not needed" holds only in the sense that a *soft* form of the same bound does better than both the
+> hard clip and the splice: see `molass/LowRank/SoftBoundedLrf.py` and `decomposition.set_rank2_method('soft_bounded')`; (2) the clip is applied only
+> for `q >= pi/R` (molass-library#411); (3) the concentration curve (refined by `ConcentrationRefine`) and the whitened SVD denoising matter more than the
+> guard at low q. The plan below is otherwise unchanged. Evidence: `molass-researcher/experiments/66_interaction_models/README.md`; paper:
+> `molass-papers/interparticle/OUTLINE.md`.
+
 ## Goal
 
 Replace the current naïve rank-2 factorization (`P = M_ @ pinv(C)`) with
