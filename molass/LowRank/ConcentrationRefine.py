@@ -15,7 +15,7 @@
     offset ``o``, shift ``s`` in frames) together with K and R_eff; (2) a free ``c(t)`` (one value per frame, Whittaker-smoothed), alternating
     with the K, R_eff fit until the largest change of c is below ``tol``. No UV curve is needed (a UV-derived curve carries the risk of a
     wrong UV->XR mapping). The hard-sphere form of the interaction is used here only to *identify* c; the correction itself is done by the
-    envelope-prior LRF (:mod:`molass.LowRank.EnvelopePrior`), which assumes no shape of B(q).
+    soft-bounded LRF (:mod:`molass.LowRank.SoftBoundedLrf`), which assumes no shape of B(q).
 
     Caveat: the refined c is not independent of the assumed interaction shape. In simulations with other interactions (experiment 66) the
     result was still much better than the unrefined curve, but the refined curve is an *effective* curve for the c^2 model.

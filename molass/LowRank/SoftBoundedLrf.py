@@ -1,8 +1,8 @@
 """
-    LowRank.EnvelopePrior.py
+    LowRank.SoftBoundedLrf.py
 
-    Envelope-prior LRF (EP-LRF): the Bounded LRF's envelope used as a prior instead of a clip
-    (molass-researcher experiments 65-66; notebook ``66d_envelope_prior``).
+    Soft-bounded LRF: the Bounded LRF's envelope used as a soft, noise-weighted bound instead of a hard clip
+    (molass-researcher experiments 65-66; notebook ``66d_envelope_prior``, where it was first called the envelope-prior LRF).
 
     **The bound.** To first order in the concentration, B(q)/A(q) = beta(q) n f(q), with f the Fourier transform of the Mayer function
     exp(-V(r)/kT) - 1 and beta(q) = <F>^2/<F^2> <= 1 for non-spherical particles. If the particles have a hard core of diameter sigma, f jumps at
@@ -10,10 +10,13 @@
     part of the potential does, ``|B/A| <= K min(1, L 3 / (q sigma)^2)`` at every q (K: the low-q plateau; L about 2 covers the first S(q) peak and the c^3
     terms). It fails for an adhesive shell (decay 1/q) and for particles without a hard core (polymers, soft particles).
 
-    **The estimator.** Per q the simple LRF (``M ~ A c + B c^2``, weights 1/E^2) gives ``r_hat = B/A`` with its propagated error ``s_r``. With the prior
-    ``r ~ N(0, tau^2)``, ``tau(q) = K min(1, L 3 / (q sigma)^2)``, the posterior mean is ``r_hat tau^2 / (tau^2 + s_r^2)``: the plain quadratic correction
-    where the data are sharper than the prior (low q), about 0 where the prior is sharper (high q), a blend by the noise between. No switch point, no
-    shape model of B(q), no sign constraint. A(q) is then solved with ``B/A = r_post`` fixed. K is the largest significant sliding-window mean of ``|r_hat|`` over the rows with q below ``k_window[1]`` (default 0.035; see :func:`estimate_envelope_K`),
+    **The estimator.** Per q the simple LRF (``M ~ A c + B c^2``, weights 1/E^2) gives ``r_hat = B/A`` with its propagated error ``s_r``. With the bound
+    ``tau(q) = K min(1, L 3 / (q sigma)^2)`` as the size that B/A may have, the ratio is multiplied by the weight ``w = tau^2 / (tau^2 + s_r^2)``:
+    ``r_post = w r_hat``. Where the data are sharper than the bound (``s_r << tau``, low q) ``w`` is about 1 and the plain quadratic correction is kept;
+    where the noise is larger than the bound (high q) ``w`` is about 0 and the correction fades out; in between it is a blend by the noise (the form of a
+    Wiener filter or of inverse-variance weighting). A hard clip (:mod:`molass.LowRank.BoundedLrf`) is the same bound applied as a threshold; this is the
+    soft version. No switch point, no shape model of B(q), no sign constraint. A(q) is then solved with ``B/A = r_post`` fixed. (Bayesian reading: ``r_post``
+    is the posterior mean of the ratio under a Gaussian prior ``N(0, tau^2)``.) K is the largest significant sliding-window mean of ``|r_hat|`` over the rows with q below ``k_window[1]`` (default 0.035; see :func:`estimate_envelope_K`),
     ``sigma = 2 sqrt(5/3) Rg`` with the Guinier Rg of the corrected profile of the first pass.
 
     **Concentration curve.** The curve ``c`` is the dominant error of every c^2 correction (K = 1.0 simulation: low-q error 0.215 with the library's XR curve, 0.006
@@ -44,12 +47,12 @@ BAND_FACTOR = 1.5               # the band b1 <= q < BAND_FACTOR b1 (b1 = pi/R) 
 VIOLATION_WARN = 0.4            # warn when more than this fraction of the band points exceeds twice the envelope significantly (provisional)
 
 
-class EnvelopePriorInfo(dict):
-    """Per-component EP-LRF diagnostic info (a ``dict``; the ``repr`` shows the scalars and the array shapes only).
+class SoftBoundedInfo(dict):
+    """Per-component soft-bounded LRF diagnostic info (a ``dict``; the ``repr`` shows the scalars and the array shapes only).
 
     Fields: ``K``, ``sigma``, ``L``, ``rg_seed`` (the Rg of the first pass), ``cutoff_q`` (``pi / R``: where the envelope starts to decay),
-    ``r_hat``, ``s_r``, ``tau``, ``r_post`` (arrays over q: the plain-fit ratio B/A, its error, the prior width, the posterior ratio actually used),
-    ``weight_mid`` (the mean weight ``tau^2 / (tau^2 + s_r^2)`` over the mid region 1.5 <= q Rg <= 3.5: 1 = all data, 0 = all prior),
+    ``r_hat``, ``s_r``, ``tau``, ``r_post`` (arrays over q: the plain-fit ratio B/A, its error, the bound ``tau(q)``, the weighted ratio actually used),
+    ``weight_mid`` (the mean weight ``tau^2 / (tau^2 + s_r^2)`` over the mid region 1.5 <= q Rg <= 3.5: 1 = all data, 0 = no correction),
     ``violation_fraction`` (the share of the band ``cutoff_q <= q < 1.5 cutoff_q`` where ``|r_hat| - 2 s_r > 2 tau``: the data exceed the hard-core envelope
     significantly, e.g. adhesive or soft particles; above the band the ratio of two small numbers is not reliable), ``c_refined`` (the refined concentration at peak 1 or ``None``), ``c_scale`` (the peak of the library's
     curve; the refined curve in its units is ``c_refined * c_scale``), ``refine`` (the dict of the refinement without the curve) and ``q_min_used``.
@@ -61,7 +64,7 @@ class EnvelopePriorInfo(dict):
         for k in self._ARRAY_KEYS:
             if k in self and self[k] is not None:
                 parts.append(f"{k}=<array {np.shape(self[k])}>")
-        return f"EnvelopePriorInfo({', '.join(parts)})"
+        return f"SoftBoundedInfo({', '.join(parts)})"
 
     def warnings_list(self):
         """The reasons (strings) why this result deserves a second look; the same texts are emitted as a ``UserWarning``."""
@@ -73,7 +76,7 @@ class EnvelopePriorInfo(dict):
             out.append(f"K = {self['K']:.3g} is small: no detectable interparticle term below q = {K_WINDOW[1]}; rank 2 may not be needed")
         if self['violation_fraction'] > VIOLATION_WARN:
             out.append(f"B/A exceeds twice the hard-core envelope significantly at {self['violation_fraction']:.0%} of the points in the band {self['cutoff_q']:.3g} <= q < {BAND_FACTOR * self['cutoff_q']:.3g}: "
-                       f"adhesive or soft particles? the envelope prior then removes real B(q)")
+                       f"adhesive or soft particles? the soft bound then removes real B(q)")
         if self['q_min_used'] > Q_MIN_WARN:
             out.append(f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on")
         return out
@@ -123,8 +126,8 @@ def estimate_envelope_K(qv, r_hat, s_r, k_window=K_WINDOW, rule="peak"):
     return best
 
 
-def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak"):
-    """EP-LRF for one component on arrays.
+def soft_bounded_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak"):
+    """Soft-bounded LRF for one component on arrays.
 
     Parameters
     ----------
@@ -162,8 +165,8 @@ def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K
     return dict(A=A, r_hat=r_hat, r_post=r_post, tau=tau, s_r=s_r, K=K, sigma=float(sigma))
 
 
-def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak", warn=True):
-    """Apply EP-LRF to every rank-2 component (the counterpart of :func:`molass.LowRank.BoundedLrf.apply_bounded_lrf`).
+def apply_soft_bounded_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak", warn=True):
+    """Apply the soft-bounded LRF to every rank-2 component (the counterpart of :func:`molass.LowRank.BoundedLrf.apply_bounded_lrf`).
 
     Parameters
     ----------
@@ -181,7 +184,7 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
         Pre-computed RgEstimator objects (one per component) from the naive P; their Rg gives the start of the refinement range.
     refine_c : bool
         Refine the concentration curve first (default). ``False`` uses the library's curve.
-    L, k_window, k_rule : see :func:`envelope_prior_lrf`.
+    L, k_window, k_rule : see :func:`soft_bounded_lrf`.
     warn : bool
 
     Returns
@@ -189,14 +192,14 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
     P_truncated : ndarray, shape (n_q, num_components)
         The corrected A columns (in the units of the library's component curve ``C_full[k]``: ``M ~ A C_full[k]``).
     info : dict
-        Keyed by component index; each value an :class:`EnvelopePriorInfo`.
+        Keyed by component index; each value a :class:`SoftBoundedInfo`.
     """
     from molass.Guinier.RgEstimator import RgEstimator
     from molass.LowRank.ErrorPropagate import compute_propagated_error
     from molass.LowRank.LowRankInfo import get_weighted_denoised_data
     from molass.LowRank.ConcentrationRefine import refine_concentration
     if E is None:
-        raise ValueError("the envelope-prior LRF needs the stated error (xr.E is None)")
+        raise ValueError("the soft-bounded LRF needs the stated error (xr.E is None)")
     qv = np.asarray(qv, float)
     M = np.asarray(M, float)
     E = np.asarray(E, float)
@@ -231,7 +234,7 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
         rg = RgEstimator(np.array([qv, P2[:, 0], Pe2[:, 0]]).T).Rg
         if rg is None or not np.isfinite(rg) or rg <= 0:
             rg = rg0
-        e = envelope_prior_lrf(qv, Mk, Md2, E, c_ref, float(rg), L=L, k_window=k_window, k_rule=k_rule)
+        e = soft_bounded_lrf(qv, Mk, Md2, E, c_ref, float(rg), L=L, k_window=k_window, k_rule=k_rule)
         A = e["A"] / scale
         P_out[:, k] = A
         P_out[:, b_col] = e["r_post"] * A / scale             # M ~ A_ref c_ref + r A_ref c_ref^2 with c_ref = c0/scale: A = A_ref/scale, B = r A_ref/scale^2 = r A/scale
@@ -241,12 +244,12 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
             viol = float(np.mean((np.abs(e["r_hat"][above]) - 2 * e["s_r"][above]) > 2 * e["tau"][above])) if above.any() else 0.0
         mid = (qv >= 1.5 / rg) & (qv < 3.5 / rg)
         w = e["tau"] ** 2 / (e["tau"] ** 2 + e["s_r"] ** 2)
-        info[k] = EnvelopePriorInfo(
+        info[k] = SoftBoundedInfo(
             K=e["K"], sigma=e["sigma"], L=float(L), rg_seed=float(rg), cutoff_q=float(b1),
             r_hat=e["r_hat"], s_r=e["s_r"], tau=e["tau"], r_post=e["r_post"],
             weight_mid=float(np.mean(w[mid])) if mid.any() else float("nan"), violation_fraction=viol,
             c_refined=c_ref if refine_c else None, c_scale=scale, refine=refine_info, q_min_used=float(np.min(qv)))
         reasons = info[k].warnings_list()
         if reasons and warn:
-            warnings.warn(f"Envelope-prior LRF, component {k}: " + "; ".join(reasons) + " (see decomposition.envelope_prior_info)", UserWarning, stacklevel=2)
+            warnings.warn(f"Soft-bounded LRF, component {k}: " + "; ".join(reasons) + " (see decomposition.soft_bounded_info)", UserWarning, stacklevel=2)
     return P_out[:, :num_components], info

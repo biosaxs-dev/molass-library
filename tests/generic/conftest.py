@@ -38,7 +38,7 @@ FAST_MODULES = {
     "200_LRF/test_115_rg_helpers_and_shape_cache_374_377",
     "200_LRF/test_116_residual_report_392",
     "200_LRF/test_120_interparticle_frames_415",
-    "200_LRF/test_130_envelope_prior_lrf",
+    "200_LRF/test_130_soft_bounded_lrf",
     "210_Ranks/test_215_title_ranks",
     "215_Homogeneity/test_215_Homogeneity",
     "230_ErrorModel/test_010_sedlak_390",

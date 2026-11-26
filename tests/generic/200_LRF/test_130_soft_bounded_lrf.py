@@ -1,11 +1,11 @@
-"""EP-LRF in molass-library: concentration refinement, whitened SVD denoising, the envelope-prior estimator on arrays and through
-Decomposition.set_rank2_method('envelope_prior'). Simulated frames with known truth (molass.Testing.interparticle_frames); no local data needed."""
+"""Soft-bounded LRF in molass-library: concentration refinement, whitened SVD denoising, the soft-bounded estimator on arrays and through
+Decomposition.set_rank2_method('soft_bounded'). Simulated frames with known truth (molass.Testing.interparticle_frames); no local data needed."""
 import warnings
 
 import numpy as np
 import pytest
 
-from molass.LowRank.EnvelopePrior import envelope_prior_lrf, EnvelopePriorInfo
+from molass.LowRank.SoftBoundedLrf import soft_bounded_lrf, SoftBoundedInfo
 from molass.LowRank.ConcentrationRefine import refine_concentration
 from molass.LowRank.LowRankInfo import get_denoised_data, get_weighted_denoised_data
 from molass.Testing import interparticle_frames, hard_sphere_B, sphere_form_factor
@@ -56,22 +56,22 @@ def test_refinement_repairs_a_distorted_concentration_curve():
 
 
 @pytest.mark.fast
-def test_ep_lrf_is_exact_without_noise_and_shrinks_b_at_high_q_with_noise():
+def test_soft_bounded_lrf_is_exact_without_noise_and_shrinks_b_at_high_q_with_noise():
     fr = _frames(noise_scale=0.0)
     E = np.full_like(fr.M, 1e-9)                                           # the stated error is also tiny: s_r << tau at every q
-    out = envelope_prior_lrf(fr.qv, fr.M, fr.M, E, fr.c, rg_seed=RG)
+    out = soft_bounded_lrf(fr.qv, fr.M, fr.M, E, fr.c, rg_seed=RG)
     np.testing.assert_allclose(out["A"], fr.A, rtol=1e-6, atol=1e-8)                   # rank 2 exactly: the weights are 1 everywhere
     ok = fr.A > 1e-3 * fr.A.max()                                           # the ratio is ill-conditioned at the zeros of the form factor
     np.testing.assert_allclose(out["r_post"][ok], (fr.B / fr.A)[ok], atol=1e-6)
 
     fr = _frames(noise_scale=1.0, seed=2)
-    out = envelope_prior_lrf(fr.qv, fr.M, get_weighted_denoised_data(fr.M, fr.E, 2), fr.E, fr.c, rg_seed=RG)
+    out = soft_bounded_lrf(fr.qv, fr.M, get_weighted_denoised_data(fr.M, fr.E, 2), fr.E, fr.c, rg_seed=RG)
     qv = fr.qv
     w = out["tau"] ** 2 / (out["tau"] ** 2 + out["s_r"] ** 2)
     assert np.all((w >= 0) & (w <= 1))
     assert np.max(np.abs(out["r_post"][qv > 0.25])) < 0.02                  # B/A -> 0 at high q (the true value is about 0.001)
     kw = (qv >= 0.018) & (qv < 0.035)
-    mean_out = envelope_prior_lrf(fr.qv, fr.M, get_weighted_denoised_data(fr.M, fr.E, 2), fr.E, fr.c, rg_seed=RG, k_rule="mean")
+    mean_out = soft_bounded_lrf(fr.qv, fr.M, get_weighted_denoised_data(fr.M, fr.E, 2), fr.E, fr.c, rg_seed=RG, k_rule="mean")
     assert mean_out["K"] == pytest.approx(np.mean(np.abs(fr.B / fr.A)[kw]), rel=0.15)  # 'mean' rule: the mean |B/A| over 0.018-0.035 (not the model K)
     assert out["K"] >= mean_out["K"] * 0.9                                  # 'peak' rule: the largest significant window below 0.035, never much below the mean
     low = (qv >= 0.018) & (qv < 0.04)
@@ -91,20 +91,20 @@ def test_set_rank2_method_validation_and_default_is_the_bounded_lrf():
     with pytest.raises(ValueError, match="unknown rank-2 method"):
         d.set_rank2_method('shape_model')
     with pytest.raises(ValueError, match="unknown option"):
-        d.set_rank2_method('envelope_prior', speed='fast')
+        d.set_rank2_method('soft_bounded', speed='fast')
     with pytest.raises(ValueError, match="no options"):
         d.set_rank2_method('bounded', L=3)
     d.update_xr_ranks([2])
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         d.get_xr_matrices()
-    assert d.bounded_lrf_info and d.envelope_prior_info is None
-    d.set_rank2_method('envelope_prior', warn=False)
-    assert d.bounded_lrf_info is None and d.envelope_prior_info is None      # caches are invalidated
+    assert d.bounded_lrf_info and d.soft_bounded_info is None
+    d.set_rank2_method('soft_bounded', warn=False)
+    assert d.bounded_lrf_info is None and d.soft_bounded_info is None      # caches are invalidated
 
 
 @pytest.mark.fast
-def test_envelope_prior_through_the_decomposition_corrects_the_low_q_bend():
+def test_soft_bounded_through_the_decomposition_corrects_the_low_q_bend():
     import molass
     molass.set_progress(False)
     qv = np.linspace(0.0143, 0.4268, 200)
@@ -120,10 +120,10 @@ def test_envelope_prior_through_the_decomposition_corrects_the_low_q_bend():
 
     err_rank1 = rel(d.get_xr_matrices()[2][:, 0])
     d.update_xr_ranks([2])
-    d.set_rank2_method('envelope_prior', warn=False)
+    d.set_rank2_method('soft_bounded', warn=False)
     M, C, P, Pe = d.get_xr_matrices()
-    info = d.envelope_prior_info[0]
-    assert isinstance(info, EnvelopePriorInfo) and d.bounded_lrf_info is None
+    info = d.soft_bounded_info[0]
+    assert isinstance(info, SoftBoundedInfo) and d.bounded_lrf_info is None
     assert P.shape == (len(qd), 1) and np.all(np.isfinite(P)) and np.all(np.isfinite(Pe))
     assert rel(P[:, 0]) < 0.5 * err_rank1                                   # rank 1: about 0.2 at this strength
     assert info['c_refined'] is not None and info['c_refined'].max() == pytest.approx(1.0)

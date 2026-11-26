@@ -95,10 +95,10 @@ class Decomposition(DidYouMeanMixin):
 
         self.guinier_objects = None
         self.bounded_lrf_info = None
-        # How the rank-2 (interparticle) components are corrected: 'bounded' (default) or 'envelope_prior' (see set_rank2_method)
+        # How the rank-2 (interparticle) components are corrected: 'bounded' (default) or 'soft_bounded' (see set_rank2_method)
         self.rank2_method = 'bounded'
         self.rank2_options = {}
-        self.envelope_prior_info = None
+        self.soft_bounded_info = None
         self.model = xr_ccurves[0].model
         # Short description of how this decomposition was made (e.g.
         # 'quick decomposition'); shown by plot_components(title='auto').
@@ -1161,11 +1161,11 @@ class Decomposition(DidYouMeanMixin):
         self.xr_ranks = ranks
         self.guinier_objects = None
         self.bounded_lrf_info = None
-        self.envelope_prior_info = None
+        self.soft_bounded_info = None
         self._kratky_shape_match = None
         self._warn_if_low_q_was_cut(ranks)
 
-    RANK2_METHODS = ('bounded', 'envelope_prior')
+    RANK2_METHODS = ('bounded', 'soft_bounded')
 
     def set_rank2_method(self, method, **options):
         """
@@ -1176,12 +1176,14 @@ class Decomposition(DidYouMeanMixin):
         method : str
             ``'bounded'`` (default): the Bounded LRF (:mod:`molass.LowRank.BoundedLrf`): B(q) is clipped to the hard-sphere envelope above ``pi/R``; the
             result is in ``bounded_lrf_info``.
-            ``'envelope_prior'``: the envelope-prior LRF (:mod:`molass.LowRank.EnvelopePrior`): the same envelope used as a prior on B/A, weighed against the
-            per-q noise (no switch point, no shape model of B(q)), with the concentration curve refined first and a whitened SVD denoising; the result is in
-            ``envelope_prior_info``. Needs the stated error ``xr.E``. Validated on simulations only; see the module docstring for its limits.
+            ``'soft_bounded'``: the soft-bounded LRF (:mod:`molass.LowRank.SoftBoundedLrf`): the same envelope used as a soft bound instead of a clip: the plain
+            c^2 ratio B/A is multiplied per q by the weight ``tau^2 / (tau^2 + s_r^2)`` (``tau`` the envelope, ``s_r`` the error of B/A), so it is kept where
+            the data are sharp and fades out where the noise is larger than the bound (no switch point, no shape model of B(q)); the concentration curve is
+            refined first and a whitened SVD denoising is used; the result is in ``soft_bounded_info``. Needs the stated error ``xr.E``. Validated on
+            simulations only; see the module docstring for its limits.
         **options
-            For ``'envelope_prior'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.0, 0.035)``,
-            the q range in which K is searched), ``k_rule`` (``'peak'`` default or ``'mean'``, see :func:`molass.LowRank.EnvelopePrior.estimate_envelope_K`), ``warn`` (default ``True``).
+            For ``'soft_bounded'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.0, 0.035)``,
+            the q range in which K is searched), ``k_rule`` (``'peak'`` default or ``'mean'``, see :func:`molass.LowRank.SoftBoundedLrf.estimate_envelope_K`), ``warn`` (default ``True``).
 
         Only has an effect for components whose rank is 2 (see :meth:`update_xr_ranks`). Invalidates the cached Guinier objects and diagnostics.
 
@@ -1190,9 +1192,9 @@ class Decomposition(DidYouMeanMixin):
         ::
 
             decomp = ssd.quick_decomposition(1, ranks=[2])
-            decomp.set_rank2_method('envelope_prior')
+            decomp.set_rank2_method('soft_bounded')
             M, C, P, Pe = decomp.get_xr_matrices()
-            decomp.envelope_prior_info[0]          # K, cut-off, weights, violation fraction, refined c ...
+            decomp.soft_bounded_info[0]          # K, cut-off, weights, violation fraction, refined c ...
         """
         if method not in self.RANK2_METHODS:
             raise ValueError(f"unknown rank-2 method {method!r}; use one of {self.RANK2_METHODS}")
@@ -1201,12 +1203,12 @@ class Decomposition(DidYouMeanMixin):
         allowed = {'refine_c', 'L', 'k_window', 'k_rule', 'warn'}
         bad = set(options) - allowed
         if bad:
-            raise ValueError(f"unknown option(s) {sorted(bad)} for 'envelope_prior'; use {sorted(allowed)}")
+            raise ValueError(f"unknown option(s) {sorted(bad)} for 'soft_bounded'; use {sorted(allowed)}")
         self.rank2_method = method
         self.rank2_options = dict(options)
         self.guinier_objects = None
         self.bounded_lrf_info = None
-        self.envelope_prior_info = None
+        self.soft_bounded_info = None
         self._kratky_shape_match = None
 
     def _warn_if_low_q_was_cut(self, ranks):
@@ -1302,11 +1304,11 @@ class Decomposition(DidYouMeanMixin):
             P_full = M_ @ np.linalg.pinv(C_full)
 
             # Step 2c: apply the chosen rank-2 correction (the Bounded LRF by default)
-            if self.rank2_method == 'envelope_prior':
-                from molass.LowRank.EnvelopePrior import apply_envelope_prior_lrf
-                P_, ep_info = apply_envelope_prior_lrf(
+            if self.rank2_method == 'soft_bounded':
+                from molass.LowRank.SoftBoundedLrf import apply_soft_bounded_lrf
+                P_, ep_info = apply_soft_bounded_lrf(
                     xr.qv, xr.M, xr.E, C_full, P_full, ranks, seed_objects, **self.rank2_options)
-                self.envelope_prior_info = ep_info
+                self.soft_bounded_info = ep_info
                 self.bounded_lrf_info = None
             else:
                 if debug:
