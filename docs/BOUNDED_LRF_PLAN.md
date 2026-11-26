@@ -5,7 +5,7 @@
 > combinations, real SAMPLE3): (1) "Synthesized LRF is not needed" holds only in the sense that a *soft* form of the same bound does better than both the
 > hard clip and the splice: see `molass/LowRank/SoftBoundedLrf.py` and `decomposition.set_rank2_method('soft_bounded')`; (2) the clip is applied only
 > for `q >= pi/R` (molass-library#411); (3) the concentration curve (refined by `ConcentrationRefine`) and the whitened SVD denoising matter more than the
-> guard at low q. The plan below is otherwise unchanged. Evidence: `molass-researcher/experiments/66_interaction_models/README.md`; paper:
+> guard at low q. The soft-bounded LRF is now the default for rank-2 components (`set_rank2_method('bounded')` gives the plan below). The plan below is otherwise unchanged. Evidence: `molass-researcher/experiments/66_interaction_models/README.md`; paper:
 > `molass-papers/interparticle/OUTLINE.md`.
 
 ## Goal

@@ -81,26 +81,53 @@ def test_soft_bounded_lrf_is_exact_without_noise_and_shrinks_b_at_high_q_with_no
 
 
 @pytest.mark.fast
-def test_set_rank2_method_validation_and_default_is_the_bounded_lrf():
+def test_set_rank2_method_validation_and_default_is_the_soft_bounded_lrf():
     import molass
     from molass.Testing import simulate_tiny
     molass.set_progress(False)
     corrected = simulate_tiny().trimmed_copy().corrected_copy()
     d = corrected.quick_decomposition(num_components=1, proportions=[1])
-    assert d.rank2_method == 'bounded'
+    assert d.rank2_method == 'soft_bounded'
     with pytest.raises(ValueError, match="unknown rank-2 method"):
         d.set_rank2_method('shape_model')
     with pytest.raises(ValueError, match="unknown option"):
         d.set_rank2_method('soft_bounded', speed='fast')
     with pytest.raises(ValueError, match="no options"):
         d.set_rank2_method('bounded', L=3)
+    assert d.rank2_method == 'soft_bounded'                                # a rejected call changes nothing
     d.update_xr_ranks([2])
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         d.get_xr_matrices()
-    assert d.bounded_lrf_info and d.soft_bounded_info is None
-    d.set_rank2_method('soft_bounded', warn=False)
+    assert d.soft_bounded_info and d.bounded_lrf_info is None              # the default for a rank-2 component
+    d.set_rank2_method('bounded')
     assert d.bounded_lrf_info is None and d.soft_bounded_info is None      # caches are invalidated
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        d.get_xr_matrices()
+    assert d.bounded_lrf_info and d.soft_bounded_info is None
+
+
+@pytest.mark.fast
+def test_soft_bounded_result_is_cached_until_ranks_or_method_change():
+    import molass
+    from molass.Testing import simulate_tiny
+    molass.set_progress(False)
+    d = simulate_tiny().trimmed_copy().corrected_copy().quick_decomposition(num_components=1, proportions=[1])
+    d.update_xr_ranks([2])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        P1 = d.get_xr_matrices()[2]
+        info1 = d.soft_bounded_info
+        P2 = d.get_xr_matrices()[2]
+    assert d.soft_bounded_info is info1 and np.array_equal(P1, P2)         # the second call did not recompute
+    P2[:] = 0                                                              # a caller cannot corrupt the cache
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert np.array_equal(d.get_xr_matrices()[2], P1)
+        d.update_xr_ranks([2])
+        d.get_xr_matrices()
+    assert d.soft_bounded_info is not info1                                # update_xr_ranks invalidated it
 
 
 @pytest.mark.fast

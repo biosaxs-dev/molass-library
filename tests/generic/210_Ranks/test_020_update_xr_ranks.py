@@ -58,8 +58,8 @@ def test_update_xr_ranks_invalidates_cached_guinier_state():
     assert d._kratky_shape_match is None
 
     # get_xr_matrices() must recompute guinier_objects fresh, not find a stale
-    # non-None cache and skip past the Bounded LRF seeding step.
+    # non-None cache and skip past the rank-2 correction's seeding step.
     M, C, P, Pe = d.get_xr_matrices()
     assert d.guinier_objects is not None
-    assert d.bounded_lrf_info is not None
+    assert d.soft_bounded_info is not None          # the soft-bounded LRF is the default for rank-2 components
     assert P.shape[0] == M.shape[0]

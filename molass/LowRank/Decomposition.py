@@ -95,8 +95,9 @@ class Decomposition(DidYouMeanMixin):
 
         self.guinier_objects = None
         self.bounded_lrf_info = None
-        # How the rank-2 (interparticle) components are corrected: 'bounded' (default) or 'soft_bounded' (see set_rank2_method)
-        self.rank2_method = 'bounded'
+        # How the rank-2 (interparticle) components are corrected: 'soft_bounded' (default) or 'bounded' (see set_rank2_method)
+        self.rank2_method = 'soft_bounded'
+        self._soft_bounded_cache = None         # (key, corrected P, info): the refinement is costly, get_xr_matrices() is called often
         self.rank2_options = {}
         self.soft_bounded_info = None
         self.model = xr_ccurves[0].model
@@ -1162,10 +1163,11 @@ class Decomposition(DidYouMeanMixin):
         self.guinier_objects = None
         self.bounded_lrf_info = None
         self.soft_bounded_info = None
+        self._soft_bounded_cache = None
         self._kratky_shape_match = None
         self._warn_if_low_q_was_cut(ranks)
 
-    RANK2_METHODS = ('bounded', 'soft_bounded')
+    RANK2_METHODS = ('soft_bounded', 'bounded')
 
     def set_rank2_method(self, method, **options):
         """
@@ -1174,13 +1176,13 @@ class Decomposition(DidYouMeanMixin):
         Parameters
         ----------
         method : str
-            ``'bounded'`` (default): the Bounded LRF (:mod:`molass.LowRank.BoundedLrf`): B(q) is clipped to the hard-sphere envelope above ``pi/R``; the
-            result is in ``bounded_lrf_info``.
-            ``'soft_bounded'``: the soft-bounded LRF (:mod:`molass.LowRank.SoftBoundedLrf`): the same envelope used as a soft bound instead of a clip: the plain
+            ``'soft_bounded'`` (default): the soft-bounded LRF (:mod:`molass.LowRank.SoftBoundedLrf`): the hard-core envelope used as a soft bound: the plain
             c^2 ratio B/A is multiplied per q by the weight ``tau^2 / (tau^2 + s_r^2)`` (``tau`` the envelope, ``s_r`` the error of B/A), so it is kept where
             the data are sharp and fades out where the noise is larger than the bound (no switch point, no shape model of B(q)); the concentration curve is
             refined first and a whitened SVD denoising is used; the result is in ``soft_bounded_info``. Needs the stated error ``xr.E``. Validated on
-            simulations only; see the module docstring for its limits.
+            simulations and one real data set; see the module docstring for its limits. The result of this step is cached until the ranks or the method change.
+            ``'bounded'``: the earlier Bounded LRF (:mod:`molass.LowRank.BoundedLrf`): B(q) is clipped to the hard-sphere envelope above ``pi/R``; the
+            result is in ``bounded_lrf_info``.
         **options
             For ``'soft_bounded'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.0, 0.035)``,
             the q range in which K is searched), ``k_rule`` (``'peak'`` default or ``'mean'``, see :func:`molass.LowRank.SoftBoundedLrf.estimate_envelope_K`), ``warn`` (default ``True``).
@@ -1191,10 +1193,10 @@ class Decomposition(DidYouMeanMixin):
         --------
         ::
 
-            decomp = ssd.quick_decomposition(1, ranks=[2])
-            decomp.set_rank2_method('soft_bounded')
+            decomp = ssd.quick_decomposition(1, ranks=[2])      # the soft-bounded LRF is used for the rank-2 component
             M, C, P, Pe = decomp.get_xr_matrices()
             decomp.soft_bounded_info[0]          # K, cut-off, weights, violation fraction, refined c ...
+            decomp.set_rank2_method('bounded')   # the earlier hard clip, for comparison
         """
         if method not in self.RANK2_METHODS:
             raise ValueError(f"unknown rank-2 method {method!r}; use one of {self.RANK2_METHODS}")
@@ -1209,6 +1211,7 @@ class Decomposition(DidYouMeanMixin):
         self.guinier_objects = None
         self.bounded_lrf_info = None
         self.soft_bounded_info = None
+        self._soft_bounded_cache = None
         self._kratky_shape_match = None
 
     def _warn_if_low_q_was_cut(self, ranks):
@@ -1282,7 +1285,7 @@ class Decomposition(DidYouMeanMixin):
         M_, C_, P_, Pe = compute_lowrank_matrices(
             xr.M, self.xr_ccurves, xr.E, self.xr_ranks, debug=debug)
 
-        # Step 2: apply bounded LRF if any component is rank-2
+        # Step 2: apply the rank-2 (interparticle) correction if any component is rank-2
         ranks = self.xr_ranks or [1] * self.num_components
         has_rank2 = any(r == 2 for r in ranks)
 
@@ -1303,11 +1306,16 @@ class Decomposition(DidYouMeanMixin):
             C_full = np.array(cy_list)
             P_full = M_ @ np.linalg.pinv(C_full)
 
-            # Step 2c: apply the chosen rank-2 correction (the Bounded LRF by default)
+            # Step 2c: apply the chosen rank-2 correction (the soft-bounded LRF by default)
             if self.rank2_method == 'soft_bounded':
-                from molass.LowRank.SoftBoundedLrf import apply_soft_bounded_lrf
-                P_, ep_info = apply_soft_bounded_lrf(
-                    xr.qv, xr.M, xr.E, C_full, P_full, ranks, seed_objects, **self.rank2_options)
+                key = (tuple(ranks), repr(sorted(self.rank2_options.items())))
+                if self._soft_bounded_cache is not None and self._soft_bounded_cache[0] == key:
+                    P_, ep_info = self._soft_bounded_cache[1].copy(), self._soft_bounded_cache[2]
+                else:
+                    from molass.LowRank.SoftBoundedLrf import apply_soft_bounded_lrf
+                    P_, ep_info = apply_soft_bounded_lrf(
+                        xr.qv, xr.M, xr.E, C_full, P_full, ranks, seed_objects, **self.rank2_options)
+                    self._soft_bounded_cache = (key, P_.copy(), ep_info)
                 self.soft_bounded_info = ep_info
                 self.bounded_lrf_info = None
             else:
@@ -1319,6 +1327,7 @@ class Decomposition(DidYouMeanMixin):
                 P_, bounded_info = apply_bounded_lrf(
                     xr.qv, P_full, C_full, ranks, seed_objects)
                 self.bounded_lrf_info = bounded_info
+                self.soft_bounded_info = None
 
             # Step 2d: re-propagate error for corrected P
             if xr.E is not None:

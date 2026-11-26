@@ -15,7 +15,8 @@
     high q and had mid-q failures on non-spherical particles and non-hard-sphere interactions (worst mid-q error 146 against 32 for the soft version);
     with the library's own elution curve and unweighted SVD denoising its low-q gain is small (0.057 against 0.125 without correction, 0.013 with the soft
     version, refined curve and whitened denoising). The soft, noise-weighted form of the same bound is :mod:`molass.LowRank.SoftBoundedLrf`
-    (``decomposition.set_rank2_method('soft_bounded')``); this method stays the default until that is decided.
+    (``decomposition.set_rank2_method('soft_bounded')``), which is now the default for rank-2 components; this method remains available as
+    ``set_rank2_method('bounded')``.
     On the real SAMPLE3 the two give the same Guinier-region correction (nothing is clipped there).
 """
 import warnings

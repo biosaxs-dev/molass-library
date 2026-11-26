@@ -24,8 +24,8 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 
 ### Added
-- **Soft-bounded LRF** (`decomp.set_rank2_method('soft_bounded')`): a second way to correct rank-2 (interparticle) components, next to the Bounded LRF
-  (`'bounded'`, still the default). The envelope of the Bounded LRF, `|B/A| <= K min(1, L 3/(q sigma)^2)`, is used as a **soft bound** instead of a hard clip:
+- **Soft-bounded LRF** (`decomp.set_rank2_method('soft_bounded')`; **the default for rank-2 components**, `set_rank2_method('bounded')` gives the earlier Bounded LRF): a second way to correct rank-2 (interparticle) components, replacing the hard clip as the default
+  (the result of the step is cached per decomposition until the ranks or the method change; the curve refinement takes a few seconds). The envelope of the Bounded LRF, `|B/A| <= K min(1, L 3/(q sigma)^2)`, is used as a **soft bound** instead of a hard clip:
   per q the plain c^2 fit gives B/A with its error `s_r`, and the ratio is multiplied by the weight `tau^2 / (tau^2 + s_r^2)` (`tau` = the envelope), so it is the
   plain quadratic correction at low q, zero at high q and a noise-weighted blend between (no switch point, no shape model of B(q), no sign constraint; the form of
   a Wiener filter, or the posterior mean under a Gaussian prior of width `tau`). K is the largest significant sliding-window mean of `|B/A|` over q < 0.035
