@@ -71,7 +71,9 @@ def test_ep_lrf_is_exact_without_noise_and_shrinks_b_at_high_q_with_noise():
     assert np.all((w >= 0) & (w <= 1))
     assert np.max(np.abs(out["r_post"][qv > 0.25])) < 0.02                  # B/A -> 0 at high q (the true value is about 0.001)
     kw = (qv >= 0.018) & (qv < 0.035)
-    assert out["K"] == pytest.approx(np.mean(np.abs(fr.B / fr.A)[kw]), rel=0.15)      # K = the mean |B/A| over the window (not the model K)
+    mean_out = envelope_prior_lrf(fr.qv, fr.M, get_weighted_denoised_data(fr.M, fr.E, 2), fr.E, fr.c, rg_seed=RG, k_rule="mean")
+    assert mean_out["K"] == pytest.approx(np.mean(np.abs(fr.B / fr.A)[kw]), rel=0.15)  # 'mean' rule: the mean |B/A| over 0.018-0.035 (not the model K)
+    assert out["K"] >= mean_out["K"] * 0.9                                  # 'peak' rule: the largest significant window below 0.035, never much below the mean
     low = (qv >= 0.018) & (qv < 0.04)
     rel = lambda a: np.sqrt(np.mean(((a / a[low].mean()) / (fr.A / fr.A[low].mean()) - 1)[low] ** 2))
     rank1 = np.sum(fr.M * fr.c[None, :], axis=1) / np.sum(fr.c ** 2)

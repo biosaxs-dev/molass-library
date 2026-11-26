@@ -1180,8 +1180,8 @@ class Decomposition(DidYouMeanMixin):
             per-q noise (no switch point, no shape model of B(q)), with the concentration curve refined first and a whitened SVD denoising; the result is in
             ``envelope_prior_info``. Needs the stated error ``xr.E``. Validated on simulations only; see the module docstring for its limits.
         **options
-            For ``'envelope_prior'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.018, 0.035)``,
-            the q range where K is estimated), ``warn`` (default ``True``).
+            For ``'envelope_prior'``: ``refine_c`` (default ``True``), ``L`` (default 2.0, the margin of the envelope), ``k_window`` (default ``(0.0, 0.035)``,
+            the q range in which K is searched), ``k_rule`` (``'peak'`` default or ``'mean'``, see :func:`molass.LowRank.EnvelopePrior.estimate_envelope_K`), ``warn`` (default ``True``).
 
         Only has an effect for components whose rank is 2 (see :meth:`update_xr_ranks`). Invalidates the cached Guinier objects and diagnostics.
 
@@ -1198,7 +1198,7 @@ class Decomposition(DidYouMeanMixin):
             raise ValueError(f"unknown rank-2 method {method!r}; use one of {self.RANK2_METHODS}")
         if method == 'bounded' and options:
             raise ValueError("the 'bounded' method has no options")
-        allowed = {'refine_c', 'L', 'k_window', 'warn'}
+        allowed = {'refine_c', 'L', 'k_window', 'k_rule', 'warn'}
         bad = set(options) - allowed
         if bad:
             raise ValueError(f"unknown option(s) {sorted(bad)} for 'envelope_prior'; use {sorted(allowed)}")

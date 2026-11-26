@@ -27,7 +27,8 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
 - **Envelope-prior LRF** (`decomp.set_rank2_method('envelope_prior')`): a second way to correct rank-2 (interparticle) components, next to the Bounded LRF
   (`'bounded'`, still the default). The envelope of the Bounded LRF, `|B/A| <= K min(1, L 3/(q sigma)^2)`, is used as a **prior** on B/A instead of a clip:
   per q the plain c^2 fit gives B/A with its error, and the posterior mean is the plain quadratic correction at low q, zero at high q and a noise-weighted
-  blend between (no switch point, no shape model of B(q), no sign constraint). The envelope has a general ground: a hard core makes the Mayer function jump at
+  blend between (no switch point, no shape model of B(q), no sign constraint). K is the largest significant sliding-window mean of `|B/A|` over q < 0.035
+  (`k_rule='peak'`; `'mean'` gives the first version, the mean over 0.018-0.035): on the real SAMPLE3 the effect sits below q = 0.016 and the window mean removed it. The envelope has a general ground: a hard core makes the Mayer function jump at
   contact, which bounds the interparticle term at every q whatever the soft part of the potential does. By default the concentration curve is refined first
   (`molass.LowRank.ConcentrationRefine.refine_concentration`; no UV curve needed) and the matrix is denoised with a whitened SVD
   (`molass.LowRank.LowRankInfo.get_weighted_denoised_data`, each q row divided by its median error). The result is in `decomp.envelope_prior_info[k]`

@@ -13,7 +13,7 @@
     **The estimator.** Per q the simple LRF (``M ~ A c + B c^2``, weights 1/E^2) gives ``r_hat = B/A`` with its propagated error ``s_r``. With the prior
     ``r ~ N(0, tau^2)``, ``tau(q) = K min(1, L 3 / (q sigma)^2)``, the posterior mean is ``r_hat tau^2 / (tau^2 + s_r^2)``: the plain quadratic correction
     where the data are sharper than the prior (low q), about 0 where the prior is sharper (high q), a blend by the noise between. No switch point, no
-    shape model of B(q), no sign constraint. A(q) is then solved with ``B/A = r_post`` fixed. K is the mean ``|r_hat|`` over ``k_window`` (default 0.018-0.035),
+    shape model of B(q), no sign constraint. A(q) is then solved with ``B/A = r_post`` fixed. K is the largest significant sliding-window mean of ``|r_hat|`` over the rows with q below ``k_window[1]`` (default 0.035; see :func:`estimate_envelope_K`),
     ``sigma = 2 sqrt(5/3) Rg`` with the Guinier Rg of the corrected profile of the first pass.
 
     **Concentration curve.** The curve ``c`` is the dominant error of every c^2 correction (K = 1.0 simulation: low-q error 0.215 with the library's XR curve, 0.006
@@ -35,7 +35,9 @@ import warnings
 import numpy as np
 
 L_DEFAULT = 2.0
-K_WINDOW = (0.018, 0.035)
+K_WINDOW = (0.0, 0.035)          # K is searched among the rows with q below the upper end (the effect can sit below 0.018: real SAMPLE3)
+K_ROWS = 5                      # rows of the sliding window of the K estimate
+K_SIGNIF = 3.0                  # a window counts only if |mean B/A| > K_SIGNIF standard errors
 Q_MIN_WARN = 0.02               # warn when the lowest q used is above this (1/Angstrom)
 K_MIN_WARN = 0.05               # K below this: no detectable interparticle term
 BAND_FACTOR = 1.5               # the band b1 <= q < BAND_FACTOR b1 (b1 = pi/R) where the envelope violation is judged
@@ -68,7 +70,7 @@ class EnvelopePriorInfo(dict):
         if ref is not None and ref.get('at_bound'):
             out.append("the concentration refinement ended at a bound of its (hard-sphere) parameters: the effect is not hard-sphere-like or very weak; the refined curve may be unreliable")
         if self['K'] < K_MIN_WARN:
-            out.append(f"K = {self['K']:.3g} is small: no detectable interparticle term in q {K_WINDOW[0]}-{K_WINDOW[1]}; rank 2 may not be needed")
+            out.append(f"K = {self['K']:.3g} is small: no detectable interparticle term below q = {K_WINDOW[1]}; rank 2 may not be needed")
         if self['violation_fraction'] > VIOLATION_WARN:
             out.append(f"B/A exceeds twice the hard-core envelope significantly at {self['violation_fraction']:.0%} of the points in the band {self['cutoff_q']:.3g} <= q < {BAND_FACTOR * self['cutoff_q']:.3g}: "
                        f"adhesive or soft particles? the envelope prior then removes real B(q)")
@@ -92,7 +94,36 @@ def simple_lrf_with_errors(M, E, c):
     return A, B, s22 / det, s11 / det, -s12 / det
 
 
-def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K_WINDOW):
+def estimate_envelope_K(qv, r_hat, s_r, k_window=K_WINDOW, rule="peak"):
+    """The plateau K of the envelope from the plain-fit ratio ``r_hat = B/A`` and its error ``s_r``.
+
+    ``rule='peak'`` (default): the largest ``|mean r_hat|`` of a sliding window of ``K_ROWS`` consecutive rows (precision-weighted, rows with q below the upper end of
+    ``k_window`` and above its lower end), among the windows whose mean is significant (``K_SIGNIF`` standard errors). The effect can sit at the lowest q:
+    on the real SAMPLE3 B/A is -0.31 at q = 0.0075-0.010 and about +0.04 at 0.018-0.035; the mean over 0.018-0.035 (``rule='mean'``, the first version) is 0.04
+    and removes the effect. If no window is significant, the mean ``|r_hat|`` over the window is used.
+    """
+    qv = np.asarray(qv, float)
+    ok = np.isfinite(r_hat) & np.isfinite(s_r) & (s_r > 0)
+    sel = np.flatnonzero((qv >= k_window[0]) & (qv < k_window[1]) & ok)
+    if rule == "mean":
+        sel_m = sel[qv[sel] >= 0.018] if (qv[sel] >= 0.018).sum() >= 3 else sel
+        return float(np.mean(np.abs(r_hat[sel_m]))) if len(sel_m) else 0.0
+    best = 0.0
+    for i in range(0, max(0, len(sel) - K_ROWS + 1)):
+        w = sel[i:i + K_ROWS]
+        if w[-1] - w[0] != K_ROWS - 1:
+            continue                                     # not consecutive rows
+        wt = 1.0 / s_r[w] ** 2
+        mean = float(np.sum(wt * r_hat[w]) / np.sum(wt))
+        se = float(1.0 / np.sqrt(np.sum(wt)))
+        if abs(mean) > K_SIGNIF * se:
+            best = max(best, abs(mean))
+    if best == 0.0 and len(sel):
+        best = float(np.mean(np.abs(r_hat[sel[qv[sel] >= 0.018]]))) if (qv[sel] >= 0.018).any() else float(np.mean(np.abs(r_hat[sel])))
+    return best
+
+
+def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak"):
     """EP-LRF for one component on arrays.
 
     Parameters
@@ -107,7 +138,8 @@ def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K
         The concentration curve **at peak 1**.
     rg_seed : float
         Rg for ``sigma = 2 sqrt(5/3) Rg``.
-    L, k_window : float, (float, float)
+    L, k_window, k_rule : float, (float, float), str
+        ``k_window``: the q range in which K is searched; ``k_rule``: ``'peak'`` or ``'mean'`` (see :func:`estimate_envelope_K`).
 
     Returns
     -------
@@ -118,10 +150,7 @@ def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K
     with np.errstate(divide="ignore", invalid="ignore"):
         r_hat = B_s / A_s
         s_r = np.sqrt(np.maximum(vB / A_s ** 2 + B_s ** 2 * vA / A_s ** 4 - 2 * B_s * cov / A_s ** 3, 1e-30))
-    m = (qv >= k_window[0]) & (qv < k_window[1]) & np.isfinite(r_hat)
-    if m.sum() < 3:
-        m = np.isfinite(r_hat) & (np.arange(len(qv)) < max(5, len(qv) // 10))      # too little data in the window: the lowest rows
-    K = float(np.mean(np.abs(r_hat[m])))
+    K = estimate_envelope_K(qv, r_hat, s_r, k_window, k_rule)
     sigma = 2 * np.sqrt(5 / 3) * rg_seed
     with np.errstate(divide="ignore", invalid="ignore"):
         tau = K * np.minimum(1.0, L * 3.0 / (qv * sigma) ** 2)
@@ -133,7 +162,7 @@ def envelope_prior_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K
     return dict(A=A, r_hat=r_hat, r_post=r_post, tau=tau, s_r=s_r, K=K, sigma=float(sigma))
 
 
-def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, warn=True):
+def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak", warn=True):
     """Apply EP-LRF to every rank-2 component (the counterpart of :func:`molass.LowRank.BoundedLrf.apply_bounded_lrf`).
 
     Parameters
@@ -152,7 +181,7 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
         Pre-computed RgEstimator objects (one per component) from the naive P; their Rg gives the start of the refinement range.
     refine_c : bool
         Refine the concentration curve first (default). ``False`` uses the library's curve.
-    L, k_window : see :func:`envelope_prior_lrf`.
+    L, k_window, k_rule : see :func:`envelope_prior_lrf`.
     warn : bool
 
     Returns
@@ -193,7 +222,7 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
         refine_info, c_ref = None, c0 / scale
         if refine_c:
             q_fit_max = float(np.clip(1.5 * np.pi / (np.sqrt(5 / 3) * rg0), 0.06, 0.12))
-            ref = refine_concentration(qv, Md2, E, c0, q_max=q_fit_max, q_min=k_window[0])
+            ref = refine_concentration(qv, Md2, E, c0, q_max=q_fit_max, q_min=0.018)
             c_ref = ref.pop("c")
             refine_info = ref
         C2 = np.array([c_ref, c_ref ** 2])
@@ -202,7 +231,7 @@ def apply_envelope_prior_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refi
         rg = RgEstimator(np.array([qv, P2[:, 0], Pe2[:, 0]]).T).Rg
         if rg is None or not np.isfinite(rg) or rg <= 0:
             rg = rg0
-        e = envelope_prior_lrf(qv, Mk, Md2, E, c_ref, float(rg), L=L, k_window=k_window)
+        e = envelope_prior_lrf(qv, Mk, Md2, E, c_ref, float(rg), L=L, k_window=k_window, k_rule=k_rule)
         A = e["A"] / scale
         P_out[:, k] = A
         P_out[:, b_col] = e["r_post"] * A / scale             # M ~ A_ref c_ref + r A_ref c_ref^2 with c_ref = c0/scale: A = A_ref/scale, B = r A_ref/scale^2 = r A/scale
