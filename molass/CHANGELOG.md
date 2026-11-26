@@ -24,6 +24,12 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 
 ### Added
+- **`molass.Testing.interparticle_frames(A, B, c, qv, error, noise_scale=1.0, seed=0)`** (#415): frames
+  `M = A c + B c^2 + noise` with the truth attached (`A`, `B`, `c`, `K`, `R_eff`, `truth_on(qv)` for any q grid, because the
+  automatic trimming changes the grid with the noise and the interaction) and `to_ssd()` (a `SecSaxsData` with a UV matrix
+  proportional to the true concentration, so that the whole chain can be run). Helpers: `hard_sphere_B` (`-K Phi(2 q R_eff) A`),
+  `sphere_form_factor`, `debye_form_factor`, `ellipsoid_form_factor`, `scale_axes_to_rg`, `effective_radius` (orientation-averaged
+  excluded volume of a tri-axial ellipsoid). `noise_scale` multiplies the stated error (1 = the stated level).
 - **`ssd.xr.error_scale()`** (#416): the true scatter of the data in units of the stated error `xr.E`, per q region, estimated
   without any model from the fourth difference over neighbouring frames (1 = the stated error is right, 2.5 = 2.5 times too
   small). Recovers a known noise factor within a few percent; emits a `UserWarning` for regions outside 0.67-1.5
