@@ -40,6 +40,7 @@ FAST_MODULES = {
     "210_Ranks/test_215_title_ranks",
     "215_Homogeneity/test_215_Homogeneity",
     "230_ErrorModel/test_010_sedlak_390",
+    "230_ErrorModel/test_020_error_scale_416",
     "810_VoxelSpace/test_010_shapes",
     "910_DENSS/test_020_denss_detector",
     "test_log_streams",

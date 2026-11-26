@@ -23,6 +23,17 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   the result is unchanged (identical at low q); the high-q clipping that suppresses the noise of the rank-2 solution is
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 
+### Added
+- **`ssd.xr.error_scale()`** (#416): the true scatter of the data in units of the stated error `xr.E`, per q region, estimated
+  without any model from the fourth difference over neighbouring frames (1 = the stated error is right, 2.5 = 2.5 times too
+  small). Recovers a known noise factor within a few percent; emits a `UserWarning` for regions outside 0.67-1.5
+  (`warn=False` to silence). A reduced chi-square of a fit cannot give this number because a wrong model inflates it in the
+  same way: on SAMPLE3 the reduced chi-square of the component-curve fit is about 6 ("errors 2.5x too small") while this
+  estimate is 0.94-1.0 for q >= 0.02 (the stated errors are right).
+- **`Decomposition.get_curve_fit_report()`** (#416): per q region the `s = sqrt(chi2/dof)` of the fit with the component curves
+  against a free SVD fit of the same rank; `report.misfit_regions()` lists where the curves, not the stated error, are what
+  does not describe the data (SAMPLE3: the EGH curve gives up to 5.6 near q = 0.035, a free rank-1 fit 1.0-1.1).
+
 ## 1.3.0 (2026-11-18)
 
 Headline: continue an analysis in a new folder under another elution model (`molass.fork_analysis`),

@@ -182,6 +182,42 @@ class XrData(SsMatrixData):
         from molass.Trimming.UsableQrange import get_usable_qrange_impl
         return get_usable_qrange_impl(self, **kwargs)
 
+    def error_scale(self, frames=None, regions=None, warn=True, order=4):
+        """xr.error_scale()
+
+        The true scatter of the data in units of the stated error ``xr.E``, per q region, estimated **without any model**
+        from the second difference over neighbouring frames (molass-library#416).
+
+        ``1`` means the stated error is right, ``2.5`` that it is 2.5 times too small, ``0.5`` that it is 2 times too large.
+        A reduced chi-square of a fit cannot give this number: a wrong model (for example an elution curve that does not
+        follow the peak) inflates it in the same way (on SAMPLE3 the reduced chi-square of the component-curve fit is about 6
+        while this estimate is 1.0: the stated errors are right). For the misfit of the curves see
+        :meth:`~molass.LowRank.Decomposition.Decomposition.get_curve_fit_report`.
+
+        Parameters
+        ----------
+        frames : None, 'all' or array of int, optional
+            Frames used. Default: frames above 5 % of the strongest frame (the scatter is estimated from neighbouring
+            frames, so the signal must be smooth over the frames and the noise independent between them).
+        regions : array-like of q edges, optional
+            Default ``(0, 0.02, 0.04, 0.1, 0.2, inf)`` in 1/Angstrom.
+        warn : bool, optional
+            Emit a ``UserWarning`` naming the regions where the value is outside 0.67-1.5.
+        order : int, optional
+            Order of the difference over neighbouring frames (even; default 4, which cancels the curvature of a strong peak;
+            2 is the plain second difference).
+
+        Returns
+        -------
+        molass.LowRank.ErrorScale.ErrorScaleReport
+
+        Examples
+        --------
+        >>> print(ssd.xr.error_scale())
+        """
+        from molass.LowRank.ErrorScale import compute_error_scale
+        return compute_error_scale(self, frames=frames, regions=regions, warn=warn, order=order)
+
     def get_ibaseline(self, pickat=None, method=None, **kwargs):
         """xr.get_ibaseline()
         

@@ -429,6 +429,30 @@ class Decomposition(DidYouMeanMixin):
         from molass.LowRank.ResidualReport import compute_residual_report
         return compute_residual_report(self, dmax=dmax, min_fraction=min_fraction, params_per_curve=params_per_curve)
 
+    def get_curve_fit_report(self, min_fraction=0.05, regions=None):
+        """Do the component curves describe the measured data? (molass-library#416)
+
+        Per q region, ``s = sqrt(chi2/dof)`` in units of the stated error of the per-q-row least-squares fit with the
+        component curves of this decomposition (``s_curves``), against a free SVD fit of the same rank (``s_free``).
+        If ``s_free`` is about 1 and ``s_curves`` is well above it, the stated error is right and the *curves* are what does not
+        describe the data (``report.misfit_regions()``). On SAMPLE3 the EGH curve gives up to about 5.6 near q = 0.035 where a
+        free rank-1 fit gives 1.0-1.1. Compare with :meth:`~molass.DataObjects.XrData.XrData.error_scale`, the model-free noise
+        scale.
+
+        Parameters
+        ----------
+        min_fraction : float, optional
+            Frames weaker than this fraction of the strongest frame are left out (as in :meth:`get_residuals`).
+        regions : array-like of q edges, optional
+            Default ``(0, 0.02, 0.04, 0.1, 0.2, inf)`` in 1/Angstrom.
+
+        Returns
+        -------
+        molass.LowRank.ErrorScale.CurveFitReport
+        """
+        from molass.LowRank.ErrorScale import compute_curve_fit_report
+        return compute_curve_fit_report(self, min_fraction=min_fraction, regions=regions)
+
     def get_kratky_shape_match(self, debug=False, qrg_window=None):
         """Compute a components x reference-shapes Kratky shape-match score matrix.
 
