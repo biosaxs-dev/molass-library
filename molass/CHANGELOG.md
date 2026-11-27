@@ -32,6 +32,11 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   On the real SAMPLE3 the result is practically unchanged (Guinier Rg 34.28 and 34.30 Å).
 
 ### Added
+- **`decomposition.rank2_report()`** (#420): what the rank-2 correction did, per rank-2 component, in one call (empty when no component has rank 2). For the soft-bounded LRF:
+  K, sigma, L, the cut-off, the mean weight in the mid-q region, the envelope-violation fraction, the curve refinement (ended at a bound or not, the largest change of the
+  curve at peak 1), the Rg of the corrected and of the uncorrected (rank 1) profile under the two conventions of `molass.Guinier.rg_conventions`, and the warnings
+  (the texts of the `UserWarning`, kept when `warn=False` or when the result is cached); for the Bounded LRF the clipped fractions and `L_penalized`. The `repr` is a
+  short text for a status record.
 - **Which points the Rg comes from** (#419). `RgEstimator` has a readable `repr` (Rg, q interval, number of points, `q*Rg` at the upper end, `rg_source`,
   `score`, "(low)" below `LOW_SCORE_WARN = 0.6`, provisional) and `describe()` (the same in lines, with a note on a low score); `molass.Guinier.rg_conventions(q, I, e)`
   returns the Rg of the adaptive interval and of a fixed `q*Rg < 1.3` fit started at the lowest q, with the intervals and the spread. On the real SAMPLE3 peak

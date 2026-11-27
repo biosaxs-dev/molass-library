@@ -1214,6 +1214,30 @@ class Decomposition(DidYouMeanMixin):
         self._soft_bounded_cache = None
         self._kratky_shape_match = None
 
+    def rank2_report(self):
+        """
+        What the rank-2 (interparticle) correction did, per rank-2 component, in one call (molass-library#420).
+
+        Returns
+        -------
+        molass.LowRank.Rank2Report.Rank2Report
+            A ``dict`` keyed by the component index; its ``repr`` is a short text for a status record. For the soft-bounded LRF each entry has the bound
+            (``K``, ``sigma``, ``L``, ``cutoff_q``), the mean weight in the mid-q region and the envelope-violation fraction, the curve refinement
+            (``at_bound``, ``max_curve_change`` against the library curve at peak 1), the Rg of the corrected and of the uncorrected (rank 1) profile under
+            two Guinier conventions (:func:`molass.Guinier.rg_conventions`) and ``warnings``; for the Bounded LRF the clipped fractions and ``L_penalized``.
+            Empty when no component has rank 2. The warnings are the same texts as the ``UserWarning`` of :meth:`get_xr_matrices`, but are not lost when
+            ``warn=False`` or when the result is cached.
+
+        Example
+        -------
+        ::
+
+            decomp = ssd.quick_decomposition(1, ranks=[2])
+            print(decomp.rank2_report())
+        """
+        from molass.LowRank.Rank2Report import build_rank2_report
+        return build_rank2_report(self)
+
     def _warn_if_low_q_was_cut(self, ranks):
         """Warn when a rank-2 (interparticle) component is requested on data whose lowest-q points were
         cut at the Guinier start: the interparticle effect acts at the lowest q, so the correction then

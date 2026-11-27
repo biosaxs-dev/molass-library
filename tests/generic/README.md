@@ -24,6 +24,8 @@ Running `200_LRF` and `210_Ranks` together takes more than 25 minutes; run by fi
 |---|---|
 | `LowRank/Decomposition.py`: `get_xr_matrices`, `update_xr_ranks`, `set_rank2_method` | `200_LRF/test_130_soft_bounded_lrf.py` (fast, about 70 s), `210_Ranks/test_020_update_xr_ranks.py`, `210_Ranks/test_060_quick_ranks_380.py`; the call-order tests `210_Ranks/test_030_*` and `test_040_*` are slow |
 | `LowRank/SoftBoundedLrf.py`, `ConcentrationRefine.py`, `LowRankInfo.get_weighted_denoised_data` | `200_LRF/test_130_soft_bounded_lrf.py` |
+| `LowRank/Rank2Report.py` (`rank2_report()`) | `200_LRF/test_150_rank2_report_420.py` (fast) |
+| `Guinier/RgConventions.py` (`rg_conventions`), `RgEstimator` repr / `describe()` | `200_LRF/test_140_rg_conventions_419.py` (fast) |
 | `LowRank/BoundedLrf.py` | `200_LRF/test_020_BoundedLrf.py` (fast) |
 | `LowRank/ErrorScale.py`, residual report | `230_ErrorModel/test_020_error_scale_416.py`, `200_LRF/test_116_residual_report_392.py` |
 | `molass.Testing` (`interparticle_frames`, `simulate_tiny`) | `200_LRF/test_120_interparticle_frames_415.py`, `130_Mapping/test_090_simulate_tiny_387.py` |
