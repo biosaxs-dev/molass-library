@@ -66,20 +66,55 @@ class SoftBoundedInfo(dict):
                 parts.append(f"{k}=<array {np.shape(self[k])}>")
         return f"SoftBoundedInfo({', '.join(parts)})"
 
-    def warnings_list(self):
-        """The reasons (strings) why this result deserves a second look; the same texts are emitted as a ``UserWarning``."""
+    def findings(self):
+        """What deserves a second look, as :class:`molass.LowRank.Findings.Finding` records (code, the library's text, a plain-language text, the part of the
+        profile affected, a suggested check, the numbers); the texts of :meth:`warnings_list` are their ``text`` (molass-library#423)."""
+        from molass.LowRank.Findings import Finding
         out = []
         ref = self.get('refine')
         if ref is not None and ref.get('at_bound'):
-            out.append("the concentration refinement ended at a bound of its (hard-sphere) parameters: the effect is not hard-sphere-like or very weak; the refined curve may be unreliable")
+            out.append(Finding(
+                code='refine_at_bound',
+                text="the concentration refinement ended at a bound of its (hard-sphere) parameters: the effect is not hard-sphere-like or very weak; the refined curve may be unreliable",
+                plain="The fit of the concentration curve ended at the edge of what a hard-sphere effect allows: the interparticle effect is either very weak or not "
+                      "hard-sphere-like. The refined curve, and so the correction, may be unreliable.",
+                region="all q (the correction rests on the refined curve)",
+                check="Compare with Ranks = 1 and with refine_c=False (set_rank2_method('soft_bounded', refine_c=False)); if the Rg barely changes, the correction does not matter for it.",
+                values=dict(at_bound=True)))
         if self['K'] < K_MIN_WARN:
-            out.append(f"K = {self['K']:.3g} is small: no detectable interparticle term below q = {K_WINDOW[1]}; rank 2 may not be needed")
+            out.append(Finding(
+                code='k_small',
+                text=f"K = {self['K']:.3g} is small: no detectable interparticle term below q = {K_WINDOW[1]}; rank 2 may not be needed",
+                plain=f"No interparticle term could be detected at low q (K = {self['K']:.2g}), so Ranks = 2 may not be needed.",
+                region=f"low q (below {K_WINDOW[1]} 1/A)",
+                check="Compare with Ranks = 1; use rank 1 if the profiles agree.",
+                values=dict(K=float(self['K']), threshold=K_MIN_WARN)))
         if self['violation_fraction'] > VIOLATION_WARN:
-            out.append(f"B/A exceeds twice the hard-core envelope significantly at {self['violation_fraction']:.0%} of the points in the band {self['cutoff_q']:.3g} <= q < {BAND_FACTOR * self['cutoff_q']:.3g}: "
-                       f"adhesive or soft particles? the soft bound then removes real B(q)")
+            lo, hi = self['cutoff_q'], BAND_FACTOR * self['cutoff_q']
+            out.append(Finding(
+                code='violation',
+                text=f"B/A exceeds twice the hard-core envelope significantly at {self['violation_fraction']:.0%} of the points in the band {lo:.3g} <= q < {hi:.3g}: "
+                     f"adhesive or soft particles? the soft bound then removes real B(q)",
+                plain=f"At mid q ({lo:.3g}-{hi:.3g} 1/A) the data show more interparticle signal than a particle with a hard core can have "
+                      f"({self['violation_fraction']:.0%} of the points). The correction may be partly removed there instead of applied. Typical for sticky or "
+                      f"flexible particles; in our simulations such cases were still corrected well at low and mid q.",
+                region=f"mid q, {lo:.3g}-{hi:.3g} 1/A",
+                check="Compare the Rg with and without Ranks = 2 (rank2_report shows both).",
+                values=dict(violation_fraction=float(self['violation_fraction']), band=(float(lo), float(hi)), threshold=VIOLATION_WARN)))
         if self['q_min_used'] > Q_MIN_WARN:
-            out.append(f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on")
+            out.append(Finding(
+                code='q_min_high',
+                text=f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on",
+                plain=f"The lowest q used is {self['q_min_used']:.3g} 1/A: the trimming cut away much of the low-q region where the interparticle effect acts, "
+                      f"so the correction has little to work on.",
+                region="low q",
+                check="Trim less at small angles (small_angle_limit) if the data allow.",
+                values=dict(q_min_used=float(self['q_min_used']), threshold=Q_MIN_WARN)))
         return out
+
+    def warnings_list(self):
+        """The reasons (strings) why this result deserves a second look; the same texts are emitted as a ``UserWarning``."""
+        return [f.text for f in self.findings()]
 
 
 def simple_lrf_with_errors(M, E, c):

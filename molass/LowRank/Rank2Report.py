@@ -36,11 +36,50 @@ class Rank2Report(dict):
             for name, conv in (("corrected", r['rg_corrected']), ("uncorrected (rank 1)", r['rg_uncorrected'])):
                 lines.append(f"  Rg {name}: " + "; ".join(f"{n} {v['Rg']:.2f} A" + (f" (score {v['score']:.2f}{', low' if v.get('low_score') else ''})" if v.get('score') is not None else "")
                                                          for n, v in conv.items()) + f"; spread {conv.spread:.2f} A")
-            for w in r['warnings']:
-                lines.append(f"  WARNING: {w}")
-            if not r['warnings']:
-                lines.append("  no warnings")
+            imp = r['impact']
+            lines.append("  impact: Rg " + "; ".join(f"{g['convention']} {g['uncorrected']:.2f} -> {g['corrected']:.2f} A ({g['change_pct']:+.1f} %)" for g in imp['rg']))
+            sh = imp['shape']
+            if sh is None:
+                lines.append("  impact: the shape of A(q) against rank 1 could not be compared (too few points at high q)")
+            else:
+                lines.append(f"  impact: A(q) shape against rank 1 (normalised at q*Rg >= {sh['high_from']:g}, Rg = {sh['rg']:.1f} A): " + ", ".join(
+                    f"{name} {v['median_pct']:+.1f} % (max {v['max_abs_pct']:.1f})" for name, v in sh['regions'].items() if v is not None))
+            for f in r['findings']:
+                lines.append(f"  finding [{f.code}]: {f.plain}")
+                lines.append(f"    affects: {f.region}; check: {f.check}")
+            if r['findings']:
+                lines.append("  (the thresholds behind the findings are provisional; a finding is not a risk level)")
+            else:
+                lines.append("  no findings")
         return "\n".join(lines)
+
+
+HIGH_FROM = 3.5          # q*Rg from which the profile is taken as unchanged by the correction (it fades out there)
+REGIONS = (("Guinier", 0.0, 1.3), ("mid", 1.3, HIGH_FROM), ("high", HIGH_FROM, np.inf))
+
+
+def profile_shape_change(qv, A_corrected, A_uncorrected, rg):
+    """How much the correction changes the **shape** of A(q) against the uncorrected (rank 1) profile, per region of ``q*Rg``.
+
+    The units of the two A(q) differ (the refined concentration curve changes the scale), so the ratio ``A_corrected / A_uncorrected`` is divided by its median
+    over the high-q region (``q*Rg >= 3.5``), where the correction fades out; the change is that ratio minus 1. Returns ``None`` when the high-q region has
+    fewer than 5 usable points, else a dict ``rg``, ``high_from`` and ``regions``: region name (``'Guinier'`` ``q*Rg < 1.3``, ``'mid'`` ``1.3 <= q*Rg < 3.5``, ``'high'``) ->
+    ``dict(median_pct, max_abs_pct, n)`` (``None`` for an empty region).
+    """
+    qv, a, b = (np.asarray(x, float) for x in (qv, A_corrected, A_uncorrected))
+    ok = np.isfinite(a) & np.isfinite(b) & (a > 0) & (b > 0)
+    qrg = qv * rg
+    ratio = np.full(len(qv), np.nan)
+    ratio[ok] = a[ok] / b[ok]
+    high = ok & (qrg >= HIGH_FROM)
+    if high.sum() < 5:
+        return None
+    change = ratio / np.median(ratio[high]) - 1.0
+    regions = {}
+    for name, lo, hi in REGIONS:
+        m = ok & (qrg >= lo) & (qrg < hi)
+        regions[name] = None if not m.any() else dict(median_pct=float(np.median(change[m]) * 100), max_abs_pct=float(np.max(np.abs(change[m])) * 100), n=int(m.sum()))
+    return dict(rg=float(rg), high_from=HIGH_FROM, regions=regions)
 
 
 def build_rank2_report(decomp):
@@ -80,5 +119,11 @@ def build_rank2_report(decomp):
                          max_move_in_band=float(info['max_move_in_band']))
         entry['rg_corrected'] = rg_conventions(xr.qv, P[:, k], Pe[:, k] if Pe is not None else None)
         entry['rg_uncorrected'] = rg_conventions(xr.qv, P1[:, k], Pe1[:, k] if Pe1 is not None else None)
+        entry['findings'] = info.findings()
+        rg_changes = [dict(convention=name, uncorrected=float(entry['rg_uncorrected'][name]['Rg']), corrected=float(v['Rg']),
+                           change_pct=float((v['Rg'] / entry['rg_uncorrected'][name]['Rg'] - 1) * 100))
+                      for name, v in entry['rg_corrected'].items() if name in entry['rg_uncorrected']]
+        rg_region = next((v['Rg'] for v in entry['rg_corrected'].values() if np.isfinite(v['Rg'])), None)
+        entry['impact'] = dict(rg=rg_changes, shape=None if rg_region is None else profile_shape_change(xr.qv, P[:, k], P1[:, k], rg_region))
         report[k] = entry
     return report

@@ -32,6 +32,12 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   On the real SAMPLE3 the result is practically unchanged (Guinier Rg 34.28 and 34.30 Å).
 
 ### Added
+- **Findings and impact of the rank-2 correction** (#423). `SoftBoundedInfo.findings()` and `BoundedLrfInfo.findings()` return `molass.LowRank.Findings.Finding` records
+  (`code`, `text` = the library's own warning text, `plain` = a plain-language text, `region` = the part of the profile affected, `check` = a suggested check, `values`);
+  `warnings_list()` and the `UserWarning` texts are unchanged (they are the `text` of the findings). `decomposition.rank2_report()` has per component `findings`
+  and `impact`: the Rg of the corrected against the uncorrected (rank 1) profile under both conventions with the change in %, and the change of the shape of A(q) against
+  rank 1 per region of `q*Rg` (Guinier < 1.3, mid 1.3-3.5, high >= 3.5; median and largest |change| in %, the ratio normalised at the high-q region because the units of
+  A differ between the methods). The report text shows the plain findings and says that the thresholds are provisional: a finding is not a risk level.
 - **`molass.LowRank.correct_interparticle(M, c, qv, error=, method=, rg=)`** (#414): the interparticle correction of one component on arrays, without a `Decomposition`
   (comparisons, tutorials, stress tests, papers). `method` is `'soft_bounded'` (default), `'bounded'`, `'simple'` (the plain c^2 fit) or `'rank1'` (no correction); the
   Synthesized splice is not offered. The concentration curve `c` is a required argument; `rg` overrides the Guinier Rg that seeds the bound (the Bounded LRF's `R`; the

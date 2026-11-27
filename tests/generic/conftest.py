@@ -42,6 +42,7 @@ FAST_MODULES = {
     "200_LRF/test_140_rg_conventions_419",
     "200_LRF/test_150_rank2_report_420",
     "200_LRF/test_160_correct_interparticle_414",
+    "200_LRF/test_170_findings_423",
     "210_Ranks/test_215_title_ranks",
     "215_Homogeneity/test_215_Homogeneity",
     "230_ErrorModel/test_010_sedlak_390",

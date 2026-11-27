@@ -85,22 +85,62 @@ class BoundedLrfInfo(dict):
                 parts.append(f"{k}=<array {shape}>")
         return f"BoundedLrfInfo({', '.join(parts)})"
 
+    def findings(self):
+        """What deserves a second look, as :class:`molass.LowRank.Findings.Finding` records (code, the library's text, a plain-language text, the part of the
+        profile affected, a suggested check, the numbers); the texts of :meth:`warnings_list` are their ``text`` (molass-library#423)."""
+        from molass.LowRank.Findings import Finding
+        out = []
+        cf = self['clipped_fraction']
+        if cf['below_b1'] > 0:
+            out.append(Finding(
+                code='clipped_below_b1',
+                text="B(q) was clipped below the cut-off, which should not happen",
+                plain="B(q) was clipped below the cut-off pi/R, where the Bounded LRF is meant to leave it alone. This should not happen and is probably a defect.",
+                region=f"below the cut-off {self['cutoff_q']:.3g} 1/A",
+                check="Report it with the data (the other rank-2 method, set_rank2_method('soft_bounded'), is not affected by this).",
+                values=dict(clipped_below_b1=float(cf['below_b1']))))
+        if cf['band'] > BAND_CLIP_WARN:
+            out.append(Finding(
+                code='clipped_band',
+                text=f"B(q) exceeds the hard-sphere envelope at {cf['band']:.0%} of the points in the band "
+                     f"{self['cutoff_q']:.3g} <= q < {self['band_upper_q']:.3g} (noise or real structure; A(q) changes by up to "
+                     f"{self['max_move_in_band']:.1%} there; the cut-off follows Rg = {self['Rg']:.1f} A)",
+                plain=f"B(q) is larger than a hard sphere allows at {cf['band']:.0%} of the points at mid q ({self['cutoff_q']:.3g}-{self['band_upper_q']:.3g} 1/A), "
+                      f"and the hard clip moves up to {self['max_move_in_band']:.1%} of A(q) there. That is noise or real structure the hard-sphere envelope does not describe.",
+                region=f"mid q, {self['cutoff_q']:.3g}-{self['band_upper_q']:.3g} 1/A",
+                check="Compare with set_rank2_method('soft_bounded') and with Ranks = 1 (rank2_report shows the Rg of both).",
+                values=dict(clipped_band=float(cf['band']), max_move_in_band=float(self['max_move_in_band']), threshold=BAND_CLIP_WARN)))
+        if self['L_penalized']:
+            out.append(Finding(
+                code='l_penalized',
+                text="the stage-1 L sits at the penalty bound 2: the envelope does not follow the shape of B(q)",
+                plain="The fit of the envelope stopped at its lower limit (L = 2): the envelope does not follow the shape of B(q), so the clip above the cut-off is only approximate.",
+                region=f"mid and high q (above {self['cutoff_q']:.3g} 1/A)",
+                check="Compare with set_rank2_method('soft_bounded'), which does not fit L.",
+                values=dict(L_stage1=float(self['L_stage1']))))
+        if self['K'] < 0 or self['L'] < 0:
+            out.append(Finding(
+                code='kl_negative',
+                text=f"K = {self['K']:.3g}, L = {self['L']:.3g}: a negative value means the stage-1 fit did not find the hard-sphere shape of B(q)",
+                plain=f"The hard-sphere fit of B(q) gave a negative amplitude or size (K = {self['K']:.2g}, L = {self['L']:.2g}): B(q) does not have the hard-sphere shape, "
+                      f"so the envelope is not meaningful.",
+                region="all q (the envelope)",
+                check="Do not rely on the Bounded LRF here; use set_rank2_method('soft_bounded') or Ranks = 1.",
+                values=dict(K=float(self['K']), L=float(self['L']))))
+        if self['q_min_used'] > Q_MIN_WARN:
+            out.append(Finding(
+                code='q_min_high',
+                text=f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on",
+                plain=f"The lowest q used is {self['q_min_used']:.3g} 1/A: the trimming cut away much of the low-q region where the interparticle effect acts, "
+                      f"so the correction has little to work on.",
+                region="low q",
+                check="Trim less at small angles (small_angle_limit) if the data allow.",
+                values=dict(q_min_used=float(self['q_min_used']), threshold=Q_MIN_WARN)))
+        return out
+
     def warnings_list(self):
         """The reasons (strings) why this result deserves a second look; the same texts are emitted as a ``UserWarning``."""
-        out = []
-        if self['clipped_fraction']['below_b1'] > 0:
-            out.append("B(q) was clipped below the cut-off, which should not happen")
-        if self['clipped_fraction']['band'] > BAND_CLIP_WARN:
-            out.append(f"B(q) exceeds the hard-sphere envelope at {self['clipped_fraction']['band']:.0%} of the points in the band "
-                       f"{self['cutoff_q']:.3g} <= q < {self['band_upper_q']:.3g} (noise or real structure; A(q) changes by up to "
-                       f"{self['max_move_in_band']:.1%} there; the cut-off follows Rg = {self['Rg']:.1f} A)")
-        if self['L_penalized']:
-            out.append("the stage-1 L sits at the penalty bound 2: the envelope does not follow the shape of B(q)")
-        if self['K'] < 0 or self['L'] < 0:
-            out.append(f"K = {self['K']:.3g}, L = {self['L']:.3g}: a negative value means the stage-1 fit did not find the hard-sphere shape of B(q)")
-        if self['q_min_used'] > Q_MIN_WARN:
-            out.append(f"the lowest q used is {self['q_min_used']:.3g} 1/A (above {Q_MIN_WARN}): the trimming left little of the low-q region the correction acts on")
-        return out
+        return [f.text for f in self.findings()]
 
 
 def clipping_summary(qv, aq, bq, bq_coerced, c1, R):
