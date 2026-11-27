@@ -32,6 +32,16 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   On the real SAMPLE3 the result is practically unchanged (Guinier Rg 34.28 and 34.30 Å).
 
 ### Added
+- **`decomposition.second_direction_report(frames=None)`** (#417; `molass.LowRank.second_direction_report(qv, M, E, frames)` on arrays): what is the second direction of a rank-2 matrix, a pure c^2 term
+  of one species (an interparticle effect) or another time profile (a second species, composition drift, aggregation, a baseline error)? SRR, SCD and SNR2 cannot tell them apart (the same
+  2-dimensional subspace); the report reads the structure inside it from the data alone (no UV curve, no structure-factor model, no known concentration curve): **SNR2** as a gate (below 3 nothing
+  is read), a **baseline-direction flag** (SNR3 and the distance of the flat vector 1/e(q) from the top-2 / top-3 subspace; floor about 0.1-0.2 % of I0), and four time-side indicators with their
+  provisional reference ranges from simulations: **closure** (a time direction in the subspace whose square is also in it), **CEF** with c = the first singular vector, **parity** of the extra
+  direction and **hysteresis** (rise against fall at equal concentration, normalised by the noise scale). Evidence, no verdict, no thresholds; the `repr` is a short text. The data of a
+  decomposition with several components need `frames=(start, stop)` of one peak. Validated on simulations (molass-researcher experiment 67: interparticle, species with a shift or a width change,
+  drift, ramp) and the real SAMPLE3 (SNR2 6.8; closure 0.048, CEF 0.962, parity 0.023: near the interparticle ranges, no baseline direction). Limits: a monomer-dimer equilibrium has the same c^2
+  time structure and reads like an interparticle effect; the reference ranges were obtained at SNR2 of 8 and more; the q side (where in q the extra signal sits) is left out because it was not robust
+  to the region edges (molass-researcher#15).
 - **Findings and impact of the rank-2 correction** (#423). `SoftBoundedInfo.findings()` and `BoundedLrfInfo.findings()` return `molass.LowRank.Findings.Finding` records
   (`code`, `text` = the library's own warning text, `plain` = a plain-language text, `region` = the part of the profile affected, `check` = a suggested check, `values`);
   `warnings_list()` and the `UserWarning` texts are unchanged (they are the `text` of the findings). `decomposition.rank2_report()` has per component `findings`

@@ -1238,6 +1238,42 @@ class Decomposition(DidYouMeanMixin):
         from molass.LowRank.Rank2Report import build_rank2_report
         return build_rank2_report(self)
 
+    def second_direction_report(self, frames=None):
+        """
+        What is the second direction of the X-ray matrix? Evidence for whether it is a pure c^2 term of one species (an interparticle effect) or another time profile
+        (a second species, composition drift, aggregation, a baseline error), from the data alone (molass-library#417).
+
+        Both an interparticle effect and two overlapping species give a rank-2 matrix, so SRR, SCD and SNR2 cannot tell them apart; this report reads the structure inside the
+        2-dimensional subspace: SNR2 (the gate), a baseline-direction flag, and four time-side indicators (closure, CEF, parity, hysteresis) with provisional reference ranges
+        from simulations. It shows evidence and no verdict; see :mod:`molass.LowRank.SecondDirection` for the definitions and the limits (a monomer-dimer equilibrium reads like an
+        interparticle effect; validated on simulations and one real data set).
+
+        Parameters
+        ----------
+        frames : (start, stop) or None
+            The frames of one component's peak (``start <= frame < stop``). Required when the decomposition has several components (the second direction is defined for one
+            species around its peak); ``None`` with one component: the frames above 5 % of the peak.
+
+        Returns
+        -------
+        molass.LowRank.SecondDirection.SecondDirectionReport
+            A ``dict`` whose ``repr`` is a short text.
+
+        Example
+        -------
+        ::
+
+            decomp = ssd.quick_decomposition(1)
+            print(decomp.second_direction_report())
+        """
+        from molass.LowRank.SecondDirection import second_direction_report
+        xr = self.xr
+        if xr.E is None:
+            raise ValueError("the second-direction report needs the stated error xr.E, which is missing")
+        if frames is None and self.num_components > 1:
+            raise ValueError(f"the decomposition has {self.num_components} components: give frames=(start, stop) of one component's peak")
+        return second_direction_report(xr.qv, xr.M, xr.E, frames=frames)
+
     def _warn_if_low_q_was_cut(self, ranks):
         """Warn when a rank-2 (interparticle) component is requested on data whose lowest-q points were
         cut at the Guinier start: the interparticle effect acts at the lowest q, so the correction then

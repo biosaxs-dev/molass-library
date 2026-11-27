@@ -26,6 +26,7 @@ Running `200_LRF` and `210_Ranks` together takes more than 25 minutes; run by fi
 | `LowRank/SoftBoundedLrf.py`, `ConcentrationRefine.py`, `LowRankInfo.get_weighted_denoised_data` | `200_LRF/test_130_soft_bounded_lrf.py` |
 | `LowRank/Rank2Report.py` (`rank2_report()`) | `200_LRF/test_150_rank2_report_420.py` (fast) |
 | `LowRank/Findings.py`, `findings()` of the infos, the impact of `rank2_report()` | `200_LRF/test_170_findings_423.py` (fast) |
+| `LowRank/SecondDirection.py` (`second_direction_report()`) | `200_LRF/test_180_second_direction_417.py` (fast) |
 | `LowRank/CorrectInterparticle.py` (`correct_interparticle`) | `200_LRF/test_160_correct_interparticle_414.py` (fast) |
 | `Guinier/RgConventions.py` (`rg_conventions`), `RgEstimator` repr / `describe()` | `200_LRF/test_140_rg_conventions_419.py` (fast) |
 | `LowRank/BoundedLrf.py` | `200_LRF/test_020_BoundedLrf.py` (fast) |
