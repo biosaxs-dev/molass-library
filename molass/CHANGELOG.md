@@ -22,6 +22,8 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   and add it to A(q) (Guinier Rg 38-54 Å instead of 33 Å in simulations). For hard-sphere-like data and the real SAMPLE3
   the result is unchanged (identical at low q); the high-q clipping that suppresses the noise of the rank-2 solution is
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
+- **A rank-2 component without the stated error now raises a `ValueError`** (#421) naming the cause and the options
+  (supply `xr.E`, or use rank 1), instead of a bare `TypeError` from the seed step; it applies to both rank-2 methods.
 
 ### Added
 - **Soft-bounded LRF** (`decomp.set_rank2_method('soft_bounded')`; **the default for rank-2 components**, `set_rank2_method('bounded')` gives the earlier Bounded LRF): a second way to correct rank-2 (interparticle) components, replacing the hard clip as the default

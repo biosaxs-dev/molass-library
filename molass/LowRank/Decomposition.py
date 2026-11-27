@@ -1290,6 +1290,10 @@ class Decomposition(DidYouMeanMixin):
         has_rank2 = any(r == 2 for r in ranks)
 
         if has_rank2:
+            if xr.E is None:
+                raise ValueError(
+                    "a rank-2 (interparticle) component needs the stated error xr.E, which is missing: "
+                    "supply the error column with the data, or use rank 1 (update_xr_ranks([1, ...])).")
             from molass.Guinier.RgEstimator import RgEstimator
 
             # Step 2a: fit seeds from the naïve P. They are always computed here from the

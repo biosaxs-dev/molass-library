@@ -131,6 +131,20 @@ def test_soft_bounded_result_is_cached_until_ranks_or_method_change():
 
 
 @pytest.mark.fast
+@pytest.mark.parametrize("method", ["soft_bounded", "bounded"])
+def test_rank2_without_the_stated_error_raises_a_clear_value_error_421(method):
+    import molass
+    from molass.Testing import simulate_tiny
+    molass.set_progress(False)
+    d = simulate_tiny().trimmed_copy().corrected_copy().quick_decomposition(num_components=1, proportions=[1])
+    d.update_xr_ranks([2])
+    d.set_rank2_method(method)
+    d.xr.E = None
+    with pytest.raises(ValueError, match="stated error"):
+        d.get_xr_matrices()
+
+
+@pytest.mark.fast
 def test_soft_bounded_through_the_decomposition_corrects_the_low_q_bend():
     import molass
     molass.set_progress(False)
