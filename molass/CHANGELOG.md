@@ -32,6 +32,12 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   On the real SAMPLE3 the result is practically unchanged (Guinier Rg 34.28 and 34.30 Å).
 
 ### Added
+- **`molass.LowRank.correct_interparticle(M, c, qv, error=, method=, rg=)`** (#414): the interparticle correction of one component on arrays, without a `Decomposition`
+  (comparisons, tutorials, stress tests, papers). `method` is `'soft_bounded'` (default), `'bounded'`, `'simple'` (the plain c^2 fit) or `'rank1'` (no correction); the
+  Synthesized splice is not offered. The concentration curve `c` is a required argument; `rg` overrides the Guinier Rg that seeds the bound (the Bounded LRF's `R`; the
+  soft-bounded LRF's `sigma` and cut-off, through the new `rg_fixed` argument of `apply_soft_bounded_lrf`, which the library path never sets). Returns an
+  `InterparticleResult` (`A`, `B`, `c_used` (the refined curve for the soft-bounded LRF), `rg`, `info`, `warnings`). For one component with the library's curve and the
+  stated error it gives the same A(q) as `Decomposition.get_xr_matrices()`.
 - **`decomposition.rank2_report()`** (#420): what the rank-2 correction did, per rank-2 component, in one call (empty when no component has rank 2). For the soft-bounded LRF:
   K, sigma, L, the cut-off, the mean weight in the mid-q region, the envelope-violation fraction, the curve refinement (ended at a bound or not, the largest change of the
   curve at peak 1), the Rg of the corrected and of the uncorrected (rank 1) profile under the two conventions of `molass.Guinier.rg_conventions`, and the warnings

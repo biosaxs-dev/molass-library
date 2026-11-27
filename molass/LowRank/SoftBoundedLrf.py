@@ -165,7 +165,7 @@ def soft_bounded_lrf(qv, M, M_denoised, E, c, rg_seed, L=L_DEFAULT, k_window=K_W
     return dict(A=A, r_hat=r_hat, r_post=r_post, tau=tau, s_r=s_r, K=K, sigma=float(sigma))
 
 
-def apply_soft_bounded_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak", warn=True):
+def apply_soft_bounded_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine_c=True, L=L_DEFAULT, k_window=K_WINDOW, k_rule="peak", warn=True, rg_fixed=None):
     """Apply the soft-bounded LRF to every rank-2 component (the counterpart of :func:`molass.LowRank.BoundedLrf.apply_bounded_lrf`).
 
     Parameters
@@ -186,6 +186,9 @@ def apply_soft_bounded_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine
         Refine the concentration curve first (default). ``False`` uses the library's curve.
     L, k_window, k_rule : see :func:`soft_bounded_lrf`.
     warn : bool
+    rg_fixed : float or None
+        Use this Rg for ``sigma`` and the cut-off instead of the Guinier Rg of the corrected first-pass profile (for a stress test of an Rg error; the library
+        path never sets it). The seed Rg still sets the range of the concentration refinement.
 
     Returns
     -------
@@ -232,7 +235,9 @@ def apply_soft_bounded_lrf(qv, M, E, C_full, P_full, ranks, seed_objects, refine
         P2 = Md2 @ np.linalg.pinv(C2)
         Pe2 = compute_propagated_error(Md2, P2[:, :1], E)
         rg = RgEstimator(np.array([qv, P2[:, 0], Pe2[:, 0]]).T).Rg
-        if rg is None or not np.isfinite(rg) or rg <= 0:
+        if rg_fixed is not None:
+            rg = float(rg_fixed)
+        elif rg is None or not np.isfinite(rg) or rg <= 0:
             rg = rg0
         e = soft_bounded_lrf(qv, Mk, Md2, E, c_ref, float(rg), L=L, k_window=k_window, k_rule=k_rule)
         A = e["A"] / scale
