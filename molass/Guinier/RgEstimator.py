@@ -21,6 +21,9 @@ _DENSS_SCORE_CAP = 0.5
 # last-resort path; a saturated (clipped) value carries no real magnitude
 # information at all and is scored 0.
 _FALLBACK_SCORE_CAP = 0.2
+# the fit score below which the Rg is reported with a note that it depends on the interval (provisional: 0.51 for the uncorrected
+# SAMPLE3 peak profile, 0.79 for the corrected one; molass-library#419)
+LOW_SCORE_WARN = 0.6
 
 def _guinier_fit_with_quality(data, ne):
     """Same window-shifting logic as DENSS's ``calc_rg_I0_by_guinier``, reimplemented
@@ -119,6 +122,50 @@ class RgEstimator(SimpleGuinier):
             self.guinier_start = None
         if not hasattr(self, 'guinier_stop'):
             self.guinier_stop = None
+
+    def _interval(self):
+        """The Guinier interval that produced ``Rg`` as a dict (``min_q``, ``max_q``, ``n_points``, ``qrg_max``); values are ``None`` when there is none."""
+        min_q, max_q = getattr(self, 'min_q', None), getattr(self, 'max_q', None)
+        rg = getattr(self, 'Rg', None)
+        if min_q is None or max_q is None:
+            return dict(min_q=None, max_q=None, n_points=None, qrg_max=None)
+        q = np.asarray(self.data)[:, 0]
+        n = int(np.count_nonzero((q >= min_q) & (q <= max_q)))
+        qrg_max = float(max_q * rg) if rg is not None and np.isfinite(rg) else None
+        return dict(min_q=float(min_q), max_q=float(max_q), n_points=n, qrg_max=qrg_max)
+
+    @property
+    def low_score(self):
+        """True when the fit score is below ``LOW_SCORE_WARN``: the Rg then depends on the interval (see :func:`molass.Guinier.rg_conventions`)."""
+        return self.score is not None and bool(self.score < LOW_SCORE_WARN)
+
+    def describe(self):
+        """Which points the Rg comes from: Rg, I0, the q interval and its number of points, ``q*Rg`` at its upper end, ``rg_source`` and ``score``,
+        with a note when the score is low (molass-library#419)."""
+        iv = self._interval()
+        lines = [f"Rg = {self.Rg:.2f} A" if self.Rg is not None else "Rg = None",
+                 f"I0 = {self.Iz:.4g}" if getattr(self, 'Iz', None) is not None else "I0 = None"]
+        if iv['min_q'] is None:
+            lines.append("interval: none")
+        else:
+            lines.append(f"interval: q = {iv['min_q']:.4f}-{iv['max_q']:.4f} 1/A, {iv['n_points']} points, q*Rg at the upper end = {iv['qrg_max']:.2f}"
+                         if iv['qrg_max'] is not None else f"interval: q = {iv['min_q']:.4f}-{iv['max_q']:.4f} 1/A, {iv['n_points']} points")
+        lines.append(f"rg_source = {self.rg_source!r}, score = {self.score:.2f}" if self.score is not None else f"rg_source = {self.rg_source!r}")
+        if self.low_score:
+            lines.append(f"low fit score (< {LOW_SCORE_WARN}): the Rg depends on the interval used; compare conventions with molass.Guinier.rg_conventions(q, I, e)")
+        return "\n".join(lines)
+
+    def __repr__(self):
+        iv = self._interval()
+        parts = [f"Rg={self.Rg:.2f} A" if self.Rg is not None else "Rg=None"]
+        if iv['min_q'] is not None:
+            parts.append(f"q={iv['min_q']:.4f}-{iv['max_q']:.4f} ({iv['n_points']} points)")
+            if iv['qrg_max'] is not None:
+                parts.append(f"q*Rg max={iv['qrg_max']:.2f}")
+        parts.append(f"source={self.rg_source!r}")
+        if self.score is not None:
+            parts.append(f"score={self.score:.2f}" + (" (low)" if self.low_score else ""))
+        return "RgEstimator(" + ", ".join(parts) + ")"
 
     def _try_relaxed_legacy(self):
         # guinier_interval()/make_cadidate_pairs() read self.worst_quality, which is
