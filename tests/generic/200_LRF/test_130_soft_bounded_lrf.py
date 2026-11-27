@@ -43,6 +43,29 @@ def test_weighted_denoising_equals_plain_for_equal_errors_and_resists_a_noisy_ro
 
 
 @pytest.mark.fast
+def test_compute_lowrank_matrices_whitens_by_the_stated_error_418():
+    from molass.LowRank.LowRankInfo import compute_lowrank_matrices
+
+    class _Curve:
+        def __init__(self, y): self.y = y
+        def get_xy(self): return np.arange(len(self.y)), self.y
+
+    rng = np.random.default_rng(1)
+    c = _curve()
+    M0 = np.outer(rng.uniform(1, 2, 60), c) * 50
+    E = np.full_like(M0, 1.0); E[:3] = 40.0                              # the noisy lowest q rows
+    M = M0 + E * rng.standard_normal(M0.shape)
+    cc = [_Curve(c)]
+    M_w, *_ = compute_lowrank_matrices(M, cc, E, [1])
+    np.testing.assert_allclose(M_w, get_weighted_denoised_data(M, E, 1))
+    M_n, *_ = compute_lowrank_matrices(M, cc, None, [1])                  # no stated error: the plain SVD as before
+    np.testing.assert_allclose(M_n, get_denoised_data(M, 1))
+    M_p, *_ = compute_lowrank_matrices(M, cc, E, [1], whiten=False)
+    np.testing.assert_allclose(M_p, get_denoised_data(M, 1))
+    assert np.linalg.norm(M_w[10:] - M0[10:]) < np.linalg.norm(M_p[10:] - M0[10:])
+
+
+@pytest.mark.fast
 def test_refinement_repairs_a_distorted_concentration_curve():
     fr = _frames(noise_scale=1.0)
     c_true = fr.c

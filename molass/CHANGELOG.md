@@ -24,6 +24,12 @@ Detect a feature instead of comparing versions: `hasattr(molass, "fork_analysis"
   unchanged. Returned `bq_bounds` is still the envelope at all q; only the clipping is restricted.
 - **A rank-2 component without the stated error now raises a `ValueError`** (#421) naming the cause and the options
   (supply `xr.E`, or use rank 1), instead of a bare `TypeError` from the seed step; it applies to both rank-2 methods.
+- **The SVD denoising of the X-ray matrix is whitened** (#418). `compute_lowrank_matrices` (so `get_xr_matrices` for every rank)
+  divides each q row by its median stated error before the rank-k SVD (`get_weighted_denoised_data`), when `xr.E` is available;
+  without `E`, and for the UV matrix, the plain SVD is used as before (`compute_lowrank_matrices(..., whiten=False)` gives the plain SVD).
+  The stated error varies strongly with q, so the unweighted SVD could be dominated by the noisy lowest-q rows: in 14 simulated
+  truths the low-q error of A(q) was 0.072 against 0.017 when the lowest q (about 0.008) was kept, and the same when it was not.
+  On the real SAMPLE3 the result is practically unchanged (Guinier Rg 34.28 and 34.30 Å).
 
 ### Added
 - **Soft-bounded LRF** (`decomp.set_rank2_method('soft_bounded')`; **the default for rank-2 components**, `set_rank2_method('bounded')` gives the earlier Bounded LRF): a second way to correct rank-2 (interparticle) components, replacing the hard clip as the default

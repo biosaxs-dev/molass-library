@@ -90,6 +90,10 @@ def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
         Possible keys include:
             - svd_rank: int or None
                 The rank for the SVD used in the low rank approximation. If None, it will be set to the sum of ranks.
+            - whiten: bool, optional
+                If True (default) and ``E`` is given, each q row is divided by its median error before the SVD
+                (:func:`get_weighted_denoised_data`, molass-library#418); the plain SVD is used when ``E`` is None or
+                ``whiten=False``.
     Returns
     -------
     M_ : 2D array-like
@@ -112,7 +116,7 @@ def compute_lowrank_matrices(M, ccurves, E, ranks, **kwargs):
         from molass.Except.ExceptionTypes import InadequateUseError
         raise InadequateUseError("svd_rank(%d) must not be less than number of components(%d)" % (svd_rank, rank))
     
-    M_ = get_denoised_data(M, rank=svd_rank)
+    M_ = get_denoised_data(M, rank=svd_rank) if (E is None or not kwargs.get('whiten', True)) else get_weighted_denoised_data(M, E, svd_rank)
     cy_list = [c.get_xy()[1] for c in ccurves]
     for k, r in enumerate(ranks):
         if r > 1:

@@ -1529,7 +1529,8 @@ class Decomposition(DidYouMeanMixin):
         from molass.LowRank.LowRankInfo import compute_lowrank_matrices
 
         uv = self.uv
-        return compute_lowrank_matrices(uv.M, self.uv_ccurves, uv.E, self.uv_ranks, debug=debug)
+        # the whitened SVD is validated for the X-ray data only (molass-library#418)
+        return compute_lowrank_matrices(uv.M, self.uv_ccurves, uv.E, self.uv_ranks, whiten=False, debug=debug)
 
     def get_uv_components(self, debug=False):
         """
