@@ -48,6 +48,19 @@ FAST_MODULES = {
     "test_log_streams",
 }
 
+# Tests that take more than about 30 s (molass-library#422): (module, test function), all parametrizations.
+# `pytest tests/generic -m "not slow"` leaves them out; the durations are in tests/generic/README.md.
+SLOW_TESTS = {
+    ("210_Ranks/test_040_getter_order_independence", "test_getters_are_order_independent"),   # 259 s (rank2), 157 s (rank1)
+    ("210_Ranks/test_010_Ranks", "test_010_compute_scds"),                                      # 44 s
+    ("210_Ranks/test_030_rg_call_order", "test_get_rgs_independent_of_call_order"),             # 33-60 s
+}
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "fast: runs in seconds on bundled data (see FAST_MODULES); CI runs it on every push")
+    config.addinivalue_line("markers", "slow: takes more than 30 s (see SLOW_TESTS); skip with -m 'not slow'")
+
 
 def pytest_collection_modifyitems(items):
     for item in items:
@@ -57,3 +70,5 @@ def pytest_collection_modifyitems(items):
         module = path.split("/tests/generic/", 1)[1].removesuffix(".py")
         if module in FAST_MODULES:
             item.add_marker(pytest.mark.fast)
+        if (module, item.originalname) in SLOW_TESTS:
+            item.add_marker(pytest.mark.slow)
